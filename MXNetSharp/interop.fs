@@ -189,7 +189,7 @@ module MXSymbol =
                     for i = 0 to int numArgs - 1 do 
                         {
                             Name = readString i argNames
-                            Description = readString i description
+                            Description = readString i arg_descriptions
                             TypeInfo = readString i arg_type_infos
                         }
                 |]
