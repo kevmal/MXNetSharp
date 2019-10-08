@@ -623,7 +623,7 @@ module MXPred =
     /// The returned shape_data and shape_ndim is only valid before next call to MXPred function.</summary>
     /// <param name="handle">The handle of the predictor.</param>
     /// <param name="index">The index of output node, set to 0 if there is only one output.</param>
-    let getOutputShape handle index shape_data shape_ndim : uint32[] = 
+    let getOutputShape handle index : uint32[] = 
         let mutable shape_data = 0n
         let mutable shape_ndim = un
         MXPredGetOutputShape(handle, index, &shape_data, &shape_ndim) |> throwOnError "MXPredGetOutputShape"
