@@ -42,7 +42,7 @@ type NDArrayHandle = IntPtr
 /// <summary>handle to a mxnet narray function that changes NDArray</summary>
 type FunctionHandle = IntPtr
 /// <summary>handle to a function that takes param and creates symbol</summary>
-type AtomicSymbolCreator = IntPtr
+type AtomicSymbolCreatorHandle = IntPtr
 /// <summary>handle to cached operator</summary>
 type CachedOpHandle = IntPtr
 /// <summary>handle to a symbol that can be bind as operator</summary>
@@ -539,7 +539,6 @@ extern int MXNDArrayLoad(string fname, [<Out>] uint32& out_size, [<Out>] IntPtr&
 extern int MXNDArrayLoadFromBuffer__(IntPtr ndarray_buffer, size_t size, uint32[] out_size, [<Out>] NDArrayHandle& out_arr, [<Out>] uint32& out_name_size, [<Out>] IntPtr& out_names)
 
 /// <summary>Perform a synchronize copy from a continugous CPU memory region.
-///
 /// This function will call WaitToWrite before the copy is performed.
 /// This is useful to copy data from existing memory region that are
 /// not wrapped by NDArray(thus dependency not being tracked).</summary>
@@ -547,7 +546,7 @@ extern int MXNDArrayLoadFromBuffer__(IntPtr ndarray_buffer, size_t size, uint32[
 /// <param name="data">the data source to copy from.</param>
 /// <param name="size">the memory size we want to copy from.</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArraySyncCopyFromCPU__(NDArrayHandle handle, IntPtr data, size_t size)
+extern int MXNDArraySyncCopyFromCPU(NDArrayHandle handle, IntPtr data, size_t size)
 
 /// <summary>Perform a synchronize copyto a continugous CPU memory region.
 ///
@@ -558,7 +557,7 @@ extern int MXNDArraySyncCopyFromCPU__(NDArrayHandle handle, IntPtr data, size_t 
 /// <param name="data">the data source to copy into.</param>
 /// <param name="size">the memory size we want to copy into.</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArraySyncCopyToCPU__(NDArrayHandle handle, IntPtr data, size_t size)
+extern int MXNDArraySyncCopyToCPU(NDArrayHandle handle, IntPtr data, size_t size)
 
 /// <summary>Copy src.data() to dst.data() if i = -1, else dst.aux_data(i) if i >= 0
 ///This function blocks. Do not use it in performance critical code.</summary>
@@ -566,33 +565,33 @@ extern int MXNDArraySyncCopyToCPU__(NDArrayHandle handle, IntPtr data, size_t si
 /// <param name="handle_src">handle of a src ndarray which has default storage type</param>
 /// <param name="i">dst data blob indicator</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArraySyncCopyFromNDArray__(NDArrayHandle handle_dst, [<Out>] NDArrayHandle& handle_src, int i)
+extern int MXNDArraySyncCopyFromNDArray__(NDArrayHandle handle_dst, NDArrayHandle& handle_src, int i)
 
 /// <summary>check whether the NDArray format is valid</summary>
 /// <param name="full_check">if `True`, rigorous check, O(N) operations
 ///   Otherwise basic check, O(1) operations</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArraySyncCheckFormat__(NDArrayHandle handle, bool full_check)
+extern int MXNDArraySyncCheckFormat(NDArrayHandle handle, bool full_check)
 
 /// <summary>Wait until all the pending writes with respect NDArray are finished.
 /// Always call this before read data out synchronizely.</summary>
 /// <param name="handle">the NDArray handle</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayWaitToRead__(NDArrayHandle handle)
+extern int MXNDArrayWaitToRead(NDArrayHandle handle)
 
 /// <summary>Wait until all the pending read/write with respect NDArray are finished.
 /// Always call this before write data into NDArray synchronizely.</summary>
 /// <param name="handle">the NDArray handle</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayWaitToWrite__(NDArrayHandle handle)
+extern int MXNDArrayWaitToWrite(NDArrayHandle handle)
 
 /// <summary>wait until all delayed operations in
 ///  the system is completed</summary>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayWaitAll__()
+extern int MXNDArrayWaitAll()
 
 /// <summary>free the narray handle</summary>
 /// <param name="handle">the handle to be freed</param>
@@ -645,6 +644,8 @@ extern int MXNDArrayReshape(NDArrayHandle handle, int ndim, int[] dims, [<Out>] 
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXNDArrayReshape64(NDArrayHandle handle, int ndim, dim_t[] dims, bool reverse, [<Out>] NDArrayHandle& out)
 
+
+(* DEPRECATED and excluded
 /// <summary>DEPRECATED. Use MXNDArrayGetShapeEx instead.
 ///get the shape of the array</summary>
 /// <param name="handle">the handle to the narray</param>
@@ -656,6 +657,7 @@ extern int MXNDArrayGetShape__(NDArrayHandle handle, uint32[] out_dim, uint32[]&
 
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXNDArrayGetShape64__(NDArrayHandle handle, int[] out_dim, int64[]& out_pdata)
+*)
 
 /// <summary>get the shape of the array</summary>
 /// <param name="handle">the handle to the narray</param>
@@ -673,7 +675,7 @@ extern int MXNDArrayGetShapeEx64(NDArrayHandle handle, [<Out>] int& out_dim, [<O
 /// <param name="out_pdata">pointer holder to get pointer of data</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayGetData__(NDArrayHandle handle, IntPtr out_pdata)
+extern int MXNDArrayGetData(NDArrayHandle handle, [<Out>] IntPtr& out_pdata)
 
 /// <summary>Create a reference view of NDArray that
 /// represents as DLManagedTensor
@@ -685,8 +687,10 @@ extern int MXNDArrayGetData__(NDArrayHandle handle, IntPtr out_pdata)
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXNDArrayToDLPack__(NDArrayHandle handle, DLManagedTensorHandle[] out_dlpack)
 
-/// <summary>DEPRECATED. Use MXNDArrayFromDLPackEx instead.
 
+
+(* DEPRECATED and excluded
+/// <summary>DEPRECATED. Use MXNDArrayFromDLPackEx instead.
 ///
 ///This allows us to create a NDArray using the memory
 ///allocated by an external deep learning framework
@@ -699,6 +703,8 @@ extern int MXNDArrayToDLPack__(NDArrayHandle handle, DLManagedTensorHandle[] out
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXNDArrayFromDLPack__(DLManagedTensorHandle dlpack, [<Out>] NDArrayHandle& out_handle)
+*)
+
 
 /// <summary>Create a NDArray backed by a dlpack tensor.
 ///
@@ -725,7 +731,7 @@ extern int MXNDArrayCallDLPackDeleter__(DLManagedTensorHandle dlpack)
 /// <param name="out_dtype">pointer holder to get type of data</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayGetDType__(NDArrayHandle handle, int[] out_dtype)
+extern int MXNDArrayGetDType(NDArrayHandle handle, [<Out>] int& out_dtype)
 
 /// <summary>get the type of the ith aux data in NDArray</summary>
 /// <param name="handle">the handle to the narray</param>
@@ -759,7 +765,7 @@ extern int MXNDArrayGetDataNDArray__(NDArrayHandle handle, [<Out>] NDArrayHandle
 /// <param name="out_dev_id">the output device id</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayGetContext__(NDArrayHandle handle, int[] out_dev_type, int& out_dev_id)
+extern int MXNDArrayGetContext(NDArrayHandle handle, [<Out>] int& out_dev_type, [<Out>] int& out_dev_id)
 
 /// <summary>return gradient buffer attached to this NDArray</summary>
 /// <param name="handle">NDArray handle</param>
@@ -873,7 +879,7 @@ extern int MXFuncInvokeEx__(FunctionHandle ``fun``, NDArrayHandle[] use_vars, fl
 /// <param name="param_vals">values for keyword parameters</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXImperativeInvoke__(AtomicSymbolCreator creator, int num_inputs, NDArrayHandle[] inputs, int[] num_outputs, NDArrayHandle[]& outputs, int num_params, string[] param_keys, string[] param_vals)
+extern int MXImperativeInvoke(AtomicSymbolCreatorHandle creator, int num_inputs, NDArrayHandle[] inputs, int& num_outputs, NDArrayHandle& outputs, int num_params, string[] param_keys, string[] param_vals)
 
 /// <summary>invoke a nnvm op and imperative function</summary>
 /// <param name="creator">the op</param>
@@ -887,7 +893,7 @@ extern int MXImperativeInvoke__(AtomicSymbolCreator creator, int num_inputs, NDA
 /// <param name="out_stypes">output ndarrays' stypes</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXImperativeInvokeEx__(AtomicSymbolCreator creator, int num_inputs, NDArrayHandle[] inputs, int[] num_outputs, NDArrayHandle[]& outputs, int num_params, string[] param_keys, string[] param_vals, int[]& out_stypes)
+extern int MXImperativeInvokeEx__(AtomicSymbolCreatorHandle creator, int num_inputs, NDArrayHandle[] inputs, int[] num_outputs, NDArrayHandle[]& outputs, int num_params, string[] param_keys, string[] param_vals, int[]& out_stypes)
 
 /// <summary>set whether to record operator for autograd</summary>
 /// <param name="is_recording">1 when recording, 0 when not recording.</param>
@@ -1022,7 +1028,7 @@ extern int MXSymbolListAtomicSymbolCreators([<Out>] uint32& out_size, [<Out>] In
 /// <param name="creator">the AtomicSymbolCreator.</param>
 /// <param name="name">The returned name of the creator.</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolGetAtomicSymbolName(AtomicSymbolCreator creator, [<Out>] IntPtr& name)
+extern int MXSymbolGetAtomicSymbolName(AtomicSymbolCreatorHandle creator, [<Out>] IntPtr& name)
 
 /// <summary>Get the input symbols of the graph.</summary>
 /// <param name="sym">The graph.</param>
@@ -1058,7 +1064,7 @@ extern int MXSymbolCutSubgraph__(SymbolHandle sym, SymbolHandle[]& inputs, int[]
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXSymbolGetAtomicSymbolInfo(
-    AtomicSymbolCreator creator, 
+    AtomicSymbolCreatorHandle creator, 
     [<Out>] IntPtr& name, 
     [<Out>] IntPtr& description, 
     [<Out>] uint32& num_args,
@@ -1076,7 +1082,7 @@ extern int MXSymbolGetAtomicSymbolInfo(
 /// <param name="out">pointer to the created symbol handle</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolCreateAtomicSymbol__(AtomicSymbolCreator creator, uint32 num_param, string[] keys, string[] vals, SymbolHandle[] out)
+extern int MXSymbolCreateAtomicSymbol__(AtomicSymbolCreatorHandle creator, uint32 num_param, string[] keys, string[] vals, SymbolHandle[] out)
 
 /// <summary>Create a Variable Symbol.</summary>
 /// <param name="name">name of the variable</param>
