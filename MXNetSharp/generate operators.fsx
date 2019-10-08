@@ -964,6 +964,33 @@ let processDefinedType (t : UnionType) (arg : ProcessedArg) =
                     |]
                 TypeString = ""
             } 
+        | Cases ["Float16"; "Float32"; "Float64"; "Int32"; "Int64"; "Int8"; "Uint8"] ->  
+            {
+                Name = "IntOrFloatDType"
+                Cases = 
+                    [|
+                        "Float16", "float16"
+                        "Float32", "float32"
+                        "Float64", "float64"
+                        "Int32", "int32"
+                        "Int64", "int64"
+                        "Int8", "int8"
+                        "UInt8", "uint8"
+                    |]
+                TypeString = ""
+            } 
+            
+        | Cases ["Float16"; "Float32"; "Float64"] -> 
+            {
+                Name = "FloatDType"
+                Cases = 
+                    [|
+                        "Float16", "float16"
+                        "Float32", "float32"
+                        "Float64", "float64"
+                    |]
+                TypeString = ""
+            } 
         | Name "ActType" & (_,a) when a.Arg.AtomicSymbolInfo.Name = "LeakyReLU" -> 
             {t with Name = "LeakyReLUType"}
         | (Name "Mode" | Name "OutType" | Name "Dtype" | Name "Layout" | Name "TransformType") & (_,{ProcessedAtomicSymbol = Some pas}) -> 
@@ -1072,7 +1099,7 @@ let generatedLines =
                 [
                     ""
                     "// ********************************************************************************************************"
-                    sprintf "// Exception %s" (e.GetType().Name)
+                    sprintf "// EXCEPTION" 
                     sprintf "// %s" e.Message
                     yield! (sprintf "%A" x) |> splitLines |> Array.map (fun x -> "// " + x)
                     "// ********************************************************************************************************"
@@ -1081,7 +1108,11 @@ let generatedLines =
             if skipped.Contains x.Name then 
                 skip.Add code
             else
-                errors.Add code
+                errors.Add 
+                    [
+                        yield "// ========================================== Not Skipped =========================================="
+                        yield! code
+                    ]
         | Ok(cb) when skipped.Contains cb.AtomicSymbolInfo.Name->     
             cb.TypeDefinitions
             |> List.map snd

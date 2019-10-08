@@ -151,27 +151,7 @@ type PoolingLayout =
             | NHWC -> "NHWC"
             | NWC -> "NWC"
 
-type SoftmaxDtype = 
-    | Float16
-    | Float32
-    | Float64
-    override x.ToString() =
-        match x with
-            | Float16 -> "float16"
-            | Float32 -> "float32"
-            | Float64 -> "float64"
-
-type SoftminDtype = 
-    | Float16
-    | Float32
-    | Float64
-    override x.ToString() =
-        match x with
-            | Float16 -> "float16"
-            | Float32 -> "float32"
-            | Float64 -> "float64"
-
-type LogSoftmaxDtype = 
+type FloatDType = 
     | Float16
     | Float32
     | Float64
@@ -279,76 +259,6 @@ type ContribRequantizeOutType =
             | Int8 -> "int8"
             | Uint8 -> "uint8"
 
-type SampleUniformDtype = 
-    | Float16
-    | Float32
-    | Float64
-    override x.ToString() =
-        match x with
-            | Float16 -> "float16"
-            | Float32 -> "float32"
-            | Float64 -> "float64"
-
-type SampleNormalDtype = 
-    | Float16
-    | Float32
-    | Float64
-    override x.ToString() =
-        match x with
-            | Float16 -> "float16"
-            | Float32 -> "float32"
-            | Float64 -> "float64"
-
-type SampleGammaDtype = 
-    | Float16
-    | Float32
-    | Float64
-    override x.ToString() =
-        match x with
-            | Float16 -> "float16"
-            | Float32 -> "float32"
-            | Float64 -> "float64"
-
-type SampleExponentialDtype = 
-    | Float16
-    | Float32
-    | Float64
-    override x.ToString() =
-        match x with
-            | Float16 -> "float16"
-            | Float32 -> "float32"
-            | Float64 -> "float64"
-
-type SamplePoissonDtype = 
-    | Float16
-    | Float32
-    | Float64
-    override x.ToString() =
-        match x with
-            | Float16 -> "float16"
-            | Float32 -> "float32"
-            | Float64 -> "float64"
-
-type SampleNegativeBinomialDtype = 
-    | Float16
-    | Float32
-    | Float64
-    override x.ToString() =
-        match x with
-            | Float16 -> "float16"
-            | Float32 -> "float32"
-            | Float64 -> "float64"
-
-type SampleGeneralizedNegativeBinomialDtype = 
-    | Float16
-    | Float32
-    | Float64
-    override x.ToString() =
-        match x with
-            | Float16 -> "float16"
-            | Float32 -> "float32"
-            | Float64 -> "float64"
-
 type SampleMultinomialDtype = 
     | Float16
     | Float32
@@ -385,14 +295,14 @@ type Normalization =
             | Null -> "null"
             | Valid -> "valid"
 
-type AmpCastDtype = 
+type IntOrFloatDType = 
     | Float16
     | Float32
     | Float64
     | Int32
     | Int64
     | Int8
-    | Uint8
+    | UInt8
     override x.ToString() =
         match x with
             | Float16 -> "float16"
@@ -401,7 +311,7 @@ type AmpCastDtype =
             | Int32 -> "int32"
             | Int64 -> "int64"
             | Int8 -> "int8"
-            | Uint8 -> "uint8"
+            | UInt8 -> "uint8"
 
 type PickMode = 
     | Clip
@@ -447,60 +357,6 @@ type ForwardStype =
             | Default -> "default"
             | RowSparse -> "row_sparse"
 
-type CastDtype = 
-    | Float16
-    | Float32
-    | Float64
-    | Int32
-    | Int64
-    | Int8
-    | Uint8
-    override x.ToString() =
-        match x with
-            | Float16 -> "float16"
-            | Float32 -> "float32"
-            | Float64 -> "float64"
-            | Int32 -> "int32"
-            | Int64 -> "int64"
-            | Int8 -> "int8"
-            | Uint8 -> "uint8"
-
-type EmbeddingDtype = 
-    | Float16
-    | Float32
-    | Float64
-    | Int32
-    | Int64
-    | Int8
-    | Uint8
-    override x.ToString() =
-        match x with
-            | Float16 -> "float16"
-            | Float32 -> "float32"
-            | Float64 -> "float64"
-            | Int32 -> "int32"
-            | Int64 -> "int64"
-            | Int8 -> "int8"
-            | Uint8 -> "uint8"
-
-type ContribSparseEmbeddingDtype = 
-    | Float16
-    | Float32
-    | Float64
-    | Int32
-    | Int64
-    | Int8
-    | Uint8
-    override x.ToString() =
-        match x with
-            | Float16 -> "float16"
-            | Float32 -> "float32"
-            | Float64 -> "float64"
-            | Int32 -> "int32"
-            | Int64 -> "int64"
-            | Int8 -> "int8"
-            | Uint8 -> "uint8"
-
 type TakeMode = 
     | Clip
     | Raise
@@ -510,24 +366,6 @@ type TakeMode =
             | Clip -> "clip"
             | Raise -> "raise"
             | Wrap -> "wrap"
-
-type OneHotDtype = 
-    | Float16
-    | Float32
-    | Float64
-    | Int32
-    | Int64
-    | Int8
-    | Uint8
-    override x.ToString() =
-        match x with
-            | Float16 -> "float16"
-            | Float32 -> "float32"
-            | Float64 -> "float64"
-            | Int32 -> "int32"
-            | Int64 -> "int64"
-            | Int8 -> "int8"
-            | Uint8 -> "uint8"
 
 type RetTyp = 
     | Both
@@ -3390,7 +3228,7 @@ type NDArray() =
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="temperature">Temperature parameter in softmax</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmax(data : NDArray, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] temperature : float Nullable, [<Optional>] dtype : SoftmaxDtype) =
+    static member Softmax(data : NDArray, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] temperature : float Nullable, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmax"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
@@ -3427,7 +3265,7 @@ type NDArray() =
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="temperature">Temperature parameter in softmax</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmax(data : NDArray, ?axis : int, ?temperature : float, ?dtype : SoftmaxDtype) =
+    static member Softmax(data : NDArray, ?axis : int, ?temperature : float, ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmax"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
@@ -3474,7 +3312,7 @@ type NDArray() =
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="temperature">Temperature parameter in softmax</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmin(data : NDArray, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] temperature : float Nullable, [<Optional>] dtype : SoftminDtype) =
+    static member Softmin(data : NDArray, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] temperature : float Nullable, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmin"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
@@ -3512,7 +3350,7 @@ type NDArray() =
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="temperature">Temperature parameter in softmax</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmin(data : NDArray, ?axis : int, ?temperature : float, ?dtype : SoftminDtype) =
+    static member Softmin(data : NDArray, ?axis : int, ?temperature : float, ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmin"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
@@ -3549,7 +3387,7 @@ type NDArray() =
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="temperature">Temperature parameter in softmax</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member LogSoftmax(data : NDArray, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] temperature : float Nullable, [<Optional>] dtype : LogSoftmaxDtype) =
+    static member LogSoftmax(data : NDArray, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] temperature : float Nullable, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "log_softmax"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
@@ -3577,7 +3415,7 @@ type NDArray() =
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="temperature">Temperature parameter in softmax</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member LogSoftmax(data : NDArray, ?axis : int, ?temperature : float, ?dtype : LogSoftmaxDtype) =
+    static member LogSoftmax(data : NDArray, ?axis : int, ?temperature : float, ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "log_softmax"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
@@ -4952,7 +4790,7 @@ type NDArray() =
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     /// <param name="high">Upper bounds of the distributions.</param>
-    static member SampleUniform(low : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : SampleUniformDtype, high : NDArray) =
+    static member SampleUniform(low : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType, high : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_sample_uniform"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|low.NDArrayHandle; high.NDArrayHandle|]
@@ -4992,7 +4830,7 @@ type NDArray() =
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     /// <param name="sigma">Standard deviations of the distributions.</param>
-    static member SampleNormal(mu : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : SampleNormalDtype, sigma : NDArray) =
+    static member SampleNormal(mu : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType, sigma : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_sample_normal"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|mu.NDArrayHandle; sigma.NDArrayHandle|]
@@ -5032,7 +4870,7 @@ type NDArray() =
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     /// <param name="beta">Beta (scale) parameters of the distributions.</param>
-    static member SampleGamma(alpha : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : SampleGammaDtype, beta : NDArray) =
+    static member SampleGamma(alpha : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType, beta : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_sample_gamma"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|alpha.NDArrayHandle; beta.NDArrayHandle|]
@@ -5070,7 +4908,7 @@ type NDArray() =
     /// <param name="lam">Lambda (rate) parameters of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member SampleExponential(lam : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : SampleExponentialDtype) =
+    static member SampleExponential(lam : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_exponential"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lam.NDArrayHandle|]
@@ -5110,7 +4948,7 @@ type NDArray() =
     /// <param name="lam">Lambda (rate) parameters of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member SamplePoisson(lam : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : SamplePoissonDtype) =
+    static member SamplePoisson(lam : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_poisson"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lam.NDArrayHandle|]
@@ -5152,7 +4990,7 @@ type NDArray() =
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     /// <param name="p">Failure probabilities in each experiment.</param>
-    static member SampleNegativeBinomial(k : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : SampleNegativeBinomialDtype, p : NDArray) =
+    static member SampleNegativeBinomial(k : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType, p : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_sample_negative_binomial"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|k.NDArrayHandle; p.NDArrayHandle|]
@@ -5194,7 +5032,7 @@ type NDArray() =
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     /// <param name="alpha">Alpha (dispersion) parameters of the distributions.</param>
-    static member SampleGeneralizedNegativeBinomial(mu : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : SampleGeneralizedNegativeBinomialDtype, alpha : NDArray) =
+    static member SampleGeneralizedNegativeBinomial(mu : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType, alpha : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_sample_generalized_negative_binomial"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|mu.NDArrayHandle; alpha.NDArrayHandle|]
@@ -5934,7 +5772,7 @@ type NDArray() =
     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
-    static member AmpCast(data : NDArray, dtype : AmpCastDtype) =
+    static member AmpCast(data : NDArray, dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "amp_cast"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
@@ -8437,7 +8275,7 @@ type NDArray() =
     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L634</summary>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
-    static member Cast(data : NDArray, dtype : CastDtype) =
+    static member Cast(data : NDArray, dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "Cast"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
@@ -9802,7 +9640,7 @@ type NDArray() =
                             weight : NDArray, 
                             inputDim : int, 
                             outputDim : int, 
-                            [<Optional>] dtype : EmbeddingDtype, 
+                            [<Optional>] dtype : IntOrFloatDType, 
                             [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
         let creator = AtomicSymbolCreator.FromName "Embedding"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
@@ -9873,7 +9711,7 @@ type NDArray() =
                                          weight : NDArray, 
                                          inputDim : int, 
                                          outputDim : int, 
-                                         [<Optional>] dtype : ContribSparseEmbeddingDtype, 
+                                         [<Optional>] dtype : IntOrFloatDType, 
                                          [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_SparseEmbedding"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
@@ -10022,7 +9860,7 @@ type NDArray() =
                          depth : int, 
                          onValue : double, 
                          offValue : double, 
-                         [<Optional>] dtype : OneHotDtype) =
+                         [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "one_hot"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|indices.NDArrayHandle|]
@@ -13136,7 +12974,7 @@ type NDArray() =
         outputs
 
 // ********************************************************************************************************
-// Exception Exception
+// EXCEPTION
 // Unexpected SymbolOrNDArray [|Symbol; ManySymbolOrNDArray|]
 // { Name = "_foreach"
 //   Description =
@@ -13177,7 +13015,7 @@ type NDArray() =
 
 
 // ********************************************************************************************************
-// Exception Exception
+// EXCEPTION
 // Unexpected SymbolOrNDArray [|Symbol; ManySymbolOrNDArray|]
 // { Name = "_while_loop"
 //   Description =
@@ -13226,7 +13064,7 @@ type NDArray() =
 
 
 // ********************************************************************************************************
-// Exception Exception
+// EXCEPTION
 // Unexpected SymbolOrNDArray [|Symbol; ManySymbolOrNDArray|]
 // { Name = "_cond"
 //   Description =
