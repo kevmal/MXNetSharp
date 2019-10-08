@@ -342,7 +342,7 @@ let indent n lines =
 
 let comment lines = lines |> List.map (fun x -> "// " + x) 
 
-let toCode ndarray (x : ProcessedAtomicSymbol) =
+let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
     let args = 
         x.Args 
         |> Seq.filter (fun x -> match x.CodeGenerator with ConstantArg _ -> false | _ -> true)
@@ -392,7 +392,15 @@ let toCode ndarray (x : ProcessedAtomicSymbol) =
                     | _ -> None
                 )
             |> arr
-        else failwith "add symbol support"
+        else 
+            x.Args 
+            |> Array.choose 
+                (fun x ->
+                    match x.SymbolOrNDArray with 
+                    | Some NDArray | Some SymbolOrNDArray -> Some(sprintf "%s.SymbolHandle" x.Name)
+                    | _ -> None
+                )
+            |> arr
     let paramNamesStr = 
         x.Args 
         |> Array.filter (fun x -> match x.CodeGenerator with | SkipArg -> false | _ -> true)
@@ -441,6 +449,26 @@ let toCode ndarray (x : ProcessedAtomicSymbol) =
         yield! indent 1 (x.Args |> Array.collect (fun x -> x.Doc))
         yield! indent 1 define 
         yield! indent 2 invoke 
+    ]
+
+let toCode (x : ProcessedAtomicSymbol) =
+    let ndArray = 
+        match x.SymbolOrNDArray with 
+        | NDArray | SymbolOrNDArray | ManySymbolOrNDArray -> true 
+        | _ -> false
+    let symbol = 
+        match x.SymbolOrNDArray with 
+        | Symbol | SymbolOrNDArray | ManySymbolOrNDArray -> true 
+        | _ -> false
+    [
+        if not ndArray && not symbol then 
+            //yield! toCodeTarget true x //TODO: can't overload
+            ()
+        else    
+            if ndArray then 
+                yield! toCodeTarget true x
+            if symbol then 
+                yield! toCodeTarget false x
     ]
 
 let definedTypeToCode (a : ProcessedArg) =
@@ -1022,14 +1050,7 @@ let processed =
             try 
                 let r = 
                     let y = mapAtomicSymbolInfoBase x
-                    y
-                    |> List.filter 
-                        (fun x ->
-                            match x.SymbolOrNDArray with 
-                            | NDArray | SymbolOrNDArray | ManySymbolOrNDArray -> true 
-                            | _ -> false
-                        )
-                    |> Ok 
+                    Ok y
                 Some(x,r)
             with 
             | e -> Some(x, Error(x,e))
@@ -1038,7 +1059,7 @@ let processed =
         (fun result ->
             match result with 
             | x, Ok(y) -> 
-                let memberDefs = y |> List.map (fun i -> i, toCode true i)
+                let memberDefs = y |> List.map (fun i -> i, toCode i)
                 let typeDefs = 
                     y
                     |> Seq.collect (fun x -> x.Args |> Seq.choose (fun x -> x.DefinedType |> Option.map (fun d -> x, d)))
@@ -1149,7 +1170,7 @@ open MXNetSharp.Interop
 """
         yield! types |> breakBlocks
         """
-type NDArray() = 
+type Operators() = 
     member x.NDArrayHandle = failwith "" 
 """  
         yield! members |> breakBlocks
@@ -1158,4 +1179,4 @@ type NDArray() =
     ]
             
 
-System.IO.File.WriteAllLines(System.IO.Path.Combine(__SOURCE_DIRECTORY__,"ndarray.fs"),  generatedLines)
+System.IO.File.WriteAllLines(System.IO.Path.Combine(__SOURCE_DIRECTORY__,"operators.fs"),  generatedLines)
