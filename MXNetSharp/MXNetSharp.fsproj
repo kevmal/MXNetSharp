@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Compile Include="capi.fs" />
+    <Compile Include="cpredictapi.fs" />
     <Compile Include="interop.fs" />
     <Compile Include="AtomicSymbolMap.fs" />
     <Compile Include="symbol.fs" />

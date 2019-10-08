@@ -233,6 +233,58 @@ module MXSymbol =
         }
 
 
+    /// <summary>Create an AtomicSymbol.</summary>
+    /// <param name="creator">the AtomicSymbolCreator</param>
+    /// <param name="keys">the keys to the params</param>
+    /// <param name="vals">the vals of the params</param>
+    /// <returns>pointer to the created symbol handle</returns>
+    let createAtomicSymbol creator keys vals : AtomicSymbolHandle = 
+        let mutable out = un
+        assert(Array.length keys = Array.length vals)
+        MXSymbolCreateAtomicSymbol(creator, uint32(Array.length keys), keys, vals, &out) |> throwOnError "MXSymbolCreateAtomicSymbol"
+        out
+
+    /// <summary>Compose the symbol on other symbols.
+    /// This function will change the sym hanlde.
+    /// To achieve function apply behavior, copy the symbol first
+    /// before apply.</summary>
+    /// <param name="sym">the symbol to apply</param>
+    /// <param name="name">the name of symbol</param>
+    /// <param name="keys">the key of keyword args (optional)</param>
+    /// <param name="args">arguments to sym</param>
+    let compose sym name keys args = 
+        assert(Array.length keys = Array.length args)
+        MXSymbolCompose(sym, name, uint32(Array.length keys), keys, args) |> throwOnError "MXSymbolCompose"
+
+    /// <summary>Save a symbol into a json string</summary>
+    /// <param name="symbol">the input symbol.</param>
+    let saveToJSON symbol = 
+        let mutable out_json = un
+        MXSymbolSaveToJSON(symbol, &out_json) |> throwOnError "MXSymbolSaveToJSON"
+        str out_json
+
+    /// <summary>Create a Variable Symbol.</summary>
+    /// <param name="name">name of the variable</param>
+    /// <returns>pointer to the created symbol handle</returns>
+    let createVariable name = 
+        let mutable out = un
+        MXSymbolCreateVariable(name, &out) |> throwOnError "MXSymbolCreateVariable"
+        str out
+
+    /// <summary>Free the symbol handle.</summary>
+    /// <param name="symbol">the symbol</param>
+    let free symbol = MXSymbolFree(symbol) |> throwOnError "MXSymbolFree"
+        
+    /// <summary>Generate atomic symbol (able to be composed) from a source symbol</summary>
+    /// <param name="sym_handle">source symbol</param>
+    let genAtomicSymbolFromSymbol sym_handle : AtomicSymbolHandle =
+        let mutable ret_sym_handle = un
+        MXGenAtomicSymbolFromSymbol(sym_handle, &ret_sym_handle) |> throwOnError "MXGenAtomicSymbolFromSymbol"
+        ret_sym_handle
+        
+
+        
+
 module MXNDArray = 
     /// <summary>create a NDArray handle that is not initialized
     /// can be used to pass in as mutate variables

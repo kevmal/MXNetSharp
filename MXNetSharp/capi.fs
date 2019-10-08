@@ -1082,14 +1082,14 @@ extern int MXSymbolGetAtomicSymbolInfo(
 /// <param name="out">pointer to the created symbol handle</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolCreateAtomicSymbol__(AtomicSymbolCreatorHandle creator, uint32 num_param, string[] keys, string[] vals, SymbolHandle[] out)
+extern int MXSymbolCreateAtomicSymbol(AtomicSymbolCreatorHandle creator, uint32 num_param, string[] keys, string[] vals, [<Out>] SymbolHandle& out)
 
 /// <summary>Create a Variable Symbol.</summary>
 /// <param name="name">name of the variable</param>
 /// <param name="out">pointer to the created symbol handle</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolCreateVariable__(string name, SymbolHandle[] out)
+extern int MXSymbolCreateVariable(string name, [<Out>] SymbolHandle& out)
 
 /// <summary>Create a Symbol by grouping list of symbols together</summary>
 /// <param name="num_symbols">number of symbols to be grouped</param>
@@ -1132,13 +1132,13 @@ extern int MXSymbolSaveToFile__(SymbolHandle symbol, string fname)
 /// <param name="out_json">output json string.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolSaveToJSON__(SymbolHandle symbol, string[] out_json)
+extern int MXSymbolSaveToJSON(SymbolHandle symbol, IntPtr& out_json)
 
 /// <summary>Free the symbol handle.</summary>
 /// <param name="symbol">the symbol</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolFree__(SymbolHandle symbol)
+extern int MXSymbolFree(SymbolHandle symbol)
 
 /// <summary>Copy the symbol to another handle</summary>
 /// <param name="symbol">the source symbol</param>
@@ -1268,7 +1268,7 @@ extern int MXSymbolListAuxiliaryStates__(SymbolHandle symbol, uint32[] out_size,
 /// <param name="args">arguments to sym</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolCompose__(SymbolHandle sym, string name, uint32 num_args, string[] keys, SymbolHandle[] args)
+extern int MXSymbolCompose(SymbolHandle sym, string name, uint32 num_args, string[] keys, SymbolHandle[] args)
 
 /// <summary>Get the gradient graph of the symbol</summary>
 /// <param name="sym">the symbol to get gradient</param>
@@ -1489,7 +1489,7 @@ extern int MXGenBackendSubgraph__(SymbolHandle sym_handle, string backend, Symbo
 /// <param name="sym_handle">source symbol</param>
 /// <param name="ret_sym_handle">returned atomic symbol</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXGenAtomicSymbolFromSymbol__(SymbolHandle sym_handle, SymbolHandle[] ret_sym_handle)
+extern int MXGenAtomicSymbolFromSymbol(SymbolHandle sym_handle, [<Out>] SymbolHandle& ret_sym_handle)
 
 /// <summary>Partitions symbol for given backend, potentially creating subgraphs</summary>
 /// <param name="sym_handle">symbol to be partitioned</param>
