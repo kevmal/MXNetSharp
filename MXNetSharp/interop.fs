@@ -510,6 +510,122 @@ module MXNDArray =
         
 
         
-        
-    
-         
+module MXPred = 
+    open CPredictApi
+    /// <summary>create a predictor</summary>
+    /// <param name="symbol_json_str">The JSON string of the symbol.</param>
+    /// <param name="param_bytes">The in-memory raw bytes of parameter ndarray file.</param>
+    /// <param name="param_size">The size of parameter ndarray file.</param>
+    /// <param name="dev_type">The device type, 1: cpu, 2:gpu</param>
+    /// <param name="dev_id">The device id of the predictor.</param>
+    /// <param name="input_keys">The name of input argument.
+    ///   For feedforward net, this is {"data"}</param>
+    /// <param name="input_shape_indptr">Index pointer of shapes of each input node.
+    ///   The length of this array = num_input_nodes + 1.
+    ///   For feedforward net that takes 4 dimensional input, this is {0, 4}.</param>
+    /// <param name="input_shape_data">A flattened data of shapes of each input node.
+    ///   For feedforward net that takes 4 dimensional input, this is the shape data.</param>
+    /// <returns>The created predictor handle.</returns>
+    let create symbol_json_str param_bytes param_size dev_type dev_id input_keys input_shape_indptr input_shape_data = 
+        let mutable out = un
+        MXPredCreate(symbol_json_str, param_bytes, param_size, dev_type, dev_id, uint32(Array.length input_keys), input_keys, input_shape_indptr, input_shape_data, &out) |> throwOnError "MXPredCreate"
+        out
+
+    /// <summary>create a predictor</summary>
+    /// <param name="symbol_json_str">The JSON string of the symbol.</param>
+    /// <param name="param_bytes">The in-memory raw bytes of parameter ndarray file.</param>
+    /// <param name="param_size">The size of parameter ndarray file.</param>
+    /// <param name="dev_type">The device type, 1: cpu, 2: gpu</param>
+    /// <param name="dev_id">The device id of the predictor.</param>
+    /// <param name="num_input_nodes">Number of input nodes to the net.
+    ///   For feedforward net, this is 1.</param>
+    /// <param name="input_keys">The name of the input argument.
+    ///   For feedforward net, this is {"data"}</param>
+    /// <param name="input_shape_indptr">Index pointer of shapes of each input node.
+    ///   The length of this array = num_input_nodes + 1.
+    ///   For feedforward net that takes 4 dimensional input, this is {0, 4}.</param>
+    /// <param name="input_shape_data">A flattened data of shapes of each input node.
+    ///   For feedforward net that takes 4 dimensional input, this is the shape data.</param>
+    /// <param name="num_provided_arg_dtypes">  The length of provided_arg_dtypes.</param>
+    /// <param name="provided_arg_dtype_names">  The provided_arg_dtype_names the names of args for which dtypes are provided.</param>
+    /// <param name="provided_arg_dtypes">  The provided_arg_dtypes the dtype provided</param>
+    /// <returns>The created predictor handle.</returns>
+    let createEx symbol_json_str param_bytes param_size dev_type dev_id input_keys input_shape_indptr input_shape_data provided_arg_dtype_names provided_arg_dtypes = 
+        let mutable out = un
+        MXPredCreateEx(symbol_json_str, param_bytes, param_size, dev_type, dev_id, uint32(Array.length input_keys), input_keys, input_shape_indptr, input_shape_data, uint32(Array.length provided_arg_dtype_names), provided_arg_dtype_names, provided_arg_dtypes, &out) 
+        |> throwOnError "MXPredCreateEx"
+        out
+
+
+    /// <summary>create a predictor with customized outputs</summary>
+    /// <param name="symbol_json_str">The JSON string of the symbol.</param>
+    /// <param name="param_bytes">The in-memory raw bytes of parameter ndarray file.</param>
+    /// <param name="param_size">The size of parameter ndarray file.</param>
+    /// <param name="dev_type">The device type, 1: cpu, 2:gpu</param>
+    /// <param name="dev_id">The device id of the predictor.</param>
+    /// <param name="num_input_nodes">Number of input nodes to the net,
+    ///   For feedforward net, this is 1.</param>
+    /// <param name="input_keys">The name of input argument.
+    ///   For feedforward net, this is {"data"}</param>
+    /// <param name="input_shape_indptr">Index pointer of shapes of each input node.
+    ///   The length of this array = num_input_nodes + 1.
+    ///   For feedforward net that takes 4 dimensional input, this is {0, 4}.</param>
+    /// <param name="input_shape_data">A flattened data of shapes of each input node.
+    ///   For feedforward net that takes 4 dimensional input, this is the shape data.</param>
+    /// <param name="num_output_nodes">Number of output nodes to the net,</param>
+    /// <param name="output_keys">The name of output argument.
+    ///   For example {"global_pool"}</param>
+    /// <returns>The created predictor handle.</returns>
+    let createPartialOut symbol_json_str param_bytes param_size dev_type dev_id input_keys input_shape_indptr input_shape_data output_keys = 
+        let mutable out = un
+        MXPredCreatePartialOut(symbol_json_str, param_bytes, param_size, dev_type, dev_id, input_keys |> Array.length |> uint32, input_keys, input_shape_indptr, input_shape_data, output_keys |> Array.length |> uint32, output_keys, &out) |> throwOnError "MXPredCreatePartialOut"
+        out
+
+    /// <summary>create predictors for multiple threads. One predictor for a thread.</summary>
+    /// <param name="symbol_json_str">The JSON string of the symbol.</param>
+    /// <param name="param_bytes">The in-memory raw bytes of parameter ndarray file.</param>
+    /// <param name="param_size">The size of parameter ndarray file.</param>
+    /// <param name="dev_type">The device type, 1: cpu, 2:gpu</param>
+    /// <param name="dev_id">The device id of the predictor.</param>
+    /// <param name="num_input_nodes">Number of input nodes to the net,
+    ///   For feedforward net, this is 1.</param>
+    /// <param name="input_keys">The name of input argument.
+    ///   For feedforward net, this is {"data"}</param>
+    /// <param name="input_shape_indptr">Index pointer of shapes of each input node.
+    ///   The length of this array = num_input_nodes + 1.
+    ///   For feedforward net that takes 4 dimensional input, this is {0, 4}.</param>
+    /// <param name="input_shape_data">A flattened data of shapes of each input node.
+    ///   For feedforward net that takes 4 dimensional input, this is the shape data.</param>
+    /// <param name="num_threads">The number of threads that we'll run the predictors.</param>
+    /// <returns>An array of created predictor handles. The array has to be large
+    ///  enough to keep `num_threads` predictors.</returns>
+    let createMultiThread symbol_json_str param_bytes param_size dev_type dev_id input_keys input_shape_indptr input_shape_data num_threads = 
+        let mutable out = un
+        MXPredCreateMultiThread(symbol_json_str, param_bytes, param_size, dev_type, dev_id, input_keys |> Array.length |> uint32, input_keys, input_shape_indptr, input_shape_data, num_threads, &out) |> throwOnError "MXPredCreateMultiThread"
+        out
+
+    /// <summary>Change the input shape of an existing predictor.</summary>
+    /// <param name="input_keys">The name of input argument.
+    ///   For feedforward net, this is {"data"}</param>
+    /// <param name="input_shape_indptr">Index pointer of shapes of each input node.
+    ///   The length of this array = num_input_nodes + 1.
+    ///   For feedforward net that takes 4 dimensional input, this is {0, 4}.</param>
+    /// <param name="input_shape_data">A flattened data of shapes of each input node.
+    ///   For feedforward net that takes 4 dimensional input, this is the shape data.</param>
+    /// <param name="handle">The original predictor handle.</param>
+    /// <returns>The reshaped predictor handle.</returns>
+    let reshape input_keys input_shape_indptr input_shape_data handle = 
+        let mutable out = un
+        MXPredReshape(input_keys |> Array.length |> uint32, input_keys, input_shape_indptr, input_shape_data, handle, &out) |> throwOnError "MXPredReshape"
+        out
+
+    /// <summary>Get the shape of output node.
+    /// The returned shape_data and shape_ndim is only valid before next call to MXPred function.</summary>
+    /// <param name="handle">The handle of the predictor.</param>
+    /// <param name="index">The index of output node, set to 0 if there is only one output.</param>
+    let getOutputShape handle index shape_data shape_ndim : uint32[] = 
+        let mutable shape_data = 0n
+        let mutable shape_ndim = un
+        MXPredGetOutputShape(handle, index, &shape_data, &shape_ndim) |> throwOnError "MXPredGetOutputShape"
+        readStructArray shape_ndim shape_data
+

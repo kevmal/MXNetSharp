@@ -65,18 +65,15 @@ extern int MXPredCreate(string symbol_json_str, IntPtr param_bytes, int param_si
 ///   For feedforward net that takes 4 dimensional input, this is {0, 4}.</param>
 /// <param name="input_shape_data">A flattened data of shapes of each input node.
 ///   For feedforward net that takes 4 dimensional input, this is the shape data.</param>
-/// <param name="num_provided_arg_dtypes
-///">  The length of provided_arg_dtypes.</param>
-/// <param name="provided_arg_dtype_names
-///">  The provided_arg_dtype_names the names of args for which dtypes are provided.</param>
-/// <param name="provided_arg_dtypes
-///">  The provided_arg_dtypes the dtype provided</param>
+/// <param name="num_provided_arg_dtypes">  The length of provided_arg_dtypes.</param>
+/// <param name="provided_arg_dtype_names">  The provided_arg_dtype_names the names of args for which dtypes are provided.</param>
+/// <param name="provided_arg_dtypes">  The provided_arg_dtypes the dtype provided</param>
 /// <param name="out">The created predictor handle.</param>
 /// <returns>0 when success, -1 when failure.</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl)>]
 extern int MXPredCreateEx(string symbol_json_str, IntPtr param_bytes, int param_size, int dev_type, int dev_id, uint32 num_input_nodes, string[] input_keys, uint32[] input_shape_indptr, uint32[] input_shape_data, uint32 num_provided_arg_dtypes, string[] provided_arg_dtype_names, int[] provided_arg_dtypes, [<Out>] PredictorHandle& out)
 
-/// <summary>create a predictor wich customized outputs</summary>
+/// <summary>create a predictor wicth customized outputs</summary>
 /// <param name="symbol_json_str">The JSON string of the symbol.</param>
 /// <param name="param_bytes">The in-memory raw bytes of parameter ndarray file.</param>
 /// <param name="param_size">The size of parameter ndarray file.</param>
@@ -97,7 +94,7 @@ extern int MXPredCreateEx(string symbol_json_str, IntPtr param_bytes, int param_
 /// <param name="out">The created predictor handle.</param>
 /// <returns>0 when success, -1 when failure.</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl)>]
-extern int MXPredCreatePartialOut(string symbol_json_str, IntPtr param_bytes, int param_size, int dev_type, int dev_id, uint32 num_input_nodes, string[] input_keys, uint32[] input_shape_indptr, uint32[] input_shape_data, uint32 num_output_nodes, IntPtr output_keys, [<Out>] PredictorHandle& out)
+extern int MXPredCreatePartialOut(string symbol_json_str, IntPtr param_bytes, int param_size, int dev_type, int dev_id, uint32 num_input_nodes, string[] input_keys, uint32[] input_shape_indptr, uint32[] input_shape_data, uint32 num_output_nodes, string[] output_keys, [<Out>] PredictorHandle& out)
 
 /// <summary>create predictors for multiple threads. One predictor for a thread.</summary>
 /// <param name="symbol_json_str">The JSON string of the symbol.</param>
@@ -145,7 +142,7 @@ extern int MXPredReshape(uint32 num_input_nodes, string[] input_keys, uint32[] i
 /// <param name="shape_ndim">Used to hold shape dimension.</param>
 /// <returns>0 when success, -1 when failure.</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl)>]
-extern int MXPredGetOutputShape(PredictorHandle handle, uint32 index, uint32[]& shape_data, uint32& shape_ndim)
+extern int MXPredGetOutputShape(PredictorHandle handle, uint32 index, [<Out>] IntPtr& shape_data, [<Out>] uint32& shape_ndim)
 
 /// <summary>Get the dtype of output node.
 ///The returned data type is only valid before next call to MXPred function.</summary>
