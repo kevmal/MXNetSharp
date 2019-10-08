@@ -7,7 +7,12 @@
   <ItemGroup>
     <Compile Include="capi.fs" />
     <Compile Include="interop.fs" />
+    <Compile Include="AtomicSymbolMap.fs" />
+    <Compile Include="operator.fs" />
     <Compile Include="ndarray.fs" />
+    <None Include="generate operators.fsx" />
   </ItemGroup>
+
+  <ItemGroup />
 
 </Project>
