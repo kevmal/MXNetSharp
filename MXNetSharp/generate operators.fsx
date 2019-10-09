@@ -390,12 +390,30 @@ let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
             ]
     let arr x = if Array.isEmpty x then "Array.empty" else sprintf "[|%s|]" (x |> String.concat "; ")
     let inputsStr = 
+        let handle x =  
+            if ndarray then 
+                sprintf "%s.NDArrayHandle" x
+            else
+                sprintf "%s.SymbolHandle" x
+        let arr (x : _ []) = 
+            match x with 
+            | [| Choice2Of2 name |] -> sprintf "(%s |> Array.map (fun x -> %s))" name (handle "x")
+            | [||] -> "Array.empty"
+            | _ -> 
+                x
+                |> Array.map (function
+                    | Choice1Of2 str -> str
+                    | Choice2Of2 name -> 
+                        sprintf "yield! (%s |> Seq.map (fun x -> %s))" name (handle "x") )
+                |> String.concat "; "
+                |> sprintf "[|%s|]" 
         if ndarray then 
             x.Args 
             |> Array.choose 
                 (fun x ->
                     match x.SymbolOrNDArray with 
-                    | Some NDArray | Some SymbolOrNDArray -> Some(sprintf "%s.NDArrayHandle" x.Name)
+                    | Some NDArray | Some SymbolOrNDArray -> Choice1Of2(handle x.Name) |> Some
+                    | Some ManySymbolOrNDArray -> Choice2Of2(x.Name) |> Some
                     | _ -> None
                 )
             |> arr
@@ -404,7 +422,8 @@ let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
             |> Array.choose 
                 (fun x ->
                     match x.SymbolOrNDArray with 
-                    | Some NDArray | Some SymbolOrNDArray -> Some(sprintf "%s.SymbolHandle" x.Name)
+                    | Some Symbol | Some SymbolOrNDArray -> Choice1Of2(handle x.Name) |> Some
+                    | Some ManySymbolOrNDArray -> Choice2Of2(x.Name) |> Some
                     | _ -> None
                 )
             |> arr
@@ -432,7 +451,7 @@ let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
                         | ConstantArg a -> Some a
                     match a.DefaultMode with 
                     | Some(ReplaceOptionWithString v) -> 
-                        valueStr |> Option.map (fun s -> sprintf "(match %s with None -> %s | _ -> %s)" a.Name v s) 
+                        valueStr |> Option.map (fun s -> sprintf "(match %s with None -> %s | Some %s -> %s)" a.Name v a.Name s) 
                     | Some(ReplaceNull v) -> 
                         valueStr |> Option.map (fun s -> sprintf "(if isNull (%s :> obj) then %s else %s)" a.Name v s)
                     | _ -> valueStr
