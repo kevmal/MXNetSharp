@@ -629,3 +629,99 @@ module MXPred =
         MXPredGetOutputShape(handle, index, &shape_data, &shape_ndim) |> throwOnError "MXPredGetOutputShape"
         readStructArray shape_ndim shape_data
 
+        
+    /// <summary>Get the dtype of output node.
+    ///The returned data type is only valid before next call to MXPred function.</summary>
+    /// <param name="handle">The handle of the predictor.</param>
+    /// <param name="index">The index of the output node, set to 0 if there is only one output.</param>
+    let getOutputType handle index = 
+        let mutable out_dtype = un
+        MXPredGetOutputType(handle, uint32 index, &out_dtype) |> throwOnError "MXPredGetOutputType"
+        out_dtype
+
+    /// <summary>Set the input data of predictor.</summary>
+    /// <param name="handle">The predictor handle.</param>
+    /// <param name="key">The name of input node to set.
+    ///    For feedforward net, this is "data".</param>
+    /// <param name="data">The pointer to the data to be set, with the shape specified in MXPredCreate.</param>
+    /// <param name="size">The size of data array, used for safety check.</param>
+    let setInput handle key data size = 
+        MXPredSetInput(handle, key, data, size) |> throwOnError "MXPredSetInput"
+
+    /// <summary>Run a forward pass to get the output.</summary>
+    /// <param name="handle">The handle of the predictor.</param>
+    let forward handle = 
+        MXPredForward(handle) |> throwOnError "MXPredForward"
+
+    /// <summary>Run a interactive forward pass to get the output.
+    /// This is helpful for displaying progress of prediction which can be slow.
+    /// User must call PartialForward from step=0, keep increasing it until step_left=0.</summary>
+    /// <code>int step_left = 1;
+    ///for (int step = 0; step_left != 0; ++step) {
+    ///   MXPredPartialForward(handle, step, &step_left);
+    ///   printf("Current progress [%d/%d]", step, step + step_left + 1);
+    ///}</code>
+    /// <param name="handle">The handle of the predictor.</param>
+    /// <param name="step">The current step to run forward on.</param>
+    /// <param name="step_left">The number of steps left</param>
+    /// <returns>0 when success, -1 when failure.</returns>
+    let partialForward handle step = 
+        let mutable step_left = un
+        MXPredPartialForward(handle, step, &step_left) |> throwOnError "MXPredPartialForward"
+
+    /// <summary>Get the output value of prediction.</summary>
+    /// <param name="handle">The handle of the predictor.</param>
+    /// <param name="index">The index of output node, set to 0 if there is only one output.</param>
+    /// <param name="data">User allocated data to hold the output.</param>
+    /// <param name="size">The size of data array, used for safe checking.</param>
+    let getOutput handle index data size = 
+        MXPredGetOutput(handle, index, data, size) |> throwOnError "MXPredGetOutput"
+
+    /// <summary>Free a predictor handle.</summary>
+    /// <param name="handle">The handle of the predictor.</param>
+    let free handle = 
+        MXPredFree(handle) |> throwOnError "MXPredFree"
+
+    /// <summary>set a call back to notify the completion of operation and allow for
+    ///additional monitoring</summary>
+    let setMonitorCallback handle callback monitor_all = 
+        let mutable callback_handle = un
+        MXPredSetMonitorCallback(handle, callback, &callback_handle, monitor_all) |> throwOnError "MXPredSetMonitorCallback"
+        callback_handle
+
+module MXNDList = 
+    open CPredictApi
+    /// <summary>Get an element from list</summary>
+    /// <param name="handle">The handle to the NDArray</param>
+    /// <param name="index">The index in the list</param>
+    /// <param name="out_key">The output key of the item</param>
+    /// <param name="out_data">The data region of the item</param>
+    /// <param name="out_shape">The shape of the item.</param>
+    /// <param name="out_ndim">The number of dimension in the shape.</param>
+    let create nd_file_bytes nd_file_size : uint32 [] = 
+        let mutable out = 0n
+        let mutable out_length = un
+        MXNDListCreate(nd_file_bytes, nd_file_size, &out, &out_length) |> throwOnError "MXNDListCreate"
+        readStructArray out_length out
+
+    
+    /// <summary>Get an element from list</summary>
+    /// <param name="handle">The handle to the NDArray</param>
+    /// <param name="index">The index in the list</param>
+    /// <param name="out_key">The output key of the item</param>
+    /// <param name="out_data">The data region of the item</param>
+    /// <param name="out_shape">The shape of the item.</param>
+    /// <param name="out_ndim">The number of dimension in the shape.</param>
+    let get handle index = 
+        failwith "not implemented" //TODO: MXNDListGet
+        let mutable out_key = un
+        let mutable out_data = un
+        let mutable out_shape = un
+        let mutable out_ndim = un
+        MXNDListGet(handle, index, &out_key, &out_data, &out_shape, &out_ndim) |> throwOnError "MXNDListGet"
+
+        
+    /// <summary>Free a MXAPINDList</summary>
+    /// <param name="handle">The handle of the MXAPINDList.</param>
+    let free handle = 
+        MXNDListFree(handle) |> throwOnError "MXNDListFree"

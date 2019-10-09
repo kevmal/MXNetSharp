@@ -181,7 +181,7 @@ extern int MXPredForward(PredictorHandle handle)
 /// <param name="step_left">The number of steps left</param>
 /// <returns>0 when success, -1 when failure.</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl)>]
-extern int MXPredPartialForward(PredictorHandle handle, int step, int[] step_left)
+extern int MXPredPartialForward(PredictorHandle handle, int step, [<Out>] int& step_left)
 
 /// <summary>Get the output value of prediction.</summary>
 /// <param name="handle">The handle of the predictor.</param>
@@ -222,7 +222,7 @@ extern int MXNDListGet(NDListHandle handle, uint32 index, [<Out>] IntPtr& out_ke
 /// <summary>set a call back to notify the completion of operation and allow for
 ///additional monitoring</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl)>]
-extern int MXPredSetMonitorCallback(PredictorHandle handle, PredMonitorCallback callback, IntPtr callback_handle, bool monitor_all)
+extern int MXPredSetMonitorCallback(PredictorHandle handle, PredMonitorCallback callback, [<Out>] IntPtr& callback_handle, bool monitor_all)
 
 /// <summary>Free a MXAPINDList</summary>
 /// <param name="handle">The handle of the MXAPINDList.</param>
