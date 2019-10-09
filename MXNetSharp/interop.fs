@@ -68,7 +68,10 @@ type AtomicSymbolInfo =
     }
 
 module Helper = 
-    let ulength (a : 'a []) = a.Length |> uint32
+    let ulength (a : 'a []) = 
+        match a with 
+        | null -> uint32 0
+        | _ -> uint32 a.Length
     let boolToInt b = if b then 1 else 0
     let intPtrSz = Marshal.SizeOf<IntPtr>()
     let un<'a> = Unchecked.defaultof<'a>
@@ -254,8 +257,8 @@ module MXSymbol =
     /// <param name="keys">the key of keyword args (optional)</param>
     /// <param name="args">arguments to sym</param>
     let compose sym name keys args = 
-        assert(Array.length keys = Array.length args)
-        MXSymbolCompose(sym, name, uint32(Array.length keys), keys, args) |> throwOnError "MXSymbolCompose"
+        assert(isNull keys || ulength keys = ulength args)
+        MXSymbolCompose(sym, name, ulength keys, keys, args) |> throwOnError "MXSymbolCompose"
 
     /// <summary>Save a symbol into a json string</summary>
     /// <param name="symbol">the input symbol.</param>
@@ -270,7 +273,7 @@ module MXSymbol =
     let createVariable name = 
         let mutable out = un
         MXSymbolCreateVariable(name, &out) |> throwOnError "MXSymbolCreateVariable"
-        str out
+        out
 
     /// <summary>Free the symbol handle.</summary>
     /// <param name="symbol">the symbol</param>
@@ -376,7 +379,7 @@ module MXSymbol =
     /// <param name="symbol">the source symbol</param>
     /// <param name="key">The key of the symbol.</param>
     /// <returns>The result attribute, can be NULL if the attribute do not exist.</returns>
-    let getAttr symbol key success = 
+    let getAttr symbol key = 
         let mutable out = un
         let mutable success = un
         MXSymbolGetAttr(symbol, key, &out, &success) |> throwOnError "MXSymbolGetAttr"

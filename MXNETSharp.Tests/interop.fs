@@ -40,6 +40,25 @@ module MXSymbol =
                 Assert.NotEqual(0, arg.Name.Length)
                 Assert.NotEqual(0, arg.TypeInfo.Length)
 
+    [<Fact>]
+    let ``simple create symbol``() = 
+        let h = MXNDArray.createEx [|100;10|] DeviceType.CPU 0 false TypeFlag.Float32
+        MXNDArray.syncCopyFromCPU h [|1.f .. 1000.f|]
+        //let h2 = MXNDArray.createEx [|1|] DeviceType.CPU 0 false TypeFlag.Float32
+        //MXNDArray.syncCopyFromCPU h [|1.f|]
+        let creator = MXSymbol.listAtomicSymbolCreators() |> Seq.find (fun x -> MXSymbol.getAtomicSymbolName x = "_plus_scalar")
+        let mySymbol = MXSymbol.createAtomicSymbol creator [|"scalar"|] [|"1.0"|]
+        Assert.True(MXSymbol.listAttr mySymbol = [|"$scalar"|])
+        Assert.Equal(Some("1.0"), MXSymbol.getAttr mySymbol "scalar")
+        Assert.Empty(MXSymbol.getInputSymbols mySymbol)
+        let inputVariable = MXSymbol.createVariable "myInput"
+        MXSymbol.compose mySymbol "mySymbol" null [|inputVariable|]
+        let inputSymbols = MXSymbol.getInputSymbols mySymbol
+        Assert.Equal(1, inputSymbols.Length)
+        Assert.Equal(Some("mySymbol_data"), MXSymbol.getName inputSymbols.[0])
+        MXSymbol.free mySymbol
+
+
 module MXNDArray = 
     [<Fact>]
     let none() = 
