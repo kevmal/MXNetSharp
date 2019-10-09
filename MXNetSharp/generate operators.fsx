@@ -3,7 +3,9 @@ open System.Collections.Generic
 open System.Diagnostics
 
 #load "capi.fs"
+#load "cpredictapi.fs"
 #load "interop.fs"
+
 open MXNetSharp.Interop
 open System
 
@@ -114,7 +116,6 @@ let tpinfo x =
 type DefaultMode = 
     | UseAttr of string
     | ReplaceNull of string
-    | ReplaceOptionWithValue of string
     | ReplaceOptionWithString of string
     | IgnoreNull
 
@@ -342,6 +343,8 @@ let indent n lines =
 
 let comment lines = lines |> List.map (fun x -> "// " + x) 
 
+let toCStr (str : string) = sprintf "string %s" str
+
 let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
     let args = 
         x.Args 
@@ -355,7 +358,7 @@ let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
                     | Some _ -> if ndarray then "NDArray" else "Symbol"
                     | _ -> x.TypeString
                 match x.DefaultMode with 
-                | Some (ReplaceOptionWithValue _ | ReplaceOptionWithString _) -> 
+                | Some (ReplaceOptionWithString _) -> 
                     sprintf "?%s : %s" x.Name t
                 | Some (ReplaceNull _)
                 | Some IgnoreNull -> 
@@ -421,11 +424,9 @@ let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
                         match a.CodeGenerator with 
                         | SkipArg -> None
                         | ValueString str -> Some str
-                        | Normal -> Some (a.Name + ".ToString()")
+                        | Normal -> Some (toCStr a.Name)
                         | ConstantArg a -> Some a
                     match a.DefaultMode with 
-                    | Some(ReplaceOptionWithValue v) -> 
-                        valueStr |> Option.map (fun s -> sprintf "(defaultArg %s %s).ToString()" a.Name v) //REVIEW: Dropping valueStr here, could cause headache
                     | Some(ReplaceOptionWithString v) -> 
                         valueStr |> Option.map (fun s -> sprintf "(match %s with None -> %s | _ -> %s)" a.Name v s) 
                     | Some(ReplaceNull v) -> 
