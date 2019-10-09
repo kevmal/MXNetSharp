@@ -1035,7 +1035,7 @@ extern int MXSymbolGetAtomicSymbolName(AtomicSymbolCreatorHandle creator, [<Out>
 /// <param name="inputs">The input symbols of the graph.</param>
 /// <param name="input_size">the number of input symbols returned.</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolGetInputSymbols__(SymbolHandle sym, SymbolHandle[]& inputs, int[] input_size)
+extern int MXSymbolGetInputSymbols(SymbolHandle sym, [<Out>] IntPtr& inputs, [<Out>] int& input_size)
 
 /// <summary>Cut a subgraph whose nodes are marked with a subgraph attribute.
 ///The input graph will be modified. A variable node will be created for each
@@ -1045,7 +1045,7 @@ extern int MXSymbolGetInputSymbols__(SymbolHandle sym, SymbolHandle[]& inputs, i
 /// <param name="inputs">The nodes that connect to the subgraph.</param>
 /// <param name="input_size">The number of such nodes.</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolCutSubgraph__(SymbolHandle sym, SymbolHandle[]& inputs, int[] input_size)
+extern int MXSymbolCutSubgraph(SymbolHandle sym, [<Out>] IntPtr& inputs, [<Out>] int& input_size)
 
 /// <summary>Get the detailed information about atomic symbol.</summary>
 /// <param name="creator">the AtomicSymbolCreator.</param>
@@ -1097,42 +1097,42 @@ extern int MXSymbolCreateVariable(string name, [<Out>] SymbolHandle& out)
 /// <param name="out">pointer to the created symbol handle</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolCreateGroup__(uint32 num_symbols, SymbolHandle[] symbols, SymbolHandle[] out)
+extern int MXSymbolCreateGroup(uint32 num_symbols, SymbolHandle[] symbols, [<Out>] SymbolHandle& out)
 
 /// <summary>Load a symbol from a json file.</summary>
 /// <param name="fname">the file name.</param>
 /// <param name="out">the output symbol.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolCreateFromFile__(string fname, SymbolHandle[] out)
+extern int MXSymbolCreateFromFile(string fname, [<Out>] SymbolHandle& out)
 
 /// <summary>Load a symbol from a json string.</summary>
 /// <param name="json">the json string.</param>
 /// <param name="out">the output symbol.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolCreateFromJSON__(string json, SymbolHandle[] out)
+extern int MXSymbolCreateFromJSON(string json, [<Out>] SymbolHandle& out)
 
 /// <summary>Remove the operators amp_cast and amp_multicast</summary>
 /// <param name="sym_handle">the input symbol.</param>
 /// <param name="ret_sym_handle">the output symbol.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolRemoveAmpCast__(SymbolHandle sym_handle, SymbolHandle[] ret_sym_handle)
+extern int MXSymbolRemoveAmpCast(SymbolHandle sym_handle, [<Out>] SymbolHandle& ret_sym_handle)
 
 /// <summary>Save a symbol into a json file.</summary>
 /// <param name="symbol">the input symbol.</param>
 /// <param name="fname">the file name.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolSaveToFile__(SymbolHandle symbol, string fname)
+extern int MXSymbolSaveToFile(SymbolHandle symbol, string fname)
 
 /// <summary>Save a symbol into a json string</summary>
 /// <param name="symbol">the input symbol.</param>
 /// <param name="out_json">output json string.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolSaveToJSON(SymbolHandle symbol, IntPtr& out_json)
+extern int MXSymbolSaveToJSON(SymbolHandle symbol, [<Out>] IntPtr& out_json)
 
 /// <summary>Free the symbol handle.</summary>
 /// <param name="symbol">the symbol</param>
@@ -1145,14 +1145,14 @@ extern int MXSymbolFree(SymbolHandle symbol)
 /// <param name="out">used to hold the result of copy</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolCopy__(SymbolHandle symbol, SymbolHandle[] out)
+extern int MXSymbolCopy(SymbolHandle symbol, [<Out>] SymbolHandle& out)
 
 /// <summary>Print the content of symbol, used for debug.</summary>
 /// <param name="symbol">the symbol</param>
 /// <param name="out_str">pointer to hold the output string of the printing.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolPrint__(SymbolHandle symbol, string[] out_str)
+extern int MXSymbolPrint(SymbolHandle symbol, [<Out>] IntPtr& out_str)
 
 /// <summary>Get string name from symbol</summary>
 /// <param name="symbol">the source symbol</param>
@@ -1160,7 +1160,7 @@ extern int MXSymbolPrint__(SymbolHandle symbol, string[] out_str)
 /// <param name="success">Whether the result is contained in out.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolGetName__(SymbolHandle symbol, string[] out, int[] success)
+extern int MXSymbolGetName(SymbolHandle symbol, [<Out>] IntPtr& out, [<Out>] int& success)
 
 /// <summary>Get string attribute from symbol</summary>
 /// <param name="symbol">the source symbol</param>
@@ -1169,7 +1169,7 @@ extern int MXSymbolGetName__(SymbolHandle symbol, string[] out, int[] success)
 /// <param name="success">Whether the result is contained in out.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolGetAttr__(SymbolHandle symbol, string key, string[] out, int[] success)
+extern int MXSymbolGetAttr(SymbolHandle symbol, string key, [<Out>] IntPtr& out, [<Out>] int& success)
 
 /// <summary>Set string attribute from symbol.
 /// NOTE: Setting attribute to a symbol can affect the semantics(mutable/immutable) of symbolic graph.
@@ -1185,7 +1185,7 @@ extern int MXSymbolGetAttr__(SymbolHandle symbol, string key, string[] out, int[
 /// <param name="value">The value to be saved.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolSetAttr__(SymbolHandle symbol, string key, string value)
+extern int MXSymbolSetAttr(SymbolHandle symbol, string key, string value)
 
 /// <summary>Get all attributes from symbol, including all descendents.</summary>
 /// <param name="symbol">the source symbol</param>
@@ -1193,7 +1193,7 @@ extern int MXSymbolSetAttr__(SymbolHandle symbol, string key, string value)
 /// <param name="out">2*out_size strings representing key value pairs.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolListAttr__(SymbolHandle symbol, uint32[] out_size, string[]& out)
+extern int MXSymbolListAttr(SymbolHandle symbol, [<Out>] uint32& out_size, [<Out>] IntPtr& out)
 
 /// <summary>Get all attributes from symbol, excluding descendents.</summary>
 /// <param name="symbol">the source symbol</param>
@@ -1201,7 +1201,7 @@ extern int MXSymbolListAttr__(SymbolHandle symbol, uint32[] out_size, string[]& 
 /// <param name="out">2*out_size strings representing key value pairs.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolListAttrShallow__(SymbolHandle symbol, uint32[] out_size, string[]& out)
+extern int MXSymbolListAttrShallow(SymbolHandle symbol, [<Out>] uint32& out_size, [<Out>] IntPtr& out)
 
 /// <summary>List arguments in the symbol.</summary>
 /// <param name="symbol">the symbol</param>
@@ -1209,7 +1209,7 @@ extern int MXSymbolListAttrShallow__(SymbolHandle symbol, uint32[] out_size, str
 /// <param name="out_str_array">pointer to hold the output string array</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolListArguments__(SymbolHandle symbol, uint32[] out_size, string[]& out_str_array)
+extern int MXSymbolListArguments(SymbolHandle symbol, [<Out>] uint32& out_size, [<Out>] IntPtr& out_str_array)
 
 /// <summary>List returns in the symbol.</summary>
 /// <param name="symbol">the symbol</param>
@@ -1217,28 +1217,28 @@ extern int MXSymbolListArguments__(SymbolHandle symbol, uint32[] out_size, strin
 /// <param name="out_str_array">pointer to hold the output string array</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolListOutputs__(SymbolHandle symbol, uint32[] out_size, string[]& out_str_array)
+extern int MXSymbolListOutputs(SymbolHandle symbol, [<Out>] uint32& out_size, [<Out>] IntPtr& out_str_array)
 
 /// <summary>Get number of outputs of the symbol.</summary>
 /// <param name="symbol">The symbol</param>
 /// <param name="out_size">number of outputs</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolGetNumOutputs__(SymbolHandle symbol, uint32[] output_count)
+extern int MXSymbolGetNumOutputs(SymbolHandle symbol, [<Out>] uint32& output_count)
 
 /// <summary>Get a symbol that contains all the internals.</summary>
 /// <param name="symbol">The symbol</param>
 /// <param name="out">The output symbol whose outputs are all the internals.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolGetInternals__(SymbolHandle symbol, SymbolHandle[] out)
+extern int MXSymbolGetInternals(SymbolHandle symbol, [<Out>] SymbolHandle& out)
 
 /// <summary>Get a symbol that contains only direct children.</summary>
 /// <param name="symbol">The symbol</param>
 /// <param name="out">The output symbol whose outputs are the direct children.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolGetChildren__(SymbolHandle symbol, SymbolHandle[] out)
+extern int MXSymbolGetChildren(SymbolHandle symbol, [<Out>] SymbolHandle& out)
 
 /// <summary>Get index-th outputs of the symbol.</summary>
 /// <param name="symbol">The symbol</param>
@@ -1246,7 +1246,7 @@ extern int MXSymbolGetChildren__(SymbolHandle symbol, SymbolHandle[] out)
 /// <param name="out">The output symbol whose outputs are the index-th symbol.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolGetOutput__(SymbolHandle symbol, uint32 index, SymbolHandle[] out)
+extern int MXSymbolGetOutput(SymbolHandle symbol, uint32 index, [<Out>] SymbolHandle& out)
 
 /// <summary>List auxiliary states in the symbol.</summary>
 /// <param name="symbol">the symbol</param>
@@ -1254,7 +1254,7 @@ extern int MXSymbolGetOutput__(SymbolHandle symbol, uint32 index, SymbolHandle[]
 /// <param name="out_str_array">pointer to hold the output string array</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolListAuxiliaryStates__(SymbolHandle symbol, uint32[] out_size, string[]& out_str_array)
+extern int MXSymbolListAuxiliaryStates(SymbolHandle symbol, [<Out>] uint32& out_size, [<Out>] IntPtr& out_str_array)
 
 /// <summary>Compose the symbol on other symbols.
 ///
@@ -1277,8 +1277,9 @@ extern int MXSymbolCompose(SymbolHandle sym, string name, uint32 num_args, strin
 /// <param name="out">the returned symbol that has gradient</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolGrad__(SymbolHandle sym, uint32 num_wrt, string[] wrt, SymbolHandle[] out)
+extern int MXSymbolGrad(SymbolHandle sym, uint32 num_wrt, string[] wrt, [<Out>] SymbolHandle& out)
 
+(* DEPRECATED
 /// <summary>DEPRECATED. Use MXSymbolInferShapeEx instead.
 ///infer shape of unknown input shapes given the known one.
 /// The shapes are packed into a CSR matrix represented by arg_ind_ptr and arg_shape_data
@@ -1300,10 +1301,11 @@ extern int MXSymbolGrad__(SymbolHandle sym, uint32 num_wrt, string[] wrt, Symbol
 /// <param name="complete">whether infer shape completes or more information is needed.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolInferShape__(SymbolHandle sym, uint32 num_args, string[] keys, uint32[] arg_ind_ptr, uint32[] arg_shape_data, uint32[] in_shape_size, uint32[]& in_shape_ndim, IntPtr[]& in_shape_data, uint32[] out_shape_size, uint32[]& out_shape_ndim, IntPtr[]& out_shape_data, uint32[] aux_shape_size, uint32[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
+extern int MXSymbolInferShape(SymbolHandle sym, uint32 num_args, string[] keys, uint32[] arg_ind_ptr, uint32[] arg_shape_data, uint32[] in_shape_size, uint32[]& in_shape_ndim, IntPtr[]& in_shape_data, uint32[] out_shape_size, uint32[]& out_shape_ndim, IntPtr[]& out_shape_data, uint32[] aux_shape_size, uint32[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
 
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXSymbolInferShape64__(SymbolHandle sym, uint32 num_args, string[] keys, int64[] arg_ind_ptr, int64[] arg_shape_data, size_t[] in_shape_size, int[]& in_shape_ndim, IntPtr[]& in_shape_data, size_t[] out_shape_size, int[]& out_shape_ndim, IntPtr[]& out_shape_data, size_t[] aux_shape_size, int[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
+*)
 
 /// <summary>infer shape of unknown input shapes given the known one.
 /// The shapes are packed into a CSR matrix represented by arg_ind_ptr and arg_shape_data
@@ -1325,11 +1327,12 @@ extern int MXSymbolInferShape64__(SymbolHandle sym, uint32 num_args, string[] ke
 /// <param name="complete">whether infer shape completes or more information is needed.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolInferShapeEx__(SymbolHandle sym, uint32 num_args, string[] keys, uint32[] arg_ind_ptr, int[] arg_shape_data, uint32[] in_shape_size, int[]& in_shape_ndim, IntPtr[]& in_shape_data, uint32[] out_shape_size, int[]& out_shape_ndim, IntPtr[]& out_shape_data, uint32[] aux_shape_size, int[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
+extern int MXSymbolInferShapeEx(SymbolHandle sym, uint32 num_args, string[] keys, uint32[] arg_ind_ptr, int[] arg_shape_data, [<Out>] uint32& in_shape_size, [<Out>] IntPtr& in_shape_ndim, [<Out>] IntPtr& in_shape_data, [<Out>] uint32& out_shape_size, [<Out>] IntPtr& out_shape_ndim, [<Out>] IntPtr& out_shape_data, [<Out>] uint32& aux_shape_size, [<Out>] IntPtr& aux_shape_ndim, [<Out>] IntPtr& aux_shape_data, [<Out>] int& complete)
 
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolInferShapeEx64__(SymbolHandle sym, uint32 num_args, string[] keys, int64[] arg_ind_ptr, int64[] arg_shape_data, size_t[] in_shape_size, int[]& in_shape_ndim, IntPtr[]& in_shape_data, size_t[] out_shape_size, int[]& out_shape_ndim, IntPtr[]& out_shape_data, size_t[] aux_shape_size, int[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
+extern int MXSymbolInferShapeEx64(SymbolHandle sym, uint32 num_args, string[] keys, int64[] arg_ind_ptr, int64[] arg_shape_data, [<Out>] size_t& in_shape_size, [<Out>] IntPtr& in_shape_ndim, [<Out>] IntPtr& in_shape_data, [<Out>] size_t& out_shape_size, [<Out>] IntPtr& out_shape_ndim, [<Out>] IntPtr& out_shape_data, [<Out>] size_t& aux_shape_size, [<Out>] IntPtr& aux_shape_ndim, [<Out>] IntPtr& aux_shape_data, [<Out>] int& complete)
 
+(* DEPRECATED
 /// <summary>DEPRECATED. Use MXSymbolInferShapePartialEx instead.
 ///partially infer shape of unknown input shapes given the known one.
 ///
@@ -1357,6 +1360,7 @@ extern int MXSymbolInferShapePartial__(SymbolHandle sym, uint32 num_args, string
 
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXSymbolInferShapePartial64__(SymbolHandle sym, uint32 num_args, string[] keys, int64[] arg_ind_ptr, int64[] arg_shape_data, size_t[] in_shape_size, int[]& in_shape_ndim, IntPtr[]& in_shape_data, size_t[] out_shape_size, int[]& out_shape_ndim, IntPtr[]& out_shape_data, size_t[] aux_shape_size, int[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
+*)
 
 /// <summary>partially infer shape of unknown input shapes given the known one.
 ///
@@ -1380,10 +1384,10 @@ extern int MXSymbolInferShapePartial64__(SymbolHandle sym, uint32 num_args, stri
 /// <param name="complete">whether infer shape completes or more information is needed.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolInferShapePartialEx__(SymbolHandle sym, uint32 num_args, string[] keys, uint32[] arg_ind_ptr, int[] arg_shape_data, uint32[] in_shape_size, int[]& in_shape_ndim, IntPtr[]& in_shape_data, uint32[] out_shape_size, int[]& out_shape_ndim, IntPtr[]& out_shape_data, uint32[] aux_shape_size, int[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
+extern int MXSymbolInferShapePartialEx(SymbolHandle sym, uint32 num_args, string[] keys, uint32[] arg_ind_ptr, int[] arg_shape_data, [<Out>] uint32& in_shape_size, [<Out>] IntPtr& in_shape_ndim, [<Out>] IntPtr& in_shape_data, [<Out>] uint32& out_shape_size, [<Out>] IntPtr& out_shape_ndim, [<Out>] IntPtr& out_shape_data, [<Out>] uint32& aux_shape_size, [<Out>] IntPtr& aux_shape_ndim, [<Out>] IntPtr& aux_shape_data, [<Out>] int& complete)
 
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolInferShapePartialEx64__(SymbolHandle sym, uint32 num_args, string[] keys, int64[] arg_ind_ptr, int64[] arg_shape_data, size_t[] in_shape_size, int[]& in_shape_ndim, IntPtr[]& in_shape_data, size_t[] out_shape_size, int[]& out_shape_ndim, IntPtr[]& out_shape_data, size_t[] aux_shape_size, int[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
+extern int MXSymbolInferShapePartialEx64(SymbolHandle sym, uint32 num_args, string[] keys, int64[] arg_ind_ptr, int64[] arg_shape_data, [<Out>] size_t& in_shape_size, [<Out>] IntPtr& in_shape_ndim, [<Out>] IntPtr& in_shape_data, [<Out>] size_t& out_shape_size, [<Out>] IntPtr& out_shape_ndim, [<Out>] IntPtr& out_shape_data, [<Out>] size_t& aux_shape_size, [<Out>] IntPtr& aux_shape_ndim, [<Out>] IntPtr& aux_shape_data, [<Out>] int& complete)
 
 /// <summary>infer type of unknown input types given the known one.
 /// The types are packed into a CSR matrix represented by arg_ind_ptr and arg_type_data
@@ -1401,7 +1405,7 @@ extern int MXSymbolInferShapePartialEx64__(SymbolHandle sym, uint32 num_args, st
 /// <param name="complete">whether infer type completes or more information is needed.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolInferType__(SymbolHandle sym, uint32 num_args, string[] keys, int[] arg_type_data, uint32[] in_type_size, int[]& in_type_data, uint32[] out_type_size, int[]& out_type_data, uint32[] aux_type_size, int[]& aux_type_data, int[] complete)
+extern int MXSymbolInferType(SymbolHandle sym, uint32 num_args, string[] keys, int[] arg_type_data, [<Out>] uint32& in_type_size, [<Out>] IntPtr& in_type_data, [<Out>] uint32& out_type_size, [<Out>] IntPtr& out_type_data, [<Out>] uint32& aux_type_size, [<Out>] IntPtr& aux_type_data, [<Out>] int& complete)
 
 /// <summary>partially infer type of unknown input types given the known one.
 ///
@@ -1421,7 +1425,7 @@ extern int MXSymbolInferType__(SymbolHandle sym, uint32 num_args, string[] keys,
 /// <param name="complete">whether infer type completes or more information is needed.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolInferTypePartial__(SymbolHandle sym, uint32 num_args, string[] keys, int[] arg_type_data, uint32[] in_type_size, int[]& in_type_data, uint32[] out_type_size, int[]& out_type_data, uint32[] aux_type_size, int[]& aux_type_data, int[] complete)
+extern int MXSymbolInferTypePartial(SymbolHandle sym, uint32 num_args, string[] keys, int[] arg_type_data, [<Out>] uint32& in_type_size, [<Out>] IntPtr& in_type_data, [<Out>] uint32& out_type_size, [<Out>] IntPtr& out_type_data, [<Out>] uint32& aux_type_size, [<Out>] IntPtr& aux_type_data, [<Out>] int& complete)
 
 /// <summary>Convert a symbol into a quantized symbol where FP32 operators are replaced with INT8</summary>
 /// <param name="sym_handle">symbol to be converted</param>
@@ -1439,7 +1443,7 @@ extern int MXSymbolInferTypePartial__(SymbolHandle sym, uint32 num_args, string[
 /// <param name="out_num_calib_names">return the number of nodes to be calibrated</param>
 /// <param name="out_calib_names">return the node names to be calibrated</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXQuantizeSymbol__(SymbolHandle sym_handle, SymbolHandle[] ret_sym_handle, int[] dev_type, uint32 num_excluded_sym_names, string[] excluded_sym_names, uint32 num_excluded_op_names, string[] excluded_op_names, uint32 num_offline, string[] offline_params, string quantized_dtype, bool calib_quantize, string quantize_mode, uint32[] out_num_calib_names, string[]& out_calib_names)
+extern int MXQuantizeSymbol(SymbolHandle sym_handle, [<Out>] SymbolHandle& ret_sym_handle, [<Out>] int& dev_type, uint32 num_excluded_sym_names, string[] excluded_sym_names, uint32 num_excluded_op_names, string[] excluded_op_names, uint32 num_offline, string[] offline_params, string quantized_dtype, bool calib_quantize, string quantize_mode, [<Out>] uint32& out_num_calib_names, [<Out>] IntPtr& out_calib_names)
 
 /// <summary>Convert a symbol into a mixed precision symbol with cast operators for target dtype casting</summary>
 /// <param name="sym_handle">symbol to be converted</param>
@@ -1466,7 +1470,7 @@ extern int MXQuantizeSymbol__(SymbolHandle sym_handle, SymbolHandle[] ret_sym_ha
 /// <param name="arg_names">argument names for which type information is provided</param>
 /// <param name="model_param_names">names for model parameters</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXReducePrecisionSymbol__(SymbolHandle sym_handle, SymbolHandle[] ret_sym_handle, uint32 num_args, int[] arg_type_data, uint32 num_ind_ptr, int[] ind_ptr, int[] target_dtype, int cast_optional_params, uint32 num_target_dtype_op_names, uint32 num_fp32_op_names, uint32 num_widest_dtype_op_names, uint32 num_conditional_fp32_op_names, uint32 num_excluded_symbols, uint32 num_model_params, string[] target_dtype_op_names, string[] fp32_op_names, string[] widest_dtype_op_names, string[] conditional_fp32_op_names, string[] excluded_symbols, string[] conditional_param_names, string[] conditional_param_vals, string[] model_param_names, string[] arg_names)
+extern int MXReducePrecisionSymbol(SymbolHandle sym_handle, [<Out>] SymbolHandle& ret_sym_handle, uint32 num_args, int[] arg_type_data, uint32 num_ind_ptr, int[] ind_ptr, int[] target_dtype, int cast_optional_params, uint32 num_target_dtype_op_names, uint32 num_fp32_op_names, uint32 num_widest_dtype_op_names, uint32 num_conditional_fp32_op_names, uint32 num_excluded_symbols, uint32 num_model_params, string[] target_dtype_op_names, string[] fp32_op_names, string[] widest_dtype_op_names, string[] conditional_fp32_op_names, string[] excluded_symbols, string[] conditional_param_names, string[] conditional_param_vals, string[] model_param_names, string[] arg_names)
 
 /// <summary>Set calibration table to node attributes in the sym</summary>
 /// <param name="sym_handle">symbol whose node attributes are to be set by calibration table</param>
@@ -1476,14 +1480,14 @@ extern int MXReducePrecisionSymbol__(SymbolHandle sym_handle, SymbolHandle[] ret
 /// <param name="high_quantiles">high quantiles of layers stored in the calibration table</param>
 /// <param name="ret_sym_handle">returned symbol</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSetCalibTableToQuantizedSymbol__(SymbolHandle qsym_handle, uint32 num_layers, string[] layer_names, float32[] low_quantiles, float32[] high_quantiles, SymbolHandle[] ret_sym_handle)
+extern int MXSetCalibTableToQuantizedSymbol(SymbolHandle qsym_handle, uint32 num_layers, string[] layer_names, float32[] low_quantiles, float32[] high_quantiles, [<Out>] SymbolHandle& ret_sym_handle)
 
 /// <summary>Run subgraph pass based on the backend provided</summary>
 /// <param name="sym_handle">symbol to be converted</param>
 /// <param name="backend">backend names for subgraph pass</param>
 /// <param name="ret_sym_handle">returned symbol</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXGenBackendSubgraph__(SymbolHandle sym_handle, string backend, SymbolHandle[] ret_sym_handle)
+extern int MXGenBackendSubgraph(SymbolHandle sym_handle, string backend, [<Out>] SymbolHandle& ret_sym_handle)
 
 /// <summary>Generate atomic symbol (able to be composed) from a source symbol</summary>
 /// <param name="sym_handle">source symbol</param>
@@ -1502,7 +1506,7 @@ extern int MXGenAtomicSymbolFromSymbol(SymbolHandle sym_handle, [<Out>] SymbolHa
 /// <param name="keys">keys for options</param>
 /// <param name="vals">values corresponding to keys</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXOptimizeForBackend__(SymbolHandle sym_handle, string backend_name, int dev_type, SymbolHandle[] ret_sym_handle, uint32 len, NDArrayHandle[] in_args_handle, uint32 num_options, string[] keys, string[] vals)
+extern int MXOptimizeForBackend(SymbolHandle sym_handle, string backend_name, int dev_type, SymbolHandle[] ret_sym_handle, uint32 len, NDArrayHandle[] in_args_handle, uint32 num_options, string[] keys, string[] vals)
 
 //--------------------------------------------
 // Part 4: Executor interface

@@ -282,9 +282,453 @@ module MXSymbol =
         let mutable ret_sym_handle = un
         MXGenAtomicSymbolFromSymbol(sym_handle, &ret_sym_handle) |> throwOnError "MXGenAtomicSymbolFromSymbol"
         ret_sym_handle
+            
+
+    /// <summary>Get the input symbols of the graph.</summary>
+    /// <param name="sym">The graph.</param>
+    /// <returns>The input symbols of the graph.</returns>
+    let getInputSymbols sym  : SymbolHandle [] = 
+        let mutable input_size = un
+        let mutable inputs = 0n
+        MXSymbolGetInputSymbols(sym, &inputs, &input_size) |> throwOnError "MXSymbolGetInputSymbols"
+        readStructArray input_size inputs
+
+    /// <summary>Cut a subgraph whose nodes are marked with a subgraph attribute.
+    ///The input graph will be modified. A variable node will be created for each
+    ///edge that connects to nodes outside the subgraph. The outside nodes that
+    ///connect to the subgraph will be returned.</summary>
+    /// <param name="sym">The graph.</param>
+    /// <returns>The nodes that connect to the subgraph.</returns>
+    let cutSubgraph sym = 
+        let mutable input_size = un
+        let mutable inputs = 0n
+        MXSymbolCutSubgraph(sym, &inputs, &input_size) |> throwOnError "MXSymbolCutSubgraph"
+        readStructArray input_size inputs
+
+    /// <summary>Create a Symbol by grouping list of symbols together</summary>
+    /// <param name="num_symbols">number of symbols to be grouped</param>
+    /// <param name="symbols">array of symbol handles</param>
+    /// <returns>pointer to the created symbol handle</returns>
+    let createGroup symbols = 
+        let mutable out = un
+        MXSymbolCreateGroup(ulength symbols, symbols, &out) |> throwOnError "MXSymbolCreateGroup"
+        out
+
+    /// <summary>Load a symbol from a json file.</summary>
+    /// <param name="fname">the file name.</param>
+    /// <returns>the output symbol.</returns>
+    let createFromFile fname = 
+        let mutable out = un
+        MXSymbolCreateFromFile(fname, &out) |> throwOnError "MXSymbolCreateFromFile"
+        out
+
+    /// <summary>Load a symbol from a json string.</summary>
+    /// <param name="json">the json string.</param>
+    /// <returns>the output symbol.</returns>
+    let createFromJSON json = 
+        let mutable out = un
+        MXSymbolCreateFromJSON(json, &out) |> throwOnError "MXSymbolCreateFromJSON"
+        out
+
+    /// <summary>Remove the operators amp_cast and amp_multicast</summary>
+    /// <param name="sym_handle">the input symbol.</param>
+    /// <returns>the output symbol.</returns>
+    let removeAmpCast sym_handle = 
+        let mutable ret_sym_handle = 0n
+        MXSymbolRemoveAmpCast(sym_handle, &ret_sym_handle) |> throwOnError "MXSymbolRemoveAmpCast"
+        ret_sym_handle
+
+    /// <summary>Save a symbol into a json file.</summary>
+    /// <param name="symbol">the input symbol.</param>
+    /// <param name="fname">the file name.</param>
+    let saveToFile symbol fname = 
+        MXSymbolSaveToFile(symbol, fname) |> throwOnError "MXSymbolSaveToFile"
+
+    /// <summary>Copy the symbol to another handle</summary>
+    /// <param name="symbol">the source symbol</param>
+    /// <returns>used to hold the result of copy</returns>
+    let copy symbol = 
+        let mutable out = un
+        MXSymbolCopy(symbol, &out) |> throwOnError "MXSymbolCopy"
+        out
+
+    /// <summary>Print the content of symbol, used for debug.</summary>
+    /// <param name="symbol">the symbol</param>
+    /// <returns>pointer to hold the output string of the printing.</returns>
+    let print symbol = 
+        let mutable out_str = un
+        MXSymbolPrint(symbol, &out_str) |> throwOnError "MXSymbolPrint"
+        str out_str
+
+    /// <summary>Get string name from symbol</summary>
+    /// <param name="symbol">the source symbol</param>
+    /// <returns>The result name.</returns>
+    let getName symbol = 
+        let mutable out = un
+        let mutable success = un
+        MXSymbolGetName(symbol, &out, &success) |> throwOnError "MXSymbolGetName"
+        if success = 0 then 
+            None
+        else
+            Some (str out)
+
+    /// <summary>Get string attribute from symbol</summary>
+    /// <param name="symbol">the source symbol</param>
+    /// <param name="key">The key of the symbol.</param>
+    /// <returns>The result attribute, can be NULL if the attribute do not exist.</returns>
+    let getAttr symbol key success = 
+        let mutable out = un
+        let mutable success = un
+        MXSymbolGetAttr(symbol, key, &out, &success) |> throwOnError "MXSymbolGetAttr"
+        if success = 0 then 
+            None
+        else
+            Some (str out)
+
+    /// <summary>Set string attribute from symbol.
+    /// NOTE: Setting attribute to a symbol can affect the semantics(mutable/immutable) of symbolic graph.
+    ///
+    /// Safe recommendaton: use  immutable graph
+    /// - Only allow set attributes during creation of new symbol as optional parameter
+    ///
+    /// Mutable graph (be careful about the semantics):
+    /// - Allow set attr at any point.
+    /// - Mutating an attribute of some common node of two graphs can cause confusion from user.</summary>
+    /// <param name="symbol">the source symbol</param>
+    /// <param name="key">The key of the symbol.</param>
+    /// <param name="value">The value to be saved.</param>
+    let setAttr symbol key value = 
+        MXSymbolSetAttr(symbol, key, value) |> throwOnError "MXSymbolSetAttr"
+
+    /// <summary>Get all attributes from symbol, including all descendents.</summary>
+    /// <param name="symbol">the source symbol</param>
+    /// <returns>2*out_size strings representing key value pairs.</returns>
+    let listAttr symbol = 
+        let mutable out_size = un
+        let mutable out = un
+        MXSymbolListAttr(symbol, &out_size, &out) |> throwOnError "MXSymbolListAttr"
+        readStringArray out_size out
+
+    /// <summary>Get all attributes from symbol, excluding descendents.</summary>
+    /// <param name="symbol">the source symbol</param>
+    /// <returns>key value pairs.</returns>
+    let listAttrShallow symbol = 
+        let mutable out_size = un
+        let mutable out = un
+        MXSymbolListAttrShallow(symbol, &out_size, &out) |> throwOnError "MXSymbolListAttrShallow"
+        readStringArray (2*int out_size) out
+        |> Array.chunkBySize 2
+        |> Array.map (fun a -> a.[0], a.[1])
+
+    /// <summary>List arguments in the symbol.</summary>
+    /// <param name="symbol">the symbol</param>
+    let listArguments symbol = 
+        let mutable out_size = un
+        let mutable out_str_array = un
+        MXSymbolListArguments(symbol, &out_size, &out_str_array) |> throwOnError "MXSymbolListArguments"
+        readStringArray out_size out_str_array
+
+    /// <summary>List returns in the symbol.</summary>
+    /// <param name="symbol">the symbol</param>
+    let listOutputs symbol = 
+        let mutable out_size = un
+        let mutable out_str_array = un
+        MXSymbolListOutputs(symbol, &out_size, &out_str_array) |> throwOnError "MXSymbolListOutputs"
+        readStringArray out_size out_str_array
+
+    /// <summary>Get number of outputs of the symbol.</summary>
+    /// <param name="symbol">The symbol</param>
+    /// <returns>number of outputs</returns>
+    let getNumOutputs symbol = 
+        let mutable output_count = un
+        MXSymbolGetNumOutputs(symbol, &output_count) |> throwOnError "MXSymbolGetNumOutputs"
+        output_count
+
+    /// <summary>Get a symbol that contains all the internals.</summary>
+    /// <param name="symbol">The symbol</param>
+    /// <returns>The output symbol whose outputs are all the internals.</returns>
+    let getInternals symbol = 
+        let mutable out = un
+        MXSymbolGetInternals(symbol, &out) |> throwOnError "MXSymbolGetInternals"
+        out
+
+    /// <summary>Get a symbol that contains only direct children.</summary>
+    /// <param name="symbol">The symbol</param>
+    /// <returns>The output symbol whose outputs are the direct children.</returns>
+    let getChildren symbol = 
+        let mutable out = un
+        MXSymbolGetChildren(symbol, &out) |> throwOnError "MXSymbolGetChildren"
+        out
+
+    /// <summary>Get index-th outputs of the symbol.</summary>
+    /// <param name="symbol">The symbol</param>
+    /// <param name="index">the Index of the output.</param>
+    /// <returns>The output symbol whose outputs are the index-th symbol.</returns>
+    let getOutput symbol index = 
+        let mutable out = un
+        MXSymbolGetOutput(symbol, uint32 index, &out) |> throwOnError "MXSymbolGetOutput"
+        out
+
+    /// <summary>List auxiliary states in the symbol.</summary>
+    /// <param name="symbol">the symbol</param>
+    let listAuxiliaryStates symbol = 
+        let mutable out_size = un
+        let mutable out_str_array = un
+        MXSymbolListAuxiliaryStates(symbol, &out_size, &out_str_array) |> throwOnError "MXSymbolListAuxiliaryStates"
+        readStringArray out_size out_str_array
+
+    /// <summary>Get the gradient graph of the symbol</summary>
+    /// <param name="sym">the symbol to get gradient</param>
+    /// <param name="wrt">the name of the arguments to get gradient</param>
+    /// <returns>the returned symbol that has gradient</returns>
+    let grad sym wrt = 
+        let mutable out = un
+        MXSymbolGrad(sym, ulength wrt, wrt, &out) |> throwOnError "MXSymbolGrad"
+        out
+
+    /// <summary>infer shape of unknown input shapes given the known one.
+    /// The shapes are packed into a CSR matrix represented by arg_ind_ptr and arg_shape_data
+    /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
+    /// <param name="sym">symbol handle</param>
+    /// <param name="num_args">numbe of input arguments.</param>
+    /// <param name="keys">the key of keyword args (optional)</param>
+    /// <param name="arg_ind_ptr">the head pointer of the rows in CSR</param>
+    /// <param name="arg_shape_data">the content of the CSR</param>
+    /// <param name="in_shape_size">sizeof the returning array of in_shapes</param>
+    /// <param name="in_shape_ndim">returning array of shape dimensions of eachs input shape.</param>
+    /// <param name="in_shape_data">returning array of pointers to head of the input shape.</param>
+    /// <param name="out_shape_size">sizeof the returning array of out_shapes</param>
+    /// <param name="out_shape_ndim">returning array of shape dimensions of eachs input shape.</param>
+    /// <param name="out_shape_data">returning array of pointers to head of the input shape.</param>
+    /// <param name="aux_shape_size">sizeof the returning array of aux_shapes</param>
+    /// <param name="aux_shape_ndim">returning array of shape dimensions of eachs auxiliary shape.</param>
+    /// <param name="aux_shape_data">returning array of pointers to head of the auxiliary shape.</param>
+    /// <param name="complete">whether infer shape completes or more information is needed.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let inferShapeEx sym num_args keys arg_ind_ptr arg_shape_data complete = 
+        //TODO: Complete MXSymbolInferShapeEx
+        let mutable in_shape_size = un
+        let mutable in_shape_ndim = un
+        let mutable in_shape_data = un
+        let mutable aux_shape_size = un
+        let mutable aux_shape_ndim = un
+        let mutable aux_shape_data = un
+        let mutable out_shape_size = un
+        let mutable out_shape_ndim = un
+        let mutable out_shape_data = un
+        let mutable complete = un
+        MXSymbolInferShapeEx(sym, num_args, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapeEx"
+
+    let inferShapeEx64 sym num_args keys arg_ind_ptr arg_shape_data = 
+        //TODO: Complete MXSymbolInferShapeEx64
+        let mutable in_shape_size = un
+        let mutable in_shape_ndim = un
+        let mutable in_shape_data = un
+        let mutable aux_shape_size = un
+        let mutable aux_shape_ndim = un
+        let mutable aux_shape_data = un
+        let mutable out_shape_size = un
+        let mutable out_shape_ndim = un
+        let mutable out_shape_data = un
+        let mutable complete = un
+        MXSymbolInferShapeEx64(sym, num_args, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapeEx64"
+  
+    /// <summary>partially infer shape of unknown input shapes given the known one.
+    ///
+    /// Return partially inferred results if not all shapes could be inferred.
+    /// The shapes are packed into a CSR matrix represented by arg_ind_ptr and arg_shape_data
+    /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
+    /// <param name="sym">symbol handle</param>
+    /// <param name="num_args">numbe of input arguments.</param>
+    /// <param name="keys">the key of keyword args (optional)</param>
+    /// <param name="arg_ind_ptr">the head pointer of the rows in CSR</param>
+    /// <param name="arg_shape_data">the content of the CSR</param>
+    /// <param name="in_shape_size">sizeof the returning array of in_shapes</param>
+    /// <param name="in_shape_ndim">returning array of shape dimensions of eachs input shape.</param>
+    /// <param name="in_shape_data">returning array of pointers to head of the input shape.</param>
+    /// <param name="out_shape_size">sizeof the returning array of out_shapes</param>
+    /// <param name="out_shape_ndim">returning array of shape dimensions of eachs input shape.</param>
+    /// <param name="out_shape_data">returning array of pointers to head of the input shape.</param>
+    /// <param name="aux_shape_size">sizeof the returning array of aux_shapes</param>
+    /// <param name="aux_shape_ndim">returning array of shape dimensions of eachs auxiliary shape.</param>
+    /// <param name="aux_shape_data">returning array of pointers to head of the auxiliary shape.</param>
+    /// <param name="complete">whether infer shape completes or more information is needed.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let inferShapePartialEx sym num_args keys arg_ind_ptr arg_shape_data in_shape_size in_shape_ndim in_shape_data aux_shape_size aux_shape_ndim aux_shape_data complete = 
+        //TODO: Complete MXSymbolInferShapePartialEx
+        let mutable in_shape_size = un
+        let mutable in_shape_ndim = un
+        let mutable in_shape_data = un
+        let mutable aux_shape_size = un
+        let mutable aux_shape_ndim = un
+        let mutable aux_shape_data = un
+        let mutable out_shape_size = un
+        let mutable out_shape_ndim = un
+        let mutable out_shape_data = un
+        let mutable complete = un
+        MXSymbolInferShapePartialEx(sym, num_args, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapePartialEx"
+
+    let inferShapePartialEx64 sym num_args keys arg_ind_ptr arg_shape_data in_shape_size in_shape_ndim in_shape_data aux_shape_size aux_shape_ndim aux_shape_data complete = 
+        //TODO: Complete MXSymbolInferShapePartialEx64
+        let mutable in_shape_size = un
+        let mutable in_shape_ndim = un
+        let mutable in_shape_data = un
+        let mutable aux_shape_size = un
+        let mutable aux_shape_ndim = un
+        let mutable aux_shape_data = un
+        let mutable out_shape_size = un
+        let mutable out_shape_ndim = un
+        let mutable out_shape_data = un
+        let mutable complete = un
+        MXSymbolInferShapePartialEx64(sym, num_args, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapePartialEx64"
+
+    /// <summary>infer type of unknown input types given the known one.
+    /// The types are packed into a CSR matrix represented by arg_ind_ptr and arg_type_data
+    /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
+    /// <param name="sym">symbol handle</param>
+    /// <param name="num_args">numbe of input arguments.</param>
+    /// <param name="keys">the key of keyword args (optional)</param>
+    /// <param name="arg_type_data">the content of the CSR</param>
+    /// <param name="in_type_size">sizeof the returning array of in_types</param>
+    /// <param name="in_type_data">returning array of pointers to head of the input type.</param>
+    /// <param name="out_type_size">sizeof the returning array of out_types</param>
+    /// <param name="out_type_data">returning array of pointers to head of the input type.</param>
+    /// <param name="aux_type_size">sizeof the returning array of aux_types</param>
+    /// <param name="aux_type_data">returning array of pointers to head of the auxiliary type.</param>
+    /// <param name="complete">whether infer type completes or more information is needed.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let inferType sym num_args keys arg_type_data = 
+        //TODO: Complete MXSymbolInferType
+        let mutable in_type_size = un
+        let mutable in_type_data = un
+        let mutable aux_type_size = un
+        let mutable aux_type_data = un
+        let mutable complete = un
+        let mutable out_type_size = un
+        let mutable out_type_data = un
+        MXSymbolInferType(sym, num_args, keys, arg_type_data, &in_type_size, &in_type_data, &out_type_size, &out_type_data, &aux_type_size, &aux_type_data, &complete) |> throwOnError "MXSymbolInferType"
+
+    /// <summary>partially infer type of unknown input types given the known one.
+    ///
+    /// Return partially inferred results if not all types could be inferred.
+    /// The types are packed into a CSR matrix represented by arg_ind_ptr and arg_type_data
+    /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
+    /// <param name="sym">symbol handle</param>
+    /// <param name="num_args">numbe of input arguments.</param>
+    /// <param name="keys">the key of keyword args (optional)</param>
+    /// <param name="arg_type_data">the content of the CSR</param>
+    /// <param name="in_type_size">sizeof the returning array of in_types</param>
+    /// <param name="in_type_data">returning array of pointers to head of the input type.</param>
+    /// <param name="out_type_size">sizeof the returning array of out_types</param>
+    /// <param name="out_type_data">returning array of pointers to head of the input type.</param>
+    /// <param name="aux_type_size">sizeof the returning array of aux_types</param>
+    /// <param name="aux_type_data">returning array of pointers to head of the auxiliary type.</param>
+    /// <param name="complete">whether infer type completes or more information is needed.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let inferTypePartial sym num_args keys arg_type_data = 
+        //TODO: Complete MXSymbolInferTypePartial
+        let mutable in_type_size = un
+        let mutable in_type_data = un
+        let mutable aux_type_size = un
+        let mutable aux_type_data = un
+        let mutable complete = un
+        let mutable out_type_size = un
+        let mutable out_type_data = un
+        MXSymbolInferTypePartial(sym, num_args, keys, arg_type_data, &in_type_size, &in_type_data, &out_type_size, &out_type_data, &aux_type_size, &aux_type_data, &complete) |> throwOnError "MXSymbolInferTypePartial"
+
+    /// <summary>Convert a symbol into a quantized symbol where FP32 operators are replaced with INT8</summary>
+    /// <param name="sym_handle">symbol to be converted</param>
+    /// <param name="ret_sym_handle">quantized symbol result</param>
+    /// <param name="dev_type">device type</param>
+    /// <param name="num_excluded_sym_names">number of layers excluded from being quantized in the input symbol</param>
+    /// <param name="excluded_sym_names">node names to be excluded from being quantized</param>
+    /// <param name="num_excluded_op_names">number of operators excluded from being quantized in the input symbol</param>
+    /// <param name="excluded_op_names">operator names to be excluded from being quantized</param>
+    /// <param name="num_offline">number of parameters that are quantized offline</param>
+    /// <param name="offline_params">array of c strings representing the names of params quantized offline</param>
+    /// <param name="quantized_dtype">the quantized destination type for input data</param>
+    /// <param name="calib_quantize">**Deprecated**. quantize op will always be calibrated if could</param>
+    /// <param name="quantize_mode">quantize mode to be used in quantize pass</param>
+    /// <param name="out_num_calib_names">return the number of nodes to be calibrated</param>
+    /// <param name="out_calib_names">return the node names to be calibrated</param>
+    let quantize sym_handle excluded_sym_names excluded_op_names offline_params quantized_dtype quantize_mode = 
+        //TODO: Complete MXQuantizeSymbol
+        let mutable dev_type = un
+        let mutable ret_sym_handle = un
+        let mutable out_num_calib_names = un
+        let mutable out_calib_names = un
+        MXQuantizeSymbol(sym_handle, &ret_sym_handle, &dev_type, ulength excluded_sym_names, excluded_sym_names, ulength excluded_op_names, excluded_op_names, ulength offline_params, offline_params, quantized_dtype, true, quantize_mode, &out_num_calib_names, &out_calib_names) |> throwOnError "MXQuantizeSymbol"
+
+    /// <summary>Convert a symbol into a mixed precision symbol with cast operators for target dtype casting</summary>
+    /// <param name="sym_handle">symbol to be converted</param>
+    /// <param name="arg_type_data">arg types of the arguments</param>
+    /// <param name="target_dtype">target_dtype for mixed precision symbol</param>
+    /// <param name="cast_optional_params">whether to cast optional params to target_dtype</param>
+    /// <param name="num_target_dtype_op_names">number of ops to be casted to target_dtype</param>
+    /// <param name="num_fp32_op_names">number of ops to be casted to FP32</param>
+    /// <param name="num_widest_dtype_op_names">number of ops to be casted to widest dtype</param>
+    /// <param name="num_conditional_fp32_op_names">number of ops to be casted to FP32 based on a condition</param>
+    /// <param name="num_excluded_symbols">number of symbols to be excluded from casting</param>
+    /// <param name="num_model_params">number of model parameters</param>
+    /// <param name="num_widest_dtype_op_names">number of ops to be casted to the widest dtype</param>
+    /// <param name="num_conditional_fp32_op_names">number of ops to be cast to fp32 based on precision</param>
+    /// <param name="target_dtype_op_names">op names to be casted to target_dtype</param>
+    /// <param name="fp32_op_names">op names to be casted to fp32</param>
+    /// <param name="widest_dtype_op_names">names to be casted to widest dtype</param>
+    /// <param name="conditional_fp32_op_names">names to be casted to FP32 conditionally</param>
+    /// <param name="excluded_symbols">symbol names to be excluded from casting</param>
+    /// <param name="param_names">param names for conditional FP32 casting</param>
+    /// <param name="param_values">param values for conditional FP32 casting</param>
+    /// <param name="arg_names">argument names for which type information is provided</param>
+    /// <param name="model_param_names">names for model parameters</param>
+    let reducePrecision sym_handle arg_type_data ind_ptr target_dtype cast_optional_params num_target_dtype_op_names num_fp32_op_names num_widest_dtype_op_names num_conditional_fp32_op_names num_excluded_symbols num_model_params target_dtype_op_names fp32_op_names widest_dtype_op_names conditional_fp32_op_names excluded_symbols conditional_param_names conditional_param_vals model_param_names arg_names = 
+        //TODO: Complete MXReducePrecisionSymbol
+        let mutable ret_sym_handle = un
+        MXReducePrecisionSymbol(sym_handle, &ret_sym_handle, ulength arg_type_data, arg_type_data, ulength ind_ptr, ind_ptr, target_dtype, cast_optional_params, num_target_dtype_op_names, num_fp32_op_names, num_widest_dtype_op_names, num_conditional_fp32_op_names, num_excluded_symbols, num_model_params, target_dtype_op_names, fp32_op_names, widest_dtype_op_names, conditional_fp32_op_names, excluded_symbols, conditional_param_names, conditional_param_vals, model_param_names, arg_names) |> throwOnError "MXReducePrecisionSymbol"
+
+    /// <summary>Set calibration table to node attributes in the sym</summary>
+    /// <param name="sym_handle">symbol whose node attributes are to be set by calibration table</param>
+    /// <param name="num_layers">number of layers in the calibration table</param>
+    /// <param name="layer">names stored as keys in the calibration table</param>
+    /// <param name="low_quantiles">low quantiles of layers stored in the calibration table</param>
+    /// <param name="high_quantiles">high quantiles of layers stored in the calibration table</param>
+    /// <param name="ret_sym_handle">returned symbol</param>
+    let mXSetCalibTableToQuantizedSymbol qsym_handle layer_names low_quantiles high_quantiles = 
+        let mutable ret_sym_handle = un
+        MXSetCalibTableToQuantizedSymbol(qsym_handle, ulength layer_names, layer_names, low_quantiles, high_quantiles, &ret_sym_handle) |> throwOnError "MXSetCalibTableToQuantizedSymbol"
+        ret_sym_handle
+
+    /// <summary>Run subgraph pass based on the backend provided</summary>
+    /// <param name="sym_handle">symbol to be converted</param>
+    /// <param name="backend">backend names for subgraph pass</param>
+    /// <param name="ret_sym_handle">returned symbol</param>
+    let mXGenBackendSubgraph sym_handle backend = 
+        let mutable ret_sym_handle = un
+        MXGenBackendSubgraph(sym_handle, backend, &ret_sym_handle) |> throwOnError "MXGenBackendSubgraph"
+        ret_sym_handle
+
+    /// <summary>Generate atomic symbol (able to be composed) from a source symbol</summary>
+    /// <param name="sym_handle">source symbol</param>
+    /// <param name="ret_sym_handle">returned atomic symbol</param>
+    let mXGenAtomicSymbolFromSymbol sym_handle = 
+        let mutable ret_sym_handle = un
+        MXGenAtomicSymbolFromSymbol(sym_handle, &ret_sym_handle) |> throwOnError "MXGenAtomicSymbolFromSymbol"
+        ret_sym_handle
+
+    /// <summary>Partitions symbol for given backend, potentially creating subgraphs</summary>
+    /// <param name="sym_handle">symbol to be partitioned</param>
+    /// <param name="dev_type">context device type</param>
+    /// <param name="backend_name">backend name</param>
+    /// <param name="ret_sym_handle">partitioned symbol returned</param>
+    /// <param name="len">number of args</param>
+    /// <param name="in_args_handle">args array</param>
+    /// <param name="num_options">number of key value pairs</param>
+    /// <param name="keys">keys for options</param>
+    /// <param name="vals">values corresponding to keys</param>
+    let mXOptimizeForBackend sym_handle backend_name dev_type ret_sym_handle len in_args_handle num_options keys vals = 
+        MXOptimizeForBackend(sym_handle, backend_name, dev_type, ret_sym_handle, len, in_args_handle, num_options, keys, vals) |> throwOnError "MXOptimizeForBackend"
         
 
-        
 
 module MXNDArray = 
     /// <summary>create a NDArray handle that is not initialized
