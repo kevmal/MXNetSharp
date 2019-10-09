@@ -68,6 +68,7 @@ type AtomicSymbolInfo =
     }
 
 module Helper = 
+    let ulength (a : 'a []) = a.Length |> uint32
     let boolToInt b = if b then 1 else 0
     let intPtrSz = Marshal.SizeOf<IntPtr>()
     let un<'a> = Unchecked.defaultof<'a>
@@ -508,7 +509,148 @@ module MXNDArray =
         readStructArray num_outputs outputs
 
         
+module MXExecutor = 
 
+    /// <summary>Delete the executor</summary>
+    /// <param name="handle">the executor.</param>
+    let free handle = 
+        MXExecutorFree(handle) |> throwOnError "MXExecutorFree"
+
+    /// <summary>Print the content of execution plan, used for debug.</summary>
+    /// <param name="handle">the executor.</param>
+    /// <returns>pointer to hold the output string of the printing.</returns>
+    let print handle = 
+        let mutable out_str = 0n
+        MXExecutorPrint(handle, &out_str) |> throwOnError "MXExecutorPrint"
+        str out_str
+
+    /// <summary>Executor forward method</summary>
+    /// <param name="handle">executor handle</param>
+    /// <param name="is_train">int value to indicate whether the forward pass is for evaluation</param>
+    let forward handle is_train = 
+        MXExecutorForward(handle, is_train) |> throwOnError "MXExecutorForward"
+
+    /// <summary>Excecutor run backward</summary>
+    /// <param name="handle">execute handle</param>
+    /// <param name="head_grads">NDArray handle for heads' gradient</param>
+    let backward handle head_grads = 
+        MXExecutorBackward(handle, head_grads |> Array.length |> uint32, head_grads) |> throwOnError "MXExecutorBackward"
+
+    /// <summary>Excecutor run backward</summary>
+    /// <param name="handle">execute handle</param>
+    /// <param name="head_grads">NDArray handle for heads' gradient</param>
+    /// <param name="is_train">int value to indicate whether the backward pass is for evaluation</param>
+    let backwardEx handle head_grads is_train = 
+        MXExecutorBackwardEx(handle, head_grads |> Array.length |> uint32, head_grads, is_train) |> throwOnError "MXExecutorBackwardEx"
+
+    /// <summary>Get executor's head NDArray</summary>
+    /// <param name="handle">executor handle</param>
+    /// <returns>narray handles</returns>
+    let outputs handle : NDArrayHandle[] = 
+        let mutable out_size = un
+        let mutable out = un
+        MXExecutorOutputs(handle, &out_size, &out) |> throwOnError "MXExecutorOutputs"
+        readStructArray out_size out
+
+    /// <summary>Generate Executor from symbol</summary>
+    /// <param name="symbol_handle">symbol handle</param>
+    /// <param name="dev_type">device type</param>
+    /// <param name="dev_id">device id</param>
+    /// <param name="in_args">in args array</param>
+    /// <param name="arg_grad_store">arg grads handle array</param>
+    /// <param name="grad_req_type">grad req array</param>
+    /// <param name="aux_states">auxiliary states array</param>
+    /// <returns>output executor handle</returns>
+    let bind symbol_handle dev_type dev_id in_args arg_grad_store grad_req_type aux_states = 
+        let mutable out = un
+        MXExecutorBind(symbol_handle, dev_type, dev_id, ulength in_args, in_args, arg_grad_store, grad_req_type, ulength aux_states, aux_states, &out) |> throwOnError "MXExecutorBind"
+        out
+
+    /// <summary>Generate Executor from symbol,
+    /// This is advanced function, allow specify group2ctx map.
+    /// The user can annotate "ctx_group" attribute to name each group.</summary>
+    /// <param name="symbol_handle">symbol handle</param>
+    /// <param name="dev_type">device type of default context</param>
+    /// <param name="dev_id">device id of default context</param>
+    /// <param name="map_keys">keys of group2ctx map</param>
+    /// <param name="map_dev_types">device type of group2ctx map</param>
+    /// <param name="map_dev_ids">device id of group2ctx map</param>
+    /// <param name="in_args">in args array</param>
+    /// <param name="arg_grad_store">arg grads handle array</param>
+    /// <param name="grad_req_type">grad req array</param>
+    /// <param name="aux_states">auxiliary states array</param>
+    /// <returns>output executor handle</returns>
+    let bindX symbol_handle dev_type dev_id map_keys map_dev_types map_dev_ids in_args arg_grad_store grad_req_type aux_states = 
+        let mutable out = un
+        MXExecutorBindX(symbol_handle, dev_type, dev_id, ulength map_keys, map_keys, map_dev_types, map_dev_ids, ulength in_args, in_args, arg_grad_store, grad_req_type, ulength aux_states, aux_states, &out) |> throwOnError "MXExecutorBindX"
+        out
+
+    /// <summary>Generate Executor from symbol,
+    /// This is advanced function, allow specify group2ctx map.
+    /// The user can annotate "ctx_group" attribute to name each group.</summary>
+    /// <param name="symbol_handle">symbol handle</param>
+    /// <param name="dev_type">device type of default context</param>
+    /// <param name="dev_id">device id of default context</param>
+    /// <param name="map_keys">keys of group2ctx map</param>
+    /// <param name="map_dev_types">device type of group2ctx map</param>
+    /// <param name="map_dev_ids">device id of group2ctx map</param>
+    /// <param name="in_args">in args array</param>
+    /// <param name="arg_grad_store">arg grads handle array</param>
+    /// <param name="grad_req_type">grad req array</param>
+    /// <param name="aux_states">auxiliary states array</param>
+    /// <param name="shared_exec">input executor handle for memory sharing</param>
+    /// <returns>output executor handle</returns>
+    let bindEX symbol_handle dev_type dev_id map_keys map_dev_types map_dev_ids in_args arg_grad_store grad_req_type aux_states shared_exec = 
+        let mutable out = un
+        MXExecutorBindEX(symbol_handle, dev_type, dev_id, ulength map_keys, map_keys, map_dev_types, map_dev_ids, ulength in_args, in_args, arg_grad_store, grad_req_type, ulength aux_states, aux_states, shared_exec, &out) |> throwOnError "MXExecutorBindEX"
+
+    // TODO: simpleBindEx wrapper
+    //let simpleBindEx symbol_handle dev_type dev_id num_g2c_keys g2c_keys g2c_dev_types g2c_dev_ids provided_grad_req_list_len provided_grad_req_names provided_grad_req_types num_provided_arg_shapes provided_arg_shape_names provided_arg_shape_data provided_arg_shape_idx num_provided_arg_dtypes provided_arg_dtype_names provided_arg_dtypes num_provided_arg_stypes provided_arg_stype_names provided_arg_stypes num_shared_arg_names shared_arg_name_list shared_buffer_len shared_buffer_name_list shared_buffer_handle_list updated_shared_buffer_name_list updated_shared_buffer_handle_list num_in_args in_args arg_grads num_aux_states aux_states shared_exec_handle = 
+    //    let mutable out = un
+    //    MXExecutorSimpleBindEx(symbol_handle, dev_type, dev_id, num_g2c_keys, g2c_keys, g2c_dev_types, g2c_dev_ids, provided_grad_req_list_len, provided_grad_req_names, provided_grad_req_types, num_provided_arg_shapes, provided_arg_shape_names, provided_arg_shape_data, provided_arg_shape_idx, num_provided_arg_dtypes, provided_arg_dtype_names, provided_arg_dtypes, num_provided_arg_stypes, provided_arg_stype_names, provided_arg_stypes, num_shared_arg_names, shared_arg_name_list, shared_buffer_len, shared_buffer_name_list, shared_buffer_handle_list, updated_shared_buffer_name_list, updated_shared_buffer_handle_list, num_in_args, in_args, arg_grads, num_aux_states, aux_states, shared_exec_handle, &out) |> throwOnError "MXExecutorSimpleBindEx"
+
+    (* TODO: MXExecutorReshapeEx
+    /// <summary>Return a new executor with the same symbol and shared memory,
+    ///but different input/output shapes.</summary>
+    /// <param name="partial_shaping">Whether to allow changing the shape of unspecified arguments.</param>
+    /// <param name="allow_up_sizing">Whether to allow allocating new ndarrays that's larger than the original.</param>
+    /// <param name="dev_type">device type of default context</param>
+    /// <param name="dev_id">device id of default context</param>
+    /// <param name="num_map_keys">size of group2ctx map</param>
+    /// <param name="map_keys">keys of group2ctx map</param>
+    /// <param name="map_dev_types">device type of group2ctx map</param>
+    /// <param name="map_dev_ids">device id of group2ctx map</param>
+    /// <param name="num_in_args">length of in_args</param>
+    /// <param name="in_args">in args array</param>
+    /// <param name="arg_grads">arg grads handle array</param>
+    /// <param name="num_aux_states">length of auxiliary states</param>
+    /// <param name="aux_states">auxiliary states array</param>
+    /// <param name="shared_exec">input executor handle for memory sharing</param>
+    /// <param name="out">output executor handle</param>
+    /// <returns>a new executor</returns>
+    let reshapeEx partial_shaping allow_up_sizing dev_type dev_id num_map_keys map_keys map_dev_types map_dev_ids num_provided_arg_shapes provided_arg_shape_names provided_arg_shape_data provided_arg_shape_idx num_in_args in_args arg_grads num_aux_states aux_states shared_exec = 
+        let mutable out = un
+        MXExecutorReshapeEx(partial_shaping, allow_up_sizing, dev_type, dev_id, num_map_keys, map_keys, map_dev_types, map_dev_ids, num_provided_arg_shapes, provided_arg_shape_names, provided_arg_shape_data, provided_arg_shape_idx, num_in_args, in_args, arg_grads, num_aux_states, aux_states, shared_exec, &out) |> throwOnError "MXExecutorReshapeEx"
+    *)
+
+    /// <summary>get optimized graph from graph executor</summary>
+    let getOptimizedSymbol handle = 
+        let mutable out = un
+        MXExecutorGetOptimizedSymbol(handle, &out) |> throwOnError "MXExecutorGetOptimizedSymbol"
+        out
+
+    /// <summary>set a call back to notify the completion of operation</summary>
+    let setMonitorCallback handle callback = 
+        let mutable callback_handle = 0n
+        MXExecutorSetMonitorCallback(handle, callback, &callback_handle) |> throwOnError "MXExecutorSetMonitorCallback"
+        callback_handle
+
+    /// <summary>set a call back to notify the completion of operation</summary>
+    /// <param name="monitor_all">If true, monitor both input and output, otherwise monitor output only.</param>
+    let setMonitorCallbackEX handle callback monitor_all = 
+        let mutable callback_handle = 0n
+        MXExecutorSetMonitorCallbackEX(handle, callback, &callback_handle, monitor_all) |> throwOnError "MXExecutorSetMonitorCallbackEX"
+        callback_handle
         
 module MXPred = 
     open CPredictApi

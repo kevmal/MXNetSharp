@@ -1511,21 +1511,21 @@ extern int MXOptimizeForBackend__(SymbolHandle sym_handle, string backend_name, 
 /// <param name="handle">the executor.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorFree__(ExecutorHandle handle)
+extern int MXExecutorFree(ExecutorHandle handle)
 
 /// <summary>Print the content of execution plan, used for debug.</summary>
 /// <param name="handle">the executor.</param>
 /// <param name="out_str">pointer to hold the output string of the printing.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorPrint__(ExecutorHandle handle, string[] out_str)
+extern int MXExecutorPrint(ExecutorHandle handle, [<Out>] IntPtr& out_str)
 
 /// <summary>Executor forward method</summary>
 /// <param name="handle">executor handle</param>
 /// <param name="is_train">int value to indicate whether the forward pass is for evaluation</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorForward__(ExecutorHandle handle, int is_train)
+extern int MXExecutorForward(ExecutorHandle handle, int is_train)
 
 /// <summary>Excecutor run backward</summary>
 /// <param name="handle">execute handle</param>
@@ -1533,7 +1533,7 @@ extern int MXExecutorForward__(ExecutorHandle handle, int is_train)
 /// <param name="head_grads">NDArray handle for heads' gradient</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorBackward__(ExecutorHandle handle, uint32 len, NDArrayHandle[] head_grads)
+extern int MXExecutorBackward(ExecutorHandle handle, uint32 len, NDArrayHandle[] head_grads)
 
 /// <summary>Excecutor run backward</summary>
 /// <param name="handle">execute handle</param>
@@ -1542,7 +1542,7 @@ extern int MXExecutorBackward__(ExecutorHandle handle, uint32 len, NDArrayHandle
 /// <param name="is_train">int value to indicate whether the backward pass is for evaluation</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorBackwardEx__(ExecutorHandle handle, uint32 len, NDArrayHandle[] head_grads, int is_train)
+extern int MXExecutorBackwardEx(ExecutorHandle handle, uint32 len, NDArrayHandle[] head_grads, int is_train)
 
 /// <summary>Get executor's head NDArray</summary>
 /// <param name="handle">executor handle</param>
@@ -1550,7 +1550,7 @@ extern int MXExecutorBackwardEx__(ExecutorHandle handle, uint32 len, NDArrayHand
 /// <param name="out">out put narray handles</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorOutputs__(ExecutorHandle handle, uint32[] out_size, NDArrayHandle[]& out)
+extern int MXExecutorOutputs(ExecutorHandle handle, [<Out>] uint32& out_size, [<Out>] IntPtr& out)
 
 /// <summary>Generate Executor from symbol</summary>
 /// <param name="symbol_handle">symbol handle</param>
@@ -1565,7 +1565,7 @@ extern int MXExecutorOutputs__(ExecutorHandle handle, uint32[] out_size, NDArray
 /// <param name="out">output executor handle</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorBind__(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 len, NDArrayHandle[] in_args, NDArrayHandle[] arg_grad_store, uint32[] grad_req_type, uint32 aux_states_len, NDArrayHandle[] aux_states, ExecutorHandle[] out)
+extern int MXExecutorBind(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 len, NDArrayHandle[] in_args, NDArrayHandle[] arg_grad_store, uint32[] grad_req_type, uint32 aux_states_len, NDArrayHandle[] aux_states, [<Out>] ExecutorHandle& out)
 
 /// <summary>Generate Executor from symbol,
 /// This is advanced function, allow specify group2ctx map.
@@ -1586,7 +1586,7 @@ extern int MXExecutorBind__(SymbolHandle symbol_handle, int dev_type, int dev_id
 /// <param name="out">output executor handle</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorBindX__(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 len, NDArrayHandle[] in_args, NDArrayHandle[] arg_grad_store, uint32[] grad_req_type, uint32 aux_states_len, NDArrayHandle[] aux_states, ExecutorHandle[] out)
+extern int MXExecutorBindX(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 len, NDArrayHandle[] in_args, NDArrayHandle[] arg_grad_store, uint32[] grad_req_type, uint32 aux_states_len, NDArrayHandle[] aux_states, [<Out>] ExecutorHandle& out)
 
 /// <summary>Generate Executor from symbol,
 /// This is advanced function, allow specify group2ctx map.
@@ -1608,15 +1608,18 @@ extern int MXExecutorBindX__(SymbolHandle symbol_handle, int dev_type, int dev_i
 /// <param name="out">output executor handle</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorBindEX__(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 len, NDArrayHandle[] in_args, NDArrayHandle[] arg_grad_store, uint32[] grad_req_type, uint32 aux_states_len, NDArrayHandle[] aux_states, ExecutorHandle shared_exec, ExecutorHandle[] out)
+extern int MXExecutorBindEX(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 len, NDArrayHandle[] in_args, NDArrayHandle[] arg_grad_store, uint32[] grad_req_type, uint32 aux_states_len, NDArrayHandle[] aux_states, ExecutorHandle shared_exec, [<Out>] ExecutorHandle& out)
 
+(* Exclude DEPRECATED
 /// <summary>DEPRECATED. Use MXExecutorSimpleBindEx instead.</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXExecutorSimpleBind__(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_g2c_keys, string[] g2c_keys, int[] g2c_dev_types, int[] g2c_dev_ids, uint32 provided_grad_req_list_len, string[] provided_grad_req_names, string[] provided_grad_req_types, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, uint32[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32 num_provided_arg_dtypes, string[] provided_arg_dtype_names, int[] provided_arg_dtypes, uint32 num_provided_arg_stypes, string[] provided_arg_stype_names, int[] provided_arg_stypes, uint32 num_shared_arg_names, string[] shared_arg_name_list, int[] shared_buffer_len, string[] shared_buffer_name_list, NDArrayHandle[] shared_buffer_handle_list, string[]& updated_shared_buffer_name_list, NDArrayHandle[]& updated_shared_buffer_handle_list, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec_handle, ExecutorHandle[] out)
+*)
 
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorSimpleBindEx__(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_g2c_keys, string[] g2c_keys, int[] g2c_dev_types, int[] g2c_dev_ids, uint32 provided_grad_req_list_len, string[] provided_grad_req_names, string[] provided_grad_req_types, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, int[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32 num_provided_arg_dtypes, string[] provided_arg_dtype_names, int[] provided_arg_dtypes, uint32 num_provided_arg_stypes, string[] provided_arg_stype_names, int[] provided_arg_stypes, uint32 num_shared_arg_names, string[] shared_arg_name_list, int[] shared_buffer_len, string[] shared_buffer_name_list, NDArrayHandle[] shared_buffer_handle_list, string[]& updated_shared_buffer_name_list, NDArrayHandle[]& updated_shared_buffer_handle_list, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec_handle, ExecutorHandle[] out)
+extern int MXExecutorSimpleBindEx__(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_g2c_keys, string[] g2c_keys, int[] g2c_dev_types, int[] g2c_dev_ids, uint32 provided_grad_req_list_len, string[] provided_grad_req_names, string[] provided_grad_req_types, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, int[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32 num_provided_arg_dtypes, string[] provided_arg_dtype_names, int[] provided_arg_dtypes, uint32 num_provided_arg_stypes, string[] provided_arg_stype_names, int[] provided_arg_stypes, uint32 num_shared_arg_names, string[] shared_arg_name_list, int[] shared_buffer_len, string[] shared_buffer_name_list, NDArrayHandle[] shared_buffer_handle_list, string[]& updated_shared_buffer_name_list, NDArrayHandle[]& updated_shared_buffer_handle_list, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec_handle, [<Out>] ExecutorHandle& out)
 
+(* Exclude DEPRECATED
 /// <summary>DEPRECATED. Use MXExecutorReshapeEx instead.
 ///Return a new executor with the same symbol and shared memory,
 ///but different input/output shapes.</summary>
@@ -1638,6 +1641,7 @@ extern int MXExecutorSimpleBindEx__(SymbolHandle symbol_handle, int dev_type, in
 /// <returns>a new executor</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXExecutorReshape__(int partial_shaping, int allow_up_sizing, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, uint32[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec, ExecutorHandle[] out)
+*)
 
 /// <summary>Return a new executor with the same symbol and shared memory,
 ///but different input/output shapes.</summary>
@@ -1658,20 +1662,20 @@ extern int MXExecutorReshape__(int partial_shaping, int allow_up_sizing, int dev
 /// <param name="out">output executor handle</param>
 /// <returns>a new executor</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorReshapeEx__(int partial_shaping, int allow_up_sizing, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, int[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec, ExecutorHandle[] out)
+extern int MXExecutorReshapeEx__(int partial_shaping, int allow_up_sizing, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, int[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32[] num_in_args, NDArrayHandle[] in_args, NDArrayHandle[] arg_grads, uint32[] num_aux_states, NDArrayHandle[] aux_states, ExecutorHandle shared_exec, [<Out>]ExecutorHandle& out)
 
 /// <summary>get optimized graph from graph executor</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorGetOptimizedSymbol__(ExecutorHandle handle, SymbolHandle[] out)
+extern int MXExecutorGetOptimizedSymbol(ExecutorHandle handle, [<Out>] SymbolHandle& out)
 
 /// <summary>set a call back to notify the completion of operation</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorSetMonitorCallback__(ExecutorHandle handle, ExecutorMonitorCallback callback, IntPtr callback_handle)
+extern int MXExecutorSetMonitorCallback(ExecutorHandle handle, ExecutorMonitorCallback callback, [<Out>] IntPtr& callback_handle)
 
 /// <summary>set a call back to notify the completion of operation</summary>
 /// <param name="monitor_all">If true, monitor both input and output, otherwise monitor output only.</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorSetMonitorCallbackEX__(ExecutorHandle handle, ExecutorMonitorCallback callback, IntPtr callback_handle, bool monitor_all)
+extern int MXExecutorSetMonitorCallbackEX(ExecutorHandle handle, ExecutorMonitorCallback callback, [<Out>] IntPtr& callback_handle, bool monitor_all)
 
 //--------------------------------------------
 // Part 5: IO Interface
