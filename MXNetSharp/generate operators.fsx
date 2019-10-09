@@ -343,7 +343,11 @@ let indent n lines =
 
 let comment lines = lines |> List.map (fun x -> "// " + x) 
 
-let toCStr (str : string) = sprintf "string %s" str
+let toCStr (a : ProcessedArg) (str : string) = 
+    match a.TypeString with 
+    | "int seq" -> sprintf "(%s |> Seq.map string |> String.concat \", \")" str 
+    | "string" -> str
+    | _ -> sprintf "string %s" str
 
 let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
     let args = 
@@ -424,7 +428,7 @@ let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
                         match a.CodeGenerator with 
                         | SkipArg -> None
                         | ValueString str -> Some str
-                        | Normal -> Some (toCStr a.Name)
+                        | Normal -> Some (toCStr a a.Name)
                         | ConstantArg a -> Some a
                     match a.DefaultMode with 
                     | Some(ReplaceOptionWithString v) -> 

@@ -500,7 +500,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|buf.NDArrayHandle|]
                                                  [|"flag"; "to_rgb"|]
-                                                 [|flag.ToString(); toRgb.ToString()|]
+                                                 [|string flag; string toRgb|]
         outputs
 
 
@@ -515,7 +515,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|src.NDArrayHandle|]
                                                  [|"w"; "h"; "interp"|]
-                                                 [|w.ToString(); h.ToString(); interp.ToString()|]
+                                                 [|string w; string h; string interp|]
         outputs
 
     /// <summary>Pad image border with OpenCV. 
@@ -540,7 +540,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|src.NDArrayHandle|]
                                                  [|"top"; "bot"; "left"; "right"; "type"; "value"; "values"|]
-                                                 [|top.ToString(); bot.ToString(); left.ToString(); right.ToString(); fillingType.ToString(); value.ToString(); values.ToString()|]
+                                                 [|string top; string bot; string left; string right; string fillingType; string value; string values|]
         outputs
 
     /// <param name="data">input data</param>
@@ -621,7 +621,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; gamma.NDArrayHandle; beta.NDArrayHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"|]
-                                                 [|eps.ToString(); momentum.ToString(); fixGamma.ToString(); useGlobalStats.ToString(); outputMeanVar.ToString()|]
+                                                 [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar|]
         outputs
     /// <summary>Batch normalization.
     /// 
@@ -691,7 +691,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; gamma.SymbolHandle; beta.SymbolHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"|]
-                                                 [|eps.ToString(); momentum.ToString(); fixGamma.ToString(); useGlobalStats.ToString(); outputMeanVar.ToString()|]
+                                                 [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar|]
         outputs
 
     /// <summary>Update function for multi-precision AdamW optimizer.
@@ -750,7 +750,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle; mean.NDArrayHandle; var.NDArrayHandle; weight32.NDArrayHandle; rescaleGrad.NDArrayHandle|]
                                                  [|"lr"; "beta1"; "beta2"; "epsilon"; "wd"; "eta"; "clip_gradient"|]
-                                                 [|lr.ToString(); beta1.ToString(); beta2.ToString(); epsilon.ToString(); wd.ToString(); eta.ToString(); clipGradient.ToString()|]
+                                                 [|string lr; string beta1; string beta2; string epsilon; string wd; string eta; string clipGradient|]
         outputs
     /// <summary>Update function for multi-precision AdamW optimizer.
     /// 
@@ -808,7 +808,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle; mean.SymbolHandle; var.SymbolHandle; weight32.SymbolHandle; rescaleGrad.SymbolHandle|]
                                                  [|"lr"; "beta1"; "beta2"; "epsilon"; "wd"; "eta"; "clip_gradient"|]
-                                                 [|lr.ToString(); beta1.ToString(); beta2.ToString(); epsilon.ToString(); wd.ToString(); eta.ToString(); clipGradient.ToString()|]
+                                                 [|string lr; string beta1; string beta2; string epsilon; string wd; string eta; string clipGradient|]
         outputs
 
     /// <summary>Update function for AdamW optimizer. AdamW is seen as a modification of
@@ -863,7 +863,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle; mean.NDArrayHandle; var.NDArrayHandle; rescaleGrad.NDArrayHandle|]
                                                  [|"lr"; "beta1"; "beta2"; "epsilon"; "wd"; "eta"; "clip_gradient"|]
-                                                 [|lr.ToString(); beta1.ToString(); beta2.ToString(); epsilon.ToString(); wd.ToString(); eta.ToString(); clipGradient.ToString()|]
+                                                 [|string lr; string beta1; string beta2; string epsilon; string wd; string eta; string clipGradient|]
         outputs
     /// <summary>Update function for AdamW optimizer. AdamW is seen as a modification of
     /// Adam by decoupling the weight decay from the optimization steps taken w.r.t. the loss function.
@@ -917,7 +917,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle; mean.SymbolHandle; var.SymbolHandle; rescaleGrad.SymbolHandle|]
                                                  [|"lr"; "beta1"; "beta2"; "epsilon"; "wd"; "eta"; "clip_gradient"|]
-                                                 [|lr.ToString(); beta1.ToString(); beta2.ToString(); epsilon.ToString(); wd.ToString(); eta.ToString(); clipGradient.ToString()|]
+                                                 [|string lr; string beta1; string beta2; string epsilon; string wd; string eta; string clipGradient|]
         outputs
 
     /// <summary>
@@ -940,7 +940,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"output_size"|]
-                                                 [|(if isNull (outputSize :> obj) then "[]" else outputSize.ToString())|]
+                                                 [|(if isNull (outputSize :> obj) then "[]" else string outputSize)|]
         outputs
     /// <summary>
     /// Applies a 2D adaptive average pooling over a 4D input with the shape of (NCHW).
@@ -962,7 +962,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"output_size"|]
-                                                 [|(if isNull (outputSize :> obj) then "[]" else outputSize.ToString())|]
+                                                 [|(if isNull (outputSize :> obj) then "[]" else string outputSize)|]
         outputs
 
     /// <summary>
@@ -1024,7 +1024,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"init_output"|]
-                                                 [|initOutput.ToString()|]
+                                                 [|string initOutput|]
         outputs
 
     /// <summary>Check if all the float numbers in all the arrays are finite (used for AMP)
@@ -1039,7 +1039,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"num_arrays"; "init_output"|]
-                                                 [|numArrays.ToString(); initOutput.ToString()|]
+                                                 [|string numArrays; string initOutput|]
         outputs
     /// <summary>Check if all the float numbers in all the arrays are finite (used for AMP)
     /// 
@@ -1053,7 +1053,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"num_arrays"; "init_output"|]
-                                                 [|numArrays.ToString(); initOutput.ToString()|]
+                                                 [|string numArrays; string initOutput|]
         outputs
 
     /// <summary>
@@ -1086,7 +1086,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; like.NDArrayHandle|]
                                                  [|"height"; "width"; "scale_height"; "scale_width"; "mode"|]
-                                                 [|height.ToString(); width.ToString(); scaleHeight.ToString(); scaleWidth.ToString(); (if isNull (mode :> obj) then "size" else mode.ToString())|]
+                                                 [|string height; string width; string scaleHeight; string scaleWidth; (if isNull (mode :> obj) then "size" else string mode)|]
         outputs
     /// <summary>
     /// Perform 2D resizing (upsampling or downsampling) for 4D input using bilinear interpolation.
@@ -1118,7 +1118,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; like.SymbolHandle|]
                                                  [|"height"; "width"; "scale_height"; "scale_width"; "mode"|]
-                                                 [|height.ToString(); width.ToString(); scaleHeight.ToString(); scaleWidth.ToString(); (if isNull (mode :> obj) then "size" else mode.ToString())|]
+                                                 [|string height; string width; string scaleHeight; string scaleWidth; (if isNull (mode :> obj) then "size" else string mode)|]
         outputs
 
     /// <summary>
@@ -1151,7 +1151,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; like.NDArrayHandle|]
                                                  [|"height"; "width"; "scale_height"; "scale_width"; "mode"|]
-                                                 [|(match height with None -> "1" | _ -> height.ToString()); (match width with None -> "1" | _ -> width.ToString()); (match scaleHeight with None -> "None" | _ -> scaleHeight.ToString()); (match scaleWidth with None -> "None" | _ -> scaleWidth.ToString()); (match mode with None -> "size" | _ -> mode.ToString())|]
+                                                 [|(match height with None -> "1" | _ -> string height); (match width with None -> "1" | _ -> string width); (match scaleHeight with None -> "None" | _ -> string scaleHeight); (match scaleWidth with None -> "None" | _ -> string scaleWidth); (match mode with None -> "size" | _ -> string mode)|]
         outputs
     /// <summary>
     /// Perform 2D resizing (upsampling or downsampling) for 4D input using bilinear interpolation.
@@ -1183,7 +1183,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; like.SymbolHandle|]
                                                  [|"height"; "width"; "scale_height"; "scale_width"; "mode"|]
-                                                 [|(match height with None -> "1" | _ -> height.ToString()); (match width with None -> "1" | _ -> width.ToString()); (match scaleHeight with None -> "None" | _ -> scaleHeight.ToString()); (match scaleWidth with None -> "None" | _ -> scaleWidth.ToString()); (match mode with None -> "size" | _ -> mode.ToString())|]
+                                                 [|(match height with None -> "1" | _ -> string height); (match width with None -> "1" | _ -> string width); (match scaleHeight with None -> "None" | _ -> string scaleHeight); (match scaleWidth with None -> "None" | _ -> string scaleWidth); (match mode with None -> "size" | _ -> string mode)|]
         outputs
 
 
@@ -1211,7 +1211,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; index.NDArrayHandle|]
                                                  [|"axis"|]
-                                                 [|axis.ToString()|]
+                                                 [|string axis|]
         outputs
     /// <summary>
     /// Given an n-d NDArray data, and a 1-d NDArray index,
@@ -1237,7 +1237,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; index.SymbolHandle|]
                                                  [|"axis"|]
-                                                 [|axis.ToString()|]
+                                                 [|string axis|]
         outputs
 
 
@@ -1327,7 +1327,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"overlap_thresh"; "valid_thresh"; "topk"; "coord_start"; "score_index"; "id_index"; "background_id"; "force_suppress"; "in_format"; "out_format"|]
-                                                 [|overlapThresh.ToString(); validThresh.ToString(); topk.ToString(); coordStart.ToString(); scoreIndex.ToString(); idIndex.ToString(); backgroundId.ToString(); forceSuppress.ToString(); (if isNull (inFormat :> obj) then "corner" else inFormat.ToString()); (if isNull (outFormat :> obj) then "corner" else outFormat.ToString())|]
+                                                 [|string overlapThresh; string validThresh; string topk; string coordStart; string scoreIndex; string idIndex; string backgroundId; string forceSuppress; (if isNull (inFormat :> obj) then "corner" else string inFormat); (if isNull (outFormat :> obj) then "corner" else string outFormat)|]
         outputs
     /// <summary>Apply non-maximum suppression to input.
     /// 
@@ -1415,7 +1415,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"overlap_thresh"; "valid_thresh"; "topk"; "coord_start"; "score_index"; "id_index"; "background_id"; "force_suppress"; "in_format"; "out_format"|]
-                                                 [|overlapThresh.ToString(); validThresh.ToString(); topk.ToString(); coordStart.ToString(); scoreIndex.ToString(); idIndex.ToString(); backgroundId.ToString(); forceSuppress.ToString(); (if isNull (inFormat :> obj) then "corner" else inFormat.ToString()); (if isNull (outFormat :> obj) then "corner" else outFormat.ToString())|]
+                                                 [|string overlapThresh; string validThresh; string topk; string coordStart; string scoreIndex; string idIndex; string backgroundId; string forceSuppress; (if isNull (inFormat :> obj) then "corner" else string inFormat); (if isNull (outFormat :> obj) then "corner" else string outFormat)|]
         outputs
 
 
@@ -1447,7 +1447,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
                                                  [|"format"|]
-                                                 [|(if isNull (format :> obj) then "corner" else format.ToString())|]
+                                                 [|(if isNull (format :> obj) then "corner" else string format)|]
         outputs
     /// <summary>Bounding box overlap of two arrays.
     ///   The overlap is defined as Intersection-over-Union, aka, IOU.
@@ -1477,7 +1477,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.SymbolHandle; rhs.SymbolHandle|]
                                                  [|"format"|]
-                                                 [|(if isNull (format :> obj) then "corner" else format.ToString())|]
+                                                 [|(if isNull (format :> obj) then "corner" else string format)|]
         outputs
 
 
@@ -1514,7 +1514,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"is_ascend"; "threshold"; "topk"|]
-                                                 [|isAscend.ToString(); threshold.ToString(); topk.ToString()|]
+                                                 [|string isAscend; string threshold; string topk|]
         outputs
     /// <summary>Compute bipartite matching.
     ///   The matching is performed on score matrix with shape [B, N, M]
@@ -1549,7 +1549,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"is_ascend"; "threshold"; "topk"|]
-                                                 [|isAscend.ToString(); threshold.ToString(); topk.ToString()|]
+                                                 [|string isAscend; string threshold; string topk|]
         outputs
 
 
@@ -1611,7 +1611,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|csrMatrix.NDArrayHandle|]
                                                  [|"num_args"; "num_hops"; "num_neighbor"; "max_num_vertices"|]
-                                                 [|numArgs.ToString(); numHops.ToString(); numNeighbor.ToString(); maxNumVertices.ToString()|]
+                                                 [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|]
         outputs
     /// <summary>This operator samples sub-graphs from a csr graph via an
     /// uniform probability. The operator is designed for DGL.
@@ -1671,7 +1671,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|csrMatrix.SymbolHandle|]
                                                  [|"num_args"; "num_hops"; "num_neighbor"; "max_num_vertices"|]
-                                                 [|numArgs.ToString(); numHops.ToString(); numNeighbor.ToString(); maxNumVertices.ToString()|]
+                                                 [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|]
         outputs
 
     /// <summary>This operator samples sub-graph from a csr graph via an
@@ -1739,7 +1739,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|csrMatrix.NDArrayHandle; probability.NDArrayHandle|]
                                                  [|"num_args"; "num_hops"; "num_neighbor"; "max_num_vertices"|]
-                                                 [|numArgs.ToString(); numHops.ToString(); numNeighbor.ToString(); maxNumVertices.ToString()|]
+                                                 [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|]
         outputs
     /// <summary>This operator samples sub-graph from a csr graph via an
     /// non-uniform probability. The operator is designed for DGL.
@@ -1806,7 +1806,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|csrMatrix.SymbolHandle; probability.SymbolHandle|]
                                                  [|"num_args"; "num_hops"; "num_neighbor"; "max_num_vertices"|]
-                                                 [|numArgs.ToString(); numHops.ToString(); numNeighbor.ToString(); maxNumVertices.ToString()|]
+                                                 [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|]
         outputs
 
     /// <summary>This operator constructs an induced subgraph for
@@ -1845,7 +1845,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|graph.NDArrayHandle|]
                                                  [|"num_args"; "return_mapping"|]
-                                                 [|numArgs.ToString(); returnMapping.ToString()|]
+                                                 [|string numArgs; string returnMapping|]
         outputs
     /// <summary>This operator constructs an induced subgraph for
     /// a given set of vertices from a graph. The operator accepts multiple
@@ -1883,7 +1883,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|graph.SymbolHandle|]
                                                  [|"num_args"; "return_mapping"|]
-                                                 [|numArgs.ToString(); returnMapping.ToString()|]
+                                                 [|string numArgs; string returnMapping|]
         outputs
 
     /// <summary>This operator implements the edge_id function for a graph
@@ -2050,7 +2050,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"num_args"; "return_mapping"; "graph_sizes"|]
-                                                 [|numArgs.ToString(); returnMapping.ToString(); graphSizes.ToString()|]
+                                                 [|string numArgs; string returnMapping; string graphSizes|]
         outputs
     /// <summary>This operator compacts a CSR matrix generated by
     /// dgl_csr_neighbor_uniform_sample and dgl_csr_neighbor_non_uniform_sample.
@@ -2094,7 +2094,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"num_args"; "return_mapping"; "graph_sizes"|]
-                                                 [|numArgs.ToString(); returnMapping.ToString(); graphSizes.ToString()|]
+                                                 [|string numArgs; string returnMapping; string graphSizes|]
         outputs
 
     /// <summary>This operator implements the gradient multiplier function.
@@ -2111,7 +2111,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <summary>This operator implements the gradient multiplier function.
     /// In forward pass it acts as an identity transform. During backpropagation it
@@ -2127,7 +2127,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -2137,7 +2137,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -2146,7 +2146,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <summary>Computes the log likelihood of a univariate Hawkes process.
@@ -2358,7 +2358,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axes"|]
-                                                 [|axes.ToString()|]
+                                                 [|(axes |> Seq.map string |> String.concat ", ")|]
         outputs
     /// <summary>Returns an array of indexes of the input array.
     /// 
@@ -2415,7 +2415,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axes"|]
-                                                 [|axes.ToString()|]
+                                                 [|(axes |> Seq.map string |> String.concat ", ")|]
         outputs
 
     /// <summary>Copies the elements of a `new_tensor` into the `old_tensor`.
@@ -2601,7 +2601,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"|]
-                                                 [|axis.ToString()|]
+                                                 [|string axis|]
         outputs
     /// <summary>Number of stored values for a sparse tensor, including explicit zeros.
     /// 
@@ -2617,7 +2617,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"|]
-                                                 [|axis.ToString()|]
+                                                 [|string axis|]
         outputs
 
     /// <summary>Number of stored values for a sparse tensor, including explicit zeros.
@@ -2634,7 +2634,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"|]
-                                                 [|(match axis with None -> "None" | _ -> axis.ToString())|]
+                                                 [|(match axis with None -> "None" | _ -> string axis)|]
         outputs
     /// <summary>Number of stored values for a sparse tensor, including explicit zeros.
     /// 
@@ -2650,7 +2650,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"|]
-                                                 [|(match axis with None -> "None" | _ -> axis.ToString())|]
+                                                 [|(match axis with None -> "None" | _ -> string axis)|]
         outputs
 
     /// <summary>Update function for Group AdaGrad optimizer.
@@ -2691,7 +2691,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle; history.NDArrayHandle|]
                                                  [|"lr"; "rescale_grad"; "clip_gradient"; "epsilon"|]
-                                                 [|lr.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); epsilon.ToString()|]
+                                                 [|string lr; string rescaleGrad; string clipGradient; string epsilon|]
         outputs
     /// <summary>Update function for Group AdaGrad optimizer.
     /// 
@@ -2731,7 +2731,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle; history.SymbolHandle|]
                                                  [|"lr"; "rescale_grad"; "clip_gradient"; "epsilon"|]
-                                                 [|lr.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); epsilon.ToString()|]
+                                                 [|string lr; string rescaleGrad; string clipGradient; string epsilon|]
         outputs
 
     /// <summary>This operators implements the quadratic function.
@@ -2764,7 +2764,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"a"; "b"; "c"|]
-                                                 [|a.ToString(); b.ToString(); c.ToString()|]
+                                                 [|string a; string b; string c|]
         outputs
     /// <summary>This operators implements the quadratic function.
     /// 
@@ -2796,7 +2796,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"a"; "b"; "c"|]
-                                                 [|a.ToString(); b.ToString(); c.ToString()|]
+                                                 [|string a; string b; string c|]
         outputs
 
 
@@ -2837,7 +2837,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; rois.NDArrayHandle|]
                                                  [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|]
-                                                 [|pooledSize.ToString(); spatialScale.ToString(); sampleRatio.ToString(); positionSensitive.ToString()|]
+                                                 [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale; string sampleRatio; string positionSensitive|]
         outputs
     /// <summary>
     /// This operator takes a 4D feature map as an input array and region proposals as `rois`,
@@ -2876,7 +2876,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; rois.SymbolHandle|]
                                                  [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|]
-                                                 [|pooledSize.ToString(); spatialScale.ToString(); sampleRatio.ToString(); positionSensitive.ToString()|]
+                                                 [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale; string sampleRatio; string positionSensitive|]
         outputs
 
     /// <summary>
@@ -2918,7 +2918,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; rois.NDArrayHandle|]
                                                  [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|]
-                                                 [|(height, width).ToString(); spatialScale.ToString(); sampleRatio.ToString(); positionSensitive.ToString()|]
+                                                 [|(height, width).ToString(); string spatialScale; string sampleRatio; string positionSensitive|]
         outputs
     /// <summary>
     /// This operator takes a 4D feature map as an input array and region proposals as `rois`,
@@ -2959,7 +2959,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; rois.SymbolHandle|]
                                                  [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|]
-                                                 [|(height, width).ToString(); spatialScale.ToString(); sampleRatio.ToString(); positionSensitive.ToString()|]
+                                                 [|(height, width).ToString(); string spatialScale; string sampleRatio; string positionSensitive|]
         outputs
 
 
@@ -3042,7 +3042,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; gamma.NDArrayHandle; beta.NDArrayHandle; movingMean.NDArrayHandle; movingVar.NDArrayHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "ndev"; "key"|]
-                                                 [|eps.ToString(); momentum.ToString(); fixGamma.ToString(); useGlobalStats.ToString(); outputMeanVar.ToString(); ndev.ToString(); key.ToString()|]
+                                                 [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar; string ndev; key|]
         outputs
     /// <summary>Batch normalization.
     /// 
@@ -3123,7 +3123,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; gamma.SymbolHandle; beta.SymbolHandle; movingMean.SymbolHandle; movingVar.SymbolHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "ndev"; "key"|]
-                                                 [|eps.ToString(); momentum.ToString(); fixGamma.ToString(); useGlobalStats.ToString(); outputMeanVar.ToString(); ndev.ToString(); key.ToString()|]
+                                                 [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar; string ndev; key|]
         outputs
 
     /// <summary>Rescale the input by the square root of the channel dimension.
@@ -3176,7 +3176,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"op_type"|]
-                                                 [|opType.ToString()|]
+                                                 [|opType|]
         outputs
     /// <summary>Apply a custom operator implemented in a frontend language (like Python).
     /// 
@@ -3194,7 +3194,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"op_type"|]
-                                                 [|opType.ToString()|]
+                                                 [|opType|]
         outputs
 
 
@@ -3208,7 +3208,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"sparseness_target"; "penalty"; "momentum"|]
-                                                 [|sparsenessTarget.ToString(); penalty.ToString(); momentum.ToString()|]
+                                                 [|string sparsenessTarget; string penalty; string momentum|]
         outputs
     /// <summary>Apply a sparse regularization to the output a sigmoid activation function.</summary>
     /// <param name="data">Input data.</param>
@@ -3220,7 +3220,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"sparseness_target"; "penalty"; "momentum"|]
-                                                 [|sparsenessTarget.ToString(); penalty.ToString(); momentum.ToString()|]
+                                                 [|string sparsenessTarget; string penalty; string momentum|]
         outputs
 
     /// <summary>Crop an image NDArray of shape (H x W x C) or (N x H x W x C) 
@@ -3267,7 +3267,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"x"; "y"; "width"; "height"|]
-                                                 [|x.ToString(); y.ToString(); width.ToString(); height.ToString()|]
+                                                 [|string x; string y; string width; string height|]
         outputs
     /// <summary>Crop an image NDArray of shape (H x W x C) or (N x H x W x C) 
     /// to the given size.
@@ -3313,7 +3313,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"x"; "y"; "width"; "height"|]
-                                                 [|x.ToString(); y.ToString(); width.ToString(); height.ToString()|]
+                                                 [|string x; string y; string width; string height|]
         outputs
 
 
@@ -3509,7 +3509,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"mean"; "std"|]
-                                                 [|mean.ToString(); std.ToString()|]
+                                                 [|string mean; string std|]
         outputs
     /// <summary>Normalize an tensor of shape (C x H x W) or (N x C x H x W) with mean and
     ///     standard deviation.
@@ -3582,7 +3582,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"mean"; "std"|]
-                                                 [|mean.ToString(); std.ToString()|]
+                                                 [|string mean; string std|]
         outputs
 
 
@@ -3689,7 +3689,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"min_factor"; "max_factor"|]
-                                                 [|minFactor.ToString(); maxFactor.ToString()|]
+                                                 [|string minFactor; string maxFactor|]
         outputs
     /// <summary>
     /// 
@@ -3702,7 +3702,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"min_factor"; "max_factor"|]
-                                                 [|minFactor.ToString(); maxFactor.ToString()|]
+                                                 [|string minFactor; string maxFactor|]
         outputs
 
     /// <summary>
@@ -3716,7 +3716,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"min_factor"; "max_factor"|]
-                                                 [|minFactor.ToString(); maxFactor.ToString()|]
+                                                 [|string minFactor; string maxFactor|]
         outputs
     /// <summary>
     /// 
@@ -3729,7 +3729,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"min_factor"; "max_factor"|]
-                                                 [|minFactor.ToString(); maxFactor.ToString()|]
+                                                 [|string minFactor; string maxFactor|]
         outputs
 
     /// <summary>
@@ -3743,7 +3743,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"min_factor"; "max_factor"|]
-                                                 [|minFactor.ToString(); maxFactor.ToString()|]
+                                                 [|string minFactor; string maxFactor|]
         outputs
     /// <summary>
     /// 
@@ -3756,7 +3756,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"min_factor"; "max_factor"|]
-                                                 [|minFactor.ToString(); maxFactor.ToString()|]
+                                                 [|string minFactor; string maxFactor|]
         outputs
 
     /// <summary>
@@ -3770,7 +3770,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"min_factor"; "max_factor"|]
-                                                 [|minFactor.ToString(); maxFactor.ToString()|]
+                                                 [|string minFactor; string maxFactor|]
         outputs
     /// <summary>
     /// 
@@ -3783,7 +3783,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"min_factor"; "max_factor"|]
-                                                 [|minFactor.ToString(); maxFactor.ToString()|]
+                                                 [|string minFactor; string maxFactor|]
         outputs
 
     /// <summary>
@@ -3803,7 +3803,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"brightness"; "contrast"; "saturation"; "hue"|]
-                                                 [|brightness.ToString(); contrast.ToString(); saturation.ToString(); hue.ToString()|]
+                                                 [|string brightness; string contrast; string saturation; string hue|]
         outputs
     /// <summary>
     /// 
@@ -3822,7 +3822,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"brightness"; "contrast"; "saturation"; "hue"|]
-                                                 [|brightness.ToString(); contrast.ToString(); saturation.ToString(); hue.ToString()|]
+                                                 [|string brightness; string contrast; string saturation; string hue|]
         outputs
 
     /// <summary>Randomly add PCA noise. Follow the AlexNet style.
@@ -3835,7 +3835,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"alpha_std"|]
-                                                 [|alphaStd.ToString()|]
+                                                 [|string alphaStd|]
         outputs
     /// <summary>Randomly add PCA noise. Follow the AlexNet style.
     /// 
@@ -3847,7 +3847,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"alpha_std"|]
-                                                 [|alphaStd.ToString()|]
+                                                 [|string alphaStd|]
         outputs
 
     /// <summary>Resize an image NDArray of shape (H x W x C) or (N x H x W x C) 
@@ -3895,7 +3895,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"size"; "keep_ratio"; "interp"|]
-                                                 [|(if isNull (size :> obj) then "[]" else size.ToString()); keepRatio.ToString(); interp.ToString()|]
+                                                 [|(if isNull (size :> obj) then "[]" else string size); string keepRatio; string interp|]
         outputs
     /// <summary>Resize an image NDArray of shape (H x W x C) or (N x H x W x C) 
     /// to the given size
@@ -3942,7 +3942,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"size"; "keep_ratio"; "interp"|]
-                                                 [|(if isNull (size :> obj) then "[]" else size.ToString()); keepRatio.ToString(); interp.ToString()|]
+                                                 [|(if isNull (size :> obj) then "[]" else string size); string keepRatio; string interp|]
         outputs
 
     /// <summary>Resize an image NDArray of shape (H x W x C) or (N x H x W x C) 
@@ -3995,7 +3995,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"size"; "keep_ratio"; "interp"|]
-                                                 [|(if isNull (height :> obj) then "[]" else (height, width).ToString()); keepRatio.ToString(); interp.ToString()|]
+                                                 [|(if isNull (height :> obj) then "[]" else (height, width).ToString()); string keepRatio; string interp|]
         outputs
     /// <summary>Resize an image NDArray of shape (H x W x C) or (N x H x W x C) 
     /// to the given size
@@ -4047,7 +4047,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"size"; "keep_ratio"; "interp"|]
-                                                 [|(if isNull (height :> obj) then "[]" else (height, width).ToString()); keepRatio.ToString(); interp.ToString()|]
+                                                 [|(if isNull (height :> obj) then "[]" else (height, width).ToString()); string keepRatio; string interp|]
         outputs
 
     /// <summary>Applies Leaky rectified linear unit activation element-wise to the input.
@@ -4085,7 +4085,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; gamma.NDArrayHandle|]
                                                  [|"act_type"; "slope"; "lower_bound"; "upper_bound"|]
-                                                 [|(if isNull (actType :> obj) then "leaky" else actType.ToString()); slope.ToString(); lowerBound.ToString(); upperBound.ToString()|]
+                                                 [|(if isNull (actType :> obj) then "leaky" else string actType); string slope; string lowerBound; string upperBound|]
         outputs
     /// <summary>Applies Leaky rectified linear unit activation element-wise to the input.
     /// 
@@ -4122,7 +4122,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; gamma.SymbolHandle|]
                                                  [|"act_type"; "slope"; "lower_bound"; "upper_bound"|]
-                                                 [|(if isNull (actType :> obj) then "leaky" else actType.ToString()); slope.ToString(); lowerBound.ToString(); upperBound.ToString()|]
+                                                 [|(if isNull (actType :> obj) then "leaky" else string actType); string slope; string lowerBound; string upperBound|]
         outputs
 
     /// <summary>Calculate cross entropy of softmax output and one-hot label.
@@ -4227,7 +4227,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"act_type"|]
-                                                 [|actType.ToString()|]
+                                                 [|string actType|]
         outputs
     /// <summary>Applies an activation function element-wise to the input.
     /// 
@@ -4249,7 +4249,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"act_type"|]
-                                                 [|actType.ToString()|]
+                                                 [|string actType|]
         outputs
 
 
@@ -4333,7 +4333,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; gamma.NDArrayHandle; beta.NDArrayHandle; movingMean.NDArrayHandle; movingVar.NDArrayHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "axis"; "cudnn_off"|]
-                                                 [|eps.ToString(); momentum.ToString(); fixGamma.ToString(); useGlobalStats.ToString(); outputMeanVar.ToString(); axis.ToString(); cudnnOff.ToString()|]
+                                                 [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar; string axis; string cudnnOff|]
         outputs
     /// <summary>Batch normalization.
     /// 
@@ -4415,7 +4415,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; gamma.SymbolHandle; beta.SymbolHandle; movingMean.SymbolHandle; movingVar.SymbolHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "axis"; "cudnn_off"|]
-                                                 [|eps.ToString(); momentum.ToString(); fixGamma.ToString(); useGlobalStats.ToString(); outputMeanVar.ToString(); axis.ToString(); cudnnOff.ToString()|]
+                                                 [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar; string axis; string cudnnOff|]
         outputs
 
 
@@ -4466,7 +4466,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"num_args"; "dim"|]
-                                                 [|numArgs.ToString(); dim.ToString()|]
+                                                 [|string numArgs; string dim|]
         outputs
     /// <summary>Joins input arrays along a given axis.
     /// 
@@ -4515,7 +4515,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"num_args"; "dim"|]
-                                                 [|numArgs.ToString(); dim.ToString()|]
+                                                 [|string numArgs; string dim|]
         outputs
 
 
@@ -4527,7 +4527,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"num_args"; "dim"|]
-                                                 [|numArgs.ToString(); dim.ToString()|]
+                                                 [|string numArgs; string dim|]
         outputs
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
@@ -4537,7 +4537,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"num_args"; "dim"|]
-                                                 [|numArgs.ToString(); dim.ToString()|]
+                                                 [|string numArgs; string dim|]
         outputs
 
     /// <summary>Compute *N*-D convolution on *(N+2)*-D input.
@@ -4648,7 +4648,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle|]
                                                  [|"kernel"; "stride"; "dilate"; "pad"; "num_filter"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|kernel.ToString(); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (dilate :> obj) then "[]" else dilate.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString()); numFilter.ToString(); numGroup.ToString(); workspace.ToString(); noBias.ToString(); (if isNull (cudnnTune :> obj) then "None" else cudnnTune.ToString()); cudnnOff.ToString(); (if isNull (layout :> obj) then "None" else layout.ToString())|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
     /// <summary>Compute *N*-D convolution on *(N+2)*-D input.
     /// 
@@ -4758,7 +4758,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; weight.SymbolHandle; bias.SymbolHandle|]
                                                  [|"kernel"; "stride"; "dilate"; "pad"; "num_filter"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|kernel.ToString(); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (dilate :> obj) then "[]" else dilate.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString()); numFilter.ToString(); numGroup.ToString(); workspace.ToString(); noBias.ToString(); (if isNull (cudnnTune :> obj) then "None" else cudnnTune.ToString()); cudnnOff.ToString(); (if isNull (layout :> obj) then "None" else layout.ToString())|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
 
 
@@ -4828,7 +4828,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; label.NDArrayHandle; dataLengths.NDArrayHandle; labelLengths.NDArrayHandle|]
                                                  [|"use_data_lengths"; "use_label_lengths"; "blank_label"|]
-                                                 [|useDataLengths.ToString(); useLabelLengths.ToString(); (if isNull (blankLabel :> obj) then "first" else blankLabel.ToString())|]
+                                                 [|string useDataLengths; string useLabelLengths; (if isNull (blankLabel :> obj) then "first" else string blankLabel)|]
         outputs
     /// <summary>Connectionist Temporal Classification Loss.
     /// 
@@ -4896,7 +4896,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; label.SymbolHandle; dataLengths.SymbolHandle; labelLengths.SymbolHandle|]
                                                  [|"use_data_lengths"; "use_label_lengths"; "blank_label"|]
-                                                 [|useDataLengths.ToString(); useLabelLengths.ToString(); (if isNull (blankLabel :> obj) then "first" else blankLabel.ToString())|]
+                                                 [|string useDataLengths; string useLabelLengths; (if isNull (blankLabel :> obj) then "first" else string blankLabel)|]
         outputs
 
 
@@ -4937,7 +4937,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle|]
                                                  [|"kernel"; "stride"; "dilate"; "pad"; "adj"; "target_shape"; "num_filter"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|kernel.ToString(); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (dilate :> obj) then "[]" else dilate.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString()); (if isNull (adj :> obj) then "[]" else adj.ToString()); (if isNull (targetShape :> obj) then "[]" else targetShape.ToString()); numFilter.ToString(); numGroup.ToString(); workspace.ToString(); noBias.ToString(); (if isNull (cudnnTune :> obj) then "None" else cudnnTune.ToString()); cudnnOff.ToString(); (if isNull (layout :> obj) then "None" else layout.ToString())|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", ")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
     /// <summary>Computes 1D or 2D transposed convolution (aka fractionally strided convolution) of the input tensor. This operation can be seen as the gradient of Convolution operation with respect to its input. Convolution usually reduces the size of the input. Transposed convolution works the other way, going from a smaller input to a larger output while preserving the connectivity pattern.</summary>
     /// <param name="data">Input tensor to the deconvolution operation.</param>
@@ -4976,7 +4976,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; weight.SymbolHandle; bias.SymbolHandle|]
                                                  [|"kernel"; "stride"; "dilate"; "pad"; "adj"; "target_shape"; "num_filter"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|kernel.ToString(); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (dilate :> obj) then "[]" else dilate.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString()); (if isNull (adj :> obj) then "[]" else adj.ToString()); (if isNull (targetShape :> obj) then "[]" else targetShape.ToString()); numFilter.ToString(); numGroup.ToString(); workspace.ToString(); noBias.ToString(); (if isNull (cudnnTune :> obj) then "None" else cudnnTune.ToString()); cudnnOff.ToString(); (if isNull (layout :> obj) then "None" else layout.ToString())|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", ")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
 
 
@@ -5026,7 +5026,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"p"; "mode"; "axes"; "cudnn_off"|]
-                                                 [|p.ToString(); (if isNull (mode :> obj) then "training" else mode.ToString()); (if isNull (axes :> obj) then "[]" else axes.ToString()); cudnnOff.ToString()|]
+                                                 [|string p; (if isNull (mode :> obj) then "training" else string mode); (if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", ")); string cudnnOff|]
         outputs
     /// <summary>Applies dropout operation to input array.
     /// 
@@ -5074,7 +5074,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"p"; "mode"; "axes"; "cudnn_off"|]
-                                                 [|p.ToString(); (if isNull (mode :> obj) then "training" else mode.ToString()); (if isNull (axes :> obj) then "[]" else axes.ToString()); cudnnOff.ToString()|]
+                                                 [|string p; (if isNull (mode :> obj) then "training" else string mode); (if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", ")); string cudnnOff|]
         outputs
 
     /// <summary>Applies dropout operation to input array.
@@ -5123,7 +5123,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"p"; "mode"; "axes"; "cudnn_off"|]
-                                                 [|(match p with None -> "0.5" | _ -> p.ToString()); (match mode with None -> "training" | _ -> mode.ToString()); (match axes with None -> "[]" | _ -> axes.ToString()); (match cudnnOff with None -> "None" | _ -> cudnnOff.ToString())|]
+                                                 [|(match p with None -> "0.5" | _ -> string p); (match mode with None -> "training" | _ -> string mode); (match axes with None -> "[]" | _ -> (axes |> Seq.map string |> String.concat ", ")); (match cudnnOff with None -> "None" | _ -> string cudnnOff)|]
         outputs
     /// <summary>Applies dropout operation to input array.
     /// 
@@ -5171,7 +5171,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"p"; "mode"; "axes"; "cudnn_off"|]
-                                                 [|(match p with None -> "0.5" | _ -> p.ToString()); (match mode with None -> "training" | _ -> mode.ToString()); (match axes with None -> "[]" | _ -> axes.ToString()); (match cudnnOff with None -> "None" | _ -> cudnnOff.ToString())|]
+                                                 [|(match p with None -> "0.5" | _ -> string p); (match mode with None -> "training" | _ -> string mode); (match axes with None -> "[]" | _ -> (axes |> Seq.map string |> String.concat ", ")); (match cudnnOff with None -> "None" | _ -> string cudnnOff)|]
         outputs
 
 
@@ -5224,7 +5224,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle|]
                                                  [|"num_hidden"; "no_bias"; "flatten"|]
-                                                 [|numHidden.ToString(); noBias.ToString(); flatten.ToString()|]
+                                                 [|string numHidden; string noBias; string flatten|]
         outputs
     /// <summary>Applies a linear transformation: :math:`Y = XW^T + b`.
     /// 
@@ -5275,7 +5275,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; weight.SymbolHandle; bias.SymbolHandle|]
                                                  [|"num_hidden"; "no_bias"; "flatten"|]
-                                                 [|numHidden.ToString(); noBias.ToString(); flatten.ToString()|]
+                                                 [|string numHidden; string noBias; string flatten|]
         outputs
 
 
@@ -5323,7 +5323,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; gamma.NDArrayHandle; beta.NDArrayHandle|]
                                                  [|"axis"; "eps"; "output_mean_var"|]
-                                                 [|axis.ToString(); eps.ToString(); outputMeanVar.ToString()|]
+                                                 [|string axis; string eps; string outputMeanVar|]
         outputs
     /// <summary>Layer normalization.
     /// 
@@ -5369,7 +5369,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; gamma.SymbolHandle; beta.SymbolHandle|]
                                                  [|"axis"; "eps"; "output_mean_var"|]
-                                                 [|axis.ToString(); eps.ToString(); outputMeanVar.ToString()|]
+                                                 [|string axis; string eps; string outputMeanVar|]
         outputs
 
 
@@ -5405,7 +5405,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"alpha"; "beta"; "knorm"; "nsize"|]
-                                                 [|alpha.ToString(); beta.ToString(); knorm.ToString(); nsize.ToString()|]
+                                                 [|string alpha; string beta; string knorm; string nsize|]
         outputs
     /// <summary>Applies local response normalization to the input.
     /// 
@@ -5439,7 +5439,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"alpha"; "beta"; "knorm"; "nsize"|]
-                                                 [|alpha.ToString(); beta.ToString(); knorm.ToString(); nsize.ToString()|]
+                                                 [|string alpha; string beta; string knorm; string nsize|]
         outputs
 
 
@@ -5473,7 +5473,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axes"; "keepdims"|]
-                                                 [|axes.ToString(); keepdims.ToString()|]
+                                                 [|(axes |> Seq.map string |> String.concat ", "); string keepdims|]
         outputs
     /// <summary>
     /// Calculate the mean and variance of `data`.
@@ -5505,7 +5505,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axes"; "keepdims"|]
-                                                 [|axes.ToString(); keepdims.ToString()|]
+                                                 [|(axes |> Seq.map string |> String.concat ", "); string keepdims|]
         outputs
 
 
@@ -5588,7 +5588,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "p_value"; "count_include_pad"; "layout"|]
-                                                 [|(if isNull (kernel :> obj) then "[]" else kernel.ToString()); (if isNull (poolType :> obj) then "max" else poolType.ToString()); globalPool.ToString(); cudnnOff.ToString(); (if isNull (poolingConvention :> obj) then "valid" else poolingConvention.ToString()); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString()); pValue.ToString(); countIncludePad.ToString(); (if isNull (layout :> obj) then "None" else layout.ToString())|]
+                                                 [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; string cudnnOff; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string pValue; string countIncludePad; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
     /// <summary>Performs pooling on the input.
     /// 
@@ -5669,7 +5669,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "p_value"; "count_include_pad"; "layout"|]
-                                                 [|(if isNull (kernel :> obj) then "[]" else kernel.ToString()); (if isNull (poolType :> obj) then "max" else poolType.ToString()); globalPool.ToString(); cudnnOff.ToString(); (if isNull (poolingConvention :> obj) then "valid" else poolingConvention.ToString()); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString()); pValue.ToString(); countIncludePad.ToString(); (if isNull (layout :> obj) then "None" else layout.ToString())|]
+                                                 [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; string cudnnOff; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string pValue; string countIncludePad; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
 
     /// <summary>Performs pooling on the input.
@@ -5751,7 +5751,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "p_value"; "count_include_pad"; "layout"|]
-                                                 [|(match kernel with None -> "[]" | _ -> kernel.ToString()); (match poolType with None -> "max" | _ -> poolType.ToString()); (match globalPool with None -> "false" | _ -> globalPool.ToString()); (match cudnnOff with None -> "false" | _ -> cudnnOff.ToString()); (match poolingConvention with None -> "valid" | _ -> poolingConvention.ToString()); (match stride with None -> "[]" | _ -> stride.ToString()); (match pad with None -> "[]" | _ -> pad.ToString()); (match pValue with None -> "None" | _ -> pValue.ToString()); (match countIncludePad with None -> "None" | _ -> countIncludePad.ToString()); (match layout with None -> "None" | _ -> layout.ToString())|]
+                                                 [|(match kernel with None -> "[]" | _ -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | _ -> string poolType); (match globalPool with None -> "false" | _ -> string globalPool); (match cudnnOff with None -> "false" | _ -> string cudnnOff); (match poolingConvention with None -> "valid" | _ -> string poolingConvention); (match stride with None -> "[]" | _ -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | _ -> (pad |> Seq.map string |> String.concat ", ")); (match pValue with None -> "None" | _ -> string pValue); (match countIncludePad with None -> "None" | _ -> string countIncludePad); (match layout with None -> "None" | _ -> string layout)|]
         outputs
     /// <summary>Performs pooling on the input.
     /// 
@@ -5832,7 +5832,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "p_value"; "count_include_pad"; "layout"|]
-                                                 [|(match kernel with None -> "[]" | _ -> kernel.ToString()); (match poolType with None -> "max" | _ -> poolType.ToString()); (match globalPool with None -> "false" | _ -> globalPool.ToString()); (match cudnnOff with None -> "false" | _ -> cudnnOff.ToString()); (match poolingConvention with None -> "valid" | _ -> poolingConvention.ToString()); (match stride with None -> "[]" | _ -> stride.ToString()); (match pad with None -> "[]" | _ -> pad.ToString()); (match pValue with None -> "None" | _ -> pValue.ToString()); (match countIncludePad with None -> "None" | _ -> countIncludePad.ToString()); (match layout with None -> "None" | _ -> layout.ToString())|]
+                                                 [|(match kernel with None -> "[]" | _ -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | _ -> string poolType); (match globalPool with None -> "false" | _ -> string globalPool); (match cudnnOff with None -> "false" | _ -> string cudnnOff); (match poolingConvention with None -> "valid" | _ -> string poolingConvention); (match stride with None -> "[]" | _ -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | _ -> (pad |> Seq.map string |> String.concat ", ")); (match pValue with None -> "None" | _ -> string pValue); (match countIncludePad with None -> "None" | _ -> string countIncludePad); (match layout with None -> "None" | _ -> string layout)|]
         outputs
 
 
@@ -5870,7 +5870,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
-                                                 [|axis.ToString(); temperature.ToString(); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|string axis; string temperature; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
     /// <summary>Applies the softmax function.
     /// 
@@ -5906,7 +5906,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
-                                                 [|axis.ToString(); temperature.ToString(); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|string axis; string temperature; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
 
     /// <summary>Applies the softmax function.
@@ -5943,7 +5943,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
-                                                 [|(match axis with None -> "-1" | _ -> axis.ToString()); (match temperature with None -> "None" | _ -> temperature.ToString()); (match dtype with None -> "None" | _ -> dtype.ToString())|]
+                                                 [|(match axis with None -> "-1" | _ -> string axis); (match temperature with None -> "None" | _ -> string temperature); (match dtype with None -> "None" | _ -> string dtype)|]
         outputs
     /// <summary>Applies the softmax function.
     /// 
@@ -5979,7 +5979,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
-                                                 [|(match axis with None -> "-1" | _ -> axis.ToString()); (match temperature with None -> "None" | _ -> temperature.ToString()); (match dtype with None -> "None" | _ -> dtype.ToString())|]
+                                                 [|(match axis with None -> "-1" | _ -> string axis); (match temperature with None -> "None" | _ -> string temperature); (match dtype with None -> "None" | _ -> string dtype)|]
         outputs
 
     /// <param name="args">Positional input arguments</param>
@@ -6034,7 +6034,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
-                                                 [|axis.ToString(); temperature.ToString(); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|string axis; string temperature; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
     /// <summary>Applies the softmin function.
     /// 
@@ -6071,7 +6071,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
-                                                 [|axis.ToString(); temperature.ToString(); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|string axis; string temperature; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
 
     /// <summary>Applies the softmin function.
@@ -6109,7 +6109,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
-                                                 [|(match axis with None -> "-1" | _ -> axis.ToString()); (match temperature with None -> "None" | _ -> temperature.ToString()); (match dtype with None -> "None" | _ -> dtype.ToString())|]
+                                                 [|(match axis with None -> "-1" | _ -> string axis); (match temperature with None -> "None" | _ -> string temperature); (match dtype with None -> "None" | _ -> string dtype)|]
         outputs
     /// <summary>Applies the softmin function.
     /// 
@@ -6146,7 +6146,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
-                                                 [|(match axis with None -> "-1" | _ -> axis.ToString()); (match temperature with None -> "None" | _ -> temperature.ToString()); (match dtype with None -> "None" | _ -> dtype.ToString())|]
+                                                 [|(match axis with None -> "-1" | _ -> string axis); (match temperature with None -> "None" | _ -> string temperature); (match dtype with None -> "None" | _ -> string dtype)|]
         outputs
 
     /// <param name="args">Positional input arguments</param>
@@ -6191,7 +6191,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
-                                                 [|axis.ToString(); temperature.ToString(); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|string axis; string temperature; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
     /// <summary>Computes the log softmax of the input.
     /// This is equivalent to computing softmax followed by log.
@@ -6218,7 +6218,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
-                                                 [|axis.ToString(); temperature.ToString(); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|string axis; string temperature; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
 
     /// <summary>Computes the log softmax of the input.
@@ -6246,7 +6246,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
-                                                 [|(match axis with None -> "-1" | _ -> axis.ToString()); (match temperature with None -> "None" | _ -> temperature.ToString()); (match dtype with None -> "None" | _ -> dtype.ToString())|]
+                                                 [|(match axis with None -> "-1" | _ -> string axis); (match temperature with None -> "None" | _ -> string temperature); (match dtype with None -> "None" | _ -> string dtype)|]
         outputs
     /// <summary>Computes the log softmax of the input.
     /// This is equivalent to computing softmax followed by log.
@@ -6273,7 +6273,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
-                                                 [|(match axis with None -> "-1" | _ -> axis.ToString()); (match temperature with None -> "None" | _ -> temperature.ToString()); (match dtype with None -> "None" | _ -> dtype.ToString())|]
+                                                 [|(match axis with None -> "-1" | _ -> string axis); (match temperature with None -> "None" | _ -> string temperature); (match dtype with None -> "None" | _ -> string dtype)|]
         outputs
 
     /// <param name="args">Positional input arguments</param>
@@ -6326,7 +6326,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"mode"|]
-                                                 [|(if isNull (mode :> obj) then "instance" else mode.ToString())|]
+                                                 [|(if isNull (mode :> obj) then "instance" else string mode)|]
         outputs
     /// <summary>Applies softmax activation to input. This is intended for internal layers.
     /// 
@@ -6361,7 +6361,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"mode"|]
-                                                 [|(if isNull (mode :> obj) then "instance" else mode.ToString())|]
+                                                 [|(if isNull (mode :> obj) then "instance" else string mode)|]
         outputs
 
 
@@ -6435,7 +6435,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"scale"; "num_filter"; "sample_type"; "multi_input_mode"; "num_args"; "workspace"|]
-                                                 [|scale.ToString(); numFilter.ToString(); sampleType.ToString(); (if isNull (multiInputMode :> obj) then "concat" else multiInputMode.ToString()); numArgs.ToString(); workspace.ToString()|]
+                                                 [|string scale; string numFilter; string sampleType; (if isNull (multiInputMode :> obj) then "concat" else string multiInputMode); string numArgs; string workspace|]
         outputs
     /// <summary>Upsamples the given input data.
     /// 
@@ -6507,7 +6507,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"scale"; "num_filter"; "sample_type"; "multi_input_mode"; "num_args"; "workspace"|]
-                                                 [|scale.ToString(); numFilter.ToString(); sampleType.ToString(); (if isNull (multiInputMode :> obj) then "concat" else multiInputMode.ToString()); numArgs.ToString(); workspace.ToString()|]
+                                                 [|string scale; string numFilter; string sampleType; (if isNull (multiInputMode :> obj) then "concat" else string multiInputMode); string numArgs; string workspace|]
         outputs
 
 
@@ -6543,7 +6543,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle|]
                                                  [|"lr"; "wd"; "rescale_grad"; "clip_gradient"|]
-                                                 [|lr.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString()|]
+                                                 [|string lr; string wd; string rescaleGrad; string clipGradient|]
         outputs
     /// <summary>Update function for SignSGD optimizer.
     /// 
@@ -6577,7 +6577,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle|]
                                                  [|"lr"; "wd"; "rescale_grad"; "clip_gradient"|]
-                                                 [|lr.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString()|]
+                                                 [|string lr; string wd; string rescaleGrad; string clipGradient|]
         outputs
 
     /// <summary>SIGN momentUM (Signum) optimizer.
@@ -6621,7 +6621,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle; mom.NDArrayHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "wd_lh"|]
-                                                 [|lr.ToString(); momentum.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); wdLh.ToString()|]
+                                                 [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string wdLh|]
         outputs
     /// <summary>SIGN momentUM (Signum) optimizer.
     /// 
@@ -6664,7 +6664,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle; mom.SymbolHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "wd_lh"|]
-                                                 [|lr.ToString(); momentum.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); wdLh.ToString()|]
+                                                 [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string wdLh|]
         outputs
 
     /// <summary>Update function for Stochastic Gradient Descent (SGD) optimizer.
@@ -6700,7 +6700,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle|]
                                                  [|"lr"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
-                                                 [|lr.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); lazyUpdate.ToString()|]
+                                                 [|string lr; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         outputs
     /// <summary>Update function for Stochastic Gradient Descent (SGD) optimizer.
     /// 
@@ -6735,7 +6735,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle|]
                                                  [|"lr"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
-                                                 [|lr.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); lazyUpdate.ToString()|]
+                                                 [|string lr; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         outputs
 
     /// <summary>Momentum update function for Stochastic Gradient Descent (SGD) optimizer.
@@ -6789,7 +6789,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle; mom.NDArrayHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
-                                                 [|lr.ToString(); momentum.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); lazyUpdate.ToString()|]
+                                                 [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         outputs
     /// <summary>Momentum update function for Stochastic Gradient Descent (SGD) optimizer.
     /// 
@@ -6842,7 +6842,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle; mom.SymbolHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
-                                                 [|lr.ToString(); momentum.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); lazyUpdate.ToString()|]
+                                                 [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         outputs
 
     /// <summary>Updater function for multi-precision sgd optimizer</summary>
@@ -6866,7 +6866,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle; weight32.NDArrayHandle|]
                                                  [|"lr"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
-                                                 [|lr.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); lazyUpdate.ToString()|]
+                                                 [|string lr; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         outputs
     /// <summary>Updater function for multi-precision sgd optimizer</summary>
     /// <param name="weight">Weight</param>
@@ -6889,7 +6889,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle; weight32.SymbolHandle|]
                                                  [|"lr"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
-                                                 [|lr.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); lazyUpdate.ToString()|]
+                                                 [|string lr; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         outputs
 
     /// <summary>Updater function for multi-precision sgd optimizer</summary>
@@ -6917,7 +6917,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle; mom.NDArrayHandle; weight32.NDArrayHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
-                                                 [|lr.ToString(); momentum.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); lazyUpdate.ToString()|]
+                                                 [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         outputs
     /// <summary>Updater function for multi-precision sgd optimizer</summary>
     /// <param name="weight">Weight</param>
@@ -6944,7 +6944,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle; mom.SymbolHandle; weight32.SymbolHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
-                                                 [|lr.ToString(); momentum.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); lazyUpdate.ToString()|]
+                                                 [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         outputs
 
     /// <summary>The FTML optimizer described in
@@ -6993,7 +6993,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle; d.NDArrayHandle; v.NDArrayHandle; z.NDArrayHandle|]
                                                  [|"lr"; "beta1"; "beta2"; "epsilon"; "t"; "wd"; "rescale_grad"; "clip_grad"|]
-                                                 [|lr.ToString(); beta1.ToString(); beta2.ToString(); epsilon.ToString(); t.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGrad.ToString()|]
+                                                 [|string lr; string beta1; string beta2; string epsilon; string t; string wd; string rescaleGrad; string clipGrad|]
         outputs
     /// <summary>The FTML optimizer described in
     /// *FTML - Follow the Moving Leader in Deep Learning*,
@@ -7041,7 +7041,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle; d.SymbolHandle; v.SymbolHandle; z.SymbolHandle|]
                                                  [|"lr"; "beta1"; "beta2"; "epsilon"; "t"; "wd"; "rescale_grad"; "clip_grad"|]
-                                                 [|lr.ToString(); beta1.ToString(); beta2.ToString(); epsilon.ToString(); t.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGrad.ToString()|]
+                                                 [|string lr; string beta1; string beta2; string epsilon; string t; string wd; string rescaleGrad; string clipGrad|]
         outputs
 
     /// <summary>Update function for Adam optimizer. Adam is seen as a generalization
@@ -7103,7 +7103,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle; mean.NDArrayHandle; var.NDArrayHandle|]
                                                  [|"lr"; "beta1"; "beta2"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
-                                                 [|lr.ToString(); beta1.ToString(); beta2.ToString(); epsilon.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); lazyUpdate.ToString()|]
+                                                 [|string lr; string beta1; string beta2; string epsilon; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         outputs
     /// <summary>Update function for Adam optimizer. Adam is seen as a generalization
     /// of AdaGrad.
@@ -7164,7 +7164,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle; mean.SymbolHandle; var.SymbolHandle|]
                                                  [|"lr"; "beta1"; "beta2"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
-                                                 [|lr.ToString(); beta1.ToString(); beta2.ToString(); epsilon.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); lazyUpdate.ToString()|]
+                                                 [|string lr; string beta1; string beta2; string epsilon; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         outputs
 
     /// <summary>Update function for Nesterov Accelerated Gradient( NAG) optimizer.
@@ -7203,7 +7203,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle; mom.NDArrayHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"|]
-                                                 [|lr.ToString(); momentum.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString()|]
+                                                 [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient|]
         outputs
     /// <summary>Update function for Nesterov Accelerated Gradient( NAG) optimizer.
     /// It updates the weights using the following formula,
@@ -7241,7 +7241,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle; mom.SymbolHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"|]
-                                                 [|lr.ToString(); momentum.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString()|]
+                                                 [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient|]
         outputs
 
     /// <summary>Update function for multi-precision Nesterov Accelerated Gradient( NAG) optimizer.
@@ -7270,7 +7270,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle; mom.NDArrayHandle; weight32.NDArrayHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"|]
-                                                 [|lr.ToString(); momentum.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString()|]
+                                                 [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient|]
         outputs
     /// <summary>Update function for multi-precision Nesterov Accelerated Gradient( NAG) optimizer.
     /// 
@@ -7298,7 +7298,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle; mom.SymbolHandle; weight32.SymbolHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"|]
-                                                 [|lr.ToString(); momentum.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString()|]
+                                                 [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient|]
         outputs
 
     /// <summary>Update function for `RMSProp` optimizer.
@@ -7361,7 +7361,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle; n.NDArrayHandle|]
                                                  [|"lr"; "gamma1"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "clip_weights"|]
-                                                 [|lr.ToString(); gamma1.ToString(); epsilon.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); clipWeights.ToString()|]
+                                                 [|string lr; string gamma1; string epsilon; string wd; string rescaleGrad; string clipGradient; string clipWeights|]
         outputs
     /// <summary>Update function for `RMSProp` optimizer.
     /// 
@@ -7423,7 +7423,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle; n.SymbolHandle|]
                                                  [|"lr"; "gamma1"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "clip_weights"|]
-                                                 [|lr.ToString(); gamma1.ToString(); epsilon.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); clipWeights.ToString()|]
+                                                 [|string lr; string gamma1; string epsilon; string wd; string rescaleGrad; string clipGradient; string clipWeights|]
         outputs
 
     /// <summary>Update function for RMSPropAlex optimizer.
@@ -7481,7 +7481,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle; n.NDArrayHandle; g.NDArrayHandle; delta.NDArrayHandle|]
                                                  [|"lr"; "gamma1"; "gamma2"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "clip_weights"|]
-                                                 [|lr.ToString(); gamma1.ToString(); gamma2.ToString(); epsilon.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); clipWeights.ToString()|]
+                                                 [|string lr; string gamma1; string gamma2; string epsilon; string wd; string rescaleGrad; string clipGradient; string clipWeights|]
         outputs
     /// <summary>Update function for RMSPropAlex optimizer.
     /// 
@@ -7538,7 +7538,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle; n.SymbolHandle; g.SymbolHandle; delta.SymbolHandle|]
                                                  [|"lr"; "gamma1"; "gamma2"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "clip_weights"|]
-                                                 [|lr.ToString(); gamma1.ToString(); gamma2.ToString(); epsilon.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); clipWeights.ToString()|]
+                                                 [|string lr; string gamma1; string gamma2; string epsilon; string wd; string rescaleGrad; string clipGradient; string clipWeights|]
         outputs
 
     /// <summary>Update function for Ftrl optimizer.
@@ -7588,7 +7588,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle; z.NDArrayHandle; n.NDArrayHandle|]
                                                  [|"lr"; "lamda1"; "beta"; "wd"; "rescale_grad"; "clip_gradient"|]
-                                                 [|lr.ToString(); lamda1.ToString(); beta.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString()|]
+                                                 [|string lr; string lamda1; string beta; string wd; string rescaleGrad; string clipGradient|]
         outputs
     /// <summary>Update function for Ftrl optimizer.
     /// Referenced from *Ad Click Prediction: a View from the Trenches*, available at
@@ -7637,7 +7637,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle; z.SymbolHandle; n.SymbolHandle|]
                                                  [|"lr"; "lamda1"; "beta"; "wd"; "rescale_grad"; "clip_gradient"|]
-                                                 [|lr.ToString(); lamda1.ToString(); beta.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString()|]
+                                                 [|string lr; string lamda1; string beta; string wd; string rescaleGrad; string clipGradient|]
         outputs
 
     /// <summary>Update function for AdaGrad optimizer.
@@ -7676,7 +7676,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle; grad.NDArrayHandle; history.NDArrayHandle|]
                                                  [|"lr"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"|]
-                                                 [|lr.ToString(); epsilon.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString()|]
+                                                 [|string lr; string epsilon; string wd; string rescaleGrad; string clipGradient|]
         outputs
     /// <summary>Update function for AdaGrad optimizer.
     /// 
@@ -7714,7 +7714,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.SymbolHandle; grad.SymbolHandle; history.SymbolHandle|]
                                                  [|"lr"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"|]
-                                                 [|lr.ToString(); epsilon.ToString(); wd.ToString(); rescaleGrad.ToString(); clipGradient.ToString()|]
+                                                 [|string lr; string epsilon; string wd; string rescaleGrad; string clipGradient|]
         outputs
 
     /// <summary>Pads an input array with a constant or edge values of the array.
@@ -7810,7 +7810,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"mode"; "pad_width"; "constant_value"|]
-                                                 [|mode.ToString(); padWidth.ToString(); constantValue.ToString()|]
+                                                 [|string mode; (padWidth |> Seq.map string |> String.concat ", "); string constantValue|]
         outputs
     /// <summary>Pads an input array with a constant or edge values of the array.
     /// 
@@ -7905,7 +7905,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"mode"; "pad_width"; "constant_value"|]
-                                                 [|mode.ToString(); padWidth.ToString(); constantValue.ToString()|]
+                                                 [|string mode; (padWidth |> Seq.map string |> String.concat ", "); string constantValue|]
         outputs
 
     /// <summary>Dequantize the input tensor into a float tensor.
@@ -7935,7 +7935,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; minRange.NDArrayHandle; maxRange.NDArrayHandle|]
                                                  [|"out_type"|]
-                                                 [|(if isNull (outType :> obj) then "float32" else outType.ToString())|]
+                                                 [|(if isNull (outType :> obj) then "float32" else string outType)|]
         outputs
     /// <summary>Dequantize the input tensor into a float tensor.
     /// min_range and max_range are scalar floats that specify the range for
@@ -7964,7 +7964,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; minRange.SymbolHandle; maxRange.SymbolHandle|]
                                                  [|"out_type"|]
-                                                 [|(if isNull (outType :> obj) then "float32" else outType.ToString())|]
+                                                 [|(if isNull (outType :> obj) then "float32" else string outType)|]
         outputs
 
     /// <summary>Quantize a input tensor from float to `out_type`,
@@ -8001,7 +8001,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; minRange.NDArrayHandle; maxRange.NDArrayHandle|]
                                                  [|"out_type"|]
-                                                 [|(if isNull (outType :> obj) then "uint8" else outType.ToString())|]
+                                                 [|(if isNull (outType :> obj) then "uint8" else string outType)|]
         outputs
     /// <summary>Quantize a input tensor from float to `out_type`,
     /// with user-specified `min_range` and `max_range`.
@@ -8037,7 +8037,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; minRange.SymbolHandle; maxRange.SymbolHandle|]
                                                  [|"out_type"|]
-                                                 [|(if isNull (outType :> obj) then "uint8" else outType.ToString())|]
+                                                 [|(if isNull (outType :> obj) then "uint8" else string outType)|]
         outputs
 
     /// <summary>Quantize a input tensor from float to `out_type`,
@@ -8077,7 +8077,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"out_type"; "min_calib_range"; "max_calib_range"|]
-                                                 [|(if isNull (outType :> obj) then "int8" else outType.ToString()); minCalibRange.ToString(); maxCalibRange.ToString()|]
+                                                 [|(if isNull (outType :> obj) then "int8" else string outType); string minCalibRange; string maxCalibRange|]
         outputs
     /// <summary>Quantize a input tensor from float to `out_type`,
     /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
@@ -8116,7 +8116,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"out_type"; "min_calib_range"; "max_calib_range"|]
-                                                 [|(if isNull (outType :> obj) then "int8" else outType.ToString()); minCalibRange.ToString(); maxCalibRange.ToString()|]
+                                                 [|(if isNull (outType :> obj) then "int8" else string outType); string minCalibRange; string maxCalibRange|]
         outputs
 
     /// <summary>Quantize a input tensor from float to `out_type`,
@@ -8156,7 +8156,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"out_type"; "min_calib_range"; "max_calib_range"|]
-                                                 [|(match outType with None -> "int8" | _ -> outType.ToString()); (match minCalibRange with None -> "None" | _ -> minCalibRange.ToString()); (match maxCalibRange with None -> "None" | _ -> maxCalibRange.ToString())|]
+                                                 [|(match outType with None -> "int8" | _ -> string outType); (match minCalibRange with None -> "None" | _ -> string minCalibRange); (match maxCalibRange with None -> "None" | _ -> string maxCalibRange)|]
         outputs
     /// <summary>Quantize a input tensor from float to `out_type`,
     /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
@@ -8195,7 +8195,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"out_type"; "min_calib_range"; "max_calib_range"|]
-                                                 [|(match outType with None -> "int8" | _ -> outType.ToString()); (match minCalibRange with None -> "None" | _ -> minCalibRange.ToString()); (match maxCalibRange with None -> "None" | _ -> maxCalibRange.ToString())|]
+                                                 [|(match outType with None -> "int8" | _ -> string outType); (match minCalibRange with None -> "None" | _ -> string minCalibRange); (match maxCalibRange with None -> "None" | _ -> string maxCalibRange)|]
         outputs
 
     /// <summary>Activation operator for input and output data type of int8.
@@ -8216,7 +8216,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle|]
                                                  [|"act_type"|]
-                                                 [|actType.ToString()|]
+                                                 [|string actType|]
         outputs
     /// <summary>Activation operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
@@ -8236,7 +8236,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; minData.SymbolHandle; maxData.SymbolHandle|]
                                                  [|"act_type"|]
-                                                 [|actType.ToString()|]
+                                                 [|string actType|]
         outputs
 
     /// <summary>Joins input arrays along a given axis.
@@ -8259,7 +8259,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"num_args"; "dim"|]
-                                                 [|numArgs.ToString(); dim.ToString()|]
+                                                 [|string numArgs; string dim|]
         outputs
     /// <summary>Joins input arrays along a given axis.
     /// 
@@ -8281,7 +8281,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"num_args"; "dim"|]
-                                                 [|numArgs.ToString(); dim.ToString()|]
+                                                 [|string numArgs; string dim|]
         outputs
 
     /// <summary>Convolution operator for input, weight and bias data type of int8,
@@ -8339,7 +8339,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle; minWeight.NDArrayHandle; maxWeight.NDArrayHandle; minBias.NDArrayHandle; maxBias.NDArrayHandle|]
                                                  [|"kernel"; "stride"; "dilate"; "pad"; "num_filter"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|kernel.ToString(); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (dilate :> obj) then "[]" else dilate.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString()); numFilter.ToString(); numGroup.ToString(); workspace.ToString(); noBias.ToString(); (if isNull (cudnnTune :> obj) then "None" else cudnnTune.ToString()); cudnnOff.ToString(); (if isNull (layout :> obj) then "None" else layout.ToString())|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
     /// <summary>Convolution operator for input, weight and bias data type of int8,
     /// and accumulates in type int32 for the output. For each argument, two more arguments of type
@@ -8396,7 +8396,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; weight.SymbolHandle; bias.SymbolHandle; minData.SymbolHandle; maxData.SymbolHandle; minWeight.SymbolHandle; maxWeight.SymbolHandle; minBias.SymbolHandle; maxBias.SymbolHandle|]
                                                  [|"kernel"; "stride"; "dilate"; "pad"; "num_filter"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|kernel.ToString(); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (dilate :> obj) then "[]" else dilate.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString()); numFilter.ToString(); numGroup.ToString(); workspace.ToString(); noBias.ToString(); (if isNull (cudnnTune :> obj) then "None" else cudnnTune.ToString()); cudnnOff.ToString(); (if isNull (layout :> obj) then "None" else layout.ToString())|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
 
     /// <summary>elemwise_add operator for input dataA and input dataB data type of int8,
@@ -8588,7 +8588,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle; minWeight.NDArrayHandle; maxWeight.NDArrayHandle; minBias.NDArrayHandle; maxBias.NDArrayHandle|]
                                                  [|"num_hidden"; "no_bias"; "flatten"|]
-                                                 [|numHidden.ToString(); noBias.ToString(); flatten.ToString()|]
+                                                 [|string numHidden; string noBias; string flatten|]
         outputs
     /// <summary>Fully Connected operator for input, weight and bias data type of int8,
     /// and accumulates in type int32 for the output. For each argument, two more arguments of type
@@ -8628,7 +8628,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; weight.SymbolHandle; bias.SymbolHandle; minData.SymbolHandle; maxData.SymbolHandle; minWeight.SymbolHandle; maxWeight.SymbolHandle; minBias.SymbolHandle; maxBias.SymbolHandle|]
                                                  [|"num_hidden"; "no_bias"; "flatten"|]
-                                                 [|numHidden.ToString(); noBias.ToString(); flatten.ToString()|]
+                                                 [|string numHidden; string noBias; string flatten|]
         outputs
 
     /// <summary>Pooling operator for input and output data type of int8.
@@ -8671,7 +8671,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle|]
                                                  [|"kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "p_value"; "count_include_pad"; "layout"|]
-                                                 [|(if isNull (kernel :> obj) then "[]" else kernel.ToString()); (if isNull (poolType :> obj) then "max" else poolType.ToString()); globalPool.ToString(); cudnnOff.ToString(); (if isNull (poolingConvention :> obj) then "valid" else poolingConvention.ToString()); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString()); pValue.ToString(); countIncludePad.ToString(); (if isNull (layout :> obj) then "None" else layout.ToString())|]
+                                                 [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; string cudnnOff; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string pValue; string countIncludePad; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
     /// <summary>Pooling operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
@@ -8713,7 +8713,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; minData.SymbolHandle; maxData.SymbolHandle|]
                                                  [|"kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "p_value"; "count_include_pad"; "layout"|]
-                                                 [|(if isNull (kernel :> obj) then "[]" else kernel.ToString()); (if isNull (poolType :> obj) then "max" else poolType.ToString()); globalPool.ToString(); cudnnOff.ToString(); (if isNull (poolingConvention :> obj) then "valid" else poolingConvention.ToString()); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString()); pValue.ToString(); countIncludePad.ToString(); (if isNull (layout :> obj) then "None" else layout.ToString())|]
+                                                 [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; string cudnnOff; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string pValue; string countIncludePad; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
 
     /// <summary>Pooling operator for input and output data type of int8.
@@ -8756,7 +8756,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle|]
                                                  [|"kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "p_value"; "count_include_pad"; "layout"|]
-                                                 [|(match kernel with None -> "[]" | _ -> kernel.ToString()); (match poolType with None -> "max" | _ -> poolType.ToString()); (match globalPool with None -> "false" | _ -> globalPool.ToString()); (match cudnnOff with None -> "false" | _ -> cudnnOff.ToString()); (match poolingConvention with None -> "valid" | _ -> poolingConvention.ToString()); (match stride with None -> "[]" | _ -> stride.ToString()); (match pad with None -> "[]" | _ -> pad.ToString()); (match pValue with None -> "None" | _ -> pValue.ToString()); (match countIncludePad with None -> "None" | _ -> countIncludePad.ToString()); (match layout with None -> "None" | _ -> layout.ToString())|]
+                                                 [|(match kernel with None -> "[]" | _ -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | _ -> string poolType); (match globalPool with None -> "false" | _ -> string globalPool); (match cudnnOff with None -> "false" | _ -> string cudnnOff); (match poolingConvention with None -> "valid" | _ -> string poolingConvention); (match stride with None -> "[]" | _ -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | _ -> (pad |> Seq.map string |> String.concat ", ")); (match pValue with None -> "None" | _ -> string pValue); (match countIncludePad with None -> "None" | _ -> string countIncludePad); (match layout with None -> "None" | _ -> string layout)|]
         outputs
     /// <summary>Pooling operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
@@ -8798,7 +8798,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; minData.SymbolHandle; maxData.SymbolHandle|]
                                                  [|"kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "p_value"; "count_include_pad"; "layout"|]
-                                                 [|(match kernel with None -> "[]" | _ -> kernel.ToString()); (match poolType with None -> "max" | _ -> poolType.ToString()); (match globalPool with None -> "false" | _ -> globalPool.ToString()); (match cudnnOff with None -> "false" | _ -> cudnnOff.ToString()); (match poolingConvention with None -> "valid" | _ -> poolingConvention.ToString()); (match stride with None -> "[]" | _ -> stride.ToString()); (match pad with None -> "[]" | _ -> pad.ToString()); (match pValue with None -> "None" | _ -> pValue.ToString()); (match countIncludePad with None -> "None" | _ -> countIncludePad.ToString()); (match layout with None -> "None" | _ -> layout.ToString())|]
+                                                 [|(match kernel with None -> "[]" | _ -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | _ -> string poolType); (match globalPool with None -> "false" | _ -> string globalPool); (match cudnnOff with None -> "false" | _ -> string cudnnOff); (match poolingConvention with None -> "valid" | _ -> string poolingConvention); (match stride with None -> "[]" | _ -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | _ -> (pad |> Seq.map string |> String.concat ", ")); (match pValue with None -> "None" | _ -> string pValue); (match countIncludePad with None -> "None" | _ -> string countIncludePad); (match layout with None -> "None" | _ -> string layout)|]
         outputs
 
     /// <summary>Given data that is quantized in int32 and the corresponding thresholds,
@@ -8827,7 +8827,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; minRange.NDArrayHandle; maxRange.NDArrayHandle|]
                                                  [|"out_type"; "min_calib_range"; "max_calib_range"|]
-                                                 [|(if isNull (outType :> obj) then "int8" else outType.ToString()); minCalibRange.ToString(); maxCalibRange.ToString()|]
+                                                 [|(if isNull (outType :> obj) then "int8" else string outType); string minCalibRange; string maxCalibRange|]
         outputs
     /// <summary>Given data that is quantized in int32 and the corresponding thresholds,
     /// requantize the data into int8 using min and max thresholds either calculated at runtime
@@ -8855,7 +8855,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; minRange.SymbolHandle; maxRange.SymbolHandle|]
                                                  [|"out_type"; "min_calib_range"; "max_calib_range"|]
-                                                 [|(if isNull (outType :> obj) then "int8" else outType.ToString()); minCalibRange.ToString(); maxCalibRange.ToString()|]
+                                                 [|(if isNull (outType :> obj) then "int8" else string outType); string minCalibRange; string maxCalibRange|]
         outputs
 
     /// <summary>Given data that is quantized in int32 and the corresponding thresholds,
@@ -8884,7 +8884,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; minRange.NDArrayHandle; maxRange.NDArrayHandle|]
                                                  [|"out_type"; "min_calib_range"; "max_calib_range"|]
-                                                 [|(match outType with None -> "int8" | _ -> outType.ToString()); (match minCalibRange with None -> "None" | _ -> minCalibRange.ToString()); (match maxCalibRange with None -> "None" | _ -> maxCalibRange.ToString())|]
+                                                 [|(match outType with None -> "int8" | _ -> string outType); (match minCalibRange with None -> "None" | _ -> string minCalibRange); (match maxCalibRange with None -> "None" | _ -> string maxCalibRange)|]
         outputs
     /// <summary>Given data that is quantized in int32 and the corresponding thresholds,
     /// requantize the data into int8 using min and max thresholds either calculated at runtime
@@ -8912,7 +8912,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; minRange.SymbolHandle; maxRange.SymbolHandle|]
                                                  [|"out_type"; "min_calib_range"; "max_calib_range"|]
-                                                 [|(match outType with None -> "int8" | _ -> outType.ToString()); (match minCalibRange with None -> "None" | _ -> minCalibRange.ToString()); (match maxCalibRange with None -> "None" | _ -> maxCalibRange.ToString())|]
+                                                 [|(match outType with None -> "int8" | _ -> string outType); (match minCalibRange with None -> "None" | _ -> string minCalibRange); (match maxCalibRange with None -> "None" | _ -> string maxCalibRange)|]
         outputs
 
     /// <summary>Concurrent sampling from multiple
@@ -8952,7 +8952,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|low.NDArrayHandle; high.NDArrayHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString()); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
     /// <summary>Concurrent sampling from multiple
     /// uniform distributions on the intervals given by *[low,high)*.
@@ -8991,7 +8991,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|low.SymbolHandle; high.SymbolHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString()); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
 
     /// <summary>Concurrent sampling from multiple
@@ -9031,7 +9031,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|mu.NDArrayHandle; sigma.NDArrayHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString()); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
     /// <summary>Concurrent sampling from multiple
     /// normal distributions with parameters *mu* (mean) and *sigma* (standard deviation).
@@ -9070,7 +9070,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|mu.SymbolHandle; sigma.SymbolHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString()); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
 
     /// <summary>Concurrent sampling from multiple
@@ -9110,7 +9110,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|alpha.NDArrayHandle; beta.NDArrayHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString()); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
     /// <summary>Concurrent sampling from multiple
     /// gamma distributions with parameters *alpha* (shape) and *beta* (scale).
@@ -9149,7 +9149,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|alpha.SymbolHandle; beta.SymbolHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString()); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
 
     /// <summary>Concurrent sampling from multiple
@@ -9187,7 +9187,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lam.NDArrayHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString()); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
     /// <summary>Concurrent sampling from multiple
     /// exponential distributions with parameters lambda (rate).
@@ -9224,7 +9224,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lam.SymbolHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString()); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
 
     /// <summary>Concurrent sampling from multiple
@@ -9264,7 +9264,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lam.NDArrayHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString()); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
     /// <summary>Concurrent sampling from multiple
     /// Poisson distributions with parameters lambda (rate).
@@ -9303,7 +9303,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lam.SymbolHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString()); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
 
     /// <summary>Concurrent sampling from multiple
@@ -9345,7 +9345,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|k.NDArrayHandle; p.NDArrayHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString()); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
     /// <summary>Concurrent sampling from multiple
     /// negative binomial distributions with parameters *k* (failure limit) and *p* (failure probability).
@@ -9386,7 +9386,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|k.SymbolHandle; p.SymbolHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString()); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
 
     /// <summary>Concurrent sampling from multiple
@@ -9428,7 +9428,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|mu.NDArrayHandle; alpha.NDArrayHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString()); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
     /// <summary>Concurrent sampling from multiple
     /// generalized negative binomial distributions with parameters *mu* (mean) and *alpha* (dispersion).
@@ -9469,7 +9469,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|mu.SymbolHandle; alpha.SymbolHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString()); (if isNull (dtype :> obj) then "None" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
 
     /// <summary>Concurrent sampling from multiple multinomial distributions.
@@ -9510,7 +9510,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"shape"; "get_prob"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else shape.ToString()); getProb.ToString(); (if isNull (dtype :> obj) then "int32" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string getProb; (if isNull (dtype :> obj) then "int32" else string dtype)|]
         outputs
     /// <summary>Concurrent sampling from multiple multinomial distributions.
     /// 
@@ -9550,7 +9550,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"shape"; "get_prob"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else shape.ToString()); getProb.ToString(); (if isNull (dtype :> obj) then "int32" else dtype.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string getProb; (if isNull (dtype :> obj) then "int32" else string dtype)|]
         outputs
 
 
@@ -9583,7 +9583,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"low"; "high"|]
-                                                 [|low.ToString(); high.ToString()|]
+                                                 [|string low; string high|]
         outputs
     /// <summary>Draw random samples from a uniform distribution according to the input array shape.
     /// 
@@ -9606,7 +9606,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"low"; "high"|]
-                                                 [|low.ToString(); high.ToString()|]
+                                                 [|string low; string high|]
         outputs
 
     /// <summary>Draw random samples from a normal (Gaussian) distribution according to the input array shape.
@@ -9629,7 +9629,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"loc"; "scale"|]
-                                                 [|loc.ToString(); scale.ToString()|]
+                                                 [|string loc; string scale|]
         outputs
     /// <summary>Draw random samples from a normal (Gaussian) distribution according to the input array shape.
     /// 
@@ -9651,7 +9651,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"loc"; "scale"|]
-                                                 [|loc.ToString(); scale.ToString()|]
+                                                 [|string loc; string scale|]
         outputs
 
     /// <summary>Draw random samples from a gamma distribution according to the input array shape.
@@ -9673,7 +9673,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"alpha"; "beta"|]
-                                                 [|alpha.ToString(); beta.ToString()|]
+                                                 [|string alpha; string beta|]
         outputs
     /// <summary>Draw random samples from a gamma distribution according to the input array shape.
     /// 
@@ -9694,7 +9694,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"alpha"; "beta"|]
-                                                 [|alpha.ToString(); beta.ToString()|]
+                                                 [|string alpha; string beta|]
         outputs
 
     /// <summary>Draw random samples from an exponential distribution according to the input array shape.
@@ -9715,7 +9715,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"lam"|]
-                                                 [|lam.ToString()|]
+                                                 [|string lam|]
         outputs
     /// <summary>Draw random samples from an exponential distribution according to the input array shape.
     /// 
@@ -9735,7 +9735,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"lam"|]
-                                                 [|lam.ToString()|]
+                                                 [|string lam|]
         outputs
 
     /// <summary>Draw random samples from a Poisson distribution according to the input array shape.
@@ -9757,7 +9757,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"lam"|]
-                                                 [|lam.ToString()|]
+                                                 [|string lam|]
         outputs
     /// <summary>Draw random samples from a Poisson distribution according to the input array shape.
     /// 
@@ -9778,7 +9778,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"lam"|]
-                                                 [|lam.ToString()|]
+                                                 [|string lam|]
         outputs
 
     /// <summary>Draw random samples from a negative binomial distribution according to the input array shape.
@@ -9802,7 +9802,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"k"; "p"|]
-                                                 [|k.ToString(); p.ToString()|]
+                                                 [|string k; string p|]
         outputs
     /// <summary>Draw random samples from a negative binomial distribution according to the input array shape.
     /// 
@@ -9825,7 +9825,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"k"; "p"|]
-                                                 [|k.ToString(); p.ToString()|]
+                                                 [|string k; string p|]
         outputs
 
     /// <summary>Draw random samples from a generalized negative binomial distribution according to the
@@ -9851,7 +9851,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"mu"; "alpha"|]
-                                                 [|mu.ToString(); alpha.ToString()|]
+                                                 [|string mu; string alpha|]
         outputs
     /// <summary>Draw random samples from a generalized negative binomial distribution according to the
     /// input array shape.
@@ -9876,7 +9876,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"mu"; "alpha"|]
-                                                 [|mu.ToString(); alpha.ToString()|]
+                                                 [|string mu; string alpha|]
         outputs
 
     /// <summary>Randomly shuffle the elements.
@@ -9941,7 +9941,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; label.NDArrayHandle|]
                                                  [|"grad_scale"|]
-                                                 [|gradScale.ToString()|]
+                                                 [|string gradScale|]
         outputs
     /// <summary>Computes and optimizes for squared loss during backward propagation.
     /// Just outputs ``data`` during forward propagation.
@@ -9973,7 +9973,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; label.SymbolHandle|]
                                                  [|"grad_scale"|]
-                                                 [|gradScale.ToString()|]
+                                                 [|string gradScale|]
         outputs
 
 
@@ -10008,7 +10008,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; label.NDArrayHandle|]
                                                  [|"grad_scale"|]
-                                                 [|gradScale.ToString()|]
+                                                 [|string gradScale|]
         outputs
     /// <summary>Computes mean absolute error of the input.
     /// 
@@ -10041,7 +10041,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; label.SymbolHandle|]
                                                  [|"grad_scale"|]
-                                                 [|gradScale.ToString()|]
+                                                 [|string gradScale|]
         outputs
 
 
@@ -10080,7 +10080,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; label.NDArrayHandle|]
                                                  [|"grad_scale"|]
-                                                 [|gradScale.ToString()|]
+                                                 [|string gradScale|]
         outputs
     /// <summary>Applies a logistic function to the input.
     /// 
@@ -10117,7 +10117,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; label.SymbolHandle|]
                                                  [|"grad_scale"|]
-                                                 [|gradScale.ToString()|]
+                                                 [|string gradScale|]
         outputs
 
 
@@ -10213,7 +10213,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; parameters.NDArrayHandle; state.NDArrayHandle; stateCell.NDArrayHandle; sequenceLength.NDArrayHandle|]
                                                  [|"state_size"; "num_layers"; "mode"; "projection_size"; "lstm_state_clip_min"; "lstm_state_clip_max"; "bidirectional"; "p"; "state_outputs"; "lstm_state_clip_nan"; "use_sequence_length"|]
-                                                 [|stateSize.ToString(); numLayers.ToString(); mode.ToString(); projectionSize.ToString(); lstmStateClipMin.ToString(); lstmStateClipMax.ToString(); bidirectional.ToString(); p.ToString(); stateOutputs.ToString(); lstmStateClipNan.ToString(); useSequenceLength.ToString()|]
+                                                 [|string stateSize; string numLayers; string mode; string projectionSize; string lstmStateClipMin; string lstmStateClipMax; string bidirectional; string p; string stateOutputs; string lstmStateClipNan; string useSequenceLength|]
         outputs
     /// <summary>Applies recurrent layers to input data. Currently, vanilla RNN, LSTM and GRU are
     /// implemented, with both multi-layer and bidirectional support.
@@ -10307,7 +10307,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; parameters.SymbolHandle; state.SymbolHandle; stateCell.SymbolHandle; sequenceLength.SymbolHandle|]
                                                  [|"state_size"; "num_layers"; "mode"; "projection_size"; "lstm_state_clip_min"; "lstm_state_clip_max"; "bidirectional"; "p"; "state_outputs"; "lstm_state_clip_nan"; "use_sequence_length"|]
-                                                 [|stateSize.ToString(); numLayers.ToString(); mode.ToString(); projectionSize.ToString(); lstmStateClipMin.ToString(); lstmStateClipMax.ToString(); bidirectional.ToString(); p.ToString(); stateOutputs.ToString(); lstmStateClipNan.ToString(); useSequenceLength.ToString()|]
+                                                 [|string stateSize; string numLayers; string mode; string projectionSize; string lstmStateClipMin; string lstmStateClipMax; string bidirectional; string p; string stateOutputs; string lstmStateClipNan; string useSequenceLength|]
         outputs
 
     /// <summary>Applies recurrent layers to input data. Currently, vanilla RNN, LSTM and GRU are
@@ -10402,7 +10402,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; parameters.NDArrayHandle; state.NDArrayHandle; stateCell.NDArrayHandle; sequenceLength.NDArrayHandle|]
                                                  [|"state_size"; "num_layers"; "mode"; "projection_size"; "lstm_state_clip_min"; "lstm_state_clip_max"; "bidirectional"; "p"; "state_outputs"; "lstm_state_clip_nan"; "use_sequence_length"|]
-                                                 [|stateSize.ToString(); numLayers.ToString(); mode.ToString(); (match projectionSize with None -> "None" | _ -> projectionSize.ToString()); (match lstmStateClipMin with None -> "None" | _ -> lstmStateClipMin.ToString()); (match lstmStateClipMax with None -> "None" | _ -> lstmStateClipMax.ToString()); (match bidirectional with None -> "false" | _ -> bidirectional.ToString()); (match p with None -> "0.0" | _ -> p.ToString()); (match stateOutputs with None -> "false" | _ -> stateOutputs.ToString()); (match lstmStateClipNan with None -> "false" | _ -> lstmStateClipNan.ToString()); (match useSequenceLength with None -> "false" | _ -> useSequenceLength.ToString())|]
+                                                 [|string stateSize; string numLayers; string mode; (match projectionSize with None -> "None" | _ -> string projectionSize); (match lstmStateClipMin with None -> "None" | _ -> string lstmStateClipMin); (match lstmStateClipMax with None -> "None" | _ -> string lstmStateClipMax); (match bidirectional with None -> "false" | _ -> string bidirectional); (match p with None -> "0.0" | _ -> string p); (match stateOutputs with None -> "false" | _ -> string stateOutputs); (match lstmStateClipNan with None -> "false" | _ -> string lstmStateClipNan); (match useSequenceLength with None -> "false" | _ -> string useSequenceLength)|]
         outputs
     /// <summary>Applies recurrent layers to input data. Currently, vanilla RNN, LSTM and GRU are
     /// implemented, with both multi-layer and bidirectional support.
@@ -10496,7 +10496,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; parameters.SymbolHandle; state.SymbolHandle; stateCell.SymbolHandle; sequenceLength.SymbolHandle|]
                                                  [|"state_size"; "num_layers"; "mode"; "projection_size"; "lstm_state_clip_min"; "lstm_state_clip_max"; "bidirectional"; "p"; "state_outputs"; "lstm_state_clip_nan"; "use_sequence_length"|]
-                                                 [|stateSize.ToString(); numLayers.ToString(); mode.ToString(); (match projectionSize with None -> "None" | _ -> projectionSize.ToString()); (match lstmStateClipMin with None -> "None" | _ -> lstmStateClipMin.ToString()); (match lstmStateClipMax with None -> "None" | _ -> lstmStateClipMax.ToString()); (match bidirectional with None -> "false" | _ -> bidirectional.ToString()); (match p with None -> "0.0" | _ -> p.ToString()); (match stateOutputs with None -> "false" | _ -> stateOutputs.ToString()); (match lstmStateClipNan with None -> "false" | _ -> lstmStateClipNan.ToString()); (match useSequenceLength with None -> "false" | _ -> useSequenceLength.ToString())|]
+                                                 [|string stateSize; string numLayers; string mode; (match projectionSize with None -> "None" | _ -> string projectionSize); (match lstmStateClipMin with None -> "None" | _ -> string lstmStateClipMin); (match lstmStateClipMax with None -> "None" | _ -> string lstmStateClipMax); (match bidirectional with None -> "false" | _ -> string bidirectional); (match p with None -> "0.0" | _ -> string p); (match stateOutputs with None -> "false" | _ -> string stateOutputs); (match lstmStateClipNan with None -> "false" | _ -> string lstmStateClipNan); (match useSequenceLength with None -> "false" | _ -> string useSequenceLength)|]
         outputs
 
 
@@ -10570,7 +10570,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"num_outputs"; "axis"; "squeeze_axis"|]
-                                                 [|numOutputs.ToString(); axis.ToString(); squeezeAxis.ToString()|]
+                                                 [|string numOutputs; string axis; string squeezeAxis|]
         outputs
     /// <summary>Splits an array along a particular axis into multiple sub-arrays.
     /// 
@@ -10642,7 +10642,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"num_outputs"; "axis"; "squeeze_axis"|]
-                                                 [|numOutputs.ToString(); axis.ToString(); squeezeAxis.ToString()|]
+                                                 [|string numOutputs; string axis; string squeezeAxis|]
         outputs
 
     /// <summary>Computes the gradient of cross entropy loss with respect to softmax output.
@@ -10747,7 +10747,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; label.NDArrayHandle|]
                                                  [|"grad_scale"; "ignore_label"; "multi_output"; "use_ignore"; "preserve_shape"; "normalization"; "out_grad"; "smooth_alpha"|]
-                                                 [|gradScale.ToString(); ignoreLabel.ToString(); multiOutput.ToString(); useIgnore.ToString(); preserveShape.ToString(); (if isNull (normalization :> obj) then "null" else normalization.ToString()); outGrad.ToString(); smoothAlpha.ToString()|]
+                                                 [|string gradScale; string ignoreLabel; string multiOutput; string useIgnore; string preserveShape; (if isNull (normalization :> obj) then "null" else string normalization); string outGrad; string smoothAlpha|]
         outputs
     /// <summary>Computes the gradient of cross entropy loss with respect to softmax output.
     /// 
@@ -10851,7 +10851,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; label.SymbolHandle|]
                                                  [|"grad_scale"; "ignore_label"; "multi_output"; "use_ignore"; "preserve_shape"; "normalization"; "out_grad"; "smooth_alpha"|]
-                                                 [|gradScale.ToString(); ignoreLabel.ToString(); multiOutput.ToString(); useIgnore.ToString(); preserveShape.ToString(); (if isNull (normalization :> obj) then "null" else normalization.ToString()); outGrad.ToString(); smoothAlpha.ToString()|]
+                                                 [|string gradScale; string ignoreLabel; string multiOutput; string useIgnore; string preserveShape; (if isNull (normalization :> obj) then "null" else string normalization); string outGrad; string smoothAlpha|]
         outputs
 
 
@@ -10884,7 +10884,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"dim1"; "dim2"|]
-                                                 [|dim1.ToString(); dim2.ToString()|]
+                                                 [|string dim1; string dim2|]
         outputs
     /// <summary>Interchanges two axes of an array.
     /// 
@@ -10915,7 +10915,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"dim1"; "dim2"|]
-                                                 [|dim1.ToString(); dim2.ToString()|]
+                                                 [|string dim1; string dim2|]
         outputs
 
     /// <summary>Cast function between low precision float/FP32 used by AMP.
@@ -10931,7 +10931,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"dtype"|]
-                                                 [|dtype.ToString()|]
+                                                 [|string dtype|]
         outputs
     /// <summary>Cast function between low precision float/FP32 used by AMP.
     /// 
@@ -10946,7 +10946,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"dtype"|]
-                                                 [|dtype.ToString()|]
+                                                 [|string dtype|]
         outputs
 
 
@@ -10964,7 +10964,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"num_outputs"|]
-                                                 [|numOutputs.ToString()|]
+                                                 [|string numOutputs|]
         outputs
     /// <summary>Cast function used by AMP, that casts its inputs to the common widest type.
     /// 
@@ -10980,7 +10980,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"num_outputs"|]
-                                                 [|numOutputs.ToString()|]
+                                                 [|string numOutputs|]
         outputs
 
     /// <param name="grad">Gradients</param>
@@ -10990,7 +10990,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"num_outputs"|]
-                                                 [|numOutputs.ToString()|]
+                                                 [|string numOutputs|]
         outputs
     /// <param name="grad">Gradients</param>
     /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
@@ -10999,7 +10999,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"num_outputs"|]
-                                                 [|numOutputs.ToString()|]
+                                                 [|string numOutputs|]
         outputs
 
     /// <summary>Returns indices of the maximum values along an axis.
@@ -11033,7 +11033,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "keepdims"|]
-                                                 [|axis.ToString(); keepdims.ToString()|]
+                                                 [|string axis; string keepdims|]
         outputs
     /// <summary>Returns indices of the maximum values along an axis.
     /// 
@@ -11066,7 +11066,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "keepdims"|]
-                                                 [|axis.ToString(); keepdims.ToString()|]
+                                                 [|string axis; string keepdims|]
         outputs
 
     /// <summary>Returns indices of the maximum values along an axis.
@@ -11100,7 +11100,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "keepdims"|]
-                                                 [|(match axis with None -> "None" | _ -> axis.ToString()); (match keepdims with None -> "false" | _ -> keepdims.ToString())|]
+                                                 [|(match axis with None -> "None" | _ -> string axis); (match keepdims with None -> "false" | _ -> string keepdims)|]
         outputs
     /// <summary>Returns indices of the maximum values along an axis.
     /// 
@@ -11133,7 +11133,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "keepdims"|]
-                                                 [|(match axis with None -> "None" | _ -> axis.ToString()); (match keepdims with None -> "false" | _ -> keepdims.ToString())|]
+                                                 [|(match axis with None -> "None" | _ -> string axis); (match keepdims with None -> "false" | _ -> string keepdims)|]
         outputs
 
     /// <summary>Returns indices of the minimum values along an axis.
@@ -11167,7 +11167,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "keepdims"|]
-                                                 [|axis.ToString(); keepdims.ToString()|]
+                                                 [|string axis; string keepdims|]
         outputs
     /// <summary>Returns indices of the minimum values along an axis.
     /// 
@@ -11200,7 +11200,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "keepdims"|]
-                                                 [|axis.ToString(); keepdims.ToString()|]
+                                                 [|string axis; string keepdims|]
         outputs
 
     /// <summary>Returns indices of the minimum values along an axis.
@@ -11234,7 +11234,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "keepdims"|]
-                                                 [|(match axis with None -> "None" | _ -> axis.ToString()); (match keepdims with None -> "false" | _ -> keepdims.ToString())|]
+                                                 [|(match axis with None -> "None" | _ -> string axis); (match keepdims with None -> "false" | _ -> string keepdims)|]
         outputs
     /// <summary>Returns indices of the minimum values along an axis.
     /// 
@@ -11267,7 +11267,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "keepdims"|]
-                                                 [|(match axis with None -> "None" | _ -> axis.ToString()); (match keepdims with None -> "false" | _ -> keepdims.ToString())|]
+                                                 [|(match axis with None -> "None" | _ -> string axis); (match keepdims with None -> "false" | _ -> string keepdims)|]
         outputs
 
     /// <summary>Returns argmax indices of each channel from the input array.
@@ -11379,7 +11379,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; index.NDArrayHandle|]
                                                  [|"axis"; "keepdims"; "mode"|]
-                                                 [|axis.ToString(); keepdims.ToString(); (if isNull (mode :> obj) then "clip" else mode.ToString())|]
+                                                 [|string axis; string keepdims; (if isNull (mode :> obj) then "clip" else string mode)|]
         outputs
     /// <summary>Picks elements from an input array according to the input indices along the given axis.
     /// 
@@ -11439,7 +11439,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; index.SymbolHandle|]
                                                  [|"axis"; "keepdims"; "mode"|]
-                                                 [|axis.ToString(); keepdims.ToString(); (if isNull (mode :> obj) then "clip" else mode.ToString())|]
+                                                 [|string axis; string keepdims; (if isNull (mode :> obj) then "clip" else string mode)|]
         outputs
 
     /// <summary>Picks elements from an input array according to the input indices along the given axis.
@@ -11500,7 +11500,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; index.NDArrayHandle|]
                                                  [|"axis"; "keepdims"; "mode"|]
-                                                 [|(match axis with None -> "None" | _ -> axis.ToString()); (match keepdims with None -> "false" | _ -> keepdims.ToString()); (match mode with None -> "clip" | _ -> mode.ToString())|]
+                                                 [|(match axis with None -> "None" | _ -> string axis); (match keepdims with None -> "false" | _ -> string keepdims); (match mode with None -> "clip" | _ -> string mode)|]
         outputs
     /// <summary>Picks elements from an input array according to the input indices along the given axis.
     /// 
@@ -11560,7 +11560,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; index.SymbolHandle|]
                                                  [|"axis"; "keepdims"; "mode"|]
-                                                 [|(match axis with None -> "None" | _ -> axis.ToString()); (match keepdims with None -> "false" | _ -> keepdims.ToString()); (match mode with None -> "clip" | _ -> mode.ToString())|]
+                                                 [|(match axis with None -> "None" | _ -> string axis); (match keepdims with None -> "false" | _ -> string keepdims); (match mode with None -> "clip" | _ -> string mode)|]
         outputs
 
 
@@ -11623,7 +11623,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
     /// <summary>Computes the sum of array elements over given axes.
     /// 
@@ -11684,7 +11684,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
 
 
@@ -11713,7 +11713,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
     /// <summary>Computes the mean of array elements over given axes.
     /// 
@@ -11740,7 +11740,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
 
 
@@ -11769,7 +11769,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
     /// <summary>Computes the product of array elements over given axes.
     /// 
@@ -11796,7 +11796,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
 
 
@@ -11827,7 +11827,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
     /// <summary>Computes the sum of array elements over given axes treating Not a Numbers (``NaN``) as zero.
     /// 
@@ -11856,7 +11856,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
 
 
@@ -11887,7 +11887,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
     /// <summary>Computes the product of array elements over given axes treating Not a Numbers (``NaN``) as one.
     /// 
@@ -11916,7 +11916,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
 
 
@@ -11945,7 +11945,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
     /// <summary>Computes the max of array elements over given axes.
     /// 
@@ -11972,7 +11972,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
 
 
@@ -12001,7 +12001,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
     /// <summary>Computes the min of array elements over given axes.
     /// 
@@ -12028,7 +12028,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
 
 
@@ -12062,7 +12062,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "size"|]
-                                                 [|(if isNull (axis :> obj) then "[]" else axis.ToString()); (if isNull (size :> obj) then "[]" else size.ToString())|]
+                                                 [|(if isNull (axis :> obj) then "[]" else (axis |> Seq.map string |> String.concat ", ")); (if isNull (size :> obj) then "[]" else (size |> Seq.map string |> String.concat ", "))|]
         outputs
     /// <summary>Broadcasts the input array over particular axes.
     /// 
@@ -12094,7 +12094,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "size"|]
-                                                 [|(if isNull (axis :> obj) then "[]" else axis.ToString()); (if isNull (size :> obj) then "[]" else size.ToString())|]
+                                                 [|(if isNull (axis :> obj) then "[]" else (axis |> Seq.map string |> String.concat ", ")); (if isNull (size :> obj) then "[]" else (size |> Seq.map string |> String.concat ", "))|]
         outputs
 
     /// <summary>Broadcasts the input array to a new shape.
@@ -12124,7 +12124,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"shape"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else shape.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", "))|]
         outputs
     /// <summary>Broadcasts the input array to a new shape.
     /// 
@@ -12153,7 +12153,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"shape"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else shape.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", "))|]
         outputs
 
 
@@ -12185,7 +12185,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
                                                  [|"lhs_axes"; "rhs_axes"|]
-                                                 [|lhsAxes.ToString(); rhsAxes.ToString()|]
+                                                 [|(lhsAxes |> Seq.map string |> String.concat ", "); (rhsAxes |> Seq.map string |> String.concat ", ")|]
         outputs
     /// <summary>Broadcasts lhs to have the same shape as rhs.
     /// 
@@ -12215,7 +12215,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.SymbolHandle; rhs.SymbolHandle|]
                                                  [|"lhs_axes"; "rhs_axes"|]
-                                                 [|lhsAxes.ToString(); rhsAxes.ToString()|]
+                                                 [|(lhsAxes |> Seq.map string |> String.concat ", "); (rhsAxes |> Seq.map string |> String.concat ", ")|]
         outputs
 
     /// <summary>Computes the norm on an NDArray.
@@ -12267,7 +12267,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"ord"; "axis"; "out_dtype"; "keepdims"|]
-                                                 [|ord.ToString(); axis.ToString(); (if isNull (outDtype :> obj) then "None" else outDtype.ToString()); keepdims.ToString()|]
+                                                 [|string ord; (axis |> Seq.map string |> String.concat ", "); (if isNull (outDtype :> obj) then "None" else string outDtype); string keepdims|]
         outputs
     /// <summary>Computes the norm on an NDArray.
     /// 
@@ -12318,7 +12318,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"ord"; "axis"; "out_dtype"; "keepdims"|]
-                                                 [|ord.ToString(); axis.ToString(); (if isNull (outDtype :> obj) then "None" else outDtype.ToString()); keepdims.ToString()|]
+                                                 [|string ord; (axis |> Seq.map string |> String.concat ", "); (if isNull (outDtype :> obj) then "None" else string outDtype); string keepdims|]
         outputs
 
 
@@ -12368,7 +12368,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"stype"|]
-                                                 [|stype.ToString()|]
+                                                 [|string stype|]
         outputs
     /// <summary>Casts tensor storage type to the new type.
     /// 
@@ -12416,7 +12416,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"stype"|]
-                                                 [|stype.ToString()|]
+                                                 [|string stype|]
         outputs
 
     /// <summary>Return the elements, either from x or y, depending on the condition.
@@ -12561,7 +12561,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"k"; "axis1"; "axis2"|]
-                                                 [|k.ToString(); axis1.ToString(); axis2.ToString()|]
+                                                 [|string k; string axis1; string axis2|]
         outputs
     /// <summary>Extracts a diagonal or constructs a diagonal array.
     /// 
@@ -12627,7 +12627,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"k"; "axis1"; "axis2"|]
-                                                 [|k.ToString(); axis1.ToString(); axis2.ToString()|]
+                                                 [|string k; string axis1; string axis2|]
         outputs
 
 
@@ -12692,7 +12692,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
                                                  [|"transpose_a"; "transpose_b"; "forward_stype"|]
-                                                 [|transposeA.ToString(); transposeB.ToString(); (if isNull (forwardStype :> obj) then "None" else forwardStype.ToString())|]
+                                                 [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|]
         outputs
     /// <summary>Dot product of two arrays.
     /// 
@@ -12755,7 +12755,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.SymbolHandle; rhs.SymbolHandle|]
                                                  [|"transpose_a"; "transpose_b"; "forward_stype"|]
-                                                 [|transposeA.ToString(); transposeB.ToString(); (if isNull (forwardStype :> obj) then "None" else forwardStype.ToString())|]
+                                                 [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|]
         outputs
 
 
@@ -12787,7 +12787,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
                                                  [|"transpose_a"; "transpose_b"; "forward_stype"|]
-                                                 [|transposeA.ToString(); transposeB.ToString(); (if isNull (forwardStype :> obj) then "None" else forwardStype.ToString())|]
+                                                 [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|]
         outputs
     /// <summary>Batchwise dot product.
     /// 
@@ -12817,7 +12817,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.SymbolHandle; rhs.SymbolHandle|]
                                                  [|"transpose_a"; "transpose_b"; "forward_stype"|]
-                                                 [|transposeA.ToString(); transposeB.ToString(); (if isNull (forwardStype :> obj) then "None" else forwardStype.ToString())|]
+                                                 [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|]
         outputs
 
 
@@ -14301,7 +14301,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14310,7 +14310,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14320,7 +14320,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14329,7 +14329,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14339,7 +14339,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14348,7 +14348,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <summary>Multiply an array with a scalar.
@@ -14369,7 +14369,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <summary>Multiply an array with a scalar.
     /// 
@@ -14389,7 +14389,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14399,7 +14399,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14408,7 +14408,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <summary>Divide an array with a scalar.
@@ -14429,7 +14429,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <summary>Divide an array with a scalar.
     /// 
@@ -14449,7 +14449,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14459,7 +14459,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14468,7 +14468,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14478,7 +14478,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14487,7 +14487,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="lhs">first input</param>
@@ -14498,7 +14498,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -14508,7 +14508,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.SymbolHandle; rhs.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14518,7 +14518,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14527,7 +14527,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="lhs">first input</param>
@@ -14538,7 +14538,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -14548,7 +14548,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.SymbolHandle; rhs.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14558,7 +14558,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14567,7 +14567,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="lhs">first input</param>
@@ -14578,7 +14578,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -14588,7 +14588,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.SymbolHandle; rhs.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14598,7 +14598,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14607,7 +14607,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="lhs">first input</param>
@@ -14618,7 +14618,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -14628,7 +14628,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.SymbolHandle; rhs.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14638,7 +14638,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14647,7 +14647,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="lhs">first input</param>
@@ -14658,7 +14658,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -14668,7 +14668,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.SymbolHandle; rhs.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14678,7 +14678,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14687,7 +14687,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="lhs">first input</param>
@@ -14698,7 +14698,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -14708,7 +14708,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.SymbolHandle; rhs.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14718,7 +14718,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14727,7 +14727,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="lhs">first input</param>
@@ -14738,7 +14738,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -14748,7 +14748,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.SymbolHandle; rhs.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14758,7 +14758,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14767,7 +14767,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="lhs">first input</param>
@@ -14778,7 +14778,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -14788,7 +14788,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.SymbolHandle; rhs.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <summary>Calculate Smooth L1 Loss(lhs, scalar) by summing
@@ -14818,7 +14818,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <summary>Calculate Smooth L1 Loss(lhs, scalar) by summing
     /// 
@@ -14847,7 +14847,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="lhs">first input</param>
@@ -14876,7 +14876,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14885,7 +14885,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14895,7 +14895,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14904,7 +14904,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14914,7 +14914,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14923,7 +14923,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14933,7 +14933,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14942,7 +14942,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14952,7 +14952,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14961,7 +14961,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14971,7 +14971,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14980,7 +14980,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -14990,7 +14990,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14999,7 +14999,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -15009,7 +15009,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -15018,7 +15018,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <param name="data">source input</param>
@@ -15028,7 +15028,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -15037,7 +15037,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <summary>Divides arguments element-wise.  If the left-hand-side input is &#39;row_sparse&#39;, then
@@ -15104,7 +15104,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <summary>Adds a scalar to a tensor element-wise.  If the left-hand-side input is
     /// &#39;row_sparse&#39; or &#39;csr&#39;, then only the values which exist in the left-hand sparse array are computed.
@@ -15125,7 +15125,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <summary>Subtracts a scalar to a tensor element-wise.  If the left-hand-side input is
@@ -15147,7 +15147,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
     /// <summary>Subtracts a scalar to a tensor element-wise.  If the left-hand-side input is
     /// &#39;row_sparse&#39; or &#39;csr&#39;, then only the values which exist in the left-hand sparse array are computed.
@@ -15168,7 +15168,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"|]
-                                                 [|scalar.ToString()|]
+                                                 [|string scalar|]
         outputs
 
     /// <summary>Adds all input arguments element-wise.
@@ -15358,7 +15358,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"alpha"; "beta"|]
-                                                 [|alpha.ToString(); beta.ToString()|]
+                                                 [|string alpha; string beta|]
         outputs
     /// <summary>Computes hard sigmoid of x element-wise.
     /// 
@@ -15376,7 +15376,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"alpha"; "beta"|]
-                                                 [|alpha.ToString(); beta.ToString()|]
+                                                 [|string alpha; string beta|]
         outputs
 
 
@@ -15716,7 +15716,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"lhs_begin"; "lhs_end"; "rhs_begin"; "rhs_end"|]
-                                                 [|lhsBegin.ToString(); lhsEnd.ToString(); rhsBegin.ToString(); rhsEnd.ToString()|]
+                                                 [|string lhsBegin; string lhsEnd; string rhsBegin; string rhsEnd|]
         outputs
     /// <summary>Returns a 1D int64 array containing the shape of data.
     /// 
@@ -15741,7 +15741,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"lhs_begin"; "lhs_end"; "rhs_begin"; "rhs_end"|]
-                                                 [|lhsBegin.ToString(); lhsEnd.ToString(); rhsBegin.ToString(); rhsEnd.ToString()|]
+                                                 [|string lhsBegin; string lhsEnd; string rhsBegin; string rhsEnd|]
         outputs
 
     /// <summary>Returns a 1D int64 array containing the shape of data.
@@ -15767,7 +15767,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"lhs_begin"; "lhs_end"; "rhs_begin"; "rhs_end"|]
-                                                 [|(match lhsBegin with None -> "None" | _ -> lhsBegin.ToString()); (match lhsEnd with None -> "None" | _ -> lhsEnd.ToString()); (match rhsBegin with None -> "None" | _ -> rhsBegin.ToString()); (match rhsEnd with None -> "None" | _ -> rhsEnd.ToString())|]
+                                                 [|(match lhsBegin with None -> "None" | _ -> string lhsBegin); (match lhsEnd with None -> "None" | _ -> string lhsEnd); (match rhsBegin with None -> "None" | _ -> string rhsBegin); (match rhsEnd with None -> "None" | _ -> string rhsEnd)|]
         outputs
     /// <summary>Returns a 1D int64 array containing the shape of data.
     /// 
@@ -15792,7 +15792,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"lhs_begin"; "lhs_end"; "rhs_begin"; "rhs_end"|]
-                                                 [|(match lhsBegin with None -> "None" | _ -> lhsBegin.ToString()); (match lhsEnd with None -> "None" | _ -> lhsEnd.ToString()); (match rhsBegin with None -> "None" | _ -> rhsBegin.ToString()); (match rhsEnd with None -> "None" | _ -> rhsEnd.ToString())|]
+                                                 [|(match lhsBegin with None -> "None" | _ -> string lhsBegin); (match lhsEnd with None -> "None" | _ -> string lhsEnd); (match rhsBegin with None -> "None" | _ -> string rhsBegin); (match rhsEnd with None -> "None" | _ -> string rhsEnd)|]
         outputs
 
     /// <summary>Returns a 1D int64 array containing the size of data.
@@ -15850,7 +15850,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"dtype"|]
-                                                 [|dtype.ToString()|]
+                                                 [|string dtype|]
         outputs
     /// <summary>Casts all elements of the input to a new type.
     /// 
@@ -15872,7 +15872,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"dtype"|]
-                                                 [|dtype.ToString()|]
+                                                 [|string dtype|]
         outputs
 
 
@@ -18215,7 +18215,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; bins.NDArrayHandle|]
                                                  [|"bin_cnt"; "range"|]
-                                                 [|binCnt.ToString(); (if isNull (range :> obj) then "None" else range.ToString())|]
+                                                 [|string binCnt; (if isNull (range :> obj) then "None" else string range)|]
         outputs
     /// <summary>This operators implements the histogram function.
     /// 
@@ -18239,7 +18239,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; bins.SymbolHandle|]
                                                  [|"bin_cnt"; "range"|]
-                                                 [|binCnt.ToString(); (if isNull (range :> obj) then "None" else range.ToString())|]
+                                                 [|string binCnt; (if isNull (range :> obj) then "None" else string range)|]
         outputs
 
     /// <summary>This operators implements the histogram function.
@@ -18264,7 +18264,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; bins.NDArrayHandle|]
                                                  [|"bin_cnt"; "range"|]
-                                                 [|(match binCnt with None -> "None" | _ -> binCnt.ToString()); (match range with None -> "None" | _ -> range.ToString())|]
+                                                 [|(match binCnt with None -> "None" | _ -> string binCnt); (match range with None -> "None" | _ -> string range)|]
         outputs
     /// <summary>This operators implements the histogram function.
     /// 
@@ -18288,7 +18288,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; bins.SymbolHandle|]
                                                  [|"bin_cnt"; "range"|]
-                                                 [|(match binCnt with None -> "None" | _ -> binCnt.ToString()); (match range with None -> "None" | _ -> range.ToString())|]
+                                                 [|(match binCnt with None -> "None" | _ -> string binCnt); (match range with None -> "None" | _ -> string range)|]
         outputs
 
     /// <summary>This operators implements the histogram function.
@@ -18313,7 +18313,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; bins.NDArrayHandle|]
                                                  [|"bin_cnt"; "range"|]
-                                                 [|binCnt.ToString(); (if isNull (range :> obj) then "None" else range.ToString())|]
+                                                 [|string binCnt; (if isNull (range :> obj) then "None" else string range)|]
         outputs
     /// <summary>This operators implements the histogram function.
     /// 
@@ -18337,7 +18337,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; bins.SymbolHandle|]
                                                  [|"bin_cnt"; "range"|]
-                                                 [|binCnt.ToString(); (if isNull (range :> obj) then "None" else range.ToString())|]
+                                                 [|string binCnt; (if isNull (range :> obj) then "None" else string range)|]
         outputs
 
     /// <summary>This operators implements the histogram function.
@@ -18362,7 +18362,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; bins.NDArrayHandle|]
                                                  [|"bin_cnt"; "range"|]
-                                                 [|(match binCnt with None -> "None" | _ -> binCnt.ToString()); (match range with None -> "None" | _ -> range.ToString())|]
+                                                 [|(match binCnt with None -> "None" | _ -> string binCnt); (match range with None -> "None" | _ -> string range)|]
         outputs
     /// <summary>This operators implements the histogram function.
     /// 
@@ -18386,7 +18386,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; bins.SymbolHandle|]
                                                  [|"bin_cnt"; "range"|]
-                                                 [|(match binCnt with None -> "None" | _ -> binCnt.ToString()); (match range with None -> "None" | _ -> range.ToString())|]
+                                                 [|(match binCnt with None -> "None" | _ -> string binCnt); (match range with None -> "None" | _ -> string range)|]
         outputs
 
     /// <summary>Maps integer indices to vector representations (embeddings).
@@ -18458,7 +18458,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; weight.NDArrayHandle|]
                                                  [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
-                                                 [|inputDim.ToString(); outputDim.ToString(); (if isNull (dtype :> obj) then "float32" else dtype.ToString()); sparseGrad.ToString()|]
+                                                 [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
         outputs
     /// <summary>Maps integer indices to vector representations (embeddings).
     /// 
@@ -18529,7 +18529,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; weight.SymbolHandle|]
                                                  [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
-                                                 [|inputDim.ToString(); outputDim.ToString(); (if isNull (dtype :> obj) then "float32" else dtype.ToString()); sparseGrad.ToString()|]
+                                                 [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
         outputs
 
     /// <summary>Maps integer indices to vector representations (embeddings).
@@ -18600,7 +18600,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; weight.NDArrayHandle|]
                                                  [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
-                                                 [|inputDim.ToString(); outputDim.ToString(); (if isNull (dtype :> obj) then "float32" else dtype.ToString()); sparseGrad.ToString()|]
+                                                 [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
         outputs
     /// <summary>Maps integer indices to vector representations (embeddings).
     /// 
@@ -18670,7 +18670,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; weight.SymbolHandle|]
                                                  [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
-                                                 [|inputDim.ToString(); outputDim.ToString(); (if isNull (dtype :> obj) then "float32" else dtype.ToString()); sparseGrad.ToString()|]
+                                                 [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
         outputs
 
 
@@ -18736,7 +18736,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|a.NDArrayHandle; indices.NDArrayHandle|]
                                                  [|"axis"; "mode"|]
-                                                 [|axis.ToString(); (if isNull (mode :> obj) then "clip" else mode.ToString())|]
+                                                 [|string axis; (if isNull (mode :> obj) then "clip" else string mode)|]
         outputs
     /// <summary>Takes elements from an input array along the given axis.
     /// 
@@ -18799,7 +18799,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|a.SymbolHandle; indices.SymbolHandle|]
                                                  [|"axis"; "mode"|]
-                                                 [|axis.ToString(); (if isNull (mode :> obj) then "clip" else mode.ToString())|]
+                                                 [|string axis; (if isNull (mode :> obj) then "clip" else string mode)|]
         outputs
 
 
@@ -18915,7 +18915,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|indices.NDArrayHandle|]
                                                  [|"depth"; "on_value"; "off_value"; "dtype"|]
-                                                 [|depth.ToString(); onValue.ToString(); offValue.ToString(); (if isNull (dtype :> obj) then "float32" else dtype.ToString())|]
+                                                 [|string depth; string onValue; string offValue; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         outputs
     /// <summary>Returns a one-hot array.
     /// 
@@ -18966,7 +18966,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|indices.SymbolHandle|]
                                                  [|"depth"; "on_value"; "off_value"; "dtype"|]
-                                                 [|depth.ToString(); onValue.ToString(); offValue.ToString(); (if isNull (dtype :> obj) then "float32" else dtype.ToString())|]
+                                                 [|string depth; string onValue; string offValue; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         outputs
 
     /// <summary>Gather elements or slices from `data` and store to a tensor whose
@@ -19090,7 +19090,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; indices.NDArrayHandle|]
                                                  [|"shape"|]
-                                                 [|shape.ToString()|]
+                                                 [|(shape |> Seq.map string |> String.concat ", ")|]
         outputs
     /// <summary>Scatters data into a new tensor according to indices.
     /// 
@@ -19144,7 +19144,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; indices.SymbolHandle|]
                                                  [|"shape"|]
-                                                 [|shape.ToString()|]
+                                                 [|(shape |> Seq.map string |> String.concat ", ")|]
         outputs
 
     /// <summary>Accumulates data according to indices and get the result. It&#39;s the backward of
@@ -19187,7 +19187,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; indices.NDArrayHandle|]
                                                  [|"shape"|]
-                                                 [|shape.ToString()|]
+                                                 [|(shape |> Seq.map string |> String.concat ", ")|]
         outputs
     /// <summary>Accumulates data according to indices and get the result. It&#39;s the backward of
     /// `gather_nd`.
@@ -19229,7 +19229,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; indices.SymbolHandle|]
                                                  [|"shape"|]
-                                                 [|shape.ToString()|]
+                                                 [|(shape |> Seq.map string |> String.concat ", ")|]
         outputs
 
     /// <summary>This operator has the same functionality as scatter_nd
@@ -19257,7 +19257,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle; rhs.NDArrayHandle; indices.NDArrayHandle|]
                                                  [|"shape"|]
-                                                 [|shape.ToString()|]
+                                                 [|(shape |> Seq.map string |> String.concat ", ")|]
         outputs
     /// <summary>This operator has the same functionality as scatter_nd
     /// except that it does not reset the elements not indexed by the input
@@ -19284,7 +19284,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.SymbolHandle; rhs.SymbolHandle; indices.SymbolHandle|]
                                                  [|"shape"|]
-                                                 [|shape.ToString()|]
+                                                 [|(shape |> Seq.map string |> String.concat ", ")|]
         outputs
 
 
@@ -19460,7 +19460,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.NDArrayHandle; B.NDArrayHandle; C.NDArrayHandle|]
                                                  [|"transpose_a"; "transpose_b"; "alpha"; "beta"; "axis"|]
-                                                 [|transposeA.ToString(); transposeB.ToString(); alpha.ToString(); beta.ToString(); axis.ToString()|]
+                                                 [|string transposeA; string transposeB; string alpha; string beta; string axis|]
         outputs
     /// <summary>Performs general matrix multiplication and accumulation.
     /// Input are tensors *A*, *B*, *C*, each of dimension *n &gt;= 2* and having the same shape
@@ -19532,7 +19532,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.SymbolHandle; B.SymbolHandle; C.SymbolHandle|]
                                                  [|"transpose_a"; "transpose_b"; "alpha"; "beta"; "axis"|]
-                                                 [|transposeA.ToString(); transposeB.ToString(); alpha.ToString(); beta.ToString(); axis.ToString()|]
+                                                 [|string transposeA; string transposeB; string alpha; string beta; string axis|]
         outputs
 
 
@@ -19599,7 +19599,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.NDArrayHandle; B.NDArrayHandle|]
                                                  [|"transpose_a"; "transpose_b"; "alpha"; "axis"|]
-                                                 [|transposeA.ToString(); transposeB.ToString(); alpha.ToString(); axis.ToString()|]
+                                                 [|string transposeA; string transposeB; string alpha; string axis|]
         outputs
     /// <summary>Performs general matrix multiplication.
     /// Input are tensors *A*, *B*, each of dimension *n &gt;= 2* and having the same shape
@@ -19664,7 +19664,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.SymbolHandle; B.SymbolHandle|]
                                                  [|"transpose_a"; "transpose_b"; "alpha"; "axis"|]
-                                                 [|transposeA.ToString(); transposeB.ToString(); alpha.ToString(); axis.ToString()|]
+                                                 [|string transposeA; string transposeB; string alpha; string axis|]
         outputs
 
 
@@ -19882,7 +19882,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.NDArrayHandle; B.NDArrayHandle|]
                                                  [|"transpose"; "rightside"; "lower"; "alpha"|]
-                                                 [|transpose.ToString(); rightside.ToString(); lower.ToString(); alpha.ToString()|]
+                                                 [|string transpose; string rightside; string lower; string alpha|]
         outputs
     /// <summary>Performs multiplication with a lower triangular matrix.
     /// Input are tensors *A*, *B*, each of dimension *n &gt;= 2* and having the same shape
@@ -19936,7 +19936,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.SymbolHandle; B.SymbolHandle|]
                                                  [|"transpose"; "rightside"; "lower"; "alpha"|]
-                                                 [|transpose.ToString(); rightside.ToString(); lower.ToString(); alpha.ToString()|]
+                                                 [|string transpose; string rightside; string lower; string alpha|]
         outputs
 
 
@@ -19993,7 +19993,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.NDArrayHandle; B.NDArrayHandle|]
                                                  [|"transpose"; "rightside"; "lower"; "alpha"|]
-                                                 [|transpose.ToString(); rightside.ToString(); lower.ToString(); alpha.ToString()|]
+                                                 [|string transpose; string rightside; string lower; string alpha|]
         outputs
     /// <summary>Solves matrix equation involving a lower triangular matrix.
     /// Input are tensors *A*, *B*, each of dimension *n &gt;= 2* and having the same shape
@@ -20048,7 +20048,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.SymbolHandle; B.SymbolHandle|]
                                                  [|"transpose"; "rightside"; "lower"; "alpha"|]
-                                                 [|transpose.ToString(); rightside.ToString(); lower.ToString(); alpha.ToString()|]
+                                                 [|string transpose; string rightside; string lower; string alpha|]
         outputs
 
 
@@ -20153,7 +20153,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.NDArrayHandle|]
                                                  [|"offset"|]
-                                                 [|offset.ToString()|]
+                                                 [|string offset|]
         outputs
     /// <summary>Extracts the diagonal entries of a square matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
@@ -20192,7 +20192,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.SymbolHandle|]
                                                  [|"offset"|]
-                                                 [|offset.ToString()|]
+                                                 [|string offset|]
         outputs
 
 
@@ -20234,7 +20234,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.NDArrayHandle|]
                                                  [|"offset"|]
-                                                 [|offset.ToString()|]
+                                                 [|string offset|]
         outputs
     /// <summary>Constructs a square matrix with the input as diagonal.
     /// Input is a tensor *A* of dimension *n &gt;= 1*.
@@ -20274,7 +20274,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.SymbolHandle|]
                                                  [|"offset"|]
-                                                 [|offset.ToString()|]
+                                                 [|string offset|]
         outputs
 
 
@@ -20323,7 +20323,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.NDArrayHandle|]
                                                  [|"offset"; "lower"|]
-                                                 [|offset.ToString(); lower.ToString()|]
+                                                 [|string offset; string lower|]
         outputs
     /// <summary>Extracts a triangular sub-matrix from a square matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
@@ -20370,7 +20370,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.SymbolHandle|]
                                                  [|"offset"; "lower"|]
-                                                 [|offset.ToString(); lower.ToString()|]
+                                                 [|string offset; string lower|]
         outputs
 
 
@@ -20429,7 +20429,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.NDArrayHandle|]
                                                  [|"offset"; "lower"|]
-                                                 [|offset.ToString(); lower.ToString()|]
+                                                 [|string offset; string lower|]
         outputs
     /// <summary>Constructs a square matrix with the input representing a specific triangular sub-matrix.
     /// This is basically the inverse of *linalg.extracttrian*. Input is a tensor *A* of dimension *n &gt;= 1*.
@@ -20486,7 +20486,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.SymbolHandle|]
                                                  [|"offset"; "lower"|]
-                                                 [|offset.ToString(); lower.ToString()|]
+                                                 [|string offset; string lower|]
         outputs
 
 
@@ -20534,7 +20534,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.NDArrayHandle|]
                                                  [|"transpose"; "alpha"|]
-                                                 [|transpose.ToString(); alpha.ToString()|]
+                                                 [|string transpose; string alpha|]
         outputs
     /// <summary>Multiplication of matrix with its transpose.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
@@ -20580,7 +20580,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.SymbolHandle|]
                                                  [|"transpose"; "alpha"|]
-                                                 [|transpose.ToString(); alpha.ToString()|]
+                                                 [|string transpose; string alpha|]
         outputs
 
 
@@ -20954,7 +20954,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"shape"; "reverse"; "target_shape"; "keep_highest"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else shape.ToString()); reverse.ToString(); (if isNull (targetShape :> obj) then "[]" else targetShape.ToString()); keepHighest.ToString()|]
+                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string reverse; (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string keepHighest|]
         outputs
     /// <summary>Reshapes the input array.
     /// 
@@ -21034,7 +21034,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"shape"; "reverse"; "target_shape"; "keep_highest"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else shape.ToString()); reverse.ToString(); (if isNull (targetShape :> obj) then "[]" else targetShape.ToString()); keepHighest.ToString()|]
+                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string reverse; (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string keepHighest|]
         outputs
 
     /// <summary>Permutes the dimensions of an array.
@@ -21074,7 +21074,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axes"|]
-                                                 [|(if isNull (axes :> obj) then "[]" else axes.ToString())|]
+                                                 [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|]
         outputs
     /// <summary>Permutes the dimensions of an array.
     /// 
@@ -21113,7 +21113,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axes"|]
-                                                 [|(if isNull (axes :> obj) then "[]" else axes.ToString())|]
+                                                 [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|]
         outputs
 
     /// <summary>Inserts a new axis of size 1 into the array shape
@@ -21131,7 +21131,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"|]
-                                                 [|axis.ToString()|]
+                                                 [|string axis|]
         outputs
     /// <summary>Inserts a new axis of size 1 into the array shape
     /// 
@@ -21148,7 +21148,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"|]
-                                                 [|axis.ToString()|]
+                                                 [|string axis|]
         outputs
 
     /// <summary>Slices a region of the array.
@@ -21207,7 +21207,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"begin"; "end"; "step"|]
-                                                 [|sliceBegin.ToString(); sliceEnd.ToString(); (if isNull (step :> obj) then "[]" else step.ToString())|]
+                                                 [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
         outputs
     /// <summary>Slices a region of the array.
     /// 
@@ -21265,7 +21265,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"begin"; "end"; "step"|]
-                                                 [|sliceBegin.ToString(); sliceEnd.ToString(); (if isNull (step :> obj) then "[]" else step.ToString())|]
+                                                 [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
         outputs
 
 
@@ -21292,7 +21292,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
                                                  [|"begin"; "end"; "step"|]
-                                                 [|sliceBegin.ToString(); sliceEnd.ToString(); (if isNull (step :> obj) then "[]" else step.ToString())|]
+                                                 [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
         outputs
     /// <summary>Assign the rhs to a cropped subset of lhs.
     /// 
@@ -21317,7 +21317,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.SymbolHandle; rhs.SymbolHandle|]
                                                  [|"begin"; "end"; "step"|]
-                                                 [|sliceBegin.ToString(); sliceEnd.ToString(); (if isNull (step :> obj) then "[]" else step.ToString())|]
+                                                 [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
         outputs
 
     /// <summary>(Assign the scalar to a cropped subset of the input.
@@ -21342,7 +21342,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"scalar"; "begin"; "end"; "step"|]
-                                                 [|scalar.ToString(); sliceBegin.ToString(); sliceEnd.ToString(); (if isNull (step :> obj) then "[]" else step.ToString())|]
+                                                 [|string scalar; (sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
         outputs
     /// <summary>(Assign the scalar to a cropped subset of the input.
     /// 
@@ -21366,7 +21366,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"scalar"; "begin"; "end"; "step"|]
-                                                 [|scalar.ToString(); sliceBegin.ToString(); sliceEnd.ToString(); (if isNull (step :> obj) then "[]" else step.ToString())|]
+                                                 [|string scalar; (sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
         outputs
 
     /// <summary>Slices along a given axis.
@@ -21402,7 +21402,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "begin"; "end"|]
-                                                 [|axis.ToString(); sliceBegin.ToString(); sliceEnd.ToString()|]
+                                                 [|string axis; string sliceBegin; string sliceEnd|]
         outputs
     /// <summary>Slices along a given axis.
     /// 
@@ -21437,7 +21437,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "begin"; "end"|]
-                                                 [|axis.ToString(); sliceBegin.ToString(); sliceEnd.ToString()|]
+                                                 [|string axis; string sliceBegin; string sliceEnd|]
         outputs
 
     /// <summary>Slices along a given axis.
@@ -21473,7 +21473,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "begin"; "end"|]
-                                                 [|axis.ToString(); sliceBegin.ToString(); (match sliceEnd with None -> "None" | _ -> sliceEnd.ToString())|]
+                                                 [|string axis; string sliceBegin; (match sliceEnd with None -> "None" | _ -> string sliceEnd)|]
         outputs
     /// <summary>Slices along a given axis.
     /// 
@@ -21508,7 +21508,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "begin"; "end"|]
-                                                 [|axis.ToString(); sliceBegin.ToString(); (match sliceEnd with None -> "None" | _ -> sliceEnd.ToString())|]
+                                                 [|string axis; string sliceBegin; (match sliceEnd with None -> "None" | _ -> string sliceEnd)|]
         outputs
 
 
@@ -21573,7 +21573,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; shapeLike.NDArrayHandle|]
                                                  [|"axes"|]
-                                                 [|(if isNull (axes :> obj) then "[]" else axes.ToString())|]
+                                                 [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|]
         outputs
     /// <summary>Slices a region of the array like the shape of another array.
     /// 
@@ -21636,7 +21636,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; shapeLike.SymbolHandle|]
                                                  [|"axes"|]
-                                                 [|(if isNull (axes :> obj) then "[]" else axes.ToString())|]
+                                                 [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|]
         outputs
 
 
@@ -21675,7 +21675,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"a_min"; "a_max"|]
-                                                 [|aMin.ToString(); aMax.ToString()|]
+                                                 [|string aMin; string aMax|]
         outputs
     /// <summary>Clips (limits) the values in an array.
     /// 
@@ -21712,7 +21712,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"a_min"; "a_max"|]
-                                                 [|aMin.ToString(); aMax.ToString()|]
+                                                 [|string aMin; string aMax|]
         outputs
 
 
@@ -21750,7 +21750,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"repeats"; "axis"|]
-                                                 [|repeats.ToString(); axis.ToString()|]
+                                                 [|string repeats; string axis|]
         outputs
     /// <summary>Repeats elements of an array.
     /// 
@@ -21786,7 +21786,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"repeats"; "axis"|]
-                                                 [|repeats.ToString(); axis.ToString()|]
+                                                 [|string repeats; string axis|]
         outputs
 
     /// <summary>Repeats elements of an array.
@@ -21823,7 +21823,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"repeats"; "axis"|]
-                                                 [|repeats.ToString(); (match axis with None -> "None" | _ -> axis.ToString())|]
+                                                 [|string repeats; (match axis with None -> "None" | _ -> string axis)|]
         outputs
     /// <summary>Repeats elements of an array.
     /// 
@@ -21859,7 +21859,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"repeats"; "axis"|]
-                                                 [|repeats.ToString(); (match axis with None -> "None" | _ -> axis.ToString())|]
+                                                 [|string repeats; (match axis with None -> "None" | _ -> string axis)|]
         outputs
 
 
@@ -21907,7 +21907,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"reps"|]
-                                                 [|reps.ToString()|]
+                                                 [|(reps |> Seq.map string |> String.concat ", ")|]
         outputs
     /// <summary>Repeats the whole array multiple times.
     /// 
@@ -21953,7 +21953,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"reps"|]
-                                                 [|reps.ToString()|]
+                                                 [|(reps |> Seq.map string |> String.concat ", ")|]
         outputs
 
 
@@ -21981,7 +21981,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"|]
-                                                 [|axis.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", ")|]
         outputs
     /// <summary>Reverses the order of elements along given axis while preserving array shape.
     /// 
@@ -22007,7 +22007,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"|]
-                                                 [|axis.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", ")|]
         outputs
 
 
@@ -22035,7 +22035,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"axis"; "num_args"|]
-                                                 [|axis.ToString(); numArgs.ToString()|]
+                                                 [|string axis; string numArgs|]
         outputs
     /// <summary>Join a sequence of arrays along a new axis.
     /// 
@@ -22061,7 +22061,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"axis"; "num_args"|]
-                                                 [|axis.ToString(); numArgs.ToString()|]
+                                                 [|string axis; string numArgs|]
         outputs
 
 
@@ -22088,7 +22088,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"axis"|]
-                                                 [|axis.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", ")|]
         outputs
     /// <summary>Remove single-dimensional entries from the shape of an array.
     /// Same behavior of defining the output tensor shape as numpy.squeeze for the most of cases.
@@ -22113,7 +22113,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"axis"|]
-                                                 [|axis.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", ")|]
         outputs
 
 
@@ -22159,7 +22159,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"block_size"|]
-                                                 [|blockSize.ToString()|]
+                                                 [|string blockSize|]
         outputs
     /// <summary>Rearranges(permutes) data from depth into blocks of spatial data.
     /// Similar to ONNX DepthToSpace operator:
@@ -22203,7 +22203,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"block_size"|]
-                                                 [|blockSize.ToString()|]
+                                                 [|string blockSize|]
         outputs
 
     /// <summary>Rearranges(permutes) blocks of spatial data into depth.
@@ -22250,7 +22250,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"block_size"|]
-                                                 [|blockSize.ToString()|]
+                                                 [|string blockSize|]
         outputs
     /// <summary>Rearranges(permutes) blocks of spatial data into depth.
     /// Similar to ONNX SpaceToDepth operator:
@@ -22296,7 +22296,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"block_size"|]
-                                                 [|blockSize.ToString()|]
+                                                 [|string blockSize|]
         outputs
 
     /// <summary>Splits an array along a particular axis into multiple sub-arrays.
@@ -22382,7 +22382,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"indices"; "axis"; "squeeze_axis"; "sections"|]
-                                                 [|indices.ToString(); axis.ToString(); squeezeAxis.ToString(); sections.ToString()|]
+                                                 [|(indices |> Seq.map string |> String.concat ", "); string axis; string squeezeAxis; string sections|]
         outputs
     /// <summary>Splits an array along a particular axis into multiple sub-arrays.
     /// 
@@ -22467,7 +22467,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"indices"; "axis"; "squeeze_axis"; "sections"|]
-                                                 [|indices.ToString(); axis.ToString(); squeezeAxis.ToString(); sections.ToString()|]
+                                                 [|(indices |> Seq.map string |> String.concat ", "); string axis; string squeezeAxis; string sections|]
         outputs
 
 
@@ -22518,7 +22518,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "k"; "ret_typ"; "is_ascend"; "dtype"|]
-                                                 [|axis.ToString(); k.ToString(); (if isNull (retTyp :> obj) then "indices" else retTyp.ToString()); isAscend.ToString(); (if isNull (dtype :> obj) then "float32" else dtype.ToString())|]
+                                                 [|string axis; string k; (if isNull (retTyp :> obj) then "indices" else string retTyp); string isAscend; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         outputs
     /// <summary>Returns the top *k* elements in an input array along the given axis.
     ///  The returned elements will be sorted.
@@ -22567,7 +22567,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "k"; "ret_typ"; "is_ascend"; "dtype"|]
-                                                 [|axis.ToString(); k.ToString(); (if isNull (retTyp :> obj) then "indices" else retTyp.ToString()); isAscend.ToString(); (if isNull (dtype :> obj) then "float32" else dtype.ToString())|]
+                                                 [|string axis; string k; (if isNull (retTyp :> obj) then "indices" else string retTyp); string isAscend; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         outputs
 
     /// <summary>Returns the top *k* elements in an input array along the given axis.
@@ -22617,7 +22617,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "k"; "ret_typ"; "is_ascend"; "dtype"|]
-                                                 [|(match axis with None -> "None" | _ -> axis.ToString()); (match k with None -> "1" | _ -> k.ToString()); (match retTyp with None -> "indices" | _ -> retTyp.ToString()); (match isAscend with None -> "false" | _ -> isAscend.ToString()); (match dtype with None -> "float32" | _ -> dtype.ToString())|]
+                                                 [|(match axis with None -> "None" | _ -> string axis); (match k with None -> "1" | _ -> string k); (match retTyp with None -> "indices" | _ -> string retTyp); (match isAscend with None -> "false" | _ -> string isAscend); (match dtype with None -> "float32" | _ -> string dtype)|]
         outputs
     /// <summary>Returns the top *k* elements in an input array along the given axis.
     ///  The returned elements will be sorted.
@@ -22666,7 +22666,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "k"; "ret_typ"; "is_ascend"; "dtype"|]
-                                                 [|(match axis with None -> "None" | _ -> axis.ToString()); (match k with None -> "1" | _ -> k.ToString()); (match retTyp with None -> "indices" | _ -> retTyp.ToString()); (match isAscend with None -> "false" | _ -> isAscend.ToString()); (match dtype with None -> "float32" | _ -> dtype.ToString())|]
+                                                 [|(match axis with None -> "None" | _ -> string axis); (match k with None -> "1" | _ -> string k); (match retTyp with None -> "indices" | _ -> string retTyp); (match isAscend with None -> "false" | _ -> string isAscend); (match dtype with None -> "float32" | _ -> string dtype)|]
         outputs
 
 
@@ -22703,7 +22703,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "is_ascend"|]
-                                                 [|axis.ToString(); isAscend.ToString()|]
+                                                 [|string axis; string isAscend|]
         outputs
     /// <summary>Returns a sorted copy of an input array along the given axis.
     /// 
@@ -22738,7 +22738,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "is_ascend"|]
-                                                 [|axis.ToString(); isAscend.ToString()|]
+                                                 [|string axis; string isAscend|]
         outputs
 
     /// <summary>Returns a sorted copy of an input array along the given axis.
@@ -22774,7 +22774,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "is_ascend"|]
-                                                 [|(match axis with None -> "None" | _ -> axis.ToString()); (match isAscend with None -> "true" | _ -> isAscend.ToString())|]
+                                                 [|(match axis with None -> "None" | _ -> string axis); (match isAscend with None -> "true" | _ -> string isAscend)|]
         outputs
     /// <summary>Returns a sorted copy of an input array along the given axis.
     /// 
@@ -22809,7 +22809,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "is_ascend"|]
-                                                 [|(match axis with None -> "None" | _ -> axis.ToString()); (match isAscend with None -> "true" | _ -> isAscend.ToString())|]
+                                                 [|(match axis with None -> "None" | _ -> string axis); (match isAscend with None -> "true" | _ -> string isAscend)|]
         outputs
 
     /// <summary>Returns the indices that would sort an input array along the given axis.
@@ -22844,7 +22844,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "is_ascend"; "dtype"|]
-                                                 [|axis.ToString(); isAscend.ToString(); (if isNull (dtype :> obj) then "float32" else dtype.ToString())|]
+                                                 [|string axis; string isAscend; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         outputs
     /// <summary>Returns the indices that would sort an input array along the given axis.
     /// 
@@ -22878,7 +22878,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "is_ascend"; "dtype"|]
-                                                 [|axis.ToString(); isAscend.ToString(); (if isNull (dtype :> obj) then "float32" else dtype.ToString())|]
+                                                 [|string axis; string isAscend; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         outputs
 
     /// <summary>Returns the indices that would sort an input array along the given axis.
@@ -22913,7 +22913,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "is_ascend"; "dtype"|]
-                                                 [|(match axis with None -> "None" | _ -> axis.ToString()); (match isAscend with None -> "true" | _ -> isAscend.ToString()); (match dtype with None -> "float32" | _ -> dtype.ToString())|]
+                                                 [|(match axis with None -> "None" | _ -> string axis); (match isAscend with None -> "true" | _ -> string isAscend); (match dtype with None -> "float32" | _ -> string dtype)|]
         outputs
     /// <summary>Returns the indices that would sort an input array along the given axis.
     /// 
@@ -22947,7 +22947,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "is_ascend"; "dtype"|]
-                                                 [|(match axis with None -> "None" | _ -> axis.ToString()); (match isAscend with None -> "true" | _ -> isAscend.ToString()); (match dtype with None -> "float32" | _ -> dtype.ToString())|]
+                                                 [|(match axis with None -> "None" | _ -> string axis); (match isAscend with None -> "true" | _ -> string isAscend); (match dtype with None -> "float32" | _ -> string dtype)|]
         outputs
 
     /// <summary>Converts a batch of index arrays into an array of flat indices. The operator follows numpy conventions so a single multi index is given by a column of the input matrix. The leading dimension may be left unspecified by using -1 as placeholder.  
@@ -22968,7 +22968,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"shape"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", "))|]
         outputs
     /// <summary>Converts a batch of index arrays into an array of flat indices. The operator follows numpy conventions so a single multi index is given by a column of the input matrix. The leading dimension may be left unspecified by using -1 as placeholder.  
     /// 
@@ -22988,7 +22988,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"shape"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", "))|]
         outputs
 
     /// <summary>Converts an array of flat indices into a batch of index arrays. The operator follows numpy conventions so a single multi index is given by a column of the output matrix. The leading dimension may be left unspecified by using -1 as placeholder.  
@@ -23009,7 +23009,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"shape"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", "))|]
         outputs
     /// <summary>Converts an array of flat indices into a batch of index arrays. The operator follows numpy conventions so a single multi index is given by a column of the output matrix. The leading dimension may be left unspecified by using -1 as placeholder.  
     /// 
@@ -23029,7 +23029,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"shape"|]
-                                                 [|(if isNull (shape :> obj) then "None" else shape.ToString())|]
+                                                 [|(if isNull (shape :> obj) then "None" else (shape |> Seq.map string |> String.concat ", "))|]
         outputs
 
     /// <summary>pick rows specified by user input index array from a row sparse matrix
@@ -23133,7 +23133,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
     /// <summary>Computes the square sum of array elements over a given axis
     /// for row-sparse matrix. This is a temporary solution for fusing ops square and
@@ -23172,7 +23172,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|axis.ToString(); keepdims.ToString(); exclude.ToString()|]
+                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
 
 
@@ -23259,7 +23259,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; grid.NDArrayHandle|]
                                                  [|"cudnn_off"|]
-                                                 [|cudnnOff.ToString()|]
+                                                 [|string cudnnOff|]
         outputs
     /// <summary>Applies bilinear sampling to input feature map.
     /// 
@@ -23343,7 +23343,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; grid.SymbolHandle|]
                                                  [|"cudnn_off"|]
-                                                 [|cudnnOff.ToString()|]
+                                                 [|string cudnnOff|]
         outputs
 
     /// <summary>Applies bilinear sampling to input feature map.
@@ -23428,7 +23428,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; grid.NDArrayHandle|]
                                                  [|"cudnn_off"|]
-                                                 [|(match cudnnOff with None -> "None" | _ -> cudnnOff.ToString())|]
+                                                 [|(match cudnnOff with None -> "None" | _ -> string cudnnOff)|]
         outputs
     /// <summary>Applies bilinear sampling to input feature map.
     /// 
@@ -23512,7 +23512,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; grid.SymbolHandle|]
                                                  [|"cudnn_off"|]
-                                                 [|(match cudnnOff with None -> "None" | _ -> cudnnOff.ToString())|]
+                                                 [|(match cudnnOff with None -> "None" | _ -> string cudnnOff)|]
         outputs
 
 
@@ -23554,7 +23554,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; h.NDArrayHandle; s.NDArrayHandle|]
                                                  [|"out_dim"; "processing_batch_size"|]
-                                                 [|outDim.ToString(); processingBatchSize.ToString()|]
+                                                 [|string outDim; string processingBatchSize|]
         outputs
     /// <summary>Apply CountSketch to input: map a d-dimension data to k-dimension data&quot;
     /// 
@@ -23594,7 +23594,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; h.SymbolHandle; s.SymbolHandle|]
                                                  [|"out_dim"; "processing_batch_size"|]
-                                                 [|outDim.ToString(); processingBatchSize.ToString()|]
+                                                 [|string outDim; string processingBatchSize|]
         outputs
 
 
@@ -23676,7 +23676,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; offset.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle|]
                                                  [|"kernel"; "stride"; "dilate"; "pad"; "num_filter"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "layout"|]
-                                                 [|kernel.ToString(); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (dilate :> obj) then "[]" else dilate.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString()); numFilter.ToString(); numGroup.ToString(); numDeformableGroup.ToString(); workspace.ToString(); noBias.ToString(); (if isNull (layout :> obj) then "None" else layout.ToString())|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
     /// <summary>Compute 2-D deformable convolution on 4-D input.
     /// 
@@ -23756,7 +23756,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; offset.SymbolHandle; weight.SymbolHandle; bias.SymbolHandle|]
                                                  [|"kernel"; "stride"; "dilate"; "pad"; "num_filter"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "layout"|]
-                                                 [|kernel.ToString(); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (dilate :> obj) then "[]" else dilate.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString()); numFilter.ToString(); numGroup.ToString(); numDeformableGroup.ToString(); workspace.ToString(); noBias.ToString(); (if isNull (layout :> obj) then "None" else layout.ToString())|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
 
 
@@ -23788,7 +23788,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"spatial_scale"; "output_dim"; "group_size"; "pooled_size"; "part_size"; "sample_per_part"; "trans_std"; "no_trans"|]
-                                                 [|spatialScale.ToString(); outputDim.ToString(); groupSize.ToString(); pooledSize.ToString(); partSize.ToString(); samplePerPart.ToString(); transStd.ToString(); noTrans.ToString()|]
+                                                 [|string spatialScale; string outputDim; string groupSize; string pooledSize; string partSize; string samplePerPart; string transStd; string noTrans|]
         outputs
 
 
@@ -23814,7 +23814,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"compute_size"|]
-                                                 [|computeSize.ToString()|]
+                                                 [|string computeSize|]
         outputs
     /// <summary>Apply 1D FFT to input&quot;
     /// 
@@ -23838,7 +23838,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"compute_size"|]
-                                                 [|computeSize.ToString()|]
+                                                 [|string computeSize|]
         outputs
 
 
@@ -23865,7 +23865,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"compute_size"|]
-                                                 [|computeSize.ToString()|]
+                                                 [|string computeSize|]
         outputs
     /// <summary>Apply 1D ifft to input&quot;
     /// 
@@ -23890,7 +23890,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"compute_size"|]
-                                                 [|computeSize.ToString()|]
+                                                 [|string computeSize|]
         outputs
 
 
@@ -23916,7 +23916,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"spatial_scale"; "output_dim"; "pooled_size"; "group_size"|]
-                                                 [|spatialScale.ToString(); outputDim.ToString(); pooledSize.ToString(); groupSize.ToString()|]
+                                                 [|string spatialScale; string outputDim; string pooledSize; string groupSize|]
         outputs
 
 
@@ -23963,7 +23963,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle|]
                                                  [|"kernel"; "stride"; "dilate"; "pad"; "num_filter"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|kernel.ToString(); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (dilate :> obj) then "[]" else dilate.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString()); numFilter.ToString(); numGroup.ToString(); workspace.ToString(); noBias.ToString(); (if isNull (cudnnTune :> obj) then "None" else cudnnTune.ToString()); cudnnOff.ToString(); (if isNull (layout :> obj) then "None" else layout.ToString())|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
     /// <summary>This operator is DEPRECATED. Apply convolution to input then add a bias.</summary>
     /// <param name="data">Input data to the ConvolutionV1Op.</param>
@@ -24007,7 +24007,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; weight.SymbolHandle; bias.SymbolHandle|]
                                                  [|"kernel"; "stride"; "dilate"; "pad"; "num_filter"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|kernel.ToString(); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (dilate :> obj) then "[]" else dilate.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString()); numFilter.ToString(); numGroup.ToString(); workspace.ToString(); noBias.ToString(); (if isNull (cudnnTune :> obj) then "None" else cudnnTune.ToString()); cudnnOff.ToString(); (if isNull (layout :> obj) then "None" else layout.ToString())|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
 
 
@@ -24065,7 +24065,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data1.NDArrayHandle; data2.NDArrayHandle|]
                                                  [|"kernel_size"; "max_displacement"; "stride1"; "stride2"; "pad_size"; "is_multiply"|]
-                                                 [|kernelSize.ToString(); maxDisplacement.ToString(); stride1.ToString(); stride2.ToString(); padSize.ToString(); isMultiply.ToString()|]
+                                                 [|string kernelSize; string maxDisplacement; string stride1; string stride2; string padSize; string isMultiply|]
         outputs
     /// <summary>Applies correlation to inputs.
     /// 
@@ -24121,7 +24121,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data1.SymbolHandle; data2.SymbolHandle|]
                                                  [|"kernel_size"; "max_displacement"; "stride1"; "stride2"; "pad_size"; "is_multiply"|]
-                                                 [|kernelSize.ToString(); maxDisplacement.ToString(); stride1.ToString(); stride2.ToString(); padSize.ToString(); isMultiply.ToString()|]
+                                                 [|string kernelSize; string maxDisplacement; string stride1; string stride2; string padSize; string isMultiply|]
         outputs
 
 
@@ -24140,7 +24140,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"transform_type"; "target_shape"|]
-                                                 [|transformType.ToString(); (if isNull (targetShape :> obj) then "[0,0]" else targetShape.ToString())|]
+                                                 [|string transformType; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", "))|]
         outputs
     /// <summary>Generates 2D sampling grid for bilinear sampling.</summary>
     /// <param name="data">Input data to the function.</param>
@@ -24151,7 +24151,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"transform_type"; "target_shape"|]
-                                                 [|transformType.ToString(); (if isNull (targetShape :> obj) then "[0,0]" else targetShape.ToString())|]
+                                                 [|string transformType; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", "))|]
         outputs
 
 
@@ -24207,7 +24207,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; gamma.NDArrayHandle; beta.NDArrayHandle|]
                                                  [|"eps"|]
-                                                 [|eps.ToString()|]
+                                                 [|string eps|]
         outputs
     /// <summary>Applies instance normalization to the n-dimensional input array.
     /// 
@@ -24260,7 +24260,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; gamma.SymbolHandle; beta.SymbolHandle|]
                                                  [|"eps"|]
-                                                 [|eps.ToString()|]
+                                                 [|string eps|]
         outputs
 
 
@@ -24327,7 +24327,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"eps"; "mode"|]
-                                                 [|eps.ToString(); (if isNull (mode :> obj) then "instance" else mode.ToString())|]
+                                                 [|string eps; (if isNull (mode :> obj) then "instance" else string mode)|]
         outputs
     /// <summary>Normalize the input array using the L2 norm.
     /// 
@@ -24392,7 +24392,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"eps"; "mode"|]
-                                                 [|eps.ToString(); (if isNull (mode :> obj) then "instance" else mode.ToString())|]
+                                                 [|string eps; (if isNull (mode :> obj) then "instance" else string mode)|]
         outputs
 
 
@@ -24430,7 +24430,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle|]
                                                  [|"grad_scale"; "valid_thresh"; "normalization"|]
-                                                 [|gradScale.ToString(); validThresh.ToString(); (if isNull (normalization :> obj) then "null" else normalization.ToString())|]
+                                                 [|string gradScale; string validThresh; (if isNull (normalization :> obj) then "null" else string normalization)|]
         outputs
     /// <summary>Make your own loss function in network construction.
     /// 
@@ -24465,7 +24465,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle|]
                                                  [|"grad_scale"; "valid_thresh"; "normalization"|]
-                                                 [|gradScale.ToString(); validThresh.ToString(); (if isNull (normalization :> obj) then "null" else normalization.ToString())|]
+                                                 [|string gradScale; string validThresh; (if isNull (normalization :> obj) then "null" else string normalization)|]
         outputs
 
 
@@ -24526,7 +24526,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; rois.NDArrayHandle|]
                                                  [|"pooled_size"; "spatial_scale"|]
-                                                 [|pooledSize.ToString(); spatialScale.ToString()|]
+                                                 [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale|]
         outputs
     /// <summary>Performs region of interest(ROI) pooling on the input array.
     /// 
@@ -24583,7 +24583,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; rois.SymbolHandle|]
                                                  [|"pooled_size"; "spatial_scale"|]
-                                                 [|pooledSize.ToString(); spatialScale.ToString()|]
+                                                 [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale|]
         outputs
 
 
@@ -24643,7 +24643,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; sequenceLength.NDArrayHandle|]
                                                  [|"use_sequence_length"; "axis"|]
-                                                 [|useSequenceLength.ToString(); axis.ToString()|]
+                                                 [|string useSequenceLength; string axis|]
         outputs
     /// <summary>Takes the last element of a sequence.
     /// 
@@ -24701,7 +24701,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; sequenceLength.SymbolHandle|]
                                                  [|"use_sequence_length"; "axis"|]
-                                                 [|useSequenceLength.ToString(); axis.ToString()|]
+                                                 [|string useSequenceLength; string axis|]
         outputs
 
 
@@ -24788,7 +24788,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; sequenceLength.NDArrayHandle|]
                                                  [|"use_sequence_length"; "value"; "axis"|]
-                                                 [|useSequenceLength.ToString(); value.ToString(); axis.ToString()|]
+                                                 [|string useSequenceLength; string value; string axis|]
         outputs
     /// <summary>Sets all elements outside the sequence to a constant value.
     /// 
@@ -24873,7 +24873,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; sequenceLength.SymbolHandle|]
                                                  [|"use_sequence_length"; "value"; "axis"|]
-                                                 [|useSequenceLength.ToString(); value.ToString(); axis.ToString()|]
+                                                 [|string useSequenceLength; string value; string axis|]
         outputs
 
 
@@ -24954,7 +24954,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; sequenceLength.NDArrayHandle|]
                                                  [|"use_sequence_length"; "axis"|]
-                                                 [|useSequenceLength.ToString(); axis.ToString()|]
+                                                 [|string useSequenceLength; string axis|]
         outputs
     /// <summary>Reverses the elements of each sequence.
     /// 
@@ -25033,7 +25033,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; sequenceLength.SymbolHandle|]
                                                  [|"use_sequence_length"; "axis"|]
-                                                 [|useSequenceLength.ToString(); axis.ToString()|]
+                                                 [|string useSequenceLength; string axis|]
         outputs
 
 
@@ -25050,7 +25050,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; loc.NDArrayHandle|]
                                                  [|"target_shape"; "transform_type"; "sampler_type"; "cudnn_off"|]
-                                                 [|(if isNull (targetShape :> obj) then "[0,0]" else targetShape.ToString()); "affine"; "bilinear"; cudnnOff.ToString()|]
+                                                 [|(if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", ")); "affine"; "bilinear"; string cudnnOff|]
         outputs
     /// <summary>Applies a spatial transformer to input feature map.</summary>
     /// <param name="data">Input data to the SpatialTransformerOp.</param>
@@ -25064,7 +25064,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; loc.SymbolHandle|]
                                                  [|"target_shape"; "transform_type"; "sampler_type"; "cudnn_off"|]
-                                                 [|(if isNull (targetShape :> obj) then "[0,0]" else targetShape.ToString()); "affine"; "bilinear"; cudnnOff.ToString()|]
+                                                 [|(if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", ")); "affine"; "bilinear"; string cudnnOff|]
         outputs
 
     /// <summary>Applies a spatial transformer to input feature map.</summary>
@@ -25079,7 +25079,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; loc.NDArrayHandle|]
                                                  [|"target_shape"; "transform_type"; "sampler_type"; "cudnn_off"|]
-                                                 [|(match targetShape with None -> "[0,0]" | _ -> targetShape.ToString()); "affine"; "bilinear"; (match cudnnOff with None -> "None" | _ -> cudnnOff.ToString())|]
+                                                 [|(match targetShape with None -> "[0,0]" | _ -> (targetShape |> Seq.map string |> String.concat ", ")); "affine"; "bilinear"; (match cudnnOff with None -> "None" | _ -> string cudnnOff)|]
         outputs
     /// <summary>Applies a spatial transformer to input feature map.</summary>
     /// <param name="data">Input data to the SpatialTransformerOp.</param>
@@ -25093,7 +25093,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; loc.SymbolHandle|]
                                                  [|"target_shape"; "transform_type"; "sampler_type"; "cudnn_off"|]
-                                                 [|(match targetShape with None -> "[0,0]" | _ -> targetShape.ToString()); "affine"; "bilinear"; (match cudnnOff with None -> "None" | _ -> cudnnOff.ToString())|]
+                                                 [|(match targetShape with None -> "[0,0]" | _ -> (targetShape |> Seq.map string |> String.concat ", ")); "affine"; "bilinear"; (match cudnnOff with None -> "None" | _ -> string cudnnOff)|]
         outputs
 
 
@@ -25117,7 +25117,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle; label.NDArrayHandle|]
                                                  [|"margin"; "regularization_coefficient"; "use_linear"|]
-                                                 [|margin.ToString(); regularizationCoefficient.ToString(); useLinear.ToString()|]
+                                                 [|string margin; string regularizationCoefficient; string useLinear|]
         outputs
     /// <summary>Computes support vector machine based transformation of the input.
     /// 
@@ -25139,7 +25139,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.SymbolHandle; label.SymbolHandle|]
                                                  [|"margin"; "regularization_coefficient"; "use_linear"|]
-                                                 [|margin.ToString(); regularizationCoefficient.ToString(); useLinear.ToString()|]
+                                                 [|string margin; string regularizationCoefficient; string useLinear|]
         outputs
 
 
@@ -25188,7 +25188,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|mean.NDArrayHandle|]
                                                  [|"index"; "x0"; "y0"; "x1"; "y1"; "c"; "size"|]
-                                                 [|index.ToString(); x0.ToString(); y0.ToString(); x1.ToString(); y1.ToString(); c.ToString(); size.ToString()|]
+                                                 [|string index; string x0; string y0; string x1; string y1; string c; string size|]
         outputs
     /// <summary>Decode an image, clip to (x0, y0, x1, y1), subtract mean, and write to buffer</summary>
     /// <param name="mean">image mean</param>
@@ -25211,7 +25211,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|mean.SymbolHandle|]
                                                  [|"index"; "x0"; "y0"; "x1"; "y1"; "c"; "size"|]
-                                                 [|index.ToString(); x0.ToString(); y0.ToString(); x1.ToString(); y1.ToString(); c.ToString(); size.ToString()|]
+                                                 [|string index; string x0; string y0; string x1; string y1; string c; string size|]
         outputs
 
 // ********************************************************************************************************
@@ -25360,7 +25360,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  [|data.NDArrayHandle|]
 //                                                  [|"alpha"|]
-//                                                  [|alpha.ToString()|]
+//                                                  [|string alpha|]
 //         outputs
 //     /// <summary>Adjust the lighting level of the input. Follow the AlexNet style.
 //     /// 
@@ -25372,7 +25372,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  [|data.SymbolHandle|]
 //                                                  [|"alpha"|]
-//                                                  [|alpha.ToString()|]
+//                                                  [|string alpha|]
 //         outputs
 
 //     /// <summary>Update function for Stochastic Gradient Descent (SDG) optimizer.
@@ -25400,7 +25400,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
 //                                                  [|"lrs"; "wds"; "rescale_grad"; "clip_gradient"; "num_weights"|]
-//                                                  [|lrs.ToString(); wds.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); numWeights.ToString()|]
+//                                                  [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|]
 //         outputs
 //     /// <summary>Update function for Stochastic Gradient Descent (SDG) optimizer.
 //     /// 
@@ -25427,7 +25427,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
 //                                                  [|"lrs"; "wds"; "rescale_grad"; "clip_gradient"; "num_weights"|]
-//                                                  [|lrs.ToString(); wds.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); numWeights.ToString()|]
+//                                                  [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|]
 //         outputs
 
 //     /// <summary>Momentum update function for Stochastic Gradient Descent (SGD) optimizer.
@@ -25469,7 +25469,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
 //                                                  [|"lrs"; "wds"; "momentum"; "rescale_grad"; "clip_gradient"; "num_weights"|]
-//                                                  [|lrs.ToString(); wds.ToString(); momentum.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); numWeights.ToString()|]
+//                                                  [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|]
 //         outputs
 //     /// <summary>Momentum update function for Stochastic Gradient Descent (SGD) optimizer.
 //     /// 
@@ -25510,7 +25510,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
 //                                                  [|"lrs"; "wds"; "momentum"; "rescale_grad"; "clip_gradient"; "num_weights"|]
-//                                                  [|lrs.ToString(); wds.ToString(); momentum.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); numWeights.ToString()|]
+//                                                  [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|]
 //         outputs
 
 //     /// <summary>Update function for multi-precision Stochastic Gradient Descent (SDG) optimizer.
@@ -25538,7 +25538,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
 //                                                  [|"lrs"; "wds"; "rescale_grad"; "clip_gradient"; "num_weights"|]
-//                                                  [|lrs.ToString(); wds.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); numWeights.ToString()|]
+//                                                  [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|]
 //         outputs
 //     /// <summary>Update function for multi-precision Stochastic Gradient Descent (SDG) optimizer.
 //     /// 
@@ -25565,7 +25565,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
 //                                                  [|"lrs"; "wds"; "rescale_grad"; "clip_gradient"; "num_weights"|]
-//                                                  [|lrs.ToString(); wds.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); numWeights.ToString()|]
+//                                                  [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|]
 //         outputs
 
 //     /// <summary>Momentum update function for multi-precision Stochastic Gradient Descent (SGD) optimizer.
@@ -25607,7 +25607,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
 //                                                  [|"lrs"; "wds"; "momentum"; "rescale_grad"; "clip_gradient"; "num_weights"|]
-//                                                  [|lrs.ToString(); wds.ToString(); momentum.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); numWeights.ToString()|]
+//                                                  [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|]
 //         outputs
 //     /// <summary>Momentum update function for multi-precision Stochastic Gradient Descent (SGD) optimizer.
 //     /// 
@@ -25648,7 +25648,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
 //                                                  [|"lrs"; "wds"; "momentum"; "rescale_grad"; "clip_gradient"; "num_weights"|]
-//                                                  [|lrs.ToString(); wds.ToString(); momentum.ToString(); rescaleGrad.ToString(); clipGradient.ToString(); numWeights.ToString()|]
+//                                                  [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|]
 //         outputs
 
 //     /// <summary>Generate region proposals via RPN</summary>
@@ -25680,7 +25680,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  [|clsProb.NDArrayHandle; bboxPred.NDArrayHandle; imInfo.NDArrayHandle|]
 //                                                  [|"rpn_pre_nms_top_n"; "rpn_post_nms_top_n"; "threshold"; "rpn_min_size"; "scales"; "ratios"; "feature_stride"; "output_score"; "iou_loss"|]
-//                                                  [|rpnPreNmsTopN.ToString(); rpnPostNmsTopN.ToString(); threshold.ToString(); rpnMinSize.ToString(); scales.ToString(); ratios.ToString(); featureStride.ToString(); outputScore.ToString(); iouLoss.ToString()|]
+//                                                  [|string rpnPreNmsTopN; string rpnPostNmsTopN; string threshold; string rpnMinSize; string scales; string ratios; string featureStride; string outputScore; string iouLoss|]
 //         outputs
 //     /// <summary>Generate region proposals via RPN</summary>
 //     /// <param name="clsProb">Score of how likely proposal is object.</param>
@@ -25711,7 +25711,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  [|clsProb.SymbolHandle; bboxPred.SymbolHandle; imInfo.SymbolHandle|]
 //                                                  [|"rpn_pre_nms_top_n"; "rpn_post_nms_top_n"; "threshold"; "rpn_min_size"; "scales"; "ratios"; "feature_stride"; "output_score"; "iou_loss"|]
-//                                                  [|rpnPreNmsTopN.ToString(); rpnPostNmsTopN.ToString(); threshold.ToString(); rpnMinSize.ToString(); scales.ToString(); ratios.ToString(); featureStride.ToString(); outputScore.ToString(); iouLoss.ToString()|]
+//                                                  [|string rpnPreNmsTopN; string rpnPostNmsTopN; string threshold; string rpnMinSize; string scales; string ratios; string featureStride; string outputScore; string iouLoss|]
 //         outputs
 
 //     /// <summary>Convert multibox detection predictions.</summary>
@@ -25739,7 +25739,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  [|clsProb.NDArrayHandle; locPred.NDArrayHandle; anchor.NDArrayHandle|]
 //                                                  [|"clip"; "threshold"; "background_id"; "nms_threshold"; "force_suppress"; "variances"; "nms_topk"|]
-//                                                  [|clip.ToString(); threshold.ToString(); backgroundId.ToString(); nmsThreshold.ToString(); forceSuppress.ToString(); variances.ToString(); nmsTopk.ToString()|]
+//                                                  [|string clip; string threshold; string backgroundId; string nmsThreshold; string forceSuppress; string variances; string nmsTopk|]
 //         outputs
 //     /// <summary>Convert multibox detection predictions.</summary>
 //     /// <param name="clsProb">Class probabilities.</param>
@@ -25766,7 +25766,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  [|clsProb.SymbolHandle; locPred.SymbolHandle; anchor.SymbolHandle|]
 //                                                  [|"clip"; "threshold"; "background_id"; "nms_threshold"; "force_suppress"; "variances"; "nms_topk"|]
-//                                                  [|clip.ToString(); threshold.ToString(); backgroundId.ToString(); nmsThreshold.ToString(); forceSuppress.ToString(); variances.ToString(); nmsTopk.ToString()|]
+//                                                  [|string clip; string threshold; string backgroundId; string nmsThreshold; string forceSuppress; string variances; string nmsTopk|]
 //         outputs
 
 //     /// <summary>Generate prior(anchor) boxes from data, sizes and ratios.</summary>
@@ -25786,7 +25786,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  [|data.NDArrayHandle|]
 //                                                  [|"sizes"; "ratios"; "clip"; "steps"; "offsets"|]
-//                                                  [|sizes.ToString(); ratios.ToString(); clip.ToString(); steps.ToString(); offsets.ToString()|]
+//                                                  [|string sizes; string ratios; string clip; string steps; string offsets|]
 //         outputs
 //     /// <summary>Generate prior(anchor) boxes from data, sizes and ratios.</summary>
 //     /// <param name="data">Input data.</param>
@@ -25805,7 +25805,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  [|data.SymbolHandle|]
 //                                                  [|"sizes"; "ratios"; "clip"; "steps"; "offsets"|]
-//                                                  [|sizes.ToString(); ratios.ToString(); clip.ToString(); steps.ToString(); offsets.ToString()|]
+//                                                  [|string sizes; string ratios; string clip; string steps; string offsets|]
 //         outputs
 
 //     /// <summary>Compute Multibox training targets</summary>
@@ -25831,7 +25831,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  [|anchor.NDArrayHandle; label.NDArrayHandle; clsPred.NDArrayHandle|]
 //                                                  [|"overlap_threshold"; "ignore_label"; "negative_mining_ratio"; "negative_mining_thresh"; "minimum_negative_samples"; "variances"|]
-//                                                  [|overlapThreshold.ToString(); ignoreLabel.ToString(); negativeMiningRatio.ToString(); negativeMiningThresh.ToString(); minimumNegativeSamples.ToString(); variances.ToString()|]
+//                                                  [|string overlapThreshold; string ignoreLabel; string negativeMiningRatio; string negativeMiningThresh; string minimumNegativeSamples; string variances|]
 //         outputs
 //     /// <summary>Compute Multibox training targets</summary>
 //     /// <param name="anchor">Generated anchor boxes.</param>
@@ -25856,7 +25856,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  [|anchor.SymbolHandle; label.SymbolHandle; clsPred.SymbolHandle|]
 //                                                  [|"overlap_threshold"; "ignore_label"; "negative_mining_ratio"; "negative_mining_thresh"; "minimum_negative_samples"; "variances"|]
-//                                                  [|overlapThreshold.ToString(); ignoreLabel.ToString(); negativeMiningRatio.ToString(); negativeMiningThresh.ToString(); minimumNegativeSamples.ToString(); variances.ToString()|]
+//                                                  [|string overlapThreshold; string ignoreLabel; string negativeMiningRatio; string negativeMiningThresh; string minimumNegativeSamples; string variances|]
 //         outputs
 
 //     /// <summary>Generate region proposals via RPN</summary>
@@ -25888,7 +25888,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  [|clsProb.NDArrayHandle; bboxPred.NDArrayHandle; imInfo.NDArrayHandle|]
 //                                                  [|"rpn_pre_nms_top_n"; "rpn_post_nms_top_n"; "threshold"; "rpn_min_size"; "scales"; "ratios"; "feature_stride"; "output_score"; "iou_loss"|]
-//                                                  [|rpnPreNmsTopN.ToString(); rpnPostNmsTopN.ToString(); threshold.ToString(); rpnMinSize.ToString(); scales.ToString(); ratios.ToString(); featureStride.ToString(); outputScore.ToString(); iouLoss.ToString()|]
+//                                                  [|string rpnPreNmsTopN; string rpnPostNmsTopN; string threshold; string rpnMinSize; string scales; string ratios; string featureStride; string outputScore; string iouLoss|]
 //         outputs
 //     /// <summary>Generate region proposals via RPN</summary>
 //     /// <param name="clsProb">Score of how likely proposal is object.</param>
@@ -25919,7 +25919,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  [|clsProb.SymbolHandle; bboxPred.SymbolHandle; imInfo.SymbolHandle|]
 //                                                  [|"rpn_pre_nms_top_n"; "rpn_post_nms_top_n"; "threshold"; "rpn_min_size"; "scales"; "ratios"; "feature_stride"; "output_score"; "iou_loss"|]
-//                                                  [|rpnPreNmsTopN.ToString(); rpnPostNmsTopN.ToString(); threshold.ToString(); rpnMinSize.ToString(); scales.ToString(); ratios.ToString(); featureStride.ToString(); outputScore.ToString(); iouLoss.ToString()|]
+//                                                  [|string rpnPreNmsTopN; string rpnPostNmsTopN; string threshold; string rpnMinSize; string scales; string ratios; string featureStride; string outputScore; string iouLoss|]
 //         outputs
 
 //     /// <summary>Stub for implementing an operator implemented in native frontend language.</summary>
@@ -25931,7 +25931,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
 //                                                  [|"info"; "need_top_grad"|]
-//                                                  [|info.ToString(); needTopGrad.ToString()|]
+//                                                  [|string info; string needTopGrad|]
 //         outputs
 //     /// <summary>Stub for implementing an operator implemented in native frontend language.</summary>
 //     /// <param name="data">Input data for the custom operator.</param>
@@ -25942,7 +25942,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
 //                                                  [|"info"; "need_top_grad"|]
-//                                                  [|info.ToString(); needTopGrad.ToString()|]
+//                                                  [|string info; string needTopGrad|]
 //         outputs
 
 //     /// <summary>Stub for implementing an operator implemented in native frontend language with ndarray.</summary>
@@ -25953,7 +25953,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
 //                                                  [|"info"|]
-//                                                  [|info.ToString()|]
+//                                                  [|string info|]
 //         outputs
 //     /// <summary>Stub for implementing an operator implemented in native frontend language with ndarray.</summary>
 //     /// <param name="data">Input data for the custom operator.</param>
@@ -25963,7 +25963,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
 //                                                  [|"info"|]
-//                                                  [|info.ToString()|]
+//                                                  [|string info|]
 //         outputs
 
 // type PoolType = 
@@ -26042,7 +26042,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  [|data.NDArrayHandle|]
 //                                                  [|"kernel"; "pool_type"; "global_pool"; "pooling_convention"; "stride"; "pad"|]
-//                                                  [|(if isNull (kernel :> obj) then "[]" else kernel.ToString()); (if isNull (poolType :> obj) then "max" else poolType.ToString()); globalPool.ToString(); (if isNull (poolingConvention :> obj) then "valid" else poolingConvention.ToString()); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString())|]
+//                                                  [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", "))|]
 //         outputs
 //     /// <summary>This operator is DEPRECATED.
 //     /// Perform pooling on the input.
@@ -26102,5 +26102,5 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  [|data.SymbolHandle|]
 //                                                  [|"kernel"; "pool_type"; "global_pool"; "pooling_convention"; "stride"; "pad"|]
-//                                                  [|(if isNull (kernel :> obj) then "[]" else kernel.ToString()); (if isNull (poolType :> obj) then "max" else poolType.ToString()); globalPool.ToString(); (if isNull (poolingConvention :> obj) then "valid" else poolingConvention.ToString()); (if isNull (stride :> obj) then "[]" else stride.ToString()); (if isNull (pad :> obj) then "[]" else pad.ToString())|]
+//                                                  [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", "))|]
 //         outputs
