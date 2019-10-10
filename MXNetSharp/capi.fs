@@ -879,7 +879,7 @@ extern int MXFuncInvokeEx__(FunctionHandle ``fun``, NDArrayHandle[] use_vars, fl
 /// <param name="param_vals">values for keyword parameters</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXImperativeInvoke(AtomicSymbolCreatorHandle creator, int num_inputs, NDArrayHandle[] inputs, int& num_outputs, NDArrayHandle& outputs, int num_params, string[] param_keys, string[] param_vals)
+extern int MXImperativeInvoke(AtomicSymbolCreatorHandle creator, int num_inputs, NDArrayHandle[] inputs, int& num_outputs, IntPtr& outputs, int num_params, string[] param_keys, string[] param_vals)
 
 /// <summary>invoke a nnvm op and imperative function</summary>
 /// <param name="creator">the op</param>
@@ -1621,7 +1621,7 @@ extern int MXExecutorSimpleBind__(SymbolHandle symbol_handle, int dev_type, int 
 *)
 
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorSimpleBindEx__(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_g2c_keys, string[] g2c_keys, int[] g2c_dev_types, int[] g2c_dev_ids, uint32 provided_grad_req_list_len, string[] provided_grad_req_names, string[] provided_grad_req_types, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, int[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32 num_provided_arg_dtypes, string[] provided_arg_dtype_names, int[] provided_arg_dtypes, uint32 num_provided_arg_stypes, string[] provided_arg_stype_names, int[] provided_arg_stypes, uint32 num_shared_arg_names, string[] shared_arg_name_list, int[] shared_buffer_len, string[] shared_buffer_name_list, NDArrayHandle[] shared_buffer_handle_list, string[]& updated_shared_buffer_name_list, NDArrayHandle[]& updated_shared_buffer_handle_list, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec_handle, [<Out>] ExecutorHandle& out)
+extern int MXExecutorSimpleBindEx(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_g2c_keys, string[] g2c_keys, int[] g2c_dev_types, int[] g2c_dev_ids, uint32 provided_grad_req_list_len, string[] provided_grad_req_names, string[] provided_grad_req_types, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, int[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32 num_provided_arg_dtypes, string[] provided_arg_dtype_names, int[] provided_arg_dtypes, uint32 num_provided_arg_stypes, string[] provided_arg_stype_names, int[] provided_arg_stypes, uint32 num_shared_arg_names, string[] shared_arg_name_list, int[] shared_buffer_len, string[] shared_buffer_name_list, NDArrayHandle[] shared_buffer_handle_list, string[]& updated_shared_buffer_name_list, NDArrayHandle[]& updated_shared_buffer_handle_list, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec_handle, [<Out>] ExecutorHandle& out)
 
 (* Exclude DEPRECATED
 /// <summary>DEPRECATED. Use MXExecutorReshapeEx instead.
