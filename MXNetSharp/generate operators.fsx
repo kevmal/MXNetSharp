@@ -4,6 +4,7 @@ open System.Diagnostics
 
 #load "capi.fs"
 #load "cpredictapi.fs"
+#load "cnnvmapi"
 #load "interop.fs"
 
 open MXNetSharp.Interop
@@ -389,6 +390,26 @@ let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
                 indent + args.[args.Length - 1] + ") ="
             ]
     let arr x = if Array.isEmpty x then "Array.empty" else sprintf "[|%s|]" (x |> String.concat "; ")
+    let inputNamesStr = 
+        if ndarray then 
+            x.Args 
+            |> Array.choose 
+                (fun x ->
+                    match x.SymbolOrNDArray with 
+                    | Some NDArray | Some SymbolOrNDArray -> Some(quote x.Name)
+                    | _ -> None
+                )
+            |> arr
+        else 
+            x.Args 
+            |> Array.choose 
+                (fun x ->
+                    match x.SymbolOrNDArray with 
+                    | Some Symbol | Some SymbolOrNDArray -> Some(quote x.Name)
+                    | _ -> None
+                )
+            |> arr
+        
     let inputsStr = 
         let handle x =  
             if ndarray then 
@@ -459,14 +480,27 @@ let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
             ) 
         |> arr
     let invoke = 
-        [
-            sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
-            sprintf "let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle"
-            sprintf "                                         %s" inputsStr
-            sprintf "                                         %s" paramNamesStr
-            sprintf "                                         %s" paramValuesStr
-            sprintf "outputs"
-        ]
+        if ndarray then 
+            [
+                sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
+                sprintf "let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle"
+                sprintf "                                         %s" inputsStr
+                sprintf "                                         %s" paramNamesStr
+                sprintf "                                         %s" paramValuesStr
+                sprintf "outputs"
+            ]
+        else
+            [
+                sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
+                sprintf "let symbol = MXSymbol.createAtomicSymbol creator.AtomicSymbolCreatorHandle"
+                sprintf "                                         %s" paramNamesStr
+                sprintf "                                         %s" paramValuesStr
+                sprintf "MXSymbol.compose symbol null %s" inputNamesStr
+                //sprintf "                             (%s |> Array.filter (fun x -> x > 0n))" inputsStr
+                sprintf "                             %s" inputsStr
+                sprintf "Symbol(symbol)"
+                
+            ]
         
     [
         yield! indent 1 x.Doc

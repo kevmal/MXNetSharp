@@ -202,17 +202,19 @@ module MXNDArray =
     let ``simple MXImperativeInvoke``() = 
         let h = MXNDArray.createEx [|100;10|] DeviceType.CPU 0 false TypeFlag.Float32
         MXNDArray.syncCopyFromCPU h [|1.f .. 1000.f|]
+        MXNDArray.waitAll()
         //let h2 = MXNDArray.createEx [|1|] DeviceType.CPU 0 false TypeFlag.Float32
         //MXNDArray.syncCopyFromCPU h [|1.f|]
         let creator = MXSymbol.listAtomicSymbolCreators() |> Seq.find (fun x -> MXSymbol.getAtomicSymbolName x = "_plus_scalar")
         let outputs = MXNDArray.imperativeInvoke creator [|h|] [|"scalar"|] [|"1.0"|]
         Assert.Equal(1, outputs.Length)
         let o = outputs.[0]
+        MXNDArray.waitAll()
         let dataptr = MXNDArray.getData o |> NativeInterop.NativePtr.ofNativeInt
         let a : float32 [] = Array.zeroCreate 1000
         for i = 0 to a.Length - 1 do
             a.[i] <- NativeInterop.NativePtr.get dataptr i
-        Assert.True((a = [|2.f .. 1001.f|]))
+        Assert.True((a |> Array.map (round >> int) = [|2 .. 1001|]))
         MXNDArray.free h 
         MXNDArray.free o
 
