@@ -68,10 +68,11 @@ type AtomicSymbolInfo =
     }
 
 module Helper = 
-    let ulength (a : 'a []) = 
+    let length (a : 'a []) = 
         match a with 
-        | null -> uint32 0
-        | _ -> uint32 a.Length
+        | null -> 0
+        | _ -> a.Length
+    let ulength (a : 'a []) = a |> length |> uint32
     let boolToInt b = if b then 1 else 0
     let intPtrSz = Marshal.SizeOf<IntPtr>()
     let un<'a> = Unchecked.defaultof<'a>
@@ -508,7 +509,7 @@ module MXSymbol =
     /// <param name="aux_shape_data">returning array of pointers to head of the auxiliary shape.</param>
     /// <param name="complete">whether infer shape completes or more information is needed.</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let inferShapeEx sym num_args keys arg_ind_ptr arg_shape_data complete = 
+    let inferShapeEx sym keys arg_ind_ptr arg_shape_data = 
         //TODO: Complete MXSymbolInferShapeEx
         let mutable in_shape_size = un
         let mutable in_shape_ndim = un
@@ -520,7 +521,11 @@ module MXSymbol =
         let mutable out_shape_ndim = un
         let mutable out_shape_data = un
         let mutable complete = un
-        MXSymbolInferShapeEx(sym, num_args, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapeEx"
+        MXSymbolInferShapeEx(sym, ulength keys, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapeEx"
+        //let inShape : int [] = readStructArray in_shape_size in_shape_data
+        //let aux : int [] = readStructArray aux_shape_size aux_shape_data
+        //let out : int [] = readStructArray out_shape_size out_shape_data
+
 
     let inferShapeEx64 sym num_args keys arg_ind_ptr arg_shape_data = 
         //TODO: Complete MXSymbolInferShapeEx64
@@ -924,7 +929,6 @@ module MXNDArray =
             DeviceId = out_dev_id
         }
                 
-
     /// <summary>get the type of the data in NDArray</summary>
     /// <param name="handle">the handle to the narray</param>
     let getDType handle : TypeFlag = 
@@ -941,21 +945,53 @@ module MXNDArray =
         MXNDArrayGetData(handle, &out_pdata) |> throwOnError "MXNDArrayGetDType"
         out_pdata
 
-            
+    /// <summary>invoke a nnvm op and imperative function</summary>
+    /// <param name="creator">the op</param>
+    /// <param name="inputs">input NDArrays</param>
+    /// <param name="param_keys">keys for keyword parameters</param>
+    /// <param name="param_vals">values for keyword parameters</param>
+    let imperativeInvoke creator inputs parameterKeys parameterValues : NDArrayHandle [] = 
+        let mutable num_outputs = un
+        let mutable outputs = un
+        assert(length parameterKeys = length parameterValues)
+        MXImperativeInvoke(creator, length inputs, inputs, &num_outputs, &outputs, Array.length parameterKeys, parameterKeys, parameterValues) |> throwOnError "MXImperativeInvoke"
+        readStructArray num_outputs outputs
+
     /// <summary>invoke a nnvm op and imperative function</summary>
     /// <param name="creator">the op</param>
     /// <param name="inputs">input NDArrays</param>
     /// <param name="outputs">output NDArrays</param>
     /// <param name="param_keys">keys for keyword parameters</param>
     /// <param name="param_vals">values for keyword parameters</param>
-    let imperativeInvoke creator inputs parameterKeys parameterValues : NDArrayHandle [] = 
-        let mutable num_outputs = un
-        let mutable outputs = un
-        assert(Array.length parameterKeys = Array.length parameterValues)
-        MXImperativeInvoke(creator, Array.length inputs, inputs, &num_outputs, &outputs, Array.length parameterKeys, parameterKeys, parameterValues) |> throwOnError "MXImperativeInvoke"
-        readStructArray num_outputs outputs
+    /// <returns>number of outputs</returns>
+    let imperativeInvokeInto creator inputs (outputs : NDArrayHandle []) parameterKeys parameterValues = 
+        let mutable num_outputs = outputs.Length
+        assert(length parameterKeys = length parameterValues)
+        use outputsptr = fixed outputs
+        let mutable ptr = NativeInterop.NativePtr.toNativeInt outputsptr
+        MXImperativeInvoke(creator, length inputs, inputs, &num_outputs, &ptr, length parameterKeys, parameterKeys, parameterValues) |> throwOnError "MXImperativeInvoke"
+        assert(ptr = NativeInterop.NativePtr.toNativeInt outputsptr)
+        num_outputs
 
+    /// <summary>wait until all delayed operations in
+    ///  the system is completed</summary>
+    let waitAll()  = 
+        MXNDArrayWaitAll() |> throwOnError "MXNDArrayWaitAll"
         
+    /// <summary>Perform a synchronize copyto a continugous CPU memory region.
+    ///
+    /// This function will call WaitToRead before the copy is performed.
+    /// This is useful to copy data from existing memory region that are
+    /// not wrapped by NDArray(thus dependency not being tracked).</summary>
+    /// <param name="handle">the NDArray handle</param>
+    /// <param name="data">the data source to copy into.</param>
+    /// <param name="size">the memory size we want to copy into.</param>
+    let syncCopyToCPU handle (a : 'a[]) = 
+        use ptr = fixed a
+        let size = int64 a.Length
+        let data = NativeInterop.NativePtr.toNativeInt ptr
+        MXNDArraySyncCopyToCPU(handle, data, size) |> throwOnError "MXNDArraySyncCopyToCPU"
+
 module MXExecutor = 
 
     /// <summary>Delete the executor</summary>
@@ -981,14 +1017,14 @@ module MXExecutor =
     /// <param name="handle">execute handle</param>
     /// <param name="head_grads">NDArray handle for heads' gradient</param>
     let backward handle head_grads = 
-        MXExecutorBackward(handle, head_grads |> Array.length |> uint32, head_grads) |> throwOnError "MXExecutorBackward"
+        MXExecutorBackward(handle, ulength head_grads, head_grads) |> throwOnError "MXExecutorBackward"
 
     /// <summary>Excecutor run backward</summary>
     /// <param name="handle">execute handle</param>
     /// <param name="head_grads">NDArray handle for heads' gradient</param>
     /// <param name="is_train">int value to indicate whether the backward pass is for evaluation</param>
     let backwardEx handle head_grads is_train = 
-        MXExecutorBackwardEx(handle, head_grads |> Array.length |> uint32, head_grads, is_train) |> throwOnError "MXExecutorBackwardEx"
+        MXExecutorBackwardEx(handle, ulength head_grads, head_grads, is_train) |> throwOnError "MXExecutorBackwardEx"
 
     /// <summary>Get executor's head NDArray</summary>
     /// <param name="handle">executor handle</param>
@@ -1010,6 +1046,8 @@ module MXExecutor =
     /// <returns>output executor handle</returns>
     let bind symbol_handle dev_type dev_id in_args arg_grad_store grad_req_type aux_states = 
         let mutable out = un
+        assert(length in_args = length arg_grad_store)
+        assert(length in_args = length grad_req_type)
         MXExecutorBind(symbol_handle, dev_type, dev_id, ulength in_args, in_args, arg_grad_store, grad_req_type, ulength aux_states, aux_states, &out) |> throwOnError "MXExecutorBind"
         out
 
@@ -1050,6 +1088,7 @@ module MXExecutor =
     let bindEX symbol_handle dev_type dev_id map_keys map_dev_types map_dev_ids in_args arg_grad_store grad_req_type aux_states shared_exec = 
         let mutable out = un
         MXExecutorBindEX(symbol_handle, dev_type, dev_id, ulength map_keys, map_keys, map_dev_types, map_dev_ids, ulength in_args, in_args, arg_grad_store, grad_req_type, ulength aux_states, aux_states, shared_exec, &out) |> throwOnError "MXExecutorBindEX"
+        out
 
     // TODO: simpleBindEx wrapper
     //let simpleBindEx symbol_handle dev_type dev_id num_g2c_keys g2c_keys g2c_dev_types g2c_dev_ids provided_grad_req_list_len provided_grad_req_names provided_grad_req_types num_provided_arg_shapes provided_arg_shape_names provided_arg_shape_data provided_arg_shape_idx num_provided_arg_dtypes provided_arg_dtype_names provided_arg_dtypes num_provided_arg_stypes provided_arg_stype_names provided_arg_stypes num_shared_arg_names shared_arg_name_list shared_buffer_len shared_buffer_name_list shared_buffer_handle_list updated_shared_buffer_name_list updated_shared_buffer_handle_list num_in_args in_args arg_grads num_aux_states aux_states shared_exec_handle = 
@@ -1314,3 +1353,350 @@ module MXNDList =
     /// <param name="handle">The handle of the MXAPINDList.</param>
     let free handle = 
         MXNDListFree(handle) |> throwOnError "MXNDListFree"
+
+
+open CNNVMApi
+
+module NNVM = 
+    
+    /// <summary>Set the last error message needed by C API</summary>
+    /// <param name="msg">The error message to set.</param>
+    let apiSetLastError msg = NNAPISetLastError(msg) 
+
+    /// <summary>return str message of the last error
+    /// all function in this file will return 0 when success
+    /// and -1 when an error occured,
+    /// NNGetLastError can be called to retrieve the error
+    ///
+    /// this function is threadsafe and can be called by different thread</summary>
+    /// <returns>error info</returns>
+    /// <summary>list all the available operator names, include entries.</summary>
+    /// <returns>the output operator name array.</returns>
+    let listAllOpNames()  = 
+        let mutable out_size = un
+        let mutable out_array = un
+        NNListAllOpNames(&out_size, &out_array) |> throwOnError "NNListAllOpNames"
+        readStringArray out_size out_array
+
+    /// <summary>Get operator handle given name.</summary>
+    /// <param name="op_name">The name of the operator.</param>
+    /// <returns>The returning op handle.</returns>
+    let getOpHandle op_name = 
+        let mutable op_out = un
+        NNGetOpHandle(op_name, &op_out) |> throwOnError "NNGetOpHandle"
+        op_out
+
+
+    /// <summary>list all the available operators.
+    /// This won't include the alias, use ListAllNames
+    /// instead to get all alias names.</summary>
+    /// <param name="out_size">the size of returned array</param>
+    /// <param name="out_array">the output AtomicSymbolCreator array</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let listUniqueOps() : AtomicSymbolCreatorHandle[] = 
+        let mutable out_size = un
+        let mutable out_array = un
+        NNListUniqueOps(&out_size, &out_array) |> throwOnError "NNListUniqueOps"
+        readStructArray out_size out_array
+
+
+    /// <summary>Get the detailed information about atomic symbol.</summary>
+    /// <param name="op">The operator handle.</param>
+    /// <param name="real_name">The returned name of the creator.
+    ///  This name is not the alias name of the atomic symbol.</param>
+    /// <param name="description">The returned description of the symbol.</param>
+    /// <param name="num_doc_args">Number of arguments that contain documents.</param>
+    /// <param name="arg_names">Name of the arguments of doc args</param>
+    /// <param name="arg_type_infos">Type informations about the arguments.</param>
+    /// <param name="arg_descriptions">Description information about the arguments.</param>
+    /// <param name="return_type">Return type of the function, if any.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getOpInfo op =
+        let mutable real_name = un
+        let mutable description = un
+        let mutable num_doc_args = un 
+        let mutable arg_names = un 
+        let mutable arg_type_infos = un 
+        let mutable arg_descriptions = un 
+        let mutable return_type = un
+        NNGetOpInfo(op, &real_name, &description, &num_doc_args, &arg_names, &arg_type_infos, &arg_descriptions, &return_type) |> throwOnError "NNGetOpInfo"
+        {
+            Name = str real_name
+            Description = str description
+            Arguments = 
+                [|
+                    for i = 0 to int num_doc_args - 1 do 
+                        {
+                            Name = readString i arg_names
+                            Description = readString i arg_descriptions
+                            TypeInfo = readString i arg_type_infos
+                        }
+                |]
+            ReturnTypeInfo = str return_type
+            KeyVarNumArgs = 0n
+        }
+
+module NNSymbol = 
+    /// <summary>Create an AtomicSymbol functor.</summary>
+    /// <param name="op">The operator handle</param>
+    /// <param name="num_param">the number of parameters</param>
+    /// <param name="keys">the keys to the params</param>
+    /// <param name="vals">the vals of the params</param>
+    /// <param name="out">pointer to the created symbol handle</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let createAtomicSymbol op num_param keys vals = 
+        let mutable out = un
+        NNSymbolCreateAtomicSymbol(op, num_param, keys, vals, &out) |> throwOnError "NNSymbolCreateAtomicSymbol"
+        out
+
+    /// <summary>Create a Variable Symbol.</summary>
+    /// <param name="name">name of the variable</param>
+    /// <param name="out">pointer to the created symbol handle</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let createVariable name = 
+        let mutable out = un
+        NNSymbolCreateVariable(name, &out) |> throwOnError "NNSymbolCreateVariable"
+        out
+
+    /// <summary>Create a Symbol by grouping list of symbols together</summary>
+    /// <param name="num_symbols">number of symbols to be grouped</param>
+    /// <param name="symbols">array of symbol handles</param>
+    /// <param name="out">pointer to the created symbol handle</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let createGroup num_symbols symbols = 
+        let mutable out = un
+        NNSymbolCreateGroup(num_symbols, symbols, &out) |> throwOnError "NNSymbolCreateGroup"
+        out
+
+    /// <summary>Add src_dep to the handle as control dep.</summary>
+    /// <param name="handle">The symbol to add dependency edges on.</param>
+    /// <param name="src_dep">the source handles.</param>
+    let addControlDeps handle src_dep = 
+        NNAddControlDeps(handle, src_dep) |> throwOnError "NNAddControlDeps"
+
+    /// <summary>Free the symbol handle.</summary>
+    /// <param name="symbol">the symbol</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let free symbol = 
+        NNSymbolFree(symbol) |> throwOnError "NNSymbolFree"
+
+    /// <summary>Copy the symbol to another handle</summary>
+    /// <param name="symbol">the source symbol</param>
+    /// <param name="out">used to hold the result of copy</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let copy symbol = 
+        let mutable out = un
+        NNSymbolCopy(symbol, &out) |> throwOnError "NNSymbolCopy"
+
+    /// <summary>Print the content of symbol, used for debug.</summary>
+    /// <param name="symbol">the symbol</param>
+    /// <param name="out_str">pointer to hold the output string of the printing.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let print symbol = 
+        let mutable out = un
+        NNSymbolPrint(symbol, &out) |> throwOnError "NNSymbolPrint"
+
+    /// <summary>Get string attribute from symbol</summary>
+    /// <param name="symbol">the source symbol</param>
+    /// <param name="key">The key of the symbol.</param>
+    /// <param name="out">The result attribute, can be NULL if the attribute do not exist.</param>
+    /// <param name="success">Whether the result is contained in out.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getAttr symbol key  = 
+        let mutable out = un
+        let mutable success = un
+        NNSymbolGetAttr(symbol, key, &out, &success) |> throwOnError "NNSymbolGetAttr"
+        if success = 0 || out <= 0n then 
+            None
+        else    
+            Some(str out)
+
+    /// <summary>Set string attribute from symbol.
+    /// NOTE: Setting attribute to a symbol can affect the semantics(mutable/immutable) of symbolic graph.
+    ///
+    /// Safe recommendaton: use  immutable graph
+    /// - Only allow set attributes during creation of new symbol as optional parameter
+    ///
+    /// Mutable graph (be careful about the semantics):
+    /// - Allow set attr at any point.
+    /// - Mutating an attribute of some common node of two graphs can cause confusion from user.</summary>
+    /// <param name="symbol">the source symbol</param>
+    /// <param name="num_param">Number of parameters to set.</param>
+    /// <param name="keys">The keys of the attribute</param>
+    /// <param name="values">The value to be set</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let setAttrs symbol num_param keys values = 
+        NNSymbolSetAttrs(symbol, num_param, keys, values) |> throwOnError "NNSymbolSetAttrs"
+
+    /// <summary>Get all attributes from symbol, including all descendents.</summary>
+    /// <param name="symbol">the source symbol</param>
+    /// <param name="recursive_option">0 for recursive, 1 for shallow.</param>
+    /// <param name="out_size">The number of output attributes</param>
+    /// <param name="out">2*out_size strings representing key value pairs.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let listAttrs symbol recursive_option = 
+        let mutable out_size = un
+        let mutable out = un
+        NNSymbolListAttrs(symbol, recursive_option, &out_size, &out) |> throwOnError "NNSymbolListAttrs"
+        readStringArray out_size out
+
+    /// <summary>List inputs variables in the symbol.</summary>
+    /// <param name="symbol">the symbol</param>
+    /// <param name="option">The option to list the inputs
+    ///  option=0 means list all arguments.
+    ///  option=1 means list arguments that are readed only by the graph.
+    ///  option=2 means list arguments that are mutated by the graph.</param>
+    /// <param name="out_size">output size</param>
+    /// <param name="out_sym_array">the output array.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let listInputVariables symbol option : SymbolHandle [] = 
+        let mutable out_size = un
+        let mutable out_sym_array = un
+        NNSymbolListInputVariables(symbol, option, &out_size, &out_sym_array) |> throwOnError "NNSymbolListInputVariables"
+        readStructArray out_size out_sym_array
+
+    /// <summary>List input names in the symbol.</summary>
+    /// <param name="symbol">the symbol</param>
+    /// <param name="option">The option to list the inputs
+    ///  option=0 means list all arguments.
+    ///  option=1 means list arguments that are readed only by the graph.
+    ///  option=2 means list arguments that are mutated by the graph.</param>
+    /// <param name="out_size">output size</param>
+    /// <param name="out_str_array">pointer to hold the output string array</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let listInputNames symbol option = 
+        let mutable out_size = un
+        let mutable out_sym_array = un
+        NNSymbolListInputNames(symbol, option, &out_size, &out_sym_array) |> throwOnError "NNSymbolListInputNames"
+        readStringArray out_size out_sym_array
+
+    /// <summary>List returns names in the symbol.</summary>
+    /// <param name="symbol">the symbol</param>
+    /// <param name="out_size">output size</param>
+    /// <param name="out_str_array">pointer to hold the output string array</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let listOutputNames symbol = 
+        let mutable out_size = un
+        let mutable out_str_array = un
+        NNSymbolListOutputNames(symbol, &out_size, &out_str_array) |> throwOnError "NNSymbolListOutputNames"
+        readStringArray out_size out_str_array
+
+    /// <summary>Supply number of outputs of the symbol.</summary>
+    /// <param name="symbol">the symbol</param>
+    /// <param name="output_count">number of outputs</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getNumOutputs symbol = 
+        let mutable output_count = un
+        NNSymbolGetNumOutputs(symbol, &output_count) |> throwOnError "NNSymbolGetNumOutputs"
+        output_count
+
+    /// <summary>Get a symbol that contains all the internals.</summary>
+    /// <param name="symbol">The symbol</param>
+    /// <param name="out">The output symbol whose outputs are all the internals.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getInternals symbol = 
+        let mutable out = un
+        NNSymbolGetInternals(symbol, &out) |> throwOnError "NNSymbolGetInternals"
+        out
+
+    /// <summary>Get a symbol that contains only direct children.</summary>
+    /// <param name="symbol">The symbol</param>
+    /// <param name="out">The output symbol whose outputs are the direct children.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getChildren symbol = 
+        let mutable out = un
+        NNSymbolGetChildren(symbol, &out) |> throwOnError "NNSymbolGetChildren"
+        out
+
+    /// <summary>Get index-th outputs of the symbol.</summary>
+    /// <param name="symbol">The symbol</param>
+    /// <param name="index">the Index of the output.</param>
+    /// <param name="out">The output symbol whose outputs are the index-th symbol.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getOutput symbol index = 
+        let mutable out = un
+        NNSymbolGetOutput(symbol, index, &out) |> throwOnError "NNSymbolGetOutput"
+        out
+
+    /// <summary>Compose the symbol on other symbols.
+    ///
+    /// This function will change the sym hanlde.
+    /// To achieve function apply behavior, copy the symbol first
+    /// before apply.</summary>
+    /// <param name="sym">the symbol to apply</param>
+    /// <param name="name">the name of symbol</param>
+    /// <param name="num_args">number of arguments</param>
+    /// <param name="keys">the key of keyword args (optional)</param>
+    /// <param name="args">arguments to sym</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let compose sym name num_args keys args = 
+        NNSymbolCompose(sym, name, num_args, keys, args) |> throwOnError "NNSymbolCompose"
+
+module NNGraph = 
+    /// <summary>create a graph handle from symbol</summary>
+    /// <param name="symbol">The symbol representing the graph.</param>
+    /// <param name="graph">The graph handle created.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let create symbol graph = 
+        NNGraphCreate(symbol, graph) |> throwOnError "NNGraphCreate"
+
+    /// <summary>free the graph handle</summary>
+    /// <param name="handle">The handle to be freed.</param>
+    let free handle = 
+        NNGraphFree(handle) |> throwOnError "NNGraphFree"
+
+    /// <summary>Get a new symbol from the graph.</summary>
+    /// <param name="graph">The graph handle.</param>
+    /// <param name="symbol">The corresponding symbol</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getSymbol graph symbol = 
+        NNGraphGetSymbol(graph, symbol) |> throwOnError "NNGraphGetSymbol"
+
+    /// <summary>Get Set a attribute in json format.
+    ///This feature allows pass graph attributes back and forth in reasonable speed.</summary>
+    /// <param name="handle">The graph handle.</param>
+    /// <param name="key">The key to the attribute.</param>
+    /// <param name="json_value">The value need to be in format [type_name, value],
+    /// Where type_name is a registered type string in C++ side via DMLC_JSON_ENABLE_ANY.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let setJSONAttr handle key json_value = 
+        NNGraphSetJSONAttr(handle, key, json_value) |> throwOnError "NNGraphSetJSONAttr"
+
+    /// <summary>Get a serialized attrirbute from graph.
+    ///This feature allows pass graph attributes back and forth in reasonable speed.</summary>
+    /// <param name="handle">The graph handle.</param>
+    /// <param name="key">The key to the attribute.</param>
+    /// <param name="json_out">The result attribute, can be NULL if the attribute do not exist.
+    /// The json_out is an array of [type_name, value].
+    /// Where the type_name is a registered type string in C++ side via DMLC_JSON_ENABLE_ANY.</param>
+    /// <param name="success">Whether the result is contained in out.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getJSONAttr handle key = 
+        let mutable json_out = un
+        let mutable success = un
+        NNGraphGetJSONAttr(handle, key, &json_out, &success) |> throwOnError "NNGraphGetJSONAttr"
+        if success = 0 || json_out <= 0n then 
+            None 
+        else 
+            Some(str json_out)
+
+    /// <summary>Set a attribute whose type is std::vector<NodeEntry> in c++
+    ///This feature allows pass List of symbolic variables for gradient request.</summary>
+    /// <remarks>This is beta feature only used for test purpos</remarks>
+    /// <param name="handle">The graph handle.</param>
+    /// <param name="key">The key to the attribute.</param>
+    /// <param name="list">The symbol whose outputs represents the list of NodeEntry to be passed.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let setNodeEntryListAttr handle key list = 
+        NNGraphSetNodeEntryListAttr_(handle, key, list) |> throwOnError "NNGraphSetNodeEntryListAttr"
+
+    /// <summary>Apply passes on the src graph.</summary>
+    /// <param name="src">The source graph handle.</param>
+    /// <param name="num_pass">The number of pass to be applied.</param>
+    /// <param name="pass_names">The names of the pass.</param>
+    /// <param name="dst">The result graph.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let applyPasses src num_pass pass_names = 
+        let mutable dst = un
+        NNGraphApplyPasses(src, num_pass, pass_names, &dst) |> throwOnError "NNGraphApplyPasses"
+        dst
