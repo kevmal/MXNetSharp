@@ -67,6 +67,13 @@ type AtomicSymbolInfo =
         KeyVarNumArgs : KeyVarNumArgs
     }
 
+type IterInfo = 
+    {
+        Name : string
+        Description : string
+        Arguments : ArgumentInfo []
+    }
+
 module Helper = 
     let length (a : 'a []) = 
         match a with 
@@ -701,7 +708,7 @@ module MXSymbol =
     /// <param name="low_quantiles">low quantiles of layers stored in the calibration table</param>
     /// <param name="high_quantiles">high quantiles of layers stored in the calibration table</param>
     /// <param name="ret_sym_handle">returned symbol</param>
-    let mXSetCalibTableToQuantizedSymbol qsym_handle layer_names low_quantiles high_quantiles = 
+    let setCalibTableToQuantizedSymbol qsym_handle layer_names low_quantiles high_quantiles = 
         let mutable ret_sym_handle = un
         MXSetCalibTableToQuantizedSymbol(qsym_handle, ulength layer_names, layer_names, low_quantiles, high_quantiles, &ret_sym_handle) |> throwOnError "MXSetCalibTableToQuantizedSymbol"
         ret_sym_handle
@@ -710,17 +717,9 @@ module MXSymbol =
     /// <param name="sym_handle">symbol to be converted</param>
     /// <param name="backend">backend names for subgraph pass</param>
     /// <param name="ret_sym_handle">returned symbol</param>
-    let mXGenBackendSubgraph sym_handle backend = 
+    let genBackendSubgraph sym_handle backend = 
         let mutable ret_sym_handle = un
         MXGenBackendSubgraph(sym_handle, backend, &ret_sym_handle) |> throwOnError "MXGenBackendSubgraph"
-        ret_sym_handle
-
-    /// <summary>Generate atomic symbol (able to be composed) from a source symbol</summary>
-    /// <param name="sym_handle">source symbol</param>
-    /// <param name="ret_sym_handle">returned atomic symbol</param>
-    let mXGenAtomicSymbolFromSymbol sym_handle = 
-        let mutable ret_sym_handle = un
-        MXGenAtomicSymbolFromSymbol(sym_handle, &ret_sym_handle) |> throwOnError "MXGenAtomicSymbolFromSymbol"
         ret_sym_handle
 
     /// <summary>Partitions symbol for given backend, potentially creating subgraphs</summary>
@@ -733,7 +732,7 @@ module MXSymbol =
     /// <param name="num_options">number of key value pairs</param>
     /// <param name="keys">keys for options</param>
     /// <param name="vals">values corresponding to keys</param>
-    let mXOptimizeForBackend sym_handle backend_name dev_type ret_sym_handle len in_args_handle num_options keys vals = 
+    let optimizeForBackend sym_handle backend_name dev_type ret_sym_handle len in_args_handle num_options keys vals = 
         MXOptimizeForBackend(sym_handle, backend_name, dev_type, ret_sym_handle, len, in_args_handle, num_options, keys, vals) |> throwOnError "MXOptimizeForBackend"
         
 
@@ -1700,3 +1699,113 @@ module NNGraph =
         let mutable dst = un
         NNGraphApplyPasses(src, num_pass, pass_names, &dst) |> throwOnError "NNGraphApplyPasses"
         dst
+
+module MXDataIter = 
+    /// <summary>List all the available iterator entries</summary>
+    /// <param name="out_size">the size of returned iterators</param>
+    /// <param name="out_array">the output iteratos entries</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let list()  : DataIterCreator []= 
+        let mutable out_size = un
+        let mutable out_array = un
+        MXListDataIters(&out_size, &out_array) |> throwOnError "MXListDataIters"
+        readStructArray out_size out_array
+
+    /// <summary>Init an iterator, init with parameters
+    ///the array size of passed in arguments</summary>
+    /// <param name="handle">of the iterator creator</param>
+    /// <param name="keys">parameter keys</param>
+    /// <param name="vals">parameter values</param>
+    let create handle keys vals = 
+        let mutable out = un
+        assert(length keys = length vals)
+        MXDataIterCreateIter(handle, ulength keys, keys, vals, &out) |> throwOnError "MXDataIterCreateIter"
+        out
+
+    /// <summary>Get the detailed information about data iterator.</summary>
+    /// <param name="creator">the DataIterCreator.</param>
+    /// <param name="name">The returned name of the creator.</param>
+    /// <param name="description">The returned description of the symbol.</param>
+    /// <param name="num_args">Number of arguments.</param>
+    /// <param name="arg_names">Name of the arguments.</param>
+    /// <param name="arg_type_infos">Type informations about the arguments.</param>
+    /// <param name="arg_descriptions">Description information about the arguments.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getInfo creator = 
+        let mutable name = un
+        let mutable description = un
+        let mutable num_args = un
+        let mutable arg_names = un
+        let mutable arg_type_infos = un
+        let mutable arg_descriptions = un
+        MXDataIterGetIterInfo(creator, &name, &description, &num_args, &arg_names, &arg_type_infos, &arg_descriptions) |> throwOnError "MXDataIterGetIterInfo"
+        {
+            Name = str name
+            Description = str description
+            Arguments = 
+                [|
+                    for i = 0 to int num_args - 1 do 
+                        {
+                            Name = readString i arg_names
+                            Description = readString i arg_descriptions
+                            TypeInfo = readString i arg_type_infos
+                        }
+                |]
+        }
+
+    /// <summary>Free the handle to the IO module</summary>
+    /// <param name="handle">the handle pointer to the data iterator</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let free handle = 
+        MXDataIterFree(handle) |> throwOnError "MXDataIterFree"
+
+    /// <summary>Move iterator to next position</summary>
+    /// <param name="handle">the handle to iterator</param>
+    /// <param name="out">return value of next</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let next handle = 
+        let mutable out = un
+        MXDataIterNext(handle, &out) |> throwOnError "MXDataIterNext"
+        out
+
+    /// <summary>Call iterator.Reset</summary>
+    /// <param name="handle">the handle to iterator</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let beforeFirst handle = 
+        MXDataIterBeforeFirst(handle) |> throwOnError "MXDataIterBeforeFirst"
+
+    /// <summary>Get the handle to the NDArray of underlying data</summary>
+    /// <param name="handle">the handle pointer to the data iterator</param>
+    /// <param name="out">handle to underlying data NDArray</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getData handle = 
+        let mutable out = un
+        MXDataIterGetData(handle, &out) |> throwOnError "MXDataIterGetData"
+        out
+
+    /// <summary>Get the image index by array.</summary>
+    /// <param name="handle">the handle pointer to the data iterator</param>
+    /// <returns>output index of the array.</returns>
+    let getIndex handle : uint64[] = 
+        let mutable out_index = un
+        let mutable out_size = un
+        MXDataIterGetIndex(handle, &out_index, &out_size) |> throwOnError "MXDataIterGetIndex"
+        readStructArray out_size out_index
+
+
+    /// <summary>Get the padding number in current data batch</summary>
+    /// <param name="handle">the handle pointer to the data iterator</param>
+    /// <returns>pad number</returns>
+    let getPadNum handle = 
+        let mutable pad = un
+        MXDataIterGetPadNum(handle, &pad) |> throwOnError "MXDataIterGetPadNum"
+        un
+
+    /// <summary>Get the handle to the NDArray of underlying label</summary>
+    /// <param name="handle">the handle pointer to the data iterator</param>
+    /// <param name="out">the handle to underlying label NDArray</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getLabel handle = 
+        let mutable out = un
+        MXDataIterGetLabel(handle, &out) |> throwOnError "MXDataIterGetLabel"
+        out
