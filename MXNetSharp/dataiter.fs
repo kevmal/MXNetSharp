@@ -6,24 +6,6 @@ open MXNetSharp
 open System.Runtime.InteropServices
 
 
-type DataType = 
-    | Float16
-    | Float32
-    | Float64
-    | Int32
-    | Int64
-    | Int8
-    | UInt8
-    override x.ToString() =
-        match x with
-            | Float16 -> "float16"
-            | Float32 -> "float32"
-            | Float64 -> "float64"
-            | Int32 -> "int32"
-            | Int64 -> "int64"
-            | Int8 -> "int8"
-            | UInt8 -> "uint8"
-    
 
 exception DataIterNotFound of string with
     override x.Message = 

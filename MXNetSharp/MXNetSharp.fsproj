@@ -8,8 +8,9 @@
     <Compile Include="capi.fs" />
     <Compile Include="cpredictapi.fs" />
     <Compile Include="cnnvmapi.fs" />
+    <Compile Include="coretypes.fs" />
     <Compile Include="interop.fs" />
-    <Compile Include="AtomicSymbolMap.fs" />
+    <Compile Include="atomicsymbol.fs" />
     <Compile Include="symbol.fs" />
     <Compile Include="ndarray.fs" />
     <Compile Include="dataiter.fs" />

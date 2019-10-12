@@ -16,14 +16,6 @@ type SafeNDArrayHandle(owner) =
         else
             ObjectDisposedException("SafeNDArrayHandle", "NDArray handle has been closed") |> raise
 
-
-// From https://github.com/apache/incubator-mxnet/blob/225f71f744ac5e7bd29868b6d3ba0e4fe2527c43/cpp-package/include/mxnet-cpp/base.h#L39
-type OpReqType =
-    | NullOp = 0
-    | WriteTo = 1
-    | WriteInplace = 2
-    | AddTo = 3
-
 //TODO: NDArray Use safe handle and add IDisposable
 type NDArray(handle : CApi.NDArrayHandle) = 
     new() = 

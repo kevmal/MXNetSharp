@@ -13,13 +13,6 @@ exception MXNetException of string*string with
         | MXNetException(call,msg) -> sprintf "%s: %s" call msg
         | _ -> failwith "unreachable"
 
-// defined in cpp-package/include/mxnet-cpp/ndarray.h
-// https://github.com/apache/incubator-mxnet/blob/745a41ca1a6d74a645911de8af46dece03db93ea/cpp-package/include/mxnet-cpp/ndarray.h#L41
-type DeviceType = 
-    | CPU = 1
-    | GPU = 2
-    | CPUPinned = 3 
-
 // defined in mshadow/base.h
 // https://github.com/apache/incubator-mxnet/blob/618c4811e417fb86cbb3fc0f7f38d55972eeb2af/3rdparty/mshadow/mshadow/base.h#L306
 type TypeFlag = 
@@ -32,11 +25,6 @@ type TypeFlag =
     | Int8  = 5
     | Int64 = 6
 
-type Context = 
-    {
-        DeviceType : DeviceType
-        DeviceId : int
-    }
 
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type LibFeature =
