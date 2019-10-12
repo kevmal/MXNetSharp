@@ -9,3 +9,9 @@
 #load "executor.fs"
 #load "operators.fs"
 
+type Bleh() = 
+    member x.Yield(a) = [a]
+    member x.Combine(a,b) = a@b
+let b = Bleh()
+
+

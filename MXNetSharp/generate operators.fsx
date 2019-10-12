@@ -4,7 +4,7 @@ open System.Diagnostics
 
 #load "capi.fs"
 #load "cpredictapi.fs"
-#load "cnnvmapi"
+#load "cnnvmapi.fs"
 #load "interop.fs"
 
 open MXNetSharp.Interop
@@ -230,7 +230,7 @@ Mappings.Modify
             if cases |> Array.exists (fun x -> x = "None" || x = "'None'") then 
                 let dmode = 
                     match x.DefaultMode with 
-                    | None -> Some(DefaultMode.ReplaceNull "\"None\"")
+                    | None -> Some(DefaultMode.ReplaceNull "null")
                     | dm -> dm
                 {x with     
                     DefaultMode = dmode
@@ -263,6 +263,7 @@ Mappings.Modify
             TypeString = 
                 match x.TypeString with 
                 | "boolean" -> "bool"
+                | "real_t" -> "double"
                 | str -> str}
     )
 
@@ -281,7 +282,12 @@ Mappings.Modify
                 | "int" -> str.Trim ''' |> int |> string |> UseAttr |> Some
                 | "float" -> str.Trim ''' |> double |> dblString |> UseAttr |> Some
                 | "boolean" -> str |> toBoolVal |> UseAttr |> Some
-                | "Shape(tuple)" -> ReplaceNull (sprintf "\"%s\"" str) |> Some
+                | "string" -> str.Trim ''' |> quote |> UseAttr |> Some
+                | "Shape(tuple)" -> 
+                    if str = "None" then 
+                        ReplaceNull "null" |> Some
+                    else 
+                        ReplaceNull (sprintf "\"%s\"" str) |> Some
                 | t when t.StartsWith "{" -> 
                     Some(ReplaceNull(str.Replace(''','\"')))
                 | _ -> None
@@ -347,10 +353,11 @@ let comment lines = lines |> List.map (fun x -> "// " + x)
 let toCStr (a : ProcessedArg) (str : string) = 
     match a.TypeString with 
     | "int seq" -> sprintf "(%s |> Seq.map string |> String.concat \", \")" str 
+    //| "bool" -> sprintf "(if %s then \"1\" else \"0\")" str
     | "string" -> str
     | _ -> sprintf "string %s" str
 
-let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
+let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
     let args = 
         x.Args 
         |> Seq.filter (fun x -> match x.CodeGenerator with ConstantArg _ -> false | _ -> true)
@@ -378,11 +385,18 @@ let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
                 )
         |> Seq.toArray
     let define = 
+        let name = 
+            if suffix then 
+                if ndarray then 
+                    x.Name + "NDArray"
+                else
+                    x.Name + "Symbol"
+            else x.Name
         if args.Length < 5 then 
             let argStr = args |> String.concat ", "
-            [sprintf "static member %s(%s) =" x.Name argStr]
+            [sprintf "static member %s(%s) =" name argStr]
         else
-            let dstr = sprintf "static member %s(" x.Name
+            let dstr = sprintf "static member %s(" name
             let indent = String.replicate dstr.Length " "
             [
                 dstr + args.[0] + ", "
@@ -415,7 +429,7 @@ let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
             if ndarray then 
                 sprintf "%s.NDArrayHandle" x
             else
-                sprintf "%s.SymbolHandle" x
+                sprintf "%s" x
         let arr (x : _ []) = 
             match x with 
             | [| Choice2Of2 name |] -> sprintf "(%s |> Array.map (fun x -> %s))" name (handle "x")
@@ -491,6 +505,7 @@ let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
             ]
         else
             [
+            (* OLD
                 sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
                 sprintf "let symbol = MXSymbol.createAtomicSymbol creator.AtomicSymbolCreatorHandle"
                 sprintf "                                         %s" paramNamesStr
@@ -499,14 +514,55 @@ let toCodeTarget ndarray (x : ProcessedAtomicSymbol) =
                 //sprintf "                             (%s |> Array.filter (fun x -> x > 0n))" inputsStr
                 sprintf "                             %s" inputsStr
                 sprintf "Symbol(symbol)"
-                
+            *)
+                sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
+                sprintf "Symbol(Some creator,"
+                sprintf "       %s," paramNamesStr
+                sprintf "       %s," paramValuesStr
+                sprintf "       %s," inputNamesStr
+                sprintf "       %s)" inputsStr
             ]
+    let defineInto = 
+        let name = x.Name
+        if args.Length = 0 then 
+            [sprintf "static member %s(outputArray : NDArray seq) =" name]
+        elif args.Length < 5 then 
+            let argStr = args |> String.concat ", "
+            [sprintf "static member %s(outputArray : NDArray seq, %s) =" name argStr]
+        else
+            let dstr = sprintf "static member %s(" name
+            let indent = String.replicate dstr.Length " "
+            [
+                dstr + "outputArray : NDArray seq" + ", "
+                yield! args.[0 .. args.Length - 2] |> Seq.map (fun x -> indent + x + ", ")
+                indent + args.[args.Length - 1] + ") ="
+            ]
+    let invokeInto = 
+        [
+            sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
+            sprintf "let names = %s" paramNamesStr
+            sprintf "let vals = %s" paramValuesStr
+            sprintf "let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip"
+            sprintf "let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle"
+            sprintf "                                             %s" inputsStr
+            sprintf "                                             (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)"
+            sprintf "                                             names" //paramNamesStr
+            sprintf "                                             vals" //paramValuesStr
+            sprintf "()"
+        ]
         
     [
         yield! indent 1 x.Doc
         yield! indent 1 (x.Args |> Array.collect (fun x -> x.Doc))
         yield! indent 1 define 
         yield! indent 2 invoke 
+        if ndarray then 
+            yield! indent 1 x.Doc
+            yield! indent 1 ["/// <param name = \"outputArray\">Array of NDArray for outputs</param>"]
+            yield! indent 1 (x.Args |> Array.collect (fun x -> x.Doc))
+            yield! indent 1 defineInto 
+            yield! indent 2 invokeInto 
+            
     ]
 
 let toCode (x : ProcessedAtomicSymbol) =
@@ -520,13 +576,14 @@ let toCode (x : ProcessedAtomicSymbol) =
         | _ -> false
     [
         if not ndArray && not symbol then 
-            //yield! toCodeTarget true x //TODO: can't overload
+            yield! toCodeTarget true true x 
+            yield! toCodeTarget true false x 
             ()
         else    
             if ndArray then 
-                yield! toCodeTarget true x
+                yield! toCodeTarget false true x
             if symbol then 
-                yield! toCodeTarget false x
+                yield! toCodeTarget false false x
     ]
 
 let definedTypeToCode (a : ProcessedArg) =
@@ -1146,7 +1203,10 @@ let skipped =
         //"multi_all_finite"
         //"_contrib_dgl_csr_neighbor_uniform_sample"
         /////////////////////////////////////////////////
+        "_arange"
+        "_linspace"
         "Pooling_v1" //DEPRECATED
+        "Crop" //DEPRECATED
         "_foreach" // Need to figure out types of args
         "_cond" // Need to figure out types of args
         "_while_loop" // Need to figure out types of args
