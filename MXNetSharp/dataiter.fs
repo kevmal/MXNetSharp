@@ -56,6 +56,7 @@ type DataIterDefinition internal (handle, info, parameters : IDictionary<string,
 
 //TODO: should be disposable, freeing iterHandle
 type DataIter(definition : DataIterDefinition) = 
+    let mutable atEnd = false
     let parameters = definition.GetParameters()
     let iterHandle = 
         let keys,vals = 
@@ -75,14 +76,17 @@ type DataIter(definition : DataIterDefinition) =
     internal new(handle, info, parameters : IDictionary<string, obj>) = 
         DataIter(DataIterDefinition(handle, info, parameters))
     member x.DataIterDefinition = definition
-    member x.Reset() = MXDataIter.beforeFirst iterHandle
+    member x.Reset() = 
+        MXDataIter.beforeFirst iterHandle
+        atEnd <- false
     member x.GetData() = MXDataIter.getData iterHandle |> NDArray
     member x.GetIndex() = MXDataIter.getIndex iterHandle
     member x.GetPadNum() = MXDataIter.getPadNum iterHandle
     member x.GetLabel() = MXDataIter.getLabel iterHandle |> NDArray
-    member x.Next() = MXDataIter.next iterHandle > 0
+    member x.Next() = 
+        atEnd <- atEnd || not (MXDataIter.next iterHandle > 0)
+        not atEnd
 
-//TODO: Do not callnext if not reset and last next call was 0
 
 /// <summary>Returns the CSV file iterator.
 /// 
