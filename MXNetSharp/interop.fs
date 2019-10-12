@@ -199,6 +199,15 @@ module MXLib =
        MXListAllOpNames(&out_size, &out_array) |> throwOnError "MXListAllOpNames"
        readStringArray out_size out_array
 
+
+type InferShapeResult<'a> = 
+    {
+        Complete : bool
+        AuxShapes : 'a [] []
+        InputShapes : 'a [] []
+        OutputShapes : 'a [] []
+    }
+
 module MXSymbol = 
 
     /// <summary>list all the available AtomicSymbolEntry</summary>
@@ -501,23 +510,11 @@ module MXSymbol =
     /// The shapes are packed into a CSR matrix represented by arg_ind_ptr and arg_shape_data
     /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
     /// <param name="sym">symbol handle</param>
-    /// <param name="num_args">numbe of input arguments.</param>
     /// <param name="keys">the key of keyword args (optional)</param>
     /// <param name="arg_ind_ptr">the head pointer of the rows in CSR</param>
     /// <param name="arg_shape_data">the content of the CSR</param>
-    /// <param name="in_shape_size">sizeof the returning array of in_shapes</param>
-    /// <param name="in_shape_ndim">returning array of shape dimensions of eachs input shape.</param>
-    /// <param name="in_shape_data">returning array of pointers to head of the input shape.</param>
-    /// <param name="out_shape_size">sizeof the returning array of out_shapes</param>
-    /// <param name="out_shape_ndim">returning array of shape dimensions of eachs input shape.</param>
-    /// <param name="out_shape_data">returning array of pointers to head of the input shape.</param>
-    /// <param name="aux_shape_size">sizeof the returning array of aux_shapes</param>
-    /// <param name="aux_shape_ndim">returning array of shape dimensions of eachs auxiliary shape.</param>
-    /// <param name="aux_shape_data">returning array of pointers to head of the auxiliary shape.</param>
-    /// <param name="complete">whether infer shape completes or more information is needed.</param>
-    /// <returns>0 when success, -1 when failure happens</returns>
-    let inferShapeEx sym keys arg_ind_ptr arg_shape_data = 
-        //TODO: Complete MXSymbolInferShapeEx
+    /// <returns>input, output and aux shape data in a InferShapeResult<uint32> record</returns>
+    let inferShape sym keys arg_ind_ptr arg_shape_data = 
         let mutable in_shape_size = un
         let mutable in_shape_ndim = un
         let mutable in_shape_data = un
@@ -529,13 +526,26 @@ module MXSymbol =
         let mutable out_shape_data = un
         let mutable complete = un
         MXSymbolInferShapeEx(sym, ulength keys, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapeEx"
-        //let inShape : int [] = readStructArray in_shape_size in_shape_data
-        //let aux : int [] = readStructArray aux_shape_size aux_shape_data
-        //let out : int [] = readStructArray out_shape_size out_shape_data
+        let shapes sz ndim data =
+            let dims = Helper.readStructArray sz ndim : uint32[]
+            Helper.readPtrArray sz data
+            |> Array.mapi (fun i ptr -> Helper.readStructArray dims.[i] ptr : uint32 [])
+        {
+            Complete = complete <> 0
+            AuxShapes = shapes aux_shape_size aux_shape_ndim aux_shape_data
+            InputShapes = shapes in_shape_size in_shape_ndim in_shape_data
+            OutputShapes = shapes out_shape_size out_shape_ndim out_shape_data
+        }
 
-
-    let inferShapeEx64 sym num_args keys arg_ind_ptr arg_shape_data = 
-        //TODO: Complete MXSymbolInferShapeEx64
+    /// <summary>infer shape of unknown input shapes given the known one.
+    /// The shapes are packed into a CSR matrix represented by arg_ind_ptr and arg_shape_data
+    /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
+    /// <param name="sym">symbol handle</param>
+    /// <param name="keys">the key of keyword args (optional)</param>
+    /// <param name="arg_ind_ptr">the head pointer of the rows in CSR</param>
+    /// <param name="arg_shape_data">the content of the CSR</param>
+    /// <returns>input, output and aux shape data in a InferShapeResult<int64> record</returns>
+    let inferShape64 sym keys arg_ind_ptr arg_shape_data = 
         let mutable in_shape_size = un
         let mutable in_shape_ndim = un
         let mutable in_shape_data = un
@@ -546,31 +556,28 @@ module MXSymbol =
         let mutable out_shape_ndim = un
         let mutable out_shape_data = un
         let mutable complete = un
-        MXSymbolInferShapeEx64(sym, num_args, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapeEx64"
+        MXSymbolInferShapeEx64(sym, ulength keys, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapeEx64"
+        let shapes sz ndim data =
+            let dims = Helper.readStructArray sz ndim : int[]
+            Helper.readPtrArray sz data
+            |> Array.mapi (fun i ptr -> Helper.readStructArray dims.[i] ptr : int64 []) 
+        {
+            Complete = complete <> 0
+            AuxShapes = shapes aux_shape_size aux_shape_ndim aux_shape_data
+            InputShapes = shapes in_shape_size in_shape_ndim in_shape_data
+            OutputShapes = shapes out_shape_size out_shape_ndim out_shape_data
+        }
   
     /// <summary>partially infer shape of unknown input shapes given the known one.
-    ///
     /// Return partially inferred results if not all shapes could be inferred.
     /// The shapes are packed into a CSR matrix represented by arg_ind_ptr and arg_shape_data
     /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
     /// <param name="sym">symbol handle</param>
-    /// <param name="num_args">numbe of input arguments.</param>
     /// <param name="keys">the key of keyword args (optional)</param>
     /// <param name="arg_ind_ptr">the head pointer of the rows in CSR</param>
     /// <param name="arg_shape_data">the content of the CSR</param>
-    /// <param name="in_shape_size">sizeof the returning array of in_shapes</param>
-    /// <param name="in_shape_ndim">returning array of shape dimensions of eachs input shape.</param>
-    /// <param name="in_shape_data">returning array of pointers to head of the input shape.</param>
-    /// <param name="out_shape_size">sizeof the returning array of out_shapes</param>
-    /// <param name="out_shape_ndim">returning array of shape dimensions of eachs input shape.</param>
-    /// <param name="out_shape_data">returning array of pointers to head of the input shape.</param>
-    /// <param name="aux_shape_size">sizeof the returning array of aux_shapes</param>
-    /// <param name="aux_shape_ndim">returning array of shape dimensions of eachs auxiliary shape.</param>
-    /// <param name="aux_shape_data">returning array of pointers to head of the auxiliary shape.</param>
-    /// <param name="complete">whether infer shape completes or more information is needed.</param>
-    /// <returns>0 when success, -1 when failure happens</returns>
-    let inferShapePartialEx sym num_args keys arg_ind_ptr arg_shape_data in_shape_size in_shape_ndim in_shape_data aux_shape_size aux_shape_ndim aux_shape_data complete = 
-        //TODO: Complete MXSymbolInferShapePartialEx
+    /// <returns>input, output and aux shape data in a InferShapeResult<uint32> record</returns>
+    let inferShapePartial sym keys arg_ind_ptr arg_shape_data = 
         let mutable in_shape_size = un
         let mutable in_shape_ndim = un
         let mutable in_shape_data = un
@@ -581,10 +588,28 @@ module MXSymbol =
         let mutable out_shape_ndim = un
         let mutable out_shape_data = un
         let mutable complete = un
-        MXSymbolInferShapePartialEx(sym, num_args, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapePartialEx"
+        MXSymbolInferShapePartialEx(sym, ulength keys, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapePartialEx"
+        let shapes sz ndim data =
+            let dims = Helper.readStructArray sz ndim : uint32[]
+            Helper.readPtrArray sz data
+            |> Array.mapi (fun i ptr -> Helper.readStructArray dims.[i] ptr : uint32 [])
+        {
+            Complete = complete <> 0
+            AuxShapes = shapes aux_shape_size aux_shape_ndim aux_shape_data
+            InputShapes = shapes in_shape_size in_shape_ndim in_shape_data
+            OutputShapes = shapes out_shape_size out_shape_ndim out_shape_data
+        }
 
-    let inferShapePartialEx64 sym num_args keys arg_ind_ptr arg_shape_data in_shape_size in_shape_ndim in_shape_data aux_shape_size aux_shape_ndim aux_shape_data complete = 
-        //TODO: Complete MXSymbolInferShapePartialEx64
+    /// <summary>partially infer shape of unknown input shapes given the known one.
+    /// Return partially inferred results if not all shapes could be inferred.
+    /// The shapes are packed into a CSR matrix represented by arg_ind_ptr and arg_shape_data
+    /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
+    /// <param name="sym">symbol handle</param>
+    /// <param name="keys">the key of keyword args (optional)</param>
+    /// <param name="arg_ind_ptr">the head pointer of the rows in CSR</param>
+    /// <param name="arg_shape_data">the content of the CSR</param>
+    /// <returns>input, output and aux shape data in a InferShapeResult<int64> record</returns>
+    let inferShapePartial64 sym keys arg_ind_ptr arg_shape_data = 
         let mutable in_shape_size = un
         let mutable in_shape_ndim = un
         let mutable in_shape_data = un
@@ -595,7 +620,17 @@ module MXSymbol =
         let mutable out_shape_ndim = un
         let mutable out_shape_data = un
         let mutable complete = un
-        MXSymbolInferShapePartialEx64(sym, num_args, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapePartialEx64"
+        MXSymbolInferShapePartialEx64(sym, ulength keys, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapePartialEx64"
+        let shapes sz ndim data =
+            let dims = Helper.readStructArray sz ndim : int[]
+            Helper.readPtrArray sz data
+            |> Array.mapi (fun i ptr -> Helper.readStructArray dims.[i] ptr : int64 []) 
+        {
+            Complete = complete <> 0
+            AuxShapes = shapes aux_shape_size aux_shape_ndim aux_shape_data
+            InputShapes = shapes in_shape_size in_shape_ndim in_shape_data
+            OutputShapes = shapes out_shape_size out_shape_ndim out_shape_data
+        }
 
     /// <summary>infer type of unknown input types given the known one.
     /// The types are packed into a CSR matrix represented by arg_ind_ptr and arg_type_data
