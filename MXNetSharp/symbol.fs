@@ -4,6 +4,7 @@ open System.Runtime.InteropServices
 open MXNetSharp.Interop
 
 
+//TODO: NDArray Use safe handle and add IDisposable
 type Symbol(creator : AtomicSymbolCreator option, parameters, inputs) = 
     let mutable name = None
     let mutable initialized = false

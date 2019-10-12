@@ -991,6 +991,193 @@ module MXNDArray =
         let data = NativeInterop.NativePtr.toNativeInt ptr
         MXNDArraySyncCopyToCPU(handle, data, size) |> throwOnError "MXNDArraySyncCopyToCPU"
 
+    (* TODO: MXNDArrayCreateSparseEx
+    /// <summary>create an empty sparse NDArray with specified shape and data type</summary>
+    /// <param name="storage_type">the storage type of the ndarray</param>
+    /// <param name="shape">the pointer to the shape</param>
+    /// <param name="ndim">the dimension of the shape</param>
+    /// <param name="dev_type">device type, specify device we want to take</param>
+    /// <param name="dev_id">the device id of the specific device</param>
+    /// <param name="delay_alloc">whether to delay allocation until
+    ///       the narray is first mutated</param>
+    /// <param name="dtype">data type of created array</param>
+    /// <param name="num_aux">the number of aux data to support this ndarray</param>
+    /// <param name="aux_type">data type of the aux data for the created array</param>
+    /// <param name="aux_ndims">the dimension of the shapes of aux data</param>
+    /// <param name="aux_shape">the shapes of aux data</param>
+    /// <param name="out">the returning handle</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let createSparseEx storage_type shape ndim dev_type dev_id delay_alloc dtype num_aux aux_type aux_ndims aux_shape = 
+        let mutable out = un
+        MXNDArrayCreateSparseEx(storage_type, shape, ulength shape, dev_type, dev_id, delay_alloc, dtype, ulength aus_type, aux_type, aux_ndims, aux_shape, &out) |> throwOnError "MXNDArrayCreateSparseEx"
+        out
+
+    let createSparseEx64 storage_type shape ndim dev_type dev_id delay_alloc dtype num_aux aux_type aux_ndims aux_shape = 
+        let mutable out = un
+        MXNDArrayCreateSparseEx64(storage_type, shape, ndim, dev_type, dev_id, delay_alloc, dtype, num_aux, aux_type, aux_ndims, aux_shape, &out) |> throwOnError "MXNDArrayCreateSparseEx64"
+    *)
+    
+    /// <summary>Load list / dictionary of narrays from file content loaded into memory.
+    ///This will load a list of ndarrays in a similar
+    ///manner to MXNDArrayLoad, however, it loads from
+    ///buffer containing the contents of a file, rather than
+    ///from a specified file.</summary>
+    /// <param name="ndarray_buffer">pointer to the start of the ndarray file content</param>
+    /// <param name="size">size of the file</param>
+    /// <param name="out_size">number of narray loaded.</param>
+    /// <param name="out_arr">head of the returning narray handles.</param>
+    /// <param name="out_name_size">size of output name arrray.</param>
+    /// <param name="out_names">the names of returning NDArrays, can be NULL</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let loadFromBuffer ndarray_buffer size = 
+        let mutable out_size = un
+        let mutable out_arr = un
+        let mutable out_name_size = un
+        let mutable out_names = un
+        MXNDArrayLoadFromBuffer(ndarray_buffer, size, &out_size, &out_arr, &out_name_size, &out_names) |> throwOnError "MXNDArrayLoadFromBuffer"
+        let names = readStringArray out_name_size out_names
+        let handles : NDArrayHandle [] = readStructArray out_size out_arr
+        names, handles
+
+    /// <summary>Copy src.data() to dst.data() if i = -1, else dst.aux_data(i) if i >= 0
+    ///This function blocks. Do not use it in performance critical code.</summary>
+    /// <param name="handle_dst">handle of a dst ndarray whose data/aux_data has been allocated</param>
+    /// <param name="handle_src">handle of a src ndarray which has default storage type</param>
+    /// <param name="i">dst data blob indicator</param>
+    let syncCopyFromNDArray handle_dst handle_src i = 
+        MXNDArraySyncCopyFromNDArray(handle_dst, handle_src, i) |> throwOnError "MXNDArraySyncCopyFromNDArray"
+
+    /// <summary>check whether the NDArray format is valid</summary>
+    /// <param name="full_check">if `True`, rigorous check, O(N) operations
+    ///   Otherwise basic check, O(1) operations</param>
+    let syncCheckFormat handle full_check = 
+        MXNDArraySyncCheckFormat(handle, full_check) |> throwOnError "MXNDArraySyncCheckFormat"
+
+    /// <summary>Wait until all the pending writes with respect NDArray are finished.
+    /// Always call this before read data out synchronizely.</summary>
+    /// <param name="handle">the NDArray handle</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let waitToRead handle = 
+        MXNDArrayWaitToRead(handle) |> throwOnError "MXNDArrayWaitToRead"
+
+    /// <summary>Wait until all the pending read/write with respect NDArray are finished.
+    /// Always call this before write data into NDArray synchronizely.</summary>
+    /// <param name="handle">the NDArray handle</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let waitToWrite handle = 
+        MXNDArrayWaitToWrite(handle) |> throwOnError "MXNDArrayWaitToWrite"
+
+    /// <summary>Create a reference view of NDArray that
+    /// represents as DLManagedTensor
+    /// Notice: MXNet uses asynchronous execution. Please call MXNDArrayWaitToRead or
+    ///         MXNDArrayWaitToWrite before calling MXNDArrayToDLPack.</summary>
+    /// <param name="handle">the handle to the ndarray</param>
+    /// <param name="out_dlpack">pointer holder to get pointer of DLManagedTensor</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let toDLPack handle = 
+        let mutable out_dlpack = un
+        MXNDArrayToDLPack(handle, &out_dlpack) |> throwOnError "MXNDArrayToDLPack"
+        out_dlpack
+
+    /// <summary>Create a NDArray backed by a dlpack tensor.
+    ///
+    ///This allows us to create a NDArray using the memory
+    ///allocated by an external deep learning framework
+    ///that is DLPack compatible.
+    ///
+    ///The memory is retained until the NDArray went out of scope.</summary>
+    /// <param name="dlpack">the pointer of the input DLManagedTensor</param>
+    /// <param name="transient_handle">whether the handle will be destructed before calling the deleter</param>
+    /// <param name="out_handle">pointer holder to get pointer of NDArray</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let fromDLPackEx dlpack transient_handle = 
+        let mutable out_handle = un
+        MXNDArrayFromDLPackEx(dlpack, transient_handle, &out_handle) |> throwOnError "MXNDArrayFromDLPackEx"
+        out_handle
+
+    /// <summary>Delete a dlpack tensor</summary>
+    /// <param name="dlpack">the pointer of the input DLManagedTensor</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let callDLPackDeleter dlpack = 
+        MXNDArrayCallDLPackDeleter(dlpack) |> throwOnError "MXNDArrayCallDLPackDeleter"
+
+    /// <summary>get the type of the ith aux data in NDArray</summary>
+    /// <param name="handle">the handle to the narray</param>
+    /// <param name="i">the index of the aux data</param>
+    /// <param name="out_type">pointer holder to get type of aux data</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getAuxType handle i : TypeFlag = 
+        let mutable out_type = un
+        MXNDArrayGetAuxType(handle, i, &out_type) |> throwOnError "MXNDArrayGetAuxType"
+        enum out_type
+
+    /// <summary>get the type of the ith aux data in NDArray</summary>
+    /// <param name="handle">the handle to the narray</param>
+    /// <param name="i">the index of the aux data</param>
+    /// <param name="out_type">pointer holder to get type of aux data</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getAuxType64 handle i : TypeFlag = 
+        let mutable out_type = un
+        MXNDArrayGetAuxType64(handle, i, &out_type) |> throwOnError "MXNDArrayGetAuxType64"
+        enum out_type
+
+    /// <summary>Get a deep copy of the ith aux data blob
+    ///in the form of an NDArray of default storage type.
+    ///This function blocks. Do not use it in performance critical code.</summary>
+    let getAuxNDArray handle i = 
+        let mutable out = un
+        MXNDArrayGetAuxNDArray(handle, i, &out) |> throwOnError "MXNDArrayGetAuxNDArray"
+        out
+
+    /// <summary>Get a deep copy of the ith aux data blob
+    ///in the form of an NDArray of default storage type.
+    ///This function blocks. Do not use it in performance critical code.</summary>
+    let getAuxNDArray64 handle i = 
+        let mutable out = un
+        MXNDArrayGetAuxNDArray64(handle, i, &out) |> throwOnError "MXNDArrayGetAuxNDArray64"
+        out
+
+    /// <summary>Get a deep copy of the data blob
+    ///in the form of an NDArray of default storage type.
+    ///This function blocks. Do not use it in performance critical code.</summary>
+    let getDataNDArray handle = 
+        let mutable out = un
+        MXNDArrayGetDataNDArray(handle, &out) |> throwOnError "MXNDArrayGetDataNDArray"
+        out
+
+    /// <summary>return gradient buffer attached to this NDArray</summary>
+    /// <param name="handle">NDArray handle</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getGrad handle = 
+        let mutable out = un
+        MXNDArrayGetGrad(handle, &out) |> throwOnError "MXNDArrayGetGrad"
+        out
+
+    // TODO: Figure out what NDArrayHandle detach outputs?
+    /// <summary>detach and ndarray from computation graph by clearing entry_</summary>
+    /// <param name="handle">NDArray handle</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let detach handle = 
+        let mutable out = un
+        MXNDArrayDetach(handle, &out) |> throwOnError "MXNDArrayDetach"
+        out
+
+    /// <summary>set the flag for gradient array state.</summary>
+    /// <param name="handle">NDArray handle</param>
+    /// <param name="state">the new state.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let setGradState handle state = 
+        MXNDArraySetGradState(handle, state) |> throwOnError "MXNDArraySetGradState"
+
+    /// <summary>set the flag for gradient array state.</summary>
+    /// <param name="handle">NDArray handle</param>
+    /// <param name="state">the new state.</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getGradState handle = 
+        let mutable out = un
+        MXNDArrayGetGradState(handle, &out) |> throwOnError "MXNDArrayGetGradState"
+        out
+
 module MXExecutor = 
 
     /// <summary>Delete the executor</summary>

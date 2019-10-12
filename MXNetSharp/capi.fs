@@ -464,6 +464,16 @@ extern int MXNDArrayCreate(uint32[] shape, uint32 ndim, int dev_type, int dev_id
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXNDArrayCreateEx(uint32[] shape, uint32 ndim, int dev_type, int dev_id, int delay_alloc, int dtype, [<Out>] NDArrayHandle& out)
 
+/// <summary>create a NDArray with specified shape and data type</summary>
+/// <param name="shape">the pointer to the shape</param>
+/// <param name="ndim">the dimension of the shape</param>
+/// <param name="dev_type">device type, specify device we want to take</param>
+/// <param name="dev_id">the device id of the specific device</param>
+/// <param name="delay_alloc">whether to delay allocation until
+///   the narray is first mutated</param>
+/// <param name="dtype">data type of created array</param>
+/// <param name="out">the returning handle</param>
+/// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXNDArrayCreateEx64(int64[] shape, int ndim, int dev_type, int dev_id, int delay_alloc, int dtype, [<Out>] NDArrayHandle& out)
 
@@ -483,10 +493,25 @@ extern int MXNDArrayCreateEx64(int64[] shape, int ndim, int dev_type, int dev_id
 /// <param name="out">the returning handle</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayCreateSparseEx__(int storage_type, uint32[] shape, uint32 ndim, int dev_type, int dev_id, int delay_alloc, int dtype, uint32 num_aux, int[] aux_type, uint32[] aux_ndims, uint32[] aux_shape, [<Out>] NDArrayHandle& out)
+extern int MXNDArrayCreateSparseEx(int storage_type, uint32[] shape, uint32 ndim, int dev_type, int dev_id, int delay_alloc, int dtype, uint32 num_aux, int[] aux_type, uint32[] aux_ndims, uint32[] aux_shape, [<Out>] NDArrayHandle& out)
 
+/// <summary>create an empty sparse NDArray with specified shape and data type</summary>
+/// <param name="storage_type">the storage type of the ndarray</param>
+/// <param name="shape">the pointer to the shape</param>
+/// <param name="ndim">the dimension of the shape</param>
+/// <param name="dev_type">device type, specify device we want to take</param>
+/// <param name="dev_id">the device id of the specific device</param>
+/// <param name="delay_alloc">whether to delay allocation until
+///       the narray is first mutated</param>
+/// <param name="dtype">data type of created array</param>
+/// <param name="num_aux">the number of aux data to support this ndarray</param>
+/// <param name="aux_type">data type of the aux data for the created array</param>
+/// <param name="aux_ndims">the dimension of the shapes of aux data</param>
+/// <param name="aux_shape">the shapes of aux data</param>
+/// <param name="out">the returning handle</param>
+/// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayCreateSparseEx64__(int storage_type, int64[] shape, int ndim, int dev_type, int dev_id, int delay_alloc, int dtype, uint32 num_aux, int[] aux_type, int[] aux_ndims, int64[] aux_shape, [<Out>] NDArrayHandle& out)
+extern int MXNDArrayCreateSparseEx64(int storage_type, int64[] shape, int ndim, int dev_type, int dev_id, int delay_alloc, int dtype, uint32 num_aux, int[] aux_type, int[] aux_ndims, int64[] aux_shape, [<Out>] NDArrayHandle& out)
 
 /// <summary>create a NDArray handle that is loaded from raw bytes.</summary>
 /// <param name="buf">the head of the raw bytes</param>
@@ -536,7 +561,7 @@ extern int MXNDArrayLoad(string fname, [<Out>] uint32& out_size, [<Out>] IntPtr&
 /// <param name="out_names">the names of returning NDArrays, can be NULL</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayLoadFromBuffer__(IntPtr ndarray_buffer, size_t size, uint32[] out_size, [<Out>] NDArrayHandle& out_arr, [<Out>] uint32& out_name_size, [<Out>] IntPtr& out_names)
+extern int MXNDArrayLoadFromBuffer(IntPtr ndarray_buffer, size_t size, [<Out>] uint32& out_size, [<Out>] NDArrayHandle& out_arr, [<Out>] uint32& out_name_size, [<Out>] IntPtr& out_names)
 
 /// <summary>Perform a synchronize copy from a continugous CPU memory region.
 /// This function will call WaitToWrite before the copy is performed.
@@ -565,7 +590,7 @@ extern int MXNDArraySyncCopyToCPU(NDArrayHandle handle, IntPtr data, size_t size
 /// <param name="handle_src">handle of a src ndarray which has default storage type</param>
 /// <param name="i">dst data blob indicator</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArraySyncCopyFromNDArray__(NDArrayHandle handle_dst, NDArrayHandle& handle_src, int i)
+extern int MXNDArraySyncCopyFromNDArray(NDArrayHandle handle_dst, NDArrayHandle handle_src, int i)
 
 /// <summary>check whether the NDArray format is valid</summary>
 /// <param name="full_check">if `True`, rigorous check, O(N) operations
@@ -685,7 +710,7 @@ extern int MXNDArrayGetData(NDArrayHandle handle, [<Out>] IntPtr& out_pdata)
 /// <param name="out_dlpack">pointer holder to get pointer of DLManagedTensor</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayToDLPack__(NDArrayHandle handle, DLManagedTensorHandle[] out_dlpack)
+extern int MXNDArrayToDLPack(NDArrayHandle handle, [<Out>] DLManagedTensorHandle& out_dlpack)
 
 
 
@@ -718,13 +743,13 @@ extern int MXNDArrayFromDLPack__(DLManagedTensorHandle dlpack, [<Out>] NDArrayHa
 /// <param name="out_handle">pointer holder to get pointer of NDArray</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayFromDLPackEx__(DLManagedTensorHandle dlpack, bool transient_handle, [<Out>] NDArrayHandle& out_handle)
+extern int MXNDArrayFromDLPackEx(DLManagedTensorHandle dlpack, bool transient_handle, [<Out>] NDArrayHandle& out_handle)
 
 /// <summary>Delete a dlpack tensor</summary>
 /// <param name="dlpack">the pointer of the input DLManagedTensor</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayCallDLPackDeleter__(DLManagedTensorHandle dlpack)
+extern int MXNDArrayCallDLPackDeleter(DLManagedTensorHandle dlpack)
 
 /// <summary>get the type of the data in NDArray</summary>
 /// <param name="handle">the handle to the narray</param>
@@ -739,25 +764,33 @@ extern int MXNDArrayGetDType(NDArrayHandle handle, [<Out>] int& out_dtype)
 /// <param name="out_type">pointer holder to get type of aux data</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayGetAuxType__(NDArrayHandle handle, uint32 i, int[] out_type)
+extern int MXNDArrayGetAuxType(NDArrayHandle handle, uint32 i, [<Out>] int& out_type)
 
+/// <summary>get the type of the ith aux data in NDArray</summary>
+/// <param name="handle">the handle to the narray</param>
+/// <param name="i">the index of the aux data</param>
+/// <param name="out_type">pointer holder to get type of aux data</param>
+/// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayGetAuxType64__(NDArrayHandle handle, int64 i, int[] out_type)
+extern int MXNDArrayGetAuxType64(NDArrayHandle handle, int64 i, [<Out>] int& out_type)
 
 /// <summary>Get a deep copy of the ith aux data blob
 ///in the form of an NDArray of default storage type.
 ///This function blocks. Do not use it in performance critical code.</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayGetAuxNDArray__(NDArrayHandle handle, uint32 i, [<Out>] NDArrayHandle& out)
+extern int MXNDArrayGetAuxNDArray(NDArrayHandle handle, uint32 i, [<Out>] NDArrayHandle& out)
 
+/// <summary>Get a deep copy of the ith aux data blob
+///in the form of an NDArray of default storage type.
+///This function blocks. Do not use it in performance critical code.</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayGetAuxNDArray64__(NDArrayHandle handle, int64 i, [<Out>] NDArrayHandle& out)
+extern int MXNDArrayGetAuxNDArray64(NDArrayHandle handle, int64 i, [<Out>] NDArrayHandle& out)
 
 /// <summary>Get a deep copy of the data blob
 ///in the form of an NDArray of default storage type.
 ///This function blocks. Do not use it in performance critical code.</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayGetDataNDArray__(NDArrayHandle handle, [<Out>] NDArrayHandle& out)
+extern int MXNDArrayGetDataNDArray(NDArrayHandle handle, [<Out>] NDArrayHandle& out)
 
 /// <summary>get the context of the NDArray</summary>
 /// <param name="handle">the handle to the narray</param>
@@ -771,27 +804,27 @@ extern int MXNDArrayGetContext(NDArrayHandle handle, [<Out>] int& out_dev_type, 
 /// <param name="handle">NDArray handle</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayGetGrad__(NDArrayHandle handle, [<Out>] NDArrayHandle& out)
+extern int MXNDArrayGetGrad(NDArrayHandle handle, [<Out>] NDArrayHandle& out)
 
 /// <summary>detach and ndarray from computation graph by clearing entry_</summary>
 /// <param name="handle">NDArray handle</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayDetach__(NDArrayHandle handle, [<Out>] NDArrayHandle& out)
+extern int MXNDArrayDetach(NDArrayHandle handle, [<Out>] NDArrayHandle& out)
 
 /// <summary>set the flag for gradient array state.</summary>
 /// <param name="handle">NDArray handle</param>
 /// <param name="state">the new state.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArraySetGradState__(NDArrayHandle handle, int state)
+extern int MXNDArraySetGradState(NDArrayHandle handle, int state)
 
 /// <summary>set the flag for gradient array state.</summary>
 /// <param name="handle">NDArray handle</param>
 /// <param name="state">the new state.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXNDArrayGetGradState__(NDArrayHandle handle, int[] out)
+extern int MXNDArrayGetGradState(NDArrayHandle handle, [<Out>] int& out)
 
 //--------------------------------
 // Part 2: functions on NDArray
