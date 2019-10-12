@@ -3,6 +3,7 @@ open MXNetSharp.Interop
 open System.Collections.Generic
 open System
 open MXNetSharp
+open System.Runtime.InteropServices
 
 
 type DataType = 
@@ -54,8 +55,23 @@ type DataIterDefinition internal (handle, info, parameters : IDictionary<string,
         DataIterDefinition(handle, info, d)
     member x.GetParameters() = Dictionary(parameters) :> IDictionary<_,_>
 
-//TODO: should be disposable, freeing iterHandle
-type DataIter(definition : DataIterDefinition) = 
+
+
+type SafeDataIterHandle(owner) = 
+    inherit SafeHandle(0n, true)
+    new() = new SafeDataIterHandle(true)
+    new(ptr,owner) as this = new SafeDataIterHandle(owner) then this.SetHandle(ptr)
+    override x.IsInvalid = x.handle <= 0n
+    override x.ReleaseHandle() = CApi.MXNDArrayFree x.handle = 0
+    member internal x.UnsafeHandle = 
+        if not x.IsClosed then
+            x.handle
+        else
+            ObjectDisposedException("SafeDataIterHandle", "DataIter handle has been closed") |> raise
+
+
+type DataIter(definition : DataIterDefinition) =
+    let mutable disposed = false
     let mutable atEnd = false
     let parameters = definition.GetParameters()
     let iterHandle = 
@@ -72,20 +88,31 @@ type DataIter(definition : DataIterDefinition) =
                 )
             |> Seq.toArray
             |> Array.unzip
-        MXDataIter.create definition.DataIterCreatorHandle keys vals
+        let h = MXDataIter.create definition.DataIterCreatorHandle keys vals
+        new SafeDataIterHandle(h, true)
     internal new(handle, info, parameters : IDictionary<string, obj>) = 
-        DataIter(DataIterDefinition(handle, info, parameters))
+        new DataIter(DataIterDefinition(handle, info, parameters))
     member x.DataIterDefinition = definition
     member x.Reset() = 
-        MXDataIter.beforeFirst iterHandle
+        MXDataIter.beforeFirst iterHandle.UnsafeHandle
         atEnd <- false
-    member x.GetData() = MXDataIter.getData iterHandle |> NDArray
-    member x.GetIndex() = MXDataIter.getIndex iterHandle
-    member x.GetPadNum() = MXDataIter.getPadNum iterHandle
-    member x.GetLabel() = MXDataIter.getLabel iterHandle |> NDArray
+    member x.GetData() = MXDataIter.getData iterHandle.UnsafeHandle |> NDArray
+    member x.GetIndex() = MXDataIter.getIndex iterHandle.UnsafeHandle
+    member x.GetPadNum() = MXDataIter.getPadNum iterHandle.UnsafeHandle
+    member x.GetLabel() = MXDataIter.getLabel iterHandle.UnsafeHandle |> NDArray
     member x.Next() = 
-        atEnd <- atEnd || not (MXDataIter.next iterHandle > 0)
+        atEnd <- atEnd || not (MXDataIter.next iterHandle.UnsafeHandle > 0)
         not atEnd
+    member x.Dispose(disposing) = 
+        if not disposed then 
+            if disposing then 
+                iterHandle.Dispose()
+        disposed <- true
+    member x.Dispose() = 
+        x.Dispose(true)
+        GC.SuppressFinalize(x)
+    interface IDisposable with  
+        member x.Dispose() = x.Dispose()
 
 
 /// <summary>Returns the CSV file iterator.
