@@ -1689,7 +1689,7 @@ extern int MXExecutorSetMonitorCallbackEX(ExecutorHandle handle, ExecutorMonitor
 /// <param name="out_array">the output iteratos entries</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXListDataIters__(uint32[] out_size, DataIterCreator[]& out_array)
+extern int MXListDataIters([<Out>] uint32& out_size, [<Out>] DataIterCreator& out_array)
 
 /// <summary>Init an iterator, init with parameters
 ///the array size of passed in arguments</summary>
@@ -1700,7 +1700,7 @@ extern int MXListDataIters__(uint32[] out_size, DataIterCreator[]& out_array)
 /// <param name="out">resulting iterator</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXDataIterCreateIter__(DataIterCreator handle, uint32 num_param, string[] keys, string[] vals, DataIterHandle[] out)
+extern int MXDataIterCreateIter(DataIterCreator handle, uint32 num_param, string[] keys, string[] vals, [<Out>] DataIterHandle& out)
 
 /// <summary>Get the detailed information about data iterator.</summary>
 /// <param name="creator">the DataIterCreator.</param>
@@ -1712,33 +1712,33 @@ extern int MXDataIterCreateIter__(DataIterCreator handle, uint32 num_param, stri
 /// <param name="arg_descriptions">Description information about the arguments.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXDataIterGetIterInfo__(DataIterCreator creator, string[] name, string[] description, uint32[] num_args, string[]& arg_names, string[]& arg_type_infos, string[]& arg_descriptions)
+extern int MXDataIterGetIterInfo(DataIterCreator creator, [<Out>] IntPtr& name, [<Out>] IntPtr& description, [<Out>] uint32& num_args, [<Out>] IntPtr& arg_names, [<Out>] IntPtr& arg_type_infos, [<Out>] IntPtr& arg_descriptions)
 
 /// <summary>Free the handle to the IO module</summary>
 /// <param name="handle">the handle pointer to the data iterator</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXDataIterFree__(DataIterHandle handle)
+extern int MXDataIterFree(DataIterHandle handle)
 
 /// <summary>Move iterator to next position</summary>
 /// <param name="handle">the handle to iterator</param>
 /// <param name="out">return value of next</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXDataIterNext__(DataIterHandle handle, int[] out)
+extern int MXDataIterNext(DataIterHandle handle, [<Out>]int& out)
 
 /// <summary>Call iterator.Reset</summary>
 /// <param name="handle">the handle to iterator</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXDataIterBeforeFirst__(DataIterHandle handle)
+extern int MXDataIterBeforeFirst(DataIterHandle handle)
 
 /// <summary>Get the handle to the NDArray of underlying data</summary>
 /// <param name="handle">the handle pointer to the data iterator</param>
 /// <param name="out">handle to underlying data NDArray</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXDataIterGetData__(DataIterHandle handle, [<Out>] NDArrayHandle& out)
+extern int MXDataIterGetData(DataIterHandle handle, [<Out>]NDArrayHandle& out)
 
 /// <summary>Get the image index by array.</summary>
 /// <param name="handle">the handle pointer to the data iterator</param>
@@ -1746,21 +1746,21 @@ extern int MXDataIterGetData__(DataIterHandle handle, [<Out>] NDArrayHandle& out
 /// <param name="out_size">output size of the array.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXDataIterGetIndex__(DataIterHandle handle, uint64 out_index, uint64[] out_size)
+extern int MXDataIterGetIndex(DataIterHandle handle, [<Out>]IntPtr& out_index, [<Out>]uint64& out_size)
 
 /// <summary>Get the padding number in current data batch</summary>
 /// <param name="handle">the handle pointer to the data iterator</param>
 /// <param name="pad">pad number ptr</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXDataIterGetPadNum__(DataIterHandle handle, int[] pad)
+extern int MXDataIterGetPadNum(DataIterHandle handle, [<Out>]int& pad)
 
 /// <summary>Get the handle to the NDArray of underlying label</summary>
 /// <param name="handle">the handle pointer to the data iterator</param>
 /// <param name="out">the handle to underlying label NDArray</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXDataIterGetLabel__(DataIterHandle handle, [<Out>] NDArrayHandle& out)
+extern int MXDataIterGetLabel(DataIterHandle handle, [<Out>] NDArrayHandle& out)
 
 //--------------------------------------------
 // Part 6: basic KVStore interface

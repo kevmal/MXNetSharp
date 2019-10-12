@@ -67,7 +67,7 @@ type AtomicSymbolInfo =
         KeyVarNumArgs : KeyVarNumArgs
     }
 
-type IterInfo = 
+type DataIterInfo = 
     {
         Name : string
         Description : string
