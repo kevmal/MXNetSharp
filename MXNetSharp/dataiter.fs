@@ -322,18 +322,27 @@ type CSVIter private (creatorHandle : IntPtr, info : DataIterInfo,
             | DeviceType.CPU | DeviceType.CPUPinned -> "cpu"
             | _ -> "gpu"
         CSVIter(def.DataIterCreatorHandle, def.Info, dataCsv, dataShape, labelCsv, labelShape, batchSize, roundBatch, prefetchBuffer, deviceType, dtype)
+    /// The input CSV file or a directory path.
     member x.DataCsv = dataCsv
+    /// The shape of one example.
     member x.DataShape = dataShape |> Array.toSeq
+    /// The input CSV file or a directory path. If None, all labels will be returned as 0.
     member x.LabelCsv = if String.IsNullOrEmpty labelCsv then None else Some labelCsv
+    /// The shape of one label.
     member x.LabelShape = labelShape |> Array.toSeq
+    /// Batch size.
     member x.BatchSize = batchSize
+    /// Whether to use round robin to handle overflow batch or not.
     member x.RoundBatch = roundBatch
+    /// Maximum number of batches to prefetch.
     member x.PrefetchBuffer = prefetchBuffer
+    /// Context data loader optimized for.
     member x.DeviceType = 
         match ctx.ToLower() with 
         | "cpu" -> DeviceType.CPU
         | "gpu" -> DeviceType.GPU
         | _ -> failwith "Internal error in CSVIter. Device type can only be one of 'cpu' or 'gpu'"
+    /// Output data type. ``None`` means no change.
     member x.DataType = dtype
 
 
@@ -443,9 +452,34 @@ type MNISTIter private (creatorHandle : IntPtr, info : DataIterInfo,
                   prefetchBuffer,
                   deviceType,
                   dataType)
+    /// Dataset Param: Mnist image path.
     member __.Image = image
+    /// Dataset Param: Mnist label path.
     member __.Label = label
-    member __.BatchSize = batchSize //TODO: add rest of props
+    /// Batch Param: Batch Size.
+    member __.BatchSize = batchSize 
+    /// Augmentation Param: Whether to shuffle data.
+    member __.Shuffle = shuffle
+    /// Augmentation Param: Whether to flat the data into 1D.
+    member __.Flat = flat
+    /// Augmentation Param: Random Seed.
+    member __.Seed = seed
+    /// Auxiliary Param: Whether to print out data info.
+    member __.Silent = silent
+    /// partition the data into multiple parts
+    member __.NumParts = numParts
+    /// the index of the part will read
+    member __.PartIndex = partIndex
+    /// Maximum number of batches to prefetch.
+    member __.PrefetchBuffer = prefetchBuffer
+    /// Context data loader optimized for.
+    member x.DeviceType = 
+        match ctx.ToLower() with 
+        | "cpu" -> DeviceType.CPU
+        | "gpu" -> DeviceType.GPU
+        | _ -> failwith "Internal error in CSVIter. Device type can only be one of 'cpu' or 'gpu'"
+    /// Output data type. ``None`` means no change.
+    member x.DataType = dtype
 
 
         
