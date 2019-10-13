@@ -19,6 +19,7 @@ type Executor(handle : CApi.ExecutorHandle) =
     member x.Forward(isTraining : bool) = 
         let isTrain = if isTraining then 1 else 0
         MXExecutor.forward handle isTrain
+        //REVIEW: Can we own these handles?
         MXExecutor.outputs handle
         |> Array.map NDArray
     member x.Backward() = 

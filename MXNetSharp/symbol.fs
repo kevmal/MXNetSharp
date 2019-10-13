@@ -40,7 +40,7 @@ type Symbol(creator : AtomicSymbolCreator option, parameters, inputs) =
                 ||> MXSymbol.compose symbol name
                 Some(new SafeSymbolHandle(symbol, true))
     new(creator, parameterKeys, parameterValues, inputKeys, inputValues) =  
-        Symbol(creator, Array.zip parameterKeys parameterValues, Array.zip inputKeys inputValues)
+        new Symbol(creator, Array.zip parameterKeys parameterValues, Array.zip inputKeys inputValues)
     member x.Name 
         with get() = match name with Some n -> n | _ -> ""
         and set v = 
@@ -49,8 +49,8 @@ type Symbol(creator : AtomicSymbolCreator option, parameters, inputs) =
             name <- Some v 
     member x.WithName(name) = x.Name <- name; x
     member x.SymbolHandle : SafeSymbolHandle option = handle.Value
-    static member Variable(name) = Symbol(None, Array.empty, Array.empty, Name = name)
-    static member Empty = Symbol(None, Array.empty, Array.empty)
+    static member Variable(name) = new Symbol(None, Array.empty, Array.empty, Name = name)
+    static member Empty = new Symbol(None, Array.empty, Array.empty)
     member x.IsEmpty = name.IsNone && creator.IsNone
     member x.Dispose(disposing) = 
         if not disposed then 

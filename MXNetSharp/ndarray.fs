@@ -26,35 +26,35 @@ type OpReqType =
 
 type NDArray(handle : SafeNDArrayHandle) = 
     let mutable disposed = false
-    internal new(h : CApi.NDArrayHandle) = NDArray(new SafeNDArrayHandle(h, true))
+    internal new(h : CApi.NDArrayHandle) = new NDArray(new SafeNDArrayHandle(h, true))
     new() = 
         let h1 = MXNDArray.createNone()
-        NDArray(h1)
+        new NDArray(h1)
     new(shape : int seq, context : Context, ?dtype, ?delayAlloc) = 
         let dtype = defaultArg dtype TypeFlag.Float32
         let delayAlloc = defaultArg delayAlloc true
         let shape = shape |> Seq.toArray
-        NDArray(MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype)
+        new NDArray(MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype)
     new(data : float[], shape, context) = 
         let dtype = TypeFlag.Float64
         let delayAlloc = false
         let shape = shape |> Seq.toArray
         let handle = MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype
         MXNDArray.syncCopyFromCPU handle data
-        NDArray(handle)
-    new(data : float seq, shape, context) = NDArray(data |> Seq.toArray, shape, context)
+        new NDArray(handle)
+    new(data : float seq, shape, context) = new NDArray(data |> Seq.toArray, shape, context)
     new(data : float32[], shape, context) = 
         let dtype = TypeFlag.Float32
         let delayAlloc = false
         let shape = shape |> Seq.toArray
         let handle = MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype
         MXNDArray.syncCopyFromCPU handle data
-        NDArray(handle)
-    new(data : float32 seq, shape, context) = NDArray(data |> Seq.toArray, shape, context)
+        new NDArray(handle)
+    new(data : float32 seq, shape, context) = new NDArray(data |> Seq.toArray, shape, context)
     new(data : float[]) =
         let h1 = MXNDArray.createNone()
         MXNDArray.syncCopyFromCPU h1 data
-        NDArray h1
+        new NDArray(h1)
         
     member x.NDArrayHandle = handle
 
@@ -74,7 +74,7 @@ type NDArray(handle : SafeNDArrayHandle) =
         let setValue = AtomicSymbolCreator.FromName "_mul_scalar"
         MXNDArray.imperativeInvoke setValue.AtomicSymbolCreatorHandle [|x.NDArrayHandle.UnsafeHandle|] [|"scalar"|] [|string y|] 
         |> Array.head
-        |> NDArray
+        |> (fun x -> new NDArray(x))
     member x.Substract(y : NDArray) = 
         let setValue = AtomicSymbolCreator.FromName "elemwise_sub"
         let nout = MXNDArray.imperativeInvokeInto setValue.AtomicSymbolCreatorHandle [|x.NDArrayHandle.UnsafeHandle; y.NDArrayHandle.UnsafeHandle|] [|x.NDArrayHandle.UnsafeHandle|] null null
