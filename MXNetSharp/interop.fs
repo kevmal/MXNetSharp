@@ -506,6 +506,21 @@ module MXSymbol =
         MXSymbolGrad(sym, ulength wrt, wrt, &out) |> throwOnError "MXSymbolGrad"
         out
 
+    /// key*shape to CSR from (argIndPtr,argShapeData) for inferShape call
+    let inline internal keyShapeToCsrForm (argShapes : (string * ^a []) [])  = 
+        let argIndPtr = Array.zeroCreate ((Array.length argShapes) + 1)
+        for i = 1 to argIndPtr.Length - 1 do 
+            argIndPtr.[i] <- argIndPtr.[i - 1] + (argShapes.[i - 1] |> snd |> Array.length)
+        let argShapeData = Array.zeroCreate argIndPtr.[argIndPtr.Length - 1 |> int]
+        let keys = argShapes |> Array.map fst
+        let mutable j = 0
+        for i = 0 to argShapes.Length - 1 do 
+            let shapes = snd argShapes.[i] 
+            for k = 0 to shapes.Length - 1 do
+                argShapeData.[j] <- shapes.[k]
+                j <- j + 1
+        argIndPtr,argShapeData
+        
     /// <summary>infer shape of unknown input shapes given the known one.
     /// The shapes are packed into a CSR matrix represented by arg_ind_ptr and arg_shape_data
     /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
