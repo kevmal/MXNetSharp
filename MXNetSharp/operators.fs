@@ -467,8 +467,7 @@ type SamplerType =
         match x with
             | Bilinear -> "bilinear"
 
-type Operators() = 
-    member x.NDArrayHandle = failwith "" 
+type Operators() =  
 
     static member CustomFunctionNDArray() =
         let creator = AtomicSymbolCreator.FromName "_CustomFunction"
@@ -485,7 +484,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -512,7 +511,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -528,7 +527,7 @@ type Operators() =
     static member CachedOp([<ParamArray>] data : NDArray[]) =
         let creator = AtomicSymbolCreator.FromName "_CachedOp"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (data |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -540,8 +539,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (data |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -569,7 +568,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -589,7 +588,7 @@ type Operators() =
     static member Cvimdecode(buf : NDArray, [<Optional; DefaultParameterValue(1)>] flag : int, [<Optional; DefaultParameterValue(true)>] toRgb : bool) =
         let creator = AtomicSymbolCreator.FromName "_cvimdecode"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|buf.NDArrayHandle|]
+                                                 [|buf.NDArrayHandle.UnsafeHandle|]
                                                  [|"flag"; "to_rgb"|]
                                                  [|string flag; string toRgb|]
         outputs
@@ -605,8 +604,8 @@ type Operators() =
         let vals = [|string flag; string toRgb|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|buf.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|buf.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -636,7 +635,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -662,7 +661,7 @@ type Operators() =
     static member Cvimresize(src : NDArray, w : int, h : int, [<Optional; DefaultParameterValue(1)>] interp : int) =
         let creator = AtomicSymbolCreator.FromName "_cvimresize"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|src.NDArrayHandle|]
+                                                 [|src.NDArrayHandle.UnsafeHandle|]
                                                  [|"w"; "h"; "interp"|]
                                                  [|string w; string h; string interp|]
         outputs
@@ -679,8 +678,8 @@ type Operators() =
         let vals = [|string w; string h; string interp|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|src.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|src.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -705,7 +704,7 @@ type Operators() =
                                    values : string (*REVIEW: What's the type here?*)) =
         let creator = AtomicSymbolCreator.FromName "_cvcopyMakeBorder"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|src.NDArrayHandle|]
+                                                 [|src.NDArrayHandle.UnsafeHandle|]
                                                  [|"top"; "bot"; "left"; "right"; "type"; "value"; "values"|]
                                                  [|string top; string bot; string left; string right; string fillingType; string value; string values|]
         outputs
@@ -734,8 +733,8 @@ type Operators() =
         let vals = [|string top; string bot; string left; string right; string fillingType; string value; string values|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|src.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|src.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -744,7 +743,7 @@ type Operators() =
     static member Copyto(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_copyto"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -756,8 +755,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -779,7 +778,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -858,7 +857,7 @@ type Operators() =
                               [<Optional; DefaultParameterValue(false)>] outputMeanVar : bool) =
         let creator = AtomicSymbolCreator.FromName "BatchNorm_v1"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; gamma.NDArrayHandle; beta.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"|]
                                                  [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar|]
         outputs
@@ -933,8 +932,8 @@ type Operators() =
         let vals = [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; gamma.NDArrayHandle; beta.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -1063,7 +1062,7 @@ type Operators() =
                                 [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "_mp_adamw_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle; mean.NDArrayHandle; var.NDArrayHandle; weight32.NDArrayHandle; rescaleGrad.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mean.NDArrayHandle.UnsafeHandle; var.NDArrayHandle.UnsafeHandle; weight32.NDArrayHandle.UnsafeHandle; rescaleGrad.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "beta1"; "beta2"; "epsilon"; "wd"; "eta"; "clip_gradient"|]
                                                  [|string lr; string beta1; string beta2; string epsilon; string wd; string eta; string clipGradient|]
         outputs
@@ -1126,8 +1125,8 @@ type Operators() =
         let vals = [|string lr; string beta1; string beta2; string epsilon; string wd; string eta; string clipGradient|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle; mean.NDArrayHandle; var.NDArrayHandle; weight32.NDArrayHandle; rescaleGrad.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mean.NDArrayHandle.UnsafeHandle; var.NDArrayHandle.UnsafeHandle; weight32.NDArrayHandle.UnsafeHandle; rescaleGrad.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -1240,7 +1239,7 @@ type Operators() =
                               [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "_adamw_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle; mean.NDArrayHandle; var.NDArrayHandle; rescaleGrad.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mean.NDArrayHandle.UnsafeHandle; var.NDArrayHandle.UnsafeHandle; rescaleGrad.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "beta1"; "beta2"; "epsilon"; "wd"; "eta"; "clip_gradient"|]
                                                  [|string lr; string beta1; string beta2; string epsilon; string wd; string eta; string clipGradient|]
         outputs
@@ -1299,8 +1298,8 @@ type Operators() =
         let vals = [|string lr; string beta1; string beta2; string epsilon; string wd; string eta; string clipGradient|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle; mean.NDArrayHandle; var.NDArrayHandle; rescaleGrad.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mean.NDArrayHandle.UnsafeHandle; var.NDArrayHandle.UnsafeHandle; rescaleGrad.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -1377,7 +1376,7 @@ type Operators() =
     static member ContribAdaptiveAvgPooling2D(data : NDArray, [<Optional>] outputSize : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_AdaptiveAvgPooling2D"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"output_size"|]
                                                  [|(if isNull (outputSize :> obj) then "[]" else string outputSize)|]
         outputs
@@ -1403,8 +1402,8 @@ type Operators() =
         let vals = [|(if isNull (outputSize :> obj) then "[]" else string outputSize)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -1450,7 +1449,7 @@ type Operators() =
     static member ContribAdaptiveAvgPooling2D(data : NDArray, [<Optional>] height : int, [<Optional>] width : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_AdaptiveAvgPooling2D"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"output_size"|]
                                                  [|(if isNull (height :> obj) then "[]" else (height, width).ToString())|]
         outputs
@@ -1477,8 +1476,8 @@ type Operators() =
         let vals = [|(if isNull (height :> obj) then "[]" else (height, width).ToString())|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -1521,7 +1520,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -1542,7 +1541,7 @@ type Operators() =
     static member AllFinite(data : NDArray, [<Optional; DefaultParameterValue(true)>] initOutput : bool) =
         let creator = AtomicSymbolCreator.FromName "all_finite"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"init_output"|]
                                                  [|string initOutput|]
         outputs
@@ -1559,8 +1558,8 @@ type Operators() =
         let vals = [|string initOutput|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -1575,7 +1574,7 @@ type Operators() =
     static member MultiAllFinite([<ParamArray>] data : NDArray[], [<Optional; DefaultParameterValue(1)>] numArrays : int, [<Optional; DefaultParameterValue(true)>] initOutput : bool) =
         let creator = AtomicSymbolCreator.FromName "multi_all_finite"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (data |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"num_arrays"; "init_output"|]
                                                  [|string numArrays; string initOutput|]
         outputs
@@ -1593,8 +1592,8 @@ type Operators() =
         let vals = [|string numArrays; string initOutput|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (data |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -1641,7 +1640,7 @@ type Operators() =
                                           [<Optional>] mode : ContribBilinearResize2DMode) =
         let creator = AtomicSymbolCreator.FromName "_contrib_BilinearResize2D"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; like.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; like.NDArrayHandle.UnsafeHandle|]
                                                  [|"height"; "width"; "scale_height"; "scale_width"; "mode"|]
                                                  [|string height; string width; string scaleHeight; string scaleWidth; (if isNull (mode :> obj) then "size" else string mode)|]
         outputs
@@ -1678,8 +1677,8 @@ type Operators() =
         let vals = [|string height; string width; string scaleHeight; string scaleWidth; (if isNull (mode :> obj) then "size" else string mode)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; like.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; like.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -1744,7 +1743,7 @@ type Operators() =
                                           ?mode : ContribBilinearResize2DMode) =
         let creator = AtomicSymbolCreator.FromName "_contrib_BilinearResize2D"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; like.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; like.NDArrayHandle.UnsafeHandle|]
                                                  [|"height"; "width"; "scale_height"; "scale_width"; "mode"|]
                                                  [|(match height with None -> "1" | Some height -> string height); (match width with None -> "1" | Some width -> string width); (match scaleHeight with None -> "None" | Some scaleHeight -> string scaleHeight); (match scaleWidth with None -> "None" | Some scaleWidth -> string scaleWidth); (match mode with None -> "size" | Some mode -> string mode)|]
         outputs
@@ -1781,8 +1780,8 @@ type Operators() =
         let vals = [|(match height with None -> "1" | Some height -> string height); (match width with None -> "1" | Some width -> string width); (match scaleHeight with None -> "None" | Some scaleHeight -> string scaleHeight); (match scaleWidth with None -> "None" | Some scaleWidth -> string scaleWidth); (match mode with None -> "size" | Some mode -> string mode)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; like.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; like.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -1834,7 +1833,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -1868,7 +1867,7 @@ type Operators() =
     static member ContribBooleanMask(data : NDArray, index : NDArray, [<Optional; DefaultParameterValue(0)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_boolean_mask"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; index.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; index.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"|]
                                                  [|string axis|]
         outputs
@@ -1898,8 +1897,8 @@ type Operators() =
         let vals = [|string axis|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; index.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; index.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -1947,7 +1946,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -2044,7 +2043,7 @@ type Operators() =
                                 [<Optional>] outFormat : Format) =
         let creator = AtomicSymbolCreator.FromName "_contrib_box_nms"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"overlap_thresh"; "valid_thresh"; "topk"; "coord_start"; "score_index"; "id_index"; "background_id"; "force_suppress"; "in_format"; "out_format"|]
                                                  [|string overlapThresh; string validThresh; string topk; string coordStart; string scoreIndex; string idIndex; string backgroundId; string forceSuppress; (if isNull (inFormat :> obj) then "corner" else string inFormat); (if isNull (outFormat :> obj) then "corner" else string outFormat)|]
         outputs
@@ -2137,8 +2136,8 @@ type Operators() =
         let vals = [|string overlapThresh; string validThresh; string topk; string coordStart; string scoreIndex; string idIndex; string backgroundId; string forceSuppress; (if isNull (inFormat :> obj) then "corner" else string inFormat); (if isNull (outFormat :> obj) then "corner" else string outFormat)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -2289,7 +2288,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -2348,7 +2347,7 @@ type Operators() =
     static member ContribBoxIou(lhs : NDArray, rhs : NDArray, [<Optional>] format : Format) =
         let creator = AtomicSymbolCreator.FromName "_contrib_box_iou"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"format"|]
                                                  [|(if isNull (format :> obj) then "corner" else string format)|]
         outputs
@@ -2382,8 +2381,8 @@ type Operators() =
         let vals = [|(if isNull (format :> obj) then "corner" else string format)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -2437,7 +2436,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -2482,7 +2481,7 @@ type Operators() =
     static member ContribBipartiteMatching(data : NDArray, [<Optional; DefaultParameterValue(false)>] isAscend : bool, threshold : float, [<Optional; DefaultParameterValue(-1)>] topk : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_bipartite_matching"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"is_ascend"; "threshold"; "topk"|]
                                                  [|string isAscend; string threshold; string topk|]
         outputs
@@ -2521,8 +2520,8 @@ type Operators() =
         let vals = [|string isAscend; string threshold; string topk|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -2583,7 +2582,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -2654,7 +2653,7 @@ type Operators() =
                                                      maxNumVertices : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_dgl_csr_neighbor_uniform_sample"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|csrMatrix.NDArrayHandle; yield! (seedArrays |> Seq.map (fun x -> x.NDArrayHandle))|]
+                                                 [|csrMatrix.NDArrayHandle.UnsafeHandle; yield! (seedArrays |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle))|]
                                                  [|"num_args"; "num_hops"; "num_neighbor"; "max_num_vertices"|]
                                                  [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|]
         outputs
@@ -2719,8 +2718,8 @@ type Operators() =
         let vals = [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|csrMatrix.NDArrayHandle; yield! (seedArrays |> Seq.map (fun x -> x.NDArrayHandle))|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|csrMatrix.NDArrayHandle.UnsafeHandle; yield! (seedArrays |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle))|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -2848,7 +2847,7 @@ type Operators() =
                                                         maxNumVertices : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_dgl_csr_neighbor_non_uniform_sample"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|csrMatrix.NDArrayHandle; probability.NDArrayHandle; yield! (seedArrays |> Seq.map (fun x -> x.NDArrayHandle))|]
+                                                 [|csrMatrix.NDArrayHandle.UnsafeHandle; probability.NDArrayHandle.UnsafeHandle; yield! (seedArrays |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle))|]
                                                  [|"num_args"; "num_hops"; "num_neighbor"; "max_num_vertices"|]
                                                  [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|]
         outputs
@@ -2920,8 +2919,8 @@ type Operators() =
         let vals = [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|csrMatrix.NDArrayHandle; probability.NDArrayHandle; yield! (seedArrays |> Seq.map (fun x -> x.NDArrayHandle))|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|csrMatrix.NDArrayHandle.UnsafeHandle; probability.NDArrayHandle.UnsafeHandle; yield! (seedArrays |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle))|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -3027,7 +3026,7 @@ type Operators() =
     static member ContribDglSubgraph(graph : NDArray, [<ParamArray>] data : NDArray[], numArgs : int, returnMapping : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_dgl_subgraph"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|graph.NDArrayHandle; yield! (data |> Seq.map (fun x -> x.NDArrayHandle))|]
+                                                 [|graph.NDArrayHandle.UnsafeHandle; yield! (data |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle))|]
                                                  [|"num_args"; "return_mapping"|]
                                                  [|string numArgs; string returnMapping|]
         outputs
@@ -3069,8 +3068,8 @@ type Operators() =
         let vals = [|string numArgs; string returnMapping|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|graph.NDArrayHandle; yield! (data |> Seq.map (fun x -> x.NDArrayHandle))|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|graph.NDArrayHandle.UnsafeHandle; yield! (data |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle))|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -3142,7 +3141,7 @@ type Operators() =
     static member ContribEdgeId(data : NDArray, u : NDArray, v : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_contrib_edge_id"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; u.NDArrayHandle; v.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; u.NDArrayHandle.UnsafeHandle; v.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -3179,8 +3178,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; u.NDArrayHandle; v.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; u.NDArrayHandle.UnsafeHandle; v.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -3241,7 +3240,7 @@ type Operators() =
     static member ContribDglAdjacency(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_contrib_dgl_adjacency"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -3272,8 +3271,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -3345,7 +3344,7 @@ type Operators() =
     static member ContribDglGraphCompact([<ParamArray>] graphData : NDArray[], numArgs : int, returnMapping : bool, graphSizes : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_dgl_graph_compact"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (graphData |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (graphData |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"num_args"; "return_mapping"; "graph_sizes"|]
                                                  [|string numArgs; string returnMapping; string graphSizes|]
         outputs
@@ -3393,8 +3392,8 @@ type Operators() =
         let vals = [|string numArgs; string returnMapping; string graphSizes|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (graphData |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (graphData |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -3455,7 +3454,7 @@ type Operators() =
     static member ContribGradientmultiplier(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_contrib_gradientmultiplier"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -3475,8 +3474,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -3502,7 +3501,7 @@ type Operators() =
     static member ContribBackwardGradientmultiplier(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_contrib_backward_gradientmultiplier"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -3515,8 +3514,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -3602,7 +3601,7 @@ type Operators() =
                                   maxTime : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_contrib_hawkesll"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lda.NDArrayHandle; alpha.NDArrayHandle; beta.NDArrayHandle; state.NDArrayHandle; lags.NDArrayHandle; marks.NDArrayHandle; validLength.NDArrayHandle; maxTime.NDArrayHandle|]
+                                                 [|lda.NDArrayHandle.UnsafeHandle; alpha.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; state.NDArrayHandle.UnsafeHandle; lags.NDArrayHandle.UnsafeHandle; marks.NDArrayHandle.UnsafeHandle; validLength.NDArrayHandle.UnsafeHandle; maxTime.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -3683,8 +3682,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lda.NDArrayHandle; alpha.NDArrayHandle; beta.NDArrayHandle; state.NDArrayHandle; lags.NDArrayHandle; marks.NDArrayHandle; validLength.NDArrayHandle; maxTime.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lda.NDArrayHandle.UnsafeHandle; alpha.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; state.NDArrayHandle.UnsafeHandle; lags.NDArrayHandle.UnsafeHandle; marks.NDArrayHandle.UnsafeHandle; validLength.NDArrayHandle.UnsafeHandle; maxTime.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -3780,7 +3779,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -3845,7 +3844,7 @@ type Operators() =
     static member ContribIndexArray(data : NDArray, [<Optional>] axes : int seq) =
         let creator = AtomicSymbolCreator.FromName "_contrib_index_array"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axes"|]
                                                  [|(axes |> Seq.map string |> String.concat ", ")|]
         outputs
@@ -3906,8 +3905,8 @@ type Operators() =
         let vals = [|(axes |> Seq.map string |> String.concat ", ")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -4005,7 +4004,7 @@ type Operators() =
     static member ContribIndexCopy(oldTensor : NDArray, indexVector : NDArray, newTensor : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_contrib_index_copy"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|oldTensor.NDArrayHandle; indexVector.NDArrayHandle; newTensor.NDArrayHandle|]
+                                                 [|oldTensor.NDArrayHandle.UnsafeHandle; indexVector.NDArrayHandle.UnsafeHandle; newTensor.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -4049,8 +4048,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|oldTensor.NDArrayHandle; indexVector.NDArrayHandle; newTensor.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|oldTensor.NDArrayHandle.UnsafeHandle; indexVector.NDArrayHandle.UnsafeHandle; newTensor.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -4110,7 +4109,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -4161,7 +4160,7 @@ type Operators() =
     static member KhatriRao([<ParamArray>] args : NDArray[]) =
         let creator = AtomicSymbolCreator.FromName "khatri_rao"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (args |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (args |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -4208,8 +4207,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (args |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (args |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -4269,7 +4268,7 @@ type Operators() =
     static member ContribGetnnz(data : NDArray, [<Optional>] axis : int Nullable) =
         let creator = AtomicSymbolCreator.FromName "_contrib_getnnz"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"|]
                                                  [|string axis|]
         outputs
@@ -4289,8 +4288,8 @@ type Operators() =
         let vals = [|string axis|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -4323,7 +4322,7 @@ type Operators() =
     static member ContribGetnnz(data : NDArray, ?axis : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_getnnz"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis)|]
         outputs
@@ -4343,8 +4342,8 @@ type Operators() =
         let vals = [|(match axis with None -> "None" | Some axis -> string axis)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -4401,7 +4400,7 @@ type Operators() =
                                             [<Optional; DefaultParameterValue(9.99999975E-06)>] epsilon : float) =
         let creator = AtomicSymbolCreator.FromName "_contrib_group_adagrad_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle; history.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; history.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "rescale_grad"; "clip_gradient"; "epsilon"|]
                                                  [|string lr; string rescaleGrad; string clipGradient; string epsilon|]
         outputs
@@ -4446,8 +4445,8 @@ type Operators() =
         let vals = [|string lr; string rescaleGrad; string clipGradient; string epsilon|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle; history.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; history.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -4520,7 +4519,7 @@ type Operators() =
     static member ContribQuadratic(data : NDArray, [<Optional; DefaultParameterValue(0.0)>] a : float, [<Optional; DefaultParameterValue(0.0)>] b : float, [<Optional; DefaultParameterValue(0.0)>] c : float) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quadratic"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"a"; "b"; "c"|]
                                                  [|string a; string b; string c|]
         outputs
@@ -4556,8 +4555,8 @@ type Operators() =
         let vals = [|string a; string b; string c|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -4609,7 +4608,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -4656,7 +4655,7 @@ type Operators() =
                                   [<Optional; DefaultParameterValue(false)>] positionSensitive : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_ROIAlign"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; rois.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; rois.NDArrayHandle.UnsafeHandle|]
                                                  [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|]
                                                  [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale; string sampleRatio; string positionSensitive|]
         outputs
@@ -4700,8 +4699,8 @@ type Operators() =
         let vals = [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale; string sampleRatio; string positionSensitive|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; rois.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; rois.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -4782,7 +4781,7 @@ type Operators() =
                                   [<Optional; DefaultParameterValue(false)>] positionSensitive : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_ROIAlign"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; rois.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; rois.NDArrayHandle.UnsafeHandle|]
                                                  [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|]
                                                  [|(height, width).ToString(); string spatialScale; string sampleRatio; string positionSensitive|]
         outputs
@@ -4828,8 +4827,8 @@ type Operators() =
         let vals = [|(height, width).ToString(); string spatialScale; string sampleRatio; string positionSensitive|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; rois.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; rois.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -4890,7 +4889,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -4979,7 +4978,7 @@ type Operators() =
                                        key : string) =
         let creator = AtomicSymbolCreator.FromName "_contrib_SyncBatchNorm"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; gamma.NDArrayHandle; beta.NDArrayHandle; movingMean.NDArrayHandle; movingVar.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; movingMean.NDArrayHandle.UnsafeHandle; movingVar.NDArrayHandle.UnsafeHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "ndev"; "key"|]
                                                  [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar; string ndev; key|]
         outputs
@@ -5065,8 +5064,8 @@ type Operators() =
         let vals = [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar; string ndev; key|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; gamma.NDArrayHandle; beta.NDArrayHandle; movingMean.NDArrayHandle; movingVar.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; movingMean.NDArrayHandle.UnsafeHandle; movingVar.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -5163,7 +5162,7 @@ type Operators() =
     static member ContribDivSqrtDim(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_contrib_div_sqrt_dim"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -5182,8 +5181,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -5218,7 +5217,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -5245,7 +5244,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -5272,7 +5271,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -5298,7 +5297,7 @@ type Operators() =
     static member Custom([<ParamArray>] data : NDArray[], opType : string) =
         let creator = AtomicSymbolCreator.FromName "Custom"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (data |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"op_type"|]
                                                  [|opType|]
         outputs
@@ -5320,8 +5319,8 @@ type Operators() =
         let vals = [|opType|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (data |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -5359,7 +5358,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -5379,7 +5378,7 @@ type Operators() =
     static member IdentityAttachKLSparseReg(data : NDArray, [<Optional; DefaultParameterValue(0.100000001)>] sparsenessTarget : float, [<Optional; DefaultParameterValue(0.00100000005)>] penalty : float, [<Optional; DefaultParameterValue(0.899999976)>] momentum : float) =
         let creator = AtomicSymbolCreator.FromName "IdentityAttachKLSparseReg"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"sparseness_target"; "penalty"; "momentum"|]
                                                  [|string sparsenessTarget; string penalty; string momentum|]
         outputs
@@ -5395,8 +5394,8 @@ type Operators() =
         let vals = [|string sparsenessTarget; string penalty; string momentum|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -5455,7 +5454,7 @@ type Operators() =
                             height : int) =
         let creator = AtomicSymbolCreator.FromName "_image_crop"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"x"; "y"; "width"; "height"|]
                                                  [|string x; string y; string width; string height|]
         outputs
@@ -5506,8 +5505,8 @@ type Operators() =
         let vals = [|string x; string y; string width; string height|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -5573,7 +5572,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -5641,7 +5640,7 @@ type Operators() =
     static member ImageToTensor(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_image_to_tensor"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -5705,8 +5704,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -5840,7 +5839,7 @@ type Operators() =
     static member ImageNormalize(data : NDArray, mean : double [], std : double []) =
         let creator = AtomicSymbolCreator.FromName "_image_normalize"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"mean"; "std"|]
                                                  [|string mean; string std|]
         outputs
@@ -5917,8 +5916,8 @@ type Operators() =
         let vals = [|string mean; string std|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -6011,7 +6010,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -6030,7 +6029,7 @@ type Operators() =
     static member ImageFlipLeftRight(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_image_flip_left_right"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -6045,8 +6044,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -6069,7 +6068,7 @@ type Operators() =
     static member ImageRandomFlipLeftRight(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_image_random_flip_left_right"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -6084,8 +6083,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -6108,7 +6107,7 @@ type Operators() =
     static member ImageFlipTopBottom(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_image_flip_top_bottom"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -6123,8 +6122,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -6147,7 +6146,7 @@ type Operators() =
     static member ImageRandomFlipTopBottom(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_image_random_flip_top_bottom"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -6162,8 +6161,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -6188,7 +6187,7 @@ type Operators() =
     static member ImageRandomBrightness(data : NDArray, minFactor : float, maxFactor : float) =
         let creator = AtomicSymbolCreator.FromName "_image_random_brightness"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"min_factor"; "max_factor"|]
                                                  [|string minFactor; string maxFactor|]
         outputs
@@ -6205,8 +6204,8 @@ type Operators() =
         let vals = [|string minFactor; string maxFactor|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -6233,7 +6232,7 @@ type Operators() =
     static member ImageRandomContrast(data : NDArray, minFactor : float, maxFactor : float) =
         let creator = AtomicSymbolCreator.FromName "_image_random_contrast"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"min_factor"; "max_factor"|]
                                                  [|string minFactor; string maxFactor|]
         outputs
@@ -6250,8 +6249,8 @@ type Operators() =
         let vals = [|string minFactor; string maxFactor|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -6278,7 +6277,7 @@ type Operators() =
     static member ImageRandomSaturation(data : NDArray, minFactor : float, maxFactor : float) =
         let creator = AtomicSymbolCreator.FromName "_image_random_saturation"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"min_factor"; "max_factor"|]
                                                  [|string minFactor; string maxFactor|]
         outputs
@@ -6295,8 +6294,8 @@ type Operators() =
         let vals = [|string minFactor; string maxFactor|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -6323,7 +6322,7 @@ type Operators() =
     static member ImageRandomHue(data : NDArray, minFactor : float, maxFactor : float) =
         let creator = AtomicSymbolCreator.FromName "_image_random_hue"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"min_factor"; "max_factor"|]
                                                  [|string minFactor; string maxFactor|]
         outputs
@@ -6340,8 +6339,8 @@ type Operators() =
         let vals = [|string minFactor; string maxFactor|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -6374,7 +6373,7 @@ type Operators() =
                                          hue : float) =
         let creator = AtomicSymbolCreator.FromName "_image_random_color_jitter"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"brightness"; "contrast"; "saturation"; "hue"|]
                                                  [|string brightness; string contrast; string saturation; string hue|]
         outputs
@@ -6398,8 +6397,8 @@ type Operators() =
         let vals = [|string brightness; string contrast; string saturation; string hue|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -6431,7 +6430,7 @@ type Operators() =
     static member ImageRandomLighting(data : NDArray, [<Optional; DefaultParameterValue(0.0500000007)>] alphaStd : float) =
         let creator = AtomicSymbolCreator.FromName "_image_random_lighting"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"alpha_std"|]
                                                  [|string alphaStd|]
         outputs
@@ -6447,8 +6446,8 @@ type Operators() =
         let vals = [|string alphaStd|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -6508,7 +6507,7 @@ type Operators() =
     static member ImageResize(data : NDArray, [<Optional>] size : int, [<Optional; DefaultParameterValue(false)>] keepRatio : bool, [<Optional; DefaultParameterValue(1)>] interp : int) =
         let creator = AtomicSymbolCreator.FromName "_image_resize"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"size"; "keep_ratio"; "interp"|]
                                                  [|(if isNull (size :> obj) then "[]" else string size); string keepRatio; string interp|]
         outputs
@@ -6559,8 +6558,8 @@ type Operators() =
         let vals = [|(if isNull (size :> obj) then "[]" else string size); string keepRatio; string interp|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -6660,7 +6659,7 @@ type Operators() =
                               [<Optional; DefaultParameterValue(1)>] interp : int) =
         let creator = AtomicSymbolCreator.FromName "_image_resize"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"size"; "keep_ratio"; "interp"|]
                                                  [|(if isNull (height :> obj) then "[]" else (height, width).ToString()); string keepRatio; string interp|]
         outputs
@@ -6717,8 +6716,8 @@ type Operators() =
         let vals = [|(if isNull (height :> obj) then "[]" else (height, width).ToString()); string keepRatio; string interp|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -6808,7 +6807,7 @@ type Operators() =
                             [<Optional; DefaultParameterValue(0.333999991)>] upperBound : float) =
         let creator = AtomicSymbolCreator.FromName "LeakyReLU"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; gamma.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle|]
                                                  [|"act_type"; "slope"; "lower_bound"; "upper_bound"|]
                                                  [|(if isNull (actType :> obj) then "leaky" else string actType); string slope; string lowerBound; string upperBound|]
         outputs
@@ -6850,8 +6849,8 @@ type Operators() =
         let vals = [|(if isNull (actType :> obj) then "leaky" else string actType); string slope; string lowerBound; string upperBound|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; gamma.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -6929,7 +6928,7 @@ type Operators() =
     static member SoftmaxCrossEntropy(data : NDArray, label : NDArray) =
         let creator = AtomicSymbolCreator.FromName "softmax_cross_entropy"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; label.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -6973,8 +6972,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; label.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -7034,7 +7033,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -7064,7 +7063,7 @@ type Operators() =
     static member Activation(data : NDArray, actType : ActType) =
         let creator = AtomicSymbolCreator.FromName "Activation"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"act_type"|]
                                                  [|string actType|]
         outputs
@@ -7090,8 +7089,8 @@ type Operators() =
         let vals = [|string actType|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -7133,7 +7132,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -7223,7 +7222,7 @@ type Operators() =
                             [<Optional; DefaultParameterValue(false)>] cudnnOff : bool) =
         let creator = AtomicSymbolCreator.FromName "BatchNorm"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; gamma.NDArrayHandle; beta.NDArrayHandle; movingMean.NDArrayHandle; movingVar.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; movingMean.NDArrayHandle.UnsafeHandle; movingVar.NDArrayHandle.UnsafeHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "axis"; "cudnn_off"|]
                                                  [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar; string axis; string cudnnOff|]
         outputs
@@ -7310,8 +7309,8 @@ type Operators() =
         let vals = [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar; string axis; string cudnnOff|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; gamma.NDArrayHandle; beta.NDArrayHandle; movingMean.NDArrayHandle; movingVar.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; movingMean.NDArrayHandle.UnsafeHandle; movingVar.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -7413,7 +7412,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -7470,7 +7469,7 @@ type Operators() =
     static member Concat([<ParamArray>] data : NDArray[], numArgs : int, [<Optional; DefaultParameterValue(1)>] dim : int) =
         let creator = AtomicSymbolCreator.FromName "Concat"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (data |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"num_args"; "dim"|]
                                                  [|string numArgs; string dim|]
         outputs
@@ -7523,8 +7522,8 @@ type Operators() =
         let vals = [|string numArgs; string dim|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (data |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -7593,7 +7592,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -7611,7 +7610,7 @@ type Operators() =
     static member RnnParamConcat([<ParamArray>] data : NDArray[], numArgs : int, [<Optional; DefaultParameterValue(1)>] dim : int) =
         let creator = AtomicSymbolCreator.FromName "_rnn_param_concat"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (data |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"num_args"; "dim"|]
                                                  [|string numArgs; string dim|]
         outputs
@@ -7625,8 +7624,8 @@ type Operators() =
         let vals = [|string numArgs; string dim|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (data |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -7747,7 +7746,7 @@ type Operators() =
                               [<Optional>] layout : ConvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "Convolution"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "stride"; "dilate"; "pad"; "num_filter"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
                                                  [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
@@ -7862,8 +7861,8 @@ type Operators() =
         let vals = [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -7993,7 +7992,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -8069,7 +8068,7 @@ type Operators() =
                           [<Optional>] blankLabel : BlankLabel) =
         let creator = AtomicSymbolCreator.FromName "CTCLoss"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; label.NDArrayHandle; dataLengths.NDArrayHandle; labelLengths.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle; dataLengths.NDArrayHandle.UnsafeHandle; labelLengths.NDArrayHandle.UnsafeHandle|]
                                                  [|"use_data_lengths"; "use_label_lengths"; "blank_label"|]
                                                  [|string useDataLengths; string useLabelLengths; (if isNull (blankLabel :> obj) then "first" else string blankLabel)|]
         outputs
@@ -8142,8 +8141,8 @@ type Operators() =
         let vals = [|string useDataLengths; string useLabelLengths; (if isNull (blankLabel :> obj) then "first" else string blankLabel)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; label.NDArrayHandle; dataLengths.NDArrayHandle; labelLengths.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle; dataLengths.NDArrayHandle.UnsafeHandle; labelLengths.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -8231,7 +8230,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -8278,7 +8277,7 @@ type Operators() =
                                 [<Optional>] layout : DeconvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "Deconvolution"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "stride"; "dilate"; "pad"; "adj"; "target_shape"; "num_filter"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
                                                  [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", ")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
@@ -8322,8 +8321,8 @@ type Operators() =
         let vals = [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", ")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -8382,7 +8381,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -8438,7 +8437,7 @@ type Operators() =
                           [<Optional>] cudnnOff : bool Nullable) =
         let creator = AtomicSymbolCreator.FromName "Dropout"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"p"; "mode"; "axes"; "cudnn_off"|]
                                                  [|string p; (if isNull (mode :> obj) then "training" else string mode); (if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", ")); string cudnnOff|]
         outputs
@@ -8491,8 +8490,8 @@ type Operators() =
         let vals = [|string p; (if isNull (mode :> obj) then "training" else string mode); (if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", ")); string cudnnOff|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -8589,7 +8588,7 @@ type Operators() =
                           ?cudnnOff : bool) =
         let creator = AtomicSymbolCreator.FromName "Dropout"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"p"; "mode"; "axes"; "cudnn_off"|]
                                                  [|(match p with None -> "0.5" | Some p -> string p); (match mode with None -> "training" | Some mode -> string mode); (match axes with None -> "[]" | Some axes -> (axes |> Seq.map string |> String.concat ", ")); (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff)|]
         outputs
@@ -8642,8 +8641,8 @@ type Operators() =
         let vals = [|(match p with None -> "0.5" | Some p -> string p); (match mode with None -> "training" | Some mode -> string mode); (match axes with None -> "[]" | Some axes -> (axes |> Seq.map string |> String.concat ", ")); (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -8711,7 +8710,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -8770,7 +8769,7 @@ type Operators() =
                                  [<Optional; DefaultParameterValue(true)>] flatten : bool) =
         let creator = AtomicSymbolCreator.FromName "FullyConnected"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
                                                  [|"num_hidden"; "no_bias"; "flatten"|]
                                                  [|string numHidden; string noBias; string flatten|]
         outputs
@@ -8826,8 +8825,8 @@ type Operators() =
         let vals = [|string numHidden; string noBias; string flatten|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -8898,7 +8897,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -8952,7 +8951,7 @@ type Operators() =
                             [<Optional; DefaultParameterValue(false)>] outputMeanVar : bool) =
         let creator = AtomicSymbolCreator.FromName "LayerNorm"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; gamma.NDArrayHandle; beta.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "eps"; "output_mean_var"|]
                                                  [|string axis; string eps; string outputMeanVar|]
         outputs
@@ -9003,8 +9002,8 @@ type Operators() =
         let vals = [|string axis; string eps; string outputMeanVar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; gamma.NDArrayHandle; beta.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -9070,7 +9069,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -9112,7 +9111,7 @@ type Operators() =
                       nsize : int) =
         let creator = AtomicSymbolCreator.FromName "LRN"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"alpha"; "beta"; "knorm"; "nsize"|]
                                                  [|string alpha; string beta; string knorm; string nsize|]
         outputs
@@ -9151,8 +9150,8 @@ type Operators() =
         let vals = [|string alpha; string beta; string knorm; string nsize|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -9206,7 +9205,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -9246,7 +9245,7 @@ type Operators() =
     static member Moments(data : NDArray, [<Optional>] axes : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "moments"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axes"; "keepdims"|]
                                                  [|(axes |> Seq.map string |> String.concat ", "); string keepdims|]
         outputs
@@ -9282,8 +9281,8 @@ type Operators() =
         let vals = [|(axes |> Seq.map string |> String.concat ", "); string keepdims|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -9335,7 +9334,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -9424,7 +9423,7 @@ type Operators() =
                           [<Optional>] layout : PoolingLayout) =
         let creator = AtomicSymbolCreator.FromName "Pooling"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "p_value"; "count_include_pad"; "layout"|]
                                                  [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; string cudnnOff; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string pValue; string countIncludePad; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
@@ -9510,8 +9509,8 @@ type Operators() =
         let vals = [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; string cudnnOff; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string pValue; string countIncludePad; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -9674,7 +9673,7 @@ type Operators() =
                           ?layout : PoolingLayout) =
         let creator = AtomicSymbolCreator.FromName "Pooling"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "p_value"; "count_include_pad"; "layout"|]
                                                  [|(match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match layout with None -> "None" | Some layout -> string layout)|]
         outputs
@@ -9760,8 +9759,8 @@ type Operators() =
         let vals = [|(match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match layout with None -> "None" | Some layout -> string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -9862,7 +9861,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -9906,7 +9905,7 @@ type Operators() =
     static member Softmax(data : NDArray, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] temperature : float Nullable, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmax"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
                                                  [|string axis; string temperature; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
@@ -9946,8 +9945,8 @@ type Operators() =
         let vals = [|string axis; string temperature; (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -10020,7 +10019,7 @@ type Operators() =
     static member Softmax(data : NDArray, ?axis : int, ?temperature : float, ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmax"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
                                                  [|(match axis with None -> "-1" | Some axis -> string axis); (match temperature with None -> "None" | Some temperature -> string temperature); (match dtype with None -> "None" | Some dtype -> string dtype)|]
         outputs
@@ -10060,8 +10059,8 @@ type Operators() =
         let vals = [|(match axis with None -> "-1" | Some axis -> string axis); (match temperature with None -> "None" | Some temperature -> string temperature); (match dtype with None -> "None" | Some dtype -> string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -10106,7 +10105,7 @@ type Operators() =
     static member BackwardSoftmax([<ParamArray>] args : NDArray[]) =
         let creator = AtomicSymbolCreator.FromName "_backward_softmax"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (args |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (args |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -10118,8 +10117,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (args |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (args |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -10165,7 +10164,7 @@ type Operators() =
     static member Softmin(data : NDArray, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] temperature : float Nullable, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmin"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
                                                  [|string axis; string temperature; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
@@ -10206,8 +10205,8 @@ type Operators() =
         let vals = [|string axis; string temperature; (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -10282,7 +10281,7 @@ type Operators() =
     static member Softmin(data : NDArray, ?axis : int, ?temperature : float, ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmin"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
                                                  [|(match axis with None -> "-1" | Some axis -> string axis); (match temperature with None -> "None" | Some temperature -> string temperature); (match dtype with None -> "None" | Some dtype -> string dtype)|]
         outputs
@@ -10323,8 +10322,8 @@ type Operators() =
         let vals = [|(match axis with None -> "-1" | Some axis -> string axis); (match temperature with None -> "None" | Some temperature -> string temperature); (match dtype with None -> "None" | Some dtype -> string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -10370,7 +10369,7 @@ type Operators() =
     static member BackwardSoftmin([<ParamArray>] args : NDArray[]) =
         let creator = AtomicSymbolCreator.FromName "_backward_softmin"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (args |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (args |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -10382,8 +10381,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (args |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (args |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -10419,7 +10418,7 @@ type Operators() =
     static member LogSoftmax(data : NDArray, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] temperature : float Nullable, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "log_softmax"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
                                                  [|string axis; string temperature; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
@@ -10450,8 +10449,8 @@ type Operators() =
         let vals = [|string axis; string temperature; (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -10506,7 +10505,7 @@ type Operators() =
     static member LogSoftmax(data : NDArray, ?axis : int, ?temperature : float, ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "log_softmax"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "temperature"; "dtype"|]
                                                  [|(match axis with None -> "-1" | Some axis -> string axis); (match temperature with None -> "None" | Some temperature -> string temperature); (match dtype with None -> "None" | Some dtype -> string dtype)|]
         outputs
@@ -10537,8 +10536,8 @@ type Operators() =
         let vals = [|(match axis with None -> "-1" | Some axis -> string axis); (match temperature with None -> "None" | Some temperature -> string temperature); (match dtype with None -> "None" | Some dtype -> string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -10574,7 +10573,7 @@ type Operators() =
     static member BackwardLogSoftmax([<ParamArray>] args : NDArray[]) =
         let creator = AtomicSymbolCreator.FromName "_backward_log_softmax"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (args |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (args |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -10586,8 +10585,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (args |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (args |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -10631,7 +10630,7 @@ type Operators() =
     static member SoftmaxActivation(data : NDArray, [<Optional>] mode : SoftmaxActivationMode) =
         let creator = AtomicSymbolCreator.FromName "SoftmaxActivation"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"mode"|]
                                                  [|(if isNull (mode :> obj) then "instance" else string mode)|]
         outputs
@@ -10670,8 +10669,8 @@ type Operators() =
         let vals = [|(if isNull (mode :> obj) then "instance" else string mode)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -10726,7 +10725,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -10806,7 +10805,7 @@ type Operators() =
                              workspace : int64) =
         let creator = AtomicSymbolCreator.FromName "UpSampling"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (data |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"scale"; "num_filter"; "sample_type"; "multi_input_mode"; "num_args"; "workspace"|]
                                                  [|string scale; string numFilter; string sampleType; (if isNull (multiInputMode :> obj) then "concat" else string multiInputMode); string numArgs; string workspace|]
         outputs
@@ -10883,8 +10882,8 @@ type Operators() =
         let vals = [|string scale; string numFilter; string sampleType; (if isNull (multiInputMode :> obj) then "concat" else string multiInputMode); string numArgs; string workspace|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (data |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -10976,7 +10975,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -11018,7 +11017,7 @@ type Operators() =
                                 [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "signsgd_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "wd"; "rescale_grad"; "clip_gradient"|]
                                                  [|string lr; string wd; string rescaleGrad; string clipGradient|]
         outputs
@@ -11057,8 +11056,8 @@ type Operators() =
         let vals = [|string lr; string wd; string rescaleGrad; string clipGradient|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -11136,7 +11135,7 @@ type Operators() =
                                [<Optional; DefaultParameterValue(0.0)>] wdLh : float) =
         let creator = AtomicSymbolCreator.FromName "signum_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle; mom.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mom.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "wd_lh"|]
                                                  [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string wdLh|]
         outputs
@@ -11184,8 +11183,8 @@ type Operators() =
         let vals = [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string wdLh|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle; mom.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mom.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -11264,7 +11263,7 @@ type Operators() =
                             [<Optional; DefaultParameterValue(true)>] lazyUpdate : bool) =
         let creator = AtomicSymbolCreator.FromName "sgd_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
                                                  [|string lr; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         outputs
@@ -11304,8 +11303,8 @@ type Operators() =
         let vals = [|string lr; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -11394,7 +11393,7 @@ type Operators() =
                                [<Optional; DefaultParameterValue(true)>] lazyUpdate : bool) =
         let creator = AtomicSymbolCreator.FromName "sgd_mom_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle; mom.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mom.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
                                                  [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         outputs
@@ -11452,8 +11451,8 @@ type Operators() =
         let vals = [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle; mom.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mom.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -11530,7 +11529,7 @@ type Operators() =
                               [<Optional; DefaultParameterValue(true)>] lazyUpdate : bool) =
         let creator = AtomicSymbolCreator.FromName "mp_sgd_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle; weight32.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; weight32.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
                                                  [|string lr; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         outputs
@@ -11558,8 +11557,8 @@ type Operators() =
         let vals = [|string lr; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle; weight32.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; weight32.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -11610,7 +11609,7 @@ type Operators() =
                                  [<Optional; DefaultParameterValue(true)>] lazyUpdate : bool) =
         let creator = AtomicSymbolCreator.FromName "mp_sgd_mom_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle; mom.NDArrayHandle; weight32.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mom.NDArrayHandle.UnsafeHandle; weight32.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
                                                  [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         outputs
@@ -11642,8 +11641,8 @@ type Operators() =
         let vals = [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle; mom.NDArrayHandle; weight32.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mom.NDArrayHandle.UnsafeHandle; weight32.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -11719,7 +11718,7 @@ type Operators() =
                              [<Optional; DefaultParameterValue(-1.0)>] clipGrad : float) =
         let creator = AtomicSymbolCreator.FromName "ftml_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle; d.NDArrayHandle; v.NDArrayHandle; z.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; d.NDArrayHandle.UnsafeHandle; v.NDArrayHandle.UnsafeHandle; z.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "beta1"; "beta2"; "epsilon"; "t"; "wd"; "rescale_grad"; "clip_grad"|]
                                                  [|string lr; string beta1; string beta2; string epsilon; string t; string wd; string rescaleGrad; string clipGrad|]
         outputs
@@ -11772,8 +11771,8 @@ type Operators() =
         let vals = [|string lr; string beta1; string beta2; string epsilon; string t; string wd; string rescaleGrad; string clipGrad|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle; d.NDArrayHandle; v.NDArrayHandle; z.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; d.NDArrayHandle.UnsafeHandle; v.NDArrayHandle.UnsafeHandle; z.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -11883,7 +11882,7 @@ type Operators() =
                              [<Optional; DefaultParameterValue(true)>] lazyUpdate : bool) =
         let creator = AtomicSymbolCreator.FromName "adam_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle; mean.NDArrayHandle; var.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mean.NDArrayHandle.UnsafeHandle; var.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "beta1"; "beta2"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
                                                  [|string lr; string beta1; string beta2; string epsilon; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         outputs
@@ -11949,8 +11948,8 @@ type Operators() =
         let vals = [|string lr; string beta1; string beta2; string epsilon; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle; mean.NDArrayHandle; var.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mean.NDArrayHandle.UnsafeHandle; var.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -12050,7 +12049,7 @@ type Operators() =
                                [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "nag_mom_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle; mom.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mom.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"|]
                                                  [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient|]
         outputs
@@ -12093,8 +12092,8 @@ type Operators() =
         let vals = [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle; mom.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mom.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -12161,7 +12160,7 @@ type Operators() =
                                  [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "mp_nag_mom_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle; mom.NDArrayHandle; weight32.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mom.NDArrayHandle.UnsafeHandle; weight32.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"|]
                                                  [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient|]
         outputs
@@ -12194,8 +12193,8 @@ type Operators() =
         let vals = [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle; mom.NDArrayHandle; weight32.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mom.NDArrayHandle.UnsafeHandle; weight32.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -12286,7 +12285,7 @@ type Operators() =
                                 [<Optional; DefaultParameterValue(-1.0)>] clipWeights : float) =
         let creator = AtomicSymbolCreator.FromName "rmsprop_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle; n.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; n.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "gamma1"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "clip_weights"|]
                                                  [|string lr; string gamma1; string epsilon; string wd; string rescaleGrad; string clipGradient; string clipWeights|]
         outputs
@@ -12353,8 +12352,8 @@ type Operators() =
         let vals = [|string lr; string gamma1; string epsilon; string wd; string rescaleGrad; string clipGradient; string clipWeights|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle; n.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; n.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -12474,7 +12473,7 @@ type Operators() =
                                     [<Optional; DefaultParameterValue(-1.0)>] clipWeights : float) =
         let creator = AtomicSymbolCreator.FromName "rmspropalex_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle; n.NDArrayHandle; g.NDArrayHandle; delta.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; n.NDArrayHandle.UnsafeHandle; g.NDArrayHandle.UnsafeHandle; delta.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "gamma1"; "gamma2"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "clip_weights"|]
                                                  [|string lr; string gamma1; string gamma2; string epsilon; string wd; string rescaleGrad; string clipGradient; string clipWeights|]
         outputs
@@ -12536,8 +12535,8 @@ type Operators() =
         let vals = [|string lr; string gamma1; string gamma2; string epsilon; string wd; string rescaleGrad; string clipGradient; string clipWeights|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle; n.NDArrayHandle; g.NDArrayHandle; delta.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; n.NDArrayHandle.UnsafeHandle; g.NDArrayHandle.UnsafeHandle; delta.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -12644,7 +12643,7 @@ type Operators() =
                              [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "ftrl_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle; z.NDArrayHandle; n.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; z.NDArrayHandle.UnsafeHandle; n.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "lamda1"; "beta"; "wd"; "rescale_grad"; "clip_gradient"|]
                                                  [|string lr; string lamda1; string beta; string wd; string rescaleGrad; string clipGradient|]
         outputs
@@ -12698,8 +12697,8 @@ type Operators() =
         let vals = [|string lr; string lamda1; string beta; string wd; string rescaleGrad; string clipGradient|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle; z.NDArrayHandle; n.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; z.NDArrayHandle.UnsafeHandle; n.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -12787,7 +12786,7 @@ type Operators() =
                                       [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "_sparse_adagrad_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|weight.NDArrayHandle; grad.NDArrayHandle; history.NDArrayHandle|]
+                                                 [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; history.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"|]
                                                  [|string lr; string epsilon; string wd; string rescaleGrad; string clipGradient|]
         outputs
@@ -12830,8 +12829,8 @@ type Operators() =
         let vals = [|string lr; string epsilon; string wd; string rescaleGrad; string clipGradient|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|weight.NDArrayHandle; grad.NDArrayHandle; history.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; history.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -12965,7 +12964,7 @@ type Operators() =
     static member Pad(data : NDArray, mode : PadMode, padWidth : int seq, constantValue : double) =
         let creator = AtomicSymbolCreator.FromName "Pad"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"mode"; "pad_width"; "constant_value"|]
                                                  [|string mode; (padWidth |> Seq.map string |> String.concat ", "); string constantValue|]
         outputs
@@ -13064,8 +13063,8 @@ type Operators() =
         let vals = [|string mode; (padWidth |> Seq.map string |> String.concat ", "); string constantValue|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -13190,7 +13189,7 @@ type Operators() =
     static member ContribDequantize(data : NDArray, minRange : NDArray, maxRange : NDArray, [<Optional>] outType : ContribDequantizeOutType) =
         let creator = AtomicSymbolCreator.FromName "_contrib_dequantize"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; minRange.NDArrayHandle; maxRange.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; minRange.NDArrayHandle.UnsafeHandle; maxRange.NDArrayHandle.UnsafeHandle|]
                                                  [|"out_type"|]
                                                  [|(if isNull (outType :> obj) then "float32" else string outType)|]
         outputs
@@ -13223,8 +13222,8 @@ type Operators() =
         let vals = [|(if isNull (outType :> obj) then "float32" else string outType)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; minRange.NDArrayHandle; maxRange.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; minRange.NDArrayHandle.UnsafeHandle; maxRange.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -13290,7 +13289,7 @@ type Operators() =
     static member ContribQuantize(data : NDArray, minRange : NDArray, maxRange : NDArray, [<Optional>] outType : ContribQuantizeOutType) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantize"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; minRange.NDArrayHandle; maxRange.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; minRange.NDArrayHandle.UnsafeHandle; maxRange.NDArrayHandle.UnsafeHandle|]
                                                  [|"out_type"|]
                                                  [|(if isNull (outType :> obj) then "uint8" else string outType)|]
         outputs
@@ -13330,8 +13329,8 @@ type Operators() =
         let vals = [|(if isNull (outType :> obj) then "uint8" else string outType)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; minRange.NDArrayHandle; maxRange.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; minRange.NDArrayHandle.UnsafeHandle; maxRange.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -13407,7 +13406,7 @@ type Operators() =
     static member ContribQuantizeV2(data : NDArray, [<Optional>] outType : ContribQuantizeV2OutType, [<Optional>] minCalibRange : float Nullable, [<Optional>] maxCalibRange : float Nullable) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantize_v2"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"out_type"; "min_calib_range"; "max_calib_range"|]
                                                  [|(if isNull (outType :> obj) then "int8" else string outType); string minCalibRange; string maxCalibRange|]
         outputs
@@ -13450,8 +13449,8 @@ type Operators() =
         let vals = [|(if isNull (outType :> obj) then "int8" else string outType); string minCalibRange; string maxCalibRange|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -13530,7 +13529,7 @@ type Operators() =
     static member ContribQuantizeV2(data : NDArray, ?outType : ContribQuantizeV2OutType, ?minCalibRange : float, ?maxCalibRange : float) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantize_v2"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"out_type"; "min_calib_range"; "max_calib_range"|]
                                                  [|(match outType with None -> "int8" | Some outType -> string outType); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
         outputs
@@ -13573,8 +13572,8 @@ type Operators() =
         let vals = [|(match outType with None -> "int8" | Some outType -> string outType); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -13634,7 +13633,7 @@ type Operators() =
     static member ContribQuantizedAct(data : NDArray, minData : NDArray, maxData : NDArray, actType : ActType) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_act"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
                                                  [|"act_type"|]
                                                  [|string actType|]
         outputs
@@ -13658,8 +13657,8 @@ type Operators() =
         let vals = [|string actType|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -13702,7 +13701,7 @@ type Operators() =
     static member ContribQuantizedConcat([<ParamArray>] data : NDArray[], numArgs : int, [<Optional; DefaultParameterValue(1)>] dim : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_concat"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (data |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"num_args"; "dim"|]
                                                  [|string numArgs; string dim|]
         outputs
@@ -13728,8 +13727,8 @@ type Operators() =
         let vals = [|string numArgs; string dim|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (data |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -13809,7 +13808,7 @@ type Operators() =
                                        [<Optional>] layout : ContribQuantizedConvLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_conv"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle; minWeight.NDArrayHandle; maxWeight.NDArrayHandle; minBias.NDArrayHandle; maxBias.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle; minWeight.NDArrayHandle.UnsafeHandle; maxWeight.NDArrayHandle.UnsafeHandle; minBias.NDArrayHandle.UnsafeHandle; maxBias.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "stride"; "dilate"; "pad"; "num_filter"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
                                                  [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
@@ -13871,8 +13870,8 @@ type Operators() =
         let vals = [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle; minWeight.NDArrayHandle; maxWeight.NDArrayHandle; minBias.NDArrayHandle; maxBias.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle; minWeight.NDArrayHandle.UnsafeHandle; maxWeight.NDArrayHandle.UnsafeHandle; minBias.NDArrayHandle.UnsafeHandle; maxBias.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -13958,7 +13957,7 @@ type Operators() =
                                               rhsMax : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_elemwise_add"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle; lhsMin.NDArrayHandle; lhsMax.NDArrayHandle; rhsMin.NDArrayHandle; rhsMax.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle; lhsMin.NDArrayHandle.UnsafeHandle; lhsMax.NDArrayHandle.UnsafeHandle; rhsMin.NDArrayHandle.UnsafeHandle; rhsMax.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -13991,8 +13990,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle; lhsMin.NDArrayHandle; lhsMax.NDArrayHandle; rhsMin.NDArrayHandle; rhsMax.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle; lhsMin.NDArrayHandle.UnsafeHandle; lhsMax.NDArrayHandle.UnsafeHandle; rhsMin.NDArrayHandle.UnsafeHandle; rhsMax.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -14031,7 +14030,7 @@ type Operators() =
     static member ContribQuantizedFlatten(data : NDArray, minData : NDArray, maxData : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_flatten"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -14045,8 +14044,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -14093,7 +14092,7 @@ type Operators() =
     static member Flatten(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "Flatten"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -14133,8 +14132,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -14211,7 +14210,7 @@ type Operators() =
                                                  [<Optional; DefaultParameterValue(true)>] flatten : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_fully_connected"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle; minWeight.NDArrayHandle; maxWeight.NDArrayHandle; minBias.NDArrayHandle; maxBias.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle; minWeight.NDArrayHandle.UnsafeHandle; maxWeight.NDArrayHandle.UnsafeHandle; minBias.NDArrayHandle.UnsafeHandle; maxBias.NDArrayHandle.UnsafeHandle|]
                                                  [|"num_hidden"; "no_bias"; "flatten"|]
                                                  [|string numHidden; string noBias; string flatten|]
         outputs
@@ -14256,8 +14255,8 @@ type Operators() =
         let vals = [|string numHidden; string noBias; string flatten|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle; minWeight.NDArrayHandle; maxWeight.NDArrayHandle; minBias.NDArrayHandle; maxBias.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle; minWeight.NDArrayHandle.UnsafeHandle; maxWeight.NDArrayHandle.UnsafeHandle; minBias.NDArrayHandle.UnsafeHandle; maxBias.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -14340,7 +14339,7 @@ type Operators() =
                                           [<Optional>] layout : ContribQuantizedPoolingLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_pooling"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "p_value"; "count_include_pad"; "layout"|]
                                                  [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; string cudnnOff; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string pValue; string countIncludePad; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
@@ -14387,8 +14386,8 @@ type Operators() =
         let vals = [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; string cudnnOff; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string pValue; string countIncludePad; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -14473,7 +14472,7 @@ type Operators() =
                                           ?layout : ContribQuantizedPoolingLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_pooling"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "p_value"; "count_include_pad"; "layout"|]
                                                  [|(match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match layout with None -> "None" | Some layout -> string layout)|]
         outputs
@@ -14520,8 +14519,8 @@ type Operators() =
         let vals = [|(match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match layout with None -> "None" | Some layout -> string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; minData.NDArrayHandle; maxData.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -14592,7 +14591,7 @@ type Operators() =
                                     [<Optional>] maxCalibRange : float Nullable) =
         let creator = AtomicSymbolCreator.FromName "_contrib_requantize"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; minRange.NDArrayHandle; maxRange.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; minRange.NDArrayHandle.UnsafeHandle; maxRange.NDArrayHandle.UnsafeHandle|]
                                                  [|"out_type"; "min_calib_range"; "max_calib_range"|]
                                                  [|(if isNull (outType :> obj) then "int8" else string outType); string minCalibRange; string maxCalibRange|]
         outputs
@@ -14625,8 +14624,8 @@ type Operators() =
         let vals = [|(if isNull (outType :> obj) then "int8" else string outType); string minCalibRange; string maxCalibRange|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; minRange.NDArrayHandle; maxRange.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; minRange.NDArrayHandle.UnsafeHandle; maxRange.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -14683,7 +14682,7 @@ type Operators() =
                                     ?maxCalibRange : float) =
         let creator = AtomicSymbolCreator.FromName "_contrib_requantize"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; minRange.NDArrayHandle; maxRange.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; minRange.NDArrayHandle.UnsafeHandle; maxRange.NDArrayHandle.UnsafeHandle|]
                                                  [|"out_type"; "min_calib_range"; "max_calib_range"|]
                                                  [|(match outType with None -> "int8" | Some outType -> string outType); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
         outputs
@@ -14716,8 +14715,8 @@ type Operators() =
         let vals = [|(match outType with None -> "int8" | Some outType -> string outType); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; minRange.NDArrayHandle; maxRange.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; minRange.NDArrayHandle.UnsafeHandle; maxRange.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -14785,7 +14784,7 @@ type Operators() =
     static member SampleUniform(low : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType, high : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_sample_uniform"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|low.NDArrayHandle; high.NDArrayHandle|]
+                                                 [|low.NDArrayHandle.UnsafeHandle; high.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
@@ -14828,8 +14827,8 @@ type Operators() =
         let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|low.NDArrayHandle; high.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|low.NDArrayHandle.UnsafeHandle; high.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -14908,7 +14907,7 @@ type Operators() =
     static member SampleNormal(mu : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType, sigma : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_sample_normal"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|mu.NDArrayHandle; sigma.NDArrayHandle|]
+                                                 [|mu.NDArrayHandle.UnsafeHandle; sigma.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
@@ -14951,8 +14950,8 @@ type Operators() =
         let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|mu.NDArrayHandle; sigma.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|mu.NDArrayHandle.UnsafeHandle; sigma.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -15031,7 +15030,7 @@ type Operators() =
     static member SampleGamma(alpha : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType, beta : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_sample_gamma"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|alpha.NDArrayHandle; beta.NDArrayHandle|]
+                                                 [|alpha.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
@@ -15074,8 +15073,8 @@ type Operators() =
         let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|alpha.NDArrayHandle; beta.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|alpha.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -15152,7 +15151,7 @@ type Operators() =
     static member SampleExponential(lam : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_exponential"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lam.NDArrayHandle|]
+                                                 [|lam.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
@@ -15193,8 +15192,8 @@ type Operators() =
         let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lam.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lam.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -15271,7 +15270,7 @@ type Operators() =
     static member SamplePoisson(lam : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_poisson"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lam.NDArrayHandle|]
+                                                 [|lam.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
@@ -15314,8 +15313,8 @@ type Operators() =
         let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lam.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lam.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -15396,7 +15395,7 @@ type Operators() =
     static member SampleNegativeBinomial(k : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType, p : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_sample_negative_binomial"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|k.NDArrayHandle; p.NDArrayHandle|]
+                                                 [|k.NDArrayHandle.UnsafeHandle; p.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
@@ -15441,8 +15440,8 @@ type Operators() =
         let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|k.NDArrayHandle; p.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|k.NDArrayHandle.UnsafeHandle; p.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -15525,7 +15524,7 @@ type Operators() =
     static member SampleGeneralizedNegativeBinomial(mu : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType, alpha : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_sample_generalized_negative_binomial"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|mu.NDArrayHandle; alpha.NDArrayHandle|]
+                                                 [|mu.NDArrayHandle.UnsafeHandle; alpha.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs
@@ -15570,8 +15569,8 @@ type Operators() =
         let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|mu.NDArrayHandle; alpha.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|mu.NDArrayHandle.UnsafeHandle; alpha.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -15653,7 +15652,7 @@ type Operators() =
     static member SampleMultinomial(data : NDArray, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue(false)>] getProb : bool, [<Optional>] dtype : SampleMultinomialDtype) =
         let creator = AtomicSymbolCreator.FromName "_sample_multinomial"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "get_prob"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string getProb; (if isNull (dtype :> obj) then "int32" else string dtype)|]
         outputs
@@ -15697,8 +15696,8 @@ type Operators() =
         let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string getProb; (if isNull (dtype :> obj) then "int32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -15758,7 +15757,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -15834,7 +15833,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -15932,7 +15931,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -16023,7 +16022,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -16100,7 +16099,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -16174,7 +16173,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -16262,7 +16261,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -16358,7 +16357,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -16453,7 +16452,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -16506,7 +16505,7 @@ type Operators() =
     static member RandomUniformLike([<Optional; DefaultParameterValue(0.0)>] low : float, [<Optional; DefaultParameterValue(1.0)>] high : float, data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_random_uniform_like"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"low"; "high"|]
                                                  [|string low; string high|]
         outputs
@@ -16533,8 +16532,8 @@ type Operators() =
         let vals = [|string low; string high|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -16580,7 +16579,7 @@ type Operators() =
     static member RandomNormalLike([<Optional; DefaultParameterValue(0.0)>] loc : float, [<Optional; DefaultParameterValue(1.0)>] scale : float, data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_random_normal_like"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"loc"; "scale"|]
                                                  [|string loc; string scale|]
         outputs
@@ -16606,8 +16605,8 @@ type Operators() =
         let vals = [|string loc; string scale|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -16651,7 +16650,7 @@ type Operators() =
     static member RandomGammaLike([<Optional; DefaultParameterValue(1.0)>] alpha : float, [<Optional; DefaultParameterValue(1.0)>] beta : float, data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_random_gamma_like"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"alpha"; "beta"|]
                                                  [|string alpha; string beta|]
         outputs
@@ -16676,8 +16675,8 @@ type Operators() =
         let vals = [|string alpha; string beta|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -16719,7 +16718,7 @@ type Operators() =
     static member RandomExponentialLike([<Optional; DefaultParameterValue(1.0)>] lam : float, data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_random_exponential_like"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"lam"|]
                                                  [|string lam|]
         outputs
@@ -16743,8 +16742,8 @@ type Operators() =
         let vals = [|string lam|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -16786,7 +16785,7 @@ type Operators() =
     static member RandomPoissonLike([<Optional; DefaultParameterValue(1.0)>] lam : float, data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_random_poisson_like"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"lam"|]
                                                  [|string lam|]
         outputs
@@ -16811,8 +16810,8 @@ type Operators() =
         let vals = [|string lam|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -16857,7 +16856,7 @@ type Operators() =
     static member RandomNegativeBinomialLike([<Optional; DefaultParameterValue(1)>] k : int, [<Optional; DefaultParameterValue(1.0)>] p : float, data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_random_negative_binomial_like"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"k"; "p"|]
                                                  [|string k; string p|]
         outputs
@@ -16884,8 +16883,8 @@ type Operators() =
         let vals = [|string k; string p|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -16934,7 +16933,7 @@ type Operators() =
     static member RandomGeneralizedNegativeBinomialLike([<Optional; DefaultParameterValue(1.0)>] mu : float, [<Optional; DefaultParameterValue(1.0)>] alpha : float, data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_random_generalized_negative_binomial_like"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"mu"; "alpha"|]
                                                  [|string mu; string alpha|]
         outputs
@@ -16963,8 +16962,8 @@ type Operators() =
         let vals = [|string mu; string alpha|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -17005,7 +17004,7 @@ type Operators() =
     static member Shuffle(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_shuffle"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -17024,8 +17023,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -17114,7 +17113,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -17181,7 +17180,7 @@ type Operators() =
     static member LinearRegressionOutput(data : NDArray, label : NDArray, [<Optional; DefaultParameterValue(1.0)>] gradScale : float) =
         let creator = AtomicSymbolCreator.FromName "LinearRegressionOutput"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; label.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
                                                  [|"grad_scale"|]
                                                  [|string gradScale|]
         outputs
@@ -17217,8 +17216,8 @@ type Operators() =
         let vals = [|string gradScale|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; label.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -17270,7 +17269,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -17311,7 +17310,7 @@ type Operators() =
     static member MAERegressionOutput(data : NDArray, label : NDArray, [<Optional; DefaultParameterValue(1.0)>] gradScale : float) =
         let creator = AtomicSymbolCreator.FromName "MAERegressionOutput"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; label.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
                                                  [|"grad_scale"|]
                                                  [|string gradScale|]
         outputs
@@ -17348,8 +17347,8 @@ type Operators() =
         let vals = [|string gradScale|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; label.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -17402,7 +17401,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -17447,7 +17446,7 @@ type Operators() =
     static member LogisticRegressionOutput(data : NDArray, label : NDArray, [<Optional; DefaultParameterValue(1.0)>] gradScale : float) =
         let creator = AtomicSymbolCreator.FromName "LogisticRegressionOutput"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; label.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
                                                  [|"grad_scale"|]
                                                  [|string gradScale|]
         outputs
@@ -17488,8 +17487,8 @@ type Operators() =
         let vals = [|string gradScale|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; label.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -17546,7 +17545,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -17648,7 +17647,7 @@ type Operators() =
                       [<Optional; DefaultParameterValue(false)>] useSequenceLength : bool) =
         let creator = AtomicSymbolCreator.FromName "RNN"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; parameters.NDArrayHandle; state.NDArrayHandle; stateCell.NDArrayHandle; sequenceLength.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; parameters.NDArrayHandle.UnsafeHandle; state.NDArrayHandle.UnsafeHandle; stateCell.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
                                                  [|"state_size"; "num_layers"; "mode"; "projection_size"; "lstm_state_clip_min"; "lstm_state_clip_max"; "bidirectional"; "p"; "state_outputs"; "lstm_state_clip_nan"; "use_sequence_length"|]
                                                  [|string stateSize; string numLayers; string mode; string projectionSize; string lstmStateClipMin; string lstmStateClipMax; string bidirectional; string p; string stateOutputs; string lstmStateClipNan; string useSequenceLength|]
         outputs
@@ -17747,8 +17746,8 @@ type Operators() =
         let vals = [|string stateSize; string numLayers; string mode; string projectionSize; string lstmStateClipMin; string lstmStateClipMax; string bidirectional; string p; string stateOutputs; string lstmStateClipNan; string useSequenceLength|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; parameters.NDArrayHandle; state.NDArrayHandle; stateCell.NDArrayHandle; sequenceLength.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; parameters.NDArrayHandle.UnsafeHandle; state.NDArrayHandle.UnsafeHandle; stateCell.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -17937,7 +17936,7 @@ type Operators() =
                       ?useSequenceLength : bool) =
         let creator = AtomicSymbolCreator.FromName "RNN"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; parameters.NDArrayHandle; state.NDArrayHandle; stateCell.NDArrayHandle; sequenceLength.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; parameters.NDArrayHandle.UnsafeHandle; state.NDArrayHandle.UnsafeHandle; stateCell.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
                                                  [|"state_size"; "num_layers"; "mode"; "projection_size"; "lstm_state_clip_min"; "lstm_state_clip_max"; "bidirectional"; "p"; "state_outputs"; "lstm_state_clip_nan"; "use_sequence_length"|]
                                                  [|string stateSize; string numLayers; string mode; (match projectionSize with None -> "None" | Some projectionSize -> string projectionSize); (match lstmStateClipMin with None -> "None" | Some lstmStateClipMin -> string lstmStateClipMin); (match lstmStateClipMax with None -> "None" | Some lstmStateClipMax -> string lstmStateClipMax); (match bidirectional with None -> "false" | Some bidirectional -> string bidirectional); (match p with None -> "0.0" | Some p -> string p); (match stateOutputs with None -> "false" | Some stateOutputs -> string stateOutputs); (match lstmStateClipNan with None -> "false" | Some lstmStateClipNan -> string lstmStateClipNan); (match useSequenceLength with None -> "false" | Some useSequenceLength -> string useSequenceLength)|]
         outputs
@@ -18036,8 +18035,8 @@ type Operators() =
         let vals = [|string stateSize; string numLayers; string mode; (match projectionSize with None -> "None" | Some projectionSize -> string projectionSize); (match lstmStateClipMin with None -> "None" | Some lstmStateClipMin -> string lstmStateClipMin); (match lstmStateClipMax with None -> "None" | Some lstmStateClipMax -> string lstmStateClipMax); (match bidirectional with None -> "false" | Some bidirectional -> string bidirectional); (match p with None -> "0.0" | Some p -> string p); (match stateOutputs with None -> "false" | Some stateOutputs -> string stateOutputs); (match lstmStateClipNan with None -> "false" | Some lstmStateClipNan -> string lstmStateClipNan); (match useSequenceLength with None -> "false" | Some useSequenceLength -> string useSequenceLength)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; parameters.NDArrayHandle; state.NDArrayHandle; stateCell.NDArrayHandle; sequenceLength.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; parameters.NDArrayHandle.UnsafeHandle; state.NDArrayHandle.UnsafeHandle; stateCell.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -18151,7 +18150,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -18231,7 +18230,7 @@ type Operators() =
     static member SliceChannel(data : NDArray, numOutputs : int, [<Optional; DefaultParameterValue(1)>] axis : int, [<Optional; DefaultParameterValue(false)>] squeezeAxis : bool) =
         let creator = AtomicSymbolCreator.FromName "SliceChannel"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"num_outputs"; "axis"; "squeeze_axis"|]
                                                  [|string numOutputs; string axis; string squeezeAxis|]
         outputs
@@ -18307,8 +18306,8 @@ type Operators() =
         let vals = [|string numOutputs; string axis; string squeezeAxis|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -18485,7 +18484,7 @@ type Operators() =
                                 [<Optional; DefaultParameterValue(0.0)>] smoothAlpha : float) =
         let creator = AtomicSymbolCreator.FromName "SoftmaxOutput"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; label.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
                                                  [|"grad_scale"; "ignore_label"; "multi_output"; "use_ignore"; "preserve_shape"; "normalization"; "out_grad"; "smooth_alpha"|]
                                                  [|string gradScale; string ignoreLabel; string multiOutput; string useIgnore; string preserveShape; (if isNull (normalization :> obj) then "null" else string normalization); string outGrad; string smoothAlpha|]
         outputs
@@ -18594,8 +18593,8 @@ type Operators() =
         let vals = [|string gradScale; string ignoreLabel; string multiOutput; string useIgnore; string preserveShape; (if isNull (normalization :> obj) then "null" else string normalization); string outGrad; string smoothAlpha|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; label.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -18719,7 +18718,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -18758,7 +18757,7 @@ type Operators() =
     static member SwapAxis(data : NDArray, dim1 : int, dim2 : int) =
         let creator = AtomicSymbolCreator.FromName "SwapAxis"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"dim1"; "dim2"|]
                                                  [|string dim1; string dim2|]
         outputs
@@ -18793,8 +18792,8 @@ type Operators() =
         let vals = [|string dim1; string dim2|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -18841,7 +18840,7 @@ type Operators() =
     static member AmpCast(data : NDArray, dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "amp_cast"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"dtype"|]
                                                  [|string dtype|]
         outputs
@@ -18860,8 +18859,8 @@ type Operators() =
         let vals = [|string dtype|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -18896,7 +18895,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -18920,7 +18919,7 @@ type Operators() =
     static member AmpMulticast([<ParamArray>] data : NDArray[], numOutputs : int) =
         let creator = AtomicSymbolCreator.FromName "amp_multicast"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (data |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"num_outputs"|]
                                                  [|string numOutputs|]
         outputs
@@ -18940,8 +18939,8 @@ type Operators() =
         let vals = [|string numOutputs|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (data |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -18967,7 +18966,7 @@ type Operators() =
     static member BackwardAmpMulticast([<ParamArray>] grad : NDArray[], numOutputs : int) =
         let creator = AtomicSymbolCreator.FromName "_backward_amp_multicast"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (grad |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (grad |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"num_outputs"|]
                                                  [|string numOutputs|]
         outputs
@@ -18980,8 +18979,8 @@ type Operators() =
         let vals = [|string numOutputs|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (grad |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (grad |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -19024,7 +19023,7 @@ type Operators() =
     static member Argmax(data : NDArray, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(false)>] keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "argmax"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"|]
                                                  [|string axis; string keepdims|]
         outputs
@@ -19061,8 +19060,8 @@ type Operators() =
         let vals = [|string axis; string keepdims|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -19129,7 +19128,7 @@ type Operators() =
     static member Argmax(data : NDArray, ?axis : int, ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "argmax"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
         outputs
@@ -19166,8 +19165,8 @@ type Operators() =
         let vals = [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -19234,7 +19233,7 @@ type Operators() =
     static member Argmin(data : NDArray, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(false)>] keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "argmin"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"|]
                                                  [|string axis; string keepdims|]
         outputs
@@ -19271,8 +19270,8 @@ type Operators() =
         let vals = [|string axis; string keepdims|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -19339,7 +19338,7 @@ type Operators() =
     static member Argmin(data : NDArray, ?axis : int, ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "argmin"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
         outputs
@@ -19376,8 +19375,8 @@ type Operators() =
         let vals = [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -19436,7 +19435,7 @@ type Operators() =
     static member ArgmaxChannel(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "argmax_channel"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -19465,8 +19464,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -19552,7 +19551,7 @@ type Operators() =
                        [<Optional>] mode : PickMode) =
         let creator = AtomicSymbolCreator.FromName "pick"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; index.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; index.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "mode"|]
                                                  [|string axis; string keepdims; (if isNull (mode :> obj) then "clip" else string mode)|]
         outputs
@@ -19617,8 +19616,8 @@ type Operators() =
         let vals = [|string axis; string keepdims; (if isNull (mode :> obj) then "clip" else string mode)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; index.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; index.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -19739,7 +19738,7 @@ type Operators() =
                        ?mode : PickMode) =
         let creator = AtomicSymbolCreator.FromName "pick"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; index.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; index.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "mode"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match mode with None -> "clip" | Some mode -> string mode)|]
         outputs
@@ -19804,8 +19803,8 @@ type Operators() =
         let vals = [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match mode with None -> "clip" | Some mode -> string mode)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; index.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; index.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -19885,7 +19884,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -19954,7 +19953,7 @@ type Operators() =
     static member Sum(data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "sum"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
@@ -20019,8 +20018,8 @@ type Operators() =
         let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -20101,7 +20100,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -20136,7 +20135,7 @@ type Operators() =
     static member Mean(data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "mean"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
@@ -20167,8 +20166,8 @@ type Operators() =
         let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -20215,7 +20214,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -20250,7 +20249,7 @@ type Operators() =
     static member Prod(data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "prod"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
@@ -20281,8 +20280,8 @@ type Operators() =
         let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -20329,7 +20328,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -20366,7 +20365,7 @@ type Operators() =
     static member Nansum(data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "nansum"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
@@ -20399,8 +20398,8 @@ type Operators() =
         let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -20449,7 +20448,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -20486,7 +20485,7 @@ type Operators() =
     static member Nanprod(data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "nanprod"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
@@ -20519,8 +20518,8 @@ type Operators() =
         let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -20569,7 +20568,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -20604,7 +20603,7 @@ type Operators() =
     static member Max(data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "max"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
@@ -20635,8 +20634,8 @@ type Operators() =
         let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -20683,7 +20682,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -20718,7 +20717,7 @@ type Operators() =
     static member Min(data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "min"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
@@ -20749,8 +20748,8 @@ type Operators() =
         let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -20797,7 +20796,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -20837,7 +20836,7 @@ type Operators() =
     static member BroadcastAxis(data : NDArray, [<Optional>] axis : int seq, [<Optional>] size : int seq) =
         let creator = AtomicSymbolCreator.FromName "broadcast_axis"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "size"|]
                                                  [|(if isNull (axis :> obj) then "[]" else (axis |> Seq.map string |> String.concat ", ")); (if isNull (size :> obj) then "[]" else (size |> Seq.map string |> String.concat ", "))|]
         outputs
@@ -20873,8 +20872,8 @@ type Operators() =
         let vals = [|(if isNull (axis :> obj) then "[]" else (axis |> Seq.map string |> String.concat ", ")); (if isNull (size :> obj) then "[]" else (size |> Seq.map string |> String.concat ", "))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -20936,7 +20935,7 @@ type Operators() =
     static member BroadcastTo(data : NDArray, [<Optional>] shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "broadcast_to"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", "))|]
         outputs
@@ -20969,8 +20968,8 @@ type Operators() =
         let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", "))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -21019,7 +21018,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -21057,7 +21056,7 @@ type Operators() =
     static member BroadcastLike(lhs : NDArray, rhs : NDArray, [<Optional>] lhsAxes : int seq, [<Optional>] rhsAxes : int seq) =
         let creator = AtomicSymbolCreator.FromName "broadcast_like"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"lhs_axes"; "rhs_axes"|]
                                                  [|(lhsAxes |> Seq.map string |> String.concat ", "); (rhsAxes |> Seq.map string |> String.concat ", ")|]
         outputs
@@ -21091,8 +21090,8 @@ type Operators() =
         let vals = [|(lhsAxes |> Seq.map string |> String.concat ", "); (rhsAxes |> Seq.map string |> String.concat ", ")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -21174,7 +21173,7 @@ type Operators() =
                        [<Optional; DefaultParameterValue(false)>] keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "norm"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"ord"; "axis"; "out_dtype"; "keepdims"|]
                                                  [|string ord; (axis |> Seq.map string |> String.concat ", "); (if isNull (outDtype :> obj) then "None" else string outDtype); string keepdims|]
         outputs
@@ -21230,8 +21229,8 @@ type Operators() =
         let vals = [|string ord; (axis |> Seq.map string |> String.concat ", "); (if isNull (outDtype :> obj) then "None" else string outDtype); string keepdims|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -21302,7 +21301,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -21358,7 +21357,7 @@ type Operators() =
     static member CastStorage(data : NDArray, stype : Stype) =
         let creator = AtomicSymbolCreator.FromName "cast_storage"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"stype"|]
                                                  [|string stype|]
         outputs
@@ -21410,8 +21409,8 @@ type Operators() =
         let vals = [|string stype|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -21498,7 +21497,7 @@ type Operators() =
     static member Where(condition : NDArray, x : NDArray, y : NDArray) =
         let creator = AtomicSymbolCreator.FromName "where"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|condition.NDArrayHandle; x.NDArrayHandle; y.NDArrayHandle|]
+                                                 [|condition.NDArrayHandle.UnsafeHandle; x.NDArrayHandle.UnsafeHandle; y.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -21540,8 +21539,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|condition.NDArrayHandle; x.NDArrayHandle; y.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|condition.NDArrayHandle.UnsafeHandle; x.NDArrayHandle.UnsafeHandle; y.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -21599,7 +21598,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -21673,7 +21672,7 @@ type Operators() =
     static member Diag(data : NDArray, [<Optional; DefaultParameterValue(0)>] k : int, [<Optional; DefaultParameterValue(0)>] axis1 : int, [<Optional; DefaultParameterValue(1)>] axis2 : int) =
         let creator = AtomicSymbolCreator.FromName "diag"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"k"; "axis1"; "axis2"|]
                                                  [|string k; string axis1; string axis2|]
         outputs
@@ -21743,8 +21742,8 @@ type Operators() =
         let vals = [|string k; string axis1; string axis2|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -21830,7 +21829,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -21901,7 +21900,7 @@ type Operators() =
                       [<Optional>] forwardStype : ForwardStype) =
         let creator = AtomicSymbolCreator.FromName "dot"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"transpose_a"; "transpose_b"; "forward_stype"|]
                                                  [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|]
         outputs
@@ -21969,8 +21968,8 @@ type Operators() =
         let vals = [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22059,7 +22058,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22100,7 +22099,7 @@ type Operators() =
                            [<Optional>] forwardStype : ForwardStype) =
         let creator = AtomicSymbolCreator.FromName "batch_dot"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"transpose_a"; "transpose_b"; "forward_stype"|]
                                                  [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|]
         outputs
@@ -22135,8 +22134,8 @@ type Operators() =
         let vals = [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22186,7 +22185,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22229,7 +22228,7 @@ type Operators() =
     static member BroadcastAdd(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_add"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -22268,8 +22267,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22324,7 +22323,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22367,7 +22366,7 @@ type Operators() =
     static member BroadcastSub(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_sub"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -22406,8 +22405,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22462,7 +22461,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22499,7 +22498,7 @@ type Operators() =
     static member BroadcastMul(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_mul"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -22532,8 +22531,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22582,7 +22581,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22619,7 +22618,7 @@ type Operators() =
     static member BroadcastDiv(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_div"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -22652,8 +22651,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22702,7 +22701,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22735,7 +22734,7 @@ type Operators() =
     static member BroadcastMod(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_mod"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -22764,8 +22763,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22810,7 +22809,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22843,7 +22842,7 @@ type Operators() =
     static member BroadcastPower(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_power"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -22872,8 +22871,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22918,7 +22917,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -22953,7 +22952,7 @@ type Operators() =
     static member BroadcastMaximum(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_maximum"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -22984,8 +22983,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -23032,7 +23031,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -23067,7 +23066,7 @@ type Operators() =
     static member BroadcastMinimum(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_minimum"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -23098,8 +23097,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -23146,7 +23145,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -23187,7 +23186,7 @@ type Operators() =
     static member BroadcastHypot(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_hypot"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -23224,8 +23223,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -23278,7 +23277,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -23311,7 +23310,7 @@ type Operators() =
     static member BroadcastEqual(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_equal"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -23340,8 +23339,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -23392,7 +23391,7 @@ type Operators() =
     static member BroadcastNotEqual(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_not_equal"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -23421,8 +23420,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -23473,7 +23472,7 @@ type Operators() =
     static member BroadcastGreater(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_greater"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -23502,8 +23501,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -23554,7 +23553,7 @@ type Operators() =
     static member BroadcastGreaterEqual(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_greater_equal"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -23583,8 +23582,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -23635,7 +23634,7 @@ type Operators() =
     static member BroadcastLesser(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_lesser"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -23664,8 +23663,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -23716,7 +23715,7 @@ type Operators() =
     static member BroadcastLesserEqual(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_lesser_equal"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -23745,8 +23744,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -23797,7 +23796,7 @@ type Operators() =
     static member BroadcastLogicalAnd(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_logical_and"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -23826,8 +23825,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -23878,7 +23877,7 @@ type Operators() =
     static member BroadcastLogicalOr(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_logical_or"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -23907,8 +23906,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -23959,7 +23958,7 @@ type Operators() =
     static member BroadcastLogicalXor(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "broadcast_logical_xor"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -23988,8 +23987,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24037,7 +24036,7 @@ type Operators() =
     static member ElemwiseAdd(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "elemwise_add"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24063,8 +24062,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24096,7 +24095,7 @@ type Operators() =
     static member GradAdd(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_grad_add"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24109,8 +24108,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24139,7 +24138,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24169,7 +24168,7 @@ type Operators() =
     static member ElemwiseSub(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "elemwise_sub"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24195,8 +24194,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24238,7 +24237,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24267,7 +24266,7 @@ type Operators() =
     static member ElemwiseMul(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "elemwise_mul"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24292,8 +24291,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24334,7 +24333,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24356,7 +24355,7 @@ type Operators() =
     static member ElemwiseDiv(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "elemwise_div"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24374,8 +24373,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24409,7 +24408,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24426,7 +24425,7 @@ type Operators() =
     static member Mod(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_mod"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24439,8 +24438,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24469,7 +24468,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24486,7 +24485,7 @@ type Operators() =
     static member Power(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_power"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24499,8 +24498,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24529,7 +24528,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24546,7 +24545,7 @@ type Operators() =
     static member Maximum(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_maximum"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24559,8 +24558,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24589,7 +24588,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24606,7 +24605,7 @@ type Operators() =
     static member Minimum(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_minimum"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24619,8 +24618,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24649,7 +24648,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24671,7 +24670,7 @@ type Operators() =
     static member Hypot(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_hypot"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24689,8 +24688,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24724,7 +24723,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24741,7 +24740,7 @@ type Operators() =
     static member Equal(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_equal"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24754,8 +24753,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24774,7 +24773,7 @@ type Operators() =
     static member NotEqual(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_not_equal"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24787,8 +24786,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24807,7 +24806,7 @@ type Operators() =
     static member Greater(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_greater"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24820,8 +24819,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24840,7 +24839,7 @@ type Operators() =
     static member GreaterEqual(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_greater_equal"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24853,8 +24852,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24873,7 +24872,7 @@ type Operators() =
     static member Lesser(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_lesser"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24886,8 +24885,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24906,7 +24905,7 @@ type Operators() =
     static member LesserEqual(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_lesser_equal"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24919,8 +24918,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24939,7 +24938,7 @@ type Operators() =
     static member LogicalAnd(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_logical_and"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24952,8 +24951,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -24972,7 +24971,7 @@ type Operators() =
     static member LogicalOr(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_logical_or"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -24985,8 +24984,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25005,7 +25004,7 @@ type Operators() =
     static member LogicalXor(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_logical_xor"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -25018,8 +25017,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25038,7 +25037,7 @@ type Operators() =
     static member PlusScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_plus_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25051,8 +25050,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25071,7 +25070,7 @@ type Operators() =
     static member MinusScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_minus_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25084,8 +25083,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25104,7 +25103,7 @@ type Operators() =
     static member RminusScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_rminus_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25117,8 +25116,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25148,7 +25147,7 @@ type Operators() =
     static member MulScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_mul_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25172,8 +25171,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25203,7 +25202,7 @@ type Operators() =
     static member BackwardMulScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_mul_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25216,8 +25215,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25247,7 +25246,7 @@ type Operators() =
     static member DivScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_div_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25271,8 +25270,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25302,7 +25301,7 @@ type Operators() =
     static member BackwardDivScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_div_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25315,8 +25314,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25335,7 +25334,7 @@ type Operators() =
     static member RdivScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_rdiv_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25348,8 +25347,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25369,7 +25368,7 @@ type Operators() =
     static member BackwardRdivScalar(lhs : NDArray, rhs : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_rdiv_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25383,8 +25382,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25404,7 +25403,7 @@ type Operators() =
     static member ModScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_mod_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25417,8 +25416,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25438,7 +25437,7 @@ type Operators() =
     static member BackwardModScalar(lhs : NDArray, rhs : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_mod_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25452,8 +25451,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25473,7 +25472,7 @@ type Operators() =
     static member RmodScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_rmod_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25486,8 +25485,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25507,7 +25506,7 @@ type Operators() =
     static member BackwardRmodScalar(lhs : NDArray, rhs : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_rmod_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25521,8 +25520,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25542,7 +25541,7 @@ type Operators() =
     static member MaximumScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_maximum_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25555,8 +25554,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25576,7 +25575,7 @@ type Operators() =
     static member BackwardMaximumScalar(lhs : NDArray, rhs : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_maximum_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25590,8 +25589,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25611,7 +25610,7 @@ type Operators() =
     static member MinimumScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_minimum_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25624,8 +25623,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25645,7 +25644,7 @@ type Operators() =
     static member BackwardMinimumScalar(lhs : NDArray, rhs : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_minimum_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25659,8 +25658,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25680,7 +25679,7 @@ type Operators() =
     static member PowerScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_power_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25693,8 +25692,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25714,7 +25713,7 @@ type Operators() =
     static member BackwardPowerScalar(lhs : NDArray, rhs : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_power_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25728,8 +25727,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25749,7 +25748,7 @@ type Operators() =
     static member RpowerScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_rpower_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25762,8 +25761,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25783,7 +25782,7 @@ type Operators() =
     static member BackwardRpowerScalar(lhs : NDArray, rhs : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_rpower_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25797,8 +25796,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25818,7 +25817,7 @@ type Operators() =
     static member HypotScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_hypot_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25831,8 +25830,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25852,7 +25851,7 @@ type Operators() =
     static member BackwardHypotScalar(lhs : NDArray, rhs : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_hypot_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25866,8 +25865,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25907,7 +25906,7 @@ type Operators() =
     static member SmoothL1(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "smooth_l1"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -25940,8 +25939,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -25980,7 +25979,7 @@ type Operators() =
     static member BackwardSmoothL1(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_smooth_l1"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -25993,8 +25992,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26013,7 +26012,7 @@ type Operators() =
     static member EqualScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_equal_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -26026,8 +26025,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26046,7 +26045,7 @@ type Operators() =
     static member NotEqualScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_not_equal_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -26059,8 +26058,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26079,7 +26078,7 @@ type Operators() =
     static member GreaterScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_greater_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -26092,8 +26091,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26112,7 +26111,7 @@ type Operators() =
     static member GreaterEqualScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_greater_equal_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -26125,8 +26124,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26145,7 +26144,7 @@ type Operators() =
     static member LesserScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_lesser_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -26158,8 +26157,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26178,7 +26177,7 @@ type Operators() =
     static member LesserEqualScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_lesser_equal_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -26191,8 +26190,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26211,7 +26210,7 @@ type Operators() =
     static member LogicalAndScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_logical_and_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -26224,8 +26223,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26244,7 +26243,7 @@ type Operators() =
     static member LogicalOrScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_logical_or_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -26257,8 +26256,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26277,7 +26276,7 @@ type Operators() =
     static member LogicalXorScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_logical_xor_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -26290,8 +26289,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26323,7 +26322,7 @@ type Operators() =
     static member ScatterElemwiseDiv(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_scatter_elemwise_div"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -26349,8 +26348,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26394,7 +26393,7 @@ type Operators() =
     static member ScatterPlusScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_scatter_plus_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -26419,8 +26418,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26463,7 +26462,7 @@ type Operators() =
     static member ScatterMinusScalar(data : NDArray, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_scatter_minus_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
         outputs
@@ -26488,8 +26487,8 @@ type Operators() =
         let vals = [|string scalar|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26536,7 +26535,7 @@ type Operators() =
     static member AddN([<ParamArray>] args : NDArray[]) =
         let creator = AtomicSymbolCreator.FromName "add_n"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (args |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (args |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -26565,8 +26564,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (args |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (args |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26614,7 +26613,7 @@ type Operators() =
     static member Relu(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "relu"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -26640,8 +26639,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26673,7 +26672,7 @@ type Operators() =
     static member BackwardRelu(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_relu"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -26686,8 +26685,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26715,7 +26714,7 @@ type Operators() =
     static member Sigmoid(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "sigmoid"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -26737,8 +26736,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26766,7 +26765,7 @@ type Operators() =
     static member BackwardSigmoid(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_sigmoid"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -26779,8 +26778,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26808,7 +26807,7 @@ type Operators() =
     static member HardSigmoid(data : NDArray, [<Optional; DefaultParameterValue(0.200000003)>] alpha : float, [<Optional; DefaultParameterValue(0.5)>] beta : float) =
         let creator = AtomicSymbolCreator.FromName "hard_sigmoid"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"alpha"; "beta"|]
                                                  [|string alpha; string beta|]
         outputs
@@ -26830,8 +26829,8 @@ type Operators() =
         let vals = [|string alpha; string beta|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26869,7 +26868,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26895,7 +26894,7 @@ type Operators() =
     static member Softsign(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "softsign"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -26917,8 +26916,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26946,7 +26945,7 @@ type Operators() =
     static member BackwardSoftsign(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_softsign"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -26959,8 +26958,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -26981,7 +26980,7 @@ type Operators() =
     static member Copy(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_copy"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -26996,8 +26995,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27028,7 +27027,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27055,7 +27054,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27099,7 +27098,7 @@ type Operators() =
     static member BlockGrad(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "BlockGrad"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -27139,8 +27138,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27209,7 +27208,7 @@ type Operators() =
     static member MakeLoss(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "make_loss"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -27245,8 +27244,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27288,7 +27287,7 @@ type Operators() =
     static member IdentityWithAttrLikeRhs(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_identity_with_attr_like_rhs"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -27301,8 +27300,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27349,7 +27348,7 @@ type Operators() =
     static member ReshapeLike(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "reshape_like"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -27390,8 +27389,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27454,7 +27453,7 @@ type Operators() =
                              [<Optional>] rhsEnd : int Nullable) =
         let creator = AtomicSymbolCreator.FromName "shape_array"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"lhs_begin"; "lhs_end"; "rhs_begin"; "rhs_end"|]
                                                  [|string lhsBegin; string lhsEnd; string rhsBegin; string rhsEnd|]
         outputs
@@ -27484,8 +27483,8 @@ type Operators() =
         let vals = [|string lhsBegin; string lhsEnd; string rhsBegin; string rhsEnd|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27536,7 +27535,7 @@ type Operators() =
                              ?rhsEnd : int) =
         let creator = AtomicSymbolCreator.FromName "shape_array"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"lhs_begin"; "lhs_end"; "rhs_begin"; "rhs_end"|]
                                                  [|(match lhsBegin with None -> "None" | Some lhsBegin -> string lhsBegin); (match lhsEnd with None -> "None" | Some lhsEnd -> string lhsEnd); (match rhsBegin with None -> "None" | Some rhsBegin -> string rhsBegin); (match rhsEnd with None -> "None" | Some rhsEnd -> string rhsEnd)|]
         outputs
@@ -27566,8 +27565,8 @@ type Operators() =
         let vals = [|(match lhsBegin with None -> "None" | Some lhsBegin -> string lhsBegin); (match lhsEnd with None -> "None" | Some lhsEnd -> string lhsEnd); (match rhsBegin with None -> "None" | Some rhsBegin -> string rhsBegin); (match rhsEnd with None -> "None" | Some rhsEnd -> string rhsEnd)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27610,7 +27609,7 @@ type Operators() =
     static member SizeArray(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "size_array"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -27631,8 +27630,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27672,7 +27671,7 @@ type Operators() =
     static member Cast(data : NDArray, dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "Cast"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"dtype"|]
                                                  [|string dtype|]
         outputs
@@ -27698,8 +27697,8 @@ type Operators() =
         let vals = [|string dtype|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27741,7 +27740,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27766,7 +27765,7 @@ type Operators() =
     static member Negative(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "negative"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -27787,8 +27786,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27825,7 +27824,7 @@ type Operators() =
     static member Reciprocal(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "reciprocal"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -27848,8 +27847,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27878,7 +27877,7 @@ type Operators() =
     static member BackwardReciprocal(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_reciprocal"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -27891,8 +27890,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27925,7 +27924,7 @@ type Operators() =
     static member Abs(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "abs"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -27952,8 +27951,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -27986,7 +27985,7 @@ type Operators() =
     static member BackwardAbs(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_abs"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -27999,8 +27998,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -28033,7 +28032,7 @@ type Operators() =
     static member Sign(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "sign"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -28060,8 +28059,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -28094,7 +28093,7 @@ type Operators() =
     static member BackwardSign(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_sign"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -28107,8 +28106,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -28141,7 +28140,7 @@ type Operators() =
     static member Round(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "round"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -28168,8 +28167,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -28220,7 +28219,7 @@ type Operators() =
     static member Rint(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "rint"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -28251,8 +28250,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -28305,7 +28304,7 @@ type Operators() =
     static member Ceil(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "ceil"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -28334,8 +28333,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -28386,7 +28385,7 @@ type Operators() =
     static member Floor(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "floor"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -28415,8 +28414,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -28468,7 +28467,7 @@ type Operators() =
     static member Trunc(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "trunc"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -28498,8 +28497,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -28550,7 +28549,7 @@ type Operators() =
     static member Fix(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "fix"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -28578,8 +28577,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -28630,7 +28629,7 @@ type Operators() =
     static member Square(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "square"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -28660,8 +28659,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -28697,7 +28696,7 @@ type Operators() =
     static member BackwardSquare(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_square"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -28710,8 +28709,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -28747,7 +28746,7 @@ type Operators() =
     static member Sqrt(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "sqrt"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -28777,8 +28776,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -28814,7 +28813,7 @@ type Operators() =
     static member BackwardSqrt(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_sqrt"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -28827,8 +28826,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -28860,7 +28859,7 @@ type Operators() =
     static member Rsqrt(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "rsqrt"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -28886,8 +28885,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -28919,7 +28918,7 @@ type Operators() =
     static member BackwardRsqrt(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_rsqrt"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -28932,8 +28931,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -28969,7 +28968,7 @@ type Operators() =
     static member Cbrt(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "cbrt"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -28999,8 +28998,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29036,7 +29035,7 @@ type Operators() =
     static member BackwardCbrt(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_cbrt"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29049,8 +29048,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29077,7 +29076,7 @@ type Operators() =
     static member Erf(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "erf"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29098,8 +29097,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29126,7 +29125,7 @@ type Operators() =
     static member BackwardErf(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_erf"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29139,8 +29138,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29167,7 +29166,7 @@ type Operators() =
     static member Erfinv(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "erfinv"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29188,8 +29187,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29216,7 +29215,7 @@ type Operators() =
     static member BackwardErfinv(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_erfinv"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29229,8 +29228,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29260,7 +29259,7 @@ type Operators() =
     static member Rcbrt(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "rcbrt"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29284,8 +29283,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29315,7 +29314,7 @@ type Operators() =
     static member BackwardRcbrt(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_rcbrt"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29328,8 +29327,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29361,7 +29360,7 @@ type Operators() =
     static member Exp(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "exp"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29387,8 +29386,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29428,7 +29427,7 @@ type Operators() =
     static member Log(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "log"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29449,8 +29448,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29485,7 +29484,7 @@ type Operators() =
     static member Log10(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "log10"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29506,8 +29505,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29542,7 +29541,7 @@ type Operators() =
     static member Log2(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "log2"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29563,8 +29562,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29591,7 +29590,7 @@ type Operators() =
     static member BackwardLog(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_log"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29604,8 +29603,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29624,7 +29623,7 @@ type Operators() =
     static member BackwardLog10(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_log10"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29637,8 +29636,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29657,7 +29656,7 @@ type Operators() =
     static member BackwardLog2(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_log2"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29670,8 +29669,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29703,7 +29702,7 @@ type Operators() =
     static member Log1p(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "log1p"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29729,8 +29728,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29762,7 +29761,7 @@ type Operators() =
     static member BackwardLog1p(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_log1p"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29775,8 +29774,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29807,7 +29806,7 @@ type Operators() =
     static member Expm1(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "expm1"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29832,8 +29831,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29864,7 +29863,7 @@ type Operators() =
     static member BackwardExpm1(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_expm1"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29877,8 +29876,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29902,7 +29901,7 @@ type Operators() =
     static member Gamma(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "gamma"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29920,8 +29919,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29945,7 +29944,7 @@ type Operators() =
     static member BackwardGamma(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_gamma"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -29958,8 +29957,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -29983,7 +29982,7 @@ type Operators() =
     static member Gammaln(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "gammaln"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30001,8 +30000,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30026,7 +30025,7 @@ type Operators() =
     static member BackwardGammaln(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_gammaln"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30039,8 +30038,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30064,7 +30063,7 @@ type Operators() =
     static member LogicalNot(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "logical_not"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30082,8 +30081,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30122,7 +30121,7 @@ type Operators() =
     static member Sin(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "sin"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30150,8 +30149,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30185,7 +30184,7 @@ type Operators() =
     static member BackwardSin(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_sin"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30198,8 +30197,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30229,7 +30228,7 @@ type Operators() =
     static member Cos(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "cos"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30253,8 +30252,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30284,7 +30283,7 @@ type Operators() =
     static member BackwardCos(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_cos"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30297,8 +30296,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30332,7 +30331,7 @@ type Operators() =
     static member Tan(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "tan"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30360,8 +30359,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30395,7 +30394,7 @@ type Operators() =
     static member BackwardTan(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_tan"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30408,8 +30407,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30444,7 +30443,7 @@ type Operators() =
     static member Arcsin(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arcsin"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30473,8 +30472,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30509,7 +30508,7 @@ type Operators() =
     static member BackwardArcsin(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_arcsin"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30522,8 +30521,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30554,7 +30553,7 @@ type Operators() =
     static member Arccos(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arccos"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30579,8 +30578,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30611,7 +30610,7 @@ type Operators() =
     static member BackwardArccos(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_arccos"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30624,8 +30623,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30659,7 +30658,7 @@ type Operators() =
     static member Arctan(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arctan"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30687,8 +30686,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30722,7 +30721,7 @@ type Operators() =
     static member BackwardArctan(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_arctan"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30735,8 +30734,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30768,7 +30767,7 @@ type Operators() =
     static member Degrees(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "degrees"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30794,8 +30793,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30827,7 +30826,7 @@ type Operators() =
     static member BackwardDegrees(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_degrees"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30840,8 +30839,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30873,7 +30872,7 @@ type Operators() =
     static member Radians(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "radians"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30899,8 +30898,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30932,7 +30931,7 @@ type Operators() =
     static member BackwardRadians(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_radians"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -30945,8 +30944,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -30978,7 +30977,7 @@ type Operators() =
     static member Sinh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "sinh"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -31004,8 +31003,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31037,7 +31036,7 @@ type Operators() =
     static member BackwardSinh(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_sinh"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -31050,8 +31049,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31079,7 +31078,7 @@ type Operators() =
     static member Cosh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "cosh"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -31101,8 +31100,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31130,7 +31129,7 @@ type Operators() =
     static member BackwardCosh(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_cosh"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -31143,8 +31142,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31176,7 +31175,7 @@ type Operators() =
     static member Tanh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "tanh"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -31202,8 +31201,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31235,7 +31234,7 @@ type Operators() =
     static member BackwardTanh(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_tanh"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -31248,8 +31247,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31279,7 +31278,7 @@ type Operators() =
     static member Arcsinh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arcsinh"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -31303,8 +31302,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31334,7 +31333,7 @@ type Operators() =
     static member BackwardArcsinh(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_arcsinh"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -31347,8 +31346,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31374,7 +31373,7 @@ type Operators() =
     static member Arccosh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arccosh"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -31394,8 +31393,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31421,7 +31420,7 @@ type Operators() =
     static member BackwardArccosh(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_arccosh"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -31434,8 +31433,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31465,7 +31464,7 @@ type Operators() =
     static member Arctanh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arctanh"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -31489,8 +31488,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31520,7 +31519,7 @@ type Operators() =
     static member BackwardArctanh(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_backward_arctanh"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -31533,8 +31532,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31568,7 +31567,7 @@ type Operators() =
     static member Histogram(data : NDArray, bins : NDArray, [<Optional>] binCnt : int Nullable, [<Optional>] range : struct(float*float)) =
         let creator = AtomicSymbolCreator.FromName "_histogram"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; bins.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; bins.NDArrayHandle.UnsafeHandle|]
                                                  [|"bin_cnt"; "range"|]
                                                  [|string binCnt; (if isNull (range :> obj) then "None" else string range)|]
         outputs
@@ -31596,8 +31595,8 @@ type Operators() =
         let vals = [|string binCnt; (if isNull (range :> obj) then "None" else string range)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; bins.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; bins.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31646,7 +31645,7 @@ type Operators() =
     static member Histogram(data : NDArray, bins : NDArray, ?binCnt : int, ?range : struct(float*float)) =
         let creator = AtomicSymbolCreator.FromName "_histogram"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; bins.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; bins.NDArrayHandle.UnsafeHandle|]
                                                  [|"bin_cnt"; "range"|]
                                                  [|(match binCnt with None -> "None" | Some binCnt -> string binCnt); (match range with None -> "None" | Some range -> string range)|]
         outputs
@@ -31674,8 +31673,8 @@ type Operators() =
         let vals = [|(match binCnt with None -> "None" | Some binCnt -> string binCnt); (match range with None -> "None" | Some range -> string range)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; bins.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; bins.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31724,7 +31723,7 @@ type Operators() =
     static member Histogram(data : NDArray, bins : NDArray, [<Optional>] binCnt : int Nullable, [<Optional>] range : float*float) =
         let creator = AtomicSymbolCreator.FromName "_histogram"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; bins.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; bins.NDArrayHandle.UnsafeHandle|]
                                                  [|"bin_cnt"; "range"|]
                                                  [|string binCnt; (if isNull (range :> obj) then "None" else string range)|]
         outputs
@@ -31752,8 +31751,8 @@ type Operators() =
         let vals = [|string binCnt; (if isNull (range :> obj) then "None" else string range)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; bins.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; bins.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31802,7 +31801,7 @@ type Operators() =
     static member Histogram(data : NDArray, bins : NDArray, ?binCnt : int, ?range : float*float) =
         let creator = AtomicSymbolCreator.FromName "_histogram"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; bins.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; bins.NDArrayHandle.UnsafeHandle|]
                                                  [|"bin_cnt"; "range"|]
                                                  [|(match binCnt with None -> "None" | Some binCnt -> string binCnt); (match range with None -> "None" | Some range -> string range)|]
         outputs
@@ -31830,8 +31829,8 @@ type Operators() =
         let vals = [|(match binCnt with None -> "None" | Some binCnt -> string binCnt); (match range with None -> "None" | Some range -> string range)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; bins.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; bins.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -31927,7 +31926,7 @@ type Operators() =
                             [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
         let creator = AtomicSymbolCreator.FromName "Embedding"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; weight.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle|]
                                                  [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
                                                  [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
         outputs
@@ -32003,8 +32002,8 @@ type Operators() =
         let vals = [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; weight.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -32146,7 +32145,7 @@ type Operators() =
                                          [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_SparseEmbedding"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; weight.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle|]
                                                  [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
                                                  [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
         outputs
@@ -32221,8 +32220,8 @@ type Operators() =
         let vals = [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; weight.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -32312,7 +32311,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -32339,7 +32338,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -32410,7 +32409,7 @@ type Operators() =
     static member Take(a : NDArray, indices : NDArray, [<Optional; DefaultParameterValue(0)>] axis : int, [<Optional>] mode : TakeMode) =
         let creator = AtomicSymbolCreator.FromName "take"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|a.NDArrayHandle; indices.NDArrayHandle|]
+                                                 [|a.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "mode"|]
                                                  [|string axis; (if isNull (mode :> obj) then "clip" else string mode)|]
         outputs
@@ -32477,8 +32476,8 @@ type Operators() =
         let vals = [|string axis; (if isNull (mode :> obj) then "clip" else string mode)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|a.NDArrayHandle; indices.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|a.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -32561,7 +32560,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -32600,7 +32599,7 @@ type Operators() =
     static member BatchTake(a : NDArray, indices : NDArray) =
         let creator = AtomicSymbolCreator.FromName "batch_take"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|a.NDArrayHandle; indices.NDArrayHandle|]
+                                                 [|a.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -32635,8 +32634,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|a.NDArrayHandle; indices.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|a.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -32719,7 +32718,7 @@ type Operators() =
                          [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "one_hot"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|indices.NDArrayHandle|]
+                                                 [|indices.NDArrayHandle.UnsafeHandle|]
                                                  [|"depth"; "on_value"; "off_value"; "dtype"|]
                                                  [|string depth; string onValue; string offValue; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         outputs
@@ -32775,8 +32774,8 @@ type Operators() =
         let vals = [|string depth; string onValue; string offValue; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|indices.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|indices.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -32862,7 +32861,7 @@ type Operators() =
     static member GatherNd(data : NDArray, indices : NDArray) =
         let creator = AtomicSymbolCreator.FromName "gather_nd"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; indices.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -32900,8 +32899,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; indices.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -32990,7 +32989,7 @@ type Operators() =
     static member ScatterNd(data : NDArray, indices : NDArray, shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "scatter_nd"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; indices.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
                                                  [|(shape |> Seq.map string |> String.concat ", ")|]
         outputs
@@ -33048,8 +33047,8 @@ type Operators() =
         let vals = [|(shape |> Seq.map string |> String.concat ", ")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; indices.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -33146,7 +33145,7 @@ type Operators() =
     static member BackwardGatherNd(data : NDArray, indices : NDArray, shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "_backward_gather_nd"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; indices.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
                                                  [|(shape |> Seq.map string |> String.concat ", ")|]
         outputs
@@ -33192,8 +33191,8 @@ type Operators() =
         let vals = [|(shape |> Seq.map string |> String.concat ", ")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; indices.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -33263,7 +33262,7 @@ type Operators() =
     static member ScatterSetNd(lhs : NDArray, rhs : NDArray, indices : NDArray, shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "_scatter_set_nd"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle; indices.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
                                                  [|(shape |> Seq.map string |> String.concat ", ")|]
         outputs
@@ -33294,8 +33293,8 @@ type Operators() =
         let vals = [|(shape |> Seq.map string |> String.concat ", ")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle; indices.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -33350,7 +33349,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -33389,7 +33388,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -33441,7 +33440,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -33486,7 +33485,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -33527,7 +33526,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -33566,7 +33565,7 @@ type Operators() =
     static member ZerosLike(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "zeros_like"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -33596,8 +33595,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -33644,7 +33643,7 @@ type Operators() =
     static member OnesLike(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "ones_like"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -33668,8 +33667,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -33762,7 +33761,7 @@ type Operators() =
                              [<Optional; DefaultParameterValue(-2)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "_linalg_gemm"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|A.NDArrayHandle; B.NDArrayHandle; C.NDArrayHandle|]
+                                                 [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle; C.NDArrayHandle.UnsafeHandle|]
                                                  [|"transpose_a"; "transpose_b"; "alpha"; "beta"; "axis"|]
                                                  [|string transposeA; string transposeB; string alpha; string beta; string axis|]
         outputs
@@ -33839,8 +33838,8 @@ type Operators() =
         let vals = [|string transposeA; string transposeB; string alpha; string beta; string axis|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|A.NDArrayHandle; B.NDArrayHandle; C.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle; C.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -33932,7 +33931,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -34005,7 +34004,7 @@ type Operators() =
                               [<Optional; DefaultParameterValue(-2)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "_linalg_gemm2"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|A.NDArrayHandle; B.NDArrayHandle|]
+                                                 [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle|]
                                                  [|"transpose_a"; "transpose_b"; "alpha"; "axis"|]
                                                  [|string transposeA; string transposeB; string alpha; string axis|]
         outputs
@@ -34075,8 +34074,8 @@ type Operators() =
         let vals = [|string transposeA; string transposeB; string alpha; string axis|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|A.NDArrayHandle; B.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -34161,7 +34160,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -34204,7 +34203,7 @@ type Operators() =
     static member LinalgPotrf(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_potrf"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|A.NDArrayHandle|]
+                                                 [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -34243,8 +34242,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|A.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|A.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -34299,7 +34298,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -34351,7 +34350,7 @@ type Operators() =
     static member LinalgPotri(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_potri"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|A.NDArrayHandle|]
+                                                 [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -34399,8 +34398,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|A.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|A.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -34464,7 +34463,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -34526,7 +34525,7 @@ type Operators() =
                              alpha : double) =
         let creator = AtomicSymbolCreator.FromName "_linalg_trmm"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|A.NDArrayHandle; B.NDArrayHandle|]
+                                                 [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle|]
                                                  [|"transpose"; "rightside"; "lower"; "alpha"|]
                                                  [|string transpose; string rightside; string lower; string alpha|]
         outputs
@@ -34585,8 +34584,8 @@ type Operators() =
         let vals = [|string transpose; string rightside; string lower; string alpha|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|A.NDArrayHandle; B.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -34660,7 +34659,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -34723,7 +34722,7 @@ type Operators() =
                              alpha : double) =
         let creator = AtomicSymbolCreator.FromName "_linalg_trsm"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|A.NDArrayHandle; B.NDArrayHandle|]
+                                                 [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle|]
                                                  [|"transpose"; "rightside"; "lower"; "alpha"|]
                                                  [|string transpose; string rightside; string lower; string alpha|]
         outputs
@@ -34783,8 +34782,8 @@ type Operators() =
         let vals = [|string transpose; string rightside; string lower; string alpha|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|A.NDArrayHandle; B.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -34859,7 +34858,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -34898,7 +34897,7 @@ type Operators() =
     static member LinalgSumlogdiag(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_sumlogdiag"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|A.NDArrayHandle|]
+                                                 [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -34933,8 +34932,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|A.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|A.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -34985,7 +34984,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -35032,7 +35031,7 @@ type Operators() =
     static member LinalgExtractdiag(A : NDArray, [<Optional; DefaultParameterValue(0)>] offset : int) =
         let creator = AtomicSymbolCreator.FromName "_linalg_extractdiag"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|A.NDArrayHandle|]
+                                                 [|A.NDArrayHandle.UnsafeHandle|]
                                                  [|"offset"|]
                                                  [|string offset|]
         outputs
@@ -35075,8 +35074,8 @@ type Operators() =
         let vals = [|string offset|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|A.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|A.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -35135,7 +35134,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -35183,7 +35182,7 @@ type Operators() =
     static member LinalgMakediag(A : NDArray, [<Optional; DefaultParameterValue(0)>] offset : int) =
         let creator = AtomicSymbolCreator.FromName "_linalg_makediag"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|A.NDArrayHandle|]
+                                                 [|A.NDArrayHandle.UnsafeHandle|]
                                                  [|"offset"|]
                                                  [|string offset|]
         outputs
@@ -35227,8 +35226,8 @@ type Operators() =
         let vals = [|string offset|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|A.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|A.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -35288,7 +35287,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -35343,7 +35342,7 @@ type Operators() =
     static member LinalgExtracttrian(A : NDArray, [<Optional; DefaultParameterValue(0)>] offset : int, [<Optional; DefaultParameterValue(true)>] lower : bool) =
         let creator = AtomicSymbolCreator.FromName "_linalg_extracttrian"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|A.NDArrayHandle|]
+                                                 [|A.NDArrayHandle.UnsafeHandle|]
                                                  [|"offset"; "lower"|]
                                                  [|string offset; string lower|]
         outputs
@@ -35394,8 +35393,8 @@ type Operators() =
         let vals = [|string offset; string lower|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|A.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|A.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -35462,7 +35461,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -35527,7 +35526,7 @@ type Operators() =
     static member LinalgMaketrian(A : NDArray, [<Optional; DefaultParameterValue(0)>] offset : int, [<Optional; DefaultParameterValue(true)>] lower : bool) =
         let creator = AtomicSymbolCreator.FromName "_linalg_maketrian"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|A.NDArrayHandle|]
+                                                 [|A.NDArrayHandle.UnsafeHandle|]
                                                  [|"offset"; "lower"|]
                                                  [|string offset; string lower|]
         outputs
@@ -35588,8 +35587,8 @@ type Operators() =
         let vals = [|string offset; string lower|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|A.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|A.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -35666,7 +35665,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -35720,7 +35719,7 @@ type Operators() =
     static member LinalgSyrk(A : NDArray, [<Optional; DefaultParameterValue(false)>] transpose : bool, alpha : double) =
         let creator = AtomicSymbolCreator.FromName "_linalg_syrk"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|A.NDArrayHandle|]
+                                                 [|A.NDArrayHandle.UnsafeHandle|]
                                                  [|"transpose"; "alpha"|]
                                                  [|string transpose; string alpha|]
         outputs
@@ -35770,8 +35769,8 @@ type Operators() =
         let vals = [|string transpose; string alpha|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|A.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|A.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -35837,7 +35836,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -35900,7 +35899,7 @@ type Operators() =
     static member LinalgGelqf(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_gelqf"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|A.NDArrayHandle|]
+                                                 [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -35959,8 +35958,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|A.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|A.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -36035,7 +36034,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -36097,7 +36096,7 @@ type Operators() =
     static member LinalgSyevd(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_syevd"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|A.NDArrayHandle|]
+                                                 [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -36155,8 +36154,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|A.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|A.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -36230,7 +36229,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -36272,7 +36271,7 @@ type Operators() =
     static member LinalgInverse(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_inverse"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|A.NDArrayHandle|]
+                                                 [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -36310,8 +36309,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|A.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|A.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -36365,7 +36364,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -36453,7 +36452,7 @@ type Operators() =
                           [<Optional; DefaultParameterValue(false)>] keepHighest : bool) =
         let creator = AtomicSymbolCreator.FromName "Reshape"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "reverse"; "target_shape"; "keep_highest"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string reverse; (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string keepHighest|]
         outputs
@@ -36538,8 +36537,8 @@ type Operators() =
         let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string reverse; (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string keepHighest|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -36659,7 +36658,7 @@ type Operators() =
     static member Transpose(data : NDArray, [<Optional>] axes : int seq) =
         let creator = AtomicSymbolCreator.FromName "transpose"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axes"|]
                                                  [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|]
         outputs
@@ -36702,8 +36701,8 @@ type Operators() =
         let vals = [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -36760,7 +36759,7 @@ type Operators() =
     static member ExpandDims(data : NDArray, axis : int) =
         let creator = AtomicSymbolCreator.FromName "expand_dims"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"|]
                                                  [|string axis|]
         outputs
@@ -36781,8 +36780,8 @@ type Operators() =
         let vals = [|string axis|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -36858,7 +36857,7 @@ type Operators() =
     static member Slice(data : NDArray, sliceBegin : int seq, sliceEnd : int seq, [<Optional>] step : int seq) =
         let creator = AtomicSymbolCreator.FromName "slice"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"begin"; "end"; "step"|]
                                                  [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
         outputs
@@ -36920,8 +36919,8 @@ type Operators() =
         let vals = [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -36999,7 +36998,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -37032,7 +37031,7 @@ type Operators() =
                               [<Optional>] step : int seq) =
         let creator = AtomicSymbolCreator.FromName "_slice_assign"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"begin"; "end"; "step"|]
                                                  [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
         outputs
@@ -37062,8 +37061,8 @@ type Operators() =
         let vals = [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -37113,7 +37112,7 @@ type Operators() =
                                     [<Optional>] step : int seq) =
         let creator = AtomicSymbolCreator.FromName "_slice_assign_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"; "begin"; "end"; "step"|]
                                                  [|string scalar; (sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
         outputs
@@ -37142,8 +37141,8 @@ type Operators() =
         let vals = [|string scalar; (sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -37203,7 +37202,7 @@ type Operators() =
     static member SliceAxis(data : NDArray, axis : int, sliceBegin : int, [<Optional>] sliceEnd : int Nullable) =
         let creator = AtomicSymbolCreator.FromName "slice_axis"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "begin"; "end"|]
                                                  [|string axis; string sliceBegin; string sliceEnd|]
         outputs
@@ -37242,8 +37241,8 @@ type Operators() =
         let vals = [|string axis; string sliceBegin; string sliceEnd|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -37314,7 +37313,7 @@ type Operators() =
     static member SliceAxis(data : NDArray, axis : int, sliceBegin : int, ?sliceEnd : int) =
         let creator = AtomicSymbolCreator.FromName "slice_axis"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "begin"; "end"|]
                                                  [|string axis; string sliceBegin; (match sliceEnd with None -> "None" | Some sliceEnd -> string sliceEnd)|]
         outputs
@@ -37353,8 +37352,8 @@ type Operators() =
         let vals = [|string axis; string sliceBegin; (match sliceEnd with None -> "None" | Some sliceEnd -> string sliceEnd)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -37409,7 +37408,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -37480,7 +37479,7 @@ type Operators() =
     static member SliceLike(data : NDArray, shapeLike : NDArray, [<Optional>] axes : int seq) =
         let creator = AtomicSymbolCreator.FromName "slice_like"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; shapeLike.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; shapeLike.NDArrayHandle.UnsafeHandle|]
                                                  [|"axes"|]
                                                  [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|]
         outputs
@@ -37547,8 +37546,8 @@ type Operators() =
         let vals = [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; shapeLike.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; shapeLike.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -37631,7 +37630,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -37676,7 +37675,7 @@ type Operators() =
     static member Clip(data : NDArray, aMin : float, aMax : float) =
         let creator = AtomicSymbolCreator.FromName "clip"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"a_min"; "a_max"|]
                                                  [|string aMin; string aMax|]
         outputs
@@ -37717,8 +37716,8 @@ type Operators() =
         let vals = [|string aMin; string aMax|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -37775,7 +37774,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -37819,7 +37818,7 @@ type Operators() =
     static member Repeat(data : NDArray, repeats : int, [<Optional>] axis : int Nullable) =
         let creator = AtomicSymbolCreator.FromName "repeat"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"repeats"; "axis"|]
                                                  [|string repeats; string axis|]
         outputs
@@ -37859,8 +37858,8 @@ type Operators() =
         let vals = [|string repeats; string axis|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -37933,7 +37932,7 @@ type Operators() =
     static member Repeat(data : NDArray, repeats : int, ?axis : int) =
         let creator = AtomicSymbolCreator.FromName "repeat"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"repeats"; "axis"|]
                                                  [|string repeats; (match axis with None -> "None" | Some axis -> string axis)|]
         outputs
@@ -37973,8 +37972,8 @@ type Operators() =
         let vals = [|string repeats; (match axis with None -> "None" | Some axis -> string axis)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -38030,7 +38029,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -38084,7 +38083,7 @@ type Operators() =
     static member Tile(data : NDArray, reps : int seq) =
         let creator = AtomicSymbolCreator.FromName "tile"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"reps"|]
                                                  [|(reps |> Seq.map string |> String.concat ", ")|]
         outputs
@@ -38134,8 +38133,8 @@ type Operators() =
         let vals = [|(reps |> Seq.map string |> String.concat ", ")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -38201,7 +38200,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -38235,7 +38234,7 @@ type Operators() =
     static member Reverse(data : NDArray, axis : int seq) =
         let creator = AtomicSymbolCreator.FromName "reverse"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"|]
                                                  [|(axis |> Seq.map string |> String.concat ", ")|]
         outputs
@@ -38265,8 +38264,8 @@ type Operators() =
         let vals = [|(axis |> Seq.map string |> String.concat ", ")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -38312,7 +38311,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -38346,7 +38345,7 @@ type Operators() =
     static member Stack([<ParamArray>] data : NDArray[], [<Optional; DefaultParameterValue(0)>] axis : int, numArgs : int) =
         let creator = AtomicSymbolCreator.FromName "stack"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (data |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"axis"; "num_args"|]
                                                  [|string axis; string numArgs|]
         outputs
@@ -38376,8 +38375,8 @@ type Operators() =
         let vals = [|string axis; string numArgs|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (data |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -38423,7 +38422,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -38456,7 +38455,7 @@ type Operators() =
     static member Squeeze([<ParamArray>] data : NDArray[], [<Optional>] axis : int seq) =
         let creator = AtomicSymbolCreator.FromName "squeeze"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (data |> Array.map (fun x -> x.NDArrayHandle))
+                                                 (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"axis"|]
                                                  [|(axis |> Seq.map string |> String.concat ", ")|]
         outputs
@@ -38485,8 +38484,8 @@ type Operators() =
         let vals = [|(axis |> Seq.map string |> String.concat ", ")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (data |> Array.map (fun x -> x.NDArrayHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -38531,7 +38530,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -38583,7 +38582,7 @@ type Operators() =
     static member DepthToSpace(data : NDArray, blockSize : int) =
         let creator = AtomicSymbolCreator.FromName "depth_to_space"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"block_size"|]
                                                  [|string blockSize|]
         outputs
@@ -38631,8 +38630,8 @@ type Operators() =
         let vals = [|string blockSize|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -38723,7 +38722,7 @@ type Operators() =
     static member SpaceToDepth(data : NDArray, blockSize : int) =
         let creator = AtomicSymbolCreator.FromName "space_to_depth"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"block_size"|]
                                                  [|string blockSize|]
         outputs
@@ -38773,8 +38772,8 @@ type Operators() =
         let vals = [|string blockSize|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -38906,7 +38905,7 @@ type Operators() =
                           [<Optional; DefaultParameterValue(0)>] sections : int) =
         let creator = AtomicSymbolCreator.FromName "_split_v2"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"indices"; "axis"; "squeeze_axis"; "sections"|]
                                                  [|(indices |> Seq.map string |> String.concat ", "); string axis; string squeezeAxis; string sections|]
         outputs
@@ -38996,8 +38995,8 @@ type Operators() =
         let vals = [|(indices |> Seq.map string |> String.concat ", "); string axis; string squeezeAxis; string sections|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -39102,7 +39101,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -39159,7 +39158,7 @@ type Operators() =
                        [<Optional>] dtype : TopkDtype) =
         let creator = AtomicSymbolCreator.FromName "topk"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "k"; "ret_typ"; "is_ascend"; "dtype"|]
                                                  [|string axis; string k; (if isNull (retTyp :> obj) then "indices" else string retTyp); string isAscend; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         outputs
@@ -39213,8 +39212,8 @@ type Operators() =
         let vals = [|string axis; string k; (if isNull (retTyp :> obj) then "indices" else string retTyp); string isAscend; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -39313,7 +39312,7 @@ type Operators() =
                        ?dtype : TopkDtype) =
         let creator = AtomicSymbolCreator.FromName "topk"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "k"; "ret_typ"; "is_ascend"; "dtype"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis); (match k with None -> "1" | Some k -> string k); (match retTyp with None -> "indices" | Some retTyp -> string retTyp); (match isAscend with None -> "false" | Some isAscend -> string isAscend); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
         outputs
@@ -39367,8 +39366,8 @@ type Operators() =
         let vals = [|(match axis with None -> "None" | Some axis -> string axis); (match k with None -> "1" | Some k -> string k); (match retTyp with None -> "indices" | Some retTyp -> string retTyp); (match isAscend with None -> "false" | Some isAscend -> string isAscend); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -39437,7 +39436,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -39480,7 +39479,7 @@ type Operators() =
     static member Sort(data : NDArray, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(true)>] isAscend : bool) =
         let creator = AtomicSymbolCreator.FromName "sort"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "is_ascend"|]
                                                  [|string axis; string isAscend|]
         outputs
@@ -39519,8 +39518,8 @@ type Operators() =
         let vals = [|string axis; string isAscend|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -39591,7 +39590,7 @@ type Operators() =
     static member Sort(data : NDArray, ?axis : int, ?isAscend : bool) =
         let creator = AtomicSymbolCreator.FromName "sort"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "is_ascend"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis); (match isAscend with None -> "true" | Some isAscend -> string isAscend)|]
         outputs
@@ -39630,8 +39629,8 @@ type Operators() =
         let vals = [|(match axis with None -> "None" | Some axis -> string axis); (match isAscend with None -> "true" | Some isAscend -> string isAscend)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -39701,7 +39700,7 @@ type Operators() =
     static member Argsort(data : NDArray, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(true)>] isAscend : bool, [<Optional>] dtype : ArgsortDtype) =
         let creator = AtomicSymbolCreator.FromName "argsort"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "is_ascend"; "dtype"|]
                                                  [|string axis; string isAscend; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         outputs
@@ -39739,8 +39738,8 @@ type Operators() =
         let vals = [|string axis; string isAscend; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -39809,7 +39808,7 @@ type Operators() =
     static member Argsort(data : NDArray, ?axis : int, ?isAscend : bool, ?dtype : ArgsortDtype) =
         let creator = AtomicSymbolCreator.FromName "argsort"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "is_ascend"; "dtype"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis); (match isAscend with None -> "true" | Some isAscend -> string isAscend); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
         outputs
@@ -39847,8 +39846,8 @@ type Operators() =
         let vals = [|(match axis with None -> "None" | Some axis -> string axis); (match isAscend with None -> "true" | Some isAscend -> string isAscend); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -39903,7 +39902,7 @@ type Operators() =
     static member RavelMultiIndex(data : NDArray, [<Optional>] shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "_ravel_multi_index"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
                                                  [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|]
         outputs
@@ -39927,8 +39926,8 @@ type Operators() =
         let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -39969,7 +39968,7 @@ type Operators() =
     static member UnravelIndex(data : NDArray, [<Optional>] shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "_unravel_index"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
                                                  [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|]
         outputs
@@ -39993,8 +39992,8 @@ type Operators() =
         let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -40046,7 +40045,7 @@ type Operators() =
     static member SparseRetain(data : NDArray, indices : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_sparse_retain"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; indices.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -40081,8 +40080,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; indices.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -40133,7 +40132,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -40180,7 +40179,7 @@ type Operators() =
     static member SquareSum(data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "_square_sum"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         outputs
@@ -40223,8 +40222,8 @@ type Operators() =
         let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -40283,7 +40282,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -40310,7 +40309,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -40402,7 +40401,7 @@ type Operators() =
     static member BilinearSampler(data : NDArray, grid : NDArray, [<Optional>] cudnnOff : bool Nullable) =
         let creator = AtomicSymbolCreator.FromName "BilinearSampler"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; grid.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; grid.NDArrayHandle.UnsafeHandle|]
                                                  [|"cudnn_off"|]
                                                  [|string cudnnOff|]
         outputs
@@ -40490,8 +40489,8 @@ type Operators() =
         let vals = [|string cudnnOff|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; grid.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; grid.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -40660,7 +40659,7 @@ type Operators() =
     static member BilinearSampler(data : NDArray, grid : NDArray, ?cudnnOff : bool) =
         let creator = AtomicSymbolCreator.FromName "BilinearSampler"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; grid.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; grid.NDArrayHandle.UnsafeHandle|]
                                                  [|"cudnn_off"|]
                                                  [|(match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff)|]
         outputs
@@ -40748,8 +40747,8 @@ type Operators() =
         let vals = [|(match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; grid.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; grid.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -40853,7 +40852,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -40901,7 +40900,7 @@ type Operators() =
                                      [<Optional; DefaultParameterValue(32)>] processingBatchSize : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_count_sketch"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; h.NDArrayHandle; s.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; h.NDArrayHandle.UnsafeHandle; s.NDArrayHandle.UnsafeHandle|]
                                                  [|"out_dim"; "processing_batch_size"|]
                                                  [|string outDim; string processingBatchSize|]
         outputs
@@ -40946,8 +40945,8 @@ type Operators() =
         let vals = [|string outDim; string processingBatchSize|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; h.NDArrayHandle; s.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; h.NDArrayHandle.UnsafeHandle; s.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41007,7 +41006,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41095,7 +41094,7 @@ type Operators() =
                                                [<Optional>] layout : ContribDeformableConvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_DeformableConvolution"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; offset.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; offset.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "stride"; "dilate"; "pad"; "num_filter"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "layout"|]
                                                  [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
@@ -41180,8 +41179,8 @@ type Operators() =
         let vals = [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; offset.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; offset.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41281,7 +41280,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41339,7 +41338,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41371,7 +41370,7 @@ type Operators() =
     static member ContribFft(data : NDArray, [<Optional; DefaultParameterValue(128)>] computeSize : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_fft"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"compute_size"|]
                                                  [|string computeSize|]
         outputs
@@ -41399,8 +41398,8 @@ type Operators() =
         let vals = [|string computeSize|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41444,7 +41443,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41477,7 +41476,7 @@ type Operators() =
     static member ContribIfft(data : NDArray, [<Optional; DefaultParameterValue(128)>] computeSize : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_ifft"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"compute_size"|]
                                                  [|string computeSize|]
         outputs
@@ -41506,8 +41505,8 @@ type Operators() =
         let vals = [|string computeSize|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41552,7 +41551,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41579,7 +41578,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41606,7 +41605,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41633,7 +41632,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41660,7 +41659,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41687,7 +41686,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41734,7 +41733,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41761,7 +41760,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41813,7 +41812,7 @@ type Operators() =
                                 [<Optional>] layout : ConvolutionV1Layout) =
         let creator = AtomicSymbolCreator.FromName "Convolution_v1"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "stride"; "dilate"; "pad"; "num_filter"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
                                                  [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs
@@ -41862,8 +41861,8 @@ type Operators() =
         let vals = [|(kernel |> Seq.map string |> String.concat ", "); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numFilter; string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; weight.NDArrayHandle; bias.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41927,7 +41926,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -41991,7 +41990,7 @@ type Operators() =
                               [<Optional; DefaultParameterValue(true)>] isMultiply : bool) =
         let creator = AtomicSymbolCreator.FromName "Correlation"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data1.NDArrayHandle; data2.NDArrayHandle|]
+                                                 [|data1.NDArrayHandle.UnsafeHandle; data2.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel_size"; "max_displacement"; "stride1"; "stride2"; "pad_size"; "is_multiply"|]
                                                  [|string kernelSize; string maxDisplacement; string stride1; string stride2; string padSize; string isMultiply|]
         outputs
@@ -42052,8 +42051,8 @@ type Operators() =
         let vals = [|string kernelSize; string maxDisplacement; string stride1; string stride2; string padSize; string isMultiply|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data1.NDArrayHandle; data2.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data1.NDArrayHandle.UnsafeHandle; data2.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42129,7 +42128,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42156,7 +42155,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42185,7 +42184,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42213,7 +42212,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42240,7 +42239,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42267,7 +42266,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42286,7 +42285,7 @@ type Operators() =
     static member GridGenerator(data : NDArray, transformType : GridGeneratorTransformType, [<Optional>] targetShape : int seq) =
         let creator = AtomicSymbolCreator.FromName "GridGenerator"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"transform_type"; "target_shape"|]
                                                  [|string transformType; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", "))|]
         outputs
@@ -42301,8 +42300,8 @@ type Operators() =
         let vals = [|string transformType; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", "))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42333,7 +42332,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42360,7 +42359,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42421,7 +42420,7 @@ type Operators() =
     static member InstanceNorm(data : NDArray, gamma : NDArray, beta : NDArray, [<Optional; DefaultParameterValue(0.00100000005)>] eps : float) =
         let creator = AtomicSymbolCreator.FromName "InstanceNorm"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; gamma.NDArrayHandle; beta.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
                                                  [|"eps"|]
                                                  [|string eps|]
         outputs
@@ -42478,8 +42477,8 @@ type Operators() =
         let vals = [|string eps|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; gamma.NDArrayHandle; beta.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42552,7 +42551,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42625,7 +42624,7 @@ type Operators() =
     static member L2Normalization(data : NDArray, [<Optional; DefaultParameterValue(1.00000001E-10)>] eps : float, [<Optional>] mode : L2NormalizationMode) =
         let creator = AtomicSymbolCreator.FromName "L2Normalization"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"eps"; "mode"|]
                                                  [|string eps; (if isNull (mode :> obj) then "instance" else string mode)|]
         outputs
@@ -42694,8 +42693,8 @@ type Operators() =
         let vals = [|string eps; (if isNull (mode :> obj) then "instance" else string mode)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42780,7 +42779,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42807,7 +42806,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42850,7 +42849,7 @@ type Operators() =
     static member MakeLoss(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] gradScale : float, [<Optional; DefaultParameterValue(0.0)>] validThresh : float, [<Optional>] normalization : Normalization) =
         let creator = AtomicSymbolCreator.FromName "MakeLoss"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"grad_scale"; "valid_thresh"; "normalization"|]
                                                  [|string gradScale; string validThresh; (if isNull (normalization :> obj) then "null" else string normalization)|]
         outputs
@@ -42889,8 +42888,8 @@ type Operators() =
         let vals = [|string gradScale; string validThresh; (if isNull (normalization :> obj) then "null" else string normalization)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42945,7 +42944,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42972,7 +42971,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -42999,7 +42998,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -43064,7 +43063,7 @@ type Operators() =
     static member ROIPooling(data : NDArray, rois : NDArray, pooledSize : int seq, spatialScale : float) =
         let creator = AtomicSymbolCreator.FromName "ROIPooling"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; rois.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; rois.NDArrayHandle.UnsafeHandle|]
                                                  [|"pooled_size"; "spatial_scale"|]
                                                  [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale|]
         outputs
@@ -43125,8 +43124,8 @@ type Operators() =
         let vals = [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; rois.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; rois.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -43203,7 +43202,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -43269,7 +43268,7 @@ type Operators() =
     static member SequenceLast(data : NDArray, sequenceLength : NDArray, [<Optional; DefaultParameterValue(false)>] useSequenceLength : bool, [<Optional; DefaultParameterValue(0)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "SequenceLast"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; sequenceLength.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
                                                  [|"use_sequence_length"; "axis"|]
                                                  [|string useSequenceLength; string axis|]
         outputs
@@ -43331,8 +43330,8 @@ type Operators() =
         let vals = [|string useSequenceLength; string axis|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; sequenceLength.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -43410,7 +43409,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -43503,7 +43502,7 @@ type Operators() =
                                [<Optional; DefaultParameterValue(0)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "SequenceMask"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; sequenceLength.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
                                                  [|"use_sequence_length"; "value"; "axis"|]
                                                  [|string useSequenceLength; string value; string axis|]
         outputs
@@ -43593,8 +43592,8 @@ type Operators() =
         let vals = [|string useSequenceLength; string value; string axis|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; sequenceLength.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -43699,7 +43698,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -43786,7 +43785,7 @@ type Operators() =
     static member SequenceReverse(data : NDArray, sequenceLength : NDArray, [<Optional; DefaultParameterValue(false)>] useSequenceLength : bool, [<Optional; DefaultParameterValue(0)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "SequenceReverse"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; sequenceLength.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
                                                  [|"use_sequence_length"; "axis"|]
                                                  [|string useSequenceLength; string axis|]
         outputs
@@ -43869,8 +43868,8 @@ type Operators() =
         let vals = [|string useSequenceLength; string axis|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; sequenceLength.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -43969,7 +43968,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -43996,7 +43995,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -44018,7 +44017,7 @@ type Operators() =
     static member SpatialTransformer(data : NDArray, loc : NDArray, [<Optional>] targetShape : int seq, [<Optional>] cudnnOff : bool Nullable) =
         let creator = AtomicSymbolCreator.FromName "SpatialTransformer"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; loc.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; loc.NDArrayHandle.UnsafeHandle|]
                                                  [|"target_shape"; "transform_type"; "sampler_type"; "cudnn_off"|]
                                                  [|(if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", ")); "affine"; "bilinear"; string cudnnOff|]
         outputs
@@ -44036,8 +44035,8 @@ type Operators() =
         let vals = [|(if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", ")); "affine"; "bilinear"; string cudnnOff|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; loc.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; loc.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -44066,7 +44065,7 @@ type Operators() =
     static member SpatialTransformer(data : NDArray, loc : NDArray, ?targetShape : int seq, ?cudnnOff : bool) =
         let creator = AtomicSymbolCreator.FromName "SpatialTransformer"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; loc.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; loc.NDArrayHandle.UnsafeHandle|]
                                                  [|"target_shape"; "transform_type"; "sampler_type"; "cudnn_off"|]
                                                  [|(match targetShape with None -> "[0,0]" | Some targetShape -> (targetShape |> Seq.map string |> String.concat ", ")); "affine"; "bilinear"; (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff)|]
         outputs
@@ -44084,8 +44083,8 @@ type Operators() =
         let vals = [|(match targetShape with None -> "[0,0]" | Some targetShape -> (targetShape |> Seq.map string |> String.concat ", ")); "affine"; "bilinear"; (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; loc.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; loc.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -44119,7 +44118,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -44149,7 +44148,7 @@ type Operators() =
                             [<Optional; DefaultParameterValue(false)>] useLinear : bool) =
         let creator = AtomicSymbolCreator.FromName "SVMOutput"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle; label.NDArrayHandle|]
+                                                 [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
                                                  [|"margin"; "regularization_coefficient"; "use_linear"|]
                                                  [|string margin; string regularizationCoefficient; string useLinear|]
         outputs
@@ -44176,8 +44175,8 @@ type Operators() =
         let vals = [|string margin; string regularizationCoefficient; string useLinear|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle; label.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -44219,7 +44218,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -44246,7 +44245,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -44275,7 +44274,7 @@ type Operators() =
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -44293,7 +44292,7 @@ type Operators() =
     static member OnehotEncode(lhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_onehot_encode"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -44306,8 +44305,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -44319,7 +44318,7 @@ type Operators() =
     static member FillElement0index(lhs : NDArray, mhs : NDArray, rhs : NDArray) =
         let creator = AtomicSymbolCreator.FromName "fill_element_0index"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|lhs.NDArrayHandle; mhs.NDArrayHandle; rhs.NDArrayHandle|]
+                                                 [|lhs.NDArrayHandle.UnsafeHandle; mhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
         outputs
@@ -44334,8 +44333,8 @@ type Operators() =
         let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|lhs.NDArrayHandle; mhs.NDArrayHandle; rhs.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|lhs.NDArrayHandle.UnsafeHandle; mhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -44359,7 +44358,7 @@ type Operators() =
                            size : int) =
         let creator = AtomicSymbolCreator.FromName "_imdecode"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|mean.NDArrayHandle|]
+                                                 [|mean.NDArrayHandle.UnsafeHandle|]
                                                  [|"index"; "x0"; "y0"; "x1"; "y1"; "c"; "size"|]
                                                  [|string index; string x0; string y0; string x1; string y1; string c; string size|]
         outputs
@@ -44387,8 +44386,8 @@ type Operators() =
         let vals = [|string index; string x0; string y0; string x1; string y1; string c; string size|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|mean.NDArrayHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+                                                     [|mean.NDArrayHandle.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
@@ -44560,7 +44559,7 @@ type Operators() =
 //     static member ImageAdjustLighting(data : NDArray, alpha : ) =
 //         let creator = AtomicSymbolCreator.FromName "_image_adjust_lighting"
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-//                                                  [|data.NDArrayHandle|]
+//                                                  [|data.NDArrayHandle.UnsafeHandle|]
 //                                                  [|"alpha"|]
 //                                                  [|string alpha|]
 //         outputs
@@ -44576,8 +44575,8 @@ type Operators() =
 //         let vals = [|string alpha|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-//                                                      [|data.NDArrayHandle|]
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      [|data.NDArrayHandle.UnsafeHandle|]
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -44617,7 +44616,7 @@ type Operators() =
 //                                  [<Optional; DefaultParameterValue(1)>] numWeights : int) =
 //         let creator = AtomicSymbolCreator.FromName "multi_sgd_update"
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-//                                                  (data |> Array.map (fun x -> x.NDArrayHandle))
+//                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
 //                                                  [|"lrs"; "wds"; "rescale_grad"; "clip_gradient"; "num_weights"|]
 //                                                  [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|]
 //         outputs
@@ -44649,8 +44648,8 @@ type Operators() =
 //         let vals = [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-//                                                      (data |> Array.map (fun x -> x.NDArrayHandle))
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -44719,7 +44718,7 @@ type Operators() =
 //                                     [<Optional; DefaultParameterValue(1)>] numWeights : int) =
 //         let creator = AtomicSymbolCreator.FromName "multi_sgd_mom_update"
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-//                                                  (data |> Array.map (fun x -> x.NDArrayHandle))
+//                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
 //                                                  [|"lrs"; "wds"; "momentum"; "rescale_grad"; "clip_gradient"; "num_weights"|]
 //                                                  [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|]
 //         outputs
@@ -44765,8 +44764,8 @@ type Operators() =
 //         let vals = [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-//                                                      (data |> Array.map (fun x -> x.NDArrayHandle))
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -44835,7 +44834,7 @@ type Operators() =
 //                                    [<Optional; DefaultParameterValue(1)>] numWeights : int) =
 //         let creator = AtomicSymbolCreator.FromName "multi_mp_sgd_update"
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-//                                                  (data |> Array.map (fun x -> x.NDArrayHandle))
+//                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
 //                                                  [|"lrs"; "wds"; "rescale_grad"; "clip_gradient"; "num_weights"|]
 //                                                  [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|]
 //         outputs
@@ -44867,8 +44866,8 @@ type Operators() =
 //         let vals = [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-//                                                      (data |> Array.map (fun x -> x.NDArrayHandle))
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -44937,7 +44936,7 @@ type Operators() =
 //                                       [<Optional; DefaultParameterValue(1)>] numWeights : int) =
 //         let creator = AtomicSymbolCreator.FromName "multi_mp_sgd_mom_update"
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-//                                                  (data |> Array.map (fun x -> x.NDArrayHandle))
+//                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
 //                                                  [|"lrs"; "wds"; "momentum"; "rescale_grad"; "clip_gradient"; "num_weights"|]
 //                                                  [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|]
 //         outputs
@@ -44983,8 +44982,8 @@ type Operators() =
 //         let vals = [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-//                                                      (data |> Array.map (fun x -> x.NDArrayHandle))
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -45092,7 +45091,7 @@ type Operators() =
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
 //                                                      Array.empty
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -45162,7 +45161,7 @@ type Operators() =
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
 //                                                      Array.empty
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -45250,7 +45249,7 @@ type Operators() =
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
 //                                                      Array.empty
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -45320,7 +45319,7 @@ type Operators() =
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
 //                                                      Array.empty
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -45373,7 +45372,7 @@ type Operators() =
 //                                        [<Optional; DefaultParameterValue(false)>] iouLoss : bool) =
 //         let creator = AtomicSymbolCreator.FromName "_contrib_MultiProposal"
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-//                                                  [|clsProb.NDArrayHandle; bboxPred.NDArrayHandle; imInfo.NDArrayHandle|]
+//                                                  [|clsProb.NDArrayHandle.UnsafeHandle; bboxPred.NDArrayHandle.UnsafeHandle; imInfo.NDArrayHandle.UnsafeHandle|]
 //                                                  [|"rpn_pre_nms_top_n"; "rpn_post_nms_top_n"; "threshold"; "rpn_min_size"; "scales"; "ratios"; "feature_stride"; "output_score"; "iou_loss"|]
 //                                                  [|string rpnPreNmsTopN; string rpnPostNmsTopN; string threshold; string rpnMinSize; string scales; string ratios; string featureStride; string outputScore; string iouLoss|]
 //         outputs
@@ -45409,8 +45408,8 @@ type Operators() =
 //         let vals = [|string rpnPreNmsTopN; string rpnPostNmsTopN; string threshold; string rpnMinSize; string scales; string ratios; string featureStride; string outputScore; string iouLoss|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-//                                                      [|clsProb.NDArrayHandle; bboxPred.NDArrayHandle; imInfo.NDArrayHandle|]
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      [|clsProb.NDArrayHandle.UnsafeHandle; bboxPred.NDArrayHandle.UnsafeHandle; imInfo.NDArrayHandle.UnsafeHandle|]
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -45469,7 +45468,7 @@ type Operators() =
 //                                            [<Optional; DefaultParameterValue(-1)>] nmsTopk : int) =
 //         let creator = AtomicSymbolCreator.FromName "_contrib_MultiBoxDetection"
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-//                                                  [|clsProb.NDArrayHandle; locPred.NDArrayHandle; anchor.NDArrayHandle|]
+//                                                  [|clsProb.NDArrayHandle.UnsafeHandle; locPred.NDArrayHandle.UnsafeHandle; anchor.NDArrayHandle.UnsafeHandle|]
 //                                                  [|"clip"; "threshold"; "background_id"; "nms_threshold"; "force_suppress"; "variances"; "nms_topk"|]
 //                                                  [|string clip; string threshold; string backgroundId; string nmsThreshold; string forceSuppress; string variances; string nmsTopk|]
 //         outputs
@@ -45501,8 +45500,8 @@ type Operators() =
 //         let vals = [|string clip; string threshold; string backgroundId; string nmsThreshold; string forceSuppress; string variances; string nmsTopk|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-//                                                      [|clsProb.NDArrayHandle; locPred.NDArrayHandle; anchor.NDArrayHandle|]
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      [|clsProb.NDArrayHandle.UnsafeHandle; locPred.NDArrayHandle.UnsafeHandle; anchor.NDArrayHandle.UnsafeHandle|]
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -45549,7 +45548,7 @@ type Operators() =
 //                                        offsets : ) =
 //         let creator = AtomicSymbolCreator.FromName "_contrib_MultiBoxPrior"
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-//                                                  [|data.NDArrayHandle|]
+//                                                  [|data.NDArrayHandle.UnsafeHandle|]
 //                                                  [|"sizes"; "ratios"; "clip"; "steps"; "offsets"|]
 //                                                  [|string sizes; string ratios; string clip; string steps; string offsets|]
 //         outputs
@@ -45573,8 +45572,8 @@ type Operators() =
 //         let vals = [|string sizes; string ratios; string clip; string steps; string offsets|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-//                                                      [|data.NDArrayHandle|]
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      [|data.NDArrayHandle.UnsafeHandle|]
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -45619,7 +45618,7 @@ type Operators() =
 //                                         variances : ) =
 //         let creator = AtomicSymbolCreator.FromName "_contrib_MultiBoxTarget"
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-//                                                  [|anchor.NDArrayHandle; label.NDArrayHandle; clsPred.NDArrayHandle|]
+//                                                  [|anchor.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle; clsPred.NDArrayHandle.UnsafeHandle|]
 //                                                  [|"overlap_threshold"; "ignore_label"; "negative_mining_ratio"; "negative_mining_thresh"; "minimum_negative_samples"; "variances"|]
 //                                                  [|string overlapThreshold; string ignoreLabel; string negativeMiningRatio; string negativeMiningThresh; string minimumNegativeSamples; string variances|]
 //         outputs
@@ -45649,8 +45648,8 @@ type Operators() =
 //         let vals = [|string overlapThreshold; string ignoreLabel; string negativeMiningRatio; string negativeMiningThresh; string minimumNegativeSamples; string variances|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-//                                                      [|anchor.NDArrayHandle; label.NDArrayHandle; clsPred.NDArrayHandle|]
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      [|anchor.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle; clsPred.NDArrayHandle.UnsafeHandle|]
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -45707,7 +45706,7 @@ type Operators() =
 //                                   [<Optional; DefaultParameterValue(false)>] iouLoss : bool) =
 //         let creator = AtomicSymbolCreator.FromName "_contrib_Proposal"
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-//                                                  [|clsProb.NDArrayHandle; bboxPred.NDArrayHandle; imInfo.NDArrayHandle|]
+//                                                  [|clsProb.NDArrayHandle.UnsafeHandle; bboxPred.NDArrayHandle.UnsafeHandle; imInfo.NDArrayHandle.UnsafeHandle|]
 //                                                  [|"rpn_pre_nms_top_n"; "rpn_post_nms_top_n"; "threshold"; "rpn_min_size"; "scales"; "ratios"; "feature_stride"; "output_score"; "iou_loss"|]
 //                                                  [|string rpnPreNmsTopN; string rpnPostNmsTopN; string threshold; string rpnMinSize; string scales; string ratios; string featureStride; string outputScore; string iouLoss|]
 //         outputs
@@ -45743,8 +45742,8 @@ type Operators() =
 //         let vals = [|string rpnPreNmsTopN; string rpnPostNmsTopN; string threshold; string rpnMinSize; string scales; string ratios; string featureStride; string outputScore; string iouLoss|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-//                                                      [|clsProb.NDArrayHandle; bboxPred.NDArrayHandle; imInfo.NDArrayHandle|]
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      [|clsProb.NDArrayHandle.UnsafeHandle; bboxPred.NDArrayHandle.UnsafeHandle; imInfo.NDArrayHandle.UnsafeHandle|]
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -45834,7 +45833,7 @@ type Operators() =
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
 //                                                      Array.empty
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -45872,7 +45871,7 @@ type Operators() =
 //     static member Native([<ParamArray>] data : NDArray[], info : ptr, [<Optional; DefaultParameterValue(true)>] needTopGrad : bool) =
 //         let creator = AtomicSymbolCreator.FromName "_Native"
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-//                                                  (data |> Array.map (fun x -> x.NDArrayHandle))
+//                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
 //                                                  [|"info"; "need_top_grad"|]
 //                                                  [|string info; string needTopGrad|]
 //         outputs
@@ -45887,8 +45886,8 @@ type Operators() =
 //         let vals = [|string info; string needTopGrad|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-//                                                      (data |> Array.map (fun x -> x.NDArrayHandle))
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -45910,7 +45909,7 @@ type Operators() =
 //     static member NDArray([<ParamArray>] data : NDArray[], info : ptr) =
 //         let creator = AtomicSymbolCreator.FromName "_NDArray"
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-//                                                  (data |> Array.map (fun x -> x.NDArrayHandle))
+//                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
 //                                                  [|"info"|]
 //                                                  [|string info|]
 //         outputs
@@ -45924,8 +45923,8 @@ type Operators() =
 //         let vals = [|string info|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-//                                                      (data |> Array.map (fun x -> x.NDArrayHandle))
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()
@@ -46014,7 +46013,7 @@ type Operators() =
 //                             [<Optional>] pad : int seq) =
 //         let creator = AtomicSymbolCreator.FromName "Pooling_v1"
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-//                                                  [|data.NDArrayHandle|]
+//                                                  [|data.NDArrayHandle.UnsafeHandle|]
 //                                                  [|"kernel"; "pool_type"; "global_pool"; "pooling_convention"; "stride"; "pad"|]
 //                                                  [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", "))|]
 //         outputs
@@ -46079,8 +46078,8 @@ type Operators() =
 //         let vals = [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", "))|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-//                                                      [|data.NDArrayHandle|]
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)
+//                                                      [|data.NDArrayHandle.UnsafeHandle|]
+//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
 //                                                      names
 //                                                      vals
 //         ()

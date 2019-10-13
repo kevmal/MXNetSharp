@@ -427,7 +427,7 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
     let inputsStr = 
         let handle x =  
             if ndarray then 
-                sprintf "%s.NDArrayHandle" x
+                sprintf "%s.NDArrayHandle.UnsafeHandle" x
             else
                 sprintf "%s" x
         let arr (x : _ []) = 
@@ -545,7 +545,7 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
             sprintf "let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip"
             sprintf "let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle"
             sprintf "                                             %s" inputsStr
-            sprintf "                                             (outputArray |> Seq.map (fun x -> x.NDArrayHandle) |> Seq.toArray)"
+            sprintf "                                             (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)"
             sprintf "                                             names" //paramNamesStr
             sprintf "                                             vals" //paramValuesStr
             sprintf "()"
@@ -1288,8 +1288,7 @@ open MXNetSharp.Interop
 """
         yield! types |> breakBlocks
         """
-type Operators() = 
-    member x.NDArrayHandle = failwith "" 
+type Operators() =  
 """  
         yield! members |> breakBlocks
         yield! skip |> breakBlocks

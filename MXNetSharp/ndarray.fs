@@ -25,7 +25,8 @@ type OpReqType =
     | AddTo = 3
 
 //TODO: NDArray Use safe handle and add IDisposable
-type NDArray(handle : CApi.NDArrayHandle) = 
+type NDArray(handle : SafeNDArrayHandle) = 
+    internal new(h : CApi.NDArrayHandle) = NDArray(new SafeNDArrayHandle(h, true))
     new() = 
         let h1 = MXNDArray.createNone()
         NDArray(h1)
@@ -55,32 +56,34 @@ type NDArray(handle : CApi.NDArrayHandle) =
         MXNDArray.syncCopyFromCPU h1 data
         NDArray h1
         
-    member x.NDArrayHandle : CApi.NDArrayHandle = handle
+    member x.NDArrayHandle = handle
 
-    member x.Shape = MXNDArray.getShape handle
+    member x.Shape = MXNDArray.getShape handle.UnsafeHandle
     member x.Size = x.Shape |> Array.reduce (*)
-    member x.Context = MXNDArray.getContext handle
+    member x.Context = MXNDArray.getContext handle.UnsafeHandle
 
-    member x.SyncCopyFromCPU(data : float32 []) = MXNDArray.syncCopyFromCPU handle data
+    member x.SyncCopyFromCPU(data : float32 []) = MXNDArray.syncCopyFromCPU handle.UnsafeHandle data
 
     member x.Set(value : float32) =
         let setValue = AtomicSymbolCreator.FromName "_set_value"
-        MXNDArray.imperativeInvokeInto setValue.AtomicSymbolCreatorHandle null [|handle|] [|"src"|] [|value.ToString()|]
+        MXNDArray.imperativeInvokeInto setValue.AtomicSymbolCreatorHandle null [|handle.UnsafeHandle|] [|"src"|] [|value.ToString()|]
         |> ignore
 
     static member WaitAll() = MXNDArray.waitAll()
     static member ( * )(x : NDArray, y : float32) = 
         let setValue = AtomicSymbolCreator.FromName "_mul_scalar"
-        MXNDArray.imperativeInvoke setValue.AtomicSymbolCreatorHandle [|x.NDArrayHandle|] [|"scalar"|] [|string y|] 
+        MXNDArray.imperativeInvoke setValue.AtomicSymbolCreatorHandle [|x.NDArrayHandle.UnsafeHandle|] [|"scalar"|] [|string y|] 
         |> Array.head
         |> NDArray
     member x.Substract(y : NDArray) = 
         let setValue = AtomicSymbolCreator.FromName "elemwise_sub"
-        let nout = MXNDArray.imperativeInvokeInto setValue.AtomicSymbolCreatorHandle [|x.NDArrayHandle; y.NDArrayHandle|] [|x.NDArrayHandle|] null null
+        let nout = MXNDArray.imperativeInvokeInto setValue.AtomicSymbolCreatorHandle [|x.NDArrayHandle.UnsafeHandle; y.NDArrayHandle.UnsafeHandle|] [|x.NDArrayHandle.UnsafeHandle|] null null
         assert(nout = 1)
         ()
     member x.ToArray() : 'a [] = 
         let a = Array.zeroCreate x.Size
-        MXNDArray.syncCopyToCPU handle a
+        MXNDArray.syncCopyToCPU handle.UnsafeHandle a
         a
-        
+
+
+    
