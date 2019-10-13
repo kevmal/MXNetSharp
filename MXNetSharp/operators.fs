@@ -691,22 +691,22 @@ type Operators() =
     /// <param name="bot">Bottom margin.</param>
     /// <param name="left">Left margin.</param>
     /// <param name="right">Right margin.</param>
-    /// <param name="value">(Deprecated! Use ``values`` instead.) Fill with single value.</param>
     /// <param name="values">Fill with value(RGB[A] or gray), up to 4 channels.</param>
     /// <param name="fillingType">Filling type (default=cv2.BORDER_CONSTANT).</param>
+    /// <param name="value">(Deprecated! Use ``values`` instead.) Fill with single value.</param>
     static member CvcopyMakeBorder(src : NDArray, 
                                    top : int, 
                                    bot : int, 
                                    left : int, 
                                    right : int, 
-                                   value : double, 
                                    values : string (*REVIEW: What's the type here?*), 
-                                   [<Optional; DefaultParameterValue(0)>] fillingType : int) =
+                                   [<Optional; DefaultParameterValue(0)>] fillingType : int, 
+                                   [<Optional; DefaultParameterValue(0.0)>] value : double) =
         let creator = AtomicSymbolCreator.FromName "_cvcopyMakeBorder"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|src.NDArrayHandle.UnsafeHandle|]
-                                                 [|"top"; "bot"; "left"; "right"; "value"; "values"; "type"|]
-                                                 [|string top; string bot; string left; string right; string value; string values; string fillingType|]
+                                                 [|"top"; "bot"; "left"; "right"; "values"; "type"; "value"|]
+                                                 [|string top; string bot; string left; string right; string values; string fillingType; string value|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Pad image border with OpenCV. 
     /// </summary>
@@ -716,21 +716,21 @@ type Operators() =
     /// <param name="bot">Bottom margin.</param>
     /// <param name="left">Left margin.</param>
     /// <param name="right">Right margin.</param>
-    /// <param name="value">(Deprecated! Use ``values`` instead.) Fill with single value.</param>
     /// <param name="values">Fill with value(RGB[A] or gray), up to 4 channels.</param>
     /// <param name="fillingType">Filling type (default=cv2.BORDER_CONSTANT).</param>
+    /// <param name="value">(Deprecated! Use ``values`` instead.) Fill with single value.</param>
     static member CvcopyMakeBorder(outputArray : NDArray seq, 
                                    src : NDArray, 
                                    top : int, 
                                    bot : int, 
                                    left : int, 
                                    right : int, 
-                                   value : double, 
                                    values : string (*REVIEW: What's the type here?*), 
-                                   [<Optional; DefaultParameterValue(0)>] fillingType : int) =
+                                   [<Optional; DefaultParameterValue(0)>] fillingType : int, 
+                                   [<Optional; DefaultParameterValue(0.0)>] value : double) =
         let creator = AtomicSymbolCreator.FromName "_cvcopyMakeBorder"
-        let names = [|"top"; "bot"; "left"; "right"; "value"; "values"; "type"|]
-        let vals = [|string top; string bot; string left; string right; string value; string values; string fillingType|]
+        let names = [|"top"; "bot"; "left"; "right"; "values"; "type"; "value"|]
+        let vals = [|string top; string bot; string left; string right; string values; string fillingType; string value|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|src.NDArrayHandle.UnsafeHandle|]
@@ -7213,7 +7213,7 @@ type Operators() =
                             beta : NDArray, 
                             movingMean : NDArray, 
                             movingVar : NDArray, 
-                            eps : double, 
+                            [<Optional; DefaultParameterValue(0.00100000004749745)>] eps : double, 
                             [<Optional; DefaultParameterValue(0.899999976)>] momentum : float, 
                             [<Optional; DefaultParameterValue(true)>] fixGamma : bool, 
                             [<Optional; DefaultParameterValue(false)>] useGlobalStats : bool, 
@@ -7297,7 +7297,7 @@ type Operators() =
                             beta : NDArray, 
                             movingMean : NDArray, 
                             movingVar : NDArray, 
-                            eps : double, 
+                            [<Optional; DefaultParameterValue(0.00100000004749745)>] eps : double, 
                             [<Optional; DefaultParameterValue(0.899999976)>] momentum : float, 
                             [<Optional; DefaultParameterValue(true)>] fixGamma : bool, 
                             [<Optional; DefaultParameterValue(false)>] useGlobalStats : bool, 
@@ -7383,7 +7383,7 @@ type Operators() =
                             beta : Symbol, 
                             movingMean : Symbol, 
                             movingVar : Symbol, 
-                            eps : double, 
+                            [<Optional; DefaultParameterValue(0.00100000004749745)>] eps : double, 
                             [<Optional; DefaultParameterValue(0.899999976)>] momentum : float, 
                             [<Optional; DefaultParameterValue(true)>] fixGamma : bool, 
                             [<Optional; DefaultParameterValue(false)>] useGlobalStats : bool, 
@@ -7720,11 +7720,11 @@ type Operators() =
     /// <param name="bias">Bias parameter.</param>
     /// <param name="kernel">Convolution kernel size: (w,), (h, w) or (d, h, w)</param>
     /// <param name="numFilter">Convolution filter(channel) number</param>
-    /// <param name="numGroup">Number of group partitions.</param>
-    /// <param name="workspace">Maximum temporary workspace allowed (MB) in convolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the convolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="stride">Convolution stride: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="dilate">Convolution dilate: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="pad">Zero pad for convolution: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+    /// <param name="numGroup">Number of group partitions.</param>
+    /// <param name="workspace">Maximum temporary workspace allowed (MB) in convolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the convolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="noBias">Whether to disable bias parameter.</param>
     /// <param name="cudnnTune">Whether to pick convolution algo by running performance test.</param>
     /// <param name="cudnnOff">Turn off cudnn for this layer.</param>
@@ -7735,11 +7735,11 @@ type Operators() =
                               bias : NDArray, 
                               kernel : int seq, 
                               numFilter : int, 
-                              numGroup : int, 
-                              workspace : int64, 
                               [<Optional>] stride : int seq, 
                               [<Optional>] dilate : int seq, 
                               [<Optional>] pad : int seq, 
+                              [<Optional; DefaultParameterValue(1)>] numGroup : int, 
+                              [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
                               [<Optional; DefaultParameterValue(false)>] noBias : bool, 
                               [<Optional>] cudnnTune : CudnnTune, 
                               [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
@@ -7747,8 +7747,8 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "Convolution"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
-                                                 [|"kernel"; "num_filter"; "num_group"; "workspace"; "stride"; "dilate"; "pad"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; string numGroup; string workspace; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+                                                 [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Compute *N*-D convolution on *(N+2)*-D input.
     /// 
@@ -7831,11 +7831,11 @@ type Operators() =
     /// <param name="bias">Bias parameter.</param>
     /// <param name="kernel">Convolution kernel size: (w,), (h, w) or (d, h, w)</param>
     /// <param name="numFilter">Convolution filter(channel) number</param>
-    /// <param name="numGroup">Number of group partitions.</param>
-    /// <param name="workspace">Maximum temporary workspace allowed (MB) in convolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the convolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="stride">Convolution stride: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="dilate">Convolution dilate: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="pad">Zero pad for convolution: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+    /// <param name="numGroup">Number of group partitions.</param>
+    /// <param name="workspace">Maximum temporary workspace allowed (MB) in convolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the convolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="noBias">Whether to disable bias parameter.</param>
     /// <param name="cudnnTune">Whether to pick convolution algo by running performance test.</param>
     /// <param name="cudnnOff">Turn off cudnn for this layer.</param>
@@ -7847,18 +7847,18 @@ type Operators() =
                               bias : NDArray, 
                               kernel : int seq, 
                               numFilter : int, 
-                              numGroup : int, 
-                              workspace : int64, 
                               [<Optional>] stride : int seq, 
                               [<Optional>] dilate : int seq, 
                               [<Optional>] pad : int seq, 
+                              [<Optional; DefaultParameterValue(1)>] numGroup : int, 
+                              [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
                               [<Optional; DefaultParameterValue(false)>] noBias : bool, 
                               [<Optional>] cudnnTune : CudnnTune, 
                               [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
                               [<Optional>] layout : ConvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "Convolution"
-        let names = [|"kernel"; "num_filter"; "num_group"; "workspace"; "stride"; "dilate"; "pad"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-        let vals = [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; string numGroup; string workspace; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+        let names = [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
+        let vals = [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
@@ -7946,11 +7946,11 @@ type Operators() =
     /// <param name="bias">Bias parameter.</param>
     /// <param name="kernel">Convolution kernel size: (w,), (h, w) or (d, h, w)</param>
     /// <param name="numFilter">Convolution filter(channel) number</param>
-    /// <param name="numGroup">Number of group partitions.</param>
-    /// <param name="workspace">Maximum temporary workspace allowed (MB) in convolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the convolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="stride">Convolution stride: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="dilate">Convolution dilate: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="pad">Zero pad for convolution: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+    /// <param name="numGroup">Number of group partitions.</param>
+    /// <param name="workspace">Maximum temporary workspace allowed (MB) in convolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the convolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="noBias">Whether to disable bias parameter.</param>
     /// <param name="cudnnTune">Whether to pick convolution algo by running performance test.</param>
     /// <param name="cudnnOff">Turn off cudnn for this layer.</param>
@@ -7961,19 +7961,19 @@ type Operators() =
                               bias : Symbol, 
                               kernel : int seq, 
                               numFilter : int, 
-                              numGroup : int, 
-                              workspace : int64, 
                               [<Optional>] stride : int seq, 
                               [<Optional>] dilate : int seq, 
                               [<Optional>] pad : int seq, 
+                              [<Optional; DefaultParameterValue(1)>] numGroup : int, 
+                              [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
                               [<Optional; DefaultParameterValue(false)>] noBias : bool, 
                               [<Optional>] cudnnTune : CudnnTune, 
                               [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
                               [<Optional>] layout : ConvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "Convolution"
         new Symbol(Some creator,
-                   [|"kernel"; "num_filter"; "num_group"; "workspace"; "stride"; "dilate"; "pad"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
-                   [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; string numGroup; string workspace; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
+                   [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
+                   [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
                    [|"data"; "weight"; "bias"|],
                    [|data; weight; bias|])
 
@@ -8248,13 +8248,13 @@ type Operators() =
     /// <param name="bias">Bias added to the result after the deconvolution operation.</param>
     /// <param name="kernel">Deconvolution kernel size: (w,), (h, w) or (d, h, w). This is same as the kernel size used for the corresponding convolution</param>
     /// <param name="numFilter">Number of output filters.</param>
-    /// <param name="numGroup">Number of groups partition.</param>
-    /// <param name="workspace">Maximum temporary workspace allowed (MB) in deconvolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the deconvolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="stride">The stride used for the corresponding convolution: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="dilate">Dilation factor for each dimension of the input: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="pad">The amount of implicit zero padding added during convolution for each dimension of the input: (w,), (h, w) or (d, h, w). ``(kernel-1)/2`` is usually a good choice. If `target_shape` is set, `pad` will be ignored and a padding that will generate the target shape will be used. Defaults to no padding.</param>
     /// <param name="adj">Adjustment for output shape: (w,), (h, w) or (d, h, w). If `target_shape` is set, `adj` will be ignored and computed accordingly.</param>
     /// <param name="targetShape">Shape of the output tensor: (w,), (h, w) or (d, h, w).</param>
+    /// <param name="numGroup">Number of groups partition.</param>
+    /// <param name="workspace">Maximum temporary workspace allowed (MB) in deconvolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the deconvolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="noBias">Whether to disable bias parameter.</param>
     /// <param name="cudnnTune">Whether to pick convolution algorithm by running performance test.</param>
     /// <param name="cudnnOff">Turn off cudnn for this layer.</param>
@@ -8264,13 +8264,13 @@ type Operators() =
                                 bias : NDArray, 
                                 kernel : int seq, 
                                 numFilter : int, 
-                                numGroup : int, 
-                                workspace : int64, 
                                 [<Optional>] stride : int seq, 
                                 [<Optional>] dilate : int seq, 
                                 [<Optional>] pad : int seq, 
                                 [<Optional>] adj : int seq, 
                                 [<Optional>] targetShape : int seq, 
+                                [<Optional; DefaultParameterValue(1)>] numGroup : int, 
+                                [<Optional; DefaultParameterValue(512L)>] workspace : int64, 
                                 [<Optional; DefaultParameterValue(true)>] noBias : bool, 
                                 [<Optional>] cudnnTune : CudnnTune, 
                                 [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
@@ -8278,8 +8278,8 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "Deconvolution"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
-                                                 [|"kernel"; "num_filter"; "num_group"; "workspace"; "stride"; "dilate"; "pad"; "adj"; "target_shape"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; string numGroup; string workspace; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", ")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+                                                 [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "adj"; "target_shape"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", ")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Computes 1D or 2D transposed convolution (aka fractionally strided convolution) of the input tensor. This operation can be seen as the gradient of Convolution operation with respect to its input. Convolution usually reduces the size of the input. Transposed convolution works the other way, going from a smaller input to a larger output while preserving the connectivity pattern.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -8288,13 +8288,13 @@ type Operators() =
     /// <param name="bias">Bias added to the result after the deconvolution operation.</param>
     /// <param name="kernel">Deconvolution kernel size: (w,), (h, w) or (d, h, w). This is same as the kernel size used for the corresponding convolution</param>
     /// <param name="numFilter">Number of output filters.</param>
-    /// <param name="numGroup">Number of groups partition.</param>
-    /// <param name="workspace">Maximum temporary workspace allowed (MB) in deconvolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the deconvolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="stride">The stride used for the corresponding convolution: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="dilate">Dilation factor for each dimension of the input: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="pad">The amount of implicit zero padding added during convolution for each dimension of the input: (w,), (h, w) or (d, h, w). ``(kernel-1)/2`` is usually a good choice. If `target_shape` is set, `pad` will be ignored and a padding that will generate the target shape will be used. Defaults to no padding.</param>
     /// <param name="adj">Adjustment for output shape: (w,), (h, w) or (d, h, w). If `target_shape` is set, `adj` will be ignored and computed accordingly.</param>
     /// <param name="targetShape">Shape of the output tensor: (w,), (h, w) or (d, h, w).</param>
+    /// <param name="numGroup">Number of groups partition.</param>
+    /// <param name="workspace">Maximum temporary workspace allowed (MB) in deconvolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the deconvolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="noBias">Whether to disable bias parameter.</param>
     /// <param name="cudnnTune">Whether to pick convolution algorithm by running performance test.</param>
     /// <param name="cudnnOff">Turn off cudnn for this layer.</param>
@@ -8305,20 +8305,20 @@ type Operators() =
                                 bias : NDArray, 
                                 kernel : int seq, 
                                 numFilter : int, 
-                                numGroup : int, 
-                                workspace : int64, 
                                 [<Optional>] stride : int seq, 
                                 [<Optional>] dilate : int seq, 
                                 [<Optional>] pad : int seq, 
                                 [<Optional>] adj : int seq, 
                                 [<Optional>] targetShape : int seq, 
+                                [<Optional; DefaultParameterValue(1)>] numGroup : int, 
+                                [<Optional; DefaultParameterValue(512L)>] workspace : int64, 
                                 [<Optional; DefaultParameterValue(true)>] noBias : bool, 
                                 [<Optional>] cudnnTune : CudnnTune, 
                                 [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
                                 [<Optional>] layout : DeconvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "Deconvolution"
-        let names = [|"kernel"; "num_filter"; "num_group"; "workspace"; "stride"; "dilate"; "pad"; "adj"; "target_shape"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-        let vals = [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; string numGroup; string workspace; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", ")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+        let names = [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "adj"; "target_shape"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
+        let vals = [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", ")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
@@ -8332,13 +8332,13 @@ type Operators() =
     /// <param name="bias">Bias added to the result after the deconvolution operation.</param>
     /// <param name="kernel">Deconvolution kernel size: (w,), (h, w) or (d, h, w). This is same as the kernel size used for the corresponding convolution</param>
     /// <param name="numFilter">Number of output filters.</param>
-    /// <param name="numGroup">Number of groups partition.</param>
-    /// <param name="workspace">Maximum temporary workspace allowed (MB) in deconvolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the deconvolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="stride">The stride used for the corresponding convolution: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="dilate">Dilation factor for each dimension of the input: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="pad">The amount of implicit zero padding added during convolution for each dimension of the input: (w,), (h, w) or (d, h, w). ``(kernel-1)/2`` is usually a good choice. If `target_shape` is set, `pad` will be ignored and a padding that will generate the target shape will be used. Defaults to no padding.</param>
     /// <param name="adj">Adjustment for output shape: (w,), (h, w) or (d, h, w). If `target_shape` is set, `adj` will be ignored and computed accordingly.</param>
     /// <param name="targetShape">Shape of the output tensor: (w,), (h, w) or (d, h, w).</param>
+    /// <param name="numGroup">Number of groups partition.</param>
+    /// <param name="workspace">Maximum temporary workspace allowed (MB) in deconvolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the deconvolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="noBias">Whether to disable bias parameter.</param>
     /// <param name="cudnnTune">Whether to pick convolution algorithm by running performance test.</param>
     /// <param name="cudnnOff">Turn off cudnn for this layer.</param>
@@ -8348,21 +8348,21 @@ type Operators() =
                                 bias : Symbol, 
                                 kernel : int seq, 
                                 numFilter : int, 
-                                numGroup : int, 
-                                workspace : int64, 
                                 [<Optional>] stride : int seq, 
                                 [<Optional>] dilate : int seq, 
                                 [<Optional>] pad : int seq, 
                                 [<Optional>] adj : int seq, 
                                 [<Optional>] targetShape : int seq, 
+                                [<Optional; DefaultParameterValue(1)>] numGroup : int, 
+                                [<Optional; DefaultParameterValue(512L)>] workspace : int64, 
                                 [<Optional; DefaultParameterValue(true)>] noBias : bool, 
                                 [<Optional>] cudnnTune : CudnnTune, 
                                 [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
                                 [<Optional>] layout : DeconvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "Deconvolution"
         new Symbol(Some creator,
-                   [|"kernel"; "num_filter"; "num_group"; "workspace"; "stride"; "dilate"; "pad"; "adj"; "target_shape"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
-                   [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; string numGroup; string workspace; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", ")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
+                   [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "adj"; "target_shape"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
+                   [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", ")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
                    [|"data"; "weight"; "bias"|],
                    [|data; weight; bias|])
 
@@ -10793,21 +10793,21 @@ type Operators() =
     /// <param name="scale">Up sampling scale</param>
     /// <param name="sampleType">upsampling method</param>
     /// <param name="numArgs">Number of inputs to be upsampled. For nearest neighbor upsampling, this can be 1-N; the size of output will be(scale*h_0,scale*w_0) and all other inputs will be upsampled to thesame size. For bilinear upsampling this must be 2; 1 input and 1 weight.</param>
-    /// <param name="workspace">Tmp workspace for deconvolution (MB)</param>
     /// <param name="numFilter">Input filter. Only used by bilinear sample_type.Since bilinear upsampling uses deconvolution, num_filters is set to the number of channels.</param>
     /// <param name="multiInputMode">How to handle multiple input. concat means concatenate upsampled images along the channel dimension. sum means add all images together, only available for nearest neighbor upsampling.</param>
+    /// <param name="workspace">Tmp workspace for deconvolution (MB)</param>
     static member UpSampling([<ParamArray>] data : NDArray[], 
                              scale : int, 
                              sampleType : SampleType, 
                              numArgs : int, 
-                             workspace : int64, 
                              [<Optional; DefaultParameterValue(0)>] numFilter : int, 
-                             [<Optional>] multiInputMode : MultiInputMode) =
+                             [<Optional>] multiInputMode : MultiInputMode, 
+                             [<Optional; DefaultParameterValue(512L)>] workspace : int64) =
         let creator = AtomicSymbolCreator.FromName "UpSampling"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
-                                                 [|"scale"; "sample_type"; "num_args"; "workspace"; "num_filter"; "multi_input_mode"|]
-                                                 [|string scale; string sampleType; string numArgs; string workspace; string numFilter; (if isNull (multiInputMode :> obj) then "concat" else string multiInputMode)|]
+                                                 [|"scale"; "sample_type"; "num_args"; "num_filter"; "multi_input_mode"; "workspace"|]
+                                                 [|string scale; string sampleType; string numArgs; string numFilter; (if isNull (multiInputMode :> obj) then "concat" else string multiInputMode); string workspace|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Upsamples the given input data.
     /// 
@@ -10866,20 +10866,20 @@ type Operators() =
     /// <param name="scale">Up sampling scale</param>
     /// <param name="sampleType">upsampling method</param>
     /// <param name="numArgs">Number of inputs to be upsampled. For nearest neighbor upsampling, this can be 1-N; the size of output will be(scale*h_0,scale*w_0) and all other inputs will be upsampled to thesame size. For bilinear upsampling this must be 2; 1 input and 1 weight.</param>
-    /// <param name="workspace">Tmp workspace for deconvolution (MB)</param>
     /// <param name="numFilter">Input filter. Only used by bilinear sample_type.Since bilinear upsampling uses deconvolution, num_filters is set to the number of channels.</param>
     /// <param name="multiInputMode">How to handle multiple input. concat means concatenate upsampled images along the channel dimension. sum means add all images together, only available for nearest neighbor upsampling.</param>
+    /// <param name="workspace">Tmp workspace for deconvolution (MB)</param>
     static member UpSampling(outputArray : NDArray seq, 
                              [<ParamArray>] data : NDArray[], 
                              scale : int, 
                              sampleType : SampleType, 
                              numArgs : int, 
-                             workspace : int64, 
                              [<Optional; DefaultParameterValue(0)>] numFilter : int, 
-                             [<Optional>] multiInputMode : MultiInputMode) =
+                             [<Optional>] multiInputMode : MultiInputMode, 
+                             [<Optional; DefaultParameterValue(512L)>] workspace : int64) =
         let creator = AtomicSymbolCreator.FromName "UpSampling"
-        let names = [|"scale"; "sample_type"; "num_args"; "workspace"; "num_filter"; "multi_input_mode"|]
-        let vals = [|string scale; string sampleType; string numArgs; string workspace; string numFilter; (if isNull (multiInputMode :> obj) then "concat" else string multiInputMode)|]
+        let names = [|"scale"; "sample_type"; "num_args"; "num_filter"; "multi_input_mode"; "workspace"|]
+        let vals = [|string scale; string sampleType; string numArgs; string numFilter; (if isNull (multiInputMode :> obj) then "concat" else string multiInputMode); string workspace|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
@@ -10943,20 +10943,20 @@ type Operators() =
     /// <param name="scale">Up sampling scale</param>
     /// <param name="sampleType">upsampling method</param>
     /// <param name="numArgs">Number of inputs to be upsampled. For nearest neighbor upsampling, this can be 1-N; the size of output will be(scale*h_0,scale*w_0) and all other inputs will be upsampled to thesame size. For bilinear upsampling this must be 2; 1 input and 1 weight.</param>
-    /// <param name="workspace">Tmp workspace for deconvolution (MB)</param>
     /// <param name="numFilter">Input filter. Only used by bilinear sample_type.Since bilinear upsampling uses deconvolution, num_filters is set to the number of channels.</param>
     /// <param name="multiInputMode">How to handle multiple input. concat means concatenate upsampled images along the channel dimension. sum means add all images together, only available for nearest neighbor upsampling.</param>
+    /// <param name="workspace">Tmp workspace for deconvolution (MB)</param>
     static member UpSampling([<ParamArray>] data : Symbol[], 
                              scale : int, 
                              sampleType : SampleType, 
                              numArgs : int, 
-                             workspace : int64, 
                              [<Optional; DefaultParameterValue(0)>] numFilter : int, 
-                             [<Optional>] multiInputMode : MultiInputMode) =
+                             [<Optional>] multiInputMode : MultiInputMode, 
+                             [<Optional; DefaultParameterValue(512L)>] workspace : int64) =
         let creator = AtomicSymbolCreator.FromName "UpSampling"
         new Symbol(Some creator,
-                   [|"scale"; "sample_type"; "num_args"; "workspace"; "num_filter"; "multi_input_mode"|],
-                   [|string scale; string sampleType; string numArgs; string workspace; string numFilter; (if isNull (multiInputMode :> obj) then "concat" else string multiInputMode)|],
+                   [|"scale"; "sample_type"; "num_args"; "num_filter"; "multi_input_mode"; "workspace"|],
+                   [|string scale; string sampleType; string numArgs; string numFilter; (if isNull (multiInputMode :> obj) then "concat" else string multiInputMode); string workspace|],
                    Array.empty,
                    (data |> Array.map (fun x -> x)))
 
@@ -11696,10 +11696,10 @@ type Operators() =
     /// <param name="v">Internal state ``v_t``</param>
     /// <param name="z">Internal state ``z_t``</param>
     /// <param name="lr">Learning rate.</param>
-    /// <param name="epsilon">Epsilon to prevent div 0.</param>
     /// <param name="t">Number of update.</param>
     /// <param name="beta1">Generally close to 0.5.</param>
     /// <param name="beta2">Generally close to 1.</param>
+    /// <param name="epsilon">Epsilon to prevent div 0.</param>
     /// <param name="wd">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
     /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
     /// <param name="clipGrad">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
@@ -11709,18 +11709,18 @@ type Operators() =
                              v : NDArray, 
                              z : NDArray, 
                              lr : float, 
-                             epsilon : double, 
                              t : int, 
                              [<Optional; DefaultParameterValue(0.600000024)>] beta1 : float, 
                              [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
+                             [<Optional; DefaultParameterValue(9.99999993922529E-09)>] epsilon : double, 
                              [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                              [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                              [<Optional; DefaultParameterValue(-1.0)>] clipGrad : float) =
         let creator = AtomicSymbolCreator.FromName "ftml_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; d.NDArrayHandle.UnsafeHandle; v.NDArrayHandle.UnsafeHandle; z.NDArrayHandle.UnsafeHandle|]
-                                                 [|"lr"; "epsilon"; "t"; "beta1"; "beta2"; "wd"; "rescale_grad"; "clip_grad"|]
-                                                 [|string lr; string epsilon; string t; string beta1; string beta2; string wd; string rescaleGrad; string clipGrad|]
+                                                 [|"lr"; "t"; "beta1"; "beta2"; "epsilon"; "wd"; "rescale_grad"; "clip_grad"|]
+                                                 [|string lr; string t; string beta1; string beta2; string epsilon; string wd; string rescaleGrad; string clipGrad|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>The FTML optimizer described in
     /// *FTML - Follow the Moving Leader in Deep Learning*,
@@ -11745,10 +11745,10 @@ type Operators() =
     /// <param name="v">Internal state ``v_t``</param>
     /// <param name="z">Internal state ``z_t``</param>
     /// <param name="lr">Learning rate.</param>
-    /// <param name="epsilon">Epsilon to prevent div 0.</param>
     /// <param name="t">Number of update.</param>
     /// <param name="beta1">Generally close to 0.5.</param>
     /// <param name="beta2">Generally close to 1.</param>
+    /// <param name="epsilon">Epsilon to prevent div 0.</param>
     /// <param name="wd">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
     /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
     /// <param name="clipGrad">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
@@ -11759,16 +11759,16 @@ type Operators() =
                              v : NDArray, 
                              z : NDArray, 
                              lr : float, 
-                             epsilon : double, 
                              t : int, 
                              [<Optional; DefaultParameterValue(0.600000024)>] beta1 : float, 
                              [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
+                             [<Optional; DefaultParameterValue(9.99999993922529E-09)>] epsilon : double, 
                              [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                              [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                              [<Optional; DefaultParameterValue(-1.0)>] clipGrad : float) =
         let creator = AtomicSymbolCreator.FromName "ftml_update"
-        let names = [|"lr"; "epsilon"; "t"; "beta1"; "beta2"; "wd"; "rescale_grad"; "clip_grad"|]
-        let vals = [|string lr; string epsilon; string t; string beta1; string beta2; string wd; string rescaleGrad; string clipGrad|]
+        let names = [|"lr"; "t"; "beta1"; "beta2"; "epsilon"; "wd"; "rescale_grad"; "clip_grad"|]
+        let vals = [|string lr; string t; string beta1; string beta2; string epsilon; string wd; string rescaleGrad; string clipGrad|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; d.NDArrayHandle.UnsafeHandle; v.NDArrayHandle.UnsafeHandle; z.NDArrayHandle.UnsafeHandle|]
@@ -11798,10 +11798,10 @@ type Operators() =
     /// <param name="v">Internal state ``v_t``</param>
     /// <param name="z">Internal state ``z_t``</param>
     /// <param name="lr">Learning rate.</param>
-    /// <param name="epsilon">Epsilon to prevent div 0.</param>
     /// <param name="t">Number of update.</param>
     /// <param name="beta1">Generally close to 0.5.</param>
     /// <param name="beta2">Generally close to 1.</param>
+    /// <param name="epsilon">Epsilon to prevent div 0.</param>
     /// <param name="wd">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
     /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
     /// <param name="clipGrad">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
@@ -11811,17 +11811,17 @@ type Operators() =
                              v : Symbol, 
                              z : Symbol, 
                              lr : float, 
-                             epsilon : double, 
                              t : int, 
                              [<Optional; DefaultParameterValue(0.600000024)>] beta1 : float, 
                              [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
+                             [<Optional; DefaultParameterValue(9.99999993922529E-09)>] epsilon : double, 
                              [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                              [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                              [<Optional; DefaultParameterValue(-1.0)>] clipGrad : float) =
         let creator = AtomicSymbolCreator.FromName "ftml_update"
         new Symbol(Some creator,
-                   [|"lr"; "epsilon"; "t"; "beta1"; "beta2"; "wd"; "rescale_grad"; "clip_grad"|],
-                   [|string lr; string epsilon; string t; string beta1; string beta2; string wd; string rescaleGrad; string clipGrad|],
+                   [|"lr"; "t"; "beta1"; "beta2"; "epsilon"; "wd"; "rescale_grad"; "clip_grad"|],
+                   [|string lr; string t; string beta1; string beta2; string epsilon; string wd; string rescaleGrad; string clipGrad|],
                    [|"weight"; "grad"; "d"; "v"; "z"|],
                    [|weight; grad; d; v; z|])
 
@@ -12961,7 +12961,7 @@ type Operators() =
     /// <param name="mode">Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; pads by reflecting values with respect to the edges.</param>
     /// <param name="padWidth">Widths of the padding regions applied to the edges of each axis. It is a tuple of integer padding widths for each axis of the format ``(before_1, after_1, ... , before_N, after_N)``. It should be of length ``2*N`` where ``N`` is the number of dimensions of the array.This is equivalent to pad_width in numpy.pad, but flattened.</param>
     /// <param name="constantValue">The value used for padding when `mode` is &quot;constant&quot;.</param>
-    static member Pad(data : NDArray, mode : PadMode, padWidth : int seq, constantValue : double) =
+    static member Pad(data : NDArray, mode : PadMode, padWidth : int seq, [<Optional; DefaultParameterValue(0.0)>] constantValue : double) =
         let creator = AtomicSymbolCreator.FromName "Pad"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -13057,7 +13057,7 @@ type Operators() =
     /// <param name="mode">Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; pads by reflecting values with respect to the edges.</param>
     /// <param name="padWidth">Widths of the padding regions applied to the edges of each axis. It is a tuple of integer padding widths for each axis of the format ``(before_1, after_1, ... , before_N, after_N)``. It should be of length ``2*N`` where ``N`` is the number of dimensions of the array.This is equivalent to pad_width in numpy.pad, but flattened.</param>
     /// <param name="constantValue">The value used for padding when `mode` is &quot;constant&quot;.</param>
-    static member Pad(outputArray : NDArray seq, data : NDArray, mode : PadMode, padWidth : int seq, constantValue : double) =
+    static member Pad(outputArray : NDArray seq, data : NDArray, mode : PadMode, padWidth : int seq, [<Optional; DefaultParameterValue(0.0)>] constantValue : double) =
         let creator = AtomicSymbolCreator.FromName "Pad"
         let names = [|"mode"; "pad_width"; "constant_value"|]
         let vals = [|string mode; (padWidth |> Seq.map string |> String.concat ", "); string constantValue|]
@@ -13156,7 +13156,7 @@ type Operators() =
     /// <param name="mode">Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; pads by reflecting values with respect to the edges.</param>
     /// <param name="padWidth">Widths of the padding regions applied to the edges of each axis. It is a tuple of integer padding widths for each axis of the format ``(before_1, after_1, ... , before_N, after_N)``. It should be of length ``2*N`` where ``N`` is the number of dimensions of the array.This is equivalent to pad_width in numpy.pad, but flattened.</param>
     /// <param name="constantValue">The value used for padding when `mode` is &quot;constant&quot;.</param>
-    static member Pad(data : Symbol, mode : PadMode, padWidth : int seq, constantValue : double) =
+    static member Pad(data : Symbol, mode : PadMode, padWidth : int seq, [<Optional; DefaultParameterValue(0.0)>] constantValue : double) =
         let creator = AtomicSymbolCreator.FromName "Pad"
         new Symbol(Some creator,
                    [|"mode"; "pad_width"; "constant_value"|],
@@ -13776,11 +13776,11 @@ type Operators() =
     /// <param name="maxBias">Maximum value of bias.</param>
     /// <param name="kernel">Convolution kernel size: (w,), (h, w) or (d, h, w)</param>
     /// <param name="numFilter">Convolution filter(channel) number</param>
-    /// <param name="numGroup">Number of group partitions.</param>
-    /// <param name="workspace">Maximum temporary workspace allowed (MB) in convolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the convolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="stride">Convolution stride: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="dilate">Convolution dilate: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="pad">Zero pad for convolution: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+    /// <param name="numGroup">Number of group partitions.</param>
+    /// <param name="workspace">Maximum temporary workspace allowed (MB) in convolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the convolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="noBias">Whether to disable bias parameter.</param>
     /// <param name="cudnnTune">Whether to pick convolution algo by running performance test.</param>
     /// <param name="cudnnOff">Turn off cudnn for this layer.</param>
@@ -13797,11 +13797,11 @@ type Operators() =
                                        maxBias : NDArray, 
                                        kernel : int seq, 
                                        numFilter : int, 
-                                       numGroup : int, 
-                                       workspace : int64, 
                                        [<Optional>] stride : int seq, 
                                        [<Optional>] dilate : int seq, 
                                        [<Optional>] pad : int seq, 
+                                       [<Optional; DefaultParameterValue(1)>] numGroup : int, 
+                                       [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
                                        [<Optional; DefaultParameterValue(false)>] noBias : bool, 
                                        [<Optional>] cudnnTune : CudnnTune, 
                                        [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
@@ -13809,8 +13809,8 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_conv"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle; minWeight.NDArrayHandle.UnsafeHandle; maxWeight.NDArrayHandle.UnsafeHandle; minBias.NDArrayHandle.UnsafeHandle; maxBias.NDArrayHandle.UnsafeHandle|]
-                                                 [|"kernel"; "num_filter"; "num_group"; "workspace"; "stride"; "dilate"; "pad"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; string numGroup; string workspace; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+                                                 [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Convolution operator for input, weight and bias data type of int8,
     /// and accumulates in type int32 for the output. For each argument, two more arguments of type
@@ -13834,11 +13834,11 @@ type Operators() =
     /// <param name="maxBias">Maximum value of bias.</param>
     /// <param name="kernel">Convolution kernel size: (w,), (h, w) or (d, h, w)</param>
     /// <param name="numFilter">Convolution filter(channel) number</param>
-    /// <param name="numGroup">Number of group partitions.</param>
-    /// <param name="workspace">Maximum temporary workspace allowed (MB) in convolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the convolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="stride">Convolution stride: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="dilate">Convolution dilate: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="pad">Zero pad for convolution: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+    /// <param name="numGroup">Number of group partitions.</param>
+    /// <param name="workspace">Maximum temporary workspace allowed (MB) in convolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the convolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="noBias">Whether to disable bias parameter.</param>
     /// <param name="cudnnTune">Whether to pick convolution algo by running performance test.</param>
     /// <param name="cudnnOff">Turn off cudnn for this layer.</param>
@@ -13856,18 +13856,18 @@ type Operators() =
                                        maxBias : NDArray, 
                                        kernel : int seq, 
                                        numFilter : int, 
-                                       numGroup : int, 
-                                       workspace : int64, 
                                        [<Optional>] stride : int seq, 
                                        [<Optional>] dilate : int seq, 
                                        [<Optional>] pad : int seq, 
+                                       [<Optional; DefaultParameterValue(1)>] numGroup : int, 
+                                       [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
                                        [<Optional; DefaultParameterValue(false)>] noBias : bool, 
                                        [<Optional>] cudnnTune : CudnnTune, 
                                        [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
                                        [<Optional>] layout : ContribQuantizedConvLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_conv"
-        let names = [|"kernel"; "num_filter"; "num_group"; "workspace"; "stride"; "dilate"; "pad"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-        let vals = [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; string numGroup; string workspace; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+        let names = [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
+        let vals = [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle; minWeight.NDArrayHandle.UnsafeHandle; maxWeight.NDArrayHandle.UnsafeHandle; minBias.NDArrayHandle.UnsafeHandle; maxBias.NDArrayHandle.UnsafeHandle|]
@@ -13896,11 +13896,11 @@ type Operators() =
     /// <param name="maxBias">Maximum value of bias.</param>
     /// <param name="kernel">Convolution kernel size: (w,), (h, w) or (d, h, w)</param>
     /// <param name="numFilter">Convolution filter(channel) number</param>
-    /// <param name="numGroup">Number of group partitions.</param>
-    /// <param name="workspace">Maximum temporary workspace allowed (MB) in convolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the convolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="stride">Convolution stride: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="dilate">Convolution dilate: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="pad">Zero pad for convolution: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+    /// <param name="numGroup">Number of group partitions.</param>
+    /// <param name="workspace">Maximum temporary workspace allowed (MB) in convolution.This parameter has two usages. When CUDNN is not used, it determines the effective batch size of the convolution kernel. When CUDNN is used, it controls the maximum temporary storage used for tuning the best CUDNN kernel when `limited_workspace` strategy is used.</param>
     /// <param name="noBias">Whether to disable bias parameter.</param>
     /// <param name="cudnnTune">Whether to pick convolution algo by running performance test.</param>
     /// <param name="cudnnOff">Turn off cudnn for this layer.</param>
@@ -13917,19 +13917,19 @@ type Operators() =
                                        maxBias : Symbol, 
                                        kernel : int seq, 
                                        numFilter : int, 
-                                       numGroup : int, 
-                                       workspace : int64, 
                                        [<Optional>] stride : int seq, 
                                        [<Optional>] dilate : int seq, 
                                        [<Optional>] pad : int seq, 
+                                       [<Optional; DefaultParameterValue(1)>] numGroup : int, 
+                                       [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
                                        [<Optional; DefaultParameterValue(false)>] noBias : bool, 
                                        [<Optional>] cudnnTune : CudnnTune, 
                                        [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
                                        [<Optional>] layout : ContribQuantizedConvLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_conv"
         new Symbol(Some creator,
-                   [|"kernel"; "num_filter"; "num_group"; "workspace"; "stride"; "dilate"; "pad"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
-                   [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; string numGroup; string workspace; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
+                   [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
+                   [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
                    [|"data"; "weight"; "bias"; "minData"; "maxData"; "minWeight"; "maxWeight"; "minBias"; "maxBias"|],
                    [|data; weight; bias; minData; maxData; minWeight; maxWeight; minBias; maxBias|])
 
@@ -18754,7 +18754,7 @@ type Operators() =
     /// <param name="data">Input array.</param>
     /// <param name="dim1">the first axis to be swapped.</param>
     /// <param name="dim2">the second axis to be swapped.</param>
-    static member SwapAxis(data : NDArray, dim1 : int, dim2 : int) =
+    static member SwapAxis(data : NDArray, [<Optional; DefaultParameterValue(0)>] dim1 : int, [<Optional; DefaultParameterValue(0)>] dim2 : int) =
         let creator = AtomicSymbolCreator.FromName "SwapAxis"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -18786,7 +18786,7 @@ type Operators() =
     /// <param name="data">Input array.</param>
     /// <param name="dim1">the first axis to be swapped.</param>
     /// <param name="dim2">the second axis to be swapped.</param>
-    static member SwapAxis(outputArray : NDArray seq, data : NDArray, dim1 : int, dim2 : int) =
+    static member SwapAxis(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(0)>] dim1 : int, [<Optional; DefaultParameterValue(0)>] dim2 : int) =
         let creator = AtomicSymbolCreator.FromName "SwapAxis"
         let names = [|"dim1"; "dim2"|]
         let vals = [|string dim1; string dim2|]
@@ -18821,7 +18821,7 @@ type Operators() =
     /// <param name="data">Input array.</param>
     /// <param name="dim1">the first axis to be swapped.</param>
     /// <param name="dim2">the second axis to be swapped.</param>
-    static member SwapAxis(data : Symbol, dim1 : int, dim2 : int) =
+    static member SwapAxis(data : Symbol, [<Optional; DefaultParameterValue(0)>] dim1 : int, [<Optional; DefaultParameterValue(0)>] dim2 : int) =
         let creator = AtomicSymbolCreator.FromName "SwapAxis"
         new Symbol(Some creator,
                    [|"dim1"; "dim2"|],
@@ -32713,8 +32713,8 @@ type Operators() =
     /// <param name="dtype">DType of the output</param>
     static member OneHot(indices : NDArray, 
                          depth : int, 
-                         onValue : double, 
-                         offValue : double, 
+                         [<Optional; DefaultParameterValue(1.0)>] onValue : double, 
+                         [<Optional; DefaultParameterValue(0.0)>] offValue : double, 
                          [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "one_hot"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
@@ -32766,8 +32766,8 @@ type Operators() =
     static member OneHot(outputArray : NDArray seq, 
                          indices : NDArray, 
                          depth : int, 
-                         onValue : double, 
-                         offValue : double, 
+                         [<Optional; DefaultParameterValue(1.0)>] onValue : double, 
+                         [<Optional; DefaultParameterValue(0.0)>] offValue : double, 
                          [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "one_hot"
         let names = [|"depth"; "on_value"; "off_value"; "dtype"|]
@@ -32821,8 +32821,8 @@ type Operators() =
     /// <param name="dtype">DType of the output</param>
     static member OneHot(indices : Symbol, 
                          depth : int, 
-                         onValue : double, 
-                         offValue : double, 
+                         [<Optional; DefaultParameterValue(1.0)>] onValue : double, 
+                         [<Optional; DefaultParameterValue(0.0)>] offValue : double, 
                          [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "one_hot"
         new Symbol(Some creator,
@@ -33746,24 +33746,24 @@ type Operators() =
     /// <param name="A">Tensor of input matrices</param>
     /// <param name="B">Tensor of input matrices</param>
     /// <param name="C">Tensor of input matrices</param>
-    /// <param name="alpha">Scalar factor multiplied with A*B.</param>
-    /// <param name="beta">Scalar factor multiplied with C.</param>
     /// <param name="transposeA">Multiply with transposed of first input (A).</param>
     /// <param name="transposeB">Multiply with transposed of second input (B).</param>
+    /// <param name="alpha">Scalar factor multiplied with A*B.</param>
+    /// <param name="beta">Scalar factor multiplied with C.</param>
     /// <param name="axis">Axis corresponding to the matrix rows.</param>
     static member LinalgGemm(A : NDArray, 
                              B : NDArray, 
                              C : NDArray, 
-                             alpha : double, 
-                             beta : double, 
                              [<Optional; DefaultParameterValue(false)>] transposeA : bool, 
                              [<Optional; DefaultParameterValue(false)>] transposeB : bool, 
+                             [<Optional; DefaultParameterValue(1.0)>] alpha : double, 
+                             [<Optional; DefaultParameterValue(1.0)>] beta : double, 
                              [<Optional; DefaultParameterValue(-2)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "_linalg_gemm"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle; C.NDArrayHandle.UnsafeHandle|]
-                                                 [|"alpha"; "beta"; "transpose_a"; "transpose_b"; "axis"|]
-                                                 [|string alpha; string beta; string transposeA; string transposeB; string axis|]
+                                                 [|"transpose_a"; "transpose_b"; "alpha"; "beta"; "axis"|]
+                                                 [|string transposeA; string transposeB; string alpha; string beta; string axis|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Performs general matrix multiplication and accumulation.
     /// Input are tensors *A*, *B*, *C*, each of dimension *n &gt;= 2* and having the same shape
@@ -33819,23 +33819,23 @@ type Operators() =
     /// <param name="A">Tensor of input matrices</param>
     /// <param name="B">Tensor of input matrices</param>
     /// <param name="C">Tensor of input matrices</param>
-    /// <param name="alpha">Scalar factor multiplied with A*B.</param>
-    /// <param name="beta">Scalar factor multiplied with C.</param>
     /// <param name="transposeA">Multiply with transposed of first input (A).</param>
     /// <param name="transposeB">Multiply with transposed of second input (B).</param>
+    /// <param name="alpha">Scalar factor multiplied with A*B.</param>
+    /// <param name="beta">Scalar factor multiplied with C.</param>
     /// <param name="axis">Axis corresponding to the matrix rows.</param>
     static member LinalgGemm(outputArray : NDArray seq, 
                              A : NDArray, 
                              B : NDArray, 
                              C : NDArray, 
-                             alpha : double, 
-                             beta : double, 
                              [<Optional; DefaultParameterValue(false)>] transposeA : bool, 
                              [<Optional; DefaultParameterValue(false)>] transposeB : bool, 
+                             [<Optional; DefaultParameterValue(1.0)>] alpha : double, 
+                             [<Optional; DefaultParameterValue(1.0)>] beta : double, 
                              [<Optional; DefaultParameterValue(-2)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "_linalg_gemm"
-        let names = [|"alpha"; "beta"; "transpose_a"; "transpose_b"; "axis"|]
-        let vals = [|string alpha; string beta; string transposeA; string transposeB; string axis|]
+        let names = [|"transpose_a"; "transpose_b"; "alpha"; "beta"; "axis"|]
+        let vals = [|string transposeA; string transposeB; string alpha; string beta; string axis|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle; C.NDArrayHandle.UnsafeHandle|]
@@ -33896,23 +33896,23 @@ type Operators() =
     /// <param name="A">Tensor of input matrices</param>
     /// <param name="B">Tensor of input matrices</param>
     /// <param name="C">Tensor of input matrices</param>
-    /// <param name="alpha">Scalar factor multiplied with A*B.</param>
-    /// <param name="beta">Scalar factor multiplied with C.</param>
     /// <param name="transposeA">Multiply with transposed of first input (A).</param>
     /// <param name="transposeB">Multiply with transposed of second input (B).</param>
+    /// <param name="alpha">Scalar factor multiplied with A*B.</param>
+    /// <param name="beta">Scalar factor multiplied with C.</param>
     /// <param name="axis">Axis corresponding to the matrix rows.</param>
     static member LinalgGemm(A : Symbol, 
                              B : Symbol, 
                              C : Symbol, 
-                             alpha : double, 
-                             beta : double, 
                              [<Optional; DefaultParameterValue(false)>] transposeA : bool, 
                              [<Optional; DefaultParameterValue(false)>] transposeB : bool, 
+                             [<Optional; DefaultParameterValue(1.0)>] alpha : double, 
+                             [<Optional; DefaultParameterValue(1.0)>] beta : double, 
                              [<Optional; DefaultParameterValue(-2)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "_linalg_gemm"
         new Symbol(Some creator,
-                   [|"alpha"; "beta"; "transpose_a"; "transpose_b"; "axis"|],
-                   [|string alpha; string beta; string transposeA; string transposeB; string axis|],
+                   [|"transpose_a"; "transpose_b"; "alpha"; "beta"; "axis"|],
+                   [|string transposeA; string transposeB; string alpha; string beta; string axis|],
                    [|"A"; "B"; "C"|],
                    [|A; B; C|])
 
@@ -33992,21 +33992,21 @@ type Operators() =
     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L163</summary>
     /// <param name="A">Tensor of input matrices</param>
     /// <param name="B">Tensor of input matrices</param>
-    /// <param name="alpha">Scalar factor multiplied with A*B.</param>
     /// <param name="transposeA">Multiply with transposed of first input (A).</param>
     /// <param name="transposeB">Multiply with transposed of second input (B).</param>
+    /// <param name="alpha">Scalar factor multiplied with A*B.</param>
     /// <param name="axis">Axis corresponding to the matrix row indices.</param>
     static member LinalgGemm2(A : NDArray, 
                               B : NDArray, 
-                              alpha : double, 
                               [<Optional; DefaultParameterValue(false)>] transposeA : bool, 
                               [<Optional; DefaultParameterValue(false)>] transposeB : bool, 
+                              [<Optional; DefaultParameterValue(1.0)>] alpha : double, 
                               [<Optional; DefaultParameterValue(-2)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "_linalg_gemm2"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle|]
-                                                 [|"alpha"; "transpose_a"; "transpose_b"; "axis"|]
-                                                 [|string alpha; string transposeA; string transposeB; string axis|]
+                                                 [|"transpose_a"; "transpose_b"; "alpha"; "axis"|]
+                                                 [|string transposeA; string transposeB; string alpha; string axis|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Performs general matrix multiplication.
     /// Input are tensors *A*, *B*, each of dimension *n &gt;= 2* and having the same shape
@@ -34058,20 +34058,20 @@ type Operators() =
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of input matrices</param>
     /// <param name="B">Tensor of input matrices</param>
-    /// <param name="alpha">Scalar factor multiplied with A*B.</param>
     /// <param name="transposeA">Multiply with transposed of first input (A).</param>
     /// <param name="transposeB">Multiply with transposed of second input (B).</param>
+    /// <param name="alpha">Scalar factor multiplied with A*B.</param>
     /// <param name="axis">Axis corresponding to the matrix row indices.</param>
     static member LinalgGemm2(outputArray : NDArray seq, 
                               A : NDArray, 
                               B : NDArray, 
-                              alpha : double, 
                               [<Optional; DefaultParameterValue(false)>] transposeA : bool, 
                               [<Optional; DefaultParameterValue(false)>] transposeB : bool, 
+                              [<Optional; DefaultParameterValue(1.0)>] alpha : double, 
                               [<Optional; DefaultParameterValue(-2)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "_linalg_gemm2"
-        let names = [|"alpha"; "transpose_a"; "transpose_b"; "axis"|]
-        let vals = [|string alpha; string transposeA; string transposeB; string axis|]
+        let names = [|"transpose_a"; "transpose_b"; "alpha"; "axis"|]
+        let vals = [|string transposeA; string transposeB; string alpha; string axis|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle|]
@@ -34128,20 +34128,20 @@ type Operators() =
     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L163</summary>
     /// <param name="A">Tensor of input matrices</param>
     /// <param name="B">Tensor of input matrices</param>
-    /// <param name="alpha">Scalar factor multiplied with A*B.</param>
     /// <param name="transposeA">Multiply with transposed of first input (A).</param>
     /// <param name="transposeB">Multiply with transposed of second input (B).</param>
+    /// <param name="alpha">Scalar factor multiplied with A*B.</param>
     /// <param name="axis">Axis corresponding to the matrix row indices.</param>
     static member LinalgGemm2(A : Symbol, 
                               B : Symbol, 
-                              alpha : double, 
                               [<Optional; DefaultParameterValue(false)>] transposeA : bool, 
                               [<Optional; DefaultParameterValue(false)>] transposeB : bool, 
+                              [<Optional; DefaultParameterValue(1.0)>] alpha : double, 
                               [<Optional; DefaultParameterValue(-2)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "_linalg_gemm2"
         new Symbol(Some creator,
-                   [|"alpha"; "transpose_a"; "transpose_b"; "axis"|],
-                   [|string alpha; string transposeA; string transposeB; string axis|],
+                   [|"transpose_a"; "transpose_b"; "alpha"; "axis"|],
+                   [|string transposeA; string transposeB; string alpha; string axis|],
                    [|"A"; "B"|],
                    [|A; B|])
 
@@ -34513,21 +34513,21 @@ type Operators() =
     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L333</summary>
     /// <param name="A">Tensor of lower triangular matrices</param>
     /// <param name="B">Tensor of matrices</param>
-    /// <param name="alpha">Scalar factor to be applied to the result.</param>
     /// <param name="transpose">Use transposed of the triangular matrix</param>
     /// <param name="rightside">Multiply triangular matrix from the right to non-triangular one.</param>
     /// <param name="lower">True if the triangular matrix is lower triangular, false if it is upper triangular.</param>
+    /// <param name="alpha">Scalar factor to be applied to the result.</param>
     static member LinalgTrmm(A : NDArray, 
                              B : NDArray, 
-                             alpha : double, 
                              [<Optional; DefaultParameterValue(false)>] transpose : bool, 
                              [<Optional; DefaultParameterValue(false)>] rightside : bool, 
-                             [<Optional; DefaultParameterValue(true)>] lower : bool) =
+                             [<Optional; DefaultParameterValue(true)>] lower : bool, 
+                             [<Optional; DefaultParameterValue(1.0)>] alpha : double) =
         let creator = AtomicSymbolCreator.FromName "_linalg_trmm"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle|]
-                                                 [|"alpha"; "transpose"; "rightside"; "lower"|]
-                                                 [|string alpha; string transpose; string rightside; string lower|]
+                                                 [|"transpose"; "rightside"; "lower"; "alpha"|]
+                                                 [|string transpose; string rightside; string lower; string alpha|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Performs multiplication with a lower triangular matrix.
     /// Input are tensors *A*, *B*, each of dimension *n &gt;= 2* and having the same shape
@@ -34568,20 +34568,20 @@ type Operators() =
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of lower triangular matrices</param>
     /// <param name="B">Tensor of matrices</param>
-    /// <param name="alpha">Scalar factor to be applied to the result.</param>
     /// <param name="transpose">Use transposed of the triangular matrix</param>
     /// <param name="rightside">Multiply triangular matrix from the right to non-triangular one.</param>
     /// <param name="lower">True if the triangular matrix is lower triangular, false if it is upper triangular.</param>
+    /// <param name="alpha">Scalar factor to be applied to the result.</param>
     static member LinalgTrmm(outputArray : NDArray seq, 
                              A : NDArray, 
                              B : NDArray, 
-                             alpha : double, 
                              [<Optional; DefaultParameterValue(false)>] transpose : bool, 
                              [<Optional; DefaultParameterValue(false)>] rightside : bool, 
-                             [<Optional; DefaultParameterValue(true)>] lower : bool) =
+                             [<Optional; DefaultParameterValue(true)>] lower : bool, 
+                             [<Optional; DefaultParameterValue(1.0)>] alpha : double) =
         let creator = AtomicSymbolCreator.FromName "_linalg_trmm"
-        let names = [|"alpha"; "transpose"; "rightside"; "lower"|]
-        let vals = [|string alpha; string transpose; string rightside; string lower|]
+        let names = [|"transpose"; "rightside"; "lower"; "alpha"|]
+        let vals = [|string transpose; string rightside; string lower; string alpha|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle|]
@@ -34627,20 +34627,20 @@ type Operators() =
     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L333</summary>
     /// <param name="A">Tensor of lower triangular matrices</param>
     /// <param name="B">Tensor of matrices</param>
-    /// <param name="alpha">Scalar factor to be applied to the result.</param>
     /// <param name="transpose">Use transposed of the triangular matrix</param>
     /// <param name="rightside">Multiply triangular matrix from the right to non-triangular one.</param>
     /// <param name="lower">True if the triangular matrix is lower triangular, false if it is upper triangular.</param>
+    /// <param name="alpha">Scalar factor to be applied to the result.</param>
     static member LinalgTrmm(A : Symbol, 
                              B : Symbol, 
-                             alpha : double, 
                              [<Optional; DefaultParameterValue(false)>] transpose : bool, 
                              [<Optional; DefaultParameterValue(false)>] rightside : bool, 
-                             [<Optional; DefaultParameterValue(true)>] lower : bool) =
+                             [<Optional; DefaultParameterValue(true)>] lower : bool, 
+                             [<Optional; DefaultParameterValue(1.0)>] alpha : double) =
         let creator = AtomicSymbolCreator.FromName "_linalg_trmm"
         new Symbol(Some creator,
-                   [|"alpha"; "transpose"; "rightside"; "lower"|],
-                   [|string alpha; string transpose; string rightside; string lower|],
+                   [|"transpose"; "rightside"; "lower"; "alpha"|],
+                   [|string transpose; string rightside; string lower; string alpha|],
                    [|"A"; "B"|],
                    [|A; B|])
 
@@ -34710,21 +34710,21 @@ type Operators() =
     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L396</summary>
     /// <param name="A">Tensor of lower triangular matrices</param>
     /// <param name="B">Tensor of matrices</param>
-    /// <param name="alpha">Scalar factor to be applied to the result.</param>
     /// <param name="transpose">Use transposed of the triangular matrix</param>
     /// <param name="rightside">Multiply triangular matrix from the right to non-triangular one.</param>
     /// <param name="lower">True if the triangular matrix is lower triangular, false if it is upper triangular.</param>
+    /// <param name="alpha">Scalar factor to be applied to the result.</param>
     static member LinalgTrsm(A : NDArray, 
                              B : NDArray, 
-                             alpha : double, 
                              [<Optional; DefaultParameterValue(false)>] transpose : bool, 
                              [<Optional; DefaultParameterValue(false)>] rightside : bool, 
-                             [<Optional; DefaultParameterValue(true)>] lower : bool) =
+                             [<Optional; DefaultParameterValue(true)>] lower : bool, 
+                             [<Optional; DefaultParameterValue(1.0)>] alpha : double) =
         let creator = AtomicSymbolCreator.FromName "_linalg_trsm"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle|]
-                                                 [|"alpha"; "transpose"; "rightside"; "lower"|]
-                                                 [|string alpha; string transpose; string rightside; string lower|]
+                                                 [|"transpose"; "rightside"; "lower"; "alpha"|]
+                                                 [|string transpose; string rightside; string lower; string alpha|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Solves matrix equation involving a lower triangular matrix.
     /// Input are tensors *A*, *B*, each of dimension *n &gt;= 2* and having the same shape
@@ -34766,20 +34766,20 @@ type Operators() =
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of lower triangular matrices</param>
     /// <param name="B">Tensor of matrices</param>
-    /// <param name="alpha">Scalar factor to be applied to the result.</param>
     /// <param name="transpose">Use transposed of the triangular matrix</param>
     /// <param name="rightside">Multiply triangular matrix from the right to non-triangular one.</param>
     /// <param name="lower">True if the triangular matrix is lower triangular, false if it is upper triangular.</param>
+    /// <param name="alpha">Scalar factor to be applied to the result.</param>
     static member LinalgTrsm(outputArray : NDArray seq, 
                              A : NDArray, 
                              B : NDArray, 
-                             alpha : double, 
                              [<Optional; DefaultParameterValue(false)>] transpose : bool, 
                              [<Optional; DefaultParameterValue(false)>] rightside : bool, 
-                             [<Optional; DefaultParameterValue(true)>] lower : bool) =
+                             [<Optional; DefaultParameterValue(true)>] lower : bool, 
+                             [<Optional; DefaultParameterValue(1.0)>] alpha : double) =
         let creator = AtomicSymbolCreator.FromName "_linalg_trsm"
-        let names = [|"alpha"; "transpose"; "rightside"; "lower"|]
-        let vals = [|string alpha; string transpose; string rightside; string lower|]
+        let names = [|"transpose"; "rightside"; "lower"; "alpha"|]
+        let vals = [|string transpose; string rightside; string lower; string alpha|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle|]
@@ -34826,20 +34826,20 @@ type Operators() =
     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L396</summary>
     /// <param name="A">Tensor of lower triangular matrices</param>
     /// <param name="B">Tensor of matrices</param>
-    /// <param name="alpha">Scalar factor to be applied to the result.</param>
     /// <param name="transpose">Use transposed of the triangular matrix</param>
     /// <param name="rightside">Multiply triangular matrix from the right to non-triangular one.</param>
     /// <param name="lower">True if the triangular matrix is lower triangular, false if it is upper triangular.</param>
+    /// <param name="alpha">Scalar factor to be applied to the result.</param>
     static member LinalgTrsm(A : Symbol, 
                              B : Symbol, 
-                             alpha : double, 
                              [<Optional; DefaultParameterValue(false)>] transpose : bool, 
                              [<Optional; DefaultParameterValue(false)>] rightside : bool, 
-                             [<Optional; DefaultParameterValue(true)>] lower : bool) =
+                             [<Optional; DefaultParameterValue(true)>] lower : bool, 
+                             [<Optional; DefaultParameterValue(1.0)>] alpha : double) =
         let creator = AtomicSymbolCreator.FromName "_linalg_trsm"
         new Symbol(Some creator,
-                   [|"alpha"; "transpose"; "rightside"; "lower"|],
-                   [|string alpha; string transpose; string rightside; string lower|],
+                   [|"transpose"; "rightside"; "lower"; "alpha"|],
+                   [|string transpose; string rightside; string lower; string alpha|],
                    [|"A"; "B"|],
                    [|A; B|])
 
@@ -35714,14 +35714,14 @@ type Operators() =
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L730</summary>
     /// <param name="A">Tensor of input matrices</param>
-    /// <param name="alpha">Scalar factor to be applied to the result.</param>
     /// <param name="transpose">Use transpose of input matrix.</param>
-    static member LinalgSyrk(A : NDArray, alpha : double, [<Optional; DefaultParameterValue(false)>] transpose : bool) =
+    /// <param name="alpha">Scalar factor to be applied to the result.</param>
+    static member LinalgSyrk(A : NDArray, [<Optional; DefaultParameterValue(false)>] transpose : bool, [<Optional; DefaultParameterValue(1.0)>] alpha : double) =
         let creator = AtomicSymbolCreator.FromName "_linalg_syrk"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|A.NDArrayHandle.UnsafeHandle|]
-                                                 [|"alpha"; "transpose"|]
-                                                 [|string alpha; string transpose|]
+                                                 [|"transpose"; "alpha"|]
+                                                 [|string transpose; string alpha|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Multiplication of matrix with its transpose.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
@@ -35761,12 +35761,12 @@ type Operators() =
     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L730</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of input matrices</param>
-    /// <param name="alpha">Scalar factor to be applied to the result.</param>
     /// <param name="transpose">Use transpose of input matrix.</param>
-    static member LinalgSyrk(outputArray : NDArray seq, A : NDArray, alpha : double, [<Optional; DefaultParameterValue(false)>] transpose : bool) =
+    /// <param name="alpha">Scalar factor to be applied to the result.</param>
+    static member LinalgSyrk(outputArray : NDArray seq, A : NDArray, [<Optional; DefaultParameterValue(false)>] transpose : bool, [<Optional; DefaultParameterValue(1.0)>] alpha : double) =
         let creator = AtomicSymbolCreator.FromName "_linalg_syrk"
-        let names = [|"alpha"; "transpose"|]
-        let vals = [|string alpha; string transpose|]
+        let names = [|"transpose"; "alpha"|]
+        let vals = [|string transpose; string alpha|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|A.NDArrayHandle.UnsafeHandle|]
@@ -35811,13 +35811,13 @@ type Operators() =
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L730</summary>
     /// <param name="A">Tensor of input matrices</param>
-    /// <param name="alpha">Scalar factor to be applied to the result.</param>
     /// <param name="transpose">Use transpose of input matrix.</param>
-    static member LinalgSyrk(A : Symbol, alpha : double, [<Optional; DefaultParameterValue(false)>] transpose : bool) =
+    /// <param name="alpha">Scalar factor to be applied to the result.</param>
+    static member LinalgSyrk(A : Symbol, [<Optional; DefaultParameterValue(false)>] transpose : bool, [<Optional; DefaultParameterValue(1.0)>] alpha : double) =
         let creator = AtomicSymbolCreator.FromName "_linalg_syrk"
         new Symbol(Some creator,
-                   [|"alpha"; "transpose"|],
-                   [|string alpha; string transpose|],
+                   [|"transpose"; "alpha"|],
+                   [|string transpose; string alpha|],
                    [|"A"|],
                    [|A|])
 
@@ -37101,20 +37101,20 @@ type Operators() =
     /// 
     /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:562</summary>
     /// <param name="data">Source input</param>
-    /// <param name="scalar">The scalar value for assignment.</param>
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
+    /// <param name="scalar">The scalar value for assignment.</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
     static member SliceAssignScalar(data : NDArray, 
-                                    scalar : double, 
                                     sliceBegin : int seq, 
                                     sliceEnd : int seq, 
+                                    [<Optional; DefaultParameterValue(0.0)>] scalar : double, 
                                     [<Optional>] step : int seq) =
         let creator = AtomicSymbolCreator.FromName "_slice_assign_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"scalar"; "begin"; "end"; "step"|]
-                                                 [|string scalar; (sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
+                                                 [|"begin"; "end"; "scalar"; "step"|]
+                                                 [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); string scalar; (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>(Assign the scalar to a cropped subset of the input.
     /// 
@@ -37126,19 +37126,19 @@ type Operators() =
     /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:562</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Source input</param>
-    /// <param name="scalar">The scalar value for assignment.</param>
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
+    /// <param name="scalar">The scalar value for assignment.</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
     static member SliceAssignScalar(outputArray : NDArray seq, 
                                     data : NDArray, 
-                                    scalar : double, 
                                     sliceBegin : int seq, 
                                     sliceEnd : int seq, 
+                                    [<Optional; DefaultParameterValue(0.0)>] scalar : double, 
                                     [<Optional>] step : int seq) =
         let creator = AtomicSymbolCreator.FromName "_slice_assign_scalar"
-        let names = [|"scalar"; "begin"; "end"; "step"|]
-        let vals = [|string scalar; (sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
+        let names = [|"begin"; "end"; "scalar"; "step"|]
+        let vals = [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); string scalar; (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -37155,19 +37155,19 @@ type Operators() =
     /// 
     /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:562</summary>
     /// <param name="data">Source input</param>
-    /// <param name="scalar">The scalar value for assignment.</param>
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
+    /// <param name="scalar">The scalar value for assignment.</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
     static member SliceAssignScalar(data : Symbol, 
-                                    scalar : double, 
                                     sliceBegin : int seq, 
                                     sliceEnd : int seq, 
+                                    [<Optional; DefaultParameterValue(0.0)>] scalar : double, 
                                     [<Optional>] step : int seq) =
         let creator = AtomicSymbolCreator.FromName "_slice_assign_scalar"
         new Symbol(Some creator,
-                   [|"scalar"; "begin"; "end"; "step"|],
-                   [|string scalar; (sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|],
+                   [|"begin"; "end"; "scalar"; "step"|],
+                   [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); string scalar; (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|],
                    [|"data"|],
                    [|data|])
 
@@ -41069,12 +41069,12 @@ type Operators() =
     /// <param name="bias">Bias parameter.</param>
     /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
     /// <param name="numFilter">Convolution filter(channel) number</param>
-    /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
     /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
     /// <param name="numGroup">Number of group partitions.</param>
     /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
+    /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
     /// <param name="noBias">Whether to disable bias parameter.</param>
     /// <param name="layout">Set layout for input, output and weight. Empty for
     ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
@@ -41084,19 +41084,19 @@ type Operators() =
                                                bias : NDArray, 
                                                kernel : int seq, 
                                                numFilter : int, 
-                                               workspace : int64, 
                                                [<Optional>] stride : int seq, 
                                                [<Optional>] dilate : int seq, 
                                                [<Optional>] pad : int seq, 
                                                [<Optional; DefaultParameterValue(1)>] numGroup : int, 
                                                [<Optional; DefaultParameterValue(1)>] numDeformableGroup : int, 
+                                               [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
                                                [<Optional; DefaultParameterValue(false)>] noBias : bool, 
                                                [<Optional>] layout : ContribDeformableConvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_DeformableConvolution"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; offset.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
-                                                 [|"kernel"; "num_filter"; "workspace"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "no_bias"; "layout"|]
-                                                 [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; string workspace; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string numDeformableGroup; string noBias; (if isNull (layout :> obj) then "None" else string layout)|]
+                                                 [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "layout"|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Compute 2-D deformable convolution on 4-D input.
     /// 
@@ -41150,12 +41150,12 @@ type Operators() =
     /// <param name="bias">Bias parameter.</param>
     /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
     /// <param name="numFilter">Convolution filter(channel) number</param>
-    /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
     /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
     /// <param name="numGroup">Number of group partitions.</param>
     /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
+    /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
     /// <param name="noBias">Whether to disable bias parameter.</param>
     /// <param name="layout">Set layout for input, output and weight. Empty for
     ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
@@ -41166,17 +41166,17 @@ type Operators() =
                                                bias : NDArray, 
                                                kernel : int seq, 
                                                numFilter : int, 
-                                               workspace : int64, 
                                                [<Optional>] stride : int seq, 
                                                [<Optional>] dilate : int seq, 
                                                [<Optional>] pad : int seq, 
                                                [<Optional; DefaultParameterValue(1)>] numGroup : int, 
                                                [<Optional; DefaultParameterValue(1)>] numDeformableGroup : int, 
+                                               [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
                                                [<Optional; DefaultParameterValue(false)>] noBias : bool, 
                                                [<Optional>] layout : ContribDeformableConvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_DeformableConvolution"
-        let names = [|"kernel"; "num_filter"; "workspace"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "no_bias"; "layout"|]
-        let vals = [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; string workspace; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string numDeformableGroup; string noBias; (if isNull (layout :> obj) then "None" else string layout)|]
+        let names = [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "layout"|]
+        let vals = [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; offset.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
@@ -41235,12 +41235,12 @@ type Operators() =
     /// <param name="bias">Bias parameter.</param>
     /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
     /// <param name="numFilter">Convolution filter(channel) number</param>
-    /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
     /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
     /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
     /// <param name="numGroup">Number of group partitions.</param>
     /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
+    /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
     /// <param name="noBias">Whether to disable bias parameter.</param>
     /// <param name="layout">Set layout for input, output and weight. Empty for
     ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
@@ -41250,18 +41250,18 @@ type Operators() =
                                                bias : Symbol, 
                                                kernel : int seq, 
                                                numFilter : int, 
-                                               workspace : int64, 
                                                [<Optional>] stride : int seq, 
                                                [<Optional>] dilate : int seq, 
                                                [<Optional>] pad : int seq, 
                                                [<Optional; DefaultParameterValue(1)>] numGroup : int, 
                                                [<Optional; DefaultParameterValue(1)>] numDeformableGroup : int, 
+                                               [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
                                                [<Optional; DefaultParameterValue(false)>] noBias : bool, 
                                                [<Optional>] layout : ContribDeformableConvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_DeformableConvolution"
         new Symbol(Some creator,
-                   [|"kernel"; "num_filter"; "workspace"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "no_bias"; "layout"|],
-                   [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; string workspace; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string numDeformableGroup; string noBias; (if isNull (layout :> obj) then "None" else string layout)|],
+                   [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "layout"|],
+                   [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|],
                    [|"data"; "offset"; "weight"; "bias"|],
                    [|data; offset; weight; bias|])
 
@@ -41778,12 +41778,12 @@ type Operators() =
     /// <param name="bias">Bias parameter.</param>
     /// <param name="kernel">convolution kernel size: (h, w) or (d, h, w)</param>
     /// <param name="numFilter">convolution filter(channel) number</param>
-    /// <param name="numGroup">Number of group partitions. Equivalent to slicing input into num_group
-    ///     partitions, apply convolution on each, then concatenate the results</param>
-    /// <param name="workspace">Maximum temporary workspace allowed for convolution (MB).This parameter determines the effective batch size of the convolution kernel, which may be smaller than the given batch size. Also, the workspace will be automatically enlarged to make sure that we can run the kernel with batch_size=1</param>
     /// <param name="stride">convolution stride: (h, w) or (d, h, w)</param>
     /// <param name="dilate">convolution dilate: (h, w) or (d, h, w)</param>
     /// <param name="pad">pad for convolution: (h, w) or (d, h, w)</param>
+    /// <param name="numGroup">Number of group partitions. Equivalent to slicing input into num_group
+    ///     partitions, apply convolution on each, then concatenate the results</param>
+    /// <param name="workspace">Maximum temporary workspace allowed for convolution (MB).This parameter determines the effective batch size of the convolution kernel, which may be smaller than the given batch size. Also, the workspace will be automatically enlarged to make sure that we can run the kernel with batch_size=1</param>
     /// <param name="noBias">Whether to disable bias parameter.</param>
     /// <param name="cudnnTune">Whether to pick convolution algo by running performance test.
     ///     Leads to higher startup time but may give faster speed. Options are:
@@ -41801,11 +41801,11 @@ type Operators() =
                                 bias : NDArray, 
                                 kernel : int seq, 
                                 numFilter : int, 
-                                numGroup : int, 
-                                workspace : int64, 
                                 [<Optional>] stride : int seq, 
                                 [<Optional>] dilate : int seq, 
                                 [<Optional>] pad : int seq, 
+                                [<Optional; DefaultParameterValue(1)>] numGroup : int, 
+                                [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
                                 [<Optional; DefaultParameterValue(false)>] noBias : bool, 
                                 [<Optional>] cudnnTune : CudnnTune, 
                                 [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
@@ -41813,8 +41813,8 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "Convolution_v1"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
-                                                 [|"kernel"; "num_filter"; "num_group"; "workspace"; "stride"; "dilate"; "pad"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; string numGroup; string workspace; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+                                                 [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>This operator is DEPRECATED. Apply convolution to input then add a bias.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -41823,12 +41823,12 @@ type Operators() =
     /// <param name="bias">Bias parameter.</param>
     /// <param name="kernel">convolution kernel size: (h, w) or (d, h, w)</param>
     /// <param name="numFilter">convolution filter(channel) number</param>
-    /// <param name="numGroup">Number of group partitions. Equivalent to slicing input into num_group
-    ///     partitions, apply convolution on each, then concatenate the results</param>
-    /// <param name="workspace">Maximum temporary workspace allowed for convolution (MB).This parameter determines the effective batch size of the convolution kernel, which may be smaller than the given batch size. Also, the workspace will be automatically enlarged to make sure that we can run the kernel with batch_size=1</param>
     /// <param name="stride">convolution stride: (h, w) or (d, h, w)</param>
     /// <param name="dilate">convolution dilate: (h, w) or (d, h, w)</param>
     /// <param name="pad">pad for convolution: (h, w) or (d, h, w)</param>
+    /// <param name="numGroup">Number of group partitions. Equivalent to slicing input into num_group
+    ///     partitions, apply convolution on each, then concatenate the results</param>
+    /// <param name="workspace">Maximum temporary workspace allowed for convolution (MB).This parameter determines the effective batch size of the convolution kernel, which may be smaller than the given batch size. Also, the workspace will be automatically enlarged to make sure that we can run the kernel with batch_size=1</param>
     /// <param name="noBias">Whether to disable bias parameter.</param>
     /// <param name="cudnnTune">Whether to pick convolution algo by running performance test.
     ///     Leads to higher startup time but may give faster speed. Options are:
@@ -41847,18 +41847,18 @@ type Operators() =
                                 bias : NDArray, 
                                 kernel : int seq, 
                                 numFilter : int, 
-                                numGroup : int, 
-                                workspace : int64, 
                                 [<Optional>] stride : int seq, 
                                 [<Optional>] dilate : int seq, 
                                 [<Optional>] pad : int seq, 
+                                [<Optional; DefaultParameterValue(1)>] numGroup : int, 
+                                [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
                                 [<Optional; DefaultParameterValue(false)>] noBias : bool, 
                                 [<Optional>] cudnnTune : CudnnTune, 
                                 [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
                                 [<Optional>] layout : ConvolutionV1Layout) =
         let creator = AtomicSymbolCreator.FromName "Convolution_v1"
-        let names = [|"kernel"; "num_filter"; "num_group"; "workspace"; "stride"; "dilate"; "pad"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-        let vals = [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; string numGroup; string workspace; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+        let names = [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
+        let vals = [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
@@ -41872,12 +41872,12 @@ type Operators() =
     /// <param name="bias">Bias parameter.</param>
     /// <param name="kernel">convolution kernel size: (h, w) or (d, h, w)</param>
     /// <param name="numFilter">convolution filter(channel) number</param>
-    /// <param name="numGroup">Number of group partitions. Equivalent to slicing input into num_group
-    ///     partitions, apply convolution on each, then concatenate the results</param>
-    /// <param name="workspace">Maximum temporary workspace allowed for convolution (MB).This parameter determines the effective batch size of the convolution kernel, which may be smaller than the given batch size. Also, the workspace will be automatically enlarged to make sure that we can run the kernel with batch_size=1</param>
     /// <param name="stride">convolution stride: (h, w) or (d, h, w)</param>
     /// <param name="dilate">convolution dilate: (h, w) or (d, h, w)</param>
     /// <param name="pad">pad for convolution: (h, w) or (d, h, w)</param>
+    /// <param name="numGroup">Number of group partitions. Equivalent to slicing input into num_group
+    ///     partitions, apply convolution on each, then concatenate the results</param>
+    /// <param name="workspace">Maximum temporary workspace allowed for convolution (MB).This parameter determines the effective batch size of the convolution kernel, which may be smaller than the given batch size. Also, the workspace will be automatically enlarged to make sure that we can run the kernel with batch_size=1</param>
     /// <param name="noBias">Whether to disable bias parameter.</param>
     /// <param name="cudnnTune">Whether to pick convolution algo by running performance test.
     ///     Leads to higher startup time but may give faster speed. Options are:
@@ -41895,19 +41895,19 @@ type Operators() =
                                 bias : Symbol, 
                                 kernel : int seq, 
                                 numFilter : int, 
-                                numGroup : int, 
-                                workspace : int64, 
                                 [<Optional>] stride : int seq, 
                                 [<Optional>] dilate : int seq, 
                                 [<Optional>] pad : int seq, 
+                                [<Optional; DefaultParameterValue(1)>] numGroup : int, 
+                                [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
                                 [<Optional; DefaultParameterValue(false)>] noBias : bool, 
                                 [<Optional>] cudnnTune : CudnnTune, 
                                 [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
                                 [<Optional>] layout : ConvolutionV1Layout) =
         let creator = AtomicSymbolCreator.FromName "Convolution_v1"
         new Symbol(Some creator,
-                   [|"kernel"; "num_filter"; "num_group"; "workspace"; "stride"; "dilate"; "pad"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
-                   [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; string numGroup; string workspace; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
+                   [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
+                   [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
                    [|"data"; "weight"; "bias"|],
                    [|data; weight; bias|])
 
@@ -41982,11 +41982,11 @@ type Operators() =
     /// <param name="isMultiply">operation type is either multiplication or subduction</param>
     static member Correlation(data1 : NDArray, 
                               data2 : NDArray, 
-                              kernelSize : int, 
-                              maxDisplacement : int, 
-                              stride1 : int, 
-                              stride2 : int, 
-                              padSize : int, 
+                              [<Optional; DefaultParameterValue(1)>] kernelSize : int, 
+                              [<Optional; DefaultParameterValue(1)>] maxDisplacement : int, 
+                              [<Optional; DefaultParameterValue(1)>] stride1 : int, 
+                              [<Optional; DefaultParameterValue(1)>] stride2 : int, 
+                              [<Optional; DefaultParameterValue(0)>] padSize : int, 
                               [<Optional; DefaultParameterValue(true)>] isMultiply : bool) =
         let creator = AtomicSymbolCreator.FromName "Correlation"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
@@ -42040,11 +42040,11 @@ type Operators() =
     static member Correlation(outputArray : NDArray seq, 
                               data1 : NDArray, 
                               data2 : NDArray, 
-                              kernelSize : int, 
-                              maxDisplacement : int, 
-                              stride1 : int, 
-                              stride2 : int, 
-                              padSize : int, 
+                              [<Optional; DefaultParameterValue(1)>] kernelSize : int, 
+                              [<Optional; DefaultParameterValue(1)>] maxDisplacement : int, 
+                              [<Optional; DefaultParameterValue(1)>] stride1 : int, 
+                              [<Optional; DefaultParameterValue(1)>] stride2 : int, 
+                              [<Optional; DefaultParameterValue(0)>] padSize : int, 
                               [<Optional; DefaultParameterValue(true)>] isMultiply : bool) =
         let creator = AtomicSymbolCreator.FromName "Correlation"
         let names = [|"kernel_size"; "max_displacement"; "stride1"; "stride2"; "pad_size"; "is_multiply"|]
@@ -42100,11 +42100,11 @@ type Operators() =
     /// <param name="isMultiply">operation type is either multiplication or subduction</param>
     static member Correlation(data1 : Symbol, 
                               data2 : Symbol, 
-                              kernelSize : int, 
-                              maxDisplacement : int, 
-                              stride1 : int, 
-                              stride2 : int, 
-                              padSize : int, 
+                              [<Optional; DefaultParameterValue(1)>] kernelSize : int, 
+                              [<Optional; DefaultParameterValue(1)>] maxDisplacement : int, 
+                              [<Optional; DefaultParameterValue(1)>] stride1 : int, 
+                              [<Optional; DefaultParameterValue(1)>] stride2 : int, 
+                              [<Optional; DefaultParameterValue(0)>] padSize : int, 
                               [<Optional; DefaultParameterValue(true)>] isMultiply : bool) =
         let creator = AtomicSymbolCreator.FromName "Correlation"
         new Symbol(Some creator,
@@ -45057,7 +45057,7 @@ type Operators() =
 //     /// <param name="dtype">Target data type.</param>
 //     static member ArangeNDArray(start : double, 
 //                                 [<Optional>] stop : float Nullable, 
-//                                 step : double, 
+//                                 [<Optional; DefaultParameterValue(1.0)>] step : double, 
 //                                 [<Optional; DefaultParameterValue(1)>] repeat : int, 
 //                                 [<Optional; DefaultParameterValue(false)>] inferRange : bool, 
 //                                 [<Optional; DefaultParameterValue("")>] ctx : string, 
@@ -45080,7 +45080,7 @@ type Operators() =
 //     static member Arange(outputArray : NDArray seq, 
 //                          start : double, 
 //                          [<Optional>] stop : float Nullable, 
-//                          step : double, 
+//                          [<Optional; DefaultParameterValue(1.0)>] step : double, 
 //                          [<Optional; DefaultParameterValue(1)>] repeat : int, 
 //                          [<Optional; DefaultParameterValue(false)>] inferRange : bool, 
 //                          [<Optional; DefaultParameterValue("")>] ctx : string, 
@@ -45105,7 +45105,7 @@ type Operators() =
 //     /// <param name="dtype">Target data type.</param>
 //     static member ArangeSymbol(start : double, 
 //                                [<Optional>] stop : float Nullable, 
-//                                step : double, 
+//                                [<Optional; DefaultParameterValue(1.0)>] step : double, 
 //                                [<Optional; DefaultParameterValue(1)>] repeat : int, 
 //                                [<Optional; DefaultParameterValue(false)>] inferRange : bool, 
 //                                [<Optional; DefaultParameterValue("")>] ctx : string, 
@@ -45127,7 +45127,7 @@ type Operators() =
 //     /// <param name="dtype">Target data type.</param>
 //     static member ArangeNDArray(start : double, 
 //                                 ?stop : float, 
-//                                 step : double, 
+//                                 ?step : double, 
 //                                 ?repeat : int, 
 //                                 ?inferRange : bool, 
 //                                 ?ctx : string, 
@@ -45136,7 +45136,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
 //                                                  [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
-//                                                  [|string start; (match stop with None -> "None" | Some stop -> string stop); string step; (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+//                                                  [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
 //         outputs |> Array.map (fun h -> new NDArray(h))
 //     /// <summary>Return evenly spaced values within a given interval. Similar to Numpy</summary>
 //     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -45150,14 +45150,14 @@ type Operators() =
 //     static member Arange(outputArray : NDArray seq, 
 //                          start : double, 
 //                          ?stop : float, 
-//                          step : double, 
+//                          ?step : double, 
 //                          ?repeat : int, 
 //                          ?inferRange : bool, 
 //                          ?ctx : string, 
 //                          ?dtype : IntOrFloatDType) =
 //         let creator = AtomicSymbolCreator.FromName "_arange"
 //         let names = [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
-//         let vals = [|string start; (match stop with None -> "None" | Some stop -> string stop); string step; (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+//         let vals = [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
 //                                                      Array.empty
@@ -45175,7 +45175,7 @@ type Operators() =
 //     /// <param name="dtype">Target data type.</param>
 //     static member ArangeSymbol(start : double, 
 //                                ?stop : float, 
-//                                step : double, 
+//                                ?step : double, 
 //                                ?repeat : int, 
 //                                ?inferRange : bool, 
 //                                ?ctx : string, 
@@ -45183,7 +45183,7 @@ type Operators() =
 //         let creator = AtomicSymbolCreator.FromName "_arange"
 //         new Symbol(Some creator,
 //                    [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|],
-//                    [|string start; (match stop with None -> "None" | Some stop -> string stop); string step; (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|],
+//                    [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|],
 //                    Array.empty,
 //                    Array.empty)
 
@@ -45215,7 +45215,7 @@ type Operators() =
 //     /// <param name="dtype">Target data type.</param>
 //     static member LinspaceNDArray(start : double, 
 //                                   [<Optional>] stop : float Nullable, 
-//                                   step : double, 
+//                                   [<Optional; DefaultParameterValue(1.0)>] step : double, 
 //                                   [<Optional; DefaultParameterValue(1)>] repeat : int, 
 //                                   [<Optional; DefaultParameterValue(false)>] inferRange : bool, 
 //                                   [<Optional; DefaultParameterValue("")>] ctx : string, 
@@ -45238,7 +45238,7 @@ type Operators() =
 //     static member Linspace(outputArray : NDArray seq, 
 //                            start : double, 
 //                            [<Optional>] stop : float Nullable, 
-//                            step : double, 
+//                            [<Optional; DefaultParameterValue(1.0)>] step : double, 
 //                            [<Optional; DefaultParameterValue(1)>] repeat : int, 
 //                            [<Optional; DefaultParameterValue(false)>] inferRange : bool, 
 //                            [<Optional; DefaultParameterValue("")>] ctx : string, 
@@ -45263,7 +45263,7 @@ type Operators() =
 //     /// <param name="dtype">Target data type.</param>
 //     static member LinspaceSymbol(start : double, 
 //                                  [<Optional>] stop : float Nullable, 
-//                                  step : double, 
+//                                  [<Optional; DefaultParameterValue(1.0)>] step : double, 
 //                                  [<Optional; DefaultParameterValue(1)>] repeat : int, 
 //                                  [<Optional; DefaultParameterValue(false)>] inferRange : bool, 
 //                                  [<Optional; DefaultParameterValue("")>] ctx : string, 
@@ -45285,7 +45285,7 @@ type Operators() =
 //     /// <param name="dtype">Target data type.</param>
 //     static member LinspaceNDArray(start : double, 
 //                                   ?stop : float, 
-//                                   step : double, 
+//                                   ?step : double, 
 //                                   ?repeat : int, 
 //                                   ?inferRange : bool, 
 //                                   ?ctx : string, 
@@ -45294,7 +45294,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
 //                                                  [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
-//                                                  [|string start; (match stop with None -> "None" | Some stop -> string stop); string step; (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+//                                                  [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
 //         outputs |> Array.map (fun h -> new NDArray(h))
 //     /// <summary>Return evenly spaced numbers over a specified interval. Similar to Numpy</summary>
 //     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -45308,14 +45308,14 @@ type Operators() =
 //     static member Linspace(outputArray : NDArray seq, 
 //                            start : double, 
 //                            ?stop : float, 
-//                            step : double, 
+//                            ?step : double, 
 //                            ?repeat : int, 
 //                            ?inferRange : bool, 
 //                            ?ctx : string, 
 //                            ?dtype : IntOrFloatDType) =
 //         let creator = AtomicSymbolCreator.FromName "_linspace"
 //         let names = [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
-//         let vals = [|string start; (match stop with None -> "None" | Some stop -> string stop); string step; (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+//         let vals = [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
 //                                                      Array.empty
@@ -45333,7 +45333,7 @@ type Operators() =
 //     /// <param name="dtype">Target data type.</param>
 //     static member LinspaceSymbol(start : double, 
 //                                  ?stop : float, 
-//                                  step : double, 
+//                                  ?step : double, 
 //                                  ?repeat : int, 
 //                                  ?inferRange : bool, 
 //                                  ?ctx : string, 
@@ -45341,7 +45341,7 @@ type Operators() =
 //         let creator = AtomicSymbolCreator.FromName "_linspace"
 //         new Symbol(Some creator,
 //                    [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|],
-//                    [|string start; (match stop with None -> "None" | Some stop -> string stop); string step; (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|],
+//                    [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|],
 //                    Array.empty,
 //                    Array.empty)
 
