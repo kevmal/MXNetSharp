@@ -8,13 +8,12 @@ open MXNetSharp
 
 
 let data = Symbol.Variable "data"
-let conv1_1 = Operators.Convolution(data, Symbol.Empty, Symbol.Empty, numFilter = 64, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L)
+let conv1_1 = Operators.Convolution(data, Symbol.Empty, Symbol.Empty, numFilter = 64, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv1_1")
+let relu1_1 = Operators.Activation(conv1_1, actType = Relu, Name = "relu1_1")
 
-data = mx.sym.Variable("data")
-conv1_1 = mx.symbol.Convolution(name='conv1_1', data=data , num_filter=64, pad=(1,1), kernel=(3,3), stride=(1,1), no_bias=False, workspace=1024)
-relu1_1 = mx.symbol.Activation(name='relu1_1', data=conv1_1 , act_type='relu')
-conv1_2 = mx.symbol.Convolution(name='conv1_2', data=relu1_1 , num_filter=64, pad=(1,1), kernel=(3,3), stride=(1,1), no_bias=False, workspace=1024)
-relu1_2 = mx.symbol.Activation(name='relu1_2', data=conv1_2 , act_type='relu')
+let conv1_2 = Operators.Convolution(relu1_1, Symbol.Empty, Symbol.Empty, numFilter = 64, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv1_2")
+let relu1_2 = Operators.Activation(conv1_2, actType = Relu, Name = "relu1_2")
+let pool1 = Operators.Pooling(relu1_2, pad = [0;0], kernel = [2;2]; stride = [2;2], poolType = Avg, Name = "pool1")
 pool1 = mx.symbol.Pooling(name='pool1', data=relu1_2 , pad=(0,0), kernel=(2,2), stride=(2,2), pool_type='avg')
 conv2_1 = mx.symbol.Convolution(name='conv2_1', data=pool1 , num_filter=128, pad=(1,1), kernel=(3,3), stride=(1,1), no_bias=False, workspace=1024)
 relu2_1 = mx.symbol.Activation(name='relu2_1', data=conv2_1 , act_type='relu')
