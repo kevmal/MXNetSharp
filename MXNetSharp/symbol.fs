@@ -49,6 +49,9 @@ type Symbol(creator : AtomicSymbolCreator option, parameters, inputs) =
             name <- Some v 
     member x.WithName(name) = x.Name <- name; x
     member x.SymbolHandle : SafeSymbolHandle option = handle.Value
+    member x.UnsafeSymbolHandle = 
+        let h = x.SymbolHandle |> Option.map (fun x -> x.UnsafeHandle)
+        defaultArg h 0n
     static member Variable(name) = new Symbol(None, Array.empty, Array.empty, Name = name)
     static member Empty = new Symbol(None, Array.empty, Array.empty)
     member x.IsEmpty = name.IsNone && creator.IsNone
@@ -60,5 +63,9 @@ type Symbol(creator : AtomicSymbolCreator option, parameters, inputs) =
     member x.Dispose() = 
         x.Dispose(true)
         GC.SuppressFinalize(x)
+    member x.ArgumentNames = 
+        match x.SymbolHandle with 
+        | Some h -> MXSymbol.listArguments h.UnsafeHandle
+        | None -> Array.empty
     interface IDisposable with  
         member x.Dispose() = x.Dispose()
