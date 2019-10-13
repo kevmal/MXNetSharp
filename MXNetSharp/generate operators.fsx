@@ -697,17 +697,16 @@ Mappings.Modify(fun (x : ProcessedAtomicSymbol) ->
         x
 )
 
-// **************************** RNN *******************************
-// sort optional parameters
+// **************************** Sort parameters so required args appear first *******************************
 
 Mappings.Modify(fun (x : ProcessedAtomicSymbol) -> 
-    if x.AtomicSymbolInfo.Name = "RNN" then
+    //if x.AtomicSymbolInfo.Name = "RNN" then
         let optional, required = x.Args |> Array.partition (fun x -> x.DefaultMode.IsSome) 
         { x  with 
             Args = Array.append required optional
         }
-    else    
-        x
+    //else    
+    //    x
     )
 
 
