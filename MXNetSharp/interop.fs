@@ -1331,29 +1331,24 @@ module MXExecutor =
     //    let mutable out = un
     //    MXExecutorSimpleBindEx(symbol_handle, dev_type, dev_id, num_g2c_keys, g2c_keys, g2c_dev_types, g2c_dev_ids, provided_grad_req_list_len, provided_grad_req_names, provided_grad_req_types, num_provided_arg_shapes, provided_arg_shape_names, provided_arg_shape_data, provided_arg_shape_idx, num_provided_arg_dtypes, provided_arg_dtype_names, provided_arg_dtypes, num_provided_arg_stypes, provided_arg_stype_names, provided_arg_stypes, num_shared_arg_names, shared_arg_name_list, shared_buffer_len, shared_buffer_name_list, shared_buffer_handle_list, updated_shared_buffer_name_list, updated_shared_buffer_handle_list, num_in_args, in_args, arg_grads, num_aux_states, aux_states, shared_exec_handle, &out) |> throwOnError "MXExecutorSimpleBindEx"
 
-    (* TODO: MXExecutorReshapeEx
     /// <summary>Return a new executor with the same symbol and shared memory,
-    ///but different input/output shapes.</summary>
+    /// but different input/output shapes.</summary>
     /// <param name="partial_shaping">Whether to allow changing the shape of unspecified arguments.</param>
     /// <param name="allow_up_sizing">Whether to allow allocating new ndarrays that's larger than the original.</param>
     /// <param name="dev_type">device type of default context</param>
     /// <param name="dev_id">device id of default context</param>
-    /// <param name="num_map_keys">size of group2ctx map</param>
     /// <param name="map_keys">keys of group2ctx map</param>
     /// <param name="map_dev_types">device type of group2ctx map</param>
     /// <param name="map_dev_ids">device id of group2ctx map</param>
-    /// <param name="num_in_args">length of in_args</param>
     /// <param name="in_args">in args array</param>
     /// <param name="arg_grads">arg grads handle array</param>
-    /// <param name="num_aux_states">length of auxiliary states</param>
     /// <param name="aux_states">auxiliary states array</param>
     /// <param name="shared_exec">input executor handle for memory sharing</param>
     /// <param name="out">output executor handle</param>
     /// <returns>a new executor</returns>
-    let reshapeEx partial_shaping allow_up_sizing dev_type dev_id num_map_keys map_keys map_dev_types map_dev_ids num_provided_arg_shapes provided_arg_shape_names provided_arg_shape_data provided_arg_shape_idx num_in_args in_args arg_grads num_aux_states aux_states shared_exec = 
+    let reshapeEx partial_shaping allow_up_sizing dev_type dev_id map_keys map_dev_types map_dev_ids provided_arg_shape_names provided_arg_shape_data provided_arg_shape_idx in_args arg_grads aux_states shared_exec = 
         let mutable out = un
-        MXExecutorReshapeEx(partial_shaping, allow_up_sizing, dev_type, dev_id, num_map_keys, map_keys, map_dev_types, map_dev_ids, num_provided_arg_shapes, provided_arg_shape_names, provided_arg_shape_data, provided_arg_shape_idx, num_in_args, in_args, arg_grads, num_aux_states, aux_states, shared_exec, &out) |> throwOnError "MXExecutorReshapeEx"
-    *)
+        MXExecutorReshapeEx(partial_shaping, allow_up_sizing, dev_type, dev_id, ulength map_keys, map_keys, map_dev_types, map_dev_ids, num provided_arg_shape_names, provided_arg_shape_names, provided_arg_shape_data, provided_arg_shape_idx, ulength in_args, in_args, arg_grads, ulength aux_states, aux_states, shared_exec, &out) |> throwOnError "MXExecutorReshapeEx"
 
     /// <summary>get optimized graph from graph executor</summary>
     let getOptimizedSymbol handle = 

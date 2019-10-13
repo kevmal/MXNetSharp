@@ -1389,10 +1389,10 @@ extern int MXSymbolInferShapeEx64(SymbolHandle sym, uint32 num_args, string[] ke
 /// <param name="complete">whether infer shape completes or more information is needed.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolInferShapePartial__(SymbolHandle sym, uint32 num_args, string[] keys, uint32[] arg_ind_ptr, uint32[] arg_shape_data, uint32[] in_shape_size, uint32[]& in_shape_ndim, IntPtr[]& in_shape_data, uint32[] out_shape_size, uint32[]& out_shape_ndim, IntPtr[]& out_shape_data, uint32[] aux_shape_size, uint32[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
+extern int MXSymbolInferShapePartial(SymbolHandle sym, uint32 num_args, string[] keys, uint32[] arg_ind_ptr, uint32[] arg_shape_data, uint32[] in_shape_size, uint32[]& in_shape_ndim, IntPtr[]& in_shape_data, uint32[] out_shape_size, uint32[]& out_shape_ndim, IntPtr[]& out_shape_data, uint32[] aux_shape_size, uint32[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
 
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolInferShapePartial64__(SymbolHandle sym, uint32 num_args, string[] keys, int64[] arg_ind_ptr, int64[] arg_shape_data, size_t[] in_shape_size, int[]& in_shape_ndim, IntPtr[]& in_shape_data, size_t[] out_shape_size, int[]& out_shape_ndim, IntPtr[]& out_shape_data, size_t[] aux_shape_size, int[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
+extern int MXSymbolInferShapePartial64(SymbolHandle sym, uint32 num_args, string[] keys, int64[] arg_ind_ptr, int64[] arg_shape_data, size_t[] in_shape_size, int[]& in_shape_ndim, IntPtr[]& in_shape_data, size_t[] out_shape_size, int[]& out_shape_ndim, IntPtr[]& out_shape_data, size_t[] aux_shape_size, int[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
 *)
 
 /// <summary>partially infer shape of unknown input shapes given the known one.
@@ -1650,7 +1650,7 @@ extern int MXExecutorBindEX(SymbolHandle symbol_handle, int dev_type, int dev_id
 (* Exclude DEPRECATED
 /// <summary>DEPRECATED. Use MXExecutorSimpleBindEx instead.</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorSimpleBind__(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_g2c_keys, string[] g2c_keys, int[] g2c_dev_types, int[] g2c_dev_ids, uint32 provided_grad_req_list_len, string[] provided_grad_req_names, string[] provided_grad_req_types, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, uint32[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32 num_provided_arg_dtypes, string[] provided_arg_dtype_names, int[] provided_arg_dtypes, uint32 num_provided_arg_stypes, string[] provided_arg_stype_names, int[] provided_arg_stypes, uint32 num_shared_arg_names, string[] shared_arg_name_list, int[] shared_buffer_len, string[] shared_buffer_name_list, NDArrayHandle[] shared_buffer_handle_list, string[]& updated_shared_buffer_name_list, NDArrayHandle[]& updated_shared_buffer_handle_list, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec_handle, ExecutorHandle[] out)
+extern int MXExecutorSimpleBind(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_g2c_keys, string[] g2c_keys, int[] g2c_dev_types, int[] g2c_dev_ids, uint32 provided_grad_req_list_len, string[] provided_grad_req_names, string[] provided_grad_req_types, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, uint32[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32 num_provided_arg_dtypes, string[] provided_arg_dtype_names, int[] provided_arg_dtypes, uint32 num_provided_arg_stypes, string[] provided_arg_stype_names, int[] provided_arg_stypes, uint32 num_shared_arg_names, string[] shared_arg_name_list, int[] shared_buffer_len, string[] shared_buffer_name_list, NDArrayHandle[] shared_buffer_handle_list, string[]& updated_shared_buffer_name_list, NDArrayHandle[]& updated_shared_buffer_handle_list, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec_handle, ExecutorHandle[] out)
 *)
 
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
@@ -1677,7 +1677,7 @@ extern int MXExecutorSimpleBindEx(SymbolHandle symbol_handle, int dev_type, int 
 /// <param name="out">output executor handle</param>
 /// <returns>a new executor</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorReshape__(int partial_shaping, int allow_up_sizing, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, uint32[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec, ExecutorHandle[] out)
+extern int MXExecutorReshape(int partial_shaping, int allow_up_sizing, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, uint32[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec, ExecutorHandle[] out)
 *)
 
 /// <summary>Return a new executor with the same symbol and shared memory,
@@ -1699,7 +1699,7 @@ extern int MXExecutorReshape__(int partial_shaping, int allow_up_sizing, int dev
 /// <param name="out">output executor handle</param>
 /// <returns>a new executor</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorReshapeEx__(int partial_shaping, int allow_up_sizing, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, int[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32[] num_in_args, NDArrayHandle[] in_args, NDArrayHandle[] arg_grads, uint32[] num_aux_states, NDArrayHandle[] aux_states, ExecutorHandle shared_exec, [<Out>]ExecutorHandle& out)
+extern int MXExecutorReshapeEx(int partial_shaping, int allow_up_sizing, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, int[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32[] num_in_args, NDArrayHandle[] in_args, NDArrayHandle[] arg_grads, uint32[] num_aux_states, NDArrayHandle[] aux_states, ExecutorHandle shared_exec, [<Out>]ExecutorHandle& out)
 
 /// <summary>get optimized graph from graph executor</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
