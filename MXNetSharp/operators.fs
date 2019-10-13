@@ -1633,114 +1633,11 @@ type Operators() =
     /// <param name="mode">resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);</param>
     static member ContribBilinearResize2D(data : NDArray, 
                                           like : NDArray, 
-                                          [<Optional>] scaleHeight : float Nullable, 
-                                          [<Optional>] scaleWidth : float Nullable, 
-                                          [<Optional; DefaultParameterValue(1)>] height : int, 
-                                          [<Optional; DefaultParameterValue(1)>] width : int, 
-                                          [<Optional>] mode : ContribBilinearResize2DMode) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_BilinearResize2D"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle; like.NDArrayHandle.UnsafeHandle|]
-                                                 [|"scale_height"; "scale_width"; "height"; "width"; "mode"|]
-                                                 [|string scaleHeight; string scaleWidth; string height; string width; (if isNull (mode :> obj) then "size" else string mode)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>
-    /// Perform 2D resizing (upsampling or downsampling) for 4D input using bilinear interpolation.
-    /// 
-    /// Expected input is a 4 dimensional NDArray (NCHW) and the output
-    /// with the shape of (N x C x height x width). 
-    /// The key idea of bilinear interpolation is to perform linear interpolation
-    /// first in one direction, and then again in the other direction. See the wikipedia of
-    /// `Bilinear interpolation  &lt;https://en.wikipedia.org/wiki/Bilinear_interpolation&gt;`_
-    /// for more details.
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bilinear_resize.cc:L193</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input data</param>
-    /// <param name="like">Resize data to it&#39;s shape</param>
-    /// <param name="scaleHeight">sampling scale of the height (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
-    /// <param name="scaleWidth">sampling scale of the width (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
-    /// <param name="height">output height (required, but ignored if scale_height is defined or mode is not &quot;size&quot;)</param>
-    /// <param name="width">output width (required, but ignored if scale_width is defined or mode is not &quot;size&quot;)</param>
-    /// <param name="mode">resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);</param>
-    static member ContribBilinearResize2D(outputArray : NDArray seq, 
-                                          data : NDArray, 
-                                          like : NDArray, 
-                                          [<Optional>] scaleHeight : float Nullable, 
-                                          [<Optional>] scaleWidth : float Nullable, 
-                                          [<Optional; DefaultParameterValue(1)>] height : int, 
-                                          [<Optional; DefaultParameterValue(1)>] width : int, 
-                                          [<Optional>] mode : ContribBilinearResize2DMode) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_BilinearResize2D"
-        let names = [|"scale_height"; "scale_width"; "height"; "width"; "mode"|]
-        let vals = [|string scaleHeight; string scaleWidth; string height; string width; (if isNull (mode :> obj) then "size" else string mode)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle; like.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>
-    /// Perform 2D resizing (upsampling or downsampling) for 4D input using bilinear interpolation.
-    /// 
-    /// Expected input is a 4 dimensional NDArray (NCHW) and the output
-    /// with the shape of (N x C x height x width). 
-    /// The key idea of bilinear interpolation is to perform linear interpolation
-    /// first in one direction, and then again in the other direction. See the wikipedia of
-    /// `Bilinear interpolation  &lt;https://en.wikipedia.org/wiki/Bilinear_interpolation&gt;`_
-    /// for more details.
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bilinear_resize.cc:L193</summary>
-    /// <param name="data">Input data</param>
-    /// <param name="like">Resize data to it&#39;s shape</param>
-    /// <param name="scaleHeight">sampling scale of the height (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
-    /// <param name="scaleWidth">sampling scale of the width (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
-    /// <param name="height">output height (required, but ignored if scale_height is defined or mode is not &quot;size&quot;)</param>
-    /// <param name="width">output width (required, but ignored if scale_width is defined or mode is not &quot;size&quot;)</param>
-    /// <param name="mode">resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);</param>
-    static member ContribBilinearResize2D(data : Symbol, 
-                                          like : Symbol, 
-                                          [<Optional>] scaleHeight : float Nullable, 
-                                          [<Optional>] scaleWidth : float Nullable, 
-                                          [<Optional; DefaultParameterValue(1)>] height : int, 
-                                          [<Optional; DefaultParameterValue(1)>] width : int, 
-                                          [<Optional>] mode : ContribBilinearResize2DMode) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_BilinearResize2D"
-        new Symbol(Some creator,
-                   [|"scale_height"; "scale_width"; "height"; "width"; "mode"|],
-                   [|string scaleHeight; string scaleWidth; string height; string width; (if isNull (mode :> obj) then "size" else string mode)|],
-                   [|"data"; "like"|],
-                   [|data; like|])
-
-    /// <summary>
-    /// Perform 2D resizing (upsampling or downsampling) for 4D input using bilinear interpolation.
-    /// 
-    /// Expected input is a 4 dimensional NDArray (NCHW) and the output
-    /// with the shape of (N x C x height x width). 
-    /// The key idea of bilinear interpolation is to perform linear interpolation
-    /// first in one direction, and then again in the other direction. See the wikipedia of
-    /// `Bilinear interpolation  &lt;https://en.wikipedia.org/wiki/Bilinear_interpolation&gt;`_
-    /// for more details.
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bilinear_resize.cc:L193</summary>
-    /// <param name="data">Input data</param>
-    /// <param name="like">Resize data to it&#39;s shape</param>
-    /// <param name="scaleHeight">sampling scale of the height (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
-    /// <param name="scaleWidth">sampling scale of the width (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
-    /// <param name="height">output height (required, but ignored if scale_height is defined or mode is not &quot;size&quot;)</param>
-    /// <param name="width">output width (required, but ignored if scale_width is defined or mode is not &quot;size&quot;)</param>
-    /// <param name="mode">resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);</param>
-    static member ContribBilinearResize2D(data : NDArray, 
-                                          like : NDArray, 
-                                          ?scaleHeight : float, 
-                                          ?scaleWidth : float, 
-                                          ?height : int, 
-                                          ?width : int, 
-                                          ?mode : ContribBilinearResize2DMode) =
+                                          [<Optional>] ?scaleHeight : float, 
+                                          [<Optional>] ?scaleWidth : float, 
+                                          [<Optional>] ?height : int, 
+                                          [<Optional>] ?width : int, 
+                                          [<Optional>] ?mode : ContribBilinearResize2DMode) =
         let creator = AtomicSymbolCreator.FromName "_contrib_BilinearResize2D"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; like.NDArrayHandle.UnsafeHandle|]
@@ -1770,11 +1667,11 @@ type Operators() =
     static member ContribBilinearResize2D(outputArray : NDArray seq, 
                                           data : NDArray, 
                                           like : NDArray, 
-                                          ?scaleHeight : float, 
-                                          ?scaleWidth : float, 
-                                          ?height : int, 
-                                          ?width : int, 
-                                          ?mode : ContribBilinearResize2DMode) =
+                                          [<Optional>] ?scaleHeight : float, 
+                                          [<Optional>] ?scaleWidth : float, 
+                                          [<Optional>] ?height : int, 
+                                          [<Optional>] ?width : int, 
+                                          [<Optional>] ?mode : ContribBilinearResize2DMode) =
         let creator = AtomicSymbolCreator.FromName "_contrib_BilinearResize2D"
         let names = [|"scale_height"; "scale_width"; "height"; "width"; "mode"|]
         let vals = [|(match scaleHeight with None -> "None" | Some scaleHeight -> string scaleHeight); (match scaleWidth with None -> "None" | Some scaleWidth -> string scaleWidth); (match height with None -> "1" | Some height -> string height); (match width with None -> "1" | Some width -> string width); (match mode with None -> "size" | Some mode -> string mode)|]
@@ -1806,11 +1703,11 @@ type Operators() =
     /// <param name="mode">resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);</param>
     static member ContribBilinearResize2D(data : Symbol, 
                                           like : Symbol, 
-                                          ?scaleHeight : float, 
-                                          ?scaleWidth : float, 
-                                          ?height : int, 
-                                          ?width : int, 
-                                          ?mode : ContribBilinearResize2DMode) =
+                                          [<Optional>] ?scaleHeight : float, 
+                                          [<Optional>] ?scaleWidth : float, 
+                                          [<Optional>] ?height : int, 
+                                          [<Optional>] ?width : int, 
+                                          [<Optional>] ?mode : ContribBilinearResize2DMode) =
         let creator = AtomicSymbolCreator.FromName "_contrib_BilinearResize2D"
         new Symbol(Some creator,
                    [|"scale_height"; "scale_width"; "height"; "width"; "mode"|],
@@ -4265,61 +4162,7 @@ type Operators() =
     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\nnz.cc:L177</summary>
     /// <param name="data">Input</param>
     /// <param name="axis">Select between the number of values across the whole matrix, in each column, or in each row.</param>
-    static member ContribGetnnz(data : NDArray, [<Optional>] axis : int Nullable) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_getnnz"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"axis"|]
-                                                 [|string axis|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Number of stored values for a sparse tensor, including explicit zeros.
-    /// 
-    /// This operator only supports CSR matrix on CPU.
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\nnz.cc:L177</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input</param>
-    /// <param name="axis">Select between the number of values across the whole matrix, in each column, or in each row.</param>
-    static member ContribGetnnz(outputArray : NDArray seq, data : NDArray, [<Optional>] axis : int Nullable) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_getnnz"
-        let names = [|"axis"|]
-        let vals = [|string axis|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Number of stored values for a sparse tensor, including explicit zeros.
-    /// 
-    /// This operator only supports CSR matrix on CPU.
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\nnz.cc:L177</summary>
-    /// <param name="data">Input</param>
-    /// <param name="axis">Select between the number of values across the whole matrix, in each column, or in each row.</param>
-    static member ContribGetnnz(data : Symbol, [<Optional>] axis : int Nullable) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_getnnz"
-        new Symbol(Some creator,
-                   [|"axis"|],
-                   [|string axis|],
-                   [|"data"|],
-                   [|data|])
-
-    /// <summary>Number of stored values for a sparse tensor, including explicit zeros.
-    /// 
-    /// This operator only supports CSR matrix on CPU.
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\nnz.cc:L177</summary>
-    /// <param name="data">Input</param>
-    /// <param name="axis">Select between the number of values across the whole matrix, in each column, or in each row.</param>
-    static member ContribGetnnz(data : NDArray, ?axis : int) =
+    static member ContribGetnnz(data : NDArray, [<Optional>] ?axis : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_getnnz"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -4336,7 +4179,7 @@ type Operators() =
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input</param>
     /// <param name="axis">Select between the number of values across the whole matrix, in each column, or in each row.</param>
-    static member ContribGetnnz(outputArray : NDArray seq, data : NDArray, ?axis : int) =
+    static member ContribGetnnz(outputArray : NDArray seq, data : NDArray, [<Optional>] ?axis : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_getnnz"
         let names = [|"axis"|]
         let vals = [|(match axis with None -> "None" | Some axis -> string axis)|]
@@ -4356,7 +4199,7 @@ type Operators() =
     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\nnz.cc:L177</summary>
     /// <param name="data">Input</param>
     /// <param name="axis">Select between the number of values across the whole matrix, in each column, or in each row.</param>
-    static member ContribGetnnz(data : Symbol, ?axis : int) =
+    static member ContribGetnnz(data : Symbol, [<Optional>] ?axis : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_getnnz"
         new Symbol(Some creator,
                    [|"axis"|],
@@ -8431,161 +8274,10 @@ type Operators() =
     /// <param name="mode">Whether to only turn on dropout during training or to also turn on for inference.</param>
     /// <param name="axes">Axes for variational dropout kernel.</param>
     static member Dropout(data : NDArray, 
-                          [<Optional>] cudnnOff : bool Nullable, 
-                          [<Optional; DefaultParameterValue(0.5)>] p : float, 
-                          [<Optional>] mode : DropoutMode, 
-                          [<Optional>] axes : int seq) =
-        let creator = AtomicSymbolCreator.FromName "Dropout"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"cudnn_off"; "p"; "mode"; "axes"|]
-                                                 [|string cudnnOff; string p; (if isNull (mode :> obj) then "training" else string mode); (if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Applies dropout operation to input array.
-    /// 
-    /// - During training, each element of the input is set to zero with probability p.
-    ///   The whole array is rescaled by :math:`1/(1-p)` to keep the expected
-    ///   sum of the input unchanged.
-    /// 
-    /// - During testing, this operator does not change the input if mode is &#39;training&#39;.
-    ///   If mode is &#39;always&#39;, the same computaion as during training will be applied.
-    /// 
-    /// Example::
-    /// 
-    ///   random.seed(998)
-    ///   input_array = array([[3., 0.5,  -0.5,  2., 7.],
-    ///                       [2., -0.4,   7.,  3., 0.2]])
-    ///   a = symbol.Variable(&#39;a&#39;)
-    ///   dropout = symbol.Dropout(a, p = 0.2)
-    ///   executor = dropout.simple_bind(a = input_array.shape)
-    /// 
-    ///   ## If training
-    ///   executor.forward(is_train = True, a = input_array)
-    ///   executor.outputs
-    ///   [[ 3.75   0.625 -0.     2.5    8.75 ]
-    ///    [ 2.5   -0.5    8.75   3.75   0.   ]]
-    /// 
-    ///   ## If testing
-    ///   executor.forward(is_train = False, a = input_array)
-    ///   executor.outputs
-    ///   [[ 3.     0.5   -0.5    2.     7.   ]
-    ///    [ 2.    -0.4    7.     3.     0.2  ]]
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\dropout.cc:L97</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input array to which dropout will be applied.</param>
-    /// <param name="cudnnOff">Whether to turn off cudnn in dropout operator. This option is ignored if axes is specified.</param>
-    /// <param name="p">Fraction of the input that gets dropped out during training time.</param>
-    /// <param name="mode">Whether to only turn on dropout during training or to also turn on for inference.</param>
-    /// <param name="axes">Axes for variational dropout kernel.</param>
-    static member Dropout(outputArray : NDArray seq, 
-                          data : NDArray, 
-                          [<Optional>] cudnnOff : bool Nullable, 
-                          [<Optional; DefaultParameterValue(0.5)>] p : float, 
-                          [<Optional>] mode : DropoutMode, 
-                          [<Optional>] axes : int seq) =
-        let creator = AtomicSymbolCreator.FromName "Dropout"
-        let names = [|"cudnn_off"; "p"; "mode"; "axes"|]
-        let vals = [|string cudnnOff; string p; (if isNull (mode :> obj) then "training" else string mode); (if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Applies dropout operation to input array.
-    /// 
-    /// - During training, each element of the input is set to zero with probability p.
-    ///   The whole array is rescaled by :math:`1/(1-p)` to keep the expected
-    ///   sum of the input unchanged.
-    /// 
-    /// - During testing, this operator does not change the input if mode is &#39;training&#39;.
-    ///   If mode is &#39;always&#39;, the same computaion as during training will be applied.
-    /// 
-    /// Example::
-    /// 
-    ///   random.seed(998)
-    ///   input_array = array([[3., 0.5,  -0.5,  2., 7.],
-    ///                       [2., -0.4,   7.,  3., 0.2]])
-    ///   a = symbol.Variable(&#39;a&#39;)
-    ///   dropout = symbol.Dropout(a, p = 0.2)
-    ///   executor = dropout.simple_bind(a = input_array.shape)
-    /// 
-    ///   ## If training
-    ///   executor.forward(is_train = True, a = input_array)
-    ///   executor.outputs
-    ///   [[ 3.75   0.625 -0.     2.5    8.75 ]
-    ///    [ 2.5   -0.5    8.75   3.75   0.   ]]
-    /// 
-    ///   ## If testing
-    ///   executor.forward(is_train = False, a = input_array)
-    ///   executor.outputs
-    ///   [[ 3.     0.5   -0.5    2.     7.   ]
-    ///    [ 2.    -0.4    7.     3.     0.2  ]]
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\dropout.cc:L97</summary>
-    /// <param name="data">Input array to which dropout will be applied.</param>
-    /// <param name="cudnnOff">Whether to turn off cudnn in dropout operator. This option is ignored if axes is specified.</param>
-    /// <param name="p">Fraction of the input that gets dropped out during training time.</param>
-    /// <param name="mode">Whether to only turn on dropout during training or to also turn on for inference.</param>
-    /// <param name="axes">Axes for variational dropout kernel.</param>
-    static member Dropout(data : Symbol, 
-                          [<Optional>] cudnnOff : bool Nullable, 
-                          [<Optional; DefaultParameterValue(0.5)>] p : float, 
-                          [<Optional>] mode : DropoutMode, 
-                          [<Optional>] axes : int seq) =
-        let creator = AtomicSymbolCreator.FromName "Dropout"
-        new Symbol(Some creator,
-                   [|"cudnn_off"; "p"; "mode"; "axes"|],
-                   [|string cudnnOff; string p; (if isNull (mode :> obj) then "training" else string mode); (if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|],
-                   [|"data"|],
-                   [|data|])
-
-    /// <summary>Applies dropout operation to input array.
-    /// 
-    /// - During training, each element of the input is set to zero with probability p.
-    ///   The whole array is rescaled by :math:`1/(1-p)` to keep the expected
-    ///   sum of the input unchanged.
-    /// 
-    /// - During testing, this operator does not change the input if mode is &#39;training&#39;.
-    ///   If mode is &#39;always&#39;, the same computaion as during training will be applied.
-    /// 
-    /// Example::
-    /// 
-    ///   random.seed(998)
-    ///   input_array = array([[3., 0.5,  -0.5,  2., 7.],
-    ///                       [2., -0.4,   7.,  3., 0.2]])
-    ///   a = symbol.Variable(&#39;a&#39;)
-    ///   dropout = symbol.Dropout(a, p = 0.2)
-    ///   executor = dropout.simple_bind(a = input_array.shape)
-    /// 
-    ///   ## If training
-    ///   executor.forward(is_train = True, a = input_array)
-    ///   executor.outputs
-    ///   [[ 3.75   0.625 -0.     2.5    8.75 ]
-    ///    [ 2.5   -0.5    8.75   3.75   0.   ]]
-    /// 
-    ///   ## If testing
-    ///   executor.forward(is_train = False, a = input_array)
-    ///   executor.outputs
-    ///   [[ 3.     0.5   -0.5    2.     7.   ]
-    ///    [ 2.    -0.4    7.     3.     0.2  ]]
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\dropout.cc:L97</summary>
-    /// <param name="data">Input array to which dropout will be applied.</param>
-    /// <param name="cudnnOff">Whether to turn off cudnn in dropout operator. This option is ignored if axes is specified.</param>
-    /// <param name="p">Fraction of the input that gets dropped out during training time.</param>
-    /// <param name="mode">Whether to only turn on dropout during training or to also turn on for inference.</param>
-    /// <param name="axes">Axes for variational dropout kernel.</param>
-    static member Dropout(data : NDArray, 
-                          ?cudnnOff : bool, 
-                          ?p : float, 
-                          ?mode : DropoutMode, 
-                          ?axes : int seq) =
+                          [<Optional>] ?cudnnOff : bool, 
+                          [<Optional>] ?p : float, 
+                          [<Optional>] ?mode : DropoutMode, 
+                          [<Optional>] ?axes : int seq) =
         let creator = AtomicSymbolCreator.FromName "Dropout"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -8632,10 +8324,10 @@ type Operators() =
     /// <param name="axes">Axes for variational dropout kernel.</param>
     static member Dropout(outputArray : NDArray seq, 
                           data : NDArray, 
-                          ?cudnnOff : bool, 
-                          ?p : float, 
-                          ?mode : DropoutMode, 
-                          ?axes : int seq) =
+                          [<Optional>] ?cudnnOff : bool, 
+                          [<Optional>] ?p : float, 
+                          [<Optional>] ?mode : DropoutMode, 
+                          [<Optional>] ?axes : int seq) =
         let creator = AtomicSymbolCreator.FromName "Dropout"
         let names = [|"cudnn_off"; "p"; "mode"; "axes"|]
         let vals = [|(match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match p with None -> "0.5" | Some p -> string p); (match mode with None -> "training" | Some mode -> string mode); (match axes with None -> "[]" | Some axes -> (axes |> Seq.map string |> String.concat ", "))|]
@@ -8684,10 +8376,10 @@ type Operators() =
     /// <param name="mode">Whether to only turn on dropout during training or to also turn on for inference.</param>
     /// <param name="axes">Axes for variational dropout kernel.</param>
     static member Dropout(data : Symbol, 
-                          ?cudnnOff : bool, 
-                          ?p : float, 
-                          ?mode : DropoutMode, 
-                          ?axes : int seq) =
+                          [<Optional>] ?cudnnOff : bool, 
+                          [<Optional>] ?p : float, 
+                          [<Optional>] ?mode : DropoutMode, 
+                          [<Optional>] ?axes : int seq) =
         let creator = AtomicSymbolCreator.FromName "Dropout"
         new Symbol(Some creator,
                    [|"cudnn_off"; "p"; "mode"; "axes"|],
@@ -9411,266 +9103,16 @@ type Operators() =
     /// <param name="layout">Set layout for input and output. Empty for
     ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
     static member Pooling(data : NDArray, 
-                          [<Optional>] pValue : int Nullable, 
-                          [<Optional>] countIncludePad : bool Nullable, 
-                          [<Optional>] kernel : int seq, 
-                          [<Optional>] poolType : PoolType, 
-                          [<Optional; DefaultParameterValue(false)>] globalPool : bool, 
-                          [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
-                          [<Optional>] poolingConvention : PoolingConvention, 
-                          [<Optional>] stride : int seq, 
-                          [<Optional>] pad : int seq, 
-                          [<Optional>] layout : PoolingLayout) =
-        let creator = AtomicSymbolCreator.FromName "Pooling"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|]
-                                                 [|string pValue; string countIncludePad; (if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; string cudnnOff; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (layout :> obj) then "None" else string layout)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Performs pooling on the input.
-    /// 
-    /// The shapes for 1-D pooling are
-    /// 
-    /// - **data** and **out**: *(batch_size, channel, width)* (NCW layout) or
-    ///   *(batch_size, width, channel)* (NWC layout),
-    /// 
-    /// The shapes for 2-D pooling are
-    /// 
-    /// - **data** and **out**: *(batch_size, channel, height, width)* (NCHW layout) or
-    ///   *(batch_size, height, width, channel)* (NHWC layout),
-    /// 
-    ///     out_height = f(height, kernel[0], pad[0], stride[0])
-    ///     out_width = f(width, kernel[1], pad[1], stride[1])
-    /// 
-    /// The definition of *f* depends on ``pooling_convention``, which has two options:
-    /// 
-    /// - **valid** (default)::
-    /// 
-    ///     f(x, k, p, s) = floor((x+2*p-k)/s)+1
-    /// 
-    /// - **full**, which is compatible with Caffe::
-    /// 
-    ///     f(x, k, p, s) = ceil((x+2*p-k)/s)+1
-    /// 
-    /// But ``global_pool`` is set to be true, then do a global pooling, namely reset
-    /// ``kernel=(height, width)``.
-    /// 
-    /// Three pooling options are supported by ``pool_type``:
-    /// 
-    /// - **avg**: average pooling
-    /// - **max**: max pooling
-    /// - **sum**: sum pooling
-    /// - **lp**: Lp pooling
-    /// 
-    /// For 3-D pooling, an additional *depth* dimension is added before
-    /// *height*. Namely the input data and output will have shape *(batch_size, channel, depth,
-    /// height, width)* (NCDHW layout) or *(batch_size, depth, height, width, channel)* (NDHWC layout).
-    /// 
-    /// Notes on Lp pooling:
-    /// 
-    /// Lp pooling was first introduced by this paper: https://arxiv.org/pdf/1204.3968.pdf.
-    /// L-1 pooling is simply sum pooling, while L-inf pooling is simply max pooling.
-    /// We can see that Lp pooling stands between those two, in practice the most common value for p is 2.
-    /// 
-    /// For each window ``X``, the mathematical expression for Lp pooling is:
-    /// 
-    /// :math:`f(X) = \sqrt[p]{\sum_{x}^{X} x^p}`
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\pooling.cc:L416</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input data to the pooling operator.</param>
-    /// <param name="pValue">Value of p for Lp pooling, can be 1 or 2, required for Lp Pooling.</param>
-    /// <param name="countIncludePad">Only used for AvgPool, specify whether to count padding elements for averagecalculation. For example, with a 5*5 kernel on a 3*3 corner of a image,the sum of the 9 valid elements will be divided by 25 if this is set to true,or it will be divided by 9 if this is set to false. Defaults to true.</param>
-    /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
-    /// <param name="poolType">Pooling type to be applied.</param>
-    /// <param name="globalPool">Ignore kernel size, do global pooling based on current input feature map. </param>
-    /// <param name="cudnnOff">Turn off cudnn pooling and use MXNet pooling operator. </param>
-    /// <param name="poolingConvention">Pooling convention to be applied.</param>
-    /// <param name="stride">Stride: for pooling (y, x) or (d, y, x). Defaults to 1 for each dimension.</param>
-    /// <param name="pad">Pad for pooling: (y, x) or (d, y, x). Defaults to no padding.</param>
-    /// <param name="layout">Set layout for input and output. Empty for
-    ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
-    static member Pooling(outputArray : NDArray seq, 
-                          data : NDArray, 
-                          [<Optional>] pValue : int Nullable, 
-                          [<Optional>] countIncludePad : bool Nullable, 
-                          [<Optional>] kernel : int seq, 
-                          [<Optional>] poolType : PoolType, 
-                          [<Optional; DefaultParameterValue(false)>] globalPool : bool, 
-                          [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
-                          [<Optional>] poolingConvention : PoolingConvention, 
-                          [<Optional>] stride : int seq, 
-                          [<Optional>] pad : int seq, 
-                          [<Optional>] layout : PoolingLayout) =
-        let creator = AtomicSymbolCreator.FromName "Pooling"
-        let names = [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|]
-        let vals = [|string pValue; string countIncludePad; (if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; string cudnnOff; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (layout :> obj) then "None" else string layout)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Performs pooling on the input.
-    /// 
-    /// The shapes for 1-D pooling are
-    /// 
-    /// - **data** and **out**: *(batch_size, channel, width)* (NCW layout) or
-    ///   *(batch_size, width, channel)* (NWC layout),
-    /// 
-    /// The shapes for 2-D pooling are
-    /// 
-    /// - **data** and **out**: *(batch_size, channel, height, width)* (NCHW layout) or
-    ///   *(batch_size, height, width, channel)* (NHWC layout),
-    /// 
-    ///     out_height = f(height, kernel[0], pad[0], stride[0])
-    ///     out_width = f(width, kernel[1], pad[1], stride[1])
-    /// 
-    /// The definition of *f* depends on ``pooling_convention``, which has two options:
-    /// 
-    /// - **valid** (default)::
-    /// 
-    ///     f(x, k, p, s) = floor((x+2*p-k)/s)+1
-    /// 
-    /// - **full**, which is compatible with Caffe::
-    /// 
-    ///     f(x, k, p, s) = ceil((x+2*p-k)/s)+1
-    /// 
-    /// But ``global_pool`` is set to be true, then do a global pooling, namely reset
-    /// ``kernel=(height, width)``.
-    /// 
-    /// Three pooling options are supported by ``pool_type``:
-    /// 
-    /// - **avg**: average pooling
-    /// - **max**: max pooling
-    /// - **sum**: sum pooling
-    /// - **lp**: Lp pooling
-    /// 
-    /// For 3-D pooling, an additional *depth* dimension is added before
-    /// *height*. Namely the input data and output will have shape *(batch_size, channel, depth,
-    /// height, width)* (NCDHW layout) or *(batch_size, depth, height, width, channel)* (NDHWC layout).
-    /// 
-    /// Notes on Lp pooling:
-    /// 
-    /// Lp pooling was first introduced by this paper: https://arxiv.org/pdf/1204.3968.pdf.
-    /// L-1 pooling is simply sum pooling, while L-inf pooling is simply max pooling.
-    /// We can see that Lp pooling stands between those two, in practice the most common value for p is 2.
-    /// 
-    /// For each window ``X``, the mathematical expression for Lp pooling is:
-    /// 
-    /// :math:`f(X) = \sqrt[p]{\sum_{x}^{X} x^p}`
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\pooling.cc:L416</summary>
-    /// <param name="data">Input data to the pooling operator.</param>
-    /// <param name="pValue">Value of p for Lp pooling, can be 1 or 2, required for Lp Pooling.</param>
-    /// <param name="countIncludePad">Only used for AvgPool, specify whether to count padding elements for averagecalculation. For example, with a 5*5 kernel on a 3*3 corner of a image,the sum of the 9 valid elements will be divided by 25 if this is set to true,or it will be divided by 9 if this is set to false. Defaults to true.</param>
-    /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
-    /// <param name="poolType">Pooling type to be applied.</param>
-    /// <param name="globalPool">Ignore kernel size, do global pooling based on current input feature map. </param>
-    /// <param name="cudnnOff">Turn off cudnn pooling and use MXNet pooling operator. </param>
-    /// <param name="poolingConvention">Pooling convention to be applied.</param>
-    /// <param name="stride">Stride: for pooling (y, x) or (d, y, x). Defaults to 1 for each dimension.</param>
-    /// <param name="pad">Pad for pooling: (y, x) or (d, y, x). Defaults to no padding.</param>
-    /// <param name="layout">Set layout for input and output. Empty for
-    ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
-    static member Pooling(data : Symbol, 
-                          [<Optional>] pValue : int Nullable, 
-                          [<Optional>] countIncludePad : bool Nullable, 
-                          [<Optional>] kernel : int seq, 
-                          [<Optional>] poolType : PoolType, 
-                          [<Optional; DefaultParameterValue(false)>] globalPool : bool, 
-                          [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
-                          [<Optional>] poolingConvention : PoolingConvention, 
-                          [<Optional>] stride : int seq, 
-                          [<Optional>] pad : int seq, 
-                          [<Optional>] layout : PoolingLayout) =
-        let creator = AtomicSymbolCreator.FromName "Pooling"
-        new Symbol(Some creator,
-                   [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|],
-                   [|string pValue; string countIncludePad; (if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; string cudnnOff; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (layout :> obj) then "None" else string layout)|],
-                   [|"data"|],
-                   [|data|])
-
-    /// <summary>Performs pooling on the input.
-    /// 
-    /// The shapes for 1-D pooling are
-    /// 
-    /// - **data** and **out**: *(batch_size, channel, width)* (NCW layout) or
-    ///   *(batch_size, width, channel)* (NWC layout),
-    /// 
-    /// The shapes for 2-D pooling are
-    /// 
-    /// - **data** and **out**: *(batch_size, channel, height, width)* (NCHW layout) or
-    ///   *(batch_size, height, width, channel)* (NHWC layout),
-    /// 
-    ///     out_height = f(height, kernel[0], pad[0], stride[0])
-    ///     out_width = f(width, kernel[1], pad[1], stride[1])
-    /// 
-    /// The definition of *f* depends on ``pooling_convention``, which has two options:
-    /// 
-    /// - **valid** (default)::
-    /// 
-    ///     f(x, k, p, s) = floor((x+2*p-k)/s)+1
-    /// 
-    /// - **full**, which is compatible with Caffe::
-    /// 
-    ///     f(x, k, p, s) = ceil((x+2*p-k)/s)+1
-    /// 
-    /// But ``global_pool`` is set to be true, then do a global pooling, namely reset
-    /// ``kernel=(height, width)``.
-    /// 
-    /// Three pooling options are supported by ``pool_type``:
-    /// 
-    /// - **avg**: average pooling
-    /// - **max**: max pooling
-    /// - **sum**: sum pooling
-    /// - **lp**: Lp pooling
-    /// 
-    /// For 3-D pooling, an additional *depth* dimension is added before
-    /// *height*. Namely the input data and output will have shape *(batch_size, channel, depth,
-    /// height, width)* (NCDHW layout) or *(batch_size, depth, height, width, channel)* (NDHWC layout).
-    /// 
-    /// Notes on Lp pooling:
-    /// 
-    /// Lp pooling was first introduced by this paper: https://arxiv.org/pdf/1204.3968.pdf.
-    /// L-1 pooling is simply sum pooling, while L-inf pooling is simply max pooling.
-    /// We can see that Lp pooling stands between those two, in practice the most common value for p is 2.
-    /// 
-    /// For each window ``X``, the mathematical expression for Lp pooling is:
-    /// 
-    /// :math:`f(X) = \sqrt[p]{\sum_{x}^{X} x^p}`
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\pooling.cc:L416</summary>
-    /// <param name="data">Input data to the pooling operator.</param>
-    /// <param name="pValue">Value of p for Lp pooling, can be 1 or 2, required for Lp Pooling.</param>
-    /// <param name="countIncludePad">Only used for AvgPool, specify whether to count padding elements for averagecalculation. For example, with a 5*5 kernel on a 3*3 corner of a image,the sum of the 9 valid elements will be divided by 25 if this is set to true,or it will be divided by 9 if this is set to false. Defaults to true.</param>
-    /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
-    /// <param name="poolType">Pooling type to be applied.</param>
-    /// <param name="globalPool">Ignore kernel size, do global pooling based on current input feature map. </param>
-    /// <param name="cudnnOff">Turn off cudnn pooling and use MXNet pooling operator. </param>
-    /// <param name="poolingConvention">Pooling convention to be applied.</param>
-    /// <param name="stride">Stride: for pooling (y, x) or (d, y, x). Defaults to 1 for each dimension.</param>
-    /// <param name="pad">Pad for pooling: (y, x) or (d, y, x). Defaults to no padding.</param>
-    /// <param name="layout">Set layout for input and output. Empty for
-    ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
-    static member Pooling(data : NDArray, 
-                          ?pValue : int, 
-                          ?countIncludePad : bool, 
-                          ?kernel : int seq, 
-                          ?poolType : PoolType, 
-                          ?globalPool : bool, 
-                          ?cudnnOff : bool, 
-                          ?poolingConvention : PoolingConvention, 
-                          ?stride : int seq, 
-                          ?pad : int seq, 
-                          ?layout : PoolingLayout) =
+                          [<Optional>] ?pValue : int, 
+                          [<Optional>] ?countIncludePad : bool, 
+                          [<Optional>] ?kernel : int seq, 
+                          [<Optional>] ?poolType : PoolType, 
+                          [<Optional>] ?globalPool : bool, 
+                          [<Optional>] ?cudnnOff : bool, 
+                          [<Optional>] ?poolingConvention : PoolingConvention, 
+                          [<Optional>] ?stride : int seq, 
+                          [<Optional>] ?pad : int seq, 
+                          [<Optional>] ?layout : PoolingLayout) =
         let creator = AtomicSymbolCreator.FromName "Pooling"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -9744,16 +9186,16 @@ type Operators() =
     ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
     static member Pooling(outputArray : NDArray seq, 
                           data : NDArray, 
-                          ?pValue : int, 
-                          ?countIncludePad : bool, 
-                          ?kernel : int seq, 
-                          ?poolType : PoolType, 
-                          ?globalPool : bool, 
-                          ?cudnnOff : bool, 
-                          ?poolingConvention : PoolingConvention, 
-                          ?stride : int seq, 
-                          ?pad : int seq, 
-                          ?layout : PoolingLayout) =
+                          [<Optional>] ?pValue : int, 
+                          [<Optional>] ?countIncludePad : bool, 
+                          [<Optional>] ?kernel : int seq, 
+                          [<Optional>] ?poolType : PoolType, 
+                          [<Optional>] ?globalPool : bool, 
+                          [<Optional>] ?cudnnOff : bool, 
+                          [<Optional>] ?poolingConvention : PoolingConvention, 
+                          [<Optional>] ?stride : int seq, 
+                          [<Optional>] ?pad : int seq, 
+                          [<Optional>] ?layout : PoolingLayout) =
         let creator = AtomicSymbolCreator.FromName "Pooling"
         let names = [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|]
         let vals = [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match layout with None -> "None" | Some layout -> string layout)|]
@@ -9829,16 +9271,16 @@ type Operators() =
     /// <param name="layout">Set layout for input and output. Empty for
     ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
     static member Pooling(data : Symbol, 
-                          ?pValue : int, 
-                          ?countIncludePad : bool, 
-                          ?kernel : int seq, 
-                          ?poolType : PoolType, 
-                          ?globalPool : bool, 
-                          ?cudnnOff : bool, 
-                          ?poolingConvention : PoolingConvention, 
-                          ?stride : int seq, 
-                          ?pad : int seq, 
-                          ?layout : PoolingLayout) =
+                          [<Optional>] ?pValue : int, 
+                          [<Optional>] ?countIncludePad : bool, 
+                          [<Optional>] ?kernel : int seq, 
+                          [<Optional>] ?poolType : PoolType, 
+                          [<Optional>] ?globalPool : bool, 
+                          [<Optional>] ?cudnnOff : bool, 
+                          [<Optional>] ?poolingConvention : PoolingConvention, 
+                          [<Optional>] ?stride : int seq, 
+                          [<Optional>] ?pad : int seq, 
+                          [<Optional>] ?layout : PoolingLayout) =
         let creator = AtomicSymbolCreator.FromName "Pooling"
         new Symbol(Some creator,
                    [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|],
@@ -9902,121 +9344,7 @@ type Operators() =
     /// <param name="temperature">Temperature parameter in softmax</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmax(data : NDArray, [<Optional>] temperature : float Nullable, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] dtype : FloatDType) =
-        let creator = AtomicSymbolCreator.FromName "softmax"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"temperature"; "axis"; "dtype"|]
-                                                 [|string temperature; string axis; (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Applies the softmax function.
-    /// 
-    /// The resulting array contains elements in the range (0,1) and the elements along the given axis sum up to 1.
-    /// 
-    /// .. math::
-    ///    softmax(\mathbf{z/t})_j = \frac{e^{z_j/t}}{\sum_{k=1}^K e^{z_k/t}}
-    /// 
-    /// for :math:`j = 1, ..., K`
-    /// 
-    /// t is the temperature parameter in softmax function. By default, t equals 1.0
-    /// 
-    /// Example::
-    /// 
-    ///   x = [[ 1.  1.  1.]
-    ///        [ 1.  1.  1.]]
-    /// 
-    ///   softmax(x,axis=0) = [[ 0.5  0.5  0.5]
-    ///                        [ 0.5  0.5  0.5]]
-    /// 
-    ///   softmax(x,axis=1) = [[ 0.33333334,  0.33333334,  0.33333334],
-    ///                        [ 0.33333334,  0.33333334,  0.33333334]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L93</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">The input array.</param>
-    /// <param name="temperature">Temperature parameter in softmax</param>
-    /// <param name="axis">The axis along which to compute softmax.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmax(outputArray : NDArray seq, data : NDArray, [<Optional>] temperature : float Nullable, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] dtype : FloatDType) =
-        let creator = AtomicSymbolCreator.FromName "softmax"
-        let names = [|"temperature"; "axis"; "dtype"|]
-        let vals = [|string temperature; string axis; (if isNull (dtype :> obj) then "None" else string dtype)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Applies the softmax function.
-    /// 
-    /// The resulting array contains elements in the range (0,1) and the elements along the given axis sum up to 1.
-    /// 
-    /// .. math::
-    ///    softmax(\mathbf{z/t})_j = \frac{e^{z_j/t}}{\sum_{k=1}^K e^{z_k/t}}
-    /// 
-    /// for :math:`j = 1, ..., K`
-    /// 
-    /// t is the temperature parameter in softmax function. By default, t equals 1.0
-    /// 
-    /// Example::
-    /// 
-    ///   x = [[ 1.  1.  1.]
-    ///        [ 1.  1.  1.]]
-    /// 
-    ///   softmax(x,axis=0) = [[ 0.5  0.5  0.5]
-    ///                        [ 0.5  0.5  0.5]]
-    /// 
-    ///   softmax(x,axis=1) = [[ 0.33333334,  0.33333334,  0.33333334],
-    ///                        [ 0.33333334,  0.33333334,  0.33333334]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L93</summary>
-    /// <param name="data">The input array.</param>
-    /// <param name="temperature">Temperature parameter in softmax</param>
-    /// <param name="axis">The axis along which to compute softmax.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmax(data : Symbol, [<Optional>] temperature : float Nullable, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] dtype : FloatDType) =
-        let creator = AtomicSymbolCreator.FromName "softmax"
-        new Symbol(Some creator,
-                   [|"temperature"; "axis"; "dtype"|],
-                   [|string temperature; string axis; (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   [|"data"|],
-                   [|data|])
-
-    /// <summary>Applies the softmax function.
-    /// 
-    /// The resulting array contains elements in the range (0,1) and the elements along the given axis sum up to 1.
-    /// 
-    /// .. math::
-    ///    softmax(\mathbf{z/t})_j = \frac{e^{z_j/t}}{\sum_{k=1}^K e^{z_k/t}}
-    /// 
-    /// for :math:`j = 1, ..., K`
-    /// 
-    /// t is the temperature parameter in softmax function. By default, t equals 1.0
-    /// 
-    /// Example::
-    /// 
-    ///   x = [[ 1.  1.  1.]
-    ///        [ 1.  1.  1.]]
-    /// 
-    ///   softmax(x,axis=0) = [[ 0.5  0.5  0.5]
-    ///                        [ 0.5  0.5  0.5]]
-    /// 
-    ///   softmax(x,axis=1) = [[ 0.33333334,  0.33333334,  0.33333334],
-    ///                        [ 0.33333334,  0.33333334,  0.33333334]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L93</summary>
-    /// <param name="data">The input array.</param>
-    /// <param name="temperature">Temperature parameter in softmax</param>
-    /// <param name="axis">The axis along which to compute softmax.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmax(data : NDArray, ?temperature : float, ?axis : int, ?dtype : FloatDType) =
+    static member Softmax(data : NDArray, [<Optional>] ?temperature : float, [<Optional>] ?axis : int, [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmax"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -10053,7 +9381,7 @@ type Operators() =
     /// <param name="temperature">Temperature parameter in softmax</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmax(outputArray : NDArray seq, data : NDArray, ?temperature : float, ?axis : int, ?dtype : FloatDType) =
+    static member Softmax(outputArray : NDArray seq, data : NDArray, [<Optional>] ?temperature : float, [<Optional>] ?axis : int, [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmax"
         let names = [|"temperature"; "axis"; "dtype"|]
         let vals = [|(match temperature with None -> "None" | Some temperature -> string temperature); (match axis with None -> "-1" | Some axis -> string axis); (match dtype with None -> "None" | Some dtype -> string dtype)|]
@@ -10093,7 +9421,7 @@ type Operators() =
     /// <param name="temperature">Temperature parameter in softmax</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmax(data : Symbol, ?temperature : float, ?axis : int, ?dtype : FloatDType) =
+    static member Softmax(data : Symbol, [<Optional>] ?temperature : float, [<Optional>] ?axis : int, [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmax"
         new Symbol(Some creator,
                    [|"temperature"; "axis"; "dtype"|],
@@ -10161,124 +9489,7 @@ type Operators() =
     /// <param name="temperature">Temperature parameter in softmax</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmin(data : NDArray, [<Optional>] temperature : float Nullable, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] dtype : FloatDType) =
-        let creator = AtomicSymbolCreator.FromName "softmin"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"temperature"; "axis"; "dtype"|]
-                                                 [|string temperature; string axis; (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Applies the softmin function.
-    /// 
-    /// The resulting array contains elements in the range (0,1) and the elements along the given axis sum
-    /// up to 1.
-    /// 
-    /// .. math::
-    ///    softmin(\mathbf{z/t})_j = \frac{e^{-z_j/t}}{\sum_{k=1}^K e^{-z_k/t}}
-    /// 
-    /// for :math:`j = 1, ..., K`
-    /// 
-    /// t is the temperature parameter in softmax function. By default, t equals 1.0
-    /// 
-    /// Example::
-    /// 
-    ///   x = [[ 1.  2.  3.]
-    ///        [ 3.  2.  1.]]
-    /// 
-    ///   softmin(x,axis=0) = [[ 0.88079703,  0.5,  0.11920292],
-    ///                        [ 0.11920292,  0.5,  0.88079703]]
-    /// 
-    ///   softmin(x,axis=1) = [[ 0.66524094,  0.24472848,  0.09003057],
-    ///                        [ 0.09003057,  0.24472848,  0.66524094]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L153</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">The input array.</param>
-    /// <param name="temperature">Temperature parameter in softmax</param>
-    /// <param name="axis">The axis along which to compute softmax.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmin(outputArray : NDArray seq, data : NDArray, [<Optional>] temperature : float Nullable, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] dtype : FloatDType) =
-        let creator = AtomicSymbolCreator.FromName "softmin"
-        let names = [|"temperature"; "axis"; "dtype"|]
-        let vals = [|string temperature; string axis; (if isNull (dtype :> obj) then "None" else string dtype)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Applies the softmin function.
-    /// 
-    /// The resulting array contains elements in the range (0,1) and the elements along the given axis sum
-    /// up to 1.
-    /// 
-    /// .. math::
-    ///    softmin(\mathbf{z/t})_j = \frac{e^{-z_j/t}}{\sum_{k=1}^K e^{-z_k/t}}
-    /// 
-    /// for :math:`j = 1, ..., K`
-    /// 
-    /// t is the temperature parameter in softmax function. By default, t equals 1.0
-    /// 
-    /// Example::
-    /// 
-    ///   x = [[ 1.  2.  3.]
-    ///        [ 3.  2.  1.]]
-    /// 
-    ///   softmin(x,axis=0) = [[ 0.88079703,  0.5,  0.11920292],
-    ///                        [ 0.11920292,  0.5,  0.88079703]]
-    /// 
-    ///   softmin(x,axis=1) = [[ 0.66524094,  0.24472848,  0.09003057],
-    ///                        [ 0.09003057,  0.24472848,  0.66524094]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L153</summary>
-    /// <param name="data">The input array.</param>
-    /// <param name="temperature">Temperature parameter in softmax</param>
-    /// <param name="axis">The axis along which to compute softmax.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmin(data : Symbol, [<Optional>] temperature : float Nullable, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] dtype : FloatDType) =
-        let creator = AtomicSymbolCreator.FromName "softmin"
-        new Symbol(Some creator,
-                   [|"temperature"; "axis"; "dtype"|],
-                   [|string temperature; string axis; (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   [|"data"|],
-                   [|data|])
-
-    /// <summary>Applies the softmin function.
-    /// 
-    /// The resulting array contains elements in the range (0,1) and the elements along the given axis sum
-    /// up to 1.
-    /// 
-    /// .. math::
-    ///    softmin(\mathbf{z/t})_j = \frac{e^{-z_j/t}}{\sum_{k=1}^K e^{-z_k/t}}
-    /// 
-    /// for :math:`j = 1, ..., K`
-    /// 
-    /// t is the temperature parameter in softmax function. By default, t equals 1.0
-    /// 
-    /// Example::
-    /// 
-    ///   x = [[ 1.  2.  3.]
-    ///        [ 3.  2.  1.]]
-    /// 
-    ///   softmin(x,axis=0) = [[ 0.88079703,  0.5,  0.11920292],
-    ///                        [ 0.11920292,  0.5,  0.88079703]]
-    /// 
-    ///   softmin(x,axis=1) = [[ 0.66524094,  0.24472848,  0.09003057],
-    ///                        [ 0.09003057,  0.24472848,  0.66524094]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L153</summary>
-    /// <param name="data">The input array.</param>
-    /// <param name="temperature">Temperature parameter in softmax</param>
-    /// <param name="axis">The axis along which to compute softmax.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmin(data : NDArray, ?temperature : float, ?axis : int, ?dtype : FloatDType) =
+    static member Softmin(data : NDArray, [<Optional>] ?temperature : float, [<Optional>] ?axis : int, [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmin"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -10316,7 +9527,7 @@ type Operators() =
     /// <param name="temperature">Temperature parameter in softmax</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmin(outputArray : NDArray seq, data : NDArray, ?temperature : float, ?axis : int, ?dtype : FloatDType) =
+    static member Softmin(outputArray : NDArray seq, data : NDArray, [<Optional>] ?temperature : float, [<Optional>] ?axis : int, [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmin"
         let names = [|"temperature"; "axis"; "dtype"|]
         let vals = [|(match temperature with None -> "None" | Some temperature -> string temperature); (match axis with None -> "-1" | Some axis -> string axis); (match dtype with None -> "None" | Some dtype -> string dtype)|]
@@ -10357,7 +9568,7 @@ type Operators() =
     /// <param name="temperature">Temperature parameter in softmax</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member Softmin(data : Symbol, ?temperature : float, ?axis : int, ?dtype : FloatDType) =
+    static member Softmin(data : Symbol, [<Optional>] ?temperature : float, [<Optional>] ?axis : int, [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmin"
         new Symbol(Some creator,
                    [|"temperature"; "axis"; "dtype"|],
@@ -10415,94 +9626,7 @@ type Operators() =
     /// <param name="temperature">Temperature parameter in softmax</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member LogSoftmax(data : NDArray, [<Optional>] temperature : float Nullable, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] dtype : FloatDType) =
-        let creator = AtomicSymbolCreator.FromName "log_softmax"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"temperature"; "axis"; "dtype"|]
-                                                 [|string temperature; string axis; (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Computes the log softmax of the input.
-    /// This is equivalent to computing softmax followed by log.
-    /// 
-    /// Examples::
-    /// 
-    ///   &gt;&gt;&gt; x = mx.nd.array([1, 2, .1])
-    ///   &gt;&gt;&gt; mx.nd.log_softmax(x).asnumpy()
-    ///   array([-1.41702998, -0.41702995, -2.31702995], dtype=float32)
-    /// 
-    ///   &gt;&gt;&gt; x = mx.nd.array( [[1, 2, .1],[.1, 2, 1]] )
-    ///   &gt;&gt;&gt; mx.nd.log_softmax(x, axis=0).asnumpy()
-    ///   array([[-0.34115392, -0.69314718, -1.24115396],
-    ///          [-1.24115396, -0.69314718, -0.34115392]], dtype=float32)
-    /// 
-    /// 
-    /// </summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">The input array.</param>
-    /// <param name="temperature">Temperature parameter in softmax</param>
-    /// <param name="axis">The axis along which to compute softmax.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member LogSoftmax(outputArray : NDArray seq, data : NDArray, [<Optional>] temperature : float Nullable, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] dtype : FloatDType) =
-        let creator = AtomicSymbolCreator.FromName "log_softmax"
-        let names = [|"temperature"; "axis"; "dtype"|]
-        let vals = [|string temperature; string axis; (if isNull (dtype :> obj) then "None" else string dtype)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Computes the log softmax of the input.
-    /// This is equivalent to computing softmax followed by log.
-    /// 
-    /// Examples::
-    /// 
-    ///   &gt;&gt;&gt; x = mx.nd.array([1, 2, .1])
-    ///   &gt;&gt;&gt; mx.nd.log_softmax(x).asnumpy()
-    ///   array([-1.41702998, -0.41702995, -2.31702995], dtype=float32)
-    /// 
-    ///   &gt;&gt;&gt; x = mx.nd.array( [[1, 2, .1],[.1, 2, 1]] )
-    ///   &gt;&gt;&gt; mx.nd.log_softmax(x, axis=0).asnumpy()
-    ///   array([[-0.34115392, -0.69314718, -1.24115396],
-    ///          [-1.24115396, -0.69314718, -0.34115392]], dtype=float32)
-    /// 
-    /// 
-    /// </summary>
-    /// <param name="data">The input array.</param>
-    /// <param name="temperature">Temperature parameter in softmax</param>
-    /// <param name="axis">The axis along which to compute softmax.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member LogSoftmax(data : Symbol, [<Optional>] temperature : float Nullable, [<Optional; DefaultParameterValue(-1)>] axis : int, [<Optional>] dtype : FloatDType) =
-        let creator = AtomicSymbolCreator.FromName "log_softmax"
-        new Symbol(Some creator,
-                   [|"temperature"; "axis"; "dtype"|],
-                   [|string temperature; string axis; (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   [|"data"|],
-                   [|data|])
-
-    /// <summary>Computes the log softmax of the input.
-    /// This is equivalent to computing softmax followed by log.
-    /// 
-    /// Examples::
-    /// 
-    ///   &gt;&gt;&gt; x = mx.nd.array([1, 2, .1])
-    ///   &gt;&gt;&gt; mx.nd.log_softmax(x).asnumpy()
-    ///   array([-1.41702998, -0.41702995, -2.31702995], dtype=float32)
-    /// 
-    ///   &gt;&gt;&gt; x = mx.nd.array( [[1, 2, .1],[.1, 2, 1]] )
-    ///   &gt;&gt;&gt; mx.nd.log_softmax(x, axis=0).asnumpy()
-    ///   array([[-0.34115392, -0.69314718, -1.24115396],
-    ///          [-1.24115396, -0.69314718, -0.34115392]], dtype=float32)
-    /// 
-    /// 
-    /// </summary>
-    /// <param name="data">The input array.</param>
-    /// <param name="temperature">Temperature parameter in softmax</param>
-    /// <param name="axis">The axis along which to compute softmax.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member LogSoftmax(data : NDArray, ?temperature : float, ?axis : int, ?dtype : FloatDType) =
+    static member LogSoftmax(data : NDArray, [<Optional>] ?temperature : float, [<Optional>] ?axis : int, [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "log_softmax"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -10530,7 +9654,7 @@ type Operators() =
     /// <param name="temperature">Temperature parameter in softmax</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member LogSoftmax(outputArray : NDArray seq, data : NDArray, ?temperature : float, ?axis : int, ?dtype : FloatDType) =
+    static member LogSoftmax(outputArray : NDArray seq, data : NDArray, [<Optional>] ?temperature : float, [<Optional>] ?axis : int, [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "log_softmax"
         let names = [|"temperature"; "axis"; "dtype"|]
         let vals = [|(match temperature with None -> "None" | Some temperature -> string temperature); (match axis with None -> "-1" | Some axis -> string axis); (match dtype with None -> "None" | Some dtype -> string dtype)|]
@@ -10561,7 +9685,7 @@ type Operators() =
     /// <param name="temperature">Temperature parameter in softmax</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
-    static member LogSoftmax(data : Symbol, ?temperature : float, ?axis : int, ?dtype : FloatDType) =
+    static member LogSoftmax(data : Symbol, [<Optional>] ?temperature : float, [<Optional>] ?axis : int, [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "log_softmax"
         new Symbol(Some creator,
                    [|"temperature"; "axis"; "dtype"|],
@@ -13403,130 +12527,7 @@ type Operators() =
     /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
     /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
     /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
-    static member ContribQuantizeV2(data : NDArray, [<Optional>] minCalibRange : float Nullable, [<Optional>] maxCalibRange : float Nullable, [<Optional>] outType : ContribQuantizeV2OutType) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_quantize_v2"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"min_calib_range"; "max_calib_range"; "out_type"|]
-                                                 [|string minCalibRange; string maxCalibRange; (if isNull (outType :> obj) then "int8" else string outType)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Quantize a input tensor from float to `out_type`,
-    /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
-    /// 
-    /// Output `min_range` and `max_range` are scalar floats that specify the range for the input data.
-    /// 
-    /// When out_type is `uint8`, the output is calculated using the following equation:
-    /// 
-    /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
-    /// 
-    /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
-    /// 
-    /// When out_type is `int8`, the output is calculate using the following equation
-    /// by keep zero centered for the quantized value:
-    /// 
-    /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
-    /// 
-    /// where
-    /// `quantized_range = MinAbs(max(int8), min(int8))` and
-    /// `scale = quantized_range / MaxAbs(min_range, max_range).`
-    /// 
-    /// When out_type is `auto`, the output type is automatically determined by min_calib_range if presented.
-    /// If min_calib_range &lt; 0.0f, the output type will be int8, otherwise will be uint8.
-    /// If min_calib_range isn&#39;t presented, the output type will be int8.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propagation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantize_v2.cc:L92</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">A ndarray/symbol of type `float32`</param>
-    /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-    /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-    /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
-    static member ContribQuantizeV2(outputArray : NDArray seq, data : NDArray, [<Optional>] minCalibRange : float Nullable, [<Optional>] maxCalibRange : float Nullable, [<Optional>] outType : ContribQuantizeV2OutType) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_quantize_v2"
-        let names = [|"min_calib_range"; "max_calib_range"; "out_type"|]
-        let vals = [|string minCalibRange; string maxCalibRange; (if isNull (outType :> obj) then "int8" else string outType)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Quantize a input tensor from float to `out_type`,
-    /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
-    /// 
-    /// Output `min_range` and `max_range` are scalar floats that specify the range for the input data.
-    /// 
-    /// When out_type is `uint8`, the output is calculated using the following equation:
-    /// 
-    /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
-    /// 
-    /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
-    /// 
-    /// When out_type is `int8`, the output is calculate using the following equation
-    /// by keep zero centered for the quantized value:
-    /// 
-    /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
-    /// 
-    /// where
-    /// `quantized_range = MinAbs(max(int8), min(int8))` and
-    /// `scale = quantized_range / MaxAbs(min_range, max_range).`
-    /// 
-    /// When out_type is `auto`, the output type is automatically determined by min_calib_range if presented.
-    /// If min_calib_range &lt; 0.0f, the output type will be int8, otherwise will be uint8.
-    /// If min_calib_range isn&#39;t presented, the output type will be int8.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propagation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantize_v2.cc:L92</summary>
-    /// <param name="data">A ndarray/symbol of type `float32`</param>
-    /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-    /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-    /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
-    static member ContribQuantizeV2(data : Symbol, [<Optional>] minCalibRange : float Nullable, [<Optional>] maxCalibRange : float Nullable, [<Optional>] outType : ContribQuantizeV2OutType) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_quantize_v2"
-        new Symbol(Some creator,
-                   [|"min_calib_range"; "max_calib_range"; "out_type"|],
-                   [|string minCalibRange; string maxCalibRange; (if isNull (outType :> obj) then "int8" else string outType)|],
-                   [|"data"|],
-                   [|data|])
-
-    /// <summary>Quantize a input tensor from float to `out_type`,
-    /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
-    /// 
-    /// Output `min_range` and `max_range` are scalar floats that specify the range for the input data.
-    /// 
-    /// When out_type is `uint8`, the output is calculated using the following equation:
-    /// 
-    /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
-    /// 
-    /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
-    /// 
-    /// When out_type is `int8`, the output is calculate using the following equation
-    /// by keep zero centered for the quantized value:
-    /// 
-    /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
-    /// 
-    /// where
-    /// `quantized_range = MinAbs(max(int8), min(int8))` and
-    /// `scale = quantized_range / MaxAbs(min_range, max_range).`
-    /// 
-    /// When out_type is `auto`, the output type is automatically determined by min_calib_range if presented.
-    /// If min_calib_range &lt; 0.0f, the output type will be int8, otherwise will be uint8.
-    /// If min_calib_range isn&#39;t presented, the output type will be int8.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propagation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantize_v2.cc:L92</summary>
-    /// <param name="data">A ndarray/symbol of type `float32`</param>
-    /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-    /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-    /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
-    static member ContribQuantizeV2(data : NDArray, ?minCalibRange : float, ?maxCalibRange : float, ?outType : ContribQuantizeV2OutType) =
+    static member ContribQuantizeV2(data : NDArray, [<Optional>] ?minCalibRange : float, [<Optional>] ?maxCalibRange : float, [<Optional>] ?outType : ContribQuantizeV2OutType) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantize_v2"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -13566,7 +12567,7 @@ type Operators() =
     /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
     /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
     /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
-    static member ContribQuantizeV2(outputArray : NDArray seq, data : NDArray, ?minCalibRange : float, ?maxCalibRange : float, ?outType : ContribQuantizeV2OutType) =
+    static member ContribQuantizeV2(outputArray : NDArray seq, data : NDArray, [<Optional>] ?minCalibRange : float, [<Optional>] ?maxCalibRange : float, [<Optional>] ?outType : ContribQuantizeV2OutType) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantize_v2"
         let names = [|"min_calib_range"; "max_calib_range"; "out_type"|]
         let vals = [|(match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange); (match outType with None -> "int8" | Some outType -> string outType)|]
@@ -13609,7 +12610,7 @@ type Operators() =
     /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
     /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
     /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
-    static member ContribQuantizeV2(data : Symbol, ?minCalibRange : float, ?maxCalibRange : float, ?outType : ContribQuantizeV2OutType) =
+    static member ContribQuantizeV2(data : Symbol, [<Optional>] ?minCalibRange : float, [<Optional>] ?maxCalibRange : float, [<Optional>] ?outType : ContribQuantizeV2OutType) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantize_v2"
         new Symbol(Some creator,
                    [|"min_calib_range"; "max_calib_range"; "out_type"|],
@@ -14327,149 +13328,16 @@ type Operators() =
     static member ContribQuantizedPooling(data : NDArray, 
                                           minData : NDArray, 
                                           maxData : NDArray, 
-                                          [<Optional>] pValue : int Nullable, 
-                                          [<Optional>] countIncludePad : bool Nullable, 
-                                          [<Optional>] kernel : int seq, 
-                                          [<Optional>] poolType : PoolType, 
-                                          [<Optional; DefaultParameterValue(false)>] globalPool : bool, 
-                                          [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
-                                          [<Optional>] poolingConvention : PoolingConvention, 
-                                          [<Optional>] stride : int seq, 
-                                          [<Optional>] pad : int seq, 
-                                          [<Optional>] layout : ContribQuantizedPoolingLayout) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_quantized_pooling"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
-                                                 [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|]
-                                                 [|string pValue; string countIncludePad; (if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; string cudnnOff; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (layout :> obj) then "None" else string layout)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Pooling operator for input and output data type of int8.
-    /// The input and output data comes with min and max thresholds for quantizing
-    /// the float32 data into int8.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propogation. DO NOT use it in training.
-    ///     This operator only supports `pool_type` of `avg` or `max`.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_pooling.cc:L145</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input data.</param>
-    /// <param name="minData">Minimum value of data.</param>
-    /// <param name="maxData">Maximum value of data.</param>
-    /// <param name="pValue">Value of p for Lp pooling, can be 1 or 2, required for Lp Pooling.</param>
-    /// <param name="countIncludePad">Only used for AvgPool, specify whether to count padding elements for averagecalculation. For example, with a 5*5 kernel on a 3*3 corner of a image,the sum of the 9 valid elements will be divided by 25 if this is set to true,or it will be divided by 9 if this is set to false. Defaults to true.</param>
-    /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
-    /// <param name="poolType">Pooling type to be applied.</param>
-    /// <param name="globalPool">Ignore kernel size, do global pooling based on current input feature map. </param>
-    /// <param name="cudnnOff">Turn off cudnn pooling and use MXNet pooling operator. </param>
-    /// <param name="poolingConvention">Pooling convention to be applied.</param>
-    /// <param name="stride">Stride: for pooling (y, x) or (d, y, x). Defaults to 1 for each dimension.</param>
-    /// <param name="pad">Pad for pooling: (y, x) or (d, y, x). Defaults to no padding.</param>
-    /// <param name="layout">Set layout for input and output. Empty for
-    ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
-    static member ContribQuantizedPooling(outputArray : NDArray seq, 
-                                          data : NDArray, 
-                                          minData : NDArray, 
-                                          maxData : NDArray, 
-                                          [<Optional>] pValue : int Nullable, 
-                                          [<Optional>] countIncludePad : bool Nullable, 
-                                          [<Optional>] kernel : int seq, 
-                                          [<Optional>] poolType : PoolType, 
-                                          [<Optional; DefaultParameterValue(false)>] globalPool : bool, 
-                                          [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
-                                          [<Optional>] poolingConvention : PoolingConvention, 
-                                          [<Optional>] stride : int seq, 
-                                          [<Optional>] pad : int seq, 
-                                          [<Optional>] layout : ContribQuantizedPoolingLayout) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_quantized_pooling"
-        let names = [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|]
-        let vals = [|string pValue; string countIncludePad; (if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; string cudnnOff; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (layout :> obj) then "None" else string layout)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Pooling operator for input and output data type of int8.
-    /// The input and output data comes with min and max thresholds for quantizing
-    /// the float32 data into int8.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propogation. DO NOT use it in training.
-    ///     This operator only supports `pool_type` of `avg` or `max`.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_pooling.cc:L145</summary>
-    /// <param name="data">Input data.</param>
-    /// <param name="minData">Minimum value of data.</param>
-    /// <param name="maxData">Maximum value of data.</param>
-    /// <param name="pValue">Value of p for Lp pooling, can be 1 or 2, required for Lp Pooling.</param>
-    /// <param name="countIncludePad">Only used for AvgPool, specify whether to count padding elements for averagecalculation. For example, with a 5*5 kernel on a 3*3 corner of a image,the sum of the 9 valid elements will be divided by 25 if this is set to true,or it will be divided by 9 if this is set to false. Defaults to true.</param>
-    /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
-    /// <param name="poolType">Pooling type to be applied.</param>
-    /// <param name="globalPool">Ignore kernel size, do global pooling based on current input feature map. </param>
-    /// <param name="cudnnOff">Turn off cudnn pooling and use MXNet pooling operator. </param>
-    /// <param name="poolingConvention">Pooling convention to be applied.</param>
-    /// <param name="stride">Stride: for pooling (y, x) or (d, y, x). Defaults to 1 for each dimension.</param>
-    /// <param name="pad">Pad for pooling: (y, x) or (d, y, x). Defaults to no padding.</param>
-    /// <param name="layout">Set layout for input and output. Empty for
-    ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
-    static member ContribQuantizedPooling(data : Symbol, 
-                                          minData : Symbol, 
-                                          maxData : Symbol, 
-                                          [<Optional>] pValue : int Nullable, 
-                                          [<Optional>] countIncludePad : bool Nullable, 
-                                          [<Optional>] kernel : int seq, 
-                                          [<Optional>] poolType : PoolType, 
-                                          [<Optional; DefaultParameterValue(false)>] globalPool : bool, 
-                                          [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
-                                          [<Optional>] poolingConvention : PoolingConvention, 
-                                          [<Optional>] stride : int seq, 
-                                          [<Optional>] pad : int seq, 
-                                          [<Optional>] layout : ContribQuantizedPoolingLayout) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_quantized_pooling"
-        new Symbol(Some creator,
-                   [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|],
-                   [|string pValue; string countIncludePad; (if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; string cudnnOff; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (layout :> obj) then "None" else string layout)|],
-                   [|"data"; "minData"; "maxData"|],
-                   [|data; minData; maxData|])
-
-    /// <summary>Pooling operator for input and output data type of int8.
-    /// The input and output data comes with min and max thresholds for quantizing
-    /// the float32 data into int8.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propogation. DO NOT use it in training.
-    ///     This operator only supports `pool_type` of `avg` or `max`.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_pooling.cc:L145</summary>
-    /// <param name="data">Input data.</param>
-    /// <param name="minData">Minimum value of data.</param>
-    /// <param name="maxData">Maximum value of data.</param>
-    /// <param name="pValue">Value of p for Lp pooling, can be 1 or 2, required for Lp Pooling.</param>
-    /// <param name="countIncludePad">Only used for AvgPool, specify whether to count padding elements for averagecalculation. For example, with a 5*5 kernel on a 3*3 corner of a image,the sum of the 9 valid elements will be divided by 25 if this is set to true,or it will be divided by 9 if this is set to false. Defaults to true.</param>
-    /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
-    /// <param name="poolType">Pooling type to be applied.</param>
-    /// <param name="globalPool">Ignore kernel size, do global pooling based on current input feature map. </param>
-    /// <param name="cudnnOff">Turn off cudnn pooling and use MXNet pooling operator. </param>
-    /// <param name="poolingConvention">Pooling convention to be applied.</param>
-    /// <param name="stride">Stride: for pooling (y, x) or (d, y, x). Defaults to 1 for each dimension.</param>
-    /// <param name="pad">Pad for pooling: (y, x) or (d, y, x). Defaults to no padding.</param>
-    /// <param name="layout">Set layout for input and output. Empty for
-    ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
-    static member ContribQuantizedPooling(data : NDArray, 
-                                          minData : NDArray, 
-                                          maxData : NDArray, 
-                                          ?pValue : int, 
-                                          ?countIncludePad : bool, 
-                                          ?kernel : int seq, 
-                                          ?poolType : PoolType, 
-                                          ?globalPool : bool, 
-                                          ?cudnnOff : bool, 
-                                          ?poolingConvention : PoolingConvention, 
-                                          ?stride : int seq, 
-                                          ?pad : int seq, 
-                                          ?layout : ContribQuantizedPoolingLayout) =
+                                          [<Optional>] ?pValue : int, 
+                                          [<Optional>] ?countIncludePad : bool, 
+                                          [<Optional>] ?kernel : int seq, 
+                                          [<Optional>] ?poolType : PoolType, 
+                                          [<Optional>] ?globalPool : bool, 
+                                          [<Optional>] ?cudnnOff : bool, 
+                                          [<Optional>] ?poolingConvention : PoolingConvention, 
+                                          [<Optional>] ?stride : int seq, 
+                                          [<Optional>] ?pad : int seq, 
+                                          [<Optional>] ?layout : ContribQuantizedPoolingLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_pooling"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
@@ -14504,16 +13372,16 @@ type Operators() =
                                           data : NDArray, 
                                           minData : NDArray, 
                                           maxData : NDArray, 
-                                          ?pValue : int, 
-                                          ?countIncludePad : bool, 
-                                          ?kernel : int seq, 
-                                          ?poolType : PoolType, 
-                                          ?globalPool : bool, 
-                                          ?cudnnOff : bool, 
-                                          ?poolingConvention : PoolingConvention, 
-                                          ?stride : int seq, 
-                                          ?pad : int seq, 
-                                          ?layout : ContribQuantizedPoolingLayout) =
+                                          [<Optional>] ?pValue : int, 
+                                          [<Optional>] ?countIncludePad : bool, 
+                                          [<Optional>] ?kernel : int seq, 
+                                          [<Optional>] ?poolType : PoolType, 
+                                          [<Optional>] ?globalPool : bool, 
+                                          [<Optional>] ?cudnnOff : bool, 
+                                          [<Optional>] ?poolingConvention : PoolingConvention, 
+                                          [<Optional>] ?stride : int seq, 
+                                          [<Optional>] ?pad : int seq, 
+                                          [<Optional>] ?layout : ContribQuantizedPoolingLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_pooling"
         let names = [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|]
         let vals = [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match layout with None -> "None" | Some layout -> string layout)|]
@@ -14550,16 +13418,16 @@ type Operators() =
     static member ContribQuantizedPooling(data : Symbol, 
                                           minData : Symbol, 
                                           maxData : Symbol, 
-                                          ?pValue : int, 
-                                          ?countIncludePad : bool, 
-                                          ?kernel : int seq, 
-                                          ?poolType : PoolType, 
-                                          ?globalPool : bool, 
-                                          ?cudnnOff : bool, 
-                                          ?poolingConvention : PoolingConvention, 
-                                          ?stride : int seq, 
-                                          ?pad : int seq, 
-                                          ?layout : ContribQuantizedPoolingLayout) =
+                                          [<Optional>] ?pValue : int, 
+                                          [<Optional>] ?countIncludePad : bool, 
+                                          [<Optional>] ?kernel : int seq, 
+                                          [<Optional>] ?poolType : PoolType, 
+                                          [<Optional>] ?globalPool : bool, 
+                                          [<Optional>] ?cudnnOff : bool, 
+                                          [<Optional>] ?poolingConvention : PoolingConvention, 
+                                          [<Optional>] ?stride : int seq, 
+                                          [<Optional>] ?pad : int seq, 
+                                          [<Optional>] ?layout : ContribQuantizedPoolingLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_pooling"
         new Symbol(Some creator,
                    [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|],
@@ -14586,100 +13454,9 @@ type Operators() =
     static member ContribRequantize(data : NDArray, 
                                     minRange : NDArray, 
                                     maxRange : NDArray, 
-                                    [<Optional>] minCalibRange : float Nullable, 
-                                    [<Optional>] maxCalibRange : float Nullable, 
-                                    [<Optional>] outType : ContribRequantizeOutType) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_requantize"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle; minRange.NDArrayHandle.UnsafeHandle; maxRange.NDArrayHandle.UnsafeHandle|]
-                                                 [|"min_calib_range"; "max_calib_range"; "out_type"|]
-                                                 [|string minCalibRange; string maxCalibRange; (if isNull (outType :> obj) then "int8" else string outType)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Given data that is quantized in int32 and the corresponding thresholds,
-    /// requantize the data into int8 using min and max thresholds either calculated at runtime
-    /// or from calibration. It&#39;s highly recommended to pre-calucate the min and max thresholds
-    /// through calibration since it is able to save the runtime of the operator and improve the
-    /// inference accuracy.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propogation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\requantize.cc:L60</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">A ndarray/symbol of type `int32`</param>
-    /// <param name="minRange">The original minimum scalar value in the form of float32 used for quantizing data into int32.</param>
-    /// <param name="maxRange">The original maximum scalar value in the form of float32 used for quantizing data into int32.</param>
-    /// <param name="minCalibRange">The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int32 data into int8.</param>
-    /// <param name="maxCalibRange">The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int32 data into int8.</param>
-    /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
-    static member ContribRequantize(outputArray : NDArray seq, 
-                                    data : NDArray, 
-                                    minRange : NDArray, 
-                                    maxRange : NDArray, 
-                                    [<Optional>] minCalibRange : float Nullable, 
-                                    [<Optional>] maxCalibRange : float Nullable, 
-                                    [<Optional>] outType : ContribRequantizeOutType) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_requantize"
-        let names = [|"min_calib_range"; "max_calib_range"; "out_type"|]
-        let vals = [|string minCalibRange; string maxCalibRange; (if isNull (outType :> obj) then "int8" else string outType)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle; minRange.NDArrayHandle.UnsafeHandle; maxRange.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Given data that is quantized in int32 and the corresponding thresholds,
-    /// requantize the data into int8 using min and max thresholds either calculated at runtime
-    /// or from calibration. It&#39;s highly recommended to pre-calucate the min and max thresholds
-    /// through calibration since it is able to save the runtime of the operator and improve the
-    /// inference accuracy.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propogation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\requantize.cc:L60</summary>
-    /// <param name="data">A ndarray/symbol of type `int32`</param>
-    /// <param name="minRange">The original minimum scalar value in the form of float32 used for quantizing data into int32.</param>
-    /// <param name="maxRange">The original maximum scalar value in the form of float32 used for quantizing data into int32.</param>
-    /// <param name="minCalibRange">The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int32 data into int8.</param>
-    /// <param name="maxCalibRange">The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int32 data into int8.</param>
-    /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
-    static member ContribRequantize(data : Symbol, 
-                                    minRange : Symbol, 
-                                    maxRange : Symbol, 
-                                    [<Optional>] minCalibRange : float Nullable, 
-                                    [<Optional>] maxCalibRange : float Nullable, 
-                                    [<Optional>] outType : ContribRequantizeOutType) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_requantize"
-        new Symbol(Some creator,
-                   [|"min_calib_range"; "max_calib_range"; "out_type"|],
-                   [|string minCalibRange; string maxCalibRange; (if isNull (outType :> obj) then "int8" else string outType)|],
-                   [|"data"; "minRange"; "maxRange"|],
-                   [|data; minRange; maxRange|])
-
-    /// <summary>Given data that is quantized in int32 and the corresponding thresholds,
-    /// requantize the data into int8 using min and max thresholds either calculated at runtime
-    /// or from calibration. It&#39;s highly recommended to pre-calucate the min and max thresholds
-    /// through calibration since it is able to save the runtime of the operator and improve the
-    /// inference accuracy.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propogation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\requantize.cc:L60</summary>
-    /// <param name="data">A ndarray/symbol of type `int32`</param>
-    /// <param name="minRange">The original minimum scalar value in the form of float32 used for quantizing data into int32.</param>
-    /// <param name="maxRange">The original maximum scalar value in the form of float32 used for quantizing data into int32.</param>
-    /// <param name="minCalibRange">The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int32 data into int8.</param>
-    /// <param name="maxCalibRange">The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int32 data into int8.</param>
-    /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
-    static member ContribRequantize(data : NDArray, 
-                                    minRange : NDArray, 
-                                    maxRange : NDArray, 
-                                    ?minCalibRange : float, 
-                                    ?maxCalibRange : float, 
-                                    ?outType : ContribRequantizeOutType) =
+                                    [<Optional>] ?minCalibRange : float, 
+                                    [<Optional>] ?maxCalibRange : float, 
+                                    [<Optional>] ?outType : ContribRequantizeOutType) =
         let creator = AtomicSymbolCreator.FromName "_contrib_requantize"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; minRange.NDArrayHandle.UnsafeHandle; maxRange.NDArrayHandle.UnsafeHandle|]
@@ -14707,9 +13484,9 @@ type Operators() =
                                     data : NDArray, 
                                     minRange : NDArray, 
                                     maxRange : NDArray, 
-                                    ?minCalibRange : float, 
-                                    ?maxCalibRange : float, 
-                                    ?outType : ContribRequantizeOutType) =
+                                    [<Optional>] ?minCalibRange : float, 
+                                    [<Optional>] ?maxCalibRange : float, 
+                                    [<Optional>] ?outType : ContribRequantizeOutType) =
         let creator = AtomicSymbolCreator.FromName "_contrib_requantize"
         let names = [|"min_calib_range"; "max_calib_range"; "out_type"|]
         let vals = [|(match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange); (match outType with None -> "int8" | Some outType -> string outType)|]
@@ -14739,9 +13516,9 @@ type Operators() =
     static member ContribRequantize(data : Symbol, 
                                     minRange : Symbol, 
                                     maxRange : Symbol, 
-                                    ?minCalibRange : float, 
-                                    ?maxCalibRange : float, 
-                                    ?outType : ContribRequantizeOutType) =
+                                    [<Optional>] ?minCalibRange : float, 
+                                    [<Optional>] ?maxCalibRange : float, 
+                                    [<Optional>] ?outType : ContribRequantizeOutType) =
         let creator = AtomicSymbolCreator.FromName "_contrib_requantize"
         new Symbol(Some creator,
                    [|"min_calib_range"; "max_calib_range"; "out_type"|],
@@ -17637,303 +16414,14 @@ type Operators() =
                       stateSize : int, 
                       numLayers : int, 
                       mode : RNNMode, 
-                      [<Optional>] projectionSize : int Nullable, 
-                      [<Optional>] lstmStateClipMin : float Nullable, 
-                      [<Optional>] lstmStateClipMax : float Nullable, 
-                      [<Optional; DefaultParameterValue(false)>] bidirectional : bool, 
-                      [<Optional; DefaultParameterValue(0.0)>] p : float, 
-                      [<Optional; DefaultParameterValue(false)>] stateOutputs : bool, 
-                      [<Optional; DefaultParameterValue(false)>] lstmStateClipNan : bool, 
-                      [<Optional; DefaultParameterValue(false)>] useSequenceLength : bool) =
-        let creator = AtomicSymbolCreator.FromName "RNN"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle; parameters.NDArrayHandle.UnsafeHandle; state.NDArrayHandle.UnsafeHandle; stateCell.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
-                                                 [|"state_size"; "num_layers"; "mode"; "projection_size"; "lstm_state_clip_min"; "lstm_state_clip_max"; "bidirectional"; "p"; "state_outputs"; "lstm_state_clip_nan"; "use_sequence_length"|]
-                                                 [|string stateSize; string numLayers; string mode; string projectionSize; string lstmStateClipMin; string lstmStateClipMax; string bidirectional; string p; string stateOutputs; string lstmStateClipNan; string useSequenceLength|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Applies recurrent layers to input data. Currently, vanilla RNN, LSTM and GRU are
-    /// implemented, with both multi-layer and bidirectional support.
-    /// 
-    /// When the input data is of type float32 and the environment variables MXNET_CUDA_ALLOW_TENSOR_CORE
-    /// and MXNET_CUDA_TENSOR_OP_MATH_ALLOW_CONVERSION are set to 1, this operator will try to use
-    /// pseudo-float16 precision (float32 math with float16 I/O) precision in order to use
-    /// Tensor Cores on suitable NVIDIA GPUs. This can sometimes give significant speedups.
-    /// 
-    /// **Vanilla RNN**
-    /// 
-    /// Applies a single-gate recurrent layer to input X. Two kinds of activation function are supported:
-    /// ReLU and Tanh.
-    /// 
-    /// With ReLU activation function:
-    /// 
-    /// .. math::
-    ///     h_t = relu(W_{ih} * x_t + b_{ih}  +  W_{hh} * h_{(t-1)} + b_{hh})
-    /// 
-    /// With Tanh activtion function:
-    /// 
-    /// .. math::
-    ///     h_t = \tanh(W_{ih} * x_t + b_{ih}  +  W_{hh} * h_{(t-1)} + b_{hh})
-    /// 
-    /// Reference paper: Finding structure in time - Elman, 1988.
-    /// https://crl.ucsd.edu/~elman/Papers/fsit.pdf
-    /// 
-    /// **LSTM**
-    /// 
-    /// Long Short-Term Memory - Hochreiter, 1997. http://www.bioinf.jku.at/publications/older/2604.pdf
-    /// 
-    /// .. math::
-    ///   \begin{array}{ll}
-    ///             i_t = \mathrm{sigmoid}(W_{ii} x_t + b_{ii} + W_{hi} h_{(t-1)} + b_{hi}) \\
-    ///             f_t = \mathrm{sigmoid}(W_{if} x_t + b_{if} + W_{hf} h_{(t-1)} + b_{hf}) \\
-    ///             g_t = \tanh(W_{ig} x_t + b_{ig} + W_{hc} h_{(t-1)} + b_{hg}) \\
-    ///             o_t = \mathrm{sigmoid}(W_{io} x_t + b_{io} + W_{ho} h_{(t-1)} + b_{ho}) \\
-    ///             c_t = f_t * c_{(t-1)} + i_t * g_t \\
-    ///             h_t = o_t * \tanh(c_t)
-    ///             \end{array}
-    /// 
-    /// **GRU**
-    /// 
-    /// Gated Recurrent Unit - Cho et al. 2014. http://arxiv.org/abs/1406.1078
-    /// 
-    /// The definition of GRU here is slightly different from paper but compatible with CUDNN.
-    /// 
-    /// .. math::
-    ///   \begin{array}{ll}
-    ///             r_t = \mathrm{sigmoid}(W_{ir} x_t + b_{ir} + W_{hr} h_{(t-1)} + b_{hr}) \\
-    ///             z_t = \mathrm{sigmoid}(W_{iz} x_t + b_{iz} + W_{hz} h_{(t-1)} + b_{hz}) \\
-    ///             n_t = \tanh(W_{in} x_t + b_{in} + r_t * (W_{hn} h_{(t-1)}+ b_{hn})) \\
-    ///             h_t = (1 - z_t) * n_t + z_t * h_{(t-1)} \\
-    ///             \end{array}
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L690</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input data to RNN</param>
-    /// <param name="parameters">Vector of all RNN trainable parameters concatenated</param>
-    /// <param name="state">initial hidden state of the RNN</param>
-    /// <param name="stateCell">initial cell state for LSTM networks (only for LSTM)</param>
-    /// <param name="sequenceLength">Vector of valid sequence lengths for each element in batch. (Only used if use_sequence_length kwarg is True)</param>
-    /// <param name="stateSize">size of the state for each layer</param>
-    /// <param name="numLayers">number of stacked layers</param>
-    /// <param name="mode">the type of RNN to compute</param>
-    /// <param name="projectionSize">size of project size</param>
-    /// <param name="lstmStateClipMin">Minimum clip value of LSTM states. This option must be used together with lstm_state_clip_max.</param>
-    /// <param name="lstmStateClipMax">Maximum clip value of LSTM states. This option must be used together with lstm_state_clip_min.</param>
-    /// <param name="bidirectional">whether to use bidirectional recurrent layers</param>
-    /// <param name="p">drop rate of the dropout on the outputs of each RNN layer, except the last layer.</param>
-    /// <param name="stateOutputs">Whether to have the states as symbol outputs.</param>
-    /// <param name="lstmStateClipNan">Whether to stop NaN from propagating in state by clipping it to min/max. If clipping range is not specified, this option is ignored.</param>
-    /// <param name="useSequenceLength">If set to true, this layer takes in an extra input parameter `sequence_length` to specify variable length sequence</param>
-    static member RNN(outputArray : NDArray seq, 
-                      data : NDArray, 
-                      parameters : NDArray, 
-                      state : NDArray, 
-                      stateCell : NDArray, 
-                      sequenceLength : NDArray, 
-                      stateSize : int, 
-                      numLayers : int, 
-                      mode : RNNMode, 
-                      [<Optional>] projectionSize : int Nullable, 
-                      [<Optional>] lstmStateClipMin : float Nullable, 
-                      [<Optional>] lstmStateClipMax : float Nullable, 
-                      [<Optional; DefaultParameterValue(false)>] bidirectional : bool, 
-                      [<Optional; DefaultParameterValue(0.0)>] p : float, 
-                      [<Optional; DefaultParameterValue(false)>] stateOutputs : bool, 
-                      [<Optional; DefaultParameterValue(false)>] lstmStateClipNan : bool, 
-                      [<Optional; DefaultParameterValue(false)>] useSequenceLength : bool) =
-        let creator = AtomicSymbolCreator.FromName "RNN"
-        let names = [|"state_size"; "num_layers"; "mode"; "projection_size"; "lstm_state_clip_min"; "lstm_state_clip_max"; "bidirectional"; "p"; "state_outputs"; "lstm_state_clip_nan"; "use_sequence_length"|]
-        let vals = [|string stateSize; string numLayers; string mode; string projectionSize; string lstmStateClipMin; string lstmStateClipMax; string bidirectional; string p; string stateOutputs; string lstmStateClipNan; string useSequenceLength|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle; parameters.NDArrayHandle.UnsafeHandle; state.NDArrayHandle.UnsafeHandle; stateCell.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Applies recurrent layers to input data. Currently, vanilla RNN, LSTM and GRU are
-    /// implemented, with both multi-layer and bidirectional support.
-    /// 
-    /// When the input data is of type float32 and the environment variables MXNET_CUDA_ALLOW_TENSOR_CORE
-    /// and MXNET_CUDA_TENSOR_OP_MATH_ALLOW_CONVERSION are set to 1, this operator will try to use
-    /// pseudo-float16 precision (float32 math with float16 I/O) precision in order to use
-    /// Tensor Cores on suitable NVIDIA GPUs. This can sometimes give significant speedups.
-    /// 
-    /// **Vanilla RNN**
-    /// 
-    /// Applies a single-gate recurrent layer to input X. Two kinds of activation function are supported:
-    /// ReLU and Tanh.
-    /// 
-    /// With ReLU activation function:
-    /// 
-    /// .. math::
-    ///     h_t = relu(W_{ih} * x_t + b_{ih}  +  W_{hh} * h_{(t-1)} + b_{hh})
-    /// 
-    /// With Tanh activtion function:
-    /// 
-    /// .. math::
-    ///     h_t = \tanh(W_{ih} * x_t + b_{ih}  +  W_{hh} * h_{(t-1)} + b_{hh})
-    /// 
-    /// Reference paper: Finding structure in time - Elman, 1988.
-    /// https://crl.ucsd.edu/~elman/Papers/fsit.pdf
-    /// 
-    /// **LSTM**
-    /// 
-    /// Long Short-Term Memory - Hochreiter, 1997. http://www.bioinf.jku.at/publications/older/2604.pdf
-    /// 
-    /// .. math::
-    ///   \begin{array}{ll}
-    ///             i_t = \mathrm{sigmoid}(W_{ii} x_t + b_{ii} + W_{hi} h_{(t-1)} + b_{hi}) \\
-    ///             f_t = \mathrm{sigmoid}(W_{if} x_t + b_{if} + W_{hf} h_{(t-1)} + b_{hf}) \\
-    ///             g_t = \tanh(W_{ig} x_t + b_{ig} + W_{hc} h_{(t-1)} + b_{hg}) \\
-    ///             o_t = \mathrm{sigmoid}(W_{io} x_t + b_{io} + W_{ho} h_{(t-1)} + b_{ho}) \\
-    ///             c_t = f_t * c_{(t-1)} + i_t * g_t \\
-    ///             h_t = o_t * \tanh(c_t)
-    ///             \end{array}
-    /// 
-    /// **GRU**
-    /// 
-    /// Gated Recurrent Unit - Cho et al. 2014. http://arxiv.org/abs/1406.1078
-    /// 
-    /// The definition of GRU here is slightly different from paper but compatible with CUDNN.
-    /// 
-    /// .. math::
-    ///   \begin{array}{ll}
-    ///             r_t = \mathrm{sigmoid}(W_{ir} x_t + b_{ir} + W_{hr} h_{(t-1)} + b_{hr}) \\
-    ///             z_t = \mathrm{sigmoid}(W_{iz} x_t + b_{iz} + W_{hz} h_{(t-1)} + b_{hz}) \\
-    ///             n_t = \tanh(W_{in} x_t + b_{in} + r_t * (W_{hn} h_{(t-1)}+ b_{hn})) \\
-    ///             h_t = (1 - z_t) * n_t + z_t * h_{(t-1)} \\
-    ///             \end{array}
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L690</summary>
-    /// <param name="data">Input data to RNN</param>
-    /// <param name="parameters">Vector of all RNN trainable parameters concatenated</param>
-    /// <param name="state">initial hidden state of the RNN</param>
-    /// <param name="stateCell">initial cell state for LSTM networks (only for LSTM)</param>
-    /// <param name="sequenceLength">Vector of valid sequence lengths for each element in batch. (Only used if use_sequence_length kwarg is True)</param>
-    /// <param name="stateSize">size of the state for each layer</param>
-    /// <param name="numLayers">number of stacked layers</param>
-    /// <param name="mode">the type of RNN to compute</param>
-    /// <param name="projectionSize">size of project size</param>
-    /// <param name="lstmStateClipMin">Minimum clip value of LSTM states. This option must be used together with lstm_state_clip_max.</param>
-    /// <param name="lstmStateClipMax">Maximum clip value of LSTM states. This option must be used together with lstm_state_clip_min.</param>
-    /// <param name="bidirectional">whether to use bidirectional recurrent layers</param>
-    /// <param name="p">drop rate of the dropout on the outputs of each RNN layer, except the last layer.</param>
-    /// <param name="stateOutputs">Whether to have the states as symbol outputs.</param>
-    /// <param name="lstmStateClipNan">Whether to stop NaN from propagating in state by clipping it to min/max. If clipping range is not specified, this option is ignored.</param>
-    /// <param name="useSequenceLength">If set to true, this layer takes in an extra input parameter `sequence_length` to specify variable length sequence</param>
-    static member RNN(data : Symbol, 
-                      parameters : Symbol, 
-                      state : Symbol, 
-                      stateCell : Symbol, 
-                      sequenceLength : Symbol, 
-                      stateSize : int, 
-                      numLayers : int, 
-                      mode : RNNMode, 
-                      [<Optional>] projectionSize : int Nullable, 
-                      [<Optional>] lstmStateClipMin : float Nullable, 
-                      [<Optional>] lstmStateClipMax : float Nullable, 
-                      [<Optional; DefaultParameterValue(false)>] bidirectional : bool, 
-                      [<Optional; DefaultParameterValue(0.0)>] p : float, 
-                      [<Optional; DefaultParameterValue(false)>] stateOutputs : bool, 
-                      [<Optional; DefaultParameterValue(false)>] lstmStateClipNan : bool, 
-                      [<Optional; DefaultParameterValue(false)>] useSequenceLength : bool) =
-        let creator = AtomicSymbolCreator.FromName "RNN"
-        new Symbol(Some creator,
-                   [|"state_size"; "num_layers"; "mode"; "projection_size"; "lstm_state_clip_min"; "lstm_state_clip_max"; "bidirectional"; "p"; "state_outputs"; "lstm_state_clip_nan"; "use_sequence_length"|],
-                   [|string stateSize; string numLayers; string mode; string projectionSize; string lstmStateClipMin; string lstmStateClipMax; string bidirectional; string p; string stateOutputs; string lstmStateClipNan; string useSequenceLength|],
-                   [|"data"; "parameters"; "state"; "stateCell"; "sequenceLength"|],
-                   [|data; parameters; state; stateCell; sequenceLength|])
-
-    /// <summary>Applies recurrent layers to input data. Currently, vanilla RNN, LSTM and GRU are
-    /// implemented, with both multi-layer and bidirectional support.
-    /// 
-    /// When the input data is of type float32 and the environment variables MXNET_CUDA_ALLOW_TENSOR_CORE
-    /// and MXNET_CUDA_TENSOR_OP_MATH_ALLOW_CONVERSION are set to 1, this operator will try to use
-    /// pseudo-float16 precision (float32 math with float16 I/O) precision in order to use
-    /// Tensor Cores on suitable NVIDIA GPUs. This can sometimes give significant speedups.
-    /// 
-    /// **Vanilla RNN**
-    /// 
-    /// Applies a single-gate recurrent layer to input X. Two kinds of activation function are supported:
-    /// ReLU and Tanh.
-    /// 
-    /// With ReLU activation function:
-    /// 
-    /// .. math::
-    ///     h_t = relu(W_{ih} * x_t + b_{ih}  +  W_{hh} * h_{(t-1)} + b_{hh})
-    /// 
-    /// With Tanh activtion function:
-    /// 
-    /// .. math::
-    ///     h_t = \tanh(W_{ih} * x_t + b_{ih}  +  W_{hh} * h_{(t-1)} + b_{hh})
-    /// 
-    /// Reference paper: Finding structure in time - Elman, 1988.
-    /// https://crl.ucsd.edu/~elman/Papers/fsit.pdf
-    /// 
-    /// **LSTM**
-    /// 
-    /// Long Short-Term Memory - Hochreiter, 1997. http://www.bioinf.jku.at/publications/older/2604.pdf
-    /// 
-    /// .. math::
-    ///   \begin{array}{ll}
-    ///             i_t = \mathrm{sigmoid}(W_{ii} x_t + b_{ii} + W_{hi} h_{(t-1)} + b_{hi}) \\
-    ///             f_t = \mathrm{sigmoid}(W_{if} x_t + b_{if} + W_{hf} h_{(t-1)} + b_{hf}) \\
-    ///             g_t = \tanh(W_{ig} x_t + b_{ig} + W_{hc} h_{(t-1)} + b_{hg}) \\
-    ///             o_t = \mathrm{sigmoid}(W_{io} x_t + b_{io} + W_{ho} h_{(t-1)} + b_{ho}) \\
-    ///             c_t = f_t * c_{(t-1)} + i_t * g_t \\
-    ///             h_t = o_t * \tanh(c_t)
-    ///             \end{array}
-    /// 
-    /// **GRU**
-    /// 
-    /// Gated Recurrent Unit - Cho et al. 2014. http://arxiv.org/abs/1406.1078
-    /// 
-    /// The definition of GRU here is slightly different from paper but compatible with CUDNN.
-    /// 
-    /// .. math::
-    ///   \begin{array}{ll}
-    ///             r_t = \mathrm{sigmoid}(W_{ir} x_t + b_{ir} + W_{hr} h_{(t-1)} + b_{hr}) \\
-    ///             z_t = \mathrm{sigmoid}(W_{iz} x_t + b_{iz} + W_{hz} h_{(t-1)} + b_{hz}) \\
-    ///             n_t = \tanh(W_{in} x_t + b_{in} + r_t * (W_{hn} h_{(t-1)}+ b_{hn})) \\
-    ///             h_t = (1 - z_t) * n_t + z_t * h_{(t-1)} \\
-    ///             \end{array}
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L690</summary>
-    /// <param name="data">Input data to RNN</param>
-    /// <param name="parameters">Vector of all RNN trainable parameters concatenated</param>
-    /// <param name="state">initial hidden state of the RNN</param>
-    /// <param name="stateCell">initial cell state for LSTM networks (only for LSTM)</param>
-    /// <param name="sequenceLength">Vector of valid sequence lengths for each element in batch. (Only used if use_sequence_length kwarg is True)</param>
-    /// <param name="stateSize">size of the state for each layer</param>
-    /// <param name="numLayers">number of stacked layers</param>
-    /// <param name="mode">the type of RNN to compute</param>
-    /// <param name="projectionSize">size of project size</param>
-    /// <param name="lstmStateClipMin">Minimum clip value of LSTM states. This option must be used together with lstm_state_clip_max.</param>
-    /// <param name="lstmStateClipMax">Maximum clip value of LSTM states. This option must be used together with lstm_state_clip_min.</param>
-    /// <param name="bidirectional">whether to use bidirectional recurrent layers</param>
-    /// <param name="p">drop rate of the dropout on the outputs of each RNN layer, except the last layer.</param>
-    /// <param name="stateOutputs">Whether to have the states as symbol outputs.</param>
-    /// <param name="lstmStateClipNan">Whether to stop NaN from propagating in state by clipping it to min/max. If clipping range is not specified, this option is ignored.</param>
-    /// <param name="useSequenceLength">If set to true, this layer takes in an extra input parameter `sequence_length` to specify variable length sequence</param>
-    static member RNN(data : NDArray, 
-                      parameters : NDArray, 
-                      state : NDArray, 
-                      stateCell : NDArray, 
-                      sequenceLength : NDArray, 
-                      stateSize : int, 
-                      numLayers : int, 
-                      mode : RNNMode, 
-                      ?projectionSize : int, 
-                      ?lstmStateClipMin : float, 
-                      ?lstmStateClipMax : float, 
-                      ?bidirectional : bool, 
-                      ?p : float, 
-                      ?stateOutputs : bool, 
-                      ?lstmStateClipNan : bool, 
-                      ?useSequenceLength : bool) =
+                      [<Optional>] ?projectionSize : int, 
+                      [<Optional>] ?lstmStateClipMin : float, 
+                      [<Optional>] ?lstmStateClipMax : float, 
+                      [<Optional>] ?bidirectional : bool, 
+                      [<Optional>] ?p : float, 
+                      [<Optional>] ?stateOutputs : bool, 
+                      [<Optional>] ?lstmStateClipNan : bool, 
+                      [<Optional>] ?useSequenceLength : bool) =
         let creator = AtomicSymbolCreator.FromName "RNN"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; parameters.NDArrayHandle.UnsafeHandle; state.NDArrayHandle.UnsafeHandle; stateCell.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
@@ -18022,14 +16510,14 @@ type Operators() =
                       stateSize : int, 
                       numLayers : int, 
                       mode : RNNMode, 
-                      ?projectionSize : int, 
-                      ?lstmStateClipMin : float, 
-                      ?lstmStateClipMax : float, 
-                      ?bidirectional : bool, 
-                      ?p : float, 
-                      ?stateOutputs : bool, 
-                      ?lstmStateClipNan : bool, 
-                      ?useSequenceLength : bool) =
+                      [<Optional>] ?projectionSize : int, 
+                      [<Optional>] ?lstmStateClipMin : float, 
+                      [<Optional>] ?lstmStateClipMax : float, 
+                      [<Optional>] ?bidirectional : bool, 
+                      [<Optional>] ?p : float, 
+                      [<Optional>] ?stateOutputs : bool, 
+                      [<Optional>] ?lstmStateClipNan : bool, 
+                      [<Optional>] ?useSequenceLength : bool) =
         let creator = AtomicSymbolCreator.FromName "RNN"
         let names = [|"state_size"; "num_layers"; "mode"; "projection_size"; "lstm_state_clip_min"; "lstm_state_clip_max"; "bidirectional"; "p"; "state_outputs"; "lstm_state_clip_nan"; "use_sequence_length"|]
         let vals = [|string stateSize; string numLayers; string mode; (match projectionSize with None -> "None" | Some projectionSize -> string projectionSize); (match lstmStateClipMin with None -> "None" | Some lstmStateClipMin -> string lstmStateClipMin); (match lstmStateClipMax with None -> "None" | Some lstmStateClipMax -> string lstmStateClipMax); (match bidirectional with None -> "false" | Some bidirectional -> string bidirectional); (match p with None -> "0.0" | Some p -> string p); (match stateOutputs with None -> "false" | Some stateOutputs -> string stateOutputs); (match lstmStateClipNan with None -> "false" | Some lstmStateClipNan -> string lstmStateClipNan); (match useSequenceLength with None -> "false" | Some useSequenceLength -> string useSequenceLength)|]
@@ -18120,14 +16608,14 @@ type Operators() =
                       stateSize : int, 
                       numLayers : int, 
                       mode : RNNMode, 
-                      ?projectionSize : int, 
-                      ?lstmStateClipMin : float, 
-                      ?lstmStateClipMax : float, 
-                      ?bidirectional : bool, 
-                      ?p : float, 
-                      ?stateOutputs : bool, 
-                      ?lstmStateClipNan : bool, 
-                      ?useSequenceLength : bool) =
+                      [<Optional>] ?projectionSize : int, 
+                      [<Optional>] ?lstmStateClipMin : float, 
+                      [<Optional>] ?lstmStateClipMax : float, 
+                      [<Optional>] ?bidirectional : bool, 
+                      [<Optional>] ?p : float, 
+                      [<Optional>] ?stateOutputs : bool, 
+                      [<Optional>] ?lstmStateClipNan : bool, 
+                      [<Optional>] ?useSequenceLength : bool) =
         let creator = AtomicSymbolCreator.FromName "RNN"
         new Symbol(Some creator,
                    [|"state_size"; "num_layers"; "mode"; "projection_size"; "lstm_state_clip_min"; "lstm_state_clip_max"; "bidirectional"; "p"; "state_outputs"; "lstm_state_clip_nan"; "use_sequence_length"|],
@@ -19020,112 +17508,7 @@ type Operators() =
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
-    static member Argmax(data : NDArray, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(false)>] keepdims : bool) =
-        let creator = AtomicSymbolCreator.FromName "argmax"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"axis"; "keepdims"|]
-                                                 [|string axis; string keepdims|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Returns indices of the maximum values along an axis.
-    /// 
-    /// In the case of multiple occurrences of maximum values, the indices corresponding to the first occurrence
-    /// are returned.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 0.,  1.,  2.],
-    ///        [ 3.,  4.,  5.]]
-    /// 
-    ///   // argmax along axis 0
-    ///   argmax(x, axis=0) = [ 1.,  1.,  1.]
-    /// 
-    ///   // argmax along axis 1
-    ///   argmax(x, axis=1) = [ 2.,  2.]
-    /// 
-    ///   // argmax along axis 1 keeping same dims as an input array
-    ///   argmax(x, axis=1, keepdims=True) = [[ 2.],
-    ///                                       [ 2.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L52</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">The input</param>
-    /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
-    /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
-    static member Argmax(outputArray : NDArray seq, data : NDArray, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(false)>] keepdims : bool) =
-        let creator = AtomicSymbolCreator.FromName "argmax"
-        let names = [|"axis"; "keepdims"|]
-        let vals = [|string axis; string keepdims|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Returns indices of the maximum values along an axis.
-    /// 
-    /// In the case of multiple occurrences of maximum values, the indices corresponding to the first occurrence
-    /// are returned.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 0.,  1.,  2.],
-    ///        [ 3.,  4.,  5.]]
-    /// 
-    ///   // argmax along axis 0
-    ///   argmax(x, axis=0) = [ 1.,  1.,  1.]
-    /// 
-    ///   // argmax along axis 1
-    ///   argmax(x, axis=1) = [ 2.,  2.]
-    /// 
-    ///   // argmax along axis 1 keeping same dims as an input array
-    ///   argmax(x, axis=1, keepdims=True) = [[ 2.],
-    ///                                       [ 2.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L52</summary>
-    /// <param name="data">The input</param>
-    /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
-    /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
-    static member Argmax(data : Symbol, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(false)>] keepdims : bool) =
-        let creator = AtomicSymbolCreator.FromName "argmax"
-        new Symbol(Some creator,
-                   [|"axis"; "keepdims"|],
-                   [|string axis; string keepdims|],
-                   [|"data"|],
-                   [|data|])
-
-    /// <summary>Returns indices of the maximum values along an axis.
-    /// 
-    /// In the case of multiple occurrences of maximum values, the indices corresponding to the first occurrence
-    /// are returned.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 0.,  1.,  2.],
-    ///        [ 3.,  4.,  5.]]
-    /// 
-    ///   // argmax along axis 0
-    ///   argmax(x, axis=0) = [ 1.,  1.,  1.]
-    /// 
-    ///   // argmax along axis 1
-    ///   argmax(x, axis=1) = [ 2.,  2.]
-    /// 
-    ///   // argmax along axis 1 keeping same dims as an input array
-    ///   argmax(x, axis=1, keepdims=True) = [[ 2.],
-    ///                                       [ 2.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L52</summary>
-    /// <param name="data">The input</param>
-    /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
-    /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
-    static member Argmax(data : NDArray, ?axis : int, ?keepdims : bool) =
+    static member Argmax(data : NDArray, [<Optional>] ?axis : int, [<Optional>] ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "argmax"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -19159,7 +17542,7 @@ type Operators() =
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
-    static member Argmax(outputArray : NDArray seq, data : NDArray, ?axis : int, ?keepdims : bool) =
+    static member Argmax(outputArray : NDArray seq, data : NDArray, [<Optional>] ?axis : int, [<Optional>] ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "argmax"
         let names = [|"axis"; "keepdims"|]
         let vals = [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
@@ -19196,7 +17579,7 @@ type Operators() =
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
-    static member Argmax(data : Symbol, ?axis : int, ?keepdims : bool) =
+    static member Argmax(data : Symbol, [<Optional>] ?axis : int, [<Optional>] ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "argmax"
         new Symbol(Some creator,
                    [|"axis"; "keepdims"|],
@@ -19230,112 +17613,7 @@ type Operators() =
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
-    static member Argmin(data : NDArray, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(false)>] keepdims : bool) =
-        let creator = AtomicSymbolCreator.FromName "argmin"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"axis"; "keepdims"|]
-                                                 [|string axis; string keepdims|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Returns indices of the minimum values along an axis.
-    /// 
-    /// In the case of multiple occurrences of minimum values, the indices corresponding to the first occurrence
-    /// are returned.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 0.,  1.,  2.],
-    ///        [ 3.,  4.,  5.]]
-    /// 
-    ///   // argmin along axis 0
-    ///   argmin(x, axis=0) = [ 0.,  0.,  0.]
-    /// 
-    ///   // argmin along axis 1
-    ///   argmin(x, axis=1) = [ 0.,  0.]
-    /// 
-    ///   // argmin along axis 1 keeping same dims as an input array
-    ///   argmin(x, axis=1, keepdims=True) = [[ 0.],
-    ///                                       [ 0.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L77</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">The input</param>
-    /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
-    /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
-    static member Argmin(outputArray : NDArray seq, data : NDArray, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(false)>] keepdims : bool) =
-        let creator = AtomicSymbolCreator.FromName "argmin"
-        let names = [|"axis"; "keepdims"|]
-        let vals = [|string axis; string keepdims|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Returns indices of the minimum values along an axis.
-    /// 
-    /// In the case of multiple occurrences of minimum values, the indices corresponding to the first occurrence
-    /// are returned.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 0.,  1.,  2.],
-    ///        [ 3.,  4.,  5.]]
-    /// 
-    ///   // argmin along axis 0
-    ///   argmin(x, axis=0) = [ 0.,  0.,  0.]
-    /// 
-    ///   // argmin along axis 1
-    ///   argmin(x, axis=1) = [ 0.,  0.]
-    /// 
-    ///   // argmin along axis 1 keeping same dims as an input array
-    ///   argmin(x, axis=1, keepdims=True) = [[ 0.],
-    ///                                       [ 0.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L77</summary>
-    /// <param name="data">The input</param>
-    /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
-    /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
-    static member Argmin(data : Symbol, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(false)>] keepdims : bool) =
-        let creator = AtomicSymbolCreator.FromName "argmin"
-        new Symbol(Some creator,
-                   [|"axis"; "keepdims"|],
-                   [|string axis; string keepdims|],
-                   [|"data"|],
-                   [|data|])
-
-    /// <summary>Returns indices of the minimum values along an axis.
-    /// 
-    /// In the case of multiple occurrences of minimum values, the indices corresponding to the first occurrence
-    /// are returned.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 0.,  1.,  2.],
-    ///        [ 3.,  4.,  5.]]
-    /// 
-    ///   // argmin along axis 0
-    ///   argmin(x, axis=0) = [ 0.,  0.,  0.]
-    /// 
-    ///   // argmin along axis 1
-    ///   argmin(x, axis=1) = [ 0.,  0.]
-    /// 
-    ///   // argmin along axis 1 keeping same dims as an input array
-    ///   argmin(x, axis=1, keepdims=True) = [[ 0.],
-    ///                                       [ 0.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L77</summary>
-    /// <param name="data">The input</param>
-    /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
-    /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
-    static member Argmin(data : NDArray, ?axis : int, ?keepdims : bool) =
+    static member Argmin(data : NDArray, [<Optional>] ?axis : int, [<Optional>] ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "argmin"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -19369,7 +17647,7 @@ type Operators() =
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
-    static member Argmin(outputArray : NDArray seq, data : NDArray, ?axis : int, ?keepdims : bool) =
+    static member Argmin(outputArray : NDArray seq, data : NDArray, [<Optional>] ?axis : int, [<Optional>] ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "argmin"
         let names = [|"axis"; "keepdims"|]
         let vals = [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
@@ -19406,7 +17684,7 @@ type Operators() =
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
-    static member Argmin(data : Symbol, ?axis : int, ?keepdims : bool) =
+    static member Argmin(data : Symbol, [<Optional>] ?axis : int, [<Optional>] ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "argmin"
         new Symbol(Some creator,
                    [|"axis"; "keepdims"|],
@@ -19546,196 +17824,9 @@ type Operators() =
     /// <param name="mode">Specify how out-of-bound indices behave. Default is &quot;clip&quot;. &quot;clip&quot; means clip to the range. So, if all indices mentioned are too large, they are replaced by the index that addresses the last element along an axis.  &quot;wrap&quot; means to wrap around.</param>
     static member Pick(data : NDArray, 
                        index : NDArray, 
-                       [<Optional>] axis : int Nullable, 
-                       [<Optional; DefaultParameterValue(false)>] keepdims : bool, 
-                       [<Optional>] mode : PickMode) =
-        let creator = AtomicSymbolCreator.FromName "pick"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle; index.NDArrayHandle.UnsafeHandle|]
-                                                 [|"axis"; "keepdims"; "mode"|]
-                                                 [|string axis; string keepdims; (if isNull (mode :> obj) then "clip" else string mode)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Picks elements from an input array according to the input indices along the given axis.
-    /// 
-    /// Given an input array of shape ``(d0, d1)`` and indices of shape ``(i0,)``, the result will be
-    /// an output array of shape ``(i0,)`` with::
-    /// 
-    ///   output[i] = input[i, indices[i]]
-    /// 
-    /// By default, if any index mentioned is too large, it is replaced by the index that addresses
-    /// the last element along an axis (the `clip` mode).
-    /// 
-    /// This function supports n-dimensional input and (n-1)-dimensional indices arrays.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 1.,  2.],
-    ///        [ 3.,  4.],
-    ///        [ 5.,  6.]]
-    /// 
-    ///   // picks elements with specified indices along axis 0
-    ///   pick(x, y=[0,1], 0) = [ 1.,  4.]
-    /// 
-    ///   // picks elements with specified indices along axis 1
-    ///   pick(x, y=[0,1,0], 1) = [ 1.,  4.,  5.]
-    /// 
-    ///   y = [[ 1.],
-    ///        [ 0.],
-    ///        [ 2.]]
-    /// 
-    ///   // picks elements with specified indices along axis 1 using &#39;wrap&#39; mode
-    ///   // to place indicies that would normally be out of bounds
-    ///   pick(x, y=[2,-1,-2], 1, mode=&#39;wrap&#39;) = [ 1.,  4.,  5.]
-    /// 
-    ///   y = [[ 1.],
-    ///        [ 0.],
-    ///        [ 2.]]
-    /// 
-    ///   // picks elements with specified indices along axis 1 and dims are maintained
-    ///   pick(x,y, 1, keepdims=True) = [[ 2.],
-    ///                                  [ 3.],
-    ///                                  [ 6.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L154</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">The input array</param>
-    /// <param name="index">The index array</param>
-    /// <param name="axis">int or None. The axis to picking the elements. Negative values means indexing from right to left. If is `None`, the elements in the index w.r.t the flattened input will be picked.</param>
-    /// <param name="keepdims">If true, the axis where we pick the elements is left in the result as dimension with size one.</param>
-    /// <param name="mode">Specify how out-of-bound indices behave. Default is &quot;clip&quot;. &quot;clip&quot; means clip to the range. So, if all indices mentioned are too large, they are replaced by the index that addresses the last element along an axis.  &quot;wrap&quot; means to wrap around.</param>
-    static member Pick(outputArray : NDArray seq, 
-                       data : NDArray, 
-                       index : NDArray, 
-                       [<Optional>] axis : int Nullable, 
-                       [<Optional; DefaultParameterValue(false)>] keepdims : bool, 
-                       [<Optional>] mode : PickMode) =
-        let creator = AtomicSymbolCreator.FromName "pick"
-        let names = [|"axis"; "keepdims"; "mode"|]
-        let vals = [|string axis; string keepdims; (if isNull (mode :> obj) then "clip" else string mode)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle; index.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Picks elements from an input array according to the input indices along the given axis.
-    /// 
-    /// Given an input array of shape ``(d0, d1)`` and indices of shape ``(i0,)``, the result will be
-    /// an output array of shape ``(i0,)`` with::
-    /// 
-    ///   output[i] = input[i, indices[i]]
-    /// 
-    /// By default, if any index mentioned is too large, it is replaced by the index that addresses
-    /// the last element along an axis (the `clip` mode).
-    /// 
-    /// This function supports n-dimensional input and (n-1)-dimensional indices arrays.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 1.,  2.],
-    ///        [ 3.,  4.],
-    ///        [ 5.,  6.]]
-    /// 
-    ///   // picks elements with specified indices along axis 0
-    ///   pick(x, y=[0,1], 0) = [ 1.,  4.]
-    /// 
-    ///   // picks elements with specified indices along axis 1
-    ///   pick(x, y=[0,1,0], 1) = [ 1.,  4.,  5.]
-    /// 
-    ///   y = [[ 1.],
-    ///        [ 0.],
-    ///        [ 2.]]
-    /// 
-    ///   // picks elements with specified indices along axis 1 using &#39;wrap&#39; mode
-    ///   // to place indicies that would normally be out of bounds
-    ///   pick(x, y=[2,-1,-2], 1, mode=&#39;wrap&#39;) = [ 1.,  4.,  5.]
-    /// 
-    ///   y = [[ 1.],
-    ///        [ 0.],
-    ///        [ 2.]]
-    /// 
-    ///   // picks elements with specified indices along axis 1 and dims are maintained
-    ///   pick(x,y, 1, keepdims=True) = [[ 2.],
-    ///                                  [ 3.],
-    ///                                  [ 6.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L154</summary>
-    /// <param name="data">The input array</param>
-    /// <param name="index">The index array</param>
-    /// <param name="axis">int or None. The axis to picking the elements. Negative values means indexing from right to left. If is `None`, the elements in the index w.r.t the flattened input will be picked.</param>
-    /// <param name="keepdims">If true, the axis where we pick the elements is left in the result as dimension with size one.</param>
-    /// <param name="mode">Specify how out-of-bound indices behave. Default is &quot;clip&quot;. &quot;clip&quot; means clip to the range. So, if all indices mentioned are too large, they are replaced by the index that addresses the last element along an axis.  &quot;wrap&quot; means to wrap around.</param>
-    static member Pick(data : Symbol, 
-                       index : Symbol, 
-                       [<Optional>] axis : int Nullable, 
-                       [<Optional; DefaultParameterValue(false)>] keepdims : bool, 
-                       [<Optional>] mode : PickMode) =
-        let creator = AtomicSymbolCreator.FromName "pick"
-        new Symbol(Some creator,
-                   [|"axis"; "keepdims"; "mode"|],
-                   [|string axis; string keepdims; (if isNull (mode :> obj) then "clip" else string mode)|],
-                   [|"data"; "index"|],
-                   [|data; index|])
-
-    /// <summary>Picks elements from an input array according to the input indices along the given axis.
-    /// 
-    /// Given an input array of shape ``(d0, d1)`` and indices of shape ``(i0,)``, the result will be
-    /// an output array of shape ``(i0,)`` with::
-    /// 
-    ///   output[i] = input[i, indices[i]]
-    /// 
-    /// By default, if any index mentioned is too large, it is replaced by the index that addresses
-    /// the last element along an axis (the `clip` mode).
-    /// 
-    /// This function supports n-dimensional input and (n-1)-dimensional indices arrays.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 1.,  2.],
-    ///        [ 3.,  4.],
-    ///        [ 5.,  6.]]
-    /// 
-    ///   // picks elements with specified indices along axis 0
-    ///   pick(x, y=[0,1], 0) = [ 1.,  4.]
-    /// 
-    ///   // picks elements with specified indices along axis 1
-    ///   pick(x, y=[0,1,0], 1) = [ 1.,  4.,  5.]
-    /// 
-    ///   y = [[ 1.],
-    ///        [ 0.],
-    ///        [ 2.]]
-    /// 
-    ///   // picks elements with specified indices along axis 1 using &#39;wrap&#39; mode
-    ///   // to place indicies that would normally be out of bounds
-    ///   pick(x, y=[2,-1,-2], 1, mode=&#39;wrap&#39;) = [ 1.,  4.,  5.]
-    /// 
-    ///   y = [[ 1.],
-    ///        [ 0.],
-    ///        [ 2.]]
-    /// 
-    ///   // picks elements with specified indices along axis 1 and dims are maintained
-    ///   pick(x,y, 1, keepdims=True) = [[ 2.],
-    ///                                  [ 3.],
-    ///                                  [ 6.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L154</summary>
-    /// <param name="data">The input array</param>
-    /// <param name="index">The index array</param>
-    /// <param name="axis">int or None. The axis to picking the elements. Negative values means indexing from right to left. If is `None`, the elements in the index w.r.t the flattened input will be picked.</param>
-    /// <param name="keepdims">If true, the axis where we pick the elements is left in the result as dimension with size one.</param>
-    /// <param name="mode">Specify how out-of-bound indices behave. Default is &quot;clip&quot;. &quot;clip&quot; means clip to the range. So, if all indices mentioned are too large, they are replaced by the index that addresses the last element along an axis.  &quot;wrap&quot; means to wrap around.</param>
-    static member Pick(data : NDArray, 
-                       index : NDArray, 
-                       ?axis : int, 
-                       ?keepdims : bool, 
-                       ?mode : PickMode) =
+                       [<Optional>] ?axis : int, 
+                       [<Optional>] ?keepdims : bool, 
+                       [<Optional>] ?mode : PickMode) =
         let creator = AtomicSymbolCreator.FromName "pick"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; index.NDArrayHandle.UnsafeHandle|]
@@ -19795,9 +17886,9 @@ type Operators() =
     static member Pick(outputArray : NDArray seq, 
                        data : NDArray, 
                        index : NDArray, 
-                       ?axis : int, 
-                       ?keepdims : bool, 
-                       ?mode : PickMode) =
+                       [<Optional>] ?axis : int, 
+                       [<Optional>] ?keepdims : bool, 
+                       [<Optional>] ?mode : PickMode) =
         let creator = AtomicSymbolCreator.FromName "pick"
         let names = [|"axis"; "keepdims"; "mode"|]
         let vals = [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match mode with None -> "clip" | Some mode -> string mode)|]
@@ -19859,9 +17950,9 @@ type Operators() =
     /// <param name="mode">Specify how out-of-bound indices behave. Default is &quot;clip&quot;. &quot;clip&quot; means clip to the range. So, if all indices mentioned are too large, they are replaced by the index that addresses the last element along an axis.  &quot;wrap&quot; means to wrap around.</param>
     static member Pick(data : Symbol, 
                        index : Symbol, 
-                       ?axis : int, 
-                       ?keepdims : bool, 
-                       ?mode : PickMode) =
+                       [<Optional>] ?axis : int, 
+                       [<Optional>] ?keepdims : bool, 
+                       [<Optional>] ?mode : PickMode) =
         let creator = AtomicSymbolCreator.FromName "pick"
         new Symbol(Some creator,
                    [|"axis"; "keepdims"; "mode"|],
@@ -27447,92 +25538,10 @@ type Operators() =
     /// <param name="rhsBegin">Defaults to 0. The beginning index along which the rhs dimensions are to be used for reshaping. Supports negative indices.</param>
     /// <param name="rhsEnd">Defaults to None. The ending index along which the rhs dimensions are to be used for reshaping. Supports negative indices.</param>
     static member ShapeArray(data : NDArray, 
-                             [<Optional>] lhsBegin : int Nullable, 
-                             [<Optional>] lhsEnd : int Nullable, 
-                             [<Optional>] rhsBegin : int Nullable, 
-                             [<Optional>] rhsEnd : int Nullable) =
-        let creator = AtomicSymbolCreator.FromName "shape_array"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"lhs_begin"; "lhs_end"; "rhs_begin"; "rhs_end"|]
-                                                 [|string lhsBegin; string lhsEnd; string rhsBegin; string rhsEnd|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Returns a 1D int64 array containing the shape of data.
-    /// 
-    /// Example::
-    /// 
-    ///   shape_array([[1,2,3,4], [5,6,7,8]]) = [2,4]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L544</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input Array.</param>
-    /// <param name="lhsBegin">Defaults to 0. The beginning index along which the lhs dimensions are to be reshaped. Supports negative indices.</param>
-    /// <param name="lhsEnd">Defaults to None. The ending index along which the lhs dimensions are to be used for reshaping. Supports negative indices.</param>
-    /// <param name="rhsBegin">Defaults to 0. The beginning index along which the rhs dimensions are to be used for reshaping. Supports negative indices.</param>
-    /// <param name="rhsEnd">Defaults to None. The ending index along which the rhs dimensions are to be used for reshaping. Supports negative indices.</param>
-    static member ShapeArray(outputArray : NDArray seq, 
-                             data : NDArray, 
-                             [<Optional>] lhsBegin : int Nullable, 
-                             [<Optional>] lhsEnd : int Nullable, 
-                             [<Optional>] rhsBegin : int Nullable, 
-                             [<Optional>] rhsEnd : int Nullable) =
-        let creator = AtomicSymbolCreator.FromName "shape_array"
-        let names = [|"lhs_begin"; "lhs_end"; "rhs_begin"; "rhs_end"|]
-        let vals = [|string lhsBegin; string lhsEnd; string rhsBegin; string rhsEnd|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Returns a 1D int64 array containing the shape of data.
-    /// 
-    /// Example::
-    /// 
-    ///   shape_array([[1,2,3,4], [5,6,7,8]]) = [2,4]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L544</summary>
-    /// <param name="data">Input Array.</param>
-    /// <param name="lhsBegin">Defaults to 0. The beginning index along which the lhs dimensions are to be reshaped. Supports negative indices.</param>
-    /// <param name="lhsEnd">Defaults to None. The ending index along which the lhs dimensions are to be used for reshaping. Supports negative indices.</param>
-    /// <param name="rhsBegin">Defaults to 0. The beginning index along which the rhs dimensions are to be used for reshaping. Supports negative indices.</param>
-    /// <param name="rhsEnd">Defaults to None. The ending index along which the rhs dimensions are to be used for reshaping. Supports negative indices.</param>
-    static member ShapeArray(data : Symbol, 
-                             [<Optional>] lhsBegin : int Nullable, 
-                             [<Optional>] lhsEnd : int Nullable, 
-                             [<Optional>] rhsBegin : int Nullable, 
-                             [<Optional>] rhsEnd : int Nullable) =
-        let creator = AtomicSymbolCreator.FromName "shape_array"
-        new Symbol(Some creator,
-                   [|"lhs_begin"; "lhs_end"; "rhs_begin"; "rhs_end"|],
-                   [|string lhsBegin; string lhsEnd; string rhsBegin; string rhsEnd|],
-                   [|"data"|],
-                   [|data|])
-
-    /// <summary>Returns a 1D int64 array containing the shape of data.
-    /// 
-    /// Example::
-    /// 
-    ///   shape_array([[1,2,3,4], [5,6,7,8]]) = [2,4]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L544</summary>
-    /// <param name="data">Input Array.</param>
-    /// <param name="lhsBegin">Defaults to 0. The beginning index along which the lhs dimensions are to be reshaped. Supports negative indices.</param>
-    /// <param name="lhsEnd">Defaults to None. The ending index along which the lhs dimensions are to be used for reshaping. Supports negative indices.</param>
-    /// <param name="rhsBegin">Defaults to 0. The beginning index along which the rhs dimensions are to be used for reshaping. Supports negative indices.</param>
-    /// <param name="rhsEnd">Defaults to None. The ending index along which the rhs dimensions are to be used for reshaping. Supports negative indices.</param>
-    static member ShapeArray(data : NDArray, 
-                             ?lhsBegin : int, 
-                             ?lhsEnd : int, 
-                             ?rhsBegin : int, 
-                             ?rhsEnd : int) =
+                             [<Optional>] ?lhsBegin : int, 
+                             [<Optional>] ?lhsEnd : int, 
+                             [<Optional>] ?rhsBegin : int, 
+                             [<Optional>] ?rhsEnd : int) =
         let creator = AtomicSymbolCreator.FromName "shape_array"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -27556,10 +25565,10 @@ type Operators() =
     /// <param name="rhsEnd">Defaults to None. The ending index along which the rhs dimensions are to be used for reshaping. Supports negative indices.</param>
     static member ShapeArray(outputArray : NDArray seq, 
                              data : NDArray, 
-                             ?lhsBegin : int, 
-                             ?lhsEnd : int, 
-                             ?rhsBegin : int, 
-                             ?rhsEnd : int) =
+                             [<Optional>] ?lhsBegin : int, 
+                             [<Optional>] ?lhsEnd : int, 
+                             [<Optional>] ?rhsBegin : int, 
+                             [<Optional>] ?rhsEnd : int) =
         let creator = AtomicSymbolCreator.FromName "shape_array"
         let names = [|"lhs_begin"; "lhs_end"; "rhs_begin"; "rhs_end"|]
         let vals = [|(match lhsBegin with None -> "None" | Some lhsBegin -> string lhsBegin); (match lhsEnd with None -> "None" | Some lhsEnd -> string lhsEnd); (match rhsBegin with None -> "None" | Some rhsBegin -> string rhsBegin); (match rhsEnd with None -> "None" | Some rhsEnd -> string rhsEnd)|]
@@ -27585,10 +25594,10 @@ type Operators() =
     /// <param name="rhsBegin">Defaults to 0. The beginning index along which the rhs dimensions are to be used for reshaping. Supports negative indices.</param>
     /// <param name="rhsEnd">Defaults to None. The ending index along which the rhs dimensions are to be used for reshaping. Supports negative indices.</param>
     static member ShapeArray(data : Symbol, 
-                             ?lhsBegin : int, 
-                             ?lhsEnd : int, 
-                             ?rhsBegin : int, 
-                             ?rhsEnd : int) =
+                             [<Optional>] ?lhsBegin : int, 
+                             [<Optional>] ?lhsEnd : int, 
+                             [<Optional>] ?rhsBegin : int, 
+                             [<Optional>] ?rhsEnd : int) =
         let creator = AtomicSymbolCreator.FromName "shape_array"
         new Symbol(Some creator,
                    [|"lhs_begin"; "lhs_end"; "rhs_begin"; "rhs_end"|],
@@ -31564,85 +29573,7 @@ type Operators() =
     /// <param name="bins">Input ndarray</param>
     /// <param name="binCnt">Number of bins for uniform case</param>
     /// <param name="range">The lower and upper range of the bins. if not provided, range is simply (a.min(), a.max()). values outside the range are ignored. the first element of the range must be less than or equal to the second. range affects the automatic bin computation as well. while bin width is computed to be optimal based on the actual data within range, the bin count will fill the entire range including portions containing no data.</param>
-    static member Histogram(data : NDArray, bins : NDArray, [<Optional>] binCnt : int Nullable, [<Optional>] range : struct(float*float)) =
-        let creator = AtomicSymbolCreator.FromName "_histogram"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle; bins.NDArrayHandle.UnsafeHandle|]
-                                                 [|"bin_cnt"; "range"|]
-                                                 [|string binCnt; (if isNull (range :> obj) then "None" else string range)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>This operators implements the histogram function.
-    /// 
-    /// Example::
-    ///   x = [[0, 1], [2, 2], [3, 4]]
-    ///   histo, bin_edges = histogram(data=x, bin_bounds=[], bin_cnt=5, range=(0,5))
-    ///   histo = [1, 1, 2, 1, 1]
-    ///   bin_edges = [0., 1., 2., 3., 4.]
-    ///   histo, bin_edges = histogram(data=x, bin_bounds=[0., 2.1, 3.])
-    ///   histo = [4, 1]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\histogram.cc:L136</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input ndarray</param>
-    /// <param name="bins">Input ndarray</param>
-    /// <param name="binCnt">Number of bins for uniform case</param>
-    /// <param name="range">The lower and upper range of the bins. if not provided, range is simply (a.min(), a.max()). values outside the range are ignored. the first element of the range must be less than or equal to the second. range affects the automatic bin computation as well. while bin width is computed to be optimal based on the actual data within range, the bin count will fill the entire range including portions containing no data.</param>
-    static member Histogram(outputArray : NDArray seq, data : NDArray, bins : NDArray, [<Optional>] binCnt : int Nullable, [<Optional>] range : struct(float*float)) =
-        let creator = AtomicSymbolCreator.FromName "_histogram"
-        let names = [|"bin_cnt"; "range"|]
-        let vals = [|string binCnt; (if isNull (range :> obj) then "None" else string range)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle; bins.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>This operators implements the histogram function.
-    /// 
-    /// Example::
-    ///   x = [[0, 1], [2, 2], [3, 4]]
-    ///   histo, bin_edges = histogram(data=x, bin_bounds=[], bin_cnt=5, range=(0,5))
-    ///   histo = [1, 1, 2, 1, 1]
-    ///   bin_edges = [0., 1., 2., 3., 4.]
-    ///   histo, bin_edges = histogram(data=x, bin_bounds=[0., 2.1, 3.])
-    ///   histo = [4, 1]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\histogram.cc:L136</summary>
-    /// <param name="data">Input ndarray</param>
-    /// <param name="bins">Input ndarray</param>
-    /// <param name="binCnt">Number of bins for uniform case</param>
-    /// <param name="range">The lower and upper range of the bins. if not provided, range is simply (a.min(), a.max()). values outside the range are ignored. the first element of the range must be less than or equal to the second. range affects the automatic bin computation as well. while bin width is computed to be optimal based on the actual data within range, the bin count will fill the entire range including portions containing no data.</param>
-    static member Histogram(data : Symbol, bins : Symbol, [<Optional>] binCnt : int Nullable, [<Optional>] range : struct(float*float)) =
-        let creator = AtomicSymbolCreator.FromName "_histogram"
-        new Symbol(Some creator,
-                   [|"bin_cnt"; "range"|],
-                   [|string binCnt; (if isNull (range :> obj) then "None" else string range)|],
-                   [|"data"; "bins"|],
-                   [|data; bins|])
-
-    /// <summary>This operators implements the histogram function.
-    /// 
-    /// Example::
-    ///   x = [[0, 1], [2, 2], [3, 4]]
-    ///   histo, bin_edges = histogram(data=x, bin_bounds=[], bin_cnt=5, range=(0,5))
-    ///   histo = [1, 1, 2, 1, 1]
-    ///   bin_edges = [0., 1., 2., 3., 4.]
-    ///   histo, bin_edges = histogram(data=x, bin_bounds=[0., 2.1, 3.])
-    ///   histo = [4, 1]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\histogram.cc:L136</summary>
-    /// <param name="data">Input ndarray</param>
-    /// <param name="bins">Input ndarray</param>
-    /// <param name="binCnt">Number of bins for uniform case</param>
-    /// <param name="range">The lower and upper range of the bins. if not provided, range is simply (a.min(), a.max()). values outside the range are ignored. the first element of the range must be less than or equal to the second. range affects the automatic bin computation as well. while bin width is computed to be optimal based on the actual data within range, the bin count will fill the entire range including portions containing no data.</param>
-    static member Histogram(data : NDArray, bins : NDArray, ?binCnt : int, ?range : struct(float*float)) =
+    static member Histogram(data : NDArray, bins : NDArray, [<Optional>] ?binCnt : int, [<Optional>] ?range : struct(float*float)) =
         let creator = AtomicSymbolCreator.FromName "_histogram"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; bins.NDArrayHandle.UnsafeHandle|]
@@ -31667,7 +29598,7 @@ type Operators() =
     /// <param name="bins">Input ndarray</param>
     /// <param name="binCnt">Number of bins for uniform case</param>
     /// <param name="range">The lower and upper range of the bins. if not provided, range is simply (a.min(), a.max()). values outside the range are ignored. the first element of the range must be less than or equal to the second. range affects the automatic bin computation as well. while bin width is computed to be optimal based on the actual data within range, the bin count will fill the entire range including portions containing no data.</param>
-    static member Histogram(outputArray : NDArray seq, data : NDArray, bins : NDArray, ?binCnt : int, ?range : struct(float*float)) =
+    static member Histogram(outputArray : NDArray seq, data : NDArray, bins : NDArray, [<Optional>] ?binCnt : int, [<Optional>] ?range : struct(float*float)) =
         let creator = AtomicSymbolCreator.FromName "_histogram"
         let names = [|"bin_cnt"; "range"|]
         let vals = [|(match binCnt with None -> "None" | Some binCnt -> string binCnt); (match range with None -> "None" | Some range -> string range)|]
@@ -31695,7 +29626,7 @@ type Operators() =
     /// <param name="bins">Input ndarray</param>
     /// <param name="binCnt">Number of bins for uniform case</param>
     /// <param name="range">The lower and upper range of the bins. if not provided, range is simply (a.min(), a.max()). values outside the range are ignored. the first element of the range must be less than or equal to the second. range affects the automatic bin computation as well. while bin width is computed to be optimal based on the actual data within range, the bin count will fill the entire range including portions containing no data.</param>
-    static member Histogram(data : Symbol, bins : Symbol, ?binCnt : int, ?range : struct(float*float)) =
+    static member Histogram(data : Symbol, bins : Symbol, [<Optional>] ?binCnt : int, [<Optional>] ?range : struct(float*float)) =
         let creator = AtomicSymbolCreator.FromName "_histogram"
         new Symbol(Some creator,
                    [|"bin_cnt"; "range"|],
@@ -31720,85 +29651,7 @@ type Operators() =
     /// <param name="bins">Input ndarray</param>
     /// <param name="binCnt">Number of bins for uniform case</param>
     /// <param name="range">The lower and upper range of the bins. if not provided, range is simply (a.min(), a.max()). values outside the range are ignored. the first element of the range must be less than or equal to the second. range affects the automatic bin computation as well. while bin width is computed to be optimal based on the actual data within range, the bin count will fill the entire range including portions containing no data.</param>
-    static member Histogram(data : NDArray, bins : NDArray, [<Optional>] binCnt : int Nullable, [<Optional>] range : float*float) =
-        let creator = AtomicSymbolCreator.FromName "_histogram"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle; bins.NDArrayHandle.UnsafeHandle|]
-                                                 [|"bin_cnt"; "range"|]
-                                                 [|string binCnt; (if isNull (range :> obj) then "None" else string range)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>This operators implements the histogram function.
-    /// 
-    /// Example::
-    ///   x = [[0, 1], [2, 2], [3, 4]]
-    ///   histo, bin_edges = histogram(data=x, bin_bounds=[], bin_cnt=5, range=(0,5))
-    ///   histo = [1, 1, 2, 1, 1]
-    ///   bin_edges = [0., 1., 2., 3., 4.]
-    ///   histo, bin_edges = histogram(data=x, bin_bounds=[0., 2.1, 3.])
-    ///   histo = [4, 1]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\histogram.cc:L136</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input ndarray</param>
-    /// <param name="bins">Input ndarray</param>
-    /// <param name="binCnt">Number of bins for uniform case</param>
-    /// <param name="range">The lower and upper range of the bins. if not provided, range is simply (a.min(), a.max()). values outside the range are ignored. the first element of the range must be less than or equal to the second. range affects the automatic bin computation as well. while bin width is computed to be optimal based on the actual data within range, the bin count will fill the entire range including portions containing no data.</param>
-    static member Histogram(outputArray : NDArray seq, data : NDArray, bins : NDArray, [<Optional>] binCnt : int Nullable, [<Optional>] range : float*float) =
-        let creator = AtomicSymbolCreator.FromName "_histogram"
-        let names = [|"bin_cnt"; "range"|]
-        let vals = [|string binCnt; (if isNull (range :> obj) then "None" else string range)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle; bins.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>This operators implements the histogram function.
-    /// 
-    /// Example::
-    ///   x = [[0, 1], [2, 2], [3, 4]]
-    ///   histo, bin_edges = histogram(data=x, bin_bounds=[], bin_cnt=5, range=(0,5))
-    ///   histo = [1, 1, 2, 1, 1]
-    ///   bin_edges = [0., 1., 2., 3., 4.]
-    ///   histo, bin_edges = histogram(data=x, bin_bounds=[0., 2.1, 3.])
-    ///   histo = [4, 1]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\histogram.cc:L136</summary>
-    /// <param name="data">Input ndarray</param>
-    /// <param name="bins">Input ndarray</param>
-    /// <param name="binCnt">Number of bins for uniform case</param>
-    /// <param name="range">The lower and upper range of the bins. if not provided, range is simply (a.min(), a.max()). values outside the range are ignored. the first element of the range must be less than or equal to the second. range affects the automatic bin computation as well. while bin width is computed to be optimal based on the actual data within range, the bin count will fill the entire range including portions containing no data.</param>
-    static member Histogram(data : Symbol, bins : Symbol, [<Optional>] binCnt : int Nullable, [<Optional>] range : float*float) =
-        let creator = AtomicSymbolCreator.FromName "_histogram"
-        new Symbol(Some creator,
-                   [|"bin_cnt"; "range"|],
-                   [|string binCnt; (if isNull (range :> obj) then "None" else string range)|],
-                   [|"data"; "bins"|],
-                   [|data; bins|])
-
-    /// <summary>This operators implements the histogram function.
-    /// 
-    /// Example::
-    ///   x = [[0, 1], [2, 2], [3, 4]]
-    ///   histo, bin_edges = histogram(data=x, bin_bounds=[], bin_cnt=5, range=(0,5))
-    ///   histo = [1, 1, 2, 1, 1]
-    ///   bin_edges = [0., 1., 2., 3., 4.]
-    ///   histo, bin_edges = histogram(data=x, bin_bounds=[0., 2.1, 3.])
-    ///   histo = [4, 1]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\histogram.cc:L136</summary>
-    /// <param name="data">Input ndarray</param>
-    /// <param name="bins">Input ndarray</param>
-    /// <param name="binCnt">Number of bins for uniform case</param>
-    /// <param name="range">The lower and upper range of the bins. if not provided, range is simply (a.min(), a.max()). values outside the range are ignored. the first element of the range must be less than or equal to the second. range affects the automatic bin computation as well. while bin width is computed to be optimal based on the actual data within range, the bin count will fill the entire range including portions containing no data.</param>
-    static member Histogram(data : NDArray, bins : NDArray, ?binCnt : int, ?range : float*float) =
+    static member Histogram(data : NDArray, bins : NDArray, [<Optional>] ?binCnt : int, [<Optional>] ?range : float*float) =
         let creator = AtomicSymbolCreator.FromName "_histogram"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; bins.NDArrayHandle.UnsafeHandle|]
@@ -31823,7 +29676,7 @@ type Operators() =
     /// <param name="bins">Input ndarray</param>
     /// <param name="binCnt">Number of bins for uniform case</param>
     /// <param name="range">The lower and upper range of the bins. if not provided, range is simply (a.min(), a.max()). values outside the range are ignored. the first element of the range must be less than or equal to the second. range affects the automatic bin computation as well. while bin width is computed to be optimal based on the actual data within range, the bin count will fill the entire range including portions containing no data.</param>
-    static member Histogram(outputArray : NDArray seq, data : NDArray, bins : NDArray, ?binCnt : int, ?range : float*float) =
+    static member Histogram(outputArray : NDArray seq, data : NDArray, bins : NDArray, [<Optional>] ?binCnt : int, [<Optional>] ?range : float*float) =
         let creator = AtomicSymbolCreator.FromName "_histogram"
         let names = [|"bin_cnt"; "range"|]
         let vals = [|(match binCnt with None -> "None" | Some binCnt -> string binCnt); (match range with None -> "None" | Some range -> string range)|]
@@ -31851,7 +29704,7 @@ type Operators() =
     /// <param name="bins">Input ndarray</param>
     /// <param name="binCnt">Number of bins for uniform case</param>
     /// <param name="range">The lower and upper range of the bins. if not provided, range is simply (a.min(), a.max()). values outside the range are ignored. the first element of the range must be less than or equal to the second. range affects the automatic bin computation as well. while bin width is computed to be optimal based on the actual data within range, the bin count will fill the entire range including portions containing no data.</param>
-    static member Histogram(data : Symbol, bins : Symbol, ?binCnt : int, ?range : float*float) =
+    static member Histogram(data : Symbol, bins : Symbol, [<Optional>] ?binCnt : int, [<Optional>] ?range : float*float) =
         let creator = AtomicSymbolCreator.FromName "_histogram"
         new Symbol(Some creator,
                    [|"bin_cnt"; "range"|],
@@ -37199,118 +35052,7 @@ type Operators() =
     /// <param name="axis">Axis along which to be sliced, supports negative indexes.</param>
     /// <param name="sliceBegin">The beginning index along the axis to be sliced,  supports negative indexes.</param>
     /// <param name="sliceEnd">The ending index along the axis to be sliced,  supports negative indexes.</param>
-    static member SliceAxis(data : NDArray, axis : int, sliceBegin : int, [<Optional>] sliceEnd : int Nullable) =
-        let creator = AtomicSymbolCreator.FromName "slice_axis"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"axis"; "begin"; "end"|]
-                                                 [|string axis; string sliceBegin; string sliceEnd|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Slices along a given axis.
-    /// 
-    /// Returns an array slice along a given `axis` starting from the `begin` index
-    /// to the `end` index.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[  1.,   2.,   3.,   4.],
-    ///        [  5.,   6.,   7.,   8.],
-    ///        [  9.,  10.,  11.,  12.]]
-    /// 
-    ///   slice_axis(x, axis=0, begin=1, end=3) = [[  5.,   6.,   7.,   8.],
-    ///                                            [  9.,  10.,  11.,  12.]]
-    /// 
-    ///   slice_axis(x, axis=1, begin=0, end=2) = [[  1.,   2.],
-    ///                                            [  5.,   6.],
-    ///                                            [  9.,  10.]]
-    /// 
-    ///   slice_axis(x, axis=1, begin=-3, end=-1) = [[  2.,   3.],
-    ///                                              [  6.,   7.],
-    ///                                              [ 10.,  11.]]
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L598</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Source input</param>
-    /// <param name="axis">Axis along which to be sliced, supports negative indexes.</param>
-    /// <param name="sliceBegin">The beginning index along the axis to be sliced,  supports negative indexes.</param>
-    /// <param name="sliceEnd">The ending index along the axis to be sliced,  supports negative indexes.</param>
-    static member SliceAxis(outputArray : NDArray seq, data : NDArray, axis : int, sliceBegin : int, [<Optional>] sliceEnd : int Nullable) =
-        let creator = AtomicSymbolCreator.FromName "slice_axis"
-        let names = [|"axis"; "begin"; "end"|]
-        let vals = [|string axis; string sliceBegin; string sliceEnd|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Slices along a given axis.
-    /// 
-    /// Returns an array slice along a given `axis` starting from the `begin` index
-    /// to the `end` index.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[  1.,   2.,   3.,   4.],
-    ///        [  5.,   6.,   7.,   8.],
-    ///        [  9.,  10.,  11.,  12.]]
-    /// 
-    ///   slice_axis(x, axis=0, begin=1, end=3) = [[  5.,   6.,   7.,   8.],
-    ///                                            [  9.,  10.,  11.,  12.]]
-    /// 
-    ///   slice_axis(x, axis=1, begin=0, end=2) = [[  1.,   2.],
-    ///                                            [  5.,   6.],
-    ///                                            [  9.,  10.]]
-    /// 
-    ///   slice_axis(x, axis=1, begin=-3, end=-1) = [[  2.,   3.],
-    ///                                              [  6.,   7.],
-    ///                                              [ 10.,  11.]]
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L598</summary>
-    /// <param name="data">Source input</param>
-    /// <param name="axis">Axis along which to be sliced, supports negative indexes.</param>
-    /// <param name="sliceBegin">The beginning index along the axis to be sliced,  supports negative indexes.</param>
-    /// <param name="sliceEnd">The ending index along the axis to be sliced,  supports negative indexes.</param>
-    static member SliceAxis(data : Symbol, axis : int, sliceBegin : int, [<Optional>] sliceEnd : int Nullable) =
-        let creator = AtomicSymbolCreator.FromName "slice_axis"
-        new Symbol(Some creator,
-                   [|"axis"; "begin"; "end"|],
-                   [|string axis; string sliceBegin; string sliceEnd|],
-                   [|"data"|],
-                   [|data|])
-
-    /// <summary>Slices along a given axis.
-    /// 
-    /// Returns an array slice along a given `axis` starting from the `begin` index
-    /// to the `end` index.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[  1.,   2.,   3.,   4.],
-    ///        [  5.,   6.,   7.,   8.],
-    ///        [  9.,  10.,  11.,  12.]]
-    /// 
-    ///   slice_axis(x, axis=0, begin=1, end=3) = [[  5.,   6.,   7.,   8.],
-    ///                                            [  9.,  10.,  11.,  12.]]
-    /// 
-    ///   slice_axis(x, axis=1, begin=0, end=2) = [[  1.,   2.],
-    ///                                            [  5.,   6.],
-    ///                                            [  9.,  10.]]
-    /// 
-    ///   slice_axis(x, axis=1, begin=-3, end=-1) = [[  2.,   3.],
-    ///                                              [  6.,   7.],
-    ///                                              [ 10.,  11.]]
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L598</summary>
-    /// <param name="data">Source input</param>
-    /// <param name="axis">Axis along which to be sliced, supports negative indexes.</param>
-    /// <param name="sliceBegin">The beginning index along the axis to be sliced,  supports negative indexes.</param>
-    /// <param name="sliceEnd">The ending index along the axis to be sliced,  supports negative indexes.</param>
-    static member SliceAxis(data : NDArray, axis : int, sliceBegin : int, ?sliceEnd : int) =
+    static member SliceAxis(data : NDArray, axis : int, sliceBegin : int, [<Optional>] ?sliceEnd : int) =
         let creator = AtomicSymbolCreator.FromName "slice_axis"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -37346,7 +35088,7 @@ type Operators() =
     /// <param name="axis">Axis along which to be sliced, supports negative indexes.</param>
     /// <param name="sliceBegin">The beginning index along the axis to be sliced,  supports negative indexes.</param>
     /// <param name="sliceEnd">The ending index along the axis to be sliced,  supports negative indexes.</param>
-    static member SliceAxis(outputArray : NDArray seq, data : NDArray, axis : int, sliceBegin : int, ?sliceEnd : int) =
+    static member SliceAxis(outputArray : NDArray seq, data : NDArray, axis : int, sliceBegin : int, [<Optional>] ?sliceEnd : int) =
         let creator = AtomicSymbolCreator.FromName "slice_axis"
         let names = [|"axis"; "begin"; "end"|]
         let vals = [|string axis; string sliceBegin; (match sliceEnd with None -> "None" | Some sliceEnd -> string sliceEnd)|]
@@ -37385,7 +35127,7 @@ type Operators() =
     /// <param name="axis">Axis along which to be sliced, supports negative indexes.</param>
     /// <param name="sliceBegin">The beginning index along the axis to be sliced,  supports negative indexes.</param>
     /// <param name="sliceEnd">The ending index along the axis to be sliced,  supports negative indexes.</param>
-    static member SliceAxis(data : Symbol, axis : int, sliceBegin : int, ?sliceEnd : int) =
+    static member SliceAxis(data : Symbol, axis : int, sliceBegin : int, [<Optional>] ?sliceEnd : int) =
         let creator = AtomicSymbolCreator.FromName "slice_axis"
         new Symbol(Some creator,
                    [|"axis"; "begin"; "end"|],
@@ -37815,121 +35557,7 @@ type Operators() =
     /// <param name="data">Input data array</param>
     /// <param name="repeats">The number of repetitions for each element.</param>
     /// <param name="axis">The axis along which to repeat values. The negative numbers are interpreted counting from the backward. By default, use the flattened input array, and return a flat output array.</param>
-    static member Repeat(data : NDArray, repeats : int, [<Optional>] axis : int Nullable) =
-        let creator = AtomicSymbolCreator.FromName "repeat"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"repeats"; "axis"|]
-                                                 [|string repeats; string axis|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Repeats elements of an array.
-    /// 
-    /// By default, ``repeat`` flattens the input array into 1-D and then repeats the
-    /// elements::
-    /// 
-    ///   x = [[ 1, 2],
-    ///        [ 3, 4]]
-    /// 
-    ///   repeat(x, repeats=2) = [ 1.,  1.,  2.,  2.,  3.,  3.,  4.,  4.]
-    /// 
-    /// The parameter ``axis`` specifies the axis along which to perform repeat::
-    /// 
-    ///   repeat(x, repeats=2, axis=1) = [[ 1.,  1.,  2.,  2.],
-    ///                                   [ 3.,  3.,  4.,  4.]]
-    /// 
-    ///   repeat(x, repeats=2, axis=0) = [[ 1.,  2.],
-    ///                                   [ 1.,  2.],
-    ///                                   [ 3.,  4.],
-    ///                                   [ 3.,  4.]]
-    /// 
-    ///   repeat(x, repeats=2, axis=-1) = [[ 1.,  1.,  2.,  2.],
-    ///                                    [ 3.,  3.,  4.,  4.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L798</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input data array</param>
-    /// <param name="repeats">The number of repetitions for each element.</param>
-    /// <param name="axis">The axis along which to repeat values. The negative numbers are interpreted counting from the backward. By default, use the flattened input array, and return a flat output array.</param>
-    static member Repeat(outputArray : NDArray seq, data : NDArray, repeats : int, [<Optional>] axis : int Nullable) =
-        let creator = AtomicSymbolCreator.FromName "repeat"
-        let names = [|"repeats"; "axis"|]
-        let vals = [|string repeats; string axis|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Repeats elements of an array.
-    /// 
-    /// By default, ``repeat`` flattens the input array into 1-D and then repeats the
-    /// elements::
-    /// 
-    ///   x = [[ 1, 2],
-    ///        [ 3, 4]]
-    /// 
-    ///   repeat(x, repeats=2) = [ 1.,  1.,  2.,  2.,  3.,  3.,  4.,  4.]
-    /// 
-    /// The parameter ``axis`` specifies the axis along which to perform repeat::
-    /// 
-    ///   repeat(x, repeats=2, axis=1) = [[ 1.,  1.,  2.,  2.],
-    ///                                   [ 3.,  3.,  4.,  4.]]
-    /// 
-    ///   repeat(x, repeats=2, axis=0) = [[ 1.,  2.],
-    ///                                   [ 1.,  2.],
-    ///                                   [ 3.,  4.],
-    ///                                   [ 3.,  4.]]
-    /// 
-    ///   repeat(x, repeats=2, axis=-1) = [[ 1.,  1.,  2.,  2.],
-    ///                                    [ 3.,  3.,  4.,  4.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L798</summary>
-    /// <param name="data">Input data array</param>
-    /// <param name="repeats">The number of repetitions for each element.</param>
-    /// <param name="axis">The axis along which to repeat values. The negative numbers are interpreted counting from the backward. By default, use the flattened input array, and return a flat output array.</param>
-    static member Repeat(data : Symbol, repeats : int, [<Optional>] axis : int Nullable) =
-        let creator = AtomicSymbolCreator.FromName "repeat"
-        new Symbol(Some creator,
-                   [|"repeats"; "axis"|],
-                   [|string repeats; string axis|],
-                   [|"data"|],
-                   [|data|])
-
-    /// <summary>Repeats elements of an array.
-    /// 
-    /// By default, ``repeat`` flattens the input array into 1-D and then repeats the
-    /// elements::
-    /// 
-    ///   x = [[ 1, 2],
-    ///        [ 3, 4]]
-    /// 
-    ///   repeat(x, repeats=2) = [ 1.,  1.,  2.,  2.,  3.,  3.,  4.,  4.]
-    /// 
-    /// The parameter ``axis`` specifies the axis along which to perform repeat::
-    /// 
-    ///   repeat(x, repeats=2, axis=1) = [[ 1.,  1.,  2.,  2.],
-    ///                                   [ 3.,  3.,  4.,  4.]]
-    /// 
-    ///   repeat(x, repeats=2, axis=0) = [[ 1.,  2.],
-    ///                                   [ 1.,  2.],
-    ///                                   [ 3.,  4.],
-    ///                                   [ 3.,  4.]]
-    /// 
-    ///   repeat(x, repeats=2, axis=-1) = [[ 1.,  1.,  2.,  2.],
-    ///                                    [ 3.,  3.,  4.,  4.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L798</summary>
-    /// <param name="data">Input data array</param>
-    /// <param name="repeats">The number of repetitions for each element.</param>
-    /// <param name="axis">The axis along which to repeat values. The negative numbers are interpreted counting from the backward. By default, use the flattened input array, and return a flat output array.</param>
-    static member Repeat(data : NDArray, repeats : int, ?axis : int) =
+    static member Repeat(data : NDArray, repeats : int, [<Optional>] ?axis : int) =
         let creator = AtomicSymbolCreator.FromName "repeat"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -37966,7 +35594,7 @@ type Operators() =
     /// <param name="data">Input data array</param>
     /// <param name="repeats">The number of repetitions for each element.</param>
     /// <param name="axis">The axis along which to repeat values. The negative numbers are interpreted counting from the backward. By default, use the flattened input array, and return a flat output array.</param>
-    static member Repeat(outputArray : NDArray seq, data : NDArray, repeats : int, ?axis : int) =
+    static member Repeat(outputArray : NDArray seq, data : NDArray, repeats : int, [<Optional>] ?axis : int) =
         let creator = AtomicSymbolCreator.FromName "repeat"
         let names = [|"repeats"; "axis"|]
         let vals = [|string repeats; (match axis with None -> "None" | Some axis -> string axis)|]
@@ -38006,7 +35634,7 @@ type Operators() =
     /// <param name="data">Input data array</param>
     /// <param name="repeats">The number of repetitions for each element.</param>
     /// <param name="axis">The axis along which to repeat values. The negative numbers are interpreted counting from the backward. By default, use the flattened input array, and return a flat output array.</param>
-    static member Repeat(data : Symbol, repeats : int, ?axis : int) =
+    static member Repeat(data : Symbol, repeats : int, [<Optional>] ?axis : int) =
         let creator = AtomicSymbolCreator.FromName "repeat"
         new Symbol(Some creator,
                    [|"repeats"; "axis"|],
@@ -39151,165 +36779,11 @@ type Operators() =
     /// <param name="isAscend">Whether to choose k largest or k smallest elements. Top K largest elements will be chosen if set to false.</param>
     /// <param name="dtype">DType of the output indices when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
     static member Topk(data : NDArray, 
-                       [<Optional>] axis : int Nullable, 
-                       [<Optional; DefaultParameterValue(1)>] k : int, 
-                       [<Optional>] retTyp : RetTyp, 
-                       [<Optional; DefaultParameterValue(false)>] isAscend : bool, 
-                       [<Optional>] dtype : TopkDtype) =
-        let creator = AtomicSymbolCreator.FromName "topk"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"axis"; "k"; "ret_typ"; "is_ascend"; "dtype"|]
-                                                 [|string axis; string k; (if isNull (retTyp :> obj) then "indices" else string retTyp); string isAscend; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Returns the top *k* elements in an input array along the given axis.
-    ///  The returned elements will be sorted.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 0.3,  0.2,  0.4],
-    ///        [ 0.1,  0.3,  0.2]]
-    /// 
-    ///   // returns an index of the largest element on last axis
-    ///   topk(x) = [[ 2.],
-    ///              [ 1.]]
-    /// 
-    ///   // returns the value of top-2 largest elements on last axis
-    ///   topk(x, ret_typ=&#39;value&#39;, k=2) = [[ 0.4,  0.3],
-    ///                                    [ 0.3,  0.2]]
-    /// 
-    ///   // returns the value of top-2 smallest elements on last axis
-    ///   topk(x, ret_typ=&#39;value&#39;, k=2, is_ascend=1) = [[ 0.2 ,  0.3],
-    ///                                                [ 0.1 ,  0.2]]
-    /// 
-    ///   // returns the value of top-2 largest elements on axis 0
-    ///   topk(x, axis=0, ret_typ=&#39;value&#39;, k=2) = [[ 0.3,  0.3,  0.4],
-    ///                                            [ 0.1,  0.2,  0.2]]
-    /// 
-    ///   // flattens and then returns list of both values and indices
-    ///   topk(x, ret_typ=&#39;both&#39;, k=2) = [[[ 0.4,  0.3], [ 0.3,  0.2]] ,  [[ 2.,  0.], [ 1.,  2.]]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L64</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">The input array</param>
-    /// <param name="axis">Axis along which to choose the top k indices. If not given, the flattened array is used. Default is -1.</param>
-    /// <param name="k">Number of top elements to select, should be always smaller than or equal to the element number in the given axis. A global sort is performed if set k &lt; 1.</param>
-    /// <param name="retTyp">The return type.
-    ///  &quot;value&quot; means to return the top k values, &quot;indices&quot; means to return the indices of the top k values, &quot;mask&quot; means to return a mask array containing 0 and 1. 1 means the top k values. &quot;both&quot; means to return a list of both values and indices of top k elements.</param>
-    /// <param name="isAscend">Whether to choose k largest or k smallest elements. Top K largest elements will be chosen if set to false.</param>
-    /// <param name="dtype">DType of the output indices when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
-    static member Topk(outputArray : NDArray seq, 
-                       data : NDArray, 
-                       [<Optional>] axis : int Nullable, 
-                       [<Optional; DefaultParameterValue(1)>] k : int, 
-                       [<Optional>] retTyp : RetTyp, 
-                       [<Optional; DefaultParameterValue(false)>] isAscend : bool, 
-                       [<Optional>] dtype : TopkDtype) =
-        let creator = AtomicSymbolCreator.FromName "topk"
-        let names = [|"axis"; "k"; "ret_typ"; "is_ascend"; "dtype"|]
-        let vals = [|string axis; string k; (if isNull (retTyp :> obj) then "indices" else string retTyp); string isAscend; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Returns the top *k* elements in an input array along the given axis.
-    ///  The returned elements will be sorted.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 0.3,  0.2,  0.4],
-    ///        [ 0.1,  0.3,  0.2]]
-    /// 
-    ///   // returns an index of the largest element on last axis
-    ///   topk(x) = [[ 2.],
-    ///              [ 1.]]
-    /// 
-    ///   // returns the value of top-2 largest elements on last axis
-    ///   topk(x, ret_typ=&#39;value&#39;, k=2) = [[ 0.4,  0.3],
-    ///                                    [ 0.3,  0.2]]
-    /// 
-    ///   // returns the value of top-2 smallest elements on last axis
-    ///   topk(x, ret_typ=&#39;value&#39;, k=2, is_ascend=1) = [[ 0.2 ,  0.3],
-    ///                                                [ 0.1 ,  0.2]]
-    /// 
-    ///   // returns the value of top-2 largest elements on axis 0
-    ///   topk(x, axis=0, ret_typ=&#39;value&#39;, k=2) = [[ 0.3,  0.3,  0.4],
-    ///                                            [ 0.1,  0.2,  0.2]]
-    /// 
-    ///   // flattens and then returns list of both values and indices
-    ///   topk(x, ret_typ=&#39;both&#39;, k=2) = [[[ 0.4,  0.3], [ 0.3,  0.2]] ,  [[ 2.,  0.], [ 1.,  2.]]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L64</summary>
-    /// <param name="data">The input array</param>
-    /// <param name="axis">Axis along which to choose the top k indices. If not given, the flattened array is used. Default is -1.</param>
-    /// <param name="k">Number of top elements to select, should be always smaller than or equal to the element number in the given axis. A global sort is performed if set k &lt; 1.</param>
-    /// <param name="retTyp">The return type.
-    ///  &quot;value&quot; means to return the top k values, &quot;indices&quot; means to return the indices of the top k values, &quot;mask&quot; means to return a mask array containing 0 and 1. 1 means the top k values. &quot;both&quot; means to return a list of both values and indices of top k elements.</param>
-    /// <param name="isAscend">Whether to choose k largest or k smallest elements. Top K largest elements will be chosen if set to false.</param>
-    /// <param name="dtype">DType of the output indices when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
-    static member Topk(data : Symbol, 
-                       [<Optional>] axis : int Nullable, 
-                       [<Optional; DefaultParameterValue(1)>] k : int, 
-                       [<Optional>] retTyp : RetTyp, 
-                       [<Optional; DefaultParameterValue(false)>] isAscend : bool, 
-                       [<Optional>] dtype : TopkDtype) =
-        let creator = AtomicSymbolCreator.FromName "topk"
-        new Symbol(Some creator,
-                   [|"axis"; "k"; "ret_typ"; "is_ascend"; "dtype"|],
-                   [|string axis; string k; (if isNull (retTyp :> obj) then "indices" else string retTyp); string isAscend; (if isNull (dtype :> obj) then "float32" else string dtype)|],
-                   [|"data"|],
-                   [|data|])
-
-    /// <summary>Returns the top *k* elements in an input array along the given axis.
-    ///  The returned elements will be sorted.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 0.3,  0.2,  0.4],
-    ///        [ 0.1,  0.3,  0.2]]
-    /// 
-    ///   // returns an index of the largest element on last axis
-    ///   topk(x) = [[ 2.],
-    ///              [ 1.]]
-    /// 
-    ///   // returns the value of top-2 largest elements on last axis
-    ///   topk(x, ret_typ=&#39;value&#39;, k=2) = [[ 0.4,  0.3],
-    ///                                    [ 0.3,  0.2]]
-    /// 
-    ///   // returns the value of top-2 smallest elements on last axis
-    ///   topk(x, ret_typ=&#39;value&#39;, k=2, is_ascend=1) = [[ 0.2 ,  0.3],
-    ///                                                [ 0.1 ,  0.2]]
-    /// 
-    ///   // returns the value of top-2 largest elements on axis 0
-    ///   topk(x, axis=0, ret_typ=&#39;value&#39;, k=2) = [[ 0.3,  0.3,  0.4],
-    ///                                            [ 0.1,  0.2,  0.2]]
-    /// 
-    ///   // flattens and then returns list of both values and indices
-    ///   topk(x, ret_typ=&#39;both&#39;, k=2) = [[[ 0.4,  0.3], [ 0.3,  0.2]] ,  [[ 2.,  0.], [ 1.,  2.]]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L64</summary>
-    /// <param name="data">The input array</param>
-    /// <param name="axis">Axis along which to choose the top k indices. If not given, the flattened array is used. Default is -1.</param>
-    /// <param name="k">Number of top elements to select, should be always smaller than or equal to the element number in the given axis. A global sort is performed if set k &lt; 1.</param>
-    /// <param name="retTyp">The return type.
-    ///  &quot;value&quot; means to return the top k values, &quot;indices&quot; means to return the indices of the top k values, &quot;mask&quot; means to return a mask array containing 0 and 1. 1 means the top k values. &quot;both&quot; means to return a list of both values and indices of top k elements.</param>
-    /// <param name="isAscend">Whether to choose k largest or k smallest elements. Top K largest elements will be chosen if set to false.</param>
-    /// <param name="dtype">DType of the output indices when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
-    static member Topk(data : NDArray, 
-                       ?axis : int, 
-                       ?k : int, 
-                       ?retTyp : RetTyp, 
-                       ?isAscend : bool, 
-                       ?dtype : TopkDtype) =
+                       [<Optional>] ?axis : int, 
+                       [<Optional>] ?k : int, 
+                       [<Optional>] ?retTyp : RetTyp, 
+                       [<Optional>] ?isAscend : bool, 
+                       [<Optional>] ?dtype : TopkDtype) =
         let creator = AtomicSymbolCreator.FromName "topk"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -39356,11 +36830,11 @@ type Operators() =
     /// <param name="dtype">DType of the output indices when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
     static member Topk(outputArray : NDArray seq, 
                        data : NDArray, 
-                       ?axis : int, 
-                       ?k : int, 
-                       ?retTyp : RetTyp, 
-                       ?isAscend : bool, 
-                       ?dtype : TopkDtype) =
+                       [<Optional>] ?axis : int, 
+                       [<Optional>] ?k : int, 
+                       [<Optional>] ?retTyp : RetTyp, 
+                       [<Optional>] ?isAscend : bool, 
+                       [<Optional>] ?dtype : TopkDtype) =
         let creator = AtomicSymbolCreator.FromName "topk"
         let names = [|"axis"; "k"; "ret_typ"; "is_ascend"; "dtype"|]
         let vals = [|(match axis with None -> "None" | Some axis -> string axis); (match k with None -> "1" | Some k -> string k); (match retTyp with None -> "indices" | Some retTyp -> string retTyp); (match isAscend with None -> "false" | Some isAscend -> string isAscend); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
@@ -39409,11 +36883,11 @@ type Operators() =
     /// <param name="isAscend">Whether to choose k largest or k smallest elements. Top K largest elements will be chosen if set to false.</param>
     /// <param name="dtype">DType of the output indices when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
     static member Topk(data : Symbol, 
-                       ?axis : int, 
-                       ?k : int, 
-                       ?retTyp : RetTyp, 
-                       ?isAscend : bool, 
-                       ?dtype : TopkDtype) =
+                       [<Optional>] ?axis : int, 
+                       [<Optional>] ?k : int, 
+                       [<Optional>] ?retTyp : RetTyp, 
+                       [<Optional>] ?isAscend : bool, 
+                       [<Optional>] ?dtype : TopkDtype) =
         let creator = AtomicSymbolCreator.FromName "topk"
         new Symbol(Some creator,
                    [|"axis"; "k"; "ret_typ"; "is_ascend"; "dtype"|],
@@ -39476,118 +36950,7 @@ type Operators() =
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to choose sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
-    static member Sort(data : NDArray, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(true)>] isAscend : bool) =
-        let creator = AtomicSymbolCreator.FromName "sort"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"axis"; "is_ascend"|]
-                                                 [|string axis; string isAscend|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Returns a sorted copy of an input array along the given axis.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 1, 4],
-    ///        [ 3, 1]]
-    /// 
-    ///   // sorts along the last axis
-    ///   sort(x) = [[ 1.,  4.],
-    ///              [ 1.,  3.]]
-    /// 
-    ///   // flattens and then sorts
-    ///   sort(x) = [ 1.,  1.,  3.,  4.]
-    /// 
-    ///   // sorts along the first axis
-    ///   sort(x, axis=0) = [[ 1.,  1.],
-    ///                      [ 3.,  4.]]
-    /// 
-    ///   // in a descend order
-    ///   sort(x, is_ascend=0) = [[ 4.,  1.],
-    ///                           [ 3.,  1.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L127</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">The input array</param>
-    /// <param name="axis">Axis along which to choose sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
-    /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
-    static member Sort(outputArray : NDArray seq, data : NDArray, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(true)>] isAscend : bool) =
-        let creator = AtomicSymbolCreator.FromName "sort"
-        let names = [|"axis"; "is_ascend"|]
-        let vals = [|string axis; string isAscend|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Returns a sorted copy of an input array along the given axis.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 1, 4],
-    ///        [ 3, 1]]
-    /// 
-    ///   // sorts along the last axis
-    ///   sort(x) = [[ 1.,  4.],
-    ///              [ 1.,  3.]]
-    /// 
-    ///   // flattens and then sorts
-    ///   sort(x) = [ 1.,  1.,  3.,  4.]
-    /// 
-    ///   // sorts along the first axis
-    ///   sort(x, axis=0) = [[ 1.,  1.],
-    ///                      [ 3.,  4.]]
-    /// 
-    ///   // in a descend order
-    ///   sort(x, is_ascend=0) = [[ 4.,  1.],
-    ///                           [ 3.,  1.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L127</summary>
-    /// <param name="data">The input array</param>
-    /// <param name="axis">Axis along which to choose sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
-    /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
-    static member Sort(data : Symbol, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(true)>] isAscend : bool) =
-        let creator = AtomicSymbolCreator.FromName "sort"
-        new Symbol(Some creator,
-                   [|"axis"; "is_ascend"|],
-                   [|string axis; string isAscend|],
-                   [|"data"|],
-                   [|data|])
-
-    /// <summary>Returns a sorted copy of an input array along the given axis.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 1, 4],
-    ///        [ 3, 1]]
-    /// 
-    ///   // sorts along the last axis
-    ///   sort(x) = [[ 1.,  4.],
-    ///              [ 1.,  3.]]
-    /// 
-    ///   // flattens and then sorts
-    ///   sort(x) = [ 1.,  1.,  3.,  4.]
-    /// 
-    ///   // sorts along the first axis
-    ///   sort(x, axis=0) = [[ 1.,  1.],
-    ///                      [ 3.,  4.]]
-    /// 
-    ///   // in a descend order
-    ///   sort(x, is_ascend=0) = [[ 4.,  1.],
-    ///                           [ 3.,  1.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L127</summary>
-    /// <param name="data">The input array</param>
-    /// <param name="axis">Axis along which to choose sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
-    /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
-    static member Sort(data : NDArray, ?axis : int, ?isAscend : bool) =
+    static member Sort(data : NDArray, [<Optional>] ?axis : int, [<Optional>] ?isAscend : bool) =
         let creator = AtomicSymbolCreator.FromName "sort"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -39623,7 +36986,7 @@ type Operators() =
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to choose sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
-    static member Sort(outputArray : NDArray seq, data : NDArray, ?axis : int, ?isAscend : bool) =
+    static member Sort(outputArray : NDArray seq, data : NDArray, [<Optional>] ?axis : int, [<Optional>] ?isAscend : bool) =
         let creator = AtomicSymbolCreator.FromName "sort"
         let names = [|"axis"; "is_ascend"|]
         let vals = [|(match axis with None -> "None" | Some axis -> string axis); (match isAscend with None -> "true" | Some isAscend -> string isAscend)|]
@@ -39662,7 +37025,7 @@ type Operators() =
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to choose sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
-    static member Sort(data : Symbol, ?axis : int, ?isAscend : bool) =
+    static member Sort(data : Symbol, [<Optional>] ?axis : int, [<Optional>] ?isAscend : bool) =
         let creator = AtomicSymbolCreator.FromName "sort"
         new Symbol(Some creator,
                    [|"axis"; "is_ascend"|],
@@ -39697,115 +37060,7 @@ type Operators() =
     /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
     /// <param name="dtype">DType of the output indices. It is only valid when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
-    static member Argsort(data : NDArray, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(true)>] isAscend : bool, [<Optional>] dtype : ArgsortDtype) =
-        let creator = AtomicSymbolCreator.FromName "argsort"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"axis"; "is_ascend"; "dtype"|]
-                                                 [|string axis; string isAscend; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Returns the indices that would sort an input array along the given axis.
-    /// 
-    /// This function performs sorting along the given axis and returns an array of indices having same shape
-    /// as an input array that index data in sorted order.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 0.3,  0.2,  0.4],
-    ///        [ 0.1,  0.3,  0.2]]
-    /// 
-    ///   // sort along axis -1
-    ///   argsort(x) = [[ 1.,  0.,  2.],
-    ///                 [ 0.,  2.,  1.]]
-    /// 
-    ///   // sort along axis 0
-    ///   argsort(x, axis=0) = [[ 1.,  0.,  1.]
-    ///                         [ 0.,  1.,  0.]]
-    /// 
-    ///   // flatten and then sort
-    ///   argsort(x) = [ 3.,  1.,  5.,  0.,  4.,  2.]
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L177</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">The input array</param>
-    /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
-    /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
-    /// <param name="dtype">DType of the output indices. It is only valid when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
-    static member Argsort(outputArray : NDArray seq, data : NDArray, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(true)>] isAscend : bool, [<Optional>] dtype : ArgsortDtype) =
-        let creator = AtomicSymbolCreator.FromName "argsort"
-        let names = [|"axis"; "is_ascend"; "dtype"|]
-        let vals = [|string axis; string isAscend; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Returns the indices that would sort an input array along the given axis.
-    /// 
-    /// This function performs sorting along the given axis and returns an array of indices having same shape
-    /// as an input array that index data in sorted order.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 0.3,  0.2,  0.4],
-    ///        [ 0.1,  0.3,  0.2]]
-    /// 
-    ///   // sort along axis -1
-    ///   argsort(x) = [[ 1.,  0.,  2.],
-    ///                 [ 0.,  2.,  1.]]
-    /// 
-    ///   // sort along axis 0
-    ///   argsort(x, axis=0) = [[ 1.,  0.,  1.]
-    ///                         [ 0.,  1.,  0.]]
-    /// 
-    ///   // flatten and then sort
-    ///   argsort(x) = [ 3.,  1.,  5.,  0.,  4.,  2.]
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L177</summary>
-    /// <param name="data">The input array</param>
-    /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
-    /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
-    /// <param name="dtype">DType of the output indices. It is only valid when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
-    static member Argsort(data : Symbol, [<Optional>] axis : int Nullable, [<Optional; DefaultParameterValue(true)>] isAscend : bool, [<Optional>] dtype : ArgsortDtype) =
-        let creator = AtomicSymbolCreator.FromName "argsort"
-        new Symbol(Some creator,
-                   [|"axis"; "is_ascend"; "dtype"|],
-                   [|string axis; string isAscend; (if isNull (dtype :> obj) then "float32" else string dtype)|],
-                   [|"data"|],
-                   [|data|])
-
-    /// <summary>Returns the indices that would sort an input array along the given axis.
-    /// 
-    /// This function performs sorting along the given axis and returns an array of indices having same shape
-    /// as an input array that index data in sorted order.
-    /// 
-    /// Examples::
-    /// 
-    ///   x = [[ 0.3,  0.2,  0.4],
-    ///        [ 0.1,  0.3,  0.2]]
-    /// 
-    ///   // sort along axis -1
-    ///   argsort(x) = [[ 1.,  0.,  2.],
-    ///                 [ 0.,  2.,  1.]]
-    /// 
-    ///   // sort along axis 0
-    ///   argsort(x, axis=0) = [[ 1.,  0.,  1.]
-    ///                         [ 0.,  1.,  0.]]
-    /// 
-    ///   // flatten and then sort
-    ///   argsort(x) = [ 3.,  1.,  5.,  0.,  4.,  2.]
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L177</summary>
-    /// <param name="data">The input array</param>
-    /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
-    /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
-    /// <param name="dtype">DType of the output indices. It is only valid when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
-    static member Argsort(data : NDArray, ?axis : int, ?isAscend : bool, ?dtype : ArgsortDtype) =
+    static member Argsort(data : NDArray, [<Optional>] ?axis : int, [<Optional>] ?isAscend : bool, [<Optional>] ?dtype : ArgsortDtype) =
         let creator = AtomicSymbolCreator.FromName "argsort"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -39840,7 +37095,7 @@ type Operators() =
     /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
     /// <param name="dtype">DType of the output indices. It is only valid when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
-    static member Argsort(outputArray : NDArray seq, data : NDArray, ?axis : int, ?isAscend : bool, ?dtype : ArgsortDtype) =
+    static member Argsort(outputArray : NDArray seq, data : NDArray, [<Optional>] ?axis : int, [<Optional>] ?isAscend : bool, [<Optional>] ?dtype : ArgsortDtype) =
         let creator = AtomicSymbolCreator.FromName "argsort"
         let names = [|"axis"; "is_ascend"; "dtype"|]
         let vals = [|(match axis with None -> "None" | Some axis -> string axis); (match isAscend with None -> "true" | Some isAscend -> string isAscend); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
@@ -39878,7 +37133,7 @@ type Operators() =
     /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
     /// <param name="dtype">DType of the output indices. It is only valid when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
-    static member Argsort(data : Symbol, ?axis : int, ?isAscend : bool, ?dtype : ArgsortDtype) =
+    static member Argsort(data : Symbol, [<Optional>] ?axis : int, [<Optional>] ?isAscend : bool, [<Optional>] ?dtype : ArgsortDtype) =
         let creator = AtomicSymbolCreator.FromName "argsort"
         new Symbol(Some creator,
                    [|"axis"; "is_ascend"; "dtype"|],
@@ -40398,265 +37653,7 @@ type Operators() =
     /// <param name="data">Input data to the BilinearsamplerOp.</param>
     /// <param name="grid">Input grid to the BilinearsamplerOp.grid has two channels: x_src, y_src</param>
     /// <param name="cudnnOff">whether to turn cudnn off</param>
-    static member BilinearSampler(data : NDArray, grid : NDArray, [<Optional>] cudnnOff : bool Nullable) =
-        let creator = AtomicSymbolCreator.FromName "BilinearSampler"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle; grid.NDArrayHandle.UnsafeHandle|]
-                                                 [|"cudnn_off"|]
-                                                 [|string cudnnOff|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Applies bilinear sampling to input feature map.
-    /// 
-    /// Bilinear Sampling is the key of  [NIPS2015] \&quot;Spatial Transformer Networks\&quot;. The usage of the operator is very similar to remap function in OpenCV,
-    /// except that the operator has the backward pass.
-    /// 
-    /// Given :math:`data` and :math:`grid`, then the output is computed by
-    /// 
-    /// .. math::
-    ///   x_{src} = grid[batch, 0, y_{dst}, x_{dst}] \\
-    ///   y_{src} = grid[batch, 1, y_{dst}, x_{dst}] \\
-    ///   output[batch, channel, y_{dst}, x_{dst}] = G(data[batch, channel, y_{src}, x_{src})
-    /// 
-    /// :math:`x_{dst}`, :math:`y_{dst}` enumerate all spatial locations in :math:`output`, and :math:`G()` denotes the bilinear interpolation kernel.
-    /// The out-boundary points will be padded with zeros.The shape of the output will be (data.shape[0], data.shape[1], grid.shape[2], grid.shape[3]).
-    /// 
-    /// The operator assumes that :math:`data` has &#39;NCHW&#39; layout and :math:`grid` has been normalized to [-1, 1].
-    /// 
-    /// BilinearSampler often cooperates with GridGenerator which generates sampling grids for BilinearSampler.
-    /// GridGenerator supports two kinds of transformation: ``affine`` and ``warp``.
-    /// If users want to design a CustomOp to manipulate :math:`grid`, please firstly refer to the code of GridGenerator.
-    /// 
-    /// Example 1::
-    /// 
-    ///   ## Zoom out data two times
-    ///   data = array([[[[1, 4, 3, 6],
-    ///                   [1, 8, 8, 9],
-    ///                   [0, 4, 1, 5],
-    ///                   [1, 0, 1, 3]]]])
-    /// 
-    ///   affine_matrix = array([[2, 0, 0],
-    ///                          [0, 2, 0]])
-    /// 
-    ///   affine_matrix = reshape(affine_matrix, shape=(1, 6))
-    /// 
-    ///   grid = GridGenerator(data=affine_matrix, transform_type=&#39;affine&#39;, target_shape=(4, 4))
-    /// 
-    ///   out = BilinearSampler(data, grid)
-    /// 
-    ///   out
-    ///   [[[[ 0,   0,     0,   0],
-    ///      [ 0,   3.5,   6.5, 0],
-    ///      [ 0,   1.25,  2.5, 0],
-    ///      [ 0,   0,     0,   0]]]
-    /// 
-    /// 
-    /// Example 2::
-    /// 
-    ///   ## shift data horizontally by -1 pixel
-    /// 
-    ///   data = array([[[[1, 4, 3, 6],
-    ///                   [1, 8, 8, 9],
-    ///                   [0, 4, 1, 5],
-    ///                   [1, 0, 1, 3]]]])
-    /// 
-    ///   warp_maxtrix = array([[[[1, 1, 1, 1],
-    ///                           [1, 1, 1, 1],
-    ///                           [1, 1, 1, 1],
-    ///                           [1, 1, 1, 1]],
-    ///                          [[0, 0, 0, 0],
-    ///                           [0, 0, 0, 0],
-    ///                           [0, 0, 0, 0],
-    ///                           [0, 0, 0, 0]]]])
-    /// 
-    ///   grid = GridGenerator(data=warp_matrix, transform_type=&#39;warp&#39;)
-    ///   out = BilinearSampler(data, grid)
-    /// 
-    ///   out
-    ///   [[[[ 4,  3,  6,  0],
-    ///      [ 8,  8,  9,  0],
-    ///      [ 4,  1,  5,  0],
-    ///      [ 0,  1,  3,  0]]]
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\bilinear_sampler.cc:L256</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input data to the BilinearsamplerOp.</param>
-    /// <param name="grid">Input grid to the BilinearsamplerOp.grid has two channels: x_src, y_src</param>
-    /// <param name="cudnnOff">whether to turn cudnn off</param>
-    static member BilinearSampler(outputArray : NDArray seq, data : NDArray, grid : NDArray, [<Optional>] cudnnOff : bool Nullable) =
-        let creator = AtomicSymbolCreator.FromName "BilinearSampler"
-        let names = [|"cudnn_off"|]
-        let vals = [|string cudnnOff|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle; grid.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Applies bilinear sampling to input feature map.
-    /// 
-    /// Bilinear Sampling is the key of  [NIPS2015] \&quot;Spatial Transformer Networks\&quot;. The usage of the operator is very similar to remap function in OpenCV,
-    /// except that the operator has the backward pass.
-    /// 
-    /// Given :math:`data` and :math:`grid`, then the output is computed by
-    /// 
-    /// .. math::
-    ///   x_{src} = grid[batch, 0, y_{dst}, x_{dst}] \\
-    ///   y_{src} = grid[batch, 1, y_{dst}, x_{dst}] \\
-    ///   output[batch, channel, y_{dst}, x_{dst}] = G(data[batch, channel, y_{src}, x_{src})
-    /// 
-    /// :math:`x_{dst}`, :math:`y_{dst}` enumerate all spatial locations in :math:`output`, and :math:`G()` denotes the bilinear interpolation kernel.
-    /// The out-boundary points will be padded with zeros.The shape of the output will be (data.shape[0], data.shape[1], grid.shape[2], grid.shape[3]).
-    /// 
-    /// The operator assumes that :math:`data` has &#39;NCHW&#39; layout and :math:`grid` has been normalized to [-1, 1].
-    /// 
-    /// BilinearSampler often cooperates with GridGenerator which generates sampling grids for BilinearSampler.
-    /// GridGenerator supports two kinds of transformation: ``affine`` and ``warp``.
-    /// If users want to design a CustomOp to manipulate :math:`grid`, please firstly refer to the code of GridGenerator.
-    /// 
-    /// Example 1::
-    /// 
-    ///   ## Zoom out data two times
-    ///   data = array([[[[1, 4, 3, 6],
-    ///                   [1, 8, 8, 9],
-    ///                   [0, 4, 1, 5],
-    ///                   [1, 0, 1, 3]]]])
-    /// 
-    ///   affine_matrix = array([[2, 0, 0],
-    ///                          [0, 2, 0]])
-    /// 
-    ///   affine_matrix = reshape(affine_matrix, shape=(1, 6))
-    /// 
-    ///   grid = GridGenerator(data=affine_matrix, transform_type=&#39;affine&#39;, target_shape=(4, 4))
-    /// 
-    ///   out = BilinearSampler(data, grid)
-    /// 
-    ///   out
-    ///   [[[[ 0,   0,     0,   0],
-    ///      [ 0,   3.5,   6.5, 0],
-    ///      [ 0,   1.25,  2.5, 0],
-    ///      [ 0,   0,     0,   0]]]
-    /// 
-    /// 
-    /// Example 2::
-    /// 
-    ///   ## shift data horizontally by -1 pixel
-    /// 
-    ///   data = array([[[[1, 4, 3, 6],
-    ///                   [1, 8, 8, 9],
-    ///                   [0, 4, 1, 5],
-    ///                   [1, 0, 1, 3]]]])
-    /// 
-    ///   warp_maxtrix = array([[[[1, 1, 1, 1],
-    ///                           [1, 1, 1, 1],
-    ///                           [1, 1, 1, 1],
-    ///                           [1, 1, 1, 1]],
-    ///                          [[0, 0, 0, 0],
-    ///                           [0, 0, 0, 0],
-    ///                           [0, 0, 0, 0],
-    ///                           [0, 0, 0, 0]]]])
-    /// 
-    ///   grid = GridGenerator(data=warp_matrix, transform_type=&#39;warp&#39;)
-    ///   out = BilinearSampler(data, grid)
-    /// 
-    ///   out
-    ///   [[[[ 4,  3,  6,  0],
-    ///      [ 8,  8,  9,  0],
-    ///      [ 4,  1,  5,  0],
-    ///      [ 0,  1,  3,  0]]]
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\bilinear_sampler.cc:L256</summary>
-    /// <param name="data">Input data to the BilinearsamplerOp.</param>
-    /// <param name="grid">Input grid to the BilinearsamplerOp.grid has two channels: x_src, y_src</param>
-    /// <param name="cudnnOff">whether to turn cudnn off</param>
-    static member BilinearSampler(data : Symbol, grid : Symbol, [<Optional>] cudnnOff : bool Nullable) =
-        let creator = AtomicSymbolCreator.FromName "BilinearSampler"
-        new Symbol(Some creator,
-                   [|"cudnn_off"|],
-                   [|string cudnnOff|],
-                   [|"data"; "grid"|],
-                   [|data; grid|])
-
-    /// <summary>Applies bilinear sampling to input feature map.
-    /// 
-    /// Bilinear Sampling is the key of  [NIPS2015] \&quot;Spatial Transformer Networks\&quot;. The usage of the operator is very similar to remap function in OpenCV,
-    /// except that the operator has the backward pass.
-    /// 
-    /// Given :math:`data` and :math:`grid`, then the output is computed by
-    /// 
-    /// .. math::
-    ///   x_{src} = grid[batch, 0, y_{dst}, x_{dst}] \\
-    ///   y_{src} = grid[batch, 1, y_{dst}, x_{dst}] \\
-    ///   output[batch, channel, y_{dst}, x_{dst}] = G(data[batch, channel, y_{src}, x_{src})
-    /// 
-    /// :math:`x_{dst}`, :math:`y_{dst}` enumerate all spatial locations in :math:`output`, and :math:`G()` denotes the bilinear interpolation kernel.
-    /// The out-boundary points will be padded with zeros.The shape of the output will be (data.shape[0], data.shape[1], grid.shape[2], grid.shape[3]).
-    /// 
-    /// The operator assumes that :math:`data` has &#39;NCHW&#39; layout and :math:`grid` has been normalized to [-1, 1].
-    /// 
-    /// BilinearSampler often cooperates with GridGenerator which generates sampling grids for BilinearSampler.
-    /// GridGenerator supports two kinds of transformation: ``affine`` and ``warp``.
-    /// If users want to design a CustomOp to manipulate :math:`grid`, please firstly refer to the code of GridGenerator.
-    /// 
-    /// Example 1::
-    /// 
-    ///   ## Zoom out data two times
-    ///   data = array([[[[1, 4, 3, 6],
-    ///                   [1, 8, 8, 9],
-    ///                   [0, 4, 1, 5],
-    ///                   [1, 0, 1, 3]]]])
-    /// 
-    ///   affine_matrix = array([[2, 0, 0],
-    ///                          [0, 2, 0]])
-    /// 
-    ///   affine_matrix = reshape(affine_matrix, shape=(1, 6))
-    /// 
-    ///   grid = GridGenerator(data=affine_matrix, transform_type=&#39;affine&#39;, target_shape=(4, 4))
-    /// 
-    ///   out = BilinearSampler(data, grid)
-    /// 
-    ///   out
-    ///   [[[[ 0,   0,     0,   0],
-    ///      [ 0,   3.5,   6.5, 0],
-    ///      [ 0,   1.25,  2.5, 0],
-    ///      [ 0,   0,     0,   0]]]
-    /// 
-    /// 
-    /// Example 2::
-    /// 
-    ///   ## shift data horizontally by -1 pixel
-    /// 
-    ///   data = array([[[[1, 4, 3, 6],
-    ///                   [1, 8, 8, 9],
-    ///                   [0, 4, 1, 5],
-    ///                   [1, 0, 1, 3]]]])
-    /// 
-    ///   warp_maxtrix = array([[[[1, 1, 1, 1],
-    ///                           [1, 1, 1, 1],
-    ///                           [1, 1, 1, 1],
-    ///                           [1, 1, 1, 1]],
-    ///                          [[0, 0, 0, 0],
-    ///                           [0, 0, 0, 0],
-    ///                           [0, 0, 0, 0],
-    ///                           [0, 0, 0, 0]]]])
-    /// 
-    ///   grid = GridGenerator(data=warp_matrix, transform_type=&#39;warp&#39;)
-    ///   out = BilinearSampler(data, grid)
-    /// 
-    ///   out
-    ///   [[[[ 4,  3,  6,  0],
-    ///      [ 8,  8,  9,  0],
-    ///      [ 4,  1,  5,  0],
-    ///      [ 0,  1,  3,  0]]]
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\bilinear_sampler.cc:L256</summary>
-    /// <param name="data">Input data to the BilinearsamplerOp.</param>
-    /// <param name="grid">Input grid to the BilinearsamplerOp.grid has two channels: x_src, y_src</param>
-    /// <param name="cudnnOff">whether to turn cudnn off</param>
-    static member BilinearSampler(data : NDArray, grid : NDArray, ?cudnnOff : bool) =
+    static member BilinearSampler(data : NDArray, grid : NDArray, [<Optional>] ?cudnnOff : bool) =
         let creator = AtomicSymbolCreator.FromName "BilinearSampler"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; grid.NDArrayHandle.UnsafeHandle|]
@@ -40741,7 +37738,7 @@ type Operators() =
     /// <param name="data">Input data to the BilinearsamplerOp.</param>
     /// <param name="grid">Input grid to the BilinearsamplerOp.grid has two channels: x_src, y_src</param>
     /// <param name="cudnnOff">whether to turn cudnn off</param>
-    static member BilinearSampler(outputArray : NDArray seq, data : NDArray, grid : NDArray, ?cudnnOff : bool) =
+    static member BilinearSampler(outputArray : NDArray seq, data : NDArray, grid : NDArray, [<Optional>] ?cudnnOff : bool) =
         let creator = AtomicSymbolCreator.FromName "BilinearSampler"
         let names = [|"cudnn_off"|]
         let vals = [|(match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff)|]
@@ -40829,7 +37826,7 @@ type Operators() =
     /// <param name="data">Input data to the BilinearsamplerOp.</param>
     /// <param name="grid">Input grid to the BilinearsamplerOp.grid has two channels: x_src, y_src</param>
     /// <param name="cudnnOff">whether to turn cudnn off</param>
-    static member BilinearSampler(data : Symbol, grid : Symbol, ?cudnnOff : bool) =
+    static member BilinearSampler(data : Symbol, grid : Symbol, [<Optional>] ?cudnnOff : bool) =
         let creator = AtomicSymbolCreator.FromName "BilinearSampler"
         new Symbol(Some creator,
                    [|"cudnn_off"|],
@@ -44014,55 +41011,7 @@ type Operators() =
     /// <param name="samplerType">sampling type</param>
     /// <param name="cudnnOff">whether to turn cudnn off</param>
     /// <param name="targetShape">output shape(h, w) of spatial transformer: (y, x)</param>
-    static member SpatialTransformer(data : NDArray, loc : NDArray, [<Optional>] cudnnOff : bool Nullable, [<Optional>] targetShape : int seq) =
-        let creator = AtomicSymbolCreator.FromName "SpatialTransformer"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|data.NDArrayHandle.UnsafeHandle; loc.NDArrayHandle.UnsafeHandle|]
-                                                 [|"transform_type"; "sampler_type"; "cudnn_off"; "target_shape"|]
-                                                 [|"affine"; "bilinear"; string cudnnOff; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", "))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Applies a spatial transformer to input feature map.</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input data to the SpatialTransformerOp.</param>
-    /// <param name="loc">localisation net, the output dim should be 6 when transform_type is affine. You shold initialize the weight and bias with identity tranform.</param>
-    /// <param name="transformType">transformation type</param>
-    /// <param name="samplerType">sampling type</param>
-    /// <param name="cudnnOff">whether to turn cudnn off</param>
-    /// <param name="targetShape">output shape(h, w) of spatial transformer: (y, x)</param>
-    static member SpatialTransformer(outputArray : NDArray seq, data : NDArray, loc : NDArray, [<Optional>] cudnnOff : bool Nullable, [<Optional>] targetShape : int seq) =
-        let creator = AtomicSymbolCreator.FromName "SpatialTransformer"
-        let names = [|"transform_type"; "sampler_type"; "cudnn_off"; "target_shape"|]
-        let vals = [|"affine"; "bilinear"; string cudnnOff; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", "))|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|data.NDArrayHandle.UnsafeHandle; loc.NDArrayHandle.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Applies a spatial transformer to input feature map.</summary>
-    /// <param name="data">Input data to the SpatialTransformerOp.</param>
-    /// <param name="loc">localisation net, the output dim should be 6 when transform_type is affine. You shold initialize the weight and bias with identity tranform.</param>
-    /// <param name="transformType">transformation type</param>
-    /// <param name="samplerType">sampling type</param>
-    /// <param name="cudnnOff">whether to turn cudnn off</param>
-    /// <param name="targetShape">output shape(h, w) of spatial transformer: (y, x)</param>
-    static member SpatialTransformer(data : Symbol, loc : Symbol, [<Optional>] cudnnOff : bool Nullable, [<Optional>] targetShape : int seq) =
-        let creator = AtomicSymbolCreator.FromName "SpatialTransformer"
-        new Symbol(Some creator,
-                   [|"transform_type"; "sampler_type"; "cudnn_off"; "target_shape"|],
-                   [|"affine"; "bilinear"; string cudnnOff; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", "))|],
-                   [|"data"; "loc"|],
-                   [|data; loc|])
-
-    /// <summary>Applies a spatial transformer to input feature map.</summary>
-    /// <param name="data">Input data to the SpatialTransformerOp.</param>
-    /// <param name="loc">localisation net, the output dim should be 6 when transform_type is affine. You shold initialize the weight and bias with identity tranform.</param>
-    /// <param name="transformType">transformation type</param>
-    /// <param name="samplerType">sampling type</param>
-    /// <param name="cudnnOff">whether to turn cudnn off</param>
-    /// <param name="targetShape">output shape(h, w) of spatial transformer: (y, x)</param>
-    static member SpatialTransformer(data : NDArray, loc : NDArray, ?cudnnOff : bool, ?targetShape : int seq) =
+    static member SpatialTransformer(data : NDArray, loc : NDArray, [<Optional>] ?cudnnOff : bool, [<Optional>] ?targetShape : int seq) =
         let creator = AtomicSymbolCreator.FromName "SpatialTransformer"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; loc.NDArrayHandle.UnsafeHandle|]
@@ -44077,7 +41026,7 @@ type Operators() =
     /// <param name="samplerType">sampling type</param>
     /// <param name="cudnnOff">whether to turn cudnn off</param>
     /// <param name="targetShape">output shape(h, w) of spatial transformer: (y, x)</param>
-    static member SpatialTransformer(outputArray : NDArray seq, data : NDArray, loc : NDArray, ?cudnnOff : bool, ?targetShape : int seq) =
+    static member SpatialTransformer(outputArray : NDArray seq, data : NDArray, loc : NDArray, [<Optional>] ?cudnnOff : bool, [<Optional>] ?targetShape : int seq) =
         let creator = AtomicSymbolCreator.FromName "SpatialTransformer"
         let names = [|"transform_type"; "sampler_type"; "cudnn_off"; "target_shape"|]
         let vals = [|"affine"; "bilinear"; (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match targetShape with None -> "[0,0]" | Some targetShape -> (targetShape |> Seq.map string |> String.concat ", "))|]
@@ -44095,7 +41044,7 @@ type Operators() =
     /// <param name="samplerType">sampling type</param>
     /// <param name="cudnnOff">whether to turn cudnn off</param>
     /// <param name="targetShape">output shape(h, w) of spatial transformer: (y, x)</param>
-    static member SpatialTransformer(data : Symbol, loc : Symbol, ?cudnnOff : bool, ?targetShape : int seq) =
+    static member SpatialTransformer(data : Symbol, loc : Symbol, [<Optional>] ?cudnnOff : bool, [<Optional>] ?targetShape : int seq) =
         let creator = AtomicSymbolCreator.FromName "SpatialTransformer"
         new Symbol(Some creator,
                    [|"transform_type"; "sampler_type"; "cudnn_off"; "target_shape"|],
@@ -45056,82 +42005,12 @@ type Operators() =
 //     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
 //     /// <param name="dtype">Target data type.</param>
 //     static member ArangeNDArray(start : double, 
-//                                 [<Optional>] stop : float Nullable, 
-//                                 [<Optional; DefaultParameterValue(1.0)>] step : double, 
-//                                 [<Optional; DefaultParameterValue(1)>] repeat : int, 
-//                                 [<Optional; DefaultParameterValue(false)>] inferRange : bool, 
-//                                 [<Optional; DefaultParameterValue("")>] ctx : string, 
-//                                 [<Optional>] dtype : IntOrFloatDType) =
-//         let creator = AtomicSymbolCreator.FromName "_arange"
-//         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-//                                                  Array.empty
-//                                                  [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
-//                                                  [|string start; string stop; string step; string repeat; string inferRange; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-//         outputs |> Array.map (fun h -> new NDArray(h))
-//     /// <summary>Return evenly spaced values within a given interval. Similar to Numpy</summary>
-//     /// <param name = "outputArray">Array of NDArray for outputs</param>
-//     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
-//     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
-//     /// <param name="step">Spacing between values.</param>
-//     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
-//     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
-//     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
-//     /// <param name="dtype">Target data type.</param>
-//     static member Arange(outputArray : NDArray seq, 
-//                          start : double, 
-//                          [<Optional>] stop : float Nullable, 
-//                          [<Optional; DefaultParameterValue(1.0)>] step : double, 
-//                          [<Optional; DefaultParameterValue(1)>] repeat : int, 
-//                          [<Optional; DefaultParameterValue(false)>] inferRange : bool, 
-//                          [<Optional; DefaultParameterValue("")>] ctx : string, 
-//                          [<Optional>] dtype : IntOrFloatDType) =
-//         let creator = AtomicSymbolCreator.FromName "_arange"
-//         let names = [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
-//         let vals = [|string start; string stop; string step; string repeat; string inferRange; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-//         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-//         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-//                                                      Array.empty
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-//                                                      names
-//                                                      vals
-//         ()
-//     /// <summary>Return evenly spaced values within a given interval. Similar to Numpy</summary>
-//     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
-//     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
-//     /// <param name="step">Spacing between values.</param>
-//     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
-//     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
-//     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
-//     /// <param name="dtype">Target data type.</param>
-//     static member ArangeSymbol(start : double, 
-//                                [<Optional>] stop : float Nullable, 
-//                                [<Optional; DefaultParameterValue(1.0)>] step : double, 
-//                                [<Optional; DefaultParameterValue(1)>] repeat : int, 
-//                                [<Optional; DefaultParameterValue(false)>] inferRange : bool, 
-//                                [<Optional; DefaultParameterValue("")>] ctx : string, 
-//                                [<Optional>] dtype : IntOrFloatDType) =
-//         let creator = AtomicSymbolCreator.FromName "_arange"
-//         new Symbol(Some creator,
-//                    [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|],
-//                    [|string start; string stop; string step; string repeat; string inferRange; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
-//                    Array.empty,
-//                    Array.empty)
-
-//     /// <summary>Return evenly spaced values within a given interval. Similar to Numpy</summary>
-//     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
-//     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
-//     /// <param name="step">Spacing between values.</param>
-//     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
-//     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
-//     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
-//     /// <param name="dtype">Target data type.</param>
-//     static member ArangeNDArray(start : double, 
-//                                 ?stop : float, 
-//                                 ?step : double, 
-//                                 ?repeat : int, 
-//                                 ?inferRange : bool, 
-//                                 ?ctx : string, 
-//                                 ?dtype : IntOrFloatDType) =
+//                                 [<Optional>] ?stop : float, 
+//                                 [<Optional>] ?step : double, 
+//                                 [<Optional>] ?repeat : int, 
+//                                 [<Optional>] ?inferRange : bool, 
+//                                 [<Optional>] ?ctx : string, 
+//                                 [<Optional>] ?dtype : IntOrFloatDType) =
 //         let creator = AtomicSymbolCreator.FromName "_arange"
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
@@ -45149,12 +42028,12 @@ type Operators() =
 //     /// <param name="dtype">Target data type.</param>
 //     static member Arange(outputArray : NDArray seq, 
 //                          start : double, 
-//                          ?stop : float, 
-//                          ?step : double, 
-//                          ?repeat : int, 
-//                          ?inferRange : bool, 
-//                          ?ctx : string, 
-//                          ?dtype : IntOrFloatDType) =
+//                          [<Optional>] ?stop : float, 
+//                          [<Optional>] ?step : double, 
+//                          [<Optional>] ?repeat : int, 
+//                          [<Optional>] ?inferRange : bool, 
+//                          [<Optional>] ?ctx : string, 
+//                          [<Optional>] ?dtype : IntOrFloatDType) =
 //         let creator = AtomicSymbolCreator.FromName "_arange"
 //         let names = [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
 //         let vals = [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
@@ -45174,12 +42053,12 @@ type Operators() =
 //     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
 //     /// <param name="dtype">Target data type.</param>
 //     static member ArangeSymbol(start : double, 
-//                                ?stop : float, 
-//                                ?step : double, 
-//                                ?repeat : int, 
-//                                ?inferRange : bool, 
-//                                ?ctx : string, 
-//                                ?dtype : IntOrFloatDType) =
+//                                [<Optional>] ?stop : float, 
+//                                [<Optional>] ?step : double, 
+//                                [<Optional>] ?repeat : int, 
+//                                [<Optional>] ?inferRange : bool, 
+//                                [<Optional>] ?ctx : string, 
+//                                [<Optional>] ?dtype : IntOrFloatDType) =
 //         let creator = AtomicSymbolCreator.FromName "_arange"
 //         new Symbol(Some creator,
 //                    [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|],
@@ -45214,82 +42093,12 @@ type Operators() =
 //     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
 //     /// <param name="dtype">Target data type.</param>
 //     static member LinspaceNDArray(start : double, 
-//                                   [<Optional>] stop : float Nullable, 
-//                                   [<Optional; DefaultParameterValue(1.0)>] step : double, 
-//                                   [<Optional; DefaultParameterValue(1)>] repeat : int, 
-//                                   [<Optional; DefaultParameterValue(false)>] inferRange : bool, 
-//                                   [<Optional; DefaultParameterValue("")>] ctx : string, 
-//                                   [<Optional>] dtype : IntOrFloatDType) =
-//         let creator = AtomicSymbolCreator.FromName "_linspace"
-//         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-//                                                  Array.empty
-//                                                  [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
-//                                                  [|string start; string stop; string step; string repeat; string inferRange; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-//         outputs |> Array.map (fun h -> new NDArray(h))
-//     /// <summary>Return evenly spaced numbers over a specified interval. Similar to Numpy</summary>
-//     /// <param name = "outputArray">Array of NDArray for outputs</param>
-//     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
-//     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
-//     /// <param name="step">Spacing between values.</param>
-//     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
-//     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
-//     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
-//     /// <param name="dtype">Target data type.</param>
-//     static member Linspace(outputArray : NDArray seq, 
-//                            start : double, 
-//                            [<Optional>] stop : float Nullable, 
-//                            [<Optional; DefaultParameterValue(1.0)>] step : double, 
-//                            [<Optional; DefaultParameterValue(1)>] repeat : int, 
-//                            [<Optional; DefaultParameterValue(false)>] inferRange : bool, 
-//                            [<Optional; DefaultParameterValue("")>] ctx : string, 
-//                            [<Optional>] dtype : IntOrFloatDType) =
-//         let creator = AtomicSymbolCreator.FromName "_linspace"
-//         let names = [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
-//         let vals = [|string start; string stop; string step; string repeat; string inferRange; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-//         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-//         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-//                                                      Array.empty
-//                                                      (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)
-//                                                      names
-//                                                      vals
-//         ()
-//     /// <summary>Return evenly spaced numbers over a specified interval. Similar to Numpy</summary>
-//     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
-//     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
-//     /// <param name="step">Spacing between values.</param>
-//     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
-//     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
-//     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
-//     /// <param name="dtype">Target data type.</param>
-//     static member LinspaceSymbol(start : double, 
-//                                  [<Optional>] stop : float Nullable, 
-//                                  [<Optional; DefaultParameterValue(1.0)>] step : double, 
-//                                  [<Optional; DefaultParameterValue(1)>] repeat : int, 
-//                                  [<Optional; DefaultParameterValue(false)>] inferRange : bool, 
-//                                  [<Optional; DefaultParameterValue("")>] ctx : string, 
-//                                  [<Optional>] dtype : IntOrFloatDType) =
-//         let creator = AtomicSymbolCreator.FromName "_linspace"
-//         new Symbol(Some creator,
-//                    [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|],
-//                    [|string start; string stop; string step; string repeat; string inferRange; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
-//                    Array.empty,
-//                    Array.empty)
-
-//     /// <summary>Return evenly spaced numbers over a specified interval. Similar to Numpy</summary>
-//     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
-//     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
-//     /// <param name="step">Spacing between values.</param>
-//     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
-//     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
-//     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
-//     /// <param name="dtype">Target data type.</param>
-//     static member LinspaceNDArray(start : double, 
-//                                   ?stop : float, 
-//                                   ?step : double, 
-//                                   ?repeat : int, 
-//                                   ?inferRange : bool, 
-//                                   ?ctx : string, 
-//                                   ?dtype : IntOrFloatDType) =
+//                                   [<Optional>] ?stop : float, 
+//                                   [<Optional>] ?step : double, 
+//                                   [<Optional>] ?repeat : int, 
+//                                   [<Optional>] ?inferRange : bool, 
+//                                   [<Optional>] ?ctx : string, 
+//                                   [<Optional>] ?dtype : IntOrFloatDType) =
 //         let creator = AtomicSymbolCreator.FromName "_linspace"
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
@@ -45307,12 +42116,12 @@ type Operators() =
 //     /// <param name="dtype">Target data type.</param>
 //     static member Linspace(outputArray : NDArray seq, 
 //                            start : double, 
-//                            ?stop : float, 
-//                            ?step : double, 
-//                            ?repeat : int, 
-//                            ?inferRange : bool, 
-//                            ?ctx : string, 
-//                            ?dtype : IntOrFloatDType) =
+//                            [<Optional>] ?stop : float, 
+//                            [<Optional>] ?step : double, 
+//                            [<Optional>] ?repeat : int, 
+//                            [<Optional>] ?inferRange : bool, 
+//                            [<Optional>] ?ctx : string, 
+//                            [<Optional>] ?dtype : IntOrFloatDType) =
 //         let creator = AtomicSymbolCreator.FromName "_linspace"
 //         let names = [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
 //         let vals = [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
@@ -45332,12 +42141,12 @@ type Operators() =
 //     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
 //     /// <param name="dtype">Target data type.</param>
 //     static member LinspaceSymbol(start : double, 
-//                                  ?stop : float, 
-//                                  ?step : double, 
-//                                  ?repeat : int, 
-//                                  ?inferRange : bool, 
-//                                  ?ctx : string, 
-//                                  ?dtype : IntOrFloatDType) =
+//                                  [<Optional>] ?stop : float, 
+//                                  [<Optional>] ?step : double, 
+//                                  [<Optional>] ?repeat : int, 
+//                                  [<Optional>] ?inferRange : bool, 
+//                                  [<Optional>] ?ctx : string, 
+//                                  [<Optional>] ?dtype : IntOrFloatDType) =
 //         let creator = AtomicSymbolCreator.FromName "_linspace"
 //         new Symbol(Some creator,
 //                    [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|],

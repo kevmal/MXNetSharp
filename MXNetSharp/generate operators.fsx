@@ -378,7 +378,7 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
                     | _ -> x.TypeString
                 match x.DefaultMode with 
                 | Some (ReplaceOptionWithString _) -> 
-                    sprintf "?%s : %s" x.Name t
+                    sprintf "[<Optional>] ?%s : %s" x.Name t
                 | Some (ReplaceNull _)
                 | Some IgnoreNull -> 
                     sprintf "[<Optional>] %s : %s" x.Name t
@@ -1006,32 +1006,6 @@ Mappings.Modify(fun (l : ProcessedAtomicSymbol list) ->
     |> List.collect
         (fun x ->
             if x.Args |> Seq.exists (fun a -> a.TypeString.EndsWith "or None") then 
-                let nullable = 
-                    {x with 
-                        Args = 
-                            x.Args
-                            |> Array.map    
-                                (fun a ->
-                                    match a.TypeString with 
-                                    | "boolean or None" -> 
-                                        {a with 
-                                            TypeString = "bool Nullable"
-                                            DefaultMode = Some IgnoreNull
-                                        }
-                                    | "int or None" -> 
-                                        {a with 
-                                            TypeString = "int Nullable"
-                                            DefaultMode = Some IgnoreNull
-                                        }
-                                    | "double or None"
-                                    | "float or None" -> 
-                                        {a with 
-                                            TypeString = "float Nullable"
-                                            DefaultMode = Some IgnoreNull
-                                        }
-                                    | _ -> a
-                                )
-                        }
                 let optional = 
                     {x with 
                         Args = 
@@ -1067,7 +1041,6 @@ Mappings.Modify(fun (l : ProcessedAtomicSymbol list) ->
                                 )
                         }
                 [
-                    nullable 
                     optional
                 ]
             else
