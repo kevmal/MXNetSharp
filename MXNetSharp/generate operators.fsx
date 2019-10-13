@@ -436,7 +436,7 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
             if ndarray then 
                 sprintf "%s.NDArrayHandle.UnsafeHandle" x
             else
-                sprintf "%s" x
+                sprintf "%s :> BaseSymbol" x
         let arr (x : _ []) = 
             match x with 
             | [| Choice2Of2 name |] -> sprintf "(%s |> Array.map (fun x -> %s))" name (handle "x")
@@ -523,11 +523,11 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
                 sprintf "Symbol(symbol)"
             *)
                 sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
-                sprintf "new Symbol(Some creator,"
-                sprintf "           %s," paramNamesStr
-                sprintf "           %s," paramValuesStr
-                sprintf "           %s," inputNamesStr
-                sprintf "           %s)" inputsStr
+                sprintf "new SymbolFromOperator(creator,"
+                sprintf "                       %s," paramNamesStr
+                sprintf "                       %s," paramValuesStr
+                sprintf "                       %s," inputNamesStr
+                sprintf "                       %s)" inputsStr
             ]
     let defineInto = 
         let name = x.Name

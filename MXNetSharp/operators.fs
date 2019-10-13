@@ -490,11 +490,11 @@ type Operators() =
         ()
     static member CustomFunctionSymbol() =
         let creator = AtomicSymbolCreator.FromName "_CustomFunction"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardCustomFunctionNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_CustomFunction"
@@ -517,11 +517,11 @@ type Operators() =
         ()
     static member BackwardCustomFunctionSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_CustomFunction"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <param name="data">input data list</param>
     static member CachedOp([<ParamArray>] data : NDArray[]) =
@@ -547,11 +547,11 @@ type Operators() =
     /// <param name="data">input data list</param>
     static member CachedOp([<ParamArray>] data : Symbol[]) =
         let creator = AtomicSymbolCreator.FromName "_CachedOp"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   (data |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               (data |> Array.map (fun x -> x :> BaseSymbol)))
 
     static member BackwardCachedOpNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_CachedOp"
@@ -574,11 +574,11 @@ type Operators() =
         ()
     static member BackwardCachedOpSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_CachedOp"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Decode image with OpenCV. 
     /// Note: return image in RGB by default, instead of OpenCV&#39;s default BGR.</summary>
@@ -646,11 +646,11 @@ type Operators() =
     /// <param name="toRgb">Whether to convert decoded image to mxnet&#39;s default RGB format (instead of opencv&#39;s default BGR).</param>
     static member CvimreadSymbol(filename : string, [<Optional; DefaultParameterValue(1)>] flag : int, [<Optional; DefaultParameterValue(true)>] toRgb : bool) =
         let creator = AtomicSymbolCreator.FromName "_cvimread"
-        new Symbol(Some creator,
-                   [|"filename"; "flag"; "to_rgb"|],
-                   [|filename; string flag; string toRgb|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"filename"; "flag"; "to_rgb"|],
+                               [|filename; string flag; string toRgb|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Resize image with OpenCV. 
     /// </summary>
@@ -785,11 +785,11 @@ type Operators() =
     /// <summary>Place holder for variable who cannot perform gradient</summary>
     static member NoGradientSymbol() =
         let creator = AtomicSymbolCreator.FromName "_NoGradient"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Batch normalization.
     /// 
@@ -1002,11 +1002,11 @@ type Operators() =
                               [<Optional; DefaultParameterValue(false)>] useGlobalStats : bool, 
                               [<Optional; DefaultParameterValue(false)>] outputMeanVar : bool) =
         let creator = AtomicSymbolCreator.FromName "BatchNorm_v1"
-        new Symbol(Some creator,
-                   [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"|],
-                   [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar|],
-                   [|"data"; "gamma"; "beta"|],
-                   [|data; gamma; beta|])
+        new SymbolFromOperator(creator,
+                               [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"|],
+                               [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar|],
+                               [|"data"; "gamma"; "beta"|],
+                               [|data :> BaseSymbol; gamma :> BaseSymbol; beta :> BaseSymbol|])
 
     /// <summary>Update function for multi-precision AdamW optimizer.
     /// 
@@ -1183,11 +1183,11 @@ type Operators() =
                                 [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                                 [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "_mp_adamw_update"
-        new Symbol(Some creator,
-                   [|"lr"; "eta"; "beta1"; "beta2"; "epsilon"; "wd"; "clip_gradient"|],
-                   [|string lr; string eta; string beta1; string beta2; string epsilon; string wd; string clipGradient|],
-                   [|"weight"; "grad"; "mean"; "var"; "weight32"; "rescaleGrad"|],
-                   [|weight; grad; mean; var; weight32; rescaleGrad|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "eta"; "beta1"; "beta2"; "epsilon"; "wd"; "clip_gradient"|],
+                               [|string lr; string eta; string beta1; string beta2; string epsilon; string wd; string clipGradient|],
+                               [|"weight"; "grad"; "mean"; "var"; "weight32"; "rescaleGrad"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol; mean :> BaseSymbol; var :> BaseSymbol; weight32 :> BaseSymbol; rescaleGrad :> BaseSymbol|])
 
     /// <summary>Update function for AdamW optimizer. AdamW is seen as a modification of
     /// Adam by decoupling the weight decay from the optimization steps taken w.r.t. the loss function.
@@ -1352,11 +1352,11 @@ type Operators() =
                               [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                               [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "_adamw_update"
-        new Symbol(Some creator,
-                   [|"lr"; "eta"; "beta1"; "beta2"; "epsilon"; "wd"; "clip_gradient"|],
-                   [|string lr; string eta; string beta1; string beta2; string epsilon; string wd; string clipGradient|],
-                   [|"weight"; "grad"; "mean"; "var"; "rescaleGrad"|],
-                   [|weight; grad; mean; var; rescaleGrad|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "eta"; "beta1"; "beta2"; "epsilon"; "wd"; "clip_gradient"|],
+                               [|string lr; string eta; string beta1; string beta2; string epsilon; string wd; string clipGradient|],
+                               [|"weight"; "grad"; "mean"; "var"; "rescaleGrad"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol; mean :> BaseSymbol; var :> BaseSymbol; rescaleGrad :> BaseSymbol|])
 
     /// <summary>
     /// Applies a 2D adaptive average pooling over a 4D input with the shape of (NCHW).
@@ -1424,11 +1424,11 @@ type Operators() =
     /// <param name="outputSize">output size</param>
     static member ContribAdaptiveAvgPooling2D(data : Symbol, [<Optional>] outputSize : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_AdaptiveAvgPooling2D"
-        new Symbol(Some creator,
-                   [|"output_size"|],
-                   [|(if isNull (outputSize :> obj) then "[]" else string outputSize)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"output_size"|],
+                               [|(if isNull (outputSize :> obj) then "[]" else string outputSize)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>
     /// Applies a 2D adaptive average pooling over a 4D input with the shape of (NCHW).
@@ -1499,11 +1499,11 @@ type Operators() =
     /// <param name="width">width</param>
     static member ContribAdaptiveAvgPooling2D(data : Symbol, [<Optional>] height : int, [<Optional>] width : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_AdaptiveAvgPooling2D"
-        new Symbol(Some creator,
-                   [|"output_size"|],
-                   [|(if isNull (height :> obj) then "[]" else (height, width).ToString())|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"output_size"|],
+                               [|(if isNull (height :> obj) then "[]" else (height, width).ToString())|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardContribAdaptiveAvgPooling2DNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_contrib_AdaptiveAvgPooling2D"
@@ -1526,11 +1526,11 @@ type Operators() =
         ()
     static member BackwardContribAdaptiveAvgPooling2DSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_contrib_AdaptiveAvgPooling2D"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Check if all the float numbers in the array are finite (used for AMP)
     /// 
@@ -1606,11 +1606,11 @@ type Operators() =
     /// <param name="initOutput">Initialize output to 1.</param>
     static member MultiAllFinite([<ParamArray>] data : Symbol[], [<Optional; DefaultParameterValue(1)>] numArrays : int, [<Optional; DefaultParameterValue(true)>] initOutput : bool) =
         let creator = AtomicSymbolCreator.FromName "multi_all_finite"
-        new Symbol(Some creator,
-                   [|"num_arrays"; "init_output"|],
-                   [|string numArrays; string initOutput|],
-                   Array.empty,
-                   (data |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               [|"num_arrays"; "init_output"|],
+                               [|string numArrays; string initOutput|],
+                               Array.empty,
+                               (data |> Array.map (fun x -> x :> BaseSymbol)))
 
     /// <summary>
     /// Perform 2D resizing (upsampling or downsampling) for 4D input using bilinear interpolation.
@@ -1709,11 +1709,11 @@ type Operators() =
                                           [<Optional>] ?width : int, 
                                           [<Optional>] ?mode : ContribBilinearResize2DMode) =
         let creator = AtomicSymbolCreator.FromName "_contrib_BilinearResize2D"
-        new Symbol(Some creator,
-                   [|"scale_height"; "scale_width"; "height"; "width"; "mode"|],
-                   [|(match scaleHeight with None -> "None" | Some scaleHeight -> string scaleHeight); (match scaleWidth with None -> "None" | Some scaleWidth -> string scaleWidth); (match height with None -> "1" | Some height -> string height); (match width with None -> "1" | Some width -> string width); (match mode with None -> "size" | Some mode -> string mode)|],
-                   [|"data"; "like"|],
-                   [|data; like|])
+        new SymbolFromOperator(creator,
+                               [|"scale_height"; "scale_width"; "height"; "width"; "mode"|],
+                               [|(match scaleHeight with None -> "None" | Some scaleHeight -> string scaleHeight); (match scaleWidth with None -> "None" | Some scaleWidth -> string scaleWidth); (match height with None -> "1" | Some height -> string height); (match width with None -> "1" | Some width -> string width); (match mode with None -> "size" | Some mode -> string mode)|],
+                               [|"data"; "like"|],
+                               [|data :> BaseSymbol; like :> BaseSymbol|])
 
     static member BackwardContribBilinearResize2DNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_contrib_BilinearResize2D"
@@ -1736,11 +1736,11 @@ type Operators() =
         ()
     static member BackwardContribBilinearResize2DSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_contrib_BilinearResize2D"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>
     /// Given an n-d NDArray data, and a 1-d NDArray index,
@@ -1820,11 +1820,11 @@ type Operators() =
     /// <param name="axis">An integer that represents the axis in NDArray to mask from.</param>
     static member ContribBooleanMask(data : Symbol, index : Symbol, [<Optional; DefaultParameterValue(0)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_boolean_mask"
-        new Symbol(Some creator,
-                   [|"axis"|],
-                   [|string axis|],
-                   [|"data"; "index"|],
-                   [|data; index|])
+        new SymbolFromOperator(creator,
+                               [|"axis"|],
+                               [|string axis|],
+                               [|"data"; "index"|],
+                               [|data :> BaseSymbol; index :> BaseSymbol|])
 
     /// <param name="axis">An integer that represents the axis in NDArray to mask from.</param>
     static member BackwardContribBooleanMaskNDArray([<Optional; DefaultParameterValue(0)>] axis : int) =
@@ -1850,11 +1850,11 @@ type Operators() =
     /// <param name="axis">An integer that represents the axis in NDArray to mask from.</param>
     static member BackwardContribBooleanMaskSymbol([<Optional; DefaultParameterValue(0)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "_backward_contrib_boolean_mask"
-        new Symbol(Some creator,
-                   [|"axis"|],
-                   [|string axis|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"axis"|],
+                               [|string axis|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Apply non-maximum suppression to input.
     /// 
@@ -2121,11 +2121,11 @@ type Operators() =
                                 [<Optional>] inFormat : Format, 
                                 [<Optional>] outFormat : Format) =
         let creator = AtomicSymbolCreator.FromName "_contrib_box_nms"
-        new Symbol(Some creator,
-                   [|"overlap_thresh"; "valid_thresh"; "topk"; "coord_start"; "score_index"; "id_index"; "background_id"; "force_suppress"; "in_format"; "out_format"|],
-                   [|string overlapThresh; string validThresh; string topk; string coordStart; string scoreIndex; string idIndex; string backgroundId; string forceSuppress; (if isNull (inFormat :> obj) then "corner" else string inFormat); (if isNull (outFormat :> obj) then "corner" else string outFormat)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"overlap_thresh"; "valid_thresh"; "topk"; "coord_start"; "score_index"; "id_index"; "background_id"; "force_suppress"; "in_format"; "out_format"|],
+                               [|string overlapThresh; string validThresh; string topk; string coordStart; string scoreIndex; string idIndex; string backgroundId; string forceSuppress; (if isNull (inFormat :> obj) then "corner" else string inFormat); (if isNull (outFormat :> obj) then "corner" else string outFormat)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="overlapThresh">Overlapping(IoU) threshold to suppress object with smaller score.</param>
     /// <param name="validThresh">Filter input boxes to those whose scores greater than valid_thresh.</param>
@@ -2212,11 +2212,11 @@ type Operators() =
                                               [<Optional>] inFormat : Format, 
                                               [<Optional>] outFormat : Format) =
         let creator = AtomicSymbolCreator.FromName "_backward_contrib_box_nms"
-        new Symbol(Some creator,
-                   [|"overlap_thresh"; "valid_thresh"; "topk"; "coord_start"; "score_index"; "id_index"; "background_id"; "force_suppress"; "in_format"; "out_format"|],
-                   [|string overlapThresh; string validThresh; string topk; string coordStart; string scoreIndex; string idIndex; string backgroundId; string forceSuppress; (if isNull (inFormat :> obj) then "corner" else string inFormat); (if isNull (outFormat :> obj) then "corner" else string outFormat)|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"overlap_thresh"; "valid_thresh"; "topk"; "coord_start"; "score_index"; "id_index"; "background_id"; "force_suppress"; "in_format"; "out_format"|],
+                               [|string overlapThresh; string validThresh; string topk; string coordStart; string scoreIndex; string idIndex; string backgroundId; string forceSuppress; (if isNull (inFormat :> obj) then "corner" else string inFormat); (if isNull (outFormat :> obj) then "corner" else string outFormat)|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Bounding box overlap of two arrays.
     ///   The overlap is defined as Intersection-over-Union, aka, IOU.
@@ -2308,11 +2308,11 @@ type Operators() =
     ///  &quot;corner&quot; means boxes are encoded as [xmin, ymin, xmax, ymax], &quot;center&quot; means boxes are encodes as [x, y, width, height].</param>
     static member ContribBoxIou(lhs : Symbol, rhs : Symbol, [<Optional>] format : Format) =
         let creator = AtomicSymbolCreator.FromName "_contrib_box_iou"
-        new Symbol(Some creator,
-                   [|"format"|],
-                   [|(if isNull (format :> obj) then "corner" else string format)|],
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               [|"format"|],
+                               [|(if isNull (format :> obj) then "corner" else string format)|],
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="format">The box encoding type. 
     ///  &quot;corner&quot; means boxes are encoded as [xmin, ymin, xmax, ymax], &quot;center&quot; means boxes are encodes as [x, y, width, height].</param>
@@ -2341,11 +2341,11 @@ type Operators() =
     ///  &quot;corner&quot; means boxes are encoded as [xmin, ymin, xmax, ymax], &quot;center&quot; means boxes are encodes as [x, y, width, height].</param>
     static member BackwardContribBoxIouSymbol([<Optional>] format : Format) =
         let creator = AtomicSymbolCreator.FromName "_backward_contrib_box_iou"
-        new Symbol(Some creator,
-                   [|"format"|],
-                   [|(if isNull (format :> obj) then "corner" else string format)|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"format"|],
+                               [|(if isNull (format :> obj) then "corner" else string format)|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Compute bipartite matching.
     ///   The matching is performed on score matrix with shape [B, N, M]
@@ -2452,11 +2452,11 @@ type Operators() =
     /// <param name="topk">Limit the number of matches to topk, set -1 for no limit</param>
     static member ContribBipartiteMatching(data : Symbol, threshold : float, [<Optional; DefaultParameterValue(false)>] isAscend : bool, [<Optional; DefaultParameterValue(-1)>] topk : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_bipartite_matching"
-        new Symbol(Some creator,
-                   [|"threshold"; "is_ascend"; "topk"|],
-                   [|string threshold; string isAscend; string topk|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"threshold"; "is_ascend"; "topk"|],
+                               [|string threshold; string isAscend; string topk|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="threshold">Ignore matching when score &lt; thresh, if is_ascend=false, or ignore score &gt; thresh, if is_ascend=true.</param>
     /// <param name="isAscend">Use ascend order for scores instead of descending. Please set threshold accordingly.</param>
@@ -2488,11 +2488,11 @@ type Operators() =
     /// <param name="topk">Limit the number of matches to topk, set -1 for no limit</param>
     static member BackwardContribBipartiteMatchingSymbol(threshold : float, [<Optional; DefaultParameterValue(false)>] isAscend : bool, [<Optional; DefaultParameterValue(-1)>] topk : int) =
         let creator = AtomicSymbolCreator.FromName "_backward_contrib_bipartite_matching"
-        new Symbol(Some creator,
-                   [|"threshold"; "is_ascend"; "topk"|],
-                   [|string threshold; string isAscend; string topk|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"threshold"; "is_ascend"; "topk"|],
+                               [|string threshold; string isAscend; string topk|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>This operator samples sub-graphs from a csr graph via an
     /// uniform probability. The operator is designed for DGL.
@@ -2675,11 +2675,11 @@ type Operators() =
                                                      numNeighbor : int, 
                                                      maxNumVertices : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_dgl_csr_neighbor_uniform_sample"
-        new Symbol(Some creator,
-                   [|"num_args"; "num_hops"; "num_neighbor"; "max_num_vertices"|],
-                   [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|],
-                   [|"csrMatrix"|],
-                   [|csrMatrix; yield! (seedArrays |> Seq.map (fun x -> x))|])
+        new SymbolFromOperator(creator,
+                               [|"num_args"; "num_hops"; "num_neighbor"; "max_num_vertices"|],
+                               [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|],
+                               [|"csrMatrix"|],
+                               [|csrMatrix :> BaseSymbol; yield! (seedArrays |> Seq.map (fun x -> x :> BaseSymbol))|])
 
     /// <summary>This operator samples sub-graph from a csr graph via an
     /// non-uniform probability. The operator is designed for DGL.
@@ -2883,11 +2883,11 @@ type Operators() =
                                                         numNeighbor : int, 
                                                         maxNumVertices : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_dgl_csr_neighbor_non_uniform_sample"
-        new Symbol(Some creator,
-                   [|"num_args"; "num_hops"; "num_neighbor"; "max_num_vertices"|],
-                   [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|],
-                   [|"csrMatrix"; "probability"|],
-                   [|csrMatrix; probability; yield! (seedArrays |> Seq.map (fun x -> x))|])
+        new SymbolFromOperator(creator,
+                               [|"num_args"; "num_hops"; "num_neighbor"; "max_num_vertices"|],
+                               [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|],
+                               [|"csrMatrix"; "probability"|],
+                               [|csrMatrix :> BaseSymbol; probability :> BaseSymbol; yield! (seedArrays |> Seq.map (fun x -> x :> BaseSymbol))|])
 
     /// <summary>This operator constructs an induced subgraph for
     /// a given set of vertices from a graph. The operator accepts multiple
@@ -3003,11 +3003,11 @@ type Operators() =
     /// <param name="returnMapping">Return mapping of vid and eid between the subgraph and the parent graph.</param>
     static member ContribDglSubgraph(graph : Symbol, [<ParamArray>] data : Symbol[], numArgs : int, returnMapping : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_dgl_subgraph"
-        new Symbol(Some creator,
-                   [|"num_args"; "return_mapping"|],
-                   [|string numArgs; string returnMapping|],
-                   [|"graph"|],
-                   [|graph; yield! (data |> Seq.map (fun x -> x))|])
+        new SymbolFromOperator(creator,
+                               [|"num_args"; "return_mapping"|],
+                               [|string numArgs; string returnMapping|],
+                               [|"graph"|],
+                               [|graph :> BaseSymbol; yield! (data |> Seq.map (fun x -> x :> BaseSymbol))|])
 
     /// <summary>This operator implements the edge_id function for a graph
     /// stored in a CSR matrix (the value of the CSR stores the edge Id of the graph).
@@ -3108,11 +3108,11 @@ type Operators() =
     /// <param name="v">v ndarray</param>
     static member ContribEdgeId(data : Symbol, u : Symbol, v : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_contrib_edge_id"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"; "u"; "v"|],
-                   [|data; u; v|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"; "u"; "v"|],
+                               [|data :> BaseSymbol; u :> BaseSymbol; v :> BaseSymbol|])
 
     /// <summary>This operator converts a CSR matrix whose values are edge Ids
     /// to an adjacency matrix whose values are ones. The output CSR matrix always has
@@ -3195,11 +3195,11 @@ type Operators() =
     /// <param name="data">Input ndarray</param>
     static member ContribDglAdjacency(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_contrib_dgl_adjacency"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>This operator compacts a CSR matrix generated by
     /// dgl_csr_neighbor_uniform_sample and dgl_csr_neighbor_non_uniform_sample.
@@ -3333,11 +3333,11 @@ type Operators() =
     /// <param name="graphSizes">the number of vertices in each graph.</param>
     static member ContribDglGraphCompact([<ParamArray>] graphData : Symbol[], numArgs : int, returnMapping : bool, graphSizes : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_dgl_graph_compact"
-        new Symbol(Some creator,
-                   [|"num_args"; "return_mapping"; "graph_sizes"|],
-                   [|string numArgs; string returnMapping; string graphSizes|],
-                   Array.empty,
-                   (graphData |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               [|"num_args"; "return_mapping"; "graph_sizes"|],
+                               [|string numArgs; string returnMapping; string graphSizes|],
+                               Array.empty,
+                               (graphData |> Array.map (fun x -> x :> BaseSymbol)))
 
     /// <summary>This operator implements the gradient multiplier function.
     /// In forward pass it acts as an identity transform. During backpropagation it
@@ -3387,11 +3387,11 @@ type Operators() =
     /// <param name="scalar">lambda multiplier</param>
     static member ContribGradientmultiplier(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_contrib_gradientmultiplier"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -3420,11 +3420,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member ContribBackwardGradientmultiplier(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_contrib_backward_gradientmultiplier"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Computes the log likelihood of a univariate Hawkes process.
     /// 
@@ -3655,11 +3655,11 @@ type Operators() =
                                   validLength : Symbol, 
                                   maxTime : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_contrib_hawkesll"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lda"; "alpha"; "beta"; "state"; "lags"; "marks"; "validLength"; "maxTime"|],
-                   [|lda; alpha; beta; state; lags; marks; validLength; maxTime|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lda"; "alpha"; "beta"; "state"; "lags"; "marks"; "validLength"; "maxTime"|],
+                               [|lda :> BaseSymbol; alpha :> BaseSymbol; beta :> BaseSymbol; state :> BaseSymbol; lags :> BaseSymbol; marks :> BaseSymbol; validLength :> BaseSymbol; maxTime :> BaseSymbol|])
 
     static member ContribBackwardHawkesllNDArray() =
         let creator = AtomicSymbolCreator.FromName "_contrib_backward_hawkesll"
@@ -3682,11 +3682,11 @@ type Operators() =
         ()
     static member ContribBackwardHawkesllSymbol() =
         let creator = AtomicSymbolCreator.FromName "_contrib_backward_hawkesll"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Returns an array of indexes of the input array.
     /// 
@@ -3859,11 +3859,11 @@ type Operators() =
     /// <param name="axes">The axes to include in the index array. Supports negative values.</param>
     static member ContribIndexArray(data : Symbol, [<Optional>] axes : int seq) =
         let creator = AtomicSymbolCreator.FromName "_contrib_index_array"
-        new Symbol(Some creator,
-                   [|"axes"|],
-                   [|(axes |> Seq.map string |> String.concat ", ")|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axes"|],
+                               [|(axes |> Seq.map string |> String.concat ", ")|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Copies the elements of a `new_tensor` into the `old_tensor`.
     /// 
@@ -3985,11 +3985,11 @@ type Operators() =
     /// <param name="newTensor">New tensor to be copied</param>
     static member ContribIndexCopy(oldTensor : Symbol, indexVector : Symbol, newTensor : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_contrib_index_copy"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"oldTensor"; "indexVector"; "newTensor"|],
-                   [|oldTensor; indexVector; newTensor|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"oldTensor"; "indexVector"; "newTensor"|],
+                               [|oldTensor :> BaseSymbol; indexVector :> BaseSymbol; newTensor :> BaseSymbol|])
 
     static member ContribBackwardIndexCopyNDArray() =
         let creator = AtomicSymbolCreator.FromName "_contrib_backward_index_copy"
@@ -4012,11 +4012,11 @@ type Operators() =
         ()
     static member ContribBackwardIndexCopySymbol() =
         let creator = AtomicSymbolCreator.FromName "_contrib_backward_index_copy"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Computes the Khatri-Rao product of the input matrices.
     /// 
@@ -4147,11 +4147,11 @@ type Operators() =
     /// <param name="args">Positional input matrices</param>
     static member KhatriRao([<ParamArray>] args : Symbol[]) =
         let creator = AtomicSymbolCreator.FromName "khatri_rao"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   (args |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               (args |> Array.map (fun x -> x :> BaseSymbol)))
 
     /// <summary>Number of stored values for a sparse tensor, including explicit zeros.
     /// 
@@ -4201,11 +4201,11 @@ type Operators() =
     /// <param name="axis">Select between the number of values across the whole matrix, in each column, or in each row.</param>
     static member ContribGetnnz(data : Symbol, [<Optional>] ?axis : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_getnnz"
-        new Symbol(Some creator,
-                   [|"axis"|],
-                   [|(match axis with None -> "None" | Some axis -> string axis)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"|],
+                               [|(match axis with None -> "None" | Some axis -> string axis)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Update function for Group AdaGrad optimizer.
     /// 
@@ -4328,11 +4328,11 @@ type Operators() =
                                             [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
                                             [<Optional; DefaultParameterValue(9.99999975E-06)>] epsilon : float) =
         let creator = AtomicSymbolCreator.FromName "_contrib_group_adagrad_update"
-        new Symbol(Some creator,
-                   [|"lr"; "rescale_grad"; "clip_gradient"; "epsilon"|],
-                   [|string lr; string rescaleGrad; string clipGradient; string epsilon|],
-                   [|"weight"; "grad"; "history"|],
-                   [|weight; grad; history|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "rescale_grad"; "clip_gradient"; "epsilon"|],
+                               [|string lr; string rescaleGrad; string clipGradient; string epsilon|],
+                               [|"weight"; "grad"; "history"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol; history :> BaseSymbol|])
 
     /// <summary>This operators implements the quadratic function.
     /// 
@@ -4430,11 +4430,11 @@ type Operators() =
     /// <param name="c">Constant term in the quadratic function.</param>
     static member ContribQuadratic(data : Symbol, [<Optional; DefaultParameterValue(0.0)>] a : float, [<Optional; DefaultParameterValue(0.0)>] b : float, [<Optional; DefaultParameterValue(0.0)>] c : float) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quadratic"
-        new Symbol(Some creator,
-                   [|"a"; "b"; "c"|],
-                   [|string a; string b; string c|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"a"; "b"; "c"|],
+                               [|string a; string b; string c|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member ContribBackwardQuadraticNDArray() =
         let creator = AtomicSymbolCreator.FromName "_contrib_backward_quadratic"
@@ -4457,11 +4457,11 @@ type Operators() =
         ()
     static member ContribBackwardQuadraticSymbol() =
         let creator = AtomicSymbolCreator.FromName "_contrib_backward_quadratic"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>
     /// This operator takes a 4D feature map as an input array and region proposals as `rois`,
@@ -4581,11 +4581,11 @@ type Operators() =
                                   [<Optional; DefaultParameterValue(-1)>] sampleRatio : int, 
                                   [<Optional; DefaultParameterValue(false)>] positionSensitive : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_ROIAlign"
-        new Symbol(Some creator,
-                   [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|],
-                   [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale; string sampleRatio; string positionSensitive|],
-                   [|"data"; "rois"|],
-                   [|data; rois|])
+        new SymbolFromOperator(creator,
+                               [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|],
+                               [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale; string sampleRatio; string positionSensitive|],
+                               [|"data"; "rois"|],
+                               [|data :> BaseSymbol; rois :> BaseSymbol|])
 
     /// <summary>
     /// This operator takes a 4D feature map as an input array and region proposals as `rois`,
@@ -4711,11 +4711,11 @@ type Operators() =
                                   [<Optional; DefaultParameterValue(-1)>] sampleRatio : int, 
                                   [<Optional; DefaultParameterValue(false)>] positionSensitive : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_ROIAlign"
-        new Symbol(Some creator,
-                   [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|],
-                   [|(height, width).ToString(); string spatialScale; string sampleRatio; string positionSensitive|],
-                   [|"data"; "rois"|],
-                   [|data; rois|])
+        new SymbolFromOperator(creator,
+                               [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|],
+                               [|(height, width).ToString(); string spatialScale; string sampleRatio; string positionSensitive|],
+                               [|"data"; "rois"|],
+                               [|data :> BaseSymbol; rois :> BaseSymbol|])
 
     static member BackwardROIAlignNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_ROIAlign"
@@ -4738,11 +4738,11 @@ type Operators() =
         ()
     static member BackwardROIAlignSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_ROIAlign"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Batch normalization.
     /// 
@@ -4988,11 +4988,11 @@ type Operators() =
                                        [<Optional; DefaultParameterValue(false)>] outputMeanVar : bool, 
                                        [<Optional; DefaultParameterValue(1)>] ndev : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_SyncBatchNorm"
-        new Symbol(Some creator,
-                   [|"key"; "eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "ndev"|],
-                   [|key; string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar; string ndev|],
-                   [|"data"; "gamma"; "beta"; "movingMean"; "movingVar"|],
-                   [|data; gamma; beta; movingMean; movingVar|])
+        new SymbolFromOperator(creator,
+                               [|"key"; "eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "ndev"|],
+                               [|key; string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar; string ndev|],
+                               [|"data"; "gamma"; "beta"; "movingMean"; "movingVar"|],
+                               [|data :> BaseSymbol; gamma :> BaseSymbol; beta :> BaseSymbol; movingMean :> BaseSymbol; movingVar :> BaseSymbol|])
 
     /// <summary>Rescale the input by the square root of the channel dimension.
     /// 
@@ -5039,11 +5039,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member ContribDivSqrtDim(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_contrib_div_sqrt_dim"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardForeachNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_foreach"
@@ -5066,11 +5066,11 @@ type Operators() =
         ()
     static member BackwardForeachSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_foreach"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardWhileLoopNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_while_loop"
@@ -5093,11 +5093,11 @@ type Operators() =
         ()
     static member BackwardWhileLoopSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_while_loop"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardCondNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_cond"
@@ -5120,11 +5120,11 @@ type Operators() =
         ()
     static member BackwardCondSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_cond"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Apply a custom operator implemented in a frontend language (like Python).
     /// 
@@ -5180,11 +5180,11 @@ type Operators() =
     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
     static member Custom([<ParamArray>] data : Symbol[], opType : string) =
         let creator = AtomicSymbolCreator.FromName "Custom"
-        new Symbol(Some creator,
-                   [|"op_type"|],
-                   [|opType|],
-                   Array.empty,
-                   (data |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               [|"op_type"|],
+                               [|opType|],
+                               Array.empty,
+                               (data |> Array.map (fun x -> x :> BaseSymbol)))
 
     static member BackwardCustomNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_Custom"
@@ -5207,11 +5207,11 @@ type Operators() =
         ()
     static member BackwardCustomSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_Custom"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Apply a sparse regularization to the output a sigmoid activation function.</summary>
     /// <param name="data">Input data.</param>
@@ -5249,11 +5249,11 @@ type Operators() =
     /// <param name="momentum">The momentum for running average</param>
     static member IdentityAttachKLSparseReg(data : Symbol, [<Optional; DefaultParameterValue(0.100000001)>] sparsenessTarget : float, [<Optional; DefaultParameterValue(0.00100000005)>] penalty : float, [<Optional; DefaultParameterValue(0.899999976)>] momentum : float) =
         let creator = AtomicSymbolCreator.FromName "IdentityAttachKLSparseReg"
-        new Symbol(Some creator,
-                   [|"sparseness_target"; "penalty"; "momentum"|],
-                   [|string sparsenessTarget; string penalty; string momentum|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"sparseness_target"; "penalty"; "momentum"|],
+                               [|string sparsenessTarget; string penalty; string momentum|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Crop an image NDArray of shape (H x W x C) or (N x H x W x C) 
     /// to the given size.
@@ -5394,11 +5394,11 @@ type Operators() =
                             width : int, 
                             height : int) =
         let creator = AtomicSymbolCreator.FromName "_image_crop"
-        new Symbol(Some creator,
-                   [|"x"; "y"; "width"; "height"|],
-                   [|string x; string y; string width; string height|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"x"; "y"; "width"; "height"|],
+                               [|string x; string y; string width; string height|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardImageCropNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_image_crop"
@@ -5421,11 +5421,11 @@ type Operators() =
         ()
     static member BackwardImageCropSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_image_crop"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Converts an image NDArray of shape (H x W x C) or (N x H x W x C) 
     /// with values in the range [0, 255] to a tensor NDArray of shape (C x H x W) or (N x C x H x W)
@@ -5607,11 +5607,11 @@ type Operators() =
     /// <param name="data">Input ndarray</param>
     static member ImageToTensor(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_image_to_tensor"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Normalize an tensor of shape (C x H x W) or (N x C x H x W) with mean and
     ///     standard deviation.
@@ -5832,11 +5832,11 @@ type Operators() =
     /// <param name="std">Sequence of standard deviations for each channel. Default value is 1.</param>
     static member ImageNormalize(data : Symbol, mean : double [], std : double []) =
         let creator = AtomicSymbolCreator.FromName "_image_normalize"
-        new Symbol(Some creator,
-                   [|"mean"; "std"|],
-                   [|string mean; string std|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"mean"; "std"|],
+                               [|string mean; string std|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardImageNormalizeNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_image_normalize"
@@ -5859,11 +5859,11 @@ type Operators() =
         ()
     static member BackwardImageNormalizeSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_image_normalize"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>
     /// 
@@ -5898,11 +5898,11 @@ type Operators() =
     /// <param name="data">The input.</param>
     static member ImageFlipLeftRight(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_image_flip_left_right"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>
     /// 
@@ -5937,11 +5937,11 @@ type Operators() =
     /// <param name="data">The input.</param>
     static member ImageRandomFlipLeftRight(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_image_random_flip_left_right"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>
     /// 
@@ -5976,11 +5976,11 @@ type Operators() =
     /// <param name="data">The input.</param>
     static member ImageFlipTopBottom(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_image_flip_top_bottom"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>
     /// 
@@ -6015,11 +6015,11 @@ type Operators() =
     /// <param name="data">The input.</param>
     static member ImageRandomFlipTopBottom(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_image_random_flip_top_bottom"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>
     /// 
@@ -6060,11 +6060,11 @@ type Operators() =
     /// <param name="maxFactor">Maximum factor.</param>
     static member ImageRandomBrightness(data : Symbol, minFactor : float, maxFactor : float) =
         let creator = AtomicSymbolCreator.FromName "_image_random_brightness"
-        new Symbol(Some creator,
-                   [|"min_factor"; "max_factor"|],
-                   [|string minFactor; string maxFactor|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"min_factor"; "max_factor"|],
+                               [|string minFactor; string maxFactor|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>
     /// 
@@ -6105,11 +6105,11 @@ type Operators() =
     /// <param name="maxFactor">Maximum factor.</param>
     static member ImageRandomContrast(data : Symbol, minFactor : float, maxFactor : float) =
         let creator = AtomicSymbolCreator.FromName "_image_random_contrast"
-        new Symbol(Some creator,
-                   [|"min_factor"; "max_factor"|],
-                   [|string minFactor; string maxFactor|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"min_factor"; "max_factor"|],
+                               [|string minFactor; string maxFactor|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>
     /// 
@@ -6150,11 +6150,11 @@ type Operators() =
     /// <param name="maxFactor">Maximum factor.</param>
     static member ImageRandomSaturation(data : Symbol, minFactor : float, maxFactor : float) =
         let creator = AtomicSymbolCreator.FromName "_image_random_saturation"
-        new Symbol(Some creator,
-                   [|"min_factor"; "max_factor"|],
-                   [|string minFactor; string maxFactor|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"min_factor"; "max_factor"|],
+                               [|string minFactor; string maxFactor|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>
     /// 
@@ -6195,11 +6195,11 @@ type Operators() =
     /// <param name="maxFactor">Maximum factor.</param>
     static member ImageRandomHue(data : Symbol, minFactor : float, maxFactor : float) =
         let creator = AtomicSymbolCreator.FromName "_image_random_hue"
-        new Symbol(Some creator,
-                   [|"min_factor"; "max_factor"|],
-                   [|string minFactor; string maxFactor|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"min_factor"; "max_factor"|],
+                               [|string minFactor; string maxFactor|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>
     /// 
@@ -6259,11 +6259,11 @@ type Operators() =
                                          saturation : float, 
                                          hue : float) =
         let creator = AtomicSymbolCreator.FromName "_image_random_color_jitter"
-        new Symbol(Some creator,
-                   [|"brightness"; "contrast"; "saturation"; "hue"|],
-                   [|string brightness; string contrast; string saturation; string hue|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"brightness"; "contrast"; "saturation"; "hue"|],
+                               [|string brightness; string contrast; string saturation; string hue|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Randomly add PCA noise. Follow the AlexNet style.
     /// 
@@ -6301,11 +6301,11 @@ type Operators() =
     /// <param name="alphaStd">Level of the lighting noise.</param>
     static member ImageRandomLighting(data : Symbol, [<Optional; DefaultParameterValue(0.0500000007)>] alphaStd : float) =
         let creator = AtomicSymbolCreator.FromName "_image_random_lighting"
-        new Symbol(Some creator,
-                   [|"alpha_std"|],
-                   [|string alphaStd|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"alpha_std"|],
+                               [|string alphaStd|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Resize an image NDArray of shape (H x W x C) or (N x H x W x C) 
     /// to the given size
@@ -6448,11 +6448,11 @@ type Operators() =
     /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu</param>
     static member ImageResize(data : Symbol, [<Optional>] size : int, [<Optional; DefaultParameterValue(false)>] keepRatio : bool, [<Optional; DefaultParameterValue(1)>] interp : int) =
         let creator = AtomicSymbolCreator.FromName "_image_resize"
-        new Symbol(Some creator,
-                   [|"size"; "keep_ratio"; "interp"|],
-                   [|(if isNull (size :> obj) then "[]" else string size); string keepRatio; string interp|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"size"; "keep_ratio"; "interp"|],
+                               [|(if isNull (size :> obj) then "[]" else string size); string keepRatio; string interp|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Resize an image NDArray of shape (H x W x C) or (N x H x W x C) 
     /// to the given size
@@ -6611,11 +6611,11 @@ type Operators() =
                               [<Optional; DefaultParameterValue(false)>] keepRatio : bool, 
                               [<Optional; DefaultParameterValue(1)>] interp : int) =
         let creator = AtomicSymbolCreator.FromName "_image_resize"
-        new Symbol(Some creator,
-                   [|"size"; "keep_ratio"; "interp"|],
-                   [|(if isNull (height :> obj) then "[]" else (height, width).ToString()); string keepRatio; string interp|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"size"; "keep_ratio"; "interp"|],
+                               [|(if isNull (height :> obj) then "[]" else (height, width).ToString()); string keepRatio; string interp|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Applies Leaky rectified linear unit activation element-wise to the input.
     /// 
@@ -6729,11 +6729,11 @@ type Operators() =
                             [<Optional; DefaultParameterValue(0.125)>] lowerBound : float, 
                             [<Optional; DefaultParameterValue(0.333999991)>] upperBound : float) =
         let creator = AtomicSymbolCreator.FromName "LeakyReLU"
-        new Symbol(Some creator,
-                   [|"act_type"; "slope"; "lower_bound"; "upper_bound"|],
-                   [|(if isNull (actType :> obj) then "leaky" else string actType); string slope; string lowerBound; string upperBound|],
-                   [|"data"; "gamma"|],
-                   [|data; gamma|])
+        new SymbolFromOperator(creator,
+                               [|"act_type"; "slope"; "lower_bound"; "upper_bound"|],
+                               [|(if isNull (actType :> obj) then "leaky" else string actType); string slope; string lowerBound; string upperBound|],
+                               [|"data"; "gamma"|],
+                               [|data :> BaseSymbol; gamma :> BaseSymbol|])
 
     /// <summary>Calculate cross entropy of softmax output and one-hot label.
     /// 
@@ -6855,11 +6855,11 @@ type Operators() =
     /// <param name="label">Input label</param>
     static member SoftmaxCrossEntropy(data : Symbol, label : Symbol) =
         let creator = AtomicSymbolCreator.FromName "softmax_cross_entropy"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"; "label"|],
-                   [|data; label|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"; "label"|],
+                               [|data :> BaseSymbol; label :> BaseSymbol|])
 
     static member BackwardSoftmaxCrossEntropyNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_softmax_cross_entropy"
@@ -6882,11 +6882,11 @@ type Operators() =
         ()
     static member BackwardSoftmaxCrossEntropySymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_softmax_cross_entropy"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Applies an activation function element-wise to the input.
     /// 
@@ -6954,11 +6954,11 @@ type Operators() =
     /// <param name="actType">Activation function to be applied.</param>
     static member Activation(data : Symbol, actType : ActType) =
         let creator = AtomicSymbolCreator.FromName "Activation"
-        new Symbol(Some creator,
-                   [|"act_type"|],
-                   [|string actType|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"act_type"|],
+                               [|string actType|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardActivationNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_Activation"
@@ -6981,11 +6981,11 @@ type Operators() =
         ()
     static member BackwardActivationSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_Activation"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Batch normalization.
     /// 
@@ -7234,11 +7234,11 @@ type Operators() =
                             [<Optional; DefaultParameterValue(1)>] axis : int, 
                             [<Optional; DefaultParameterValue(false)>] cudnnOff : bool) =
         let creator = AtomicSymbolCreator.FromName "BatchNorm"
-        new Symbol(Some creator,
-                   [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "axis"; "cudnn_off"|],
-                   [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar; string axis; string cudnnOff|],
-                   [|"data"; "gamma"; "beta"; "movingMean"; "movingVar"|],
-                   [|data; gamma; beta; movingMean; movingVar|])
+        new SymbolFromOperator(creator,
+                               [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "axis"; "cudnn_off"|],
+                               [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar; string axis; string cudnnOff|],
+                               [|"data"; "gamma"; "beta"; "movingMean"; "movingVar"|],
+                               [|data :> BaseSymbol; gamma :> BaseSymbol; beta :> BaseSymbol; movingMean :> BaseSymbol; movingVar :> BaseSymbol|])
 
     static member BackwardBatchNormNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_BatchNorm"
@@ -7261,11 +7261,11 @@ type Operators() =
         ()
     static member BackwardBatchNormSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_BatchNorm"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Joins input arrays along a given axis.
     /// 
@@ -7414,11 +7414,11 @@ type Operators() =
     /// <param name="dim">the dimension to be concated.</param>
     static member Concat([<ParamArray>] data : Symbol[], numArgs : int, [<Optional; DefaultParameterValue(1)>] dim : int) =
         let creator = AtomicSymbolCreator.FromName "Concat"
-        new Symbol(Some creator,
-                   [|"num_args"; "dim"|],
-                   [|string numArgs; string dim|],
-                   Array.empty,
-                   (data |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               [|"num_args"; "dim"|],
+                               [|string numArgs; string dim|],
+                               Array.empty,
+                               (data |> Array.map (fun x -> x :> BaseSymbol)))
 
     static member BackwardConcatNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_Concat"
@@ -7441,11 +7441,11 @@ type Operators() =
         ()
     static member BackwardConcatSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_Concat"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
@@ -7477,11 +7477,11 @@ type Operators() =
     /// <param name="dim">the dimension to be concated.</param>
     static member RnnParamConcat([<ParamArray>] data : Symbol[], numArgs : int, [<Optional; DefaultParameterValue(1)>] dim : int) =
         let creator = AtomicSymbolCreator.FromName "_rnn_param_concat"
-        new Symbol(Some creator,
-                   [|"num_args"; "dim"|],
-                   [|string numArgs; string dim|],
-                   Array.empty,
-                   (data |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               [|"num_args"; "dim"|],
+                               [|string numArgs; string dim|],
+                               Array.empty,
+                               (data |> Array.map (fun x -> x :> BaseSymbol)))
 
     /// <summary>Compute *N*-D convolution on *(N+2)*-D input.
     /// 
@@ -7814,11 +7814,11 @@ type Operators() =
                               [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
                               [<Optional>] layout : ConvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "Convolution"
-        new Symbol(Some creator,
-                   [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
-                   [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
-                   [|"data"; "weight"; "bias"|],
-                   [|data; weight; bias|])
+        new SymbolFromOperator(creator,
+                               [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
+                               [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
+                               [|"data"; "weight"; "bias"|],
+                               [|data :> BaseSymbol; weight :> BaseSymbol; bias :> BaseSymbol|])
 
     static member BackwardConvolutionNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_Convolution"
@@ -7841,11 +7841,11 @@ type Operators() =
         ()
     static member BackwardConvolutionSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_Convolution"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Connectionist Temporal Classification Loss.
     /// 
@@ -8052,11 +8052,11 @@ type Operators() =
                           [<Optional; DefaultParameterValue(false)>] useLabelLengths : bool, 
                           [<Optional>] blankLabel : BlankLabel) =
         let creator = AtomicSymbolCreator.FromName "CTCLoss"
-        new Symbol(Some creator,
-                   [|"use_data_lengths"; "use_label_lengths"; "blank_label"|],
-                   [|string useDataLengths; string useLabelLengths; (if isNull (blankLabel :> obj) then "first" else string blankLabel)|],
-                   [|"data"; "label"; "dataLengths"; "labelLengths"|],
-                   [|data; label; dataLengths; labelLengths|])
+        new SymbolFromOperator(creator,
+                               [|"use_data_lengths"; "use_label_lengths"; "blank_label"|],
+                               [|string useDataLengths; string useLabelLengths; (if isNull (blankLabel :> obj) then "first" else string blankLabel)|],
+                               [|"data"; "label"; "dataLengths"; "labelLengths"|],
+                               [|data :> BaseSymbol; label :> BaseSymbol; dataLengths :> BaseSymbol; labelLengths :> BaseSymbol|])
 
     static member BackwardCtcLossNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_ctc_loss"
@@ -8079,11 +8079,11 @@ type Operators() =
         ()
     static member BackwardCtcLossSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_ctc_loss"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Computes 1D or 2D transposed convolution (aka fractionally strided convolution) of the input tensor. This operation can be seen as the gradient of Convolution operation with respect to its input. Convolution usually reduces the size of the input. Transposed convolution works the other way, going from a smaller input to a larger output while preserving the connectivity pattern.</summary>
     /// <param name="data">Input tensor to the deconvolution operation.</param>
@@ -8203,11 +8203,11 @@ type Operators() =
                                 [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
                                 [<Optional>] layout : DeconvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "Deconvolution"
-        new Symbol(Some creator,
-                   [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "adj"; "target_shape"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
-                   [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", ")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
-                   [|"data"; "weight"; "bias"|],
-                   [|data; weight; bias|])
+        new SymbolFromOperator(creator,
+                               [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "adj"; "target_shape"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
+                               [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", ")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
+                               [|"data"; "weight"; "bias"|],
+                               [|data :> BaseSymbol; weight :> BaseSymbol; bias :> BaseSymbol|])
 
     static member BackwardDeconvolutionNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_Deconvolution"
@@ -8230,11 +8230,11 @@ type Operators() =
         ()
     static member BackwardDeconvolutionSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_Deconvolution"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Applies dropout operation to input array.
     /// 
@@ -8381,11 +8381,11 @@ type Operators() =
                           [<Optional>] ?mode : DropoutMode, 
                           [<Optional>] ?axes : int seq) =
         let creator = AtomicSymbolCreator.FromName "Dropout"
-        new Symbol(Some creator,
-                   [|"cudnn_off"; "p"; "mode"; "axes"|],
-                   [|(match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match p with None -> "0.5" | Some p -> string p); (match mode with None -> "training" | Some mode -> string mode); (match axes with None -> "[]" | Some axes -> (axes |> Seq.map string |> String.concat ", "))|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"cudnn_off"; "p"; "mode"; "axes"|],
+                               [|(match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match p with None -> "0.5" | Some p -> string p); (match mode with None -> "training" | Some mode -> string mode); (match axes with None -> "[]" | Some axes -> (axes |> Seq.map string |> String.concat ", "))|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardDropoutNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_Dropout"
@@ -8408,11 +8408,11 @@ type Operators() =
         ()
     static member BackwardDropoutSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_Dropout"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Applies a linear transformation: :math:`Y = XW^T + b`.
     /// 
@@ -8568,11 +8568,11 @@ type Operators() =
                                  [<Optional; DefaultParameterValue(false)>] noBias : bool, 
                                  [<Optional; DefaultParameterValue(true)>] flatten : bool) =
         let creator = AtomicSymbolCreator.FromName "FullyConnected"
-        new Symbol(Some creator,
-                   [|"num_hidden"; "no_bias"; "flatten"|],
-                   [|string numHidden; string noBias; string flatten|],
-                   [|"data"; "weight"; "bias"|],
-                   [|data; weight; bias|])
+        new SymbolFromOperator(creator,
+                               [|"num_hidden"; "no_bias"; "flatten"|],
+                               [|string numHidden; string noBias; string flatten|],
+                               [|"data"; "weight"; "bias"|],
+                               [|data :> BaseSymbol; weight :> BaseSymbol; bias :> BaseSymbol|])
 
     static member BackwardFullyConnectedNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_FullyConnected"
@@ -8595,11 +8595,11 @@ type Operators() =
         ()
     static member BackwardFullyConnectedSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_FullyConnected"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Layer normalization.
     /// 
@@ -8740,11 +8740,11 @@ type Operators() =
                             [<Optional; DefaultParameterValue(9.99999975E-06)>] eps : float, 
                             [<Optional; DefaultParameterValue(false)>] outputMeanVar : bool) =
         let creator = AtomicSymbolCreator.FromName "LayerNorm"
-        new Symbol(Some creator,
-                   [|"axis"; "eps"; "output_mean_var"|],
-                   [|string axis; string eps; string outputMeanVar|],
-                   [|"data"; "gamma"; "beta"|],
-                   [|data; gamma; beta|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "eps"; "output_mean_var"|],
+                               [|string axis; string eps; string outputMeanVar|],
+                               [|"data"; "gamma"; "beta"|],
+                               [|data :> BaseSymbol; gamma :> BaseSymbol; beta :> BaseSymbol|])
 
     static member BackwardLayerNormNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_LayerNorm"
@@ -8767,11 +8767,11 @@ type Operators() =
         ()
     static member BackwardLayerNormSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_LayerNorm"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Applies local response normalization to the input.
     /// 
@@ -8876,11 +8876,11 @@ type Operators() =
                       [<Optional; DefaultParameterValue(0.75)>] beta : float, 
                       [<Optional; DefaultParameterValue(2.0)>] knorm : float) =
         let creator = AtomicSymbolCreator.FromName "LRN"
-        new Symbol(Some creator,
-                   [|"nsize"; "alpha"; "beta"; "knorm"|],
-                   [|string nsize; string alpha; string beta; string knorm|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"nsize"; "alpha"; "beta"; "knorm"|],
+                               [|string nsize; string alpha; string beta; string knorm|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardLRNNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_LRN"
@@ -8903,11 +8903,11 @@ type Operators() =
         ()
     static member BackwardLRNSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_LRN"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>
     /// Calculate the mean and variance of `data`.
@@ -9005,11 +9005,11 @@ type Operators() =
     /// <param name="keepdims">produce moments with the same dimensionality as the input.</param>
     static member Moments(data : Symbol, [<Optional>] axes : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "moments"
-        new Symbol(Some creator,
-                   [|"axes"; "keepdims"|],
-                   [|(axes |> Seq.map string |> String.concat ", "); string keepdims|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axes"; "keepdims"|],
+                               [|(axes |> Seq.map string |> String.concat ", "); string keepdims|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardMomentsNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_moments"
@@ -9032,11 +9032,11 @@ type Operators() =
         ()
     static member BackwardMomentsSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_moments"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Performs pooling on the input.
     /// 
@@ -9282,11 +9282,11 @@ type Operators() =
                           [<Optional>] ?pad : int seq, 
                           [<Optional>] ?layout : PoolingLayout) =
         let creator = AtomicSymbolCreator.FromName "Pooling"
-        new Symbol(Some creator,
-                   [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|],
-                   [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match layout with None -> "None" | Some layout -> string layout)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|],
+                               [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match layout with None -> "None" | Some layout -> string layout)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardPoolingNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_Pooling"
@@ -9309,11 +9309,11 @@ type Operators() =
         ()
     static member BackwardPoolingSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_Pooling"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Applies the softmax function.
     /// 
@@ -9423,11 +9423,11 @@ type Operators() =
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
     static member Softmax(data : Symbol, [<Optional>] ?temperature : float, [<Optional>] ?axis : int, [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmax"
-        new Symbol(Some creator,
-                   [|"temperature"; "axis"; "dtype"|],
-                   [|(match temperature with None -> "None" | Some temperature -> string temperature); (match axis with None -> "-1" | Some axis -> string axis); (match dtype with None -> "None" | Some dtype -> string dtype)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"temperature"; "axis"; "dtype"|],
+                               [|(match temperature with None -> "None" | Some temperature -> string temperature); (match axis with None -> "-1" | Some axis -> string axis); (match dtype with None -> "None" | Some dtype -> string dtype)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="args">Positional input arguments</param>
     static member BackwardSoftmax([<ParamArray>] args : NDArray[]) =
@@ -9453,11 +9453,11 @@ type Operators() =
     /// <param name="args">Positional input arguments</param>
     static member BackwardSoftmax([<ParamArray>] args : Symbol[]) =
         let creator = AtomicSymbolCreator.FromName "_backward_softmax"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   (args |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               (args |> Array.map (fun x -> x :> BaseSymbol)))
 
     /// <summary>Applies the softmin function.
     /// 
@@ -9570,11 +9570,11 @@ type Operators() =
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
     static member Softmin(data : Symbol, [<Optional>] ?temperature : float, [<Optional>] ?axis : int, [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "softmin"
-        new Symbol(Some creator,
-                   [|"temperature"; "axis"; "dtype"|],
-                   [|(match temperature with None -> "None" | Some temperature -> string temperature); (match axis with None -> "-1" | Some axis -> string axis); (match dtype with None -> "None" | Some dtype -> string dtype)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"temperature"; "axis"; "dtype"|],
+                               [|(match temperature with None -> "None" | Some temperature -> string temperature); (match axis with None -> "-1" | Some axis -> string axis); (match dtype with None -> "None" | Some dtype -> string dtype)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="args">Positional input arguments</param>
     static member BackwardSoftmin([<ParamArray>] args : NDArray[]) =
@@ -9600,11 +9600,11 @@ type Operators() =
     /// <param name="args">Positional input arguments</param>
     static member BackwardSoftmin([<ParamArray>] args : Symbol[]) =
         let creator = AtomicSymbolCreator.FromName "_backward_softmin"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   (args |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               (args |> Array.map (fun x -> x :> BaseSymbol)))
 
     /// <summary>Computes the log softmax of the input.
     /// This is equivalent to computing softmax followed by log.
@@ -9687,11 +9687,11 @@ type Operators() =
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to the same as input&#39;s dtype if not defined (dtype=None).</param>
     static member LogSoftmax(data : Symbol, [<Optional>] ?temperature : float, [<Optional>] ?axis : int, [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "log_softmax"
-        new Symbol(Some creator,
-                   [|"temperature"; "axis"; "dtype"|],
-                   [|(match temperature with None -> "None" | Some temperature -> string temperature); (match axis with None -> "-1" | Some axis -> string axis); (match dtype with None -> "None" | Some dtype -> string dtype)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"temperature"; "axis"; "dtype"|],
+                               [|(match temperature with None -> "None" | Some temperature -> string temperature); (match axis with None -> "-1" | Some axis -> string axis); (match dtype with None -> "None" | Some dtype -> string dtype)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="args">Positional input arguments</param>
     static member BackwardLogSoftmax([<ParamArray>] args : NDArray[]) =
@@ -9717,11 +9717,11 @@ type Operators() =
     /// <param name="args">Positional input arguments</param>
     static member BackwardLogSoftmax([<ParamArray>] args : Symbol[]) =
         let creator = AtomicSymbolCreator.FromName "_backward_log_softmax"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   (args |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               (args |> Array.map (fun x -> x :> BaseSymbol)))
 
     /// <summary>Applies softmax activation to input. This is intended for internal layers.
     /// 
@@ -9828,11 +9828,11 @@ type Operators() =
     /// <param name="mode">Specifies how to compute the softmax. If set to ``instance``, it computes softmax for each instance. If set to ``channel``, It computes cross channel softmax for each position of each instance.</param>
     static member SoftmaxActivation(data : Symbol, [<Optional>] mode : SoftmaxActivationMode) =
         let creator = AtomicSymbolCreator.FromName "SoftmaxActivation"
-        new Symbol(Some creator,
-                   [|"mode"|],
-                   [|(if isNull (mode :> obj) then "instance" else string mode)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"mode"|],
+                               [|(if isNull (mode :> obj) then "instance" else string mode)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardSoftmaxActivationNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_SoftmaxActivation"
@@ -9855,11 +9855,11 @@ type Operators() =
         ()
     static member BackwardSoftmaxActivationSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_SoftmaxActivation"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Upsamples the given input data.
     /// 
@@ -10078,11 +10078,11 @@ type Operators() =
                              [<Optional>] multiInputMode : MultiInputMode, 
                              [<Optional; DefaultParameterValue(512L)>] workspace : int64) =
         let creator = AtomicSymbolCreator.FromName "UpSampling"
-        new Symbol(Some creator,
-                   [|"scale"; "sample_type"; "num_args"; "num_filter"; "multi_input_mode"; "workspace"|],
-                   [|string scale; string sampleType; string numArgs; string numFilter; (if isNull (multiInputMode :> obj) then "concat" else string multiInputMode); string workspace|],
-                   Array.empty,
-                   (data |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               [|"scale"; "sample_type"; "num_args"; "num_filter"; "multi_input_mode"; "workspace"|],
+                               [|string scale; string sampleType; string numArgs; string numFilter; (if isNull (multiInputMode :> obj) then "concat" else string multiInputMode); string workspace|],
+                               Array.empty,
+                               (data |> Array.map (fun x -> x :> BaseSymbol)))
 
     static member BackwardUpSamplingNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_UpSampling"
@@ -10105,11 +10105,11 @@ type Operators() =
         ()
     static member BackwardUpSamplingSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_UpSampling"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Update function for SignSGD optimizer.
     /// 
@@ -10214,11 +10214,11 @@ type Operators() =
                                 [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                                 [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "signsgd_update"
-        new Symbol(Some creator,
-                   [|"lr"; "wd"; "rescale_grad"; "clip_gradient"|],
-                   [|string lr; string wd; string rescaleGrad; string clipGradient|],
-                   [|"weight"; "grad"|],
-                   [|weight; grad|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "wd"; "rescale_grad"; "clip_gradient"|],
+                               [|string lr; string wd; string rescaleGrad; string clipGradient|],
+                               [|"weight"; "grad"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol|])
 
     /// <summary>SIGN momentUM (Signum) optimizer.
     /// 
@@ -10350,11 +10350,11 @@ type Operators() =
                                [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
                                [<Optional; DefaultParameterValue(0.0)>] wdLh : float) =
         let creator = AtomicSymbolCreator.FromName "signum_update"
-        new Symbol(Some creator,
-                   [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "wd_lh"|],
-                   [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string wdLh|],
-                   [|"weight"; "grad"; "mom"|],
-                   [|weight; grad; mom|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "wd_lh"|],
+                               [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string wdLh|],
+                               [|"weight"; "grad"; "mom"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol; mom :> BaseSymbol|])
 
     /// <summary>Update function for Stochastic Gradient Descent (SGD) optimizer.
     /// 
@@ -10462,11 +10462,11 @@ type Operators() =
                             [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
                             [<Optional; DefaultParameterValue(true)>] lazyUpdate : bool) =
         let creator = AtomicSymbolCreator.FromName "sgd_update"
-        new Symbol(Some creator,
-                   [|"lr"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|],
-                   [|string lr; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|],
-                   [|"weight"; "grad"|],
-                   [|weight; grad|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|],
+                               [|string lr; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|],
+                               [|"weight"; "grad"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol|])
 
     /// <summary>Momentum update function for Stochastic Gradient Descent (SGD) optimizer.
     /// 
@@ -10628,11 +10628,11 @@ type Operators() =
                                [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
                                [<Optional; DefaultParameterValue(true)>] lazyUpdate : bool) =
         let creator = AtomicSymbolCreator.FromName "sgd_mom_update"
-        new Symbol(Some creator,
-                   [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|],
-                   [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|],
-                   [|"weight"; "grad"; "mom"|],
-                   [|weight; grad; mom|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|],
+                               [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|],
+                               [|"weight"; "grad"; "mom"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol; mom :> BaseSymbol|])
 
     /// <summary>Updater function for multi-precision sgd optimizer</summary>
     /// <param name="weight">Weight</param>
@@ -10704,11 +10704,11 @@ type Operators() =
                               [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
                               [<Optional; DefaultParameterValue(true)>] lazyUpdate : bool) =
         let creator = AtomicSymbolCreator.FromName "mp_sgd_update"
-        new Symbol(Some creator,
-                   [|"lr"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|],
-                   [|string lr; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|],
-                   [|"weight"; "grad"; "weight32"|],
-                   [|weight; grad; weight32|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|],
+                               [|string lr; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|],
+                               [|"weight"; "grad"; "weight32"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol; weight32 :> BaseSymbol|])
 
     /// <summary>Updater function for multi-precision sgd optimizer</summary>
     /// <param name="weight">Weight</param>
@@ -10792,11 +10792,11 @@ type Operators() =
                                  [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
                                  [<Optional; DefaultParameterValue(true)>] lazyUpdate : bool) =
         let creator = AtomicSymbolCreator.FromName "mp_sgd_mom_update"
-        new Symbol(Some creator,
-                   [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|],
-                   [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|],
-                   [|"weight"; "grad"; "mom"; "weight32"|],
-                   [|weight; grad; mom; weight32|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|],
+                               [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|],
+                               [|"weight"; "grad"; "mom"; "weight32"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol; mom :> BaseSymbol; weight32 :> BaseSymbol|])
 
     /// <summary>The FTML optimizer described in
     /// *FTML - Follow the Moving Leader in Deep Learning*,
@@ -10943,11 +10943,11 @@ type Operators() =
                              [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                              [<Optional; DefaultParameterValue(-1.0)>] clipGrad : float) =
         let creator = AtomicSymbolCreator.FromName "ftml_update"
-        new Symbol(Some creator,
-                   [|"lr"; "t"; "beta1"; "beta2"; "epsilon"; "wd"; "rescale_grad"; "clip_grad"|],
-                   [|string lr; string t; string beta1; string beta2; string epsilon; string wd; string rescaleGrad; string clipGrad|],
-                   [|"weight"; "grad"; "d"; "v"; "z"|],
-                   [|weight; grad; d; v; z|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "t"; "beta1"; "beta2"; "epsilon"; "wd"; "rescale_grad"; "clip_grad"|],
+                               [|string lr; string t; string beta1; string beta2; string epsilon; string wd; string rescaleGrad; string clipGrad|],
+                               [|"weight"; "grad"; "d"; "v"; "z"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol; d :> BaseSymbol; v :> BaseSymbol; z :> BaseSymbol|])
 
     /// <summary>Update function for Adam optimizer. Adam is seen as a generalization
     /// of AdaGrad.
@@ -11133,11 +11133,11 @@ type Operators() =
                              [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
                              [<Optional; DefaultParameterValue(true)>] lazyUpdate : bool) =
         let creator = AtomicSymbolCreator.FromName "adam_update"
-        new Symbol(Some creator,
-                   [|"lr"; "beta1"; "beta2"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|],
-                   [|string lr; string beta1; string beta2; string epsilon; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|],
-                   [|"weight"; "grad"; "mean"; "var"|],
-                   [|weight; grad; mean; var|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "beta1"; "beta2"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|],
+                               [|string lr; string beta1; string beta2; string epsilon; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|],
+                               [|"weight"; "grad"; "mean"; "var"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol; mean :> BaseSymbol; var :> BaseSymbol|])
 
     /// <summary>Update function for Nesterov Accelerated Gradient( NAG) optimizer.
     /// It updates the weights using the following formula,
@@ -11254,11 +11254,11 @@ type Operators() =
                                [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                                [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "nag_mom_update"
-        new Symbol(Some creator,
-                   [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"|],
-                   [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient|],
-                   [|"weight"; "grad"; "mom"|],
-                   [|weight; grad; mom|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"|],
+                               [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient|],
+                               [|"weight"; "grad"; "mom"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol; mom :> BaseSymbol|])
 
     /// <summary>Update function for multi-precision Nesterov Accelerated Gradient( NAG) optimizer.
     /// 
@@ -11345,11 +11345,11 @@ type Operators() =
                                  [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                                  [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "mp_nag_mom_update"
-        new Symbol(Some creator,
-                   [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"|],
-                   [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient|],
-                   [|"weight"; "grad"; "mom"; "weight32"|],
-                   [|weight; grad; mom; weight32|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"|],
+                               [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient|],
+                               [|"weight"; "grad"; "mom"; "weight32"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol; mom :> BaseSymbol; weight32 :> BaseSymbol|])
 
     /// <summary>Update function for `RMSProp` optimizer.
     /// 
@@ -11538,11 +11538,11 @@ type Operators() =
                                 [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
                                 [<Optional; DefaultParameterValue(-1.0)>] clipWeights : float) =
         let creator = AtomicSymbolCreator.FromName "rmsprop_update"
-        new Symbol(Some creator,
-                   [|"lr"; "gamma1"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "clip_weights"|],
-                   [|string lr; string gamma1; string epsilon; string wd; string rescaleGrad; string clipGradient; string clipWeights|],
-                   [|"weight"; "grad"; "n"|],
-                   [|weight; grad; n|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "gamma1"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "clip_weights"|],
+                               [|string lr; string gamma1; string epsilon; string wd; string rescaleGrad; string clipGradient; string clipWeights|],
+                               [|"weight"; "grad"; "n"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol; n :> BaseSymbol|])
 
     /// <summary>Update function for RMSPropAlex optimizer.
     /// 
@@ -11716,11 +11716,11 @@ type Operators() =
                                     [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
                                     [<Optional; DefaultParameterValue(-1.0)>] clipWeights : float) =
         let creator = AtomicSymbolCreator.FromName "rmspropalex_update"
-        new Symbol(Some creator,
-                   [|"lr"; "gamma1"; "gamma2"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "clip_weights"|],
-                   [|string lr; string gamma1; string gamma2; string epsilon; string wd; string rescaleGrad; string clipGradient; string clipWeights|],
-                   [|"weight"; "grad"; "n"; "g"; "delta"|],
-                   [|weight; grad; n; g; delta|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "gamma1"; "gamma2"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "clip_weights"|],
+                               [|string lr; string gamma1; string gamma2; string epsilon; string wd; string rescaleGrad; string clipGradient; string clipWeights|],
+                               [|"weight"; "grad"; "n"; "g"; "delta"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol; n :> BaseSymbol; g :> BaseSymbol; delta :> BaseSymbol|])
 
     /// <summary>Update function for Ftrl optimizer.
     /// Referenced from *Ad Click Prediction: a View from the Trenches*, available at
@@ -11870,11 +11870,11 @@ type Operators() =
                              [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                              [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "ftrl_update"
-        new Symbol(Some creator,
-                   [|"lr"; "lamda1"; "beta"; "wd"; "rescale_grad"; "clip_gradient"|],
-                   [|string lr; string lamda1; string beta; string wd; string rescaleGrad; string clipGradient|],
-                   [|"weight"; "grad"; "z"; "n"|],
-                   [|weight; grad; z; n|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "lamda1"; "beta"; "wd"; "rescale_grad"; "clip_gradient"|],
+                               [|string lr; string lamda1; string beta; string wd; string rescaleGrad; string clipGradient|],
+                               [|"weight"; "grad"; "z"; "n"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol; z :> BaseSymbol; n :> BaseSymbol|])
 
     /// <summary>Update function for AdaGrad optimizer.
     /// 
@@ -11991,11 +11991,11 @@ type Operators() =
                                       [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                                       [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "_sparse_adagrad_update"
-        new Symbol(Some creator,
-                   [|"lr"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"|],
-                   [|string lr; string epsilon; string wd; string rescaleGrad; string clipGradient|],
-                   [|"weight"; "grad"; "history"|],
-                   [|weight; grad; history|])
+        new SymbolFromOperator(creator,
+                               [|"lr"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"|],
+                               [|string lr; string epsilon; string wd; string rescaleGrad; string clipGradient|],
+                               [|"weight"; "grad"; "history"|],
+                               [|weight :> BaseSymbol; grad :> BaseSymbol; history :> BaseSymbol|])
 
     /// <summary>Pads an input array with a constant or edge values of the array.
     /// 
@@ -12282,11 +12282,11 @@ type Operators() =
     /// <param name="constantValue">The value used for padding when `mode` is &quot;constant&quot;.</param>
     static member Pad(data : Symbol, mode : PadMode, padWidth : int seq, [<Optional; DefaultParameterValue(0.0)>] constantValue : double) =
         let creator = AtomicSymbolCreator.FromName "Pad"
-        new Symbol(Some creator,
-                   [|"mode"; "pad_width"; "constant_value"|],
-                   [|string mode; (padWidth |> Seq.map string |> String.concat ", "); string constantValue|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"mode"; "pad_width"; "constant_value"|],
+                               [|string mode; (padWidth |> Seq.map string |> String.concat ", "); string constantValue|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Dequantize the input tensor into a float tensor.
     /// min_range and max_range are scalar floats that specify the range for
@@ -12375,11 +12375,11 @@ type Operators() =
     /// <param name="outType">Output data type.</param>
     static member ContribDequantize(data : Symbol, minRange : Symbol, maxRange : Symbol, [<Optional>] outType : ContribDequantizeOutType) =
         let creator = AtomicSymbolCreator.FromName "_contrib_dequantize"
-        new Symbol(Some creator,
-                   [|"out_type"|],
-                   [|(if isNull (outType :> obj) then "float32" else string outType)|],
-                   [|"data"; "minRange"; "maxRange"|],
-                   [|data; minRange; maxRange|])
+        new SymbolFromOperator(creator,
+                               [|"out_type"|],
+                               [|(if isNull (outType :> obj) then "float32" else string outType)|],
+                               [|"data"; "minRange"; "maxRange"|],
+                               [|data :> BaseSymbol; minRange :> BaseSymbol; maxRange :> BaseSymbol|])
 
     /// <summary>Quantize a input tensor from float to `out_type`,
     /// with user-specified `min_range` and `max_range`.
@@ -12489,11 +12489,11 @@ type Operators() =
     /// <param name="outType">Output data type.</param>
     static member ContribQuantize(data : Symbol, minRange : Symbol, maxRange : Symbol, [<Optional>] outType : ContribQuantizeOutType) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantize"
-        new Symbol(Some creator,
-                   [|"out_type"|],
-                   [|(if isNull (outType :> obj) then "uint8" else string outType)|],
-                   [|"data"; "minRange"; "maxRange"|],
-                   [|data; minRange; maxRange|])
+        new SymbolFromOperator(creator,
+                               [|"out_type"|],
+                               [|(if isNull (outType :> obj) then "uint8" else string outType)|],
+                               [|"data"; "minRange"; "maxRange"|],
+                               [|data :> BaseSymbol; minRange :> BaseSymbol; maxRange :> BaseSymbol|])
 
     /// <summary>Quantize a input tensor from float to `out_type`,
     /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
@@ -12612,11 +12612,11 @@ type Operators() =
     /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
     static member ContribQuantizeV2(data : Symbol, [<Optional>] ?minCalibRange : float, [<Optional>] ?maxCalibRange : float, [<Optional>] ?outType : ContribQuantizeV2OutType) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantize_v2"
-        new Symbol(Some creator,
-                   [|"min_calib_range"; "max_calib_range"; "out_type"|],
-                   [|(match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange); (match outType with None -> "int8" | Some outType -> string outType)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"min_calib_range"; "max_calib_range"; "out_type"|],
+                               [|(match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange); (match outType with None -> "int8" | Some outType -> string outType)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Activation operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
@@ -12678,11 +12678,11 @@ type Operators() =
     /// <param name="actType">Activation function to be applied.</param>
     static member ContribQuantizedAct(data : Symbol, minData : Symbol, maxData : Symbol, actType : ActType) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_act"
-        new Symbol(Some creator,
-                   [|"act_type"|],
-                   [|string actType|],
-                   [|"data"; "minData"; "maxData"|],
-                   [|data; minData; maxData|])
+        new SymbolFromOperator(creator,
+                               [|"act_type"|],
+                               [|string actType|],
+                               [|"data"; "minData"; "maxData"|],
+                               [|data :> BaseSymbol; minData :> BaseSymbol; maxData :> BaseSymbol|])
 
     /// <summary>Joins input arrays along a given axis.
     /// 
@@ -12750,11 +12750,11 @@ type Operators() =
     /// <param name="dim">the dimension to be concated.</param>
     static member ContribQuantizedConcat([<ParamArray>] data : Symbol[], numArgs : int, [<Optional; DefaultParameterValue(1)>] dim : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_concat"
-        new Symbol(Some creator,
-                   [|"num_args"; "dim"|],
-                   [|string numArgs; string dim|],
-                   Array.empty,
-                   (data |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               [|"num_args"; "dim"|],
+                               [|string numArgs; string dim|],
+                               Array.empty,
+                               (data |> Array.map (fun x -> x :> BaseSymbol)))
 
     /// <summary>Convolution operator for input, weight and bias data type of int8,
     /// and accumulates in type int32 for the output. For each argument, two more arguments of type
@@ -12928,11 +12928,11 @@ type Operators() =
                                        [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
                                        [<Optional>] layout : ContribQuantizedConvLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_conv"
-        new Symbol(Some creator,
-                   [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
-                   [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
-                   [|"data"; "weight"; "bias"; "minData"; "maxData"; "minWeight"; "maxWeight"; "minBias"; "maxBias"|],
-                   [|data; weight; bias; minData; maxData; minWeight; maxWeight; minBias; maxBias|])
+        new SymbolFromOperator(creator,
+                               [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
+                               [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
+                               [|"data"; "weight"; "bias"; "minData"; "maxData"; "minWeight"; "maxWeight"; "minBias"; "maxBias"|],
+                               [|data :> BaseSymbol; weight :> BaseSymbol; bias :> BaseSymbol; minData :> BaseSymbol; maxData :> BaseSymbol; minWeight :> BaseSymbol; maxWeight :> BaseSymbol; minBias :> BaseSymbol; maxBias :> BaseSymbol|])
 
     /// <summary>elemwise_add operator for input dataA and input dataB data type of int8,
     /// and accumulates in type int32 for the output. For each argument, two more arguments of type
@@ -13019,11 +13019,11 @@ type Operators() =
                                               rhsMin : Symbol, 
                                               rhsMax : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_elemwise_add"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"; "lhsMin"; "lhsMax"; "rhsMin"; "rhsMax"|],
-                   [|lhs; rhs; lhsMin; lhsMax; rhsMin; rhsMax|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"; "lhsMin"; "lhsMax"; "rhsMin"; "rhsMax"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol; lhsMin :> BaseSymbol; lhsMax :> BaseSymbol; rhsMin :> BaseSymbol; rhsMax :> BaseSymbol|])
 
     /// <param name="data">A ndarray/symbol of type `float32`</param>
     /// <param name="minData">The minimum scalar value possibly produced for the data</param>
@@ -13055,11 +13055,11 @@ type Operators() =
     /// <param name="maxData">The maximum scalar value possibly produced for the data</param>
     static member ContribQuantizedFlatten(data : Symbol, minData : Symbol, maxData : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_flatten"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"; "minData"; "maxData"|],
-                   [|data; minData; maxData|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"; "minData"; "maxData"|],
+                               [|data :> BaseSymbol; minData :> BaseSymbol; maxData :> BaseSymbol|])
 
     /// <summary>Flattens the input array into a 2-D array by collapsing the higher dimensions.
     /// 
@@ -13169,11 +13169,11 @@ type Operators() =
     /// <param name="data">Input array.</param>
     static member Flatten(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "Flatten"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Fully Connected operator for input, weight and bias data type of int8,
     /// and accumulates in type int32 for the output. For each argument, two more arguments of type
@@ -13296,11 +13296,11 @@ type Operators() =
                                                  [<Optional; DefaultParameterValue(false)>] noBias : bool, 
                                                  [<Optional; DefaultParameterValue(true)>] flatten : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_fully_connected"
-        new Symbol(Some creator,
-                   [|"num_hidden"; "no_bias"; "flatten"|],
-                   [|string numHidden; string noBias; string flatten|],
-                   [|"data"; "weight"; "bias"; "minData"; "maxData"; "minWeight"; "maxWeight"; "minBias"; "maxBias"|],
-                   [|data; weight; bias; minData; maxData; minWeight; maxWeight; minBias; maxBias|])
+        new SymbolFromOperator(creator,
+                               [|"num_hidden"; "no_bias"; "flatten"|],
+                               [|string numHidden; string noBias; string flatten|],
+                               [|"data"; "weight"; "bias"; "minData"; "maxData"; "minWeight"; "maxWeight"; "minBias"; "maxBias"|],
+                               [|data :> BaseSymbol; weight :> BaseSymbol; bias :> BaseSymbol; minData :> BaseSymbol; maxData :> BaseSymbol; minWeight :> BaseSymbol; maxWeight :> BaseSymbol; minBias :> BaseSymbol; maxBias :> BaseSymbol|])
 
     /// <summary>Pooling operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
@@ -13429,11 +13429,11 @@ type Operators() =
                                           [<Optional>] ?pad : int seq, 
                                           [<Optional>] ?layout : ContribQuantizedPoolingLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_pooling"
-        new Symbol(Some creator,
-                   [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|],
-                   [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match layout with None -> "None" | Some layout -> string layout)|],
-                   [|"data"; "minData"; "maxData"|],
-                   [|data; minData; maxData|])
+        new SymbolFromOperator(creator,
+                               [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|],
+                               [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match layout with None -> "None" | Some layout -> string layout)|],
+                               [|"data"; "minData"; "maxData"|],
+                               [|data :> BaseSymbol; minData :> BaseSymbol; maxData :> BaseSymbol|])
 
     /// <summary>Given data that is quantized in int32 and the corresponding thresholds,
     /// requantize the data into int8 using min and max thresholds either calculated at runtime
@@ -13520,11 +13520,11 @@ type Operators() =
                                     [<Optional>] ?maxCalibRange : float, 
                                     [<Optional>] ?outType : ContribRequantizeOutType) =
         let creator = AtomicSymbolCreator.FromName "_contrib_requantize"
-        new Symbol(Some creator,
-                   [|"min_calib_range"; "max_calib_range"; "out_type"|],
-                   [|(match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange); (match outType with None -> "int8" | Some outType -> string outType)|],
-                   [|"data"; "minRange"; "maxRange"|],
-                   [|data; minRange; maxRange|])
+        new SymbolFromOperator(creator,
+                               [|"min_calib_range"; "max_calib_range"; "out_type"|],
+                               [|(match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange); (match outType with None -> "int8" | Some outType -> string outType)|],
+                               [|"data"; "minRange"; "maxRange"|],
+                               [|data :> BaseSymbol; minRange :> BaseSymbol; maxRange :> BaseSymbol|])
 
     /// <summary>Concurrent sampling from multiple
     /// uniform distributions on the intervals given by *[low,high)*.
@@ -13643,11 +13643,11 @@ type Operators() =
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member SampleUniform(low : Symbol, high : Symbol, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_uniform"
-        new Symbol(Some creator,
-                   [|"shape"; "dtype"|],
-                   [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   [|"low"; "high"|],
-                   [|low; high|])
+        new SymbolFromOperator(creator,
+                               [|"shape"; "dtype"|],
+                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|"low"; "high"|],
+                               [|low :> BaseSymbol; high :> BaseSymbol|])
 
     /// <summary>Concurrent sampling from multiple
     /// normal distributions with parameters *mu* (mean) and *sigma* (standard deviation).
@@ -13766,11 +13766,11 @@ type Operators() =
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member SampleNormal(mu : Symbol, sigma : Symbol, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_normal"
-        new Symbol(Some creator,
-                   [|"shape"; "dtype"|],
-                   [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   [|"mu"; "sigma"|],
-                   [|mu; sigma|])
+        new SymbolFromOperator(creator,
+                               [|"shape"; "dtype"|],
+                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|"mu"; "sigma"|],
+                               [|mu :> BaseSymbol; sigma :> BaseSymbol|])
 
     /// <summary>Concurrent sampling from multiple
     /// gamma distributions with parameters *alpha* (shape) and *beta* (scale).
@@ -13889,11 +13889,11 @@ type Operators() =
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member SampleGamma(alpha : Symbol, beta : Symbol, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_gamma"
-        new Symbol(Some creator,
-                   [|"shape"; "dtype"|],
-                   [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   [|"alpha"; "beta"|],
-                   [|alpha; beta|])
+        new SymbolFromOperator(creator,
+                               [|"shape"; "dtype"|],
+                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|"alpha"; "beta"|],
+                               [|alpha :> BaseSymbol; beta :> BaseSymbol|])
 
     /// <summary>Concurrent sampling from multiple
     /// exponential distributions with parameters lambda (rate).
@@ -14006,11 +14006,11 @@ type Operators() =
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member SampleExponential(lam : Symbol, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_exponential"
-        new Symbol(Some creator,
-                   [|"shape"; "dtype"|],
-                   [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   [|"lam"|],
-                   [|lam|])
+        new SymbolFromOperator(creator,
+                               [|"shape"; "dtype"|],
+                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|"lam"|],
+                               [|lam :> BaseSymbol|])
 
     /// <summary>Concurrent sampling from multiple
     /// Poisson distributions with parameters lambda (rate).
@@ -14129,11 +14129,11 @@ type Operators() =
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member SamplePoisson(lam : Symbol, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_poisson"
-        new Symbol(Some creator,
-                   [|"shape"; "dtype"|],
-                   [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   [|"lam"|],
-                   [|lam|])
+        new SymbolFromOperator(creator,
+                               [|"shape"; "dtype"|],
+                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|"lam"|],
+                               [|lam :> BaseSymbol|])
 
     /// <summary>Concurrent sampling from multiple
     /// negative binomial distributions with parameters *k* (failure limit) and *p* (failure probability).
@@ -14258,11 +14258,11 @@ type Operators() =
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member SampleNegativeBinomial(k : Symbol, p : Symbol, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_negative_binomial"
-        new Symbol(Some creator,
-                   [|"shape"; "dtype"|],
-                   [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   [|"k"; "p"|],
-                   [|k; p|])
+        new SymbolFromOperator(creator,
+                               [|"shape"; "dtype"|],
+                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|"k"; "p"|],
+                               [|k :> BaseSymbol; p :> BaseSymbol|])
 
     /// <summary>Concurrent sampling from multiple
     /// generalized negative binomial distributions with parameters *mu* (mean) and *alpha* (dispersion).
@@ -14387,11 +14387,11 @@ type Operators() =
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member SampleGeneralizedNegativeBinomial(mu : Symbol, alpha : Symbol, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_generalized_negative_binomial"
-        new Symbol(Some creator,
-                   [|"shape"; "dtype"|],
-                   [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   [|"mu"; "alpha"|],
-                   [|mu; alpha|])
+        new SymbolFromOperator(creator,
+                               [|"shape"; "dtype"|],
+                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|"mu"; "alpha"|],
+                               [|mu :> BaseSymbol; alpha :> BaseSymbol|])
 
     /// <summary>Concurrent sampling from multiple multinomial distributions.
     /// 
@@ -14513,11 +14513,11 @@ type Operators() =
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred.</param>
     static member SampleMultinomial(data : Symbol, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue(false)>] getProb : bool, [<Optional>] dtype : SampleMultinomialDtype) =
         let creator = AtomicSymbolCreator.FromName "_sample_multinomial"
-        new Symbol(Some creator,
-                   [|"shape"; "get_prob"; "dtype"|],
-                   [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string getProb; (if isNull (dtype :> obj) then "int32" else string dtype)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"shape"; "get_prob"; "dtype"|],
+                               [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string getProb; (if isNull (dtype :> obj) then "int32" else string dtype)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardSampleMultinomialNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_sample_multinomial"
@@ -14540,11 +14540,11 @@ type Operators() =
         ()
     static member BackwardSampleMultinomialSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_sample_multinomial"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Draw random samples from a uniform distribution.
     /// 
@@ -14640,11 +14640,11 @@ type Operators() =
                                       [<Optional; DefaultParameterValue("")>] ctx : string, 
                                       [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_uniform"
-        new Symbol(Some creator,
-                   [|"low"; "high"; "shape"; "ctx"; "dtype"|],
-                   [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"low"; "high"; "shape"; "ctx"; "dtype"|],
+                               [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Draw random samples from a normal (Gaussian) distribution.
     /// 
@@ -14737,11 +14737,11 @@ type Operators() =
                                      [<Optional; DefaultParameterValue("")>] ctx : string, 
                                      [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_normal"
-        new Symbol(Some creator,
-                   [|"loc"; "scale"; "shape"; "ctx"; "dtype"|],
-                   [|string loc; string scale; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"loc"; "scale"; "shape"; "ctx"; "dtype"|],
+                               [|string loc; string scale; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Draw random samples from a gamma distribution.
     /// 
@@ -14825,11 +14825,11 @@ type Operators() =
                                     [<Optional; DefaultParameterValue("")>] ctx : string, 
                                     [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_gamma"
-        new Symbol(Some creator,
-                   [|"alpha"; "beta"; "shape"; "ctx"; "dtype"|],
-                   [|string alpha; string beta; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"alpha"; "beta"; "shape"; "ctx"; "dtype"|],
+                               [|string alpha; string beta; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Draw random samples from an exponential distribution.
     /// 
@@ -14897,11 +14897,11 @@ type Operators() =
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member RandomExponentialSymbol([<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_exponential"
-        new Symbol(Some creator,
-                   [|"lam"; "shape"; "ctx"; "dtype"|],
-                   [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"lam"; "shape"; "ctx"; "dtype"|],
+                               [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Draw random samples from a Poisson distribution.
     /// 
@@ -14972,11 +14972,11 @@ type Operators() =
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member RandomPoissonSymbol([<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_poisson"
-        new Symbol(Some creator,
-                   [|"lam"; "shape"; "ctx"; "dtype"|],
-                   [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"lam"; "shape"; "ctx"; "dtype"|],
+                               [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Draw random samples from a negative binomial distribution.
     /// 
@@ -15066,11 +15066,11 @@ type Operators() =
                                                [<Optional; DefaultParameterValue("")>] ctx : string, 
                                                [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_negative_binomial"
-        new Symbol(Some creator,
-                   [|"k"; "p"; "shape"; "ctx"; "dtype"|],
-                   [|string k; string p; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"k"; "p"; "shape"; "ctx"; "dtype"|],
+                               [|string k; string p; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Draw random samples from a generalized negative binomial distribution.
     /// 
@@ -15163,11 +15163,11 @@ type Operators() =
                                                           [<Optional; DefaultParameterValue("")>] ctx : string, 
                                                           [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_generalized_negative_binomial"
-        new Symbol(Some creator,
-                   [|"mu"; "alpha"; "shape"; "ctx"; "dtype"|],
-                   [|string mu; string alpha; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"mu"; "alpha"; "shape"; "ctx"; "dtype"|],
+                               [|string mu; string alpha; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Draw random samples from a discrete uniform distribution.
     /// 
@@ -15257,11 +15257,11 @@ type Operators() =
                                       [<Optional; DefaultParameterValue("")>] ctx : string, 
                                       [<Optional>] dtype : RandomRandintDtype) =
         let creator = AtomicSymbolCreator.FromName "_random_randint"
-        new Symbol(Some creator,
-                   [|"low"; "high"; "shape"; "ctx"; "dtype"|],
-                   [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"low"; "high"; "shape"; "ctx"; "dtype"|],
+                               [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Draw random samples from a uniform distribution according to the input array shape.
     /// 
@@ -15332,11 +15332,11 @@ type Operators() =
     /// <param name="high">Upper bound of the distribution.</param>
     static member RandomUniformLike(data : Symbol, [<Optional; DefaultParameterValue(0.0)>] low : float, [<Optional; DefaultParameterValue(1.0)>] high : float) =
         let creator = AtomicSymbolCreator.FromName "_random_uniform_like"
-        new Symbol(Some creator,
-                   [|"low"; "high"|],
-                   [|string low; string high|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"low"; "high"|],
+                               [|string low; string high|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Draw random samples from a normal (Gaussian) distribution according to the input array shape.
     /// 
@@ -15404,11 +15404,11 @@ type Operators() =
     /// <param name="scale">Standard deviation of the distribution.</param>
     static member RandomNormalLike(data : Symbol, [<Optional; DefaultParameterValue(0.0)>] loc : float, [<Optional; DefaultParameterValue(1.0)>] scale : float) =
         let creator = AtomicSymbolCreator.FromName "_random_normal_like"
-        new Symbol(Some creator,
-                   [|"loc"; "scale"|],
-                   [|string loc; string scale|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"loc"; "scale"|],
+                               [|string loc; string scale|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Draw random samples from a gamma distribution according to the input array shape.
     /// 
@@ -15473,11 +15473,11 @@ type Operators() =
     /// <param name="beta">Beta parameter (scale) of the gamma distribution.</param>
     static member RandomGammaLike(data : Symbol, [<Optional; DefaultParameterValue(1.0)>] alpha : float, [<Optional; DefaultParameterValue(1.0)>] beta : float) =
         let creator = AtomicSymbolCreator.FromName "_random_gamma_like"
-        new Symbol(Some creator,
-                   [|"alpha"; "beta"|],
-                   [|string alpha; string beta|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"alpha"; "beta"|],
+                               [|string alpha; string beta|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Draw random samples from an exponential distribution according to the input array shape.
     /// 
@@ -15539,11 +15539,11 @@ type Operators() =
     /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
     static member RandomExponentialLike(data : Symbol, [<Optional; DefaultParameterValue(1.0)>] lam : float) =
         let creator = AtomicSymbolCreator.FromName "_random_exponential_like"
-        new Symbol(Some creator,
-                   [|"lam"|],
-                   [|string lam|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"lam"|],
+                               [|string lam|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Draw random samples from a Poisson distribution according to the input array shape.
     /// 
@@ -15608,11 +15608,11 @@ type Operators() =
     /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
     static member RandomPoissonLike(data : Symbol, [<Optional; DefaultParameterValue(1.0)>] lam : float) =
         let creator = AtomicSymbolCreator.FromName "_random_poisson_like"
-        new Symbol(Some creator,
-                   [|"lam"|],
-                   [|string lam|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"lam"|],
+                               [|string lam|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Draw random samples from a negative binomial distribution according to the input array shape.
     /// 
@@ -15683,11 +15683,11 @@ type Operators() =
     /// <param name="p">Failure probability in each experiment.</param>
     static member RandomNegativeBinomialLike(data : Symbol, [<Optional; DefaultParameterValue(1)>] k : int, [<Optional; DefaultParameterValue(1.0)>] p : float) =
         let creator = AtomicSymbolCreator.FromName "_random_negative_binomial_like"
-        new Symbol(Some creator,
-                   [|"k"; "p"|],
-                   [|string k; string p|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"k"; "p"|],
+                               [|string k; string p|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Draw random samples from a generalized negative binomial distribution according to the
     /// input array shape.
@@ -15764,11 +15764,11 @@ type Operators() =
     /// <param name="alpha">Alpha (dispersion) parameter of the negative binomial distribution.</param>
     static member RandomGeneralizedNegativeBinomialLike(data : Symbol, [<Optional; DefaultParameterValue(1.0)>] mu : float, [<Optional; DefaultParameterValue(1.0)>] alpha : float) =
         let creator = AtomicSymbolCreator.FromName "_random_generalized_negative_binomial_like"
-        new Symbol(Some creator,
-                   [|"mu"; "alpha"|],
-                   [|string mu; string alpha|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"mu"; "alpha"|],
+                               [|string mu; string alpha|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Randomly shuffle the elements.
     /// 
@@ -15815,11 +15815,11 @@ type Operators() =
     /// <param name="data">Data to be shuffled.</param>
     static member Shuffle(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_shuffle"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Draw random samples from an an approximately log-uniform
     /// or Zipfian distribution without replacement.
@@ -15923,11 +15923,11 @@ type Operators() =
     /// <param name="shape">2-D shape of the output, where shape[0] is the batch size, and shape[1] is the number of candidates to sample for each batch.</param>
     static member SampleUniqueZipfianSymbol(rangeMax : int, [<Optional>] shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "_sample_unique_zipfian"
-        new Symbol(Some creator,
-                   [|"range_max"; "shape"|],
-                   [|string rangeMax; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"range_max"; "shape"|],
+                               [|string rangeMax; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Computes and optimizes for squared loss during backward propagation.
     /// Just outputs ``data`` during forward propagation.
@@ -16025,11 +16025,11 @@ type Operators() =
     /// <param name="gradScale">Scale the gradient by a float factor</param>
     static member LinearRegressionOutput(data : Symbol, label : Symbol, [<Optional; DefaultParameterValue(1.0)>] gradScale : float) =
         let creator = AtomicSymbolCreator.FromName "LinearRegressionOutput"
-        new Symbol(Some creator,
-                   [|"grad_scale"|],
-                   [|string gradScale|],
-                   [|"data"; "label"|],
-                   [|data; label|])
+        new SymbolFromOperator(creator,
+                               [|"grad_scale"|],
+                               [|string gradScale|],
+                               [|"data"; "label"|],
+                               [|data :> BaseSymbol; label :> BaseSymbol|])
 
     static member BackwardLinearRegOutNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linear_reg_out"
@@ -16052,11 +16052,11 @@ type Operators() =
         ()
     static member BackwardLinearRegOutSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linear_reg_out"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Computes mean absolute error of the input.
     /// 
@@ -16157,11 +16157,11 @@ type Operators() =
     /// <param name="gradScale">Scale the gradient by a float factor</param>
     static member MAERegressionOutput(data : Symbol, label : Symbol, [<Optional; DefaultParameterValue(1.0)>] gradScale : float) =
         let creator = AtomicSymbolCreator.FromName "MAERegressionOutput"
-        new Symbol(Some creator,
-                   [|"grad_scale"|],
-                   [|string gradScale|],
-                   [|"data"; "label"|],
-                   [|data; label|])
+        new SymbolFromOperator(creator,
+                               [|"grad_scale"|],
+                               [|string gradScale|],
+                               [|"data"; "label"|],
+                               [|data :> BaseSymbol; label :> BaseSymbol|])
 
     static member BackwardMaeRegOutNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_mae_reg_out"
@@ -16184,11 +16184,11 @@ type Operators() =
         ()
     static member BackwardMaeRegOutSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_mae_reg_out"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Applies a logistic function to the input.
     /// 
@@ -16301,11 +16301,11 @@ type Operators() =
     /// <param name="gradScale">Scale the gradient by a float factor</param>
     static member LogisticRegressionOutput(data : Symbol, label : Symbol, [<Optional; DefaultParameterValue(1.0)>] gradScale : float) =
         let creator = AtomicSymbolCreator.FromName "LogisticRegressionOutput"
-        new Symbol(Some creator,
-                   [|"grad_scale"|],
-                   [|string gradScale|],
-                   [|"data"; "label"|],
-                   [|data; label|])
+        new SymbolFromOperator(creator,
+                               [|"grad_scale"|],
+                               [|string gradScale|],
+                               [|"data"; "label"|],
+                               [|data :> BaseSymbol; label :> BaseSymbol|])
 
     static member BackwardLogisticRegOutNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_logistic_reg_out"
@@ -16328,11 +16328,11 @@ type Operators() =
         ()
     static member BackwardLogisticRegOutSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_logistic_reg_out"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Applies recurrent layers to input data. Currently, vanilla RNN, LSTM and GRU are
     /// implemented, with both multi-layer and bidirectional support.
@@ -16617,11 +16617,11 @@ type Operators() =
                       [<Optional>] ?lstmStateClipNan : bool, 
                       [<Optional>] ?useSequenceLength : bool) =
         let creator = AtomicSymbolCreator.FromName "RNN"
-        new Symbol(Some creator,
-                   [|"state_size"; "num_layers"; "mode"; "projection_size"; "lstm_state_clip_min"; "lstm_state_clip_max"; "bidirectional"; "p"; "state_outputs"; "lstm_state_clip_nan"; "use_sequence_length"|],
-                   [|string stateSize; string numLayers; string mode; (match projectionSize with None -> "None" | Some projectionSize -> string projectionSize); (match lstmStateClipMin with None -> "None" | Some lstmStateClipMin -> string lstmStateClipMin); (match lstmStateClipMax with None -> "None" | Some lstmStateClipMax -> string lstmStateClipMax); (match bidirectional with None -> "false" | Some bidirectional -> string bidirectional); (match p with None -> "0.0" | Some p -> string p); (match stateOutputs with None -> "false" | Some stateOutputs -> string stateOutputs); (match lstmStateClipNan with None -> "false" | Some lstmStateClipNan -> string lstmStateClipNan); (match useSequenceLength with None -> "false" | Some useSequenceLength -> string useSequenceLength)|],
-                   [|"data"; "parameters"; "state"; "stateCell"; "sequenceLength"|],
-                   [|data; parameters; state; stateCell; sequenceLength|])
+        new SymbolFromOperator(creator,
+                               [|"state_size"; "num_layers"; "mode"; "projection_size"; "lstm_state_clip_min"; "lstm_state_clip_max"; "bidirectional"; "p"; "state_outputs"; "lstm_state_clip_nan"; "use_sequence_length"|],
+                               [|string stateSize; string numLayers; string mode; (match projectionSize with None -> "None" | Some projectionSize -> string projectionSize); (match lstmStateClipMin with None -> "None" | Some lstmStateClipMin -> string lstmStateClipMin); (match lstmStateClipMax with None -> "None" | Some lstmStateClipMax -> string lstmStateClipMax); (match bidirectional with None -> "false" | Some bidirectional -> string bidirectional); (match p with None -> "0.0" | Some p -> string p); (match stateOutputs with None -> "false" | Some stateOutputs -> string stateOutputs); (match lstmStateClipNan with None -> "false" | Some lstmStateClipNan -> string lstmStateClipNan); (match useSequenceLength with None -> "false" | Some useSequenceLength -> string useSequenceLength)|],
+                               [|"data"; "parameters"; "state"; "stateCell"; "sequenceLength"|],
+                               [|data :> BaseSymbol; parameters :> BaseSymbol; state :> BaseSymbol; stateCell :> BaseSymbol; sequenceLength :> BaseSymbol|])
 
     static member BackwardRNNNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_RNN"
@@ -16644,11 +16644,11 @@ type Operators() =
         ()
     static member BackwardRNNSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_RNN"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Splits an array along a particular axis into multiple sub-arrays.
     /// 
@@ -16866,11 +16866,11 @@ type Operators() =
     /// <param name="squeezeAxis">If true, Removes the axis with length 1 from the shapes of the output arrays. **Note** that setting `squeeze_axis` to ``true`` removes axis with length 1 only along the `axis` which it is split. Also `squeeze_axis` can be set to ``true`` only if ``input.shape[axis] == num_outputs``.</param>
     static member SliceChannel(data : Symbol, numOutputs : int, [<Optional; DefaultParameterValue(1)>] axis : int, [<Optional; DefaultParameterValue(false)>] squeezeAxis : bool) =
         let creator = AtomicSymbolCreator.FromName "SliceChannel"
-        new Symbol(Some creator,
-                   [|"num_outputs"; "axis"; "squeeze_axis"|],
-                   [|string numOutputs; string axis; string squeezeAxis|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"num_outputs"; "axis"; "squeeze_axis"|],
+                               [|string numOutputs; string axis; string squeezeAxis|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Computes the gradient of cross entropy loss with respect to softmax output.
     /// 
@@ -17185,11 +17185,11 @@ type Operators() =
                                 [<Optional; DefaultParameterValue(false)>] outGrad : bool, 
                                 [<Optional; DefaultParameterValue(0.0)>] smoothAlpha : float) =
         let creator = AtomicSymbolCreator.FromName "SoftmaxOutput"
-        new Symbol(Some creator,
-                   [|"grad_scale"; "ignore_label"; "multi_output"; "use_ignore"; "preserve_shape"; "normalization"; "out_grad"; "smooth_alpha"|],
-                   [|string gradScale; string ignoreLabel; string multiOutput; string useIgnore; string preserveShape; (if isNull (normalization :> obj) then "null" else string normalization); string outGrad; string smoothAlpha|],
-                   [|"data"; "label"|],
-                   [|data; label|])
+        new SymbolFromOperator(creator,
+                               [|"grad_scale"; "ignore_label"; "multi_output"; "use_ignore"; "preserve_shape"; "normalization"; "out_grad"; "smooth_alpha"|],
+                               [|string gradScale; string ignoreLabel; string multiOutput; string useIgnore; string preserveShape; (if isNull (normalization :> obj) then "null" else string normalization); string outGrad; string smoothAlpha|],
+                               [|"data"; "label"|],
+                               [|data :> BaseSymbol; label :> BaseSymbol|])
 
     static member BackwardSoftmaxOutputNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_SoftmaxOutput"
@@ -17212,11 +17212,11 @@ type Operators() =
         ()
     static member BackwardSoftmaxOutputSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_SoftmaxOutput"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Interchanges two axes of an array.
     /// 
@@ -17311,11 +17311,11 @@ type Operators() =
     /// <param name="dim2">the second axis to be swapped.</param>
     static member SwapAxis(data : Symbol, [<Optional; DefaultParameterValue(0)>] dim1 : int, [<Optional; DefaultParameterValue(0)>] dim2 : int) =
         let creator = AtomicSymbolCreator.FromName "SwapAxis"
-        new Symbol(Some creator,
-                   [|"dim1"; "dim2"|],
-                   [|string dim1; string dim2|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"dim1"; "dim2"|],
+                               [|string dim1; string dim2|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Cast function between low precision float/FP32 used by AMP.
     /// 
@@ -17362,11 +17362,11 @@ type Operators() =
     /// <param name="dtype">Output data type.</param>
     static member AmpCast(data : Symbol, dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "amp_cast"
-        new Symbol(Some creator,
-                   [|"dtype"|],
-                   [|string dtype|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"dtype"|],
+                               [|string dtype|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardAmpCastNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_amp_cast"
@@ -17389,11 +17389,11 @@ type Operators() =
         ()
     static member BackwardAmpCastSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_amp_cast"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Cast function used by AMP, that casts its inputs to the common widest type.
     /// 
@@ -17443,11 +17443,11 @@ type Operators() =
     /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
     static member AmpMulticast([<ParamArray>] data : Symbol[], numOutputs : int) =
         let creator = AtomicSymbolCreator.FromName "amp_multicast"
-        new Symbol(Some creator,
-                   [|"num_outputs"|],
-                   [|string numOutputs|],
-                   Array.empty,
-                   (data |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               [|"num_outputs"|],
+                               [|string numOutputs|],
+                               Array.empty,
+                               (data |> Array.map (fun x -> x :> BaseSymbol)))
 
     /// <param name="grad">Gradients</param>
     /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
@@ -17476,11 +17476,11 @@ type Operators() =
     /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
     static member BackwardAmpMulticast([<ParamArray>] grad : Symbol[], numOutputs : int) =
         let creator = AtomicSymbolCreator.FromName "_backward_amp_multicast"
-        new Symbol(Some creator,
-                   [|"num_outputs"|],
-                   [|string numOutputs|],
-                   Array.empty,
-                   (grad |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               [|"num_outputs"|],
+                               [|string numOutputs|],
+                               Array.empty,
+                               (grad |> Array.map (fun x -> x :> BaseSymbol)))
 
     /// <summary>Returns indices of the maximum values along an axis.
     /// 
@@ -17581,11 +17581,11 @@ type Operators() =
     /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
     static member Argmax(data : Symbol, [<Optional>] ?axis : int, [<Optional>] ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "argmax"
-        new Symbol(Some creator,
-                   [|"axis"; "keepdims"|],
-                   [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "keepdims"|],
+                               [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Returns indices of the minimum values along an axis.
     /// 
@@ -17686,11 +17686,11 @@ type Operators() =
     /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
     static member Argmin(data : Symbol, [<Optional>] ?axis : int, [<Optional>] ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "argmin"
-        new Symbol(Some creator,
-                   [|"axis"; "keepdims"|],
-                   [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "keepdims"|],
+                               [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Returns argmax indices of each channel from the input array.
     /// 
@@ -17767,11 +17767,11 @@ type Operators() =
     /// <param name="data">The input array</param>
     static member ArgmaxChannel(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "argmax_channel"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Picks elements from an input array according to the input indices along the given axis.
     /// 
@@ -17954,11 +17954,11 @@ type Operators() =
                        [<Optional>] ?keepdims : bool, 
                        [<Optional>] ?mode : PickMode) =
         let creator = AtomicSymbolCreator.FromName "pick"
-        new Symbol(Some creator,
-                   [|"axis"; "keepdims"; "mode"|],
-                   [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match mode with None -> "clip" | Some mode -> string mode)|],
-                   [|"data"; "index"|],
-                   [|data; index|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "keepdims"; "mode"|],
+                               [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match mode with None -> "clip" | Some mode -> string mode)|],
+                               [|"data"; "index"|],
+                               [|data :> BaseSymbol; index :> BaseSymbol|])
 
     static member BackwardPickNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_pick"
@@ -17981,11 +17981,11 @@ type Operators() =
         ()
     static member BackwardPickSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_pick"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Computes the sum of array elements over given axes.
     /// 
@@ -18170,11 +18170,11 @@ type Operators() =
     /// <param name="exclude">Whether to perform reduction on axis that are NOT in axis instead.</param>
     static member Sum(data : Symbol, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "sum"
-        new Symbol(Some creator,
-                   [|"axis"; "keepdims"; "exclude"|],
-                   [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "keepdims"; "exclude"|],
+                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardSumNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_sum"
@@ -18197,11 +18197,11 @@ type Operators() =
         ()
     static member BackwardSumSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_sum"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Computes the mean of array elements over given axes.
     /// 
@@ -18284,11 +18284,11 @@ type Operators() =
     /// <param name="exclude">Whether to perform reduction on axis that are NOT in axis instead.</param>
     static member Mean(data : Symbol, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "mean"
-        new Symbol(Some creator,
-                   [|"axis"; "keepdims"; "exclude"|],
-                   [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "keepdims"; "exclude"|],
+                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardMeanNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_mean"
@@ -18311,11 +18311,11 @@ type Operators() =
         ()
     static member BackwardMeanSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_mean"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Computes the product of array elements over given axes.
     /// 
@@ -18398,11 +18398,11 @@ type Operators() =
     /// <param name="exclude">Whether to perform reduction on axis that are NOT in axis instead.</param>
     static member Prod(data : Symbol, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "prod"
-        new Symbol(Some creator,
-                   [|"axis"; "keepdims"; "exclude"|],
-                   [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "keepdims"; "exclude"|],
+                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardProdNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_prod"
@@ -18425,11 +18425,11 @@ type Operators() =
         ()
     static member BackwardProdSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_prod"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Computes the sum of array elements over given axes treating Not a Numbers (``NaN``) as zero.
     /// 
@@ -18518,11 +18518,11 @@ type Operators() =
     /// <param name="exclude">Whether to perform reduction on axis that are NOT in axis instead.</param>
     static member Nansum(data : Symbol, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "nansum"
-        new Symbol(Some creator,
-                   [|"axis"; "keepdims"; "exclude"|],
-                   [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "keepdims"; "exclude"|],
+                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardNansumNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_nansum"
@@ -18545,11 +18545,11 @@ type Operators() =
         ()
     static member BackwardNansumSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_nansum"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Computes the product of array elements over given axes treating Not a Numbers (``NaN``) as one.
     /// 
@@ -18638,11 +18638,11 @@ type Operators() =
     /// <param name="exclude">Whether to perform reduction on axis that are NOT in axis instead.</param>
     static member Nanprod(data : Symbol, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "nanprod"
-        new Symbol(Some creator,
-                   [|"axis"; "keepdims"; "exclude"|],
-                   [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "keepdims"; "exclude"|],
+                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardNanprodNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_nanprod"
@@ -18665,11 +18665,11 @@ type Operators() =
         ()
     static member BackwardNanprodSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_nanprod"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Computes the max of array elements over given axes.
     /// 
@@ -18752,11 +18752,11 @@ type Operators() =
     /// <param name="exclude">Whether to perform reduction on axis that are NOT in axis instead.</param>
     static member Max(data : Symbol, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "max"
-        new Symbol(Some creator,
-                   [|"axis"; "keepdims"; "exclude"|],
-                   [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "keepdims"; "exclude"|],
+                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardMaxNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_max"
@@ -18779,11 +18779,11 @@ type Operators() =
         ()
     static member BackwardMaxSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_max"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Computes the min of array elements over given axes.
     /// 
@@ -18866,11 +18866,11 @@ type Operators() =
     /// <param name="exclude">Whether to perform reduction on axis that are NOT in axis instead.</param>
     static member Min(data : Symbol, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "min"
-        new Symbol(Some creator,
-                   [|"axis"; "keepdims"; "exclude"|],
-                   [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "keepdims"; "exclude"|],
+                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardMinNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_min"
@@ -18893,11 +18893,11 @@ type Operators() =
         ()
     static member BackwardMinSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_min"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Broadcasts the input array over particular axes.
     /// 
@@ -18995,11 +18995,11 @@ type Operators() =
     /// <param name="size">Target sizes of the broadcasting axes.</param>
     static member BroadcastAxis(data : Symbol, [<Optional>] axis : int seq, [<Optional>] size : int seq) =
         let creator = AtomicSymbolCreator.FromName "broadcast_axis"
-        new Symbol(Some creator,
-                   [|"axis"; "size"|],
-                   [|(if isNull (axis :> obj) then "[]" else (axis |> Seq.map string |> String.concat ", ")); (if isNull (size :> obj) then "[]" else (size |> Seq.map string |> String.concat ", "))|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "size"|],
+                               [|(if isNull (axis :> obj) then "[]" else (axis |> Seq.map string |> String.concat ", ")); (if isNull (size :> obj) then "[]" else (size |> Seq.map string |> String.concat ", "))|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Broadcasts the input array to a new shape.
     /// 
@@ -19088,11 +19088,11 @@ type Operators() =
     /// <param name="shape">The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.</param>
     static member BroadcastTo(data : Symbol, [<Optional>] shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "broadcast_to"
-        new Symbol(Some creator,
-                   [|"shape"|],
-                   [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", "))|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"shape"|],
+                               [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", "))|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BroadcastBackwardNDArray() =
         let creator = AtomicSymbolCreator.FromName "_broadcast_backward"
@@ -19115,11 +19115,11 @@ type Operators() =
         ()
     static member BroadcastBackwardSymbol() =
         let creator = AtomicSymbolCreator.FromName "_broadcast_backward"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Broadcasts lhs to have the same shape as rhs.
     /// 
@@ -19211,11 +19211,11 @@ type Operators() =
     /// <param name="rhsAxes">Axes to copy from the second input array</param>
     static member BroadcastLike(lhs : Symbol, rhs : Symbol, [<Optional>] lhsAxes : int seq, [<Optional>] rhsAxes : int seq) =
         let creator = AtomicSymbolCreator.FromName "broadcast_like"
-        new Symbol(Some creator,
-                   [|"lhs_axes"; "rhs_axes"|],
-                   [|(lhsAxes |> Seq.map string |> String.concat ", "); (rhsAxes |> Seq.map string |> String.concat ", ")|],
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               [|"lhs_axes"; "rhs_axes"|],
+                               [|(lhsAxes |> Seq.map string |> String.concat ", "); (rhsAxes |> Seq.map string |> String.concat ", ")|],
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Computes the norm on an NDArray.
     /// 
@@ -19371,11 +19371,11 @@ type Operators() =
                        [<Optional>] outDtype : OutDtype, 
                        [<Optional; DefaultParameterValue(false)>] keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "norm"
-        new Symbol(Some creator,
-                   [|"ord"; "axis"; "out_dtype"; "keepdims"|],
-                   [|string ord; (axis |> Seq.map string |> String.concat ", "); (if isNull (outDtype :> obj) then "None" else string outDtype); string keepdims|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"ord"; "axis"; "out_dtype"; "keepdims"|],
+                               [|string ord; (axis |> Seq.map string |> String.concat ", "); (if isNull (outDtype :> obj) then "None" else string outDtype); string keepdims|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardNormNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_norm"
@@ -19398,11 +19398,11 @@ type Operators() =
         ()
     static member BackwardNormSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_norm"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Casts tensor storage type to the new type.
     /// 
@@ -19548,11 +19548,11 @@ type Operators() =
     /// <param name="stype">Output storage type.</param>
     static member CastStorage(data : Symbol, stype : Stype) =
         let creator = AtomicSymbolCreator.FromName "cast_storage"
-        new Symbol(Some creator,
-                   [|"stype"|],
-                   [|string stype|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"stype"|],
+                               [|string stype|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Return the elements, either from x or y, depending on the condition.
     /// 
@@ -19668,11 +19668,11 @@ type Operators() =
     /// <param name="y"></param>
     static member Where(condition : Symbol, x : Symbol, y : Symbol) =
         let creator = AtomicSymbolCreator.FromName "where"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"condition"; "x"; "y"|],
-                   [|condition; x; y|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"condition"; "x"; "y"|],
+                               [|condition :> BaseSymbol; x :> BaseSymbol; y :> BaseSymbol|])
 
     static member BackwardWhereNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_where"
@@ -19695,11 +19695,11 @@ type Operators() =
         ()
     static member BackwardWhereSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_where"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Extracts a diagonal or constructs a diagonal array.
     /// 
@@ -19899,11 +19899,11 @@ type Operators() =
     /// <param name="axis2">The second axis of the sub-arrays of interest. Ignored when the input is a 1-D array.</param>
     static member Diag(data : Symbol, [<Optional; DefaultParameterValue(0)>] k : int, [<Optional; DefaultParameterValue(0)>] axis1 : int, [<Optional; DefaultParameterValue(1)>] axis2 : int) =
         let creator = AtomicSymbolCreator.FromName "diag"
-        new Symbol(Some creator,
-                   [|"k"; "axis1"; "axis2"|],
-                   [|string k; string axis1; string axis2|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"k"; "axis1"; "axis2"|],
+                               [|string k; string axis1; string axis2|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardDiagNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_diag"
@@ -19926,11 +19926,11 @@ type Operators() =
         ()
     static member BackwardDiagSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_diag"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Dot product of two arrays.
     /// 
@@ -20122,11 +20122,11 @@ type Operators() =
                       [<Optional; DefaultParameterValue(false)>] transposeB : bool, 
                       [<Optional>] forwardStype : ForwardStype) =
         let creator = AtomicSymbolCreator.FromName "dot"
-        new Symbol(Some creator,
-                   [|"transpose_a"; "transpose_b"; "forward_stype"|],
-                   [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|],
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               [|"transpose_a"; "transpose_b"; "forward_stype"|],
+                               [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|],
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="transposeA">If true then transpose the first input before dot.</param>
     /// <param name="transposeB">If true then transpose the second input before dot.</param>
@@ -20158,11 +20158,11 @@ type Operators() =
     /// <param name="forwardStype">The desired storage type of the forward output given by user, if thecombination of input storage types and this hint does not matchany implemented ones, the dot operator will perform fallback operationand still produce an output of the desired storage type.</param>
     static member BackwardDotSymbol([<Optional; DefaultParameterValue(false)>] transposeA : bool, [<Optional; DefaultParameterValue(false)>] transposeB : bool, [<Optional>] forwardStype : ForwardStype) =
         let creator = AtomicSymbolCreator.FromName "_backward_dot"
-        new Symbol(Some creator,
-                   [|"transpose_a"; "transpose_b"; "forward_stype"|],
-                   [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"transpose_a"; "transpose_b"; "forward_stype"|],
+                               [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Batchwise dot product.
     /// 
@@ -20255,11 +20255,11 @@ type Operators() =
                            [<Optional; DefaultParameterValue(false)>] transposeB : bool, 
                            [<Optional>] forwardStype : ForwardStype) =
         let creator = AtomicSymbolCreator.FromName "batch_dot"
-        new Symbol(Some creator,
-                   [|"transpose_a"; "transpose_b"; "forward_stype"|],
-                   [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|],
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               [|"transpose_a"; "transpose_b"; "forward_stype"|],
+                               [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|],
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardBatchDotNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_batch_dot"
@@ -20282,11 +20282,11 @@ type Operators() =
         ()
     static member BackwardBatchDotSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_batch_dot"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Returns element-wise sum of the input arrays with broadcasting.
     /// 
@@ -20393,11 +20393,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastAdd(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_add"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardBroadcastAddNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_add"
@@ -20420,11 +20420,11 @@ type Operators() =
         ()
     static member BackwardBroadcastAddSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_add"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Returns element-wise difference of the input arrays with broadcasting.
     /// 
@@ -20531,11 +20531,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastSub(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_sub"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardBroadcastSubNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_sub"
@@ -20558,11 +20558,11 @@ type Operators() =
         ()
     static member BackwardBroadcastSubSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_sub"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Returns element-wise product of the input arrays with broadcasting.
     /// 
@@ -20651,11 +20651,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastMul(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_mul"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardBroadcastMulNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_mul"
@@ -20678,11 +20678,11 @@ type Operators() =
         ()
     static member BackwardBroadcastMulSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_mul"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Returns element-wise division of the input arrays with broadcasting.
     /// 
@@ -20771,11 +20771,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastDiv(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_div"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardBroadcastDivNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_div"
@@ -20798,11 +20798,11 @@ type Operators() =
         ()
     static member BackwardBroadcastDivSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_div"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Returns element-wise modulo of the input arrays with broadcasting.
     /// 
@@ -20879,11 +20879,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastMod(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_mod"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardBroadcastModNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_mod"
@@ -20906,11 +20906,11 @@ type Operators() =
         ()
     static member BackwardBroadcastModSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_mod"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Returns result of first array elements raised to powers from second array, element-wise with broadcasting.
     /// 
@@ -20987,11 +20987,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastPower(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_power"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardBroadcastPowerNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_power"
@@ -21014,11 +21014,11 @@ type Operators() =
         ()
     static member BackwardBroadcastPowerSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_power"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Returns element-wise maximum of the input arrays with broadcasting.
     /// 
@@ -21101,11 +21101,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastMaximum(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_maximum"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardBroadcastMaximumNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_maximum"
@@ -21128,11 +21128,11 @@ type Operators() =
         ()
     static member BackwardBroadcastMaximumSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_maximum"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Returns element-wise minimum of the input arrays with broadcasting.
     /// 
@@ -21215,11 +21215,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastMinimum(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_minimum"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardBroadcastMinimumNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_minimum"
@@ -21242,11 +21242,11 @@ type Operators() =
         ()
     static member BackwardBroadcastMinimumSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_minimum"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary> Returns the hypotenuse of a right angled triangle, given its &quot;legs&quot;
     /// with broadcasting.
@@ -21347,11 +21347,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastHypot(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_hypot"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardBroadcastHypotNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_hypot"
@@ -21374,11 +21374,11 @@ type Operators() =
         ()
     static member BackwardBroadcastHypotSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_broadcast_hypot"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Returns the result of element-wise **equal to** (==) comparison operation with broadcasting.
     /// 
@@ -21455,11 +21455,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastEqual(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_equal"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the result of element-wise **not equal to** (!=) comparison operation with broadcasting.
     /// 
@@ -21536,11 +21536,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastNotEqual(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_not_equal"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the result of element-wise **greater than** (&gt;) comparison operation with broadcasting.
     /// 
@@ -21617,11 +21617,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastGreater(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_greater"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the result of element-wise **greater than or equal to** (&gt;=) comparison operation with broadcasting.
     /// 
@@ -21698,11 +21698,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastGreaterEqual(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_greater_equal"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the result of element-wise **lesser than** (&lt;) comparison operation with broadcasting.
     /// 
@@ -21779,11 +21779,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastLesser(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_lesser"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the result of element-wise **lesser than or equal to** (&lt;=) comparison operation with broadcasting.
     /// 
@@ -21860,11 +21860,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastLesserEqual(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_lesser_equal"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the result of element-wise **logical and** with broadcasting.
     /// 
@@ -21941,11 +21941,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastLogicalAnd(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_logical_and"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the result of element-wise **logical or** with broadcasting.
     /// 
@@ -22022,11 +22022,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastLogicalOr(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_logical_or"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the result of element-wise **logical xor** with broadcasting.
     /// 
@@ -22103,11 +22103,11 @@ type Operators() =
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastLogicalXor(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "broadcast_logical_xor"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Adds arguments element-wise.
     /// 
@@ -22175,11 +22175,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member ElemwiseAdd(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "elemwise_add"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -22208,11 +22208,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member GradAdd(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_grad_add"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardAddNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_add"
@@ -22235,11 +22235,11 @@ type Operators() =
         ()
     static member BackwardAddSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_add"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Subtracts arguments element-wise.
     /// 
@@ -22307,11 +22307,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member ElemwiseSub(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "elemwise_sub"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardSubNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_sub"
@@ -22334,11 +22334,11 @@ type Operators() =
         ()
     static member BackwardSubSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_sub"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Multiplies arguments element-wise.
     /// 
@@ -22403,11 +22403,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member ElemwiseMul(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "elemwise_mul"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardMulNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_mul"
@@ -22430,11 +22430,11 @@ type Operators() =
         ()
     static member BackwardMulSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_mul"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Divides arguments element-wise.
     /// 
@@ -22478,11 +22478,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member ElemwiseDiv(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "elemwise_div"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardDivNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_div"
@@ -22505,11 +22505,11 @@ type Operators() =
         ()
     static member BackwardDivSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_div"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -22538,11 +22538,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member Mod(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_mod"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardModNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_mod"
@@ -22565,11 +22565,11 @@ type Operators() =
         ()
     static member BackwardModSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_mod"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -22598,11 +22598,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member Power(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_power"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardPowerNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_power"
@@ -22625,11 +22625,11 @@ type Operators() =
         ()
     static member BackwardPowerSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_power"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -22658,11 +22658,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member Maximum(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_maximum"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardMaximumNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_maximum"
@@ -22685,11 +22685,11 @@ type Operators() =
         ()
     static member BackwardMaximumSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_maximum"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -22718,11 +22718,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member Minimum(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_minimum"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardMinimumNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_minimum"
@@ -22745,11 +22745,11 @@ type Operators() =
         ()
     static member BackwardMinimumSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_minimum"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Given the &quot;legs&quot; of a right triangle, return its hypotenuse.
     /// 
@@ -22793,11 +22793,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member Hypot(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_hypot"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     static member BackwardHypotNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_hypot"
@@ -22820,11 +22820,11 @@ type Operators() =
         ()
     static member BackwardHypotSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_hypot"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -22853,11 +22853,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member Equal(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_equal"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -22886,11 +22886,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member NotEqual(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_not_equal"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -22919,11 +22919,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member Greater(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_greater"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -22952,11 +22952,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member GreaterEqual(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_greater_equal"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -22985,11 +22985,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member Lesser(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_lesser"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -23018,11 +23018,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member LesserEqual(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_lesser_equal"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -23051,11 +23051,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member LogicalAnd(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_logical_and"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -23084,11 +23084,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member LogicalOr(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_logical_or"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -23117,11 +23117,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member LogicalXor(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_logical_xor"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -23150,11 +23150,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member PlusScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_plus_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -23183,11 +23183,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member MinusScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_minus_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -23216,11 +23216,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member RminusScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_rminus_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Multiply an array with a scalar.
     /// 
@@ -23282,11 +23282,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member MulScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_mul_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -23315,11 +23315,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member BackwardMulScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_mul_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Divide an array with a scalar.
     /// 
@@ -23381,11 +23381,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member DivScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_div_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -23414,11 +23414,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member BackwardDivScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_div_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -23447,11 +23447,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member RdivScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_rdiv_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -23483,11 +23483,11 @@ type Operators() =
     /// <param name="scalar">scalar value</param>
     static member BackwardRdivScalar(lhs : Symbol, rhs : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_rdiv_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -23516,11 +23516,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member ModScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_mod_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -23552,11 +23552,11 @@ type Operators() =
     /// <param name="scalar">scalar value</param>
     static member BackwardModScalar(lhs : Symbol, rhs : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_mod_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -23585,11 +23585,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member RmodScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_rmod_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -23621,11 +23621,11 @@ type Operators() =
     /// <param name="scalar">scalar value</param>
     static member BackwardRmodScalar(lhs : Symbol, rhs : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_rmod_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -23654,11 +23654,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member MaximumScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_maximum_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -23690,11 +23690,11 @@ type Operators() =
     /// <param name="scalar">scalar value</param>
     static member BackwardMaximumScalar(lhs : Symbol, rhs : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_maximum_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -23723,11 +23723,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member MinimumScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_minimum_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -23759,11 +23759,11 @@ type Operators() =
     /// <param name="scalar">scalar value</param>
     static member BackwardMinimumScalar(lhs : Symbol, rhs : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_minimum_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -23792,11 +23792,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member PowerScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_power_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -23828,11 +23828,11 @@ type Operators() =
     /// <param name="scalar">scalar value</param>
     static member BackwardPowerScalar(lhs : Symbol, rhs : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_power_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -23861,11 +23861,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member RpowerScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_rpower_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -23897,11 +23897,11 @@ type Operators() =
     /// <param name="scalar">scalar value</param>
     static member BackwardRpowerScalar(lhs : Symbol, rhs : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_rpower_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -23930,11 +23930,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member HypotScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_hypot_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -23966,11 +23966,11 @@ type Operators() =
     /// <param name="scalar">scalar value</param>
     static member BackwardHypotScalar(lhs : Symbol, rhs : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_backward_hypot_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Calculate Smooth L1 Loss(lhs, scalar) by summing
     /// 
@@ -24059,11 +24059,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member SmoothL1(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "smooth_l1"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -24092,11 +24092,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardSmoothL1(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_smooth_l1"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -24125,11 +24125,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member EqualScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_equal_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -24158,11 +24158,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member NotEqualScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_not_equal_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -24191,11 +24191,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member GreaterScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_greater_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -24224,11 +24224,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member GreaterEqualScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_greater_equal_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -24257,11 +24257,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member LesserScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_lesser_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -24290,11 +24290,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member LesserEqualScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_lesser_equal_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -24323,11 +24323,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member LogicalAndScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_logical_and_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -24356,11 +24356,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member LogicalOrScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_logical_or_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -24389,11 +24389,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member LogicalXorScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_logical_xor_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Divides arguments element-wise.  If the left-hand-side input is &#39;row_sparse&#39;, then
     /// only the values which exist in the left-hand sparse array are computed.  The &#39;missing&#39; values
@@ -24461,11 +24461,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member ScatterElemwiseDiv(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_scatter_elemwise_div"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Adds a scalar to a tensor element-wise.  If the left-hand-side input is
     /// &#39;row_sparse&#39; or &#39;csr&#39;, then only the values which exist in the left-hand sparse array are computed.
@@ -24530,11 +24530,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member ScatterPlusScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_scatter_plus_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Subtracts a scalar to a tensor element-wise.  If the left-hand-side input is
     /// &#39;row_sparse&#39; or &#39;csr&#39;, then only the values which exist in the left-hand sparse array are computed.
@@ -24599,11 +24599,11 @@ type Operators() =
     /// <param name="scalar">scalar input</param>
     static member ScatterMinusScalar(data : Symbol, scalar : float) =
         let creator = AtomicSymbolCreator.FromName "_scatter_minus_scalar"
-        new Symbol(Some creator,
-                   [|"scalar"|],
-                   [|string scalar|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"scalar"|],
+                               [|string scalar|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Adds all input arguments element-wise.
     /// 
@@ -24680,11 +24680,11 @@ type Operators() =
     /// <param name="args">Positional input arguments</param>
     static member AddN([<ParamArray>] args : Symbol[]) =
         let creator = AtomicSymbolCreator.FromName "add_n"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   (args |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               (args |> Array.map (fun x -> x :> BaseSymbol)))
 
     /// <summary>Computes rectified linear activation.
     /// 
@@ -24752,11 +24752,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Relu(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "relu"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -24785,11 +24785,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardRelu(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_relu"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Computes sigmoid of x element-wise.
     /// 
@@ -24845,11 +24845,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Sigmoid(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "sigmoid"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -24878,11 +24878,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardSigmoid(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_sigmoid"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Computes hard sigmoid of x element-wise.
     /// 
@@ -24938,11 +24938,11 @@ type Operators() =
     /// <param name="beta">Bias of hard sigmoid.</param>
     static member HardSigmoid(data : Symbol, [<Optional; DefaultParameterValue(0.200000003)>] alpha : float, [<Optional; DefaultParameterValue(0.5)>] beta : float) =
         let creator = AtomicSymbolCreator.FromName "hard_sigmoid"
-        new Symbol(Some creator,
-                   [|"alpha"; "beta"|],
-                   [|string alpha; string beta|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"alpha"; "beta"|],
+                               [|string alpha; string beta|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardHardSigmoidNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_hard_sigmoid"
@@ -24965,11 +24965,11 @@ type Operators() =
         ()
     static member BackwardHardSigmoidSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_hard_sigmoid"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Computes softsign of x element-wise.
     /// 
@@ -25025,11 +25025,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Softsign(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "softsign"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -25058,11 +25058,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardSoftsign(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_softsign"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns a copy of the input.
     /// 
@@ -25097,11 +25097,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Copy(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_copy"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardCopyNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_copy"
@@ -25124,11 +25124,11 @@ type Operators() =
         ()
     static member BackwardCopySymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_copy"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardReshapeNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_reshape"
@@ -25151,11 +25151,11 @@ type Operators() =
         ()
     static member BackwardReshapeSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_reshape"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Stops gradient computation.
     /// 
@@ -25265,11 +25265,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member BlockGrad(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "BlockGrad"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Make your own loss function in network construction.
     /// 
@@ -25367,11 +25367,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member MakeLoss(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "make_loss"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">First input.</param>
     /// <param name="rhs">Second input.</param>
@@ -25400,11 +25400,11 @@ type Operators() =
     /// <param name="rhs">Second input.</param>
     static member IdentityWithAttrLikeRhs(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_identity_with_attr_like_rhs"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Reshape some or all dimensions of `lhs` to have the same shape as some or all dimensions of `rhs`.
     /// 
@@ -25517,11 +25517,11 @@ type Operators() =
     /// <param name="rhs">Second input.</param>
     static member ReshapeLike(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "reshape_like"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns a 1D int64 array containing the shape of data.
     /// 
@@ -25599,11 +25599,11 @@ type Operators() =
                              [<Optional>] ?rhsBegin : int, 
                              [<Optional>] ?rhsEnd : int) =
         let creator = AtomicSymbolCreator.FromName "shape_array"
-        new Symbol(Some creator,
-                   [|"lhs_begin"; "lhs_end"; "rhs_begin"; "rhs_end"|],
-                   [|(match lhsBegin with None -> "None" | Some lhsBegin -> string lhsBegin); (match lhsEnd with None -> "None" | Some lhsEnd -> string lhsEnd); (match rhsBegin with None -> "None" | Some rhsBegin -> string rhsBegin); (match rhsEnd with None -> "None" | Some rhsEnd -> string rhsEnd)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"lhs_begin"; "lhs_end"; "rhs_begin"; "rhs_end"|],
+                               [|(match lhsBegin with None -> "None" | Some lhsBegin -> string lhsBegin); (match lhsEnd with None -> "None" | Some lhsEnd -> string lhsEnd); (match rhsBegin with None -> "None" | Some rhsBegin -> string rhsBegin); (match rhsEnd with None -> "None" | Some rhsEnd -> string rhsEnd)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Returns a 1D int64 array containing the size of data.
     /// 
@@ -25656,11 +25656,11 @@ type Operators() =
     /// <param name="data">Input Array.</param>
     static member SizeArray(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "size_array"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Casts all elements of the input to a new type.
     /// 
@@ -25728,11 +25728,11 @@ type Operators() =
     /// <param name="dtype">Output data type.</param>
     static member Cast(data : Symbol, dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "Cast"
-        new Symbol(Some creator,
-                   [|"dtype"|],
-                   [|string dtype|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"dtype"|],
+                               [|string dtype|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardCastNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_cast"
@@ -25755,11 +25755,11 @@ type Operators() =
         ()
     static member BackwardCastSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_cast"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Numerical negative of the argument, element-wise.
     /// 
@@ -25812,11 +25812,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Negative(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "negative"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Returns the reciprocal of the argument, element-wise.
     /// 
@@ -25875,11 +25875,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Reciprocal(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "reciprocal"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -25908,11 +25908,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardReciprocal(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_reciprocal"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns element-wise absolute value of the input.
     /// 
@@ -25983,11 +25983,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Abs(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "abs"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -26016,11 +26016,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardAbs(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_abs"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns element-wise sign of the input.
     /// 
@@ -26091,11 +26091,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Sign(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "sign"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -26124,11 +26124,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardSign(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_sign"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns element-wise rounded value to the nearest integer of the input.
     /// 
@@ -26199,11 +26199,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Round(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "round"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Returns element-wise rounded value to the nearest integer of the input.
     /// 
@@ -26286,11 +26286,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Rint(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "rint"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Returns element-wise ceiling of the input.
     /// 
@@ -26367,11 +26367,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Ceil(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "ceil"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Returns element-wise floor of the input.
     /// 
@@ -26448,11 +26448,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Floor(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "floor"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Return the element-wise truncated value of the input.
     /// 
@@ -26532,11 +26532,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Trunc(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "trunc"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Returns element-wise rounded value to the nearest \
     /// integer towards zero of the input.
@@ -26610,11 +26610,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Fix(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "fix"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Returns element-wise squared value of the input.
     /// 
@@ -26694,11 +26694,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Square(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "square"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -26727,11 +26727,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardSquare(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_square"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns element-wise square-root value of the input.
     /// 
@@ -26811,11 +26811,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Sqrt(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "sqrt"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -26844,11 +26844,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardSqrt(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_sqrt"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns element-wise inverse square-root value of the input.
     /// 
@@ -26916,11 +26916,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Rsqrt(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "rsqrt"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -26949,11 +26949,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardRsqrt(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_rsqrt"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns element-wise cube-root value of the input.
     /// 
@@ -27033,11 +27033,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Cbrt(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "cbrt"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27066,11 +27066,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardCbrt(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_cbrt"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns element-wise gauss error function of the input.
     /// 
@@ -27123,11 +27123,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Erf(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "erf"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27156,11 +27156,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardErf(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_erf"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns element-wise inverse gauss error function of the input.
     /// 
@@ -27213,11 +27213,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Erfinv(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "erfinv"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27246,11 +27246,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardErfinv(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_erfinv"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns element-wise inverse cube-root value of the input.
     /// 
@@ -27312,11 +27312,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Rcbrt(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "rcbrt"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27345,11 +27345,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardRcbrt(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_rcbrt"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns element-wise exponential value of the input.
     /// 
@@ -27417,11 +27417,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Exp(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "exp"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Returns element-wise Natural logarithmic value of the input.
     /// 
@@ -27474,11 +27474,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Log(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "log"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Returns element-wise Base-10 logarithmic value of the input.
     /// 
@@ -27531,11 +27531,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Log10(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "log10"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Returns element-wise Base-2 logarithmic value of the input.
     /// 
@@ -27588,11 +27588,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Log2(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "log2"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27621,11 +27621,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardLog(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_log"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27654,11 +27654,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardLog10(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_log10"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27687,11 +27687,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardLog2(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_log2"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns element-wise ``log(1 + x)`` value of the input.
     /// 
@@ -27759,11 +27759,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Log1p(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "log1p"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27792,11 +27792,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardLog1p(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_log1p"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns ``exp(x) - 1`` computed element-wise on the input.
     /// 
@@ -27861,11 +27861,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Expm1(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "expm1"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27894,11 +27894,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardExpm1(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_expm1"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the gamma function (extension of the factorial function \
     /// to the reals), computed element-wise on the input array.
@@ -27942,11 +27942,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Gamma(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "gamma"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27975,11 +27975,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardGamma(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_gamma"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns element-wise log of the absolute value of the gamma function \
     /// of the input.
@@ -28023,11 +28023,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Gammaln(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "gammaln"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -28056,11 +28056,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardGammaln(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_gammaln"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the result of logical NOT (!) function
     /// 
@@ -28104,11 +28104,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member LogicalNot(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "logical_not"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Computes the element-wise sine of the input array.
     /// 
@@ -28182,11 +28182,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Sin(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "sin"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -28215,11 +28215,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardSin(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_sin"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Computes the element-wise cosine of the input array.
     /// 
@@ -28281,11 +28281,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Cos(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "cos"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -28314,11 +28314,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardCos(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_cos"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Computes the element-wise tangent of the input array.
     /// 
@@ -28392,11 +28392,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Tan(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "tan"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -28425,11 +28425,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardTan(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_tan"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns element-wise inverse sine of the input array.
     /// 
@@ -28506,11 +28506,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Arcsin(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "arcsin"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -28539,11 +28539,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardArcsin(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_arcsin"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns element-wise inverse cosine of the input array.
     /// 
@@ -28608,11 +28608,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Arccos(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "arccos"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -28641,11 +28641,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardArccos(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_arccos"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns element-wise inverse tangent of the input array.
     /// 
@@ -28719,11 +28719,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Arctan(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "arctan"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -28752,11 +28752,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardArctan(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_arctan"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Converts each element of the input array from radians to degrees.
     /// 
@@ -28824,11 +28824,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Degrees(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "degrees"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -28857,11 +28857,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardDegrees(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_degrees"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Converts each element of the input array from degrees to radians.
     /// 
@@ -28929,11 +28929,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Radians(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "radians"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -28962,11 +28962,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardRadians(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_radians"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the hyperbolic sine of the input array, computed element-wise.
     /// 
@@ -29034,11 +29034,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Sinh(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "sinh"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -29067,11 +29067,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardSinh(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_sinh"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the hyperbolic cosine  of the input array, computed element-wise.
     /// 
@@ -29127,11 +29127,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Cosh(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "cosh"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -29160,11 +29160,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardCosh(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_cosh"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the hyperbolic tangent of the input array, computed element-wise.
     /// 
@@ -29232,11 +29232,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Tanh(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "tanh"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -29265,11 +29265,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardTanh(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_tanh"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the element-wise inverse hyperbolic sine of the input array, \
     /// computed element-wise.
@@ -29331,11 +29331,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Arcsinh(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "arcsinh"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -29364,11 +29364,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardArcsinh(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_arcsinh"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the element-wise inverse hyperbolic cosine of the input array, \
     /// computed element-wise.
@@ -29418,11 +29418,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Arccosh(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "arccosh"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -29451,11 +29451,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardArccosh(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_arccosh"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>Returns the element-wise inverse hyperbolic tangent of the input array, \
     /// computed element-wise.
@@ -29517,11 +29517,11 @@ type Operators() =
     /// <param name="data">The input array.</param>
     static member Arctanh(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "arctanh"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -29550,11 +29550,11 @@ type Operators() =
     /// <param name="rhs">second input</param>
     static member BackwardArctanh(lhs : Symbol, rhs : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_backward_arctanh"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>This operators implements the histogram function.
     /// 
@@ -29628,11 +29628,11 @@ type Operators() =
     /// <param name="range">The lower and upper range of the bins. if not provided, range is simply (a.min(), a.max()). values outside the range are ignored. the first element of the range must be less than or equal to the second. range affects the automatic bin computation as well. while bin width is computed to be optimal based on the actual data within range, the bin count will fill the entire range including portions containing no data.</param>
     static member Histogram(data : Symbol, bins : Symbol, [<Optional>] ?binCnt : int, [<Optional>] ?range : struct(float*float)) =
         let creator = AtomicSymbolCreator.FromName "_histogram"
-        new Symbol(Some creator,
-                   [|"bin_cnt"; "range"|],
-                   [|(match binCnt with None -> "None" | Some binCnt -> string binCnt); (match range with None -> "None" | Some range -> string range)|],
-                   [|"data"; "bins"|],
-                   [|data; bins|])
+        new SymbolFromOperator(creator,
+                               [|"bin_cnt"; "range"|],
+                               [|(match binCnt with None -> "None" | Some binCnt -> string binCnt); (match range with None -> "None" | Some range -> string range)|],
+                               [|"data"; "bins"|],
+                               [|data :> BaseSymbol; bins :> BaseSymbol|])
 
     /// <summary>This operators implements the histogram function.
     /// 
@@ -29706,11 +29706,11 @@ type Operators() =
     /// <param name="range">The lower and upper range of the bins. if not provided, range is simply (a.min(), a.max()). values outside the range are ignored. the first element of the range must be less than or equal to the second. range affects the automatic bin computation as well. while bin width is computed to be optimal based on the actual data within range, the bin count will fill the entire range including portions containing no data.</param>
     static member Histogram(data : Symbol, bins : Symbol, [<Optional>] ?binCnt : int, [<Optional>] ?range : float*float) =
         let creator = AtomicSymbolCreator.FromName "_histogram"
-        new Symbol(Some creator,
-                   [|"bin_cnt"; "range"|],
-                   [|(match binCnt with None -> "None" | Some binCnt -> string binCnt); (match range with None -> "None" | Some range -> string range)|],
-                   [|"data"; "bins"|],
-                   [|data; bins|])
+        new SymbolFromOperator(creator,
+                               [|"bin_cnt"; "range"|],
+                               [|(match binCnt with None -> "None" | Some binCnt -> string binCnt); (match range with None -> "None" | Some range -> string range)|],
+                               [|"data"; "bins"|],
+                               [|data :> BaseSymbol; bins :> BaseSymbol|])
 
     /// <summary>Maps integer indices to vector representations (embeddings).
     /// 
@@ -29926,11 +29926,11 @@ type Operators() =
                             [<Optional>] dtype : IntOrFloatDType, 
                             [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
         let creator = AtomicSymbolCreator.FromName "Embedding"
-        new Symbol(Some creator,
-                   [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|],
-                   [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|],
-                   [|"data"; "weight"|],
-                   [|data; weight|])
+        new SymbolFromOperator(creator,
+                               [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|],
+                               [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|],
+                               [|"data"; "weight"|],
+                               [|data :> BaseSymbol; weight :> BaseSymbol|])
 
     /// <summary>Maps integer indices to vector representations (embeddings).
     /// 
@@ -30143,11 +30143,11 @@ type Operators() =
                                          [<Optional>] dtype : IntOrFloatDType, 
                                          [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_SparseEmbedding"
-        new Symbol(Some creator,
-                   [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|],
-                   [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|],
-                   [|"data"; "weight"|],
-                   [|data; weight|])
+        new SymbolFromOperator(creator,
+                               [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|],
+                               [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|],
+                               [|"data"; "weight"|],
+                               [|data :> BaseSymbol; weight :> BaseSymbol|])
 
     static member BackwardEmbeddingNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_Embedding"
@@ -30170,11 +30170,11 @@ type Operators() =
         ()
     static member BackwardEmbeddingSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_Embedding"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardSparseEmbeddingNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_SparseEmbedding"
@@ -30197,11 +30197,11 @@ type Operators() =
         ()
     static member BackwardSparseEmbeddingSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_SparseEmbedding"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Takes elements from an input array along the given axis.
     /// 
@@ -30392,11 +30392,11 @@ type Operators() =
     /// <param name="mode">Specify how out-of-bound indices bahave. Default is &quot;clip&quot;. &quot;clip&quot; means clip to the range. So, if all indices mentioned are too large, they are replaced by the index that addresses the last element along an axis.  &quot;wrap&quot; means to wrap around.  &quot;raise&quot; means to raise an error, not supported yet.</param>
     static member Take(a : Symbol, indices : Symbol, [<Optional; DefaultParameterValue(0)>] axis : int, [<Optional>] mode : TakeMode) =
         let creator = AtomicSymbolCreator.FromName "take"
-        new Symbol(Some creator,
-                   [|"axis"; "mode"|],
-                   [|string axis; (if isNull (mode :> obj) then "clip" else string mode)|],
-                   [|"a"; "indices"|],
-                   [|a; indices|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "mode"|],
+                               [|string axis; (if isNull (mode :> obj) then "clip" else string mode)|],
+                               [|"a"; "indices"|],
+                               [|a :> BaseSymbol; indices :> BaseSymbol|])
 
     static member BackwardTakeNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_take"
@@ -30419,11 +30419,11 @@ type Operators() =
         ()
     static member BackwardTakeSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_take"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Takes elements from a data batch.
     /// 
@@ -30518,11 +30518,11 @@ type Operators() =
     /// <param name="indices">The index array</param>
     static member BatchTake(a : Symbol, indices : Symbol) =
         let creator = AtomicSymbolCreator.FromName "batch_take"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"a"; "indices"|],
-                   [|a; indices|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"a"; "indices"|],
+                               [|a :> BaseSymbol; indices :> BaseSymbol|])
 
     /// <summary>Returns a one-hot array.
     /// 
@@ -30678,11 +30678,11 @@ type Operators() =
                          [<Optional; DefaultParameterValue(0.0)>] offValue : double, 
                          [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "one_hot"
-        new Symbol(Some creator,
-                   [|"depth"; "on_value"; "off_value"; "dtype"|],
-                   [|string depth; string onValue; string offValue; (if isNull (dtype :> obj) then "float32" else string dtype)|],
-                   [|"indices"|],
-                   [|indices|])
+        new SymbolFromOperator(creator,
+                               [|"depth"; "on_value"; "off_value"; "dtype"|],
+                               [|string depth; string onValue; string offValue; (if isNull (dtype :> obj) then "float32" else string dtype)|],
+                               [|"indices"|],
+                               [|indices :> BaseSymbol|])
 
     /// <summary>Gather elements or slices from `data` and store to a tensor whose
     /// shape is defined by `indices`.
@@ -30786,11 +30786,11 @@ type Operators() =
     /// <param name="indices">indices</param>
     static member GatherNd(data : Symbol, indices : Symbol) =
         let creator = AtomicSymbolCreator.FromName "gather_nd"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"; "indices"|],
-                   [|data; indices|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"; "indices"|],
+                               [|data :> BaseSymbol; indices :> BaseSymbol|])
 
     /// <summary>Scatters data into a new tensor according to indices.
     /// 
@@ -30954,11 +30954,11 @@ type Operators() =
     /// <param name="shape">Shape of output.</param>
     static member ScatterNd(data : Symbol, indices : Symbol, shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "scatter_nd"
-        new Symbol(Some creator,
-                   [|"shape"|],
-                   [|(shape |> Seq.map string |> String.concat ", ")|],
-                   [|"data"; "indices"|],
-                   [|data; indices|])
+        new SymbolFromOperator(creator,
+                               [|"shape"|],
+                               [|(shape |> Seq.map string |> String.concat ", ")|],
+                               [|"data"; "indices"|],
+                               [|data :> BaseSymbol; indices :> BaseSymbol|])
 
     /// <summary>Accumulates data according to indices and get the result. It&#39;s the backward of
     /// `gather_nd`.
@@ -31086,11 +31086,11 @@ type Operators() =
     /// <param name="shape">Shape of output.</param>
     static member BackwardGatherNd(data : Symbol, indices : Symbol, shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "_backward_gather_nd"
-        new Symbol(Some creator,
-                   [|"shape"|],
-                   [|(shape |> Seq.map string |> String.concat ", ")|],
-                   [|"data"; "indices"|],
-                   [|data; indices|])
+        new SymbolFromOperator(creator,
+                               [|"shape"|],
+                               [|(shape |> Seq.map string |> String.concat ", ")|],
+                               [|"data"; "indices"|],
+                               [|data :> BaseSymbol; indices :> BaseSymbol|])
 
     /// <summary>This operator has the same functionality as scatter_nd
     /// except that it does not reset the elements not indexed by the input
@@ -31173,11 +31173,11 @@ type Operators() =
     /// <param name="shape">Shape of output.</param>
     static member ScatterSetNd(lhs : Symbol, rhs : Symbol, indices : Symbol, shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "_scatter_set_nd"
-        new Symbol(Some creator,
-                   [|"shape"|],
-                   [|(shape |> Seq.map string |> String.concat ", ")|],
-                   [|"lhs"; "rhs"; "indices"|],
-                   [|lhs; rhs; indices|])
+        new SymbolFromOperator(creator,
+                               [|"shape"|],
+                               [|(shape |> Seq.map string |> String.concat ", ")|],
+                               [|"lhs"; "rhs"; "indices"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol; indices :> BaseSymbol|])
 
     /// <summary>fill target with zeros without default dtype</summary>
     /// <param name="shape">The shape of the output</param>
@@ -31212,11 +31212,11 @@ type Operators() =
     /// <param name="dtype">Target data type.</param>
     static member ZerosWithoutDtypeSymbol([<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional; DefaultParameterValue(-1)>] dtype : int) =
         let creator = AtomicSymbolCreator.FromName "_zeros_without_dtype"
-        new Symbol(Some creator,
-                   [|"shape"; "ctx"; "dtype"|],
-                   [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; string dtype|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"shape"; "ctx"; "dtype"|],
+                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; string dtype|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>fill target with zeros</summary>
     /// <param name="shape">The shape of the output</param>
@@ -31251,11 +31251,11 @@ type Operators() =
     /// <param name="dtype">Target data type.</param>
     static member ZerosSymbol([<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_zeros"
-        new Symbol(Some creator,
-                   [|"shape"; "ctx"; "dtype"|],
-                   [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"shape"; "ctx"; "dtype"|],
+                               [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Return a 2-D array with ones on the diagonal and zeros elsewhere.</summary>
     /// <param name="N">Number of rows in the output.</param>
@@ -31309,11 +31309,11 @@ type Operators() =
                             [<Optional; DefaultParameterValue("")>] ctx : string, 
                             [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_eye"
-        new Symbol(Some creator,
-                   [|"N"; "M"; "k"; "ctx"; "dtype"|],
-                   [|string N; string M; string k; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"N"; "M"; "k"; "ctx"; "dtype"|],
+                               [|string N; string M; string k; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>fill target with ones</summary>
     /// <param name="shape">The shape of the output</param>
@@ -31348,11 +31348,11 @@ type Operators() =
     /// <param name="dtype">Target data type.</param>
     static member OnesSymbol([<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_ones"
-        new Symbol(Some creator,
-                   [|"shape"; "ctx"; "dtype"|],
-                   [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"shape"; "ctx"; "dtype"|],
+                               [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>fill target with a scalar value</summary>
     /// <param name="value">Value with which to fill newly created tensor</param>
@@ -31390,11 +31390,11 @@ type Operators() =
     /// <param name="dtype">Target data type.</param>
     static member FullSymbol(value : double, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_full"
-        new Symbol(Some creator,
-                   [|"value"; "shape"; "ctx"; "dtype"|],
-                   [|string value; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"value"; "shape"; "ctx"; "dtype"|],
+                               [|string value; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Return an array of zeros with the same shape, type and storage type
     /// as the input array.
@@ -31474,11 +31474,11 @@ type Operators() =
     /// <param name="data">The input</param>
     static member ZerosLike(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "zeros_like"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Return an array of ones with the same shape and type
     /// as the input array.
@@ -31540,11 +31540,11 @@ type Operators() =
     /// <param name="data">The input</param>
     static member OnesLike(data : Symbol) =
         let creator = AtomicSymbolCreator.FromName "ones_like"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Performs general matrix multiplication and accumulation.
     /// Input are tensors *A*, *B*, *C*, each of dimension *n &gt;= 2* and having the same shape
@@ -31763,11 +31763,11 @@ type Operators() =
                              [<Optional; DefaultParameterValue(1.0)>] beta : double, 
                              [<Optional; DefaultParameterValue(-2)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "_linalg_gemm"
-        new Symbol(Some creator,
-                   [|"transpose_a"; "transpose_b"; "alpha"; "beta"; "axis"|],
-                   [|string transposeA; string transposeB; string alpha; string beta; string axis|],
-                   [|"A"; "B"; "C"|],
-                   [|A; B; C|])
+        new SymbolFromOperator(creator,
+                               [|"transpose_a"; "transpose_b"; "alpha"; "beta"; "axis"|],
+                               [|string transposeA; string transposeB; string alpha; string beta; string axis|],
+                               [|"A"; "B"; "C"|],
+                               [|A :> BaseSymbol; B :> BaseSymbol; C :> BaseSymbol|])
 
     static member BackwardLinalgGemmNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_gemm"
@@ -31790,11 +31790,11 @@ type Operators() =
         ()
     static member BackwardLinalgGemmSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_gemm"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Performs general matrix multiplication.
     /// Input are tensors *A*, *B*, each of dimension *n &gt;= 2* and having the same shape
@@ -31992,11 +31992,11 @@ type Operators() =
                               [<Optional; DefaultParameterValue(1.0)>] alpha : double, 
                               [<Optional; DefaultParameterValue(-2)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "_linalg_gemm2"
-        new Symbol(Some creator,
-                   [|"transpose_a"; "transpose_b"; "alpha"; "axis"|],
-                   [|string transposeA; string transposeB; string alpha; string axis|],
-                   [|"A"; "B"|],
-                   [|A; B|])
+        new SymbolFromOperator(creator,
+                               [|"transpose_a"; "transpose_b"; "alpha"; "axis"|],
+                               [|string transposeA; string transposeB; string alpha; string axis|],
+                               [|"A"; "B"|],
+                               [|A :> BaseSymbol; B :> BaseSymbol|])
 
     static member BackwardLinalgGemm2NDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_gemm2"
@@ -32019,11 +32019,11 @@ type Operators() =
         ()
     static member BackwardLinalgGemm2Symbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_gemm2"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Performs Cholesky factorization of a symmetric positive-definite matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
@@ -32130,11 +32130,11 @@ type Operators() =
     /// <param name="A">Tensor of input matrices to be decomposed</param>
     static member LinalgPotrf(A : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_linalg_potrf"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"A"|],
-                   [|A|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"A"|],
+                               [|A :> BaseSymbol|])
 
     static member BackwardLinalgPotrfNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_potrf"
@@ -32157,11 +32157,11 @@ type Operators() =
         ()
     static member BackwardLinalgPotrfSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_potrf"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Performs matrix inversion from a Cholesky factorization.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
@@ -32295,11 +32295,11 @@ type Operators() =
     /// <param name="A">Tensor of lower triangular matrices</param>
     static member LinalgPotri(A : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_linalg_potri"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"A"|],
-                   [|A|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"A"|],
+                               [|A :> BaseSymbol|])
 
     static member BackwardLinalgPotriNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_potri"
@@ -32322,11 +32322,11 @@ type Operators() =
         ()
     static member BackwardLinalgPotriSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_potri"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Performs multiplication with a lower triangular matrix.
     /// Input are tensors *A*, *B*, each of dimension *n &gt;= 2* and having the same shape
@@ -32491,11 +32491,11 @@ type Operators() =
                              [<Optional; DefaultParameterValue(true)>] lower : bool, 
                              [<Optional; DefaultParameterValue(1.0)>] alpha : double) =
         let creator = AtomicSymbolCreator.FromName "_linalg_trmm"
-        new Symbol(Some creator,
-                   [|"transpose"; "rightside"; "lower"; "alpha"|],
-                   [|string transpose; string rightside; string lower; string alpha|],
-                   [|"A"; "B"|],
-                   [|A; B|])
+        new SymbolFromOperator(creator,
+                               [|"transpose"; "rightside"; "lower"; "alpha"|],
+                               [|string transpose; string rightside; string lower; string alpha|],
+                               [|"A"; "B"|],
+                               [|A :> BaseSymbol; B :> BaseSymbol|])
 
     static member BackwardLinalgTrmmNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_trmm"
@@ -32518,11 +32518,11 @@ type Operators() =
         ()
     static member BackwardLinalgTrmmSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_trmm"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Solves matrix equation involving a lower triangular matrix.
     /// Input are tensors *A*, *B*, each of dimension *n &gt;= 2* and having the same shape
@@ -32690,11 +32690,11 @@ type Operators() =
                              [<Optional; DefaultParameterValue(true)>] lower : bool, 
                              [<Optional; DefaultParameterValue(1.0)>] alpha : double) =
         let creator = AtomicSymbolCreator.FromName "_linalg_trsm"
-        new Symbol(Some creator,
-                   [|"transpose"; "rightside"; "lower"; "alpha"|],
-                   [|string transpose; string rightside; string lower; string alpha|],
-                   [|"A"; "B"|],
-                   [|A; B|])
+        new SymbolFromOperator(creator,
+                               [|"transpose"; "rightside"; "lower"; "alpha"|],
+                               [|string transpose; string rightside; string lower; string alpha|],
+                               [|"A"; "B"|],
+                               [|A :> BaseSymbol; B :> BaseSymbol|])
 
     static member BackwardLinalgTrsmNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_trsm"
@@ -32717,11 +32717,11 @@ type Operators() =
         ()
     static member BackwardLinalgTrsmSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_trsm"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Computes the sum of the logarithms of the diagonal elements of a square matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
@@ -32816,11 +32816,11 @@ type Operators() =
     /// <param name="A">Tensor of square matrices</param>
     static member LinalgSumlogdiag(A : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_linalg_sumlogdiag"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"A"|],
-                   [|A|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"A"|],
+                               [|A :> BaseSymbol|])
 
     static member BackwardLinalgSumlogdiagNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_sumlogdiag"
@@ -32843,11 +32843,11 @@ type Operators() =
         ()
     static member BackwardLinalgSumlogdiagSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_sumlogdiag"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Extracts the diagonal entries of a square matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
@@ -32966,11 +32966,11 @@ type Operators() =
     /// <param name="offset">Offset of the diagonal versus the main diagonal. 0 corresponds to the main diagonal, a negative/positive value to diagonals below/above the main diagonal.</param>
     static member LinalgExtractdiag(A : Symbol, [<Optional; DefaultParameterValue(0)>] offset : int) =
         let creator = AtomicSymbolCreator.FromName "_linalg_extractdiag"
-        new Symbol(Some creator,
-                   [|"offset"|],
-                   [|string offset|],
-                   [|"A"|],
-                   [|A|])
+        new SymbolFromOperator(creator,
+                               [|"offset"|],
+                               [|string offset|],
+                               [|"A"|],
+                               [|A :> BaseSymbol|])
 
     static member BackwardLinalgExtractdiagNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_extractdiag"
@@ -32993,11 +32993,11 @@ type Operators() =
         ()
     static member BackwardLinalgExtractdiagSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_extractdiag"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Constructs a square matrix with the input as diagonal.
     /// Input is a tensor *A* of dimension *n &gt;= 1*.
@@ -33119,11 +33119,11 @@ type Operators() =
     /// <param name="offset">Offset of the diagonal versus the main diagonal. 0 corresponds to the main diagonal, a negative/positive value to diagonals below/above the main diagonal.</param>
     static member LinalgMakediag(A : Symbol, [<Optional; DefaultParameterValue(0)>] offset : int) =
         let creator = AtomicSymbolCreator.FromName "_linalg_makediag"
-        new Symbol(Some creator,
-                   [|"offset"|],
-                   [|string offset|],
-                   [|"A"|],
-                   [|A|])
+        new SymbolFromOperator(creator,
+                               [|"offset"|],
+                               [|string offset|],
+                               [|"A"|],
+                               [|A :> BaseSymbol|])
 
     static member BackwardLinalgMakediagNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_makediag"
@@ -33146,11 +33146,11 @@ type Operators() =
         ()
     static member BackwardLinalgMakediagSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_makediag"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Extracts a triangular sub-matrix from a square matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
@@ -33293,11 +33293,11 @@ type Operators() =
     /// <param name="lower">Refer to the lower triangular matrix if lower=true, refer to the upper otherwise. Only relevant when offset=0</param>
     static member LinalgExtracttrian(A : Symbol, [<Optional; DefaultParameterValue(0)>] offset : int, [<Optional; DefaultParameterValue(true)>] lower : bool) =
         let creator = AtomicSymbolCreator.FromName "_linalg_extracttrian"
-        new Symbol(Some creator,
-                   [|"offset"; "lower"|],
-                   [|string offset; string lower|],
-                   [|"A"|],
-                   [|A|])
+        new SymbolFromOperator(creator,
+                               [|"offset"; "lower"|],
+                               [|string offset; string lower|],
+                               [|"A"|],
+                               [|A :> BaseSymbol|])
 
     static member BackwardLinalgExtracttrianNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_extracttrian"
@@ -33320,11 +33320,11 @@ type Operators() =
         ()
     static member BackwardLinalgExtracttrianSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_extracttrian"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Constructs a square matrix with the input representing a specific triangular sub-matrix.
     /// This is basically the inverse of *linalg.extracttrian*. Input is a tensor *A* of dimension *n &gt;= 1*.
@@ -33497,11 +33497,11 @@ type Operators() =
     /// <param name="lower">Refer to the lower triangular matrix if lower=true, refer to the upper otherwise. Only relevant when offset=0</param>
     static member LinalgMaketrian(A : Symbol, [<Optional; DefaultParameterValue(0)>] offset : int, [<Optional; DefaultParameterValue(true)>] lower : bool) =
         let creator = AtomicSymbolCreator.FromName "_linalg_maketrian"
-        new Symbol(Some creator,
-                   [|"offset"; "lower"|],
-                   [|string offset; string lower|],
-                   [|"A"|],
-                   [|A|])
+        new SymbolFromOperator(creator,
+                               [|"offset"; "lower"|],
+                               [|string offset; string lower|],
+                               [|"A"|],
+                               [|A :> BaseSymbol|])
 
     static member BackwardLinalgMaketrianNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_maketrian"
@@ -33524,11 +33524,11 @@ type Operators() =
         ()
     static member BackwardLinalgMaketrianSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_maketrian"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Multiplication of matrix with its transpose.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
@@ -33668,11 +33668,11 @@ type Operators() =
     /// <param name="alpha">Scalar factor to be applied to the result.</param>
     static member LinalgSyrk(A : Symbol, [<Optional; DefaultParameterValue(false)>] transpose : bool, [<Optional; DefaultParameterValue(1.0)>] alpha : double) =
         let creator = AtomicSymbolCreator.FromName "_linalg_syrk"
-        new Symbol(Some creator,
-                   [|"transpose"; "alpha"|],
-                   [|string transpose; string alpha|],
-                   [|"A"|],
-                   [|A|])
+        new SymbolFromOperator(creator,
+                               [|"transpose"; "alpha"|],
+                               [|string transpose; string alpha|],
+                               [|"A"|],
+                               [|A :> BaseSymbol|])
 
     static member BackwardLinalgSyrkNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_syrk"
@@ -33695,11 +33695,11 @@ type Operators() =
         ()
     static member BackwardLinalgSyrkSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_syrk"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>LQ factorization for general matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
@@ -33866,11 +33866,11 @@ type Operators() =
     /// <param name="A">Tensor of input matrices to be factorized</param>
     static member LinalgGelqf(A : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_linalg_gelqf"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"A"|],
-                   [|A|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"A"|],
+                               [|A :> BaseSymbol|])
 
     static member BackwardLinalgGelqfNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_gelqf"
@@ -33893,11 +33893,11 @@ type Operators() =
         ()
     static member BackwardLinalgGelqfSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_gelqf"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Eigendecomposition for symmetric matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
@@ -34061,11 +34061,11 @@ type Operators() =
     /// <param name="A">Tensor of input matrices to be factorized</param>
     static member LinalgSyevd(A : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_linalg_syevd"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"A"|],
-                   [|A|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"A"|],
+                               [|A :> BaseSymbol|])
 
     static member BackwardLinalgSyevdNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_syevd"
@@ -34088,11 +34088,11 @@ type Operators() =
         ()
     static member BackwardLinalgSyevdSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_syevd"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Compute the inverse of a matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
@@ -34196,11 +34196,11 @@ type Operators() =
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgInverse(A : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_linalg_inverse"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"A"|],
-                   [|A|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"A"|],
+                               [|A :> BaseSymbol|])
 
     static member BackwardLinalgInverseNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_inverse"
@@ -34223,11 +34223,11 @@ type Operators() =
         ()
     static member BackwardLinalgInverseSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_linalg_inverse"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Reshapes the input array.
     /// 
@@ -34470,11 +34470,11 @@ type Operators() =
                           [<Optional>] targetShape : int seq, 
                           [<Optional; DefaultParameterValue(false)>] keepHighest : bool) =
         let creator = AtomicSymbolCreator.FromName "Reshape"
-        new Symbol(Some creator,
-                   [|"shape"; "reverse"; "target_shape"; "keep_highest"|],
-                   [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string reverse; (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string keepHighest|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"shape"; "reverse"; "target_shape"; "keep_highest"|],
+                               [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string reverse; (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string keepHighest|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Permutes the dimensions of an array.
     /// 
@@ -34593,11 +34593,11 @@ type Operators() =
     /// <param name="axes">Target axis order. By default the axes will be inverted.</param>
     static member Transpose(data : Symbol, [<Optional>] axes : int seq) =
         let creator = AtomicSymbolCreator.FromName "transpose"
-        new Symbol(Some creator,
-                   [|"axes"|],
-                   [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axes"|],
+                               [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Inserts a new axis of size 1 into the array shape
     /// 
@@ -34650,11 +34650,11 @@ type Operators() =
     /// <param name="axis">Position where new axis is to be inserted. Suppose that the input `NDArray`&#39;s dimension is `ndim`, the range of the inserted axis is `[-ndim, ndim]`</param>
     static member ExpandDims(data : Symbol, axis : int) =
         let creator = AtomicSymbolCreator.FromName "expand_dims"
-        new Symbol(Some creator,
-                   [|"axis"|],
-                   [|string axis|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"|],
+                               [|string axis|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Slices a region of the array.
     /// 
@@ -34830,11 +34830,11 @@ type Operators() =
     /// <param name="step">step for the slice operation, supports negative values.</param>
     static member Slice(data : Symbol, sliceBegin : int seq, sliceEnd : int seq, [<Optional>] step : int seq) =
         let creator = AtomicSymbolCreator.FromName "slice"
-        new Symbol(Some creator,
-                   [|"begin"; "end"; "step"|],
-                   [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"begin"; "end"; "step"|],
+                               [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardSliceNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_slice"
@@ -34857,11 +34857,11 @@ type Operators() =
         ()
     static member BackwardSliceSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_slice"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Assign the rhs to a cropped subset of lhs.
     /// 
@@ -34939,11 +34939,11 @@ type Operators() =
                               sliceEnd : int seq, 
                               [<Optional>] step : int seq) =
         let creator = AtomicSymbolCreator.FromName "_slice_assign"
-        new Symbol(Some creator,
-                   [|"begin"; "end"; "step"|],
-                   [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|],
-                   [|"lhs"; "rhs"|],
-                   [|lhs; rhs|])
+        new SymbolFromOperator(creator,
+                               [|"begin"; "end"; "step"|],
+                               [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|],
+                               [|"lhs"; "rhs"|],
+                               [|lhs :> BaseSymbol; rhs :> BaseSymbol|])
 
     /// <summary>(Assign the scalar to a cropped subset of the input.
     /// 
@@ -35018,11 +35018,11 @@ type Operators() =
                                     [<Optional; DefaultParameterValue(0.0)>] scalar : double, 
                                     [<Optional>] step : int seq) =
         let creator = AtomicSymbolCreator.FromName "_slice_assign_scalar"
-        new Symbol(Some creator,
-                   [|"begin"; "end"; "scalar"; "step"|],
-                   [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); string scalar; (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"begin"; "end"; "scalar"; "step"|],
+                               [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); string scalar; (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Slices along a given axis.
     /// 
@@ -35129,11 +35129,11 @@ type Operators() =
     /// <param name="sliceEnd">The ending index along the axis to be sliced,  supports negative indexes.</param>
     static member SliceAxis(data : Symbol, axis : int, sliceBegin : int, [<Optional>] ?sliceEnd : int) =
         let creator = AtomicSymbolCreator.FromName "slice_axis"
-        new Symbol(Some creator,
-                   [|"axis"; "begin"; "end"|],
-                   [|string axis; string sliceBegin; (match sliceEnd with None -> "None" | Some sliceEnd -> string sliceEnd)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "begin"; "end"|],
+                               [|string axis; string sliceBegin; (match sliceEnd with None -> "None" | Some sliceEnd -> string sliceEnd)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardSliceAxisNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_slice_axis"
@@ -35156,11 +35156,11 @@ type Operators() =
         ()
     static member BackwardSliceAxisSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_slice_axis"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Slices a region of the array like the shape of another array.
     /// 
@@ -35351,11 +35351,11 @@ type Operators() =
     /// <param name="axes">List of axes on which input data will be sliced according to the corresponding size of the second input. By default will slice on all axes. Negative axes are supported.</param>
     static member SliceLike(data : Symbol, shapeLike : Symbol, [<Optional>] axes : int seq) =
         let creator = AtomicSymbolCreator.FromName "slice_like"
-        new Symbol(Some creator,
-                   [|"axes"|],
-                   [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|],
-                   [|"data"; "shapeLike"|],
-                   [|data; shapeLike|])
+        new SymbolFromOperator(creator,
+                               [|"axes"|],
+                               [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|],
+                               [|"data"; "shapeLike"|],
+                               [|data :> BaseSymbol; shapeLike :> BaseSymbol|])
 
     static member BackwardSliceLikeNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_slice_like"
@@ -35378,11 +35378,11 @@ type Operators() =
         ()
     static member BackwardSliceLikeSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_slice_like"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Clips (limits) the values in an array.
     /// 
@@ -35495,11 +35495,11 @@ type Operators() =
     /// <param name="aMax">Maximum value</param>
     static member Clip(data : Symbol, aMin : float, aMax : float) =
         let creator = AtomicSymbolCreator.FromName "clip"
-        new Symbol(Some creator,
-                   [|"a_min"; "a_max"|],
-                   [|string aMin; string aMax|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"a_min"; "a_max"|],
+                               [|string aMin; string aMax|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardClipNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_clip"
@@ -35522,11 +35522,11 @@ type Operators() =
         ()
     static member BackwardClipSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_clip"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Repeats elements of an array.
     /// 
@@ -35636,11 +35636,11 @@ type Operators() =
     /// <param name="axis">The axis along which to repeat values. The negative numbers are interpreted counting from the backward. By default, use the flattened input array, and return a flat output array.</param>
     static member Repeat(data : Symbol, repeats : int, [<Optional>] ?axis : int) =
         let creator = AtomicSymbolCreator.FromName "repeat"
-        new Symbol(Some creator,
-                   [|"repeats"; "axis"|],
-                   [|string repeats; (match axis with None -> "None" | Some axis -> string axis)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"repeats"; "axis"|],
+                               [|string repeats; (match axis with None -> "None" | Some axis -> string axis)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardRepeatNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_repeat"
@@ -35663,11 +35663,11 @@ type Operators() =
         ()
     static member BackwardRepeatSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_repeat"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Repeats the whole array multiple times.
     /// 
@@ -35807,11 +35807,11 @@ type Operators() =
     /// <param name="reps">The number of times for repeating the tensor a. Each dim size of reps must be a positive integer. If reps has length d, the result will have dimension of max(d, a.ndim); If a.ndim &lt; d, a is promoted to be d-dimensional by prepending new axes. If a.ndim &gt; d, reps is promoted to a.ndim by pre-pending 1&#39;s to it.</param>
     static member Tile(data : Symbol, reps : int seq) =
         let creator = AtomicSymbolCreator.FromName "tile"
-        new Symbol(Some creator,
-                   [|"reps"|],
-                   [|(reps |> Seq.map string |> String.concat ", ")|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"reps"|],
+                               [|(reps |> Seq.map string |> String.concat ", ")|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardTileNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_tile"
@@ -35834,11 +35834,11 @@ type Operators() =
         ()
     static member BackwardTileSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_tile"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Reverses the order of elements along given axis while preserving array shape.
     /// 
@@ -35918,11 +35918,11 @@ type Operators() =
     /// <param name="axis">The axis which to reverse elements.</param>
     static member Reverse(data : Symbol, axis : int seq) =
         let creator = AtomicSymbolCreator.FromName "reverse"
-        new Symbol(Some creator,
-                   [|"axis"|],
-                   [|(axis |> Seq.map string |> String.concat ", ")|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"|],
+                               [|(axis |> Seq.map string |> String.concat ", ")|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardReverseNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_reverse"
@@ -35945,11 +35945,11 @@ type Operators() =
         ()
     static member BackwardReverseSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_reverse"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Join a sequence of arrays along a new axis.
     /// 
@@ -36029,11 +36029,11 @@ type Operators() =
     /// <param name="axis">The axis in the result array along which the input arrays are stacked.</param>
     static member Stack([<ParamArray>] data : Symbol[], numArgs : int, [<Optional; DefaultParameterValue(0)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "stack"
-        new Symbol(Some creator,
-                   [|"num_args"; "axis"|],
-                   [|string numArgs; string axis|],
-                   Array.empty,
-                   (data |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               [|"num_args"; "axis"|],
+                               [|string numArgs; string axis|],
+                               Array.empty,
+                               (data |> Array.map (fun x -> x :> BaseSymbol)))
 
     static member BackwardStackNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_stack"
@@ -36056,11 +36056,11 @@ type Operators() =
         ()
     static member BackwardStackSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_stack"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Remove single-dimensional entries from the shape of an array.
     /// Same behavior of defining the output tensor shape as numpy.squeeze for the most of cases.
@@ -36137,11 +36137,11 @@ type Operators() =
     /// <param name="axis">Selects a subset of the single-dimensional entries in the shape. If an axis is selected with shape entry greater than one, an error is raised.</param>
     static member Squeeze([<ParamArray>] data : Symbol[], [<Optional>] axis : int seq) =
         let creator = AtomicSymbolCreator.FromName "squeeze"
-        new Symbol(Some creator,
-                   [|"axis"|],
-                   [|(axis |> Seq.map string |> String.concat ", ")|],
-                   Array.empty,
-                   (data |> Array.map (fun x -> x)))
+        new SymbolFromOperator(creator,
+                               [|"axis"|],
+                               [|(axis |> Seq.map string |> String.concat ", ")|],
+                               Array.empty,
+                               (data |> Array.map (fun x -> x :> BaseSymbol)))
 
     static member BackwardSqueezeNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_squeeze"
@@ -36164,11 +36164,11 @@ type Operators() =
         ()
     static member BackwardSqueezeSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_squeeze"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Rearranges(permutes) data from depth into blocks of spatial data.
     /// Similar to ONNX DepthToSpace operator:
@@ -36302,11 +36302,11 @@ type Operators() =
     /// <param name="blockSize">Blocks of [block_size. block_size] are moved</param>
     static member DepthToSpace(data : Symbol, blockSize : int) =
         let creator = AtomicSymbolCreator.FromName "depth_to_space"
-        new Symbol(Some creator,
-                   [|"block_size"|],
-                   [|string blockSize|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"block_size"|],
+                               [|string blockSize|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Rearranges(permutes) blocks of spatial data into depth.
     /// Similar to ONNX SpaceToDepth operator:
@@ -36446,11 +36446,11 @@ type Operators() =
     /// <param name="blockSize">Blocks of [block_size. block_size] are moved</param>
     static member SpaceToDepth(data : Symbol, blockSize : int) =
         let creator = AtomicSymbolCreator.FromName "space_to_depth"
-        new Symbol(Some creator,
-                   [|"block_size"|],
-                   [|string blockSize|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"block_size"|],
+                               [|string blockSize|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Splits an array along a particular axis into multiple sub-arrays.
     /// 
@@ -36708,11 +36708,11 @@ type Operators() =
                           [<Optional; DefaultParameterValue(false)>] squeezeAxis : bool, 
                           [<Optional; DefaultParameterValue(0)>] sections : int) =
         let creator = AtomicSymbolCreator.FromName "_split_v2"
-        new Symbol(Some creator,
-                   [|"indices"; "axis"; "squeeze_axis"; "sections"|],
-                   [|(indices |> Seq.map string |> String.concat ", "); string axis; string squeezeAxis; string sections|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"indices"; "axis"; "squeeze_axis"; "sections"|],
+                               [|(indices |> Seq.map string |> String.concat ", "); string axis; string squeezeAxis; string sections|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member SplitV2BackwardNDArray() =
         let creator = AtomicSymbolCreator.FromName "_split_v2_backward"
@@ -36735,11 +36735,11 @@ type Operators() =
         ()
     static member SplitV2BackwardSymbol() =
         let creator = AtomicSymbolCreator.FromName "_split_v2_backward"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Returns the top *k* elements in an input array along the given axis.
     ///  The returned elements will be sorted.
@@ -36889,11 +36889,11 @@ type Operators() =
                        [<Optional>] ?isAscend : bool, 
                        [<Optional>] ?dtype : TopkDtype) =
         let creator = AtomicSymbolCreator.FromName "topk"
-        new Symbol(Some creator,
-                   [|"axis"; "k"; "ret_typ"; "is_ascend"; "dtype"|],
-                   [|(match axis with None -> "None" | Some axis -> string axis); (match k with None -> "1" | Some k -> string k); (match retTyp with None -> "indices" | Some retTyp -> string retTyp); (match isAscend with None -> "false" | Some isAscend -> string isAscend); (match dtype with None -> "float32" | Some dtype -> string dtype)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "k"; "ret_typ"; "is_ascend"; "dtype"|],
+                               [|(match axis with None -> "None" | Some axis -> string axis); (match k with None -> "1" | Some k -> string k); (match retTyp with None -> "indices" | Some retTyp -> string retTyp); (match isAscend with None -> "false" | Some isAscend -> string isAscend); (match dtype with None -> "float32" | Some dtype -> string dtype)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardTopkNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_topk"
@@ -36916,11 +36916,11 @@ type Operators() =
         ()
     static member BackwardTopkSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_topk"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Returns a sorted copy of an input array along the given axis.
     /// 
@@ -37027,11 +37027,11 @@ type Operators() =
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
     static member Sort(data : Symbol, [<Optional>] ?axis : int, [<Optional>] ?isAscend : bool) =
         let creator = AtomicSymbolCreator.FromName "sort"
-        new Symbol(Some creator,
-                   [|"axis"; "is_ascend"|],
-                   [|(match axis with None -> "None" | Some axis -> string axis); (match isAscend with None -> "true" | Some isAscend -> string isAscend)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "is_ascend"|],
+                               [|(match axis with None -> "None" | Some axis -> string axis); (match isAscend with None -> "true" | Some isAscend -> string isAscend)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Returns the indices that would sort an input array along the given axis.
     /// 
@@ -37135,11 +37135,11 @@ type Operators() =
     /// <param name="dtype">DType of the output indices. It is only valid when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
     static member Argsort(data : Symbol, [<Optional>] ?axis : int, [<Optional>] ?isAscend : bool, [<Optional>] ?dtype : ArgsortDtype) =
         let creator = AtomicSymbolCreator.FromName "argsort"
-        new Symbol(Some creator,
-                   [|"axis"; "is_ascend"; "dtype"|],
-                   [|(match axis with None -> "None" | Some axis -> string axis); (match isAscend with None -> "true" | Some isAscend -> string isAscend); (match dtype with None -> "float32" | Some dtype -> string dtype)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "is_ascend"; "dtype"|],
+                               [|(match axis with None -> "None" | Some axis -> string axis); (match isAscend with None -> "true" | Some isAscend -> string isAscend); (match dtype with None -> "float32" | Some dtype -> string dtype)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Converts a batch of index arrays into an array of flat indices. The operator follows numpy conventions so a single multi index is given by a column of the input matrix. The leading dimension may be left unspecified by using -1 as placeholder.  
     /// 
@@ -37201,11 +37201,11 @@ type Operators() =
     /// <param name="shape">Shape of the array into which the multi-indices apply.</param>
     static member RavelMultiIndex(data : Symbol, [<Optional>] shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "_ravel_multi_index"
-        new Symbol(Some creator,
-                   [|"shape"|],
-                   [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"shape"|],
+                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>Converts an array of flat indices into a batch of index arrays. The operator follows numpy conventions so a single multi index is given by a column of the output matrix. The leading dimension may be left unspecified by using -1 as placeholder.  
     /// 
@@ -37267,11 +37267,11 @@ type Operators() =
     /// <param name="shape">Shape of the array into which the multi-indices apply.</param>
     static member UnravelIndex(data : Symbol, [<Optional>] shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "_unravel_index"
-        new Symbol(Some creator,
-                   [|"shape"|],
-                   [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"shape"|],
+                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     /// <summary>pick rows specified by user input index array from a row sparse matrix
     /// and save them in the output sparse matrix.
@@ -37366,11 +37366,11 @@ type Operators() =
     /// <param name="indices">The index array of rows ids that will be retained.</param>
     static member SparseRetain(data : Symbol, indices : Symbol) =
         let creator = AtomicSymbolCreator.FromName "_sparse_retain"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   [|"data"; "indices"|],
-                   [|data; indices|])
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               [|"data"; "indices"|],
+                               [|data :> BaseSymbol; indices :> BaseSymbol|])
 
     static member BackwardSparseRetainNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_sparse_retain"
@@ -37393,11 +37393,11 @@ type Operators() =
         ()
     static member BackwardSparseRetainSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_sparse_retain"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Computes the square sum of array elements over a given axis
     /// for row-sparse matrix. This is a temporary solution for fusing ops square and
@@ -37516,11 +37516,11 @@ type Operators() =
     /// <param name="exclude">Whether to perform reduction on axis that are NOT in axis instead.</param>
     static member SquareSum(data : Symbol, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "_square_sum"
-        new Symbol(Some creator,
-                   [|"axis"; "keepdims"; "exclude"|],
-                   [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"axis"; "keepdims"; "exclude"|],
+                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardSquareSumNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_square_sum"
@@ -37543,11 +37543,11 @@ type Operators() =
         ()
     static member BackwardSquareSumSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_square_sum"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardBatchNormV1NDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_BatchNorm_v1"
@@ -37570,11 +37570,11 @@ type Operators() =
         ()
     static member BackwardBatchNormV1Symbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_BatchNorm_v1"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Applies bilinear sampling to input feature map.
     /// 
@@ -37828,11 +37828,11 @@ type Operators() =
     /// <param name="cudnnOff">whether to turn cudnn off</param>
     static member BilinearSampler(data : Symbol, grid : Symbol, [<Optional>] ?cudnnOff : bool) =
         let creator = AtomicSymbolCreator.FromName "BilinearSampler"
-        new Symbol(Some creator,
-                   [|"cudnn_off"|],
-                   [|(match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff)|],
-                   [|"data"; "grid"|],
-                   [|data; grid|])
+        new SymbolFromOperator(creator,
+                               [|"cudnn_off"|],
+                               [|(match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff)|],
+                               [|"data"; "grid"|],
+                               [|data :> BaseSymbol; grid :> BaseSymbol|])
 
     static member BackwardBilinearSamplerNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_BilinearSampler"
@@ -37855,11 +37855,11 @@ type Operators() =
         ()
     static member BackwardBilinearSamplerSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_BilinearSampler"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Apply CountSketch to input: map a d-dimension data to k-dimension data&quot;
     /// 
@@ -37982,11 +37982,11 @@ type Operators() =
                                      outDim : int, 
                                      [<Optional; DefaultParameterValue(32)>] processingBatchSize : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_count_sketch"
-        new Symbol(Some creator,
-                   [|"out_dim"; "processing_batch_size"|],
-                   [|string outDim; string processingBatchSize|],
-                   [|"data"; "h"; "s"|],
-                   [|data; h; s|])
+        new SymbolFromOperator(creator,
+                               [|"out_dim"; "processing_batch_size"|],
+                               [|string outDim; string processingBatchSize|],
+                               [|"data"; "h"; "s"|],
+                               [|data :> BaseSymbol; h :> BaseSymbol; s :> BaseSymbol|])
 
     static member BackwardContribCountSketchNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_count_sketch"
@@ -38009,11 +38009,11 @@ type Operators() =
         ()
     static member BackwardContribCountSketchSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_count_sketch"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Compute 2-D deformable convolution on 4-D input.
     /// 
@@ -38256,11 +38256,11 @@ type Operators() =
                                                [<Optional; DefaultParameterValue(false)>] noBias : bool, 
                                                [<Optional>] layout : ContribDeformableConvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_DeformableConvolution"
-        new Symbol(Some creator,
-                   [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "layout"|],
-                   [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|],
-                   [|"data"; "offset"; "weight"; "bias"|],
-                   [|data; offset; weight; bias|])
+        new SymbolFromOperator(creator,
+                               [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "layout"|],
+                               [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|],
+                               [|"data"; "offset"; "weight"; "bias"|],
+                               [|data :> BaseSymbol; offset :> BaseSymbol; weight :> BaseSymbol; bias :> BaseSymbol|])
 
     static member BackwardContribDeformableConvolutionNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_DeformableConvolution"
@@ -38283,11 +38283,11 @@ type Operators() =
         ()
     static member BackwardContribDeformableConvolutionSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_DeformableConvolution"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Performs deformable position-sensitive region-of-interest pooling on inputs.
     /// The DeformablePSROIPooling operation is described in https://arxiv.org/abs/1703.06211 .batch_size will change to the number of region bounding boxes after DeformablePSROIPooling</summary>
@@ -38314,11 +38314,11 @@ type Operators() =
                                                 [<Optional; DefaultParameterValue(0.0)>] transStd : float, 
                                                 [<Optional; DefaultParameterValue(false)>] noTrans : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_DeformablePSROIPooling"
-        new Symbol(Some creator,
-                   [|"spatial_scale"; "output_dim"; "group_size"; "pooled_size"; "part_size"; "sample_per_part"; "trans_std"; "no_trans"|],
-                   [|string spatialScale; string outputDim; string groupSize; string pooledSize; string partSize; string samplePerPart; string transStd; string noTrans|],
-                   [|"data"; "rois"; "trans"|],
-                   [|data; rois; trans|])
+        new SymbolFromOperator(creator,
+                               [|"spatial_scale"; "output_dim"; "group_size"; "pooled_size"; "part_size"; "sample_per_part"; "trans_std"; "no_trans"|],
+                               [|string spatialScale; string outputDim; string groupSize; string pooledSize; string partSize; string samplePerPart; string transStd; string noTrans|],
+                               [|"data"; "rois"; "trans"|],
+                               [|data :> BaseSymbol; rois :> BaseSymbol; trans :> BaseSymbol|])
 
     static member BackwardContribDeformablePSROIPoolingNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_DeformablePSROIPooling"
@@ -38341,11 +38341,11 @@ type Operators() =
         ()
     static member BackwardContribDeformablePSROIPoolingSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_DeformablePSROIPooling"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Apply 1D FFT to input&quot;
     /// 
@@ -38419,11 +38419,11 @@ type Operators() =
     /// <param name="computeSize">Maximum size of sub-batch to be forwarded at one time</param>
     static member ContribFft(data : Symbol, [<Optional; DefaultParameterValue(128)>] computeSize : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_fft"
-        new Symbol(Some creator,
-                   [|"compute_size"|],
-                   [|string computeSize|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"compute_size"|],
+                               [|string computeSize|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardContribFftNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_fft"
@@ -38446,11 +38446,11 @@ type Operators() =
         ()
     static member BackwardContribFftSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_fft"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Apply 1D ifft to input&quot;
     /// 
@@ -38527,11 +38527,11 @@ type Operators() =
     /// <param name="computeSize">Maximum size of sub-batch to be forwarded at one time</param>
     static member ContribIfft(data : Symbol, [<Optional; DefaultParameterValue(128)>] computeSize : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_ifft"
-        new Symbol(Some creator,
-                   [|"compute_size"|],
-                   [|string computeSize|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"compute_size"|],
+                               [|string computeSize|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardContribIfftNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_ifft"
@@ -38554,11 +38554,11 @@ type Operators() =
         ()
     static member BackwardContribIfftSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_ifft"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardContribMultiProposalNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_MultiProposal"
@@ -38581,11 +38581,11 @@ type Operators() =
         ()
     static member BackwardContribMultiProposalSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_MultiProposal"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardContribMultiBoxDetectionNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_MultiBoxDetection"
@@ -38608,11 +38608,11 @@ type Operators() =
         ()
     static member BackwardContribMultiBoxDetectionSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_MultiBoxDetection"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardContribMultiBoxPriorNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_MultiBoxPrior"
@@ -38635,11 +38635,11 @@ type Operators() =
         ()
     static member BackwardContribMultiBoxPriorSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_MultiBoxPrior"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardContribMultiBoxTargetNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_MultiBoxTarget"
@@ -38662,11 +38662,11 @@ type Operators() =
         ()
     static member BackwardContribMultiBoxTargetSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_MultiBoxTarget"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardContribProposalNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_Proposal"
@@ -38689,11 +38689,11 @@ type Operators() =
         ()
     static member BackwardContribProposalSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_Proposal"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Performs region-of-interest pooling on inputs. Resize bounding box coordinates by spatial_scale and crop input feature maps accordingly. The cropped feature maps are pooled by max pooling to a fixed size output indicated by pooled_size. batch_size will change to the number of region bounding boxes after PSROIPooling</summary>
     /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
@@ -38709,11 +38709,11 @@ type Operators() =
                                       pooledSize : int, 
                                       [<Optional; DefaultParameterValue(0)>] groupSize : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_PSROIPooling"
-        new Symbol(Some creator,
-                   [|"spatial_scale"; "output_dim"; "pooled_size"; "group_size"|],
-                   [|string spatialScale; string outputDim; string pooledSize; string groupSize|],
-                   [|"data"; "rois"|],
-                   [|data; rois|])
+        new SymbolFromOperator(creator,
+                               [|"spatial_scale"; "output_dim"; "pooled_size"; "group_size"|],
+                               [|string spatialScale; string outputDim; string pooledSize; string groupSize|],
+                               [|"data"; "rois"|],
+                               [|data :> BaseSymbol; rois :> BaseSymbol|])
 
     static member BackwardContribPSROIPoolingNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_PSROIPooling"
@@ -38736,11 +38736,11 @@ type Operators() =
         ()
     static member BackwardContribPSROIPoolingSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_PSROIPooling"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardContribSyncBatchNormNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_SyncBatchNorm"
@@ -38763,11 +38763,11 @@ type Operators() =
         ()
     static member BackwardContribSyncBatchNormSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward__contrib_SyncBatchNorm"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>This operator is DEPRECATED. Apply convolution to input then add a bias.</summary>
     /// <param name="data">Input data to the ConvolutionV1Op.</param>
@@ -38902,11 +38902,11 @@ type Operators() =
                                 [<Optional; DefaultParameterValue(false)>] cudnnOff : bool, 
                                 [<Optional>] layout : ConvolutionV1Layout) =
         let creator = AtomicSymbolCreator.FromName "Convolution_v1"
-        new Symbol(Some creator,
-                   [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
-                   [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
-                   [|"data"; "weight"; "bias"|],
-                   [|data; weight; bias|])
+        new SymbolFromOperator(creator,
+                               [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
+                               [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
+                               [|"data"; "weight"; "bias"|],
+                               [|data :> BaseSymbol; weight :> BaseSymbol; bias :> BaseSymbol|])
 
     static member BackwardConvolutionV1NDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_Convolution_v1"
@@ -38929,11 +38929,11 @@ type Operators() =
         ()
     static member BackwardConvolutionV1Symbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_Convolution_v1"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Applies correlation to inputs.
     /// 
@@ -39104,11 +39104,11 @@ type Operators() =
                               [<Optional; DefaultParameterValue(0)>] padSize : int, 
                               [<Optional; DefaultParameterValue(true)>] isMultiply : bool) =
         let creator = AtomicSymbolCreator.FromName "Correlation"
-        new Symbol(Some creator,
-                   [|"kernel_size"; "max_displacement"; "stride1"; "stride2"; "pad_size"; "is_multiply"|],
-                   [|string kernelSize; string maxDisplacement; string stride1; string stride2; string padSize; string isMultiply|],
-                   [|"data1"; "data2"|],
-                   [|data1; data2|])
+        new SymbolFromOperator(creator,
+                               [|"kernel_size"; "max_displacement"; "stride1"; "stride2"; "pad_size"; "is_multiply"|],
+                               [|string kernelSize; string maxDisplacement; string stride1; string stride2; string padSize; string isMultiply|],
+                               [|"data1"; "data2"|],
+                               [|data1 :> BaseSymbol; data2 :> BaseSymbol|])
 
     static member BackwardCorrelationNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_Correlation"
@@ -39131,11 +39131,11 @@ type Operators() =
         ()
     static member BackwardCorrelationSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_Correlation"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardCropNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_Crop"
@@ -39158,11 +39158,11 @@ type Operators() =
         ()
     static member BackwardCropSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_Crop"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Special op to copy data cross device</summary>
     static member CrossDeviceCopyNDArray() =
@@ -39188,11 +39188,11 @@ type Operators() =
     /// <summary>Special op to copy data cross device</summary>
     static member CrossDeviceCopySymbol() =
         let creator = AtomicSymbolCreator.FromName "_CrossDeviceCopy"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardCrossDeviceCopyNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward__CrossDeviceCopy"
@@ -39215,11 +39215,11 @@ type Operators() =
         ()
     static member BackwardCrossDeviceCopySymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward__CrossDeviceCopy"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardNativeNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward__Native"
@@ -39242,11 +39242,11 @@ type Operators() =
         ()
     static member BackwardNativeSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward__Native"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardNDArrayNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward__NDArray"
@@ -39269,11 +39269,11 @@ type Operators() =
         ()
     static member BackwardNDArraySymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward__NDArray"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Generates 2D sampling grid for bilinear sampling.</summary>
     /// <param name="data">Input data to the function.</param>
@@ -39308,11 +39308,11 @@ type Operators() =
     /// <param name="targetShape">Specifies the output shape (H, W). This is required if transformation type is `affine`. If transformation type is `warp`, this parameter is ignored.</param>
     static member GridGenerator(data : Symbol, transformType : GridGeneratorTransformType, [<Optional>] targetShape : int seq) =
         let creator = AtomicSymbolCreator.FromName "GridGenerator"
-        new Symbol(Some creator,
-                   [|"transform_type"; "target_shape"|],
-                   [|string transformType; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", "))|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"transform_type"; "target_shape"|],
+                               [|string transformType; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", "))|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardGridGeneratorNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_GridGenerator"
@@ -39335,11 +39335,11 @@ type Operators() =
         ()
     static member BackwardGridGeneratorSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_GridGenerator"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardIdentityAttachKLSparseRegNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_IdentityAttachKLSparseReg"
@@ -39362,11 +39362,11 @@ type Operators() =
         ()
     static member BackwardIdentityAttachKLSparseRegSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_IdentityAttachKLSparseReg"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Applies instance normalization to the n-dimensional input array.
     /// 
@@ -39527,11 +39527,11 @@ type Operators() =
     /// <param name="eps">An `epsilon` parameter to prevent division by 0.</param>
     static member InstanceNorm(data : Symbol, gamma : Symbol, beta : Symbol, [<Optional; DefaultParameterValue(0.00100000005)>] eps : float) =
         let creator = AtomicSymbolCreator.FromName "InstanceNorm"
-        new Symbol(Some creator,
-                   [|"eps"|],
-                   [|string eps|],
-                   [|"data"; "gamma"; "beta"|],
-                   [|data; gamma; beta|])
+        new SymbolFromOperator(creator,
+                               [|"eps"|],
+                               [|string eps|],
+                               [|"data"; "gamma"; "beta"|],
+                               [|data :> BaseSymbol; gamma :> BaseSymbol; beta :> BaseSymbol|])
 
     static member BackwardInstanceNormNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_InstanceNorm"
@@ -39554,11 +39554,11 @@ type Operators() =
         ()
     static member BackwardInstanceNormSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_InstanceNorm"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Normalize the input array using the L2 norm.
     /// 
@@ -39755,11 +39755,11 @@ type Operators() =
     /// <param name="mode">Specify the dimension along which to compute L2 norm.</param>
     static member L2Normalization(data : Symbol, [<Optional; DefaultParameterValue(1.00000001E-10)>] eps : float, [<Optional>] mode : L2NormalizationMode) =
         let creator = AtomicSymbolCreator.FromName "L2Normalization"
-        new Symbol(Some creator,
-                   [|"eps"; "mode"|],
-                   [|string eps; (if isNull (mode :> obj) then "instance" else string mode)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"eps"; "mode"|],
+                               [|string eps; (if isNull (mode :> obj) then "instance" else string mode)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardL2NormalizationNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_L2Normalization"
@@ -39782,11 +39782,11 @@ type Operators() =
         ()
     static member BackwardL2NormalizationSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_L2Normalization"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardLeakyReLUNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_LeakyReLU"
@@ -39809,11 +39809,11 @@ type Operators() =
         ()
     static member BackwardLeakyReLUSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_LeakyReLU"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Make your own loss function in network construction.
     /// 
@@ -39920,11 +39920,11 @@ type Operators() =
     /// <param name="normalization">If this is set to null, the output gradient will not be normalized. If this is set to batch, the output gradient will be divided by the batch size. If this is set to valid, the output gradient will be divided by the number of valid input elements.</param>
     static member MakeLoss(data : Symbol, [<Optional; DefaultParameterValue(1.0)>] gradScale : float, [<Optional; DefaultParameterValue(0.0)>] validThresh : float, [<Optional>] normalization : Normalization) =
         let creator = AtomicSymbolCreator.FromName "MakeLoss"
-        new Symbol(Some creator,
-                   [|"grad_scale"; "valid_thresh"; "normalization"|],
-                   [|string gradScale; string validThresh; (if isNull (normalization :> obj) then "null" else string normalization)|],
-                   [|"data"|],
-                   [|data|])
+        new SymbolFromOperator(creator,
+                               [|"grad_scale"; "valid_thresh"; "normalization"|],
+                               [|string gradScale; string validThresh; (if isNull (normalization :> obj) then "null" else string normalization)|],
+                               [|"data"|],
+                               [|data :> BaseSymbol|])
 
     static member BackwardMakeLossNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_MakeLoss"
@@ -39947,11 +39947,11 @@ type Operators() =
         ()
     static member BackwardMakeLossSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_MakeLoss"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardPadNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_Pad"
@@ -39974,11 +39974,11 @@ type Operators() =
         ()
     static member BackwardPadSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_Pad"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardPoolingV1NDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_Pooling_v1"
@@ -40001,11 +40001,11 @@ type Operators() =
         ()
     static member BackwardPoolingV1Symbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_Pooling_v1"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Performs region of interest(ROI) pooling on the input array.
     /// 
@@ -40178,11 +40178,11 @@ type Operators() =
     /// <param name="spatialScale">Ratio of input feature map height (or w) to raw image height (or w). Equals the reciprocal of total stride in convolutional layers</param>
     static member ROIPooling(data : Symbol, rois : Symbol, pooledSize : int seq, spatialScale : float) =
         let creator = AtomicSymbolCreator.FromName "ROIPooling"
-        new Symbol(Some creator,
-                   [|"pooled_size"; "spatial_scale"|],
-                   [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale|],
-                   [|"data"; "rois"|],
-                   [|data; rois|])
+        new SymbolFromOperator(creator,
+                               [|"pooled_size"; "spatial_scale"|],
+                               [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale|],
+                               [|"data"; "rois"|],
+                               [|data :> BaseSymbol; rois :> BaseSymbol|])
 
     static member BackwardROIPoolingNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_ROIPooling"
@@ -40205,11 +40205,11 @@ type Operators() =
         ()
     static member BackwardROIPoolingSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_ROIPooling"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Takes the last element of a sequence.
     /// 
@@ -40385,11 +40385,11 @@ type Operators() =
     /// <param name="axis">The sequence axis. Only values of 0 and 1 are currently supported.</param>
     static member SequenceLast(data : Symbol, sequenceLength : Symbol, [<Optional; DefaultParameterValue(false)>] useSequenceLength : bool, [<Optional; DefaultParameterValue(0)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "SequenceLast"
-        new Symbol(Some creator,
-                   [|"use_sequence_length"; "axis"|],
-                   [|string useSequenceLength; string axis|],
-                   [|"data"; "sequenceLength"|],
-                   [|data; sequenceLength|])
+        new SymbolFromOperator(creator,
+                               [|"use_sequence_length"; "axis"|],
+                               [|string useSequenceLength; string axis|],
+                               [|"data"; "sequenceLength"|],
+                               [|data :> BaseSymbol; sequenceLength :> BaseSymbol|])
 
     static member BackwardSequenceLastNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_SequenceLast"
@@ -40412,11 +40412,11 @@ type Operators() =
         ()
     static member BackwardSequenceLastSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_SequenceLast"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Sets all elements outside the sequence to a constant value.
     /// 
@@ -40674,11 +40674,11 @@ type Operators() =
                                [<Optional; DefaultParameterValue(0.0)>] value : float, 
                                [<Optional; DefaultParameterValue(0)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "SequenceMask"
-        new Symbol(Some creator,
-                   [|"use_sequence_length"; "value"; "axis"|],
-                   [|string useSequenceLength; string value; string axis|],
-                   [|"data"; "sequenceLength"|],
-                   [|data; sequenceLength|])
+        new SymbolFromOperator(creator,
+                               [|"use_sequence_length"; "value"; "axis"|],
+                               [|string useSequenceLength; string value; string axis|],
+                               [|"data"; "sequenceLength"|],
+                               [|data :> BaseSymbol; sequenceLength :> BaseSymbol|])
 
     static member BackwardSequenceMaskNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_SequenceMask"
@@ -40701,11 +40701,11 @@ type Operators() =
         ()
     static member BackwardSequenceMaskSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_SequenceMask"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Reverses the elements of each sequence.
     /// 
@@ -40944,11 +40944,11 @@ type Operators() =
     /// <param name="axis">The sequence axis. Only 0 is currently supported.</param>
     static member SequenceReverse(data : Symbol, sequenceLength : Symbol, [<Optional; DefaultParameterValue(false)>] useSequenceLength : bool, [<Optional; DefaultParameterValue(0)>] axis : int) =
         let creator = AtomicSymbolCreator.FromName "SequenceReverse"
-        new Symbol(Some creator,
-                   [|"use_sequence_length"; "axis"|],
-                   [|string useSequenceLength; string axis|],
-                   [|"data"; "sequenceLength"|],
-                   [|data; sequenceLength|])
+        new SymbolFromOperator(creator,
+                               [|"use_sequence_length"; "axis"|],
+                               [|string useSequenceLength; string axis|],
+                               [|"data"; "sequenceLength"|],
+                               [|data :> BaseSymbol; sequenceLength :> BaseSymbol|])
 
     static member BackwardSequenceReverseNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_SequenceReverse"
@@ -40971,11 +40971,11 @@ type Operators() =
         ()
     static member BackwardSequenceReverseSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_SequenceReverse"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardSliceChannelNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_SliceChannel"
@@ -40998,11 +40998,11 @@ type Operators() =
         ()
     static member BackwardSliceChannelSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_SliceChannel"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Applies a spatial transformer to input feature map.</summary>
     /// <param name="data">Input data to the SpatialTransformerOp.</param>
@@ -41046,11 +41046,11 @@ type Operators() =
     /// <param name="targetShape">output shape(h, w) of spatial transformer: (y, x)</param>
     static member SpatialTransformer(data : Symbol, loc : Symbol, [<Optional>] ?cudnnOff : bool, [<Optional>] ?targetShape : int seq) =
         let creator = AtomicSymbolCreator.FromName "SpatialTransformer"
-        new Symbol(Some creator,
-                   [|"transform_type"; "sampler_type"; "cudnn_off"; "target_shape"|],
-                   [|"affine"; "bilinear"; (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match targetShape with None -> "[0,0]" | Some targetShape -> (targetShape |> Seq.map string |> String.concat ", "))|],
-                   [|"data"; "loc"|],
-                   [|data; loc|])
+        new SymbolFromOperator(creator,
+                               [|"transform_type"; "sampler_type"; "cudnn_off"; "target_shape"|],
+                               [|"affine"; "bilinear"; (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match targetShape with None -> "[0,0]" | Some targetShape -> (targetShape |> Seq.map string |> String.concat ", "))|],
+                               [|"data"; "loc"|],
+                               [|data :> BaseSymbol; loc :> BaseSymbol|])
 
     static member BackwardSpatialTransformerNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_SpatialTransformer"
@@ -41073,11 +41073,11 @@ type Operators() =
         ()
     static member BackwardSpatialTransformerSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_SpatialTransformer"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <summary>Computes support vector machine based transformation of the input.
     /// 
@@ -41146,11 +41146,11 @@ type Operators() =
                             [<Optional; DefaultParameterValue(1.0)>] regularizationCoefficient : float, 
                             [<Optional; DefaultParameterValue(false)>] useLinear : bool) =
         let creator = AtomicSymbolCreator.FromName "SVMOutput"
-        new Symbol(Some creator,
-                   [|"margin"; "regularization_coefficient"; "use_linear"|],
-                   [|string margin; string regularizationCoefficient; string useLinear|],
-                   [|"data"; "label"|],
-                   [|data; label|])
+        new SymbolFromOperator(creator,
+                               [|"margin"; "regularization_coefficient"; "use_linear"|],
+                               [|string margin; string regularizationCoefficient; string useLinear|],
+                               [|"data"; "label"|],
+                               [|data :> BaseSymbol; label :> BaseSymbol|])
 
     static member BackwardSVMOutputNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_SVMOutput"
@@ -41173,11 +41173,11 @@ type Operators() =
         ()
     static member BackwardSVMOutputSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_SVMOutput"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     static member BackwardSwapAxisNDArray() =
         let creator = AtomicSymbolCreator.FromName "_backward_SwapAxis"
@@ -41200,11 +41200,11 @@ type Operators() =
         ()
     static member BackwardSwapAxisSymbol() =
         let creator = AtomicSymbolCreator.FromName "_backward_SwapAxis"
-        new Symbol(Some creator,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty,
+                               Array.empty)
 
     /// <param name="src">Source input to the function.</param>
     static member SetValueNDArray(src : double) =
@@ -41230,11 +41230,11 @@ type Operators() =
     /// <param name="src">Source input to the function.</param>
     static member SetValueSymbol(src : double) =
         let creator = AtomicSymbolCreator.FromName "_set_value"
-        new Symbol(Some creator,
-                   [|"src"|],
-                   [|string src|],
-                   Array.empty,
-                   Array.empty)
+        new SymbolFromOperator(creator,
+                               [|"src"|],
+                               [|string src|],
+                               Array.empty,
+                               Array.empty)
 
     /// <param name="lhs">Left operand to the function.</param>
     /// <param name="rhs">Right operand to the function.</param>
@@ -41358,11 +41358,11 @@ type Operators() =
                            c : int, 
                            size : int) =
         let creator = AtomicSymbolCreator.FromName "_imdecode"
-        new Symbol(Some creator,
-                   [|"index"; "x0"; "y0"; "x1"; "y1"; "c"; "size"|],
-                   [|string index; string x0; string y0; string x1; string y1; string c; string size|],
-                   [|"mean"|],
-                   [|mean|])
+        new SymbolFromOperator(creator,
+                               [|"index"; "x0"; "y0"; "x1"; "y1"; "c"; "size"|],
+                               [|string index; string x0; string y0; string x1; string y1; string c; string size|],
+                               [|"mean"|],
+                               [|mean :> BaseSymbol|])
 
 // ********************************************************************************************************
 // EXCEPTION
@@ -41536,11 +41536,11 @@ type Operators() =
 //     /// <param name="alpha">The lighting alphas for the R, G, B channels.</param>
 //     static member ImageAdjustLighting(data : Symbol, alpha : ) =
 //         let creator = AtomicSymbolCreator.FromName "_image_adjust_lighting"
-//         new Symbol(Some creator,
-//                    [|"alpha"|],
-//                    [|string alpha|],
-//                    [|"data"|],
-//                    [|data|])
+//         new SymbolFromOperator(creator,
+//                                [|"alpha"|],
+//                                [|string alpha|],
+//                                [|"data"|],
+//                                [|data :> BaseSymbol|])
 
 //     /// <summary>Update function for Stochastic Gradient Descent (SDG) optimizer.
 //     /// 
@@ -41624,11 +41624,11 @@ type Operators() =
 //                                  [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
 //                                  [<Optional; DefaultParameterValue(1)>] numWeights : int) =
 //         let creator = AtomicSymbolCreator.FromName "multi_sgd_update"
-//         new Symbol(Some creator,
-//                    [|"lrs"; "wds"; "rescale_grad"; "clip_gradient"; "num_weights"|],
-//                    [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|],
-//                    Array.empty,
-//                    (data |> Array.map (fun x -> x)))
+//         new SymbolFromOperator(creator,
+//                                [|"lrs"; "wds"; "rescale_grad"; "clip_gradient"; "num_weights"|],
+//                                [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|],
+//                                Array.empty,
+//                                (data |> Array.map (fun x -> x :> BaseSymbol)))
 
 //     /// <summary>Momentum update function for Stochastic Gradient Descent (SGD) optimizer.
 //     /// 
@@ -41754,11 +41754,11 @@ type Operators() =
 //                                     [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
 //                                     [<Optional; DefaultParameterValue(1)>] numWeights : int) =
 //         let creator = AtomicSymbolCreator.FromName "multi_sgd_mom_update"
-//         new Symbol(Some creator,
-//                    [|"lrs"; "wds"; "momentum"; "rescale_grad"; "clip_gradient"; "num_weights"|],
-//                    [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|],
-//                    Array.empty,
-//                    (data |> Array.map (fun x -> x)))
+//         new SymbolFromOperator(creator,
+//                                [|"lrs"; "wds"; "momentum"; "rescale_grad"; "clip_gradient"; "num_weights"|],
+//                                [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|],
+//                                Array.empty,
+//                                (data |> Array.map (fun x -> x :> BaseSymbol)))
 
 //     /// <summary>Update function for multi-precision Stochastic Gradient Descent (SDG) optimizer.
 //     /// 
@@ -41842,11 +41842,11 @@ type Operators() =
 //                                    [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
 //                                    [<Optional; DefaultParameterValue(1)>] numWeights : int) =
 //         let creator = AtomicSymbolCreator.FromName "multi_mp_sgd_update"
-//         new Symbol(Some creator,
-//                    [|"lrs"; "wds"; "rescale_grad"; "clip_gradient"; "num_weights"|],
-//                    [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|],
-//                    Array.empty,
-//                    (data |> Array.map (fun x -> x)))
+//         new SymbolFromOperator(creator,
+//                                [|"lrs"; "wds"; "rescale_grad"; "clip_gradient"; "num_weights"|],
+//                                [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|],
+//                                Array.empty,
+//                                (data |> Array.map (fun x -> x :> BaseSymbol)))
 
 //     /// <summary>Momentum update function for multi-precision Stochastic Gradient Descent (SGD) optimizer.
 //     /// 
@@ -41972,11 +41972,11 @@ type Operators() =
 //                                       [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
 //                                       [<Optional; DefaultParameterValue(1)>] numWeights : int) =
 //         let creator = AtomicSymbolCreator.FromName "multi_mp_sgd_mom_update"
-//         new Symbol(Some creator,
-//                    [|"lrs"; "wds"; "momentum"; "rescale_grad"; "clip_gradient"; "num_weights"|],
-//                    [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|],
-//                    Array.empty,
-//                    (data |> Array.map (fun x -> x)))
+//         new SymbolFromOperator(creator,
+//                                [|"lrs"; "wds"; "momentum"; "rescale_grad"; "clip_gradient"; "num_weights"|],
+//                                [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|],
+//                                Array.empty,
+//                                (data |> Array.map (fun x -> x :> BaseSymbol)))
 
 // type IntOrFloatDType = 
 //     | Float16
@@ -42060,11 +42060,11 @@ type Operators() =
 //                                [<Optional>] ?ctx : string, 
 //                                [<Optional>] ?dtype : IntOrFloatDType) =
 //         let creator = AtomicSymbolCreator.FromName "_arange"
-//         new Symbol(Some creator,
-//                    [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|],
-//                    [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|],
-//                    Array.empty,
-//                    Array.empty)
+//         new SymbolFromOperator(creator,
+//                                [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|],
+//                                [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|],
+//                                Array.empty,
+//                                Array.empty)
 
 // type IntOrFloatDType = 
 //     | Float16
@@ -42148,11 +42148,11 @@ type Operators() =
 //                                  [<Optional>] ?ctx : string, 
 //                                  [<Optional>] ?dtype : IntOrFloatDType) =
 //         let creator = AtomicSymbolCreator.FromName "_linspace"
-//         new Symbol(Some creator,
-//                    [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|],
-//                    [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|],
-//                    Array.empty,
-//                    Array.empty)
+//         new SymbolFromOperator(creator,
+//                                [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|],
+//                                [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|],
+//                                Array.empty,
+//                                Array.empty)
 
 //     /// <summary>Generate region proposals via RPN</summary>
 //     /// <param name="clsProb">Score of how likely proposal is object.</param>
@@ -42248,11 +42248,11 @@ type Operators() =
 //                                        [<Optional; DefaultParameterValue(false)>] outputScore : bool, 
 //                                        [<Optional; DefaultParameterValue(false)>] iouLoss : bool) =
 //         let creator = AtomicSymbolCreator.FromName "_contrib_MultiProposal"
-//         new Symbol(Some creator,
-//                    [|"scales"; "ratios"; "rpn_pre_nms_top_n"; "rpn_post_nms_top_n"; "threshold"; "rpn_min_size"; "feature_stride"; "output_score"; "iou_loss"|],
-//                    [|string scales; string ratios; string rpnPreNmsTopN; string rpnPostNmsTopN; string threshold; string rpnMinSize; string featureStride; string outputScore; string iouLoss|],
-//                    [|"clsProb"; "bboxPred"; "imInfo"|],
-//                    [|clsProb; bboxPred; imInfo|])
+//         new SymbolFromOperator(creator,
+//                                [|"scales"; "ratios"; "rpn_pre_nms_top_n"; "rpn_post_nms_top_n"; "threshold"; "rpn_min_size"; "feature_stride"; "output_score"; "iou_loss"|],
+//                                [|string scales; string ratios; string rpnPreNmsTopN; string rpnPostNmsTopN; string threshold; string rpnMinSize; string featureStride; string outputScore; string iouLoss|],
+//                                [|"clsProb"; "bboxPred"; "imInfo"|],
+//                                [|clsProb :> BaseSymbol; bboxPred :> BaseSymbol; imInfo :> BaseSymbol|])
 
 //     /// <summary>Convert multibox detection predictions.</summary>
 //     /// <param name="clsProb">Class probabilities.</param>
@@ -42336,11 +42336,11 @@ type Operators() =
 //                                            [<Optional; DefaultParameterValue(false)>] forceSuppress : bool, 
 //                                            [<Optional; DefaultParameterValue(-1)>] nmsTopk : int) =
 //         let creator = AtomicSymbolCreator.FromName "_contrib_MultiBoxDetection"
-//         new Symbol(Some creator,
-//                    [|"variances"; "clip"; "threshold"; "background_id"; "nms_threshold"; "force_suppress"; "nms_topk"|],
-//                    [|string variances; string clip; string threshold; string backgroundId; string nmsThreshold; string forceSuppress; string nmsTopk|],
-//                    [|"clsProb"; "locPred"; "anchor"|],
-//                    [|clsProb; locPred; anchor|])
+//         new SymbolFromOperator(creator,
+//                                [|"variances"; "clip"; "threshold"; "background_id"; "nms_threshold"; "force_suppress"; "nms_topk"|],
+//                                [|string variances; string clip; string threshold; string backgroundId; string nmsThreshold; string forceSuppress; string nmsTopk|],
+//                                [|"clsProb"; "locPred"; "anchor"|],
+//                                [|clsProb :> BaseSymbol; locPred :> BaseSymbol; anchor :> BaseSymbol|])
 
 //     /// <summary>Generate prior(anchor) boxes from data, sizes and ratios.</summary>
 //     /// <param name="data">Input data.</param>
@@ -42400,11 +42400,11 @@ type Operators() =
 //                                        offsets : , 
 //                                        [<Optional; DefaultParameterValue(false)>] clip : bool) =
 //         let creator = AtomicSymbolCreator.FromName "_contrib_MultiBoxPrior"
-//         new Symbol(Some creator,
-//                    [|"sizes"; "ratios"; "steps"; "offsets"; "clip"|],
-//                    [|string sizes; string ratios; string steps; string offsets; string clip|],
-//                    [|"data"|],
-//                    [|data|])
+//         new SymbolFromOperator(creator,
+//                                [|"sizes"; "ratios"; "steps"; "offsets"; "clip"|],
+//                                [|string sizes; string ratios; string steps; string offsets; string clip|],
+//                                [|"data"|],
+//                                [|data :> BaseSymbol|])
 
 //     /// <summary>Compute Multibox training targets</summary>
 //     /// <param name="anchor">Generated anchor boxes.</param>
@@ -42482,11 +42482,11 @@ type Operators() =
 //                                         [<Optional; DefaultParameterValue(0.5)>] negativeMiningThresh : float, 
 //                                         [<Optional; DefaultParameterValue(0)>] minimumNegativeSamples : int) =
 //         let creator = AtomicSymbolCreator.FromName "_contrib_MultiBoxTarget"
-//         new Symbol(Some creator,
-//                    [|"variances"; "overlap_threshold"; "ignore_label"; "negative_mining_ratio"; "negative_mining_thresh"; "minimum_negative_samples"|],
-//                    [|string variances; string overlapThreshold; string ignoreLabel; string negativeMiningRatio; string negativeMiningThresh; string minimumNegativeSamples|],
-//                    [|"anchor"; "label"; "clsPred"|],
-//                    [|anchor; label; clsPred|])
+//         new SymbolFromOperator(creator,
+//                                [|"variances"; "overlap_threshold"; "ignore_label"; "negative_mining_ratio"; "negative_mining_thresh"; "minimum_negative_samples"|],
+//                                [|string variances; string overlapThreshold; string ignoreLabel; string negativeMiningRatio; string negativeMiningThresh; string minimumNegativeSamples|],
+//                                [|"anchor"; "label"; "clsPred"|],
+//                                [|anchor :> BaseSymbol; label :> BaseSymbol; clsPred :> BaseSymbol|])
 
 //     /// <summary>Generate region proposals via RPN</summary>
 //     /// <param name="clsProb">Score of how likely proposal is object.</param>
@@ -42582,11 +42582,11 @@ type Operators() =
 //                                   [<Optional; DefaultParameterValue(false)>] outputScore : bool, 
 //                                   [<Optional; DefaultParameterValue(false)>] iouLoss : bool) =
 //         let creator = AtomicSymbolCreator.FromName "_contrib_Proposal"
-//         new Symbol(Some creator,
-//                    [|"scales"; "ratios"; "rpn_pre_nms_top_n"; "rpn_post_nms_top_n"; "threshold"; "rpn_min_size"; "feature_stride"; "output_score"; "iou_loss"|],
-//                    [|string scales; string ratios; string rpnPreNmsTopN; string rpnPostNmsTopN; string threshold; string rpnMinSize; string featureStride; string outputScore; string iouLoss|],
-//                    [|"clsProb"; "bboxPred"; "imInfo"|],
-//                    [|clsProb; bboxPred; imInfo|])
+//         new SymbolFromOperator(creator,
+//                                [|"scales"; "ratios"; "rpn_pre_nms_top_n"; "rpn_post_nms_top_n"; "threshold"; "rpn_min_size"; "feature_stride"; "output_score"; "iou_loss"|],
+//                                [|string scales; string ratios; string rpnPreNmsTopN; string rpnPostNmsTopN; string threshold; string rpnMinSize; string featureStride; string outputScore; string iouLoss|],
+//                                [|"clsProb"; "bboxPred"; "imInfo"|],
+//                                [|clsProb :> BaseSymbol; bboxPred :> BaseSymbol; imInfo :> BaseSymbol|])
 
 //     /// <summary>
 //     /// 
@@ -42667,11 +42667,11 @@ type Operators() =
 //                              [<Optional>] hW : int seq, 
 //                              [<Optional; DefaultParameterValue(false)>] centerCrop : bool) =
 //         let creator = AtomicSymbolCreator.FromName "Crop"
-//         new Symbol(Some creator,
-//                    [|"data"; "num_args"; "offset"; "h_w"; "center_crop"|],
-//                    [|string data; string numArgs; (if isNull (offset :> obj) then "[0,0]" else (offset |> Seq.map string |> String.concat ", ")); (if isNull (hW :> obj) then "[0,0]" else (hW |> Seq.map string |> String.concat ", ")); string centerCrop|],
-//                    Array.empty,
-//                    Array.empty)
+//         new SymbolFromOperator(creator,
+//                                [|"data"; "num_args"; "offset"; "h_w"; "center_crop"|],
+//                                [|string data; string numArgs; (if isNull (offset :> obj) then "[0,0]" else (offset |> Seq.map string |> String.concat ", ")); (if isNull (hW :> obj) then "[0,0]" else (hW |> Seq.map string |> String.concat ", ")); string centerCrop|],
+//                                Array.empty,
+//                                Array.empty)
 
 //     /// <summary>Stub for implementing an operator implemented in native frontend language.</summary>
 //     /// <param name="data">Input data for the custom operator.</param>
@@ -42706,11 +42706,11 @@ type Operators() =
 //     /// <param name="needTopGrad">Whether this layer needs out grad for backward. Should be false for loss layers.</param>
 //     static member Native([<ParamArray>] data : Symbol[], info : ptr, [<Optional; DefaultParameterValue(true)>] needTopGrad : bool) =
 //         let creator = AtomicSymbolCreator.FromName "_Native"
-//         new Symbol(Some creator,
-//                    [|"info"; "need_top_grad"|],
-//                    [|string info; string needTopGrad|],
-//                    Array.empty,
-//                    (data |> Array.map (fun x -> x)))
+//         new SymbolFromOperator(creator,
+//                                [|"info"; "need_top_grad"|],
+//                                [|string info; string needTopGrad|],
+//                                Array.empty,
+//                                (data |> Array.map (fun x -> x :> BaseSymbol)))
 
 //     /// <summary>Stub for implementing an operator implemented in native frontend language with ndarray.</summary>
 //     /// <param name="data">Input data for the custom operator.</param>
@@ -42742,11 +42742,11 @@ type Operators() =
 //     /// <param name="info"></param>
 //     static member NDArray([<ParamArray>] data : Symbol[], info : ptr) =
 //         let creator = AtomicSymbolCreator.FromName "_NDArray"
-//         new Symbol(Some creator,
-//                    [|"info"|],
-//                    [|string info|],
-//                    Array.empty,
-//                    (data |> Array.map (fun x -> x)))
+//         new SymbolFromOperator(creator,
+//                                [|"info"|],
+//                                [|string info|],
+//                                Array.empty,
+//                                (data |> Array.map (fun x -> x :> BaseSymbol)))
 
 // type PoolType = 
 //     | Avg
@@ -42947,8 +42947,8 @@ type Operators() =
 //                             [<Optional>] stride : int seq, 
 //                             [<Optional>] pad : int seq) =
 //         let creator = AtomicSymbolCreator.FromName "Pooling_v1"
-//         new Symbol(Some creator,
-//                    [|"kernel"; "pool_type"; "global_pool"; "pooling_convention"; "stride"; "pad"|],
-//                    [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", "))|],
-//                    [|"data"|],
-//                    [|data|])
+//         new SymbolFromOperator(creator,
+//                                [|"kernel"; "pool_type"; "global_pool"; "pooling_convention"; "stride"; "pad"|],
+//                                [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", "))|],
+//                                [|"data"|],
+//                                [|data :> BaseSymbol|])
