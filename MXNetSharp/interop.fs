@@ -133,9 +133,10 @@ module MXLib =
     /// <param name="seed">the random number seed.</param>
     let randomSeed (seed : int) = MXRandomSeed seed |> throwOnError "MXRandomSeed"
 
-    //TODO: Fix Doc string
     /// <summary>Seed the global random number generator of the given device.</summary>
     /// <param name="seed">the random number seed.</param> 
+    /// <param name="dev_type">device type</param> 
+    /// <param name="dev_id">device id</param> 
     let randomSeedContext seed dev_type dev_id = MXRandomSeedContext(seed,dev_type,dev_id) |> throwOnError "MXRandomSeedContext"
 
     /// <summary>Notify the engine about a shutdown,
@@ -206,6 +207,14 @@ type InferShapeResult<'a> =
         AuxShapes : 'a [] []
         InputShapes : 'a [] []
         OutputShapes : 'a [] []
+    }
+
+type InferTypeResult<'a> = 
+    {
+        Complete : bool
+        AuxTypes : int[]
+        InputTypes : int[]
+        OutputTypes : int[]
     }
 
 module MXSymbol = 
@@ -651,7 +660,6 @@ module MXSymbol =
     /// The types are packed into a CSR matrix represented by arg_ind_ptr and arg_type_data
     /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
     /// <param name="sym">symbol handle</param>
-    /// <param name="num_args">numbe of input arguments.</param>
     /// <param name="keys">the key of keyword args (optional)</param>
     /// <param name="arg_type_data">the content of the CSR</param>
     /// <param name="in_type_size">sizeof the returning array of in_types</param>
@@ -662,8 +670,7 @@ module MXSymbol =
     /// <param name="aux_type_data">returning array of pointers to head of the auxiliary type.</param>
     /// <param name="complete">whether infer type completes or more information is needed.</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let inferType sym num_args keys arg_type_data = 
-        //TODO: Complete MXSymbolInferType
+    let inferType sym keys arg_type_data = 
         let mutable in_type_size = un
         let mutable in_type_data = un
         let mutable aux_type_size = un
@@ -671,7 +678,13 @@ module MXSymbol =
         let mutable complete = un
         let mutable out_type_size = un
         let mutable out_type_data = un
-        MXSymbolInferType(sym, num_args, keys, arg_type_data, &in_type_size, &in_type_data, &out_type_size, &out_type_data, &aux_type_size, &aux_type_data, &complete) |> throwOnError "MXSymbolInferType"
+        MXSymbolInferType(sym, ulength keys, keys, arg_type_data, &in_type_size, &in_type_data, &out_type_size, &out_type_data, &aux_type_size, &aux_type_data, &complete) |> throwOnError "MXSymbolInferType"
+        {
+            Complete = complete <> 0
+            AuxTypes = readStructArray aux_type_size aux_type_data
+            InputTypes = readStructArray in_type_size in_type_data
+            OutputTypes = readStructArray out_type_size out_type_data
+        }
 
     /// <summary>partially infer type of unknown input types given the known one.
     ///
@@ -679,7 +692,6 @@ module MXSymbol =
     /// The types are packed into a CSR matrix represented by arg_ind_ptr and arg_type_data
     /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
     /// <param name="sym">symbol handle</param>
-    /// <param name="num_args">numbe of input arguments.</param>
     /// <param name="keys">the key of keyword args (optional)</param>
     /// <param name="arg_type_data">the content of the CSR</param>
     /// <param name="in_type_size">sizeof the returning array of in_types</param>
@@ -690,8 +702,7 @@ module MXSymbol =
     /// <param name="aux_type_data">returning array of pointers to head of the auxiliary type.</param>
     /// <param name="complete">whether infer type completes or more information is needed.</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let inferTypePartial sym num_args keys arg_type_data = 
-        //TODO: Complete MXSymbolInferTypePartial
+    let inferTypePartial sym keys arg_type_data = 
         let mutable in_type_size = un
         let mutable in_type_data = un
         let mutable aux_type_size = un
@@ -699,7 +710,13 @@ module MXSymbol =
         let mutable complete = un
         let mutable out_type_size = un
         let mutable out_type_data = un
-        MXSymbolInferTypePartial(sym, num_args, keys, arg_type_data, &in_type_size, &in_type_data, &out_type_size, &out_type_data, &aux_type_size, &aux_type_data, &complete) |> throwOnError "MXSymbolInferTypePartial"
+        MXSymbolInferTypePartial(sym, ulength keys, keys, arg_type_data, &in_type_size, &in_type_data, &out_type_size, &out_type_data, &aux_type_size, &aux_type_data, &complete) |> throwOnError "MXSymbolInferTypePartial"
+        {
+            Complete = complete <> 0
+            AuxTypes = readStructArray aux_type_size aux_type_data
+            InputTypes = readStructArray in_type_size in_type_data
+            OutputTypes = readStructArray out_type_size out_type_data
+        }
 
     /// <summary>Convert a symbol into a quantized symbol where FP32 operators are replaced with INT8</summary>
     /// <param name="sym_handle">symbol to be converted</param>
@@ -1041,7 +1058,27 @@ module MXNDArray =
         let data = NativeInterop.NativePtr.toNativeInt ptr
         MXNDArraySyncCopyToCPU(handle, data, size) |> throwOnError "MXNDArraySyncCopyToCPU"
 
-    (* TODO: MXNDArrayCreateSparseEx
+    // TODO: Storag type enum?
+    /// <summary>create an empty sparse NDArray with specified shape and data type</summary>
+    /// <param name="storage_type">the storage type of the ndarray</param>
+    /// <param name="shape">the pointer to the shape</param>
+    /// <param name="dev_type">device type, specify device we want to take</param>
+    /// <param name="dev_id">the device id of the specific device</param>
+    /// <param name="delay_alloc">whether to delay allocation until
+    ///       the narray is first mutated</param>
+    /// <param name="dtype">data type of created array</param>
+    /// <param name="aux_type">data type of the aux data for the created array</param>
+    /// <param name="aux_ndims">the dimension of the shapes of aux data</param>
+    /// <param name="aux_shape">the shapes of aux data</param>
+    /// <param name="out">the returning handle</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let createSparseEx storage_type shape dev_type dev_id delay_alloc dtype aux_type (aux_shape : uint32 [][]) = 
+        let mutable out = un
+        let aux_ndims = aux_shape |> Array.map ulength
+        let aux_shape = aux_shape |> Array.concat
+        MXNDArrayCreateSparseEx(storage_type, shape, ulength shape, dev_type, dev_id, delay_alloc, dtype, ulength aux_type, aux_type, aux_ndims, aux_shape, &out) |> throwOnError "MXNDArrayCreateSparseEx"
+        out
+
     /// <summary>create an empty sparse NDArray with specified shape and data type</summary>
     /// <param name="storage_type">the storage type of the ndarray</param>
     /// <param name="shape">the pointer to the shape</param>
@@ -1057,15 +1094,11 @@ module MXNDArray =
     /// <param name="aux_shape">the shapes of aux data</param>
     /// <param name="out">the returning handle</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let createSparseEx storage_type shape ndim dev_type dev_id delay_alloc dtype num_aux aux_type aux_ndims aux_shape = 
+    let createSparseEx64 storage_type shape dev_type dev_id delay_alloc dtype num_aux aux_type (aux_shape : int64 [][]) = 
         let mutable out = un
-        MXNDArrayCreateSparseEx(storage_type, shape, ulength shape, dev_type, dev_id, delay_alloc, dtype, ulength aus_type, aux_type, aux_ndims, aux_shape, &out) |> throwOnError "MXNDArrayCreateSparseEx"
-        out
-
-    let createSparseEx64 storage_type shape ndim dev_type dev_id delay_alloc dtype num_aux aux_type aux_ndims aux_shape = 
-        let mutable out = un
-        MXNDArrayCreateSparseEx64(storage_type, shape, ndim, dev_type, dev_id, delay_alloc, dtype, num_aux, aux_type, aux_ndims, aux_shape, &out) |> throwOnError "MXNDArrayCreateSparseEx64"
-    *)
+        let aux_ndims = aux_shape |> Array.map length
+        let aux_shape = aux_shape |> Array.concat
+        MXNDArrayCreateSparseEx64(storage_type, shape, length shape, dev_type, dev_id, delay_alloc, dtype, num_aux, aux_type, aux_ndims, aux_shape, &out) |> throwOnError "MXNDArrayCreateSparseEx64"
     
     /// <summary>Load list / dictionary of narrays from file content loaded into memory.
     ///This will load a list of ndarrays in a similar
@@ -1203,10 +1236,9 @@ module MXNDArray =
         MXNDArrayGetGrad(handle, &out) |> throwOnError "MXNDArrayGetGrad"
         out
 
-    // TODO: Figure out what NDArrayHandle detach outputs?
     /// <summary>detach and ndarray from computation graph by clearing entry_</summary>
     /// <param name="handle">NDArray handle</param>
-    /// <returns>0 when success, -1 when failure happens</returns>
+    /// <returns>A new NDArray detached from graph</returns>
     let detach handle = 
         let mutable out = un
         MXNDArrayDetach(handle, &out) |> throwOnError "MXNDArrayDetach"
