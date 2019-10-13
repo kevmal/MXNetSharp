@@ -9,13 +9,8 @@ type Executor(handle : CApi.ExecutorHandle) =
         let inArgs = inArgs |> Seq.map (fun (x : NDArray) -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray
         let argGrad = argGrad |> Seq.map (fun (x : NDArray) -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray
         let gradReqType = gradReqType |> Seq.map (fun (x : OpReqType) -> uint32 x) |> Seq.toArray
-        match symbol.SymbolHandle with
-        | Some sym -> 
-            let h = MXExecutor.bindEX sym.UnsafeHandle (int context.DeviceType) context.DeviceId null null null inArgs argGrad gradReqType auxStates 0n
-            Executor(h)
-        | None -> 
-            invalidArg "symbol" "Cannot create executor on empty symbol."
-            Executor(Unchecked.defaultof<_>)
+        let h = MXExecutor.bindEX symbol.UnsafeHandle (int context.DeviceType) context.DeviceId null null null inArgs argGrad gradReqType auxStates 0n
+        Executor(h)
     member x.Forward(isTraining : bool) = 
         let isTrain = if isTraining then 1 else 0
         MXExecutor.forward handle isTrain
