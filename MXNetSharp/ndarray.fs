@@ -24,8 +24,8 @@ type OpReqType =
     | WriteInplace = 2
     | AddTo = 3
 
-//TODO: NDArray Use safe handle and add IDisposable
 type NDArray(handle : SafeNDArrayHandle) = 
+    let mutable disposed = false
     internal new(h : CApi.NDArrayHandle) = NDArray(new SafeNDArrayHandle(h, true))
     new() = 
         let h1 = MXNDArray.createNone()
@@ -84,6 +84,16 @@ type NDArray(handle : SafeNDArrayHandle) =
         let a = Array.zeroCreate x.Size
         MXNDArray.syncCopyToCPU handle.UnsafeHandle a
         a
+    member x.Dispose(disposing) = 
+        if not disposed then 
+            if disposing then 
+                handle.Dispose()
+        disposed <- true
+    member x.Dispose() = 
+        x.Dispose(true)
+        GC.SuppressFinalize(x)
+    interface IDisposable with  
+        member x.Dispose() = x.Dispose()
 
 
     
