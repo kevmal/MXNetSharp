@@ -279,7 +279,11 @@ Mappings.Modify
             match x.Arg.RequiredOrOptional with 
             | Optional str -> 
                 match x.Arg.TypeString with 
+                | "long"
+                | "long (non-negative)" -> str.Trim ''' |> int64 |> string |> sprintf "%sL" |> UseAttr |> Some
+                | "int (non-negative)" 
                 | "int" -> str.Trim ''' |> int |> string |> UseAttr |> Some
+                | "double"
                 | "float" -> str.Trim ''' |> double |> dblString |> UseAttr |> Some
                 | "boolean" -> str |> toBoolVal |> UseAttr |> Some
                 | "string" -> str.Trim ''' |> quote |> UseAttr |> Some
@@ -290,6 +294,9 @@ Mappings.Modify
                         ReplaceNull (sprintf "\"%s\"" str) |> Some
                 | t when t.StartsWith "{" -> 
                     Some(ReplaceNull(str.Replace(''','\"')))
+                | p -> 
+                    printfn "Warning: Unhandled default %A for type %A" str x.Arg.TypeString
+                    None
                 | _ -> None
             | _ -> None
         { x with DefaultMode = dmode }
