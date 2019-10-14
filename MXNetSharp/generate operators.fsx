@@ -373,8 +373,8 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
                 let t = 
                     match x.SymbolOrNDArray with 
                     | Some ManySymbolOrNDArray -> 
-                        if ndarray then "NDArray[]" else "Symbol[]"
-                    | Some _ -> if ndarray then "NDArray" else "Symbol"
+                        if ndarray then "NDArray[]" else "BaseSymbol[]"
+                    | Some _ -> if ndarray then "NDArray" else "BaseSymbol"
                     | _ -> x.TypeString
                 match x.DefaultMode with 
                 | Some (ReplaceOptionWithString _) -> 
@@ -436,7 +436,7 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
             if ndarray then 
                 sprintf "%s.NDArrayHandle.UnsafeHandle" x
             else
-                sprintf "%s :> BaseSymbol" x
+                sprintf "%s" x
         let arr (x : _ []) = 
             match x with 
             | [| Choice2Of2 name |] -> sprintf "(%s |> Array.map (fun x -> %s))" name (handle "x")
