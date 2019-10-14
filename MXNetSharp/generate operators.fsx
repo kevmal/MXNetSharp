@@ -359,7 +359,7 @@ let comment lines = lines |> List.map (fun x -> "// " + x)
 
 let toCStr (a : ProcessedArg) (str : string) = 
     match a.TypeString with 
-    | "int seq" -> sprintf "(%s |> Seq.map string |> String.concat \", \")" str 
+    | "int seq" -> sprintf "(%s |> Seq.map string |> String.concat \", \" |> sprintf \"[%%s]\")" str 
     //| "bool" -> sprintf "(if %s then \"1\" else \"0\")" str
     | "string" -> str
     | _ -> sprintf "string %s" str

@@ -55,6 +55,13 @@ type NDArray(handle : SafeNDArrayHandle) =
         let h1 = MXNDArray.createNone()
         MXNDArray.syncCopyFromCPU h1 data
         new NDArray(h1)
+    new(data : byte[], shape, context) = 
+        let dtype = TypeFlag.Uint8
+        let delayAlloc = false
+        let shape = shape |> Seq.toArray
+        let handle = MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype
+        MXNDArray.syncCopyFromCPU handle data
+        new NDArray(handle)
         
     member x.NDArrayHandle = handle
 
@@ -62,13 +69,19 @@ type NDArray(handle : SafeNDArrayHandle) =
     member x.Size = x.Shape |> Array.reduce (*)
     member x.Context = MXNDArray.getContext handle.UnsafeHandle
 
+    member x.CopyTo(destination : NDArray) = 
+        MXNDArray.syncCopyFromNDArray destination.NDArrayHandle.UnsafeHandle x.NDArrayHandle.UnsafeHandle -1
+
     member x.SyncCopyFromCPU(data : float32 []) = MXNDArray.syncCopyFromCPU handle.UnsafeHandle data
 
     member x.Set(value : float32) =
         let setValue = AtomicSymbolCreator.FromName "_set_value"
         MXNDArray.imperativeInvokeInto setValue.AtomicSymbolCreatorHandle null [|handle.UnsafeHandle|] [|"src"|] [|value.ToString()|]
         |> ignore
-
+    static member Load(file : string) = 
+        let names,handles = MXNDArray.load file
+        let arrs = handles |> Array.map (fun h -> new NDArray(h))
+        Array.zip names arrs |> dict
     static member WaitAll() = MXNDArray.waitAll()
     static member ( * )(x : NDArray, y : float32) = 
         let setValue = AtomicSymbolCreator.FromName "_mul_scalar"
@@ -84,6 +97,7 @@ type NDArray(handle : SafeNDArrayHandle) =
         let a = Array.zeroCreate x.Size
         MXNDArray.syncCopyToCPU handle.UnsafeHandle a
         a
+    override x.ToString() = sprintf "NDArray[%s]" (x.Shape |> Array.map string |> String.concat ",")
     member x.Dispose(disposing) = 
         if not disposed then 
             if disposing then 

@@ -51,7 +51,7 @@ type Symbol() =
             match x.InternalHandle with
             | Some h -> h
             | None -> failwithf "Failed to initialize Symbol %s" (defaultArg x.InternalName "") //TODO: make exception
-    member internal x.UnsafeHandle = x.SymbolHandle.UnsafeHandle
+    member x.UnsafeHandle = x.SymbolHandle.UnsafeHandle //REVIEW: mark as internal?
     abstract member Initialize : unit -> unit
     static member Empty = EmptySymbol.Instance
     member x.Dispose(disposing) = 
@@ -90,6 +90,7 @@ type SymbolFromOperator(creator : AtomicSymbolCreator, parameters, inputs) =
         match v with 
         | :? bool as x -> if x then "1" else "0"
         | :? string as x -> sprintf "%s" x
+        | :? seq<int> as x -> x |> Seq.map string |> String.concat "," |> sprintf "[%s]"
         | x -> string x
     let parametersStr = parameters |> Array.map (fun (k,v) -> k, str v)
     new(creator,pnames,ps,inames,ins) = new SymbolFromOperator(creator, Array.zip pnames ps, Array.zip inames ins)
