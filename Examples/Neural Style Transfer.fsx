@@ -44,6 +44,6 @@ let conv5_1 = Operators.Convolution(pool4, Symbol.Empty, Symbol.Empty, numFilter
 let relu5_1 = Operators.Activation(conv5_1, actType = Relu, Name = "relu5_1")
 
 
-let style = mx.sym.Group([relu1_1, relu2_1, relu3_1, relu4_1, relu5_1])
+let style = Symbol.Group([relu1_1, relu2_1, relu3_1, relu4_1, relu5_1])
 content = mx.sym.Group([relu4_2])
 return style, content
