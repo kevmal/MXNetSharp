@@ -19,6 +19,11 @@ type Executor(handle : CApi.ExecutorHandle) =
         |> Array.map NDArray
     member x.Backward() = 
         MXExecutor.backward handle null
+    member x.Backward(grads) = 
+        grads
+        |> Seq.map (fun (x : NDArray) -> x.NDArrayHandle.UnsafeHandle) 
+        |> Seq.toArray
+        |> MXExecutor.backward handle
 
 
 
