@@ -57,7 +57,7 @@ module MXSymbol =
         MXSymbol.compose mySymbol "mySymbol" null [|inputVariable|]
         let inputSymbols = MXSymbol.getInputSymbols mySymbol
         Assert.Equal(1, inputSymbols.Length)
-        Assert.Equal(Some("mySymbol_data"), MXSymbol.getName inputSymbols.[0])
+        Assert.Equal(Some("myInput"), MXSymbol.getName inputSymbols.[0])
         MXSymbol.free mySymbol
 
 

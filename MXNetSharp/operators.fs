@@ -550,7 +550,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                Array.empty,
                                Array.empty,
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (data |> Array.map (fun x -> x)))
 
     static member BackwardCachedOpNDArray() =
@@ -1609,7 +1609,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_arrays"; "init_output"|],
                                [|string numArrays; string initOutput|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (data |> Array.map (fun x -> x)))
 
     /// <summary>
@@ -2678,7 +2678,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_args"; "num_hops"; "num_neighbor"; "max_num_vertices"|],
                                [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|],
-                               [|"csrMatrix"|],
+                               [|"csrMatrix"; yield! seedArrays |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                [|csrMatrix; yield! (seedArrays |> Seq.map (fun x -> x))|])
 
     /// <summary>This operator samples sub-graph from a csr graph via an
@@ -2886,7 +2886,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_args"; "num_hops"; "num_neighbor"; "max_num_vertices"|],
                                [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|],
-                               [|"csrMatrix"; "probability"|],
+                               [|"csrMatrix"; "probability"; yield! seedArrays |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                [|csrMatrix; probability; yield! (seedArrays |> Seq.map (fun x -> x))|])
 
     /// <summary>This operator constructs an induced subgraph for
@@ -3006,7 +3006,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_args"; "return_mapping"|],
                                [|string numArgs; string returnMapping|],
-                               [|"graph"|],
+                               [|"graph"; yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                [|graph; yield! (data |> Seq.map (fun x -> x))|])
 
     /// <summary>This operator implements the edge_id function for a graph
@@ -3336,7 +3336,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_args"; "return_mapping"; "graph_sizes"|],
                                [|string numArgs; string returnMapping; string graphSizes|],
-                               Array.empty,
+                               [|yield! graphData |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (graphData |> Array.map (fun x -> x)))
 
     /// <summary>This operator implements the gradient multiplier function.
@@ -4150,7 +4150,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                Array.empty,
                                Array.empty,
-                               Array.empty,
+                               [|yield! args |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (args |> Array.map (fun x -> x)))
 
     /// <summary>Number of stored values for a sparse tensor, including explicit zeros.
@@ -5183,7 +5183,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"op_type"|],
                                [|opType|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (data |> Array.map (fun x -> x)))
 
     static member BackwardCustomNDArray() =
@@ -7309,12 +7309,12 @@ type Operators() =
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
     /// <param name="dim">the dimension to be concated.</param>
-    static member Concat([<ParamArray>] data : NDArray[], [<Optional; DefaultParameterValue(1)>] dim : int) =
+    static member Concat([<ParamArray>] data : NDArray[], numArgs : int, [<Optional; DefaultParameterValue(1)>] dim : int) =
         let creator = AtomicSymbolCreator.FromName "Concat"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"num_args"; "dim"|]
-                                                 [|string (data.Length); string dim|]
+                                                 [|string numArgs; string dim|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Joins input arrays along a given axis.
     /// 
@@ -7412,12 +7412,12 @@ type Operators() =
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
     /// <param name="dim">the dimension to be concated.</param>
-    static member Concat([<ParamArray>] data : BaseSymbol[], [<Optional; DefaultParameterValue(1)>] dim : int) =
+    static member Concat([<ParamArray>] data : BaseSymbol[], numArgs : int, [<Optional; DefaultParameterValue(1)>] dim : int) =
         let creator = AtomicSymbolCreator.FromName "Concat"
         new SymbolFromOperator(creator,
                                [|"num_args"; "dim"|],
-                               [|string (data.Length); string dim|],
-                               Array.empty,
+                               [|string numArgs; string dim|],
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (data |> Array.map (fun x -> x)))
 
     static member BackwardConcatNDArray() =
@@ -7480,7 +7480,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_args"; "dim"|],
                                [|string numArgs; string dim|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (data |> Array.map (fun x -> x)))
 
     /// <summary>Compute *N*-D convolution on *(N+2)*-D input.
@@ -9456,7 +9456,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                Array.empty,
                                Array.empty,
-                               Array.empty,
+                               [|yield! args |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (args |> Array.map (fun x -> x)))
 
     /// <summary>Applies the softmin function.
@@ -9603,7 +9603,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                Array.empty,
                                Array.empty,
-                               Array.empty,
+                               [|yield! args |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (args |> Array.map (fun x -> x)))
 
     /// <summary>Computes the log softmax of the input.
@@ -9720,7 +9720,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                Array.empty,
                                Array.empty,
-                               Array.empty,
+                               [|yield! args |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (args |> Array.map (fun x -> x)))
 
     /// <summary>Applies softmax activation to input. This is intended for internal layers.
@@ -10081,7 +10081,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"scale"; "sample_type"; "num_args"; "num_filter"; "multi_input_mode"; "workspace"|],
                                [|string scale; string sampleType; string numArgs; string numFilter; (if isNull (multiInputMode :> obj) then "concat" else string multiInputMode); string workspace|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (data |> Array.map (fun x -> x)))
 
     static member BackwardUpSamplingNDArray() =
@@ -12753,7 +12753,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_args"; "dim"|],
                                [|string numArgs; string dim|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (data |> Array.map (fun x -> x)))
 
     /// <summary>Convolution operator for input, weight and bias data type of int8,
@@ -17446,7 +17446,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_outputs"|],
                                [|string numOutputs|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (data |> Array.map (fun x -> x)))
 
     /// <param name="grad">Gradients</param>
@@ -17479,7 +17479,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_outputs"|],
                                [|string numOutputs|],
-                               Array.empty,
+                               [|yield! grad |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (grad |> Array.map (fun x -> x)))
 
     /// <summary>Returns indices of the maximum values along an axis.
@@ -24683,7 +24683,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                Array.empty,
                                Array.empty,
-                               Array.empty,
+                               [|yield! args |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (args |> Array.map (fun x -> x)))
 
     /// <summary>Computes rectified linear activation.
@@ -36032,7 +36032,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_args"; "axis"|],
                                [|string numArgs; string axis|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (data |> Array.map (fun x -> x)))
 
     static member BackwardStackNDArray() =
@@ -36140,7 +36140,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"axis"|],
                                [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
                                (data |> Array.map (fun x -> x)))
 
     static member BackwardSqueezeNDArray() =
@@ -41627,7 +41627,7 @@ type Operators() =
 //         new SymbolFromOperator(creator,
 //                                [|"lrs"; "wds"; "rescale_grad"; "clip_gradient"; "num_weights"|],
 //                                [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|],
-//                                Array.empty,
+//                                [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
 //                                (data |> Array.map (fun x -> x)))
 
 //     /// <summary>Momentum update function for Stochastic Gradient Descent (SGD) optimizer.
@@ -41757,7 +41757,7 @@ type Operators() =
 //         new SymbolFromOperator(creator,
 //                                [|"lrs"; "wds"; "momentum"; "rescale_grad"; "clip_gradient"; "num_weights"|],
 //                                [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|],
-//                                Array.empty,
+//                                [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
 //                                (data |> Array.map (fun x -> x)))
 
 //     /// <summary>Update function for multi-precision Stochastic Gradient Descent (SDG) optimizer.
@@ -41845,7 +41845,7 @@ type Operators() =
 //         new SymbolFromOperator(creator,
 //                                [|"lrs"; "wds"; "rescale_grad"; "clip_gradient"; "num_weights"|],
 //                                [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|],
-//                                Array.empty,
+//                                [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
 //                                (data |> Array.map (fun x -> x)))
 
 //     /// <summary>Momentum update function for multi-precision Stochastic Gradient Descent (SGD) optimizer.
@@ -41975,7 +41975,7 @@ type Operators() =
 //         new SymbolFromOperator(creator,
 //                                [|"lrs"; "wds"; "momentum"; "rescale_grad"; "clip_gradient"; "num_weights"|],
 //                                [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|],
-//                                Array.empty,
+//                                [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
 //                                (data |> Array.map (fun x -> x)))
 
 // type IntOrFloatDType = 
@@ -42709,7 +42709,7 @@ type Operators() =
 //         new SymbolFromOperator(creator,
 //                                [|"info"; "need_top_grad"|],
 //                                [|string info; string needTopGrad|],
-//                                Array.empty,
+//                                [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
 //                                (data |> Array.map (fun x -> x)))
 
 //     /// <summary>Stub for implementing an operator implemented in native frontend language with ndarray.</summary>
@@ -42745,7 +42745,7 @@ type Operators() =
 //         new SymbolFromOperator(creator,
 //                                [|"info"|],
 //                                [|string info|],
-//                                Array.empty,
+//                                [|yield! data |> Array.mapi (fun i _ -> sprintf "[%d]arg%d" i i)|],
 //                                (data |> Array.map (fun x -> x)))
 
 // type PoolType = 
