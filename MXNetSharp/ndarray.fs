@@ -17,12 +17,6 @@ type SafeNDArrayHandle(owner) =
             ObjectDisposedException("SafeNDArrayHandle", "NDArray handle has been closed") |> raise
 
 
-// From https://github.com/apache/incubator-mxnet/blob/225f71f744ac5e7bd29868b6d3ba0e4fe2527c43/cpp-package/include/mxnet-cpp/base.h#L39
-type OpReqType =
-    | NullOp = 0
-    | WriteTo = 1
-    | WriteInplace = 2
-    | AddTo = 3
 
 type NDArray(handle : SafeNDArrayHandle) = 
     let mutable disposed = false
@@ -35,15 +29,15 @@ type NDArray(handle : SafeNDArrayHandle) =
         let delayAlloc = defaultArg delayAlloc true
         let shape = shape |> Seq.toArray
         new NDArray(MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype)
-    new(data : float[], shape, context) = 
+    new(data : float[], shape, context : Context) = 
         let dtype = TypeFlag.Float64
         let delayAlloc = false
         let shape = shape |> Seq.toArray
         let handle = MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype
         MXNDArray.syncCopyFromCPU handle data
         new NDArray(handle)
-    new(data : float seq, shape, context) = new NDArray(data |> Seq.toArray, shape, context)
-    new(data : float32[], shape, context) = 
+    new(data : float seq, shape, context : Context) = new NDArray(data |> Seq.toArray, shape, context)
+    new(data : float32[], shape, context : Context) = 
         let dtype = TypeFlag.Float32
         let delayAlloc = false
         let shape = shape |> Seq.toArray
@@ -55,7 +49,7 @@ type NDArray(handle : SafeNDArrayHandle) =
         let h1 = MXNDArray.createNone()
         MXNDArray.syncCopyFromCPU h1 data
         new NDArray(h1)
-    new(data : byte[], shape, context) = 
+    new(data : byte[], shape, context : Context) = 
         let dtype = TypeFlag.Uint8
         let delayAlloc = false
         let shape = shape |> Seq.toArray

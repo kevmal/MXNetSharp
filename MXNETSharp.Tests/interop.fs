@@ -4,7 +4,7 @@
 
 open MXNetSharp.Interop
 open Xunit
-open MXNetSharp.Interop
+open MXNetSharp
 
 module MXLib =
     [<Fact>]
@@ -44,7 +44,7 @@ module MXSymbol =
 
     [<Fact>]
     let ``simple create symbol``() = 
-        let h = MXNDArray.createEx [|100;10|] DeviceType.CPU 0 false TypeFlag.Float32
+        let h = MXNDArray.createEx [|100;10|] DeviceTypeEnum.CPU 0 false TypeFlag.Float32
         MXNDArray.syncCopyFromCPU h [|1.f .. 1000.f|]
         //let h2 = MXNDArray.createEx [|1|] DeviceType.CPU 0 false TypeFlag.Float32
         //MXNDArray.syncCopyFromCPU h [|1.f|]
@@ -57,7 +57,7 @@ module MXSymbol =
         MXSymbol.compose mySymbol "mySymbol" null [|inputVariable|]
         let inputSymbols = MXSymbol.getInputSymbols mySymbol
         Assert.Equal(1, inputSymbols.Length)
-        Assert.Equal(Some("mySymbol_data"), MXSymbol.getName inputSymbols.[0])
+        Assert.Equal(Some("myInput"), MXSymbol.getName inputSymbols.[0])
         MXSymbol.free mySymbol
 
 
@@ -74,28 +74,28 @@ module MXNDArray =
 
     [<Fact>]
     let ``create getShape and free 10x10``() =
-        let h = MXNDArray.create [|10; 10|] DeviceType.CPU 0 false 
+        let h = MXNDArray.create [|10; 10|] DeviceTypeEnum.CPU 0 false 
         Assert.True(MXNDArray.getShape h = [|10;10|])
         Assert.Equal(TypeFlag.Float32, MXNDArray.getDType h)
         MXNDArray.free h
     
     [<Fact>]
     let ``create getShape and free 10000x111``() =
-        let h = MXNDArray.create [|10000; 111|] DeviceType.CPU 0 false 
+        let h = MXNDArray.create [|10000; 111|] DeviceTypeEnum.CPU 0 false 
         Assert.True(MXNDArray.getShape h = [|10000;111|])
         Assert.Equal(TypeFlag.Float32, MXNDArray.getDType h)
         MXNDArray.free h
 
     [<Fact>]
     let ``createEx float32 getShape and free 10x10``() =
-        let h = MXNDArray.createEx [|10; 10|] DeviceType.CPU 0 false TypeFlag.Float32
+        let h = MXNDArray.createEx [|10; 10|] DeviceTypeEnum.CPU 0 false TypeFlag.Float32
         Assert.True(MXNDArray.getShape h = [|10;10|])
         Assert.Equal(TypeFlag.Float32, MXNDArray.getDType h)
         MXNDArray.free h
 
     [<Fact>]
     let ``createEx float32 getShape and free 10000x111``() =
-        let h = MXNDArray.createEx [|10000; 111|] DeviceType.CPU 0 false TypeFlag.Float32
+        let h = MXNDArray.createEx [|10000; 111|] DeviceTypeEnum.CPU 0 false TypeFlag.Float32
         Assert.True(MXNDArray.getShape h = [|10000;111|])
         Assert.Equal(TypeFlag.Float32, MXNDArray.getDType h)
         MXNDArray.free h
@@ -103,7 +103,7 @@ module MXNDArray =
 
     [<Fact>]
     let ``createEx float32 getShape and free 5x5x5x5x5x5``() =
-        let h = MXNDArray.createEx [|5;5;5;5;5;5|] DeviceType.CPU 0 false TypeFlag.Float32
+        let h = MXNDArray.createEx [|5;5;5;5;5;5|] DeviceTypeEnum.CPU 0 false TypeFlag.Float32
         Assert.True(MXNDArray.getShape h = [|5;5;5;5;5;5|])
         Assert.Equal(TypeFlag.Float32, MXNDArray.getDType h)
         MXNDArray.free h
@@ -111,49 +111,49 @@ module MXNDArray =
 
     [<Fact>]
     let ``createEx float64 getShape and free 10x10``() =
-        let h = MXNDArray.createEx [|10; 10|] DeviceType.CPU 0 false TypeFlag.Float64
+        let h = MXNDArray.createEx [|10; 10|] DeviceTypeEnum.CPU 0 false TypeFlag.Float64
         Assert.True(MXNDArray.getShape h = [|10;10|])
         Assert.Equal(TypeFlag.Float64, MXNDArray.getDType h)
         MXNDArray.free h                
             
     [<Fact>]
     let ``createEx float16 getShape and free 10x10``() =
-        let h = MXNDArray.createEx [|10; 10|] DeviceType.CPU 0 false TypeFlag.Float16
+        let h = MXNDArray.createEx [|10; 10|] DeviceTypeEnum.CPU 0 false TypeFlag.Float16
         Assert.True(MXNDArray.getShape h = [|10;10|])
         Assert.Equal(TypeFlag.Float16, MXNDArray.getDType h)
         MXNDArray.free h                
 
     [<Fact>]
     let ``createEx int32 getShape and free 10x10``() =
-        let h = MXNDArray.createEx [|10; 10|] DeviceType.CPU 0 false TypeFlag.Int32
+        let h = MXNDArray.createEx [|10; 10|] DeviceTypeEnum.CPU 0 false TypeFlag.Int32
         Assert.True(MXNDArray.getShape h = [|10;10|])
         Assert.Equal(TypeFlag.Int32, MXNDArray.getDType h)
         MXNDArray.free h                
     
     [<Fact>]
     let ``createEx int64 getShape and free 10x10``() =
-        let h = MXNDArray.createEx [|10; 10|] DeviceType.CPU 0 false TypeFlag.Int64
+        let h = MXNDArray.createEx [|10; 10|] DeviceTypeEnum.CPU 0 false TypeFlag.Int64
         Assert.True(MXNDArray.getShape h = [|10;10|])
         Assert.Equal(TypeFlag.Int64, MXNDArray.getDType h)
         MXNDArray.free h                
 
     [<Fact>]
     let ``createEx int8 getShape and free 10x10``() =
-        let h = MXNDArray.createEx [|10; 10|] DeviceType.CPU 0 false TypeFlag.Int8
+        let h = MXNDArray.createEx [|10; 10|] DeviceTypeEnum.CPU 0 false TypeFlag.Int8
         Assert.True(MXNDArray.getShape h = [|10;10|])
         Assert.Equal(TypeFlag.Int8, MXNDArray.getDType h)
         MXNDArray.free h                
 
     [<Fact>]
     let ``createEx uint8 getShape and free 10x10``() =
-        let h = MXNDArray.createEx [|10; 10|] DeviceType.CPU 0 false TypeFlag.Uint8
+        let h = MXNDArray.createEx [|10; 10|] DeviceTypeEnum.CPU 0 false TypeFlag.Uint8
         Assert.True(MXNDArray.getShape h = [|10;10|])
         Assert.Equal(TypeFlag.Uint8, MXNDArray.getDType h)
         MXNDArray.free h                
 
     [<Fact>]
     let ``init NDArray from float32 array``() = 
-        let h = MXNDArray.createEx [|100;10|] DeviceType.CPU 0 false TypeFlag.Float32
+        let h = MXNDArray.createEx [|100;10|] DeviceTypeEnum.CPU 0 false TypeFlag.Float32
         MXNDArray.syncCopyFromCPU h [|1.f .. 1000.f|]
         Assert.True(MXNDArray.getShape h = [|100;10|])
         Assert.Equal(TypeFlag.Float32, MXNDArray.getDType h)
@@ -161,15 +161,15 @@ module MXNDArray =
 
     [<Fact>]
     let ``get context``() = 
-        let h = MXNDArray.createEx [|100;10|] DeviceType.CPU 0 false TypeFlag.Float32
-        let c = MXNDArray.getContext h
-        Assert.Equal(DeviceType.CPU,c.DeviceType)
-        Assert.Equal(0,c.DeviceId)
+        let h = MXNDArray.createEx [|100;10|] DeviceTypeEnum.CPU 0 false TypeFlag.Float32
+        let struct(t,id) = MXNDArray.getContext h
+        Assert.Equal(DeviceTypeEnum.CPU,t)
+        Assert.Equal(0,id)
         MXNDArray.free h
 
     [<Fact>]
     let getData() = 
-        let h = MXNDArray.createEx [|100;10|] DeviceType.CPU 0 false TypeFlag.Float32
+        let h = MXNDArray.createEx [|100;10|] DeviceTypeEnum.CPU 0 false TypeFlag.Float32
         let srcArray = [|1.f .. 1000.f|]
         MXNDArray.syncCopyFromCPU h srcArray
         let dataptr = MXNDArray.getData h |> NativeInterop.NativePtr.ofNativeInt
@@ -182,7 +182,7 @@ module MXNDArray =
 
     [<Fact>]
     let ``reshape``() = 
-        let h = MXNDArray.createEx [|100;10|] DeviceType.CPU 0 false TypeFlag.Float32
+        let h = MXNDArray.createEx [|100;10|] DeviceTypeEnum.CPU 0 false TypeFlag.Float32
         let srcArray = [|1.f .. 1000.f|]
         MXNDArray.syncCopyFromCPU h srcArray
         Assert.True(MXNDArray.getShape h = [|100;10|])
@@ -202,7 +202,7 @@ module MXNDArray =
 
     [<Fact>]
     let ``simple MXImperativeInvoke``() = 
-        let h = MXNDArray.createEx [|100;10|] DeviceType.CPU 0 false TypeFlag.Float32
+        let h = MXNDArray.createEx [|100;10|] DeviceTypeEnum.CPU 0 false TypeFlag.Float32
         MXNDArray.syncCopyFromCPU h [|1.f .. 1000.f|]
         MXNDArray.waitAll()
         //let h2 = MXNDArray.createEx [|1|] DeviceType.CPU 0 false TypeFlag.Float32

@@ -5,6 +5,7 @@ open System.Diagnostics
 #load "capi.fs"
 #load "cpredictapi.fs"
 #load "cnnvmapi.fs"
+#load "coretypes.fs"
 #load "interop.fs"
 
 open MXNetSharp.Interop

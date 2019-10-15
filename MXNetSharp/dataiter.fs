@@ -321,7 +321,7 @@ type CSVIter private (creatorHandle : IntPtr, info : DataIterInfo,
         ?batchSize : int, 
         ?roundBatch : bool, 
         ?prefetchBuffer : int64, 
-        ?deviceType : DeviceType, 
+        ?deviceType : DeviceTypeEnum, 
         ?dtype : DataType) =
         let def = DataIterDefinition.FromName("CSVIter")
         let dataShape = dataShape |> Seq.toArray
@@ -331,8 +331,8 @@ type CSVIter private (creatorHandle : IntPtr, info : DataIterInfo,
         let roundBatch = defaultArg roundBatch true
         let prefetchBuffer = defaultArg prefetchBuffer 4L
         let deviceType = 
-            match defaultArg deviceType DeviceType.GPU with 
-            | DeviceType.CPU | DeviceType.CPUPinned -> "cpu"
+            match defaultArg deviceType DeviceTypeEnum.GPU with 
+            | DeviceTypeEnum.CPU | DeviceTypeEnum.CPUPinned -> "cpu"
             | _ -> "gpu"
         new CSVIter(def.DataIterCreatorHandle, def.Info, dataCsv, dataShape, labelCsv, labelShape, batchSize, roundBatch, prefetchBuffer, deviceType, dtype)
     /// The input CSV file or a directory path.

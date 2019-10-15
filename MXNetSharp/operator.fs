@@ -4,8 +4,6 @@
 type Operator(name) =   
     member x.Name = name
 
-type DeviceType = Cpu|Gpu|CpuPinned
-
 type OperatorArgument<'a> = 
     {
         Name : string
