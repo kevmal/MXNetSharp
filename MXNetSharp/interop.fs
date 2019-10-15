@@ -284,7 +284,7 @@ module MXSymbol =
     /// <param name="args">arguments to sym</param>
     let compose sym name keys args = 
         assert(isNull keys || ulength keys = ulength args)
-        MXSymbolCompose(sym, name, ulength keys, keys, args) |> throwOnError "MXSymbolCompose"
+        MXSymbolCompose(sym, name, ulength args, keys, args) |> throwOnError "MXSymbolCompose"
 
     /// <summary>Save a symbol into a json string</summary>
     /// <param name="symbol">the input symbol.</param>
