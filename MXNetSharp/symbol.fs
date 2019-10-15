@@ -51,7 +51,20 @@ type Symbol() =
             match x.InternalHandle with
             | Some h -> h
             | None -> failwithf "Failed to initialize Symbol %s" (defaultArg x.InternalName "") //TODO: make exception
-    member internal x.UnsafeHandle = x.SymbolHandle.UnsafeHandle
+    member x.UnsafeHandle = x.SymbolHandle.UnsafeHandle //REVIEW: mark as internal?
+    member x.Outputs = 
+        let make handle =
+            let s = 
+                {new Symbol() with 
+                    override x.Initialize() = ()
+                }
+            s.InternalHandle <- Some(new SafeSymbolHandle(handle, true))
+            s
+        let n = MXSymbol.getNumOutputs x.UnsafeHandle |> int
+        Array.init n 
+            (fun i ->
+                MXSymbol.getOutput x.UnsafeHandle i |> make
+            )
     abstract member Initialize : unit -> unit
     static member Empty = EmptySymbol.Instance
     member x.Dispose(disposing) = 
