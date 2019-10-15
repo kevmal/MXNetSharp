@@ -1389,10 +1389,10 @@ extern int MXSymbolInferShapeEx64(SymbolHandle sym, uint32 num_args, string[] ke
 /// <param name="complete">whether infer shape completes or more information is needed.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolInferShapePartial__(SymbolHandle sym, uint32 num_args, string[] keys, uint32[] arg_ind_ptr, uint32[] arg_shape_data, uint32[] in_shape_size, uint32[]& in_shape_ndim, IntPtr[]& in_shape_data, uint32[] out_shape_size, uint32[]& out_shape_ndim, IntPtr[]& out_shape_data, uint32[] aux_shape_size, uint32[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
+extern int MXSymbolInferShapePartial(SymbolHandle sym, uint32 num_args, string[] keys, uint32[] arg_ind_ptr, uint32[] arg_shape_data, uint32[] in_shape_size, uint32[]& in_shape_ndim, IntPtr[]& in_shape_data, uint32[] out_shape_size, uint32[]& out_shape_ndim, IntPtr[]& out_shape_data, uint32[] aux_shape_size, uint32[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
 
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSymbolInferShapePartial64__(SymbolHandle sym, uint32 num_args, string[] keys, int64[] arg_ind_ptr, int64[] arg_shape_data, size_t[] in_shape_size, int[]& in_shape_ndim, IntPtr[]& in_shape_data, size_t[] out_shape_size, int[]& out_shape_ndim, IntPtr[]& out_shape_data, size_t[] aux_shape_size, int[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
+extern int MXSymbolInferShapePartial64(SymbolHandle sym, uint32 num_args, string[] keys, int64[] arg_ind_ptr, int64[] arg_shape_data, size_t[] in_shape_size, int[]& in_shape_ndim, IntPtr[]& in_shape_data, size_t[] out_shape_size, int[]& out_shape_ndim, IntPtr[]& out_shape_data, size_t[] aux_shape_size, int[]& aux_shape_ndim, IntPtr[]& aux_shape_data, int[] complete)
 *)
 
 /// <summary>partially infer shape of unknown input shapes given the known one.
@@ -1650,7 +1650,7 @@ extern int MXExecutorBindEX(SymbolHandle symbol_handle, int dev_type, int dev_id
 (* Exclude DEPRECATED
 /// <summary>DEPRECATED. Use MXExecutorSimpleBindEx instead.</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorSimpleBind__(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_g2c_keys, string[] g2c_keys, int[] g2c_dev_types, int[] g2c_dev_ids, uint32 provided_grad_req_list_len, string[] provided_grad_req_names, string[] provided_grad_req_types, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, uint32[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32 num_provided_arg_dtypes, string[] provided_arg_dtype_names, int[] provided_arg_dtypes, uint32 num_provided_arg_stypes, string[] provided_arg_stype_names, int[] provided_arg_stypes, uint32 num_shared_arg_names, string[] shared_arg_name_list, int[] shared_buffer_len, string[] shared_buffer_name_list, NDArrayHandle[] shared_buffer_handle_list, string[]& updated_shared_buffer_name_list, NDArrayHandle[]& updated_shared_buffer_handle_list, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec_handle, ExecutorHandle[] out)
+extern int MXExecutorSimpleBind(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_g2c_keys, string[] g2c_keys, int[] g2c_dev_types, int[] g2c_dev_ids, uint32 provided_grad_req_list_len, string[] provided_grad_req_names, string[] provided_grad_req_types, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, uint32[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32 num_provided_arg_dtypes, string[] provided_arg_dtype_names, int[] provided_arg_dtypes, uint32 num_provided_arg_stypes, string[] provided_arg_stype_names, int[] provided_arg_stypes, uint32 num_shared_arg_names, string[] shared_arg_name_list, int[] shared_buffer_len, string[] shared_buffer_name_list, NDArrayHandle[] shared_buffer_handle_list, string[]& updated_shared_buffer_name_list, NDArrayHandle[]& updated_shared_buffer_handle_list, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec_handle, ExecutorHandle[] out)
 *)
 
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
@@ -1677,7 +1677,7 @@ extern int MXExecutorSimpleBindEx(SymbolHandle symbol_handle, int dev_type, int 
 /// <param name="out">output executor handle</param>
 /// <returns>a new executor</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorReshape__(int partial_shaping, int allow_up_sizing, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, uint32[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec, ExecutorHandle[] out)
+extern int MXExecutorReshape(int partial_shaping, int allow_up_sizing, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, uint32[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec, ExecutorHandle[] out)
 *)
 
 /// <summary>Return a new executor with the same symbol and shared memory,
@@ -1699,7 +1699,7 @@ extern int MXExecutorReshape__(int partial_shaping, int allow_up_sizing, int dev
 /// <param name="out">output executor handle</param>
 /// <returns>a new executor</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorReshapeEx__(int partial_shaping, int allow_up_sizing, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, int[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32[] num_in_args, NDArrayHandle[] in_args, NDArrayHandle[] arg_grads, uint32[] num_aux_states, NDArrayHandle[] aux_states, ExecutorHandle shared_exec, [<Out>]ExecutorHandle& out)
+extern int MXExecutorReshapeEx(int partial_shaping, int allow_up_sizing, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, int[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32 num_in_args, NDArrayHandle[] in_args, NDArrayHandle[] arg_grads, uint32 num_aux_states, NDArrayHandle[] aux_states, ExecutorHandle shared_exec, [<Out>]ExecutorHandle& out)
 
 /// <summary>get optimized graph from graph executor</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
@@ -1803,14 +1803,14 @@ extern int MXDataIterGetLabel(DataIterHandle handle, [<Out>] NDArrayHandle& out)
 /// <param name="keys">environment keys</param>
 /// <param name="vals">environment values</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXInitPSEnv__(uint32 num_vars, string[] keys, string[] vals)
+extern int MXInitPSEnv(uint32 num_vars, string[] keys, string[] vals)
 
 /// <summary>Create a kvstore</summary>
 /// <param name="type">the type of KVStore</param>
 /// <param name="out">The output type of KVStore</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreCreate__(string ``type``, KVStoreHandle[] out)
+extern int MXKVStoreCreate(string ``type``, [<Out>] KVStoreHandle& out)
 
 /// <summary>Set parameters to use low-bit compressed gradients</summary>
 /// <param name="handle">handle to the kvstore</param>
@@ -1818,13 +1818,13 @@ extern int MXKVStoreCreate__(string ``type``, KVStoreHandle[] out)
 /// <param name="vals">values for compression parameters</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreSetGradientCompression__(KVStoreHandle handle, uint32 num_params, string[] keys, string[] vals)
+extern int MXKVStoreSetGradientCompression(KVStoreHandle handle, uint32 num_params, string[] keys, string[] vals)
 
 /// <summary>Delete a KVStore handle.</summary>
 /// <param name="handle">handle to the kvstore</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreFree__(KVStoreHandle handle)
+extern int MXKVStoreFree(KVStoreHandle handle)
 
 /// <summary>Init a list of (key,value) pairs in kvstore</summary>
 /// <param name="handle">handle to the kvstore</param>
@@ -1833,7 +1833,7 @@ extern int MXKVStoreFree__(KVStoreHandle handle)
 /// <param name="vals">the list of values</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreInit__(KVStoreHandle handle, uint32 num, int[] keys, NDArrayHandle[] vals)
+extern int MXKVStoreInit(KVStoreHandle handle, uint32 num, int[] keys, NDArrayHandle[] vals)
 
 /// <summary>Init a list of (key,value) pairs in kvstore, where each key is a string</summary>
 /// <param name="handle">handle to the kvstore</param>
@@ -1842,7 +1842,7 @@ extern int MXKVStoreInit__(KVStoreHandle handle, uint32 num, int[] keys, NDArray
 /// <param name="vals">the list of values</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreInitEx__(KVStoreHandle handle, uint32 num, string[] keys, NDArrayHandle[] vals)
+extern int MXKVStoreInitEx(KVStoreHandle handle, uint32 num, string[] keys, NDArrayHandle[] vals)
 
 /// <summary>Push a list of (key,value) pairs to kvstore</summary>
 /// <param name="handle">handle to the kvstore</param>
@@ -1852,7 +1852,7 @@ extern int MXKVStoreInitEx__(KVStoreHandle handle, uint32 num, string[] keys, ND
 /// <param name="priority">the priority of the action</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePush__(KVStoreHandle handle, uint32 num, int[] keys, NDArrayHandle[] vals, int priority)
+extern int MXKVStorePush(KVStoreHandle handle, uint32 num, int[] keys, NDArrayHandle[] vals, int priority)
 
 /// <summary>Push a list of (key,value) pairs to kvstore, where each key is a string</summary>
 /// <param name="handle">handle to the kvstore</param>
@@ -1862,7 +1862,7 @@ extern int MXKVStorePush__(KVStoreHandle handle, uint32 num, int[] keys, NDArray
 /// <param name="priority">the priority of the action</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePushEx__(KVStoreHandle handle, uint32 num, string[] keys, NDArrayHandle[] vals, int priority)
+extern int MXKVStorePushEx(KVStoreHandle handle, uint32 num, string[] keys, NDArrayHandle[] vals, int priority)
 
 /// <summary>pull a list of (key, value) pairs from the kvstore</summary>
 /// <param name="handle">handle to the kvstore</param>
@@ -1873,7 +1873,7 @@ extern int MXKVStorePushEx__(KVStoreHandle handle, uint32 num, string[] keys, ND
 /// <param name="ignore_sparse">whether to ignore sparse arrays in the request</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePullWithSparse__(KVStoreHandle handle, uint32 num, int[] keys, NDArrayHandle[] vals, int priority, bool ignore_sparse)
+extern int MXKVStorePullWithSparse(KVStoreHandle handle, uint32 num, int[] keys, [<Out>] IntPtr& vals, int priority, bool ignore_sparse)
 
 /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is a string</summary>
 /// <param name="handle">handle to the kvstore</param>
@@ -1884,7 +1884,7 @@ extern int MXKVStorePullWithSparse__(KVStoreHandle handle, uint32 num, int[] key
 /// <param name="ignore_sparse">whether to ignore sparse arrays in the request</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePullWithSparseEx__(KVStoreHandle handle, uint32 num, string[] keys, NDArrayHandle[] vals, int priority, bool ignore_sparse)
+extern int MXKVStorePullWithSparseEx(KVStoreHandle handle, uint32 num, string[] keys, [<Out>] NDArrayHandle& vals, int priority, bool ignore_sparse)
 
 /// <summary>pull a list of (key, value) pairs from the kvstore</summary>
 /// <param name="handle">handle to the kvstore</param>
@@ -1894,7 +1894,7 @@ extern int MXKVStorePullWithSparseEx__(KVStoreHandle handle, uint32 num, string[
 /// <param name="priority">the priority of the action</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePull__(KVStoreHandle handle, uint32 num, int[] keys, NDArrayHandle[] vals, int priority)
+extern int MXKVStorePull(KVStoreHandle handle, uint32 num, int[] keys, [<Out>] NDArrayHandle& vals, int priority)
 
 /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is a string</summary>
 /// <param name="handle">handle to the kvstore</param>
@@ -1904,7 +1904,7 @@ extern int MXKVStorePull__(KVStoreHandle handle, uint32 num, int[] keys, NDArray
 /// <param name="priority">the priority of the action</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePullEx__(KVStoreHandle handle, uint32 num, string[] keys, NDArrayHandle[] vals, int priority)
+extern int MXKVStorePullEx(KVStoreHandle handle, uint32 num, string[] keys, [<Out>] NDArrayHandle& vals, int priority)
 
 /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is an integer.
 ///       The NDArray pulled back will be in row_sparse storage with only the specified
@@ -1917,7 +1917,7 @@ extern int MXKVStorePullEx__(KVStoreHandle handle, uint32 num, string[] keys, ND
 /// <param name="priority">the priority of the action</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePullRowSparse__(KVStoreHandle handle, uint32 num, int[] keys, NDArrayHandle[] vals, NDArrayHandle[] row_ids, int priority)
+extern int MXKVStorePullRowSparse(KVStoreHandle handle, uint32 num, int[] keys, [<Out>] NDArrayHandle& vals, [<Out>] NDArrayHandle& row_ids, int priority)
 
 /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is a string.
 ///       The NDArray pulled back will be in row_sparse storage with only the specified
@@ -1930,7 +1930,7 @@ extern int MXKVStorePullRowSparse__(KVStoreHandle handle, uint32 num, int[] keys
 /// <param name="priority">the priority of the action</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePullRowSparseEx__(KVStoreHandle handle, uint32 num, string[] keys, NDArrayHandle[] vals, NDArrayHandle[] row_ids, int priority)
+extern int MXKVStorePullRowSparseEx(KVStoreHandle handle, uint32 num, string[] keys, [<Out>] NDArrayHandle& vals, [<Out>] NDArrayHandle& row_ids, int priority)
 
 /// <summary>push and pull a list of (key, value) pairs from the kvstore</summary>
 /// <param name="handle">handle to the kvstore</param>
@@ -1943,7 +1943,7 @@ extern int MXKVStorePullRowSparseEx__(KVStoreHandle handle, uint32 num, string[]
 /// <param name="priority">the priority of the action</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePushPull__(KVStoreHandle handle, mx_uint vnum, int[] vkeys, mx_uint onum, int[] okeys, NDArrayHandle[] vals, [<Out>] NDArrayHandle& outs, int priority)
+extern int MXKVStorePushPull(KVStoreHandle handle, mx_uint vnum, int[] vkeys, mx_uint onum, int[] okeys, NDArrayHandle[] vals, [<Out>] NDArrayHandle& outs, int priority)
 
 /// <summary>push and pull a list of (key, value) pairs from the kvstore,
 ///where each key is a string</summary>
@@ -1957,7 +1957,7 @@ extern int MXKVStorePushPull__(KVStoreHandle handle, mx_uint vnum, int[] vkeys, 
 /// <param name="priority">the priority of the action</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePushPullEx__(KVStoreHandle handle, mx_uint vnum, string[] vkeys, mx_uint onum, string[] okeys, NDArrayHandle[] vals, [<Out>] NDArrayHandle& outs, int priority)
+extern int MXKVStorePushPullEx(KVStoreHandle handle, mx_uint vnum, string[] vkeys, mx_uint onum, string[] okeys, NDArrayHandle[] vals, [<Out>] NDArrayHandle& outs, int priority)
 
 /// <summary>user-defined updater for the kvstore
 ///It's this updater's responsibility to delete\a recv and\a local</summary>
@@ -1979,7 +1979,7 @@ type MXKVStoreStrUpdater = delegate of string * NDArrayHandle * NDArrayHandle * 
 /// <param name="updater_handle">The additional handle used to invoke the updater</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreSetUpdater__(KVStoreHandle handle, MXKVStoreUpdater updater, IntPtr updater_handle)
+extern int MXKVStoreSetUpdater(KVStoreHandle handle, MXKVStoreUpdater updater, IntPtr updater_handle)
 
 /// <summary>register a push updater with int keys and one with string keys</summary>
 /// <param name="handle">handle to the KVStore</param>
@@ -1988,14 +1988,14 @@ extern int MXKVStoreSetUpdater__(KVStoreHandle handle, MXKVStoreUpdater updater,
 /// <param name="updater_handle">The additional handle used to invoke the updater</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreSetUpdaterEx__(KVStoreHandle handle, MXKVStoreUpdater updater, MXKVStoreStrUpdater str_updater, IntPtr updater_handle)
+extern int MXKVStoreSetUpdaterEx(KVStoreHandle handle, MXKVStoreUpdater updater, MXKVStoreStrUpdater str_updater, IntPtr updater_handle)
 
 /// <summary>get the type of the kvstore</summary>
 /// <param name="handle">handle to the KVStore</param>
 /// <param name="type">a string type</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreGetType__(KVStoreHandle handle, string[] ``type``)
+extern int MXKVStoreGetType(KVStoreHandle handle, [<Out>] IntPtr& ``type``)
 
 //--------------------------------------------
 // Part 6: advanced KVStore for multi-machines

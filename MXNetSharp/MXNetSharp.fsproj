@@ -4,6 +4,10 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>\MXNetSharp.XML</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="capi.fs" />
     <Compile Include="cpredictapi.fs" />

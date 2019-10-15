@@ -1,5 +1,7 @@
 ﻿namespace MXNETSharp.Tests.Interop
 
+#nowarn "9"
+
 open MXNetSharp.Interop
 open Xunit
 open MXNetSharp.Interop

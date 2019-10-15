@@ -121,9 +121,10 @@ module MXLib =
     /// <param name="seed">the random number seed.</param>
     let randomSeed (seed : int) = MXRandomSeed seed |> throwOnError "MXRandomSeed"
 
-    //TODO: Fix Doc string
     /// <summary>Seed the global random number generator of the given device.</summary>
     /// <param name="seed">the random number seed.</param> 
+    /// <param name="dev_type">device type</param> 
+    /// <param name="dev_id">device id</param> 
     let randomSeedContext seed dev_type dev_id = MXRandomSeedContext(seed,dev_type,dev_id) |> throwOnError "MXRandomSeedContext"
 
     /// <summary>Notify the engine about a shutdown,
@@ -186,6 +187,23 @@ module MXLib =
        let mutable out_array = un
        MXListAllOpNames(&out_size, &out_array) |> throwOnError "MXListAllOpNames"
        readStringArray out_size out_array
+
+
+type InferShapeResult<'a> = 
+    {
+        Complete : bool
+        AuxShapes : 'a [] []
+        InputShapes : 'a [] []
+        OutputShapes : 'a [] []
+    }
+
+type InferTypeResult<'a> = 
+    {
+        Complete : bool
+        AuxTypes : int[]
+        InputTypes : int[]
+        OutputTypes : int[]
+    }
 
 module MXSymbol = 
 
@@ -254,7 +272,7 @@ module MXSymbol =
     /// <param name="args">arguments to sym</param>
     let compose sym name keys args = 
         assert(isNull keys || ulength keys = ulength args)
-        MXSymbolCompose(sym, name, ulength keys, keys, args) |> throwOnError "MXSymbolCompose"
+        MXSymbolCompose(sym, name, ulength args, keys, args) |> throwOnError "MXSymbolCompose"
 
     /// <summary>Save a symbol into a json string</summary>
     /// <param name="symbol">the input symbol.</param>
@@ -485,27 +503,30 @@ module MXSymbol =
         MXSymbolGrad(sym, ulength wrt, wrt, &out) |> throwOnError "MXSymbolGrad"
         out
 
+    /// key*shape to CSR from (argIndPtr,argShapeData) for inferShape call
+    let inline internal keyShapeToCsrForm (argShapes : (string * ^a []) [])  = 
+        let argIndPtr = Array.zeroCreate ((Array.length argShapes) + 1)
+        for i = 1 to argIndPtr.Length - 1 do 
+            argIndPtr.[i] <- argIndPtr.[i - 1] + (argShapes.[i - 1] |> snd |> Array.length)
+        let argShapeData = Array.zeroCreate argIndPtr.[argIndPtr.Length - 1 |> int]
+        let keys = argShapes |> Array.map fst
+        let mutable j = 0
+        for i = 0 to argShapes.Length - 1 do 
+            let shapes = snd argShapes.[i] 
+            for k = 0 to shapes.Length - 1 do
+                argShapeData.[j] <- shapes.[k]
+                j <- j + 1
+        argIndPtr,argShapeData
+        
     /// <summary>infer shape of unknown input shapes given the known one.
     /// The shapes are packed into a CSR matrix represented by arg_ind_ptr and arg_shape_data
     /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
     /// <param name="sym">symbol handle</param>
-    /// <param name="num_args">numbe of input arguments.</param>
     /// <param name="keys">the key of keyword args (optional)</param>
     /// <param name="arg_ind_ptr">the head pointer of the rows in CSR</param>
     /// <param name="arg_shape_data">the content of the CSR</param>
-    /// <param name="in_shape_size">sizeof the returning array of in_shapes</param>
-    /// <param name="in_shape_ndim">returning array of shape dimensions of eachs input shape.</param>
-    /// <param name="in_shape_data">returning array of pointers to head of the input shape.</param>
-    /// <param name="out_shape_size">sizeof the returning array of out_shapes</param>
-    /// <param name="out_shape_ndim">returning array of shape dimensions of eachs input shape.</param>
-    /// <param name="out_shape_data">returning array of pointers to head of the input shape.</param>
-    /// <param name="aux_shape_size">sizeof the returning array of aux_shapes</param>
-    /// <param name="aux_shape_ndim">returning array of shape dimensions of eachs auxiliary shape.</param>
-    /// <param name="aux_shape_data">returning array of pointers to head of the auxiliary shape.</param>
-    /// <param name="complete">whether infer shape completes or more information is needed.</param>
-    /// <returns>0 when success, -1 when failure happens</returns>
-    let inferShapeEx sym keys arg_ind_ptr arg_shape_data = 
-        //TODO: Complete MXSymbolInferShapeEx
+    /// <returns>input, output and aux shape data in a InferShapeResult<uint32> record</returns>
+    let inferShape sym keys arg_ind_ptr arg_shape_data = 
         let mutable in_shape_size = un
         let mutable in_shape_ndim = un
         let mutable in_shape_data = un
@@ -517,13 +538,26 @@ module MXSymbol =
         let mutable out_shape_data = un
         let mutable complete = un
         MXSymbolInferShapeEx(sym, ulength keys, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapeEx"
-        //let inShape : int [] = readStructArray in_shape_size in_shape_data
-        //let aux : int [] = readStructArray aux_shape_size aux_shape_data
-        //let out : int [] = readStructArray out_shape_size out_shape_data
+        let shapes sz ndim data =
+            let dims = Helper.readStructArray sz ndim : uint32[]
+            Helper.readPtrArray sz data
+            |> Array.mapi (fun i ptr -> Helper.readStructArray dims.[i] ptr : uint32 [])
+        {
+            Complete = complete <> 0
+            AuxShapes = shapes aux_shape_size aux_shape_ndim aux_shape_data
+            InputShapes = shapes in_shape_size in_shape_ndim in_shape_data
+            OutputShapes = shapes out_shape_size out_shape_ndim out_shape_data
+        }
 
-
-    let inferShapeEx64 sym num_args keys arg_ind_ptr arg_shape_data = 
-        //TODO: Complete MXSymbolInferShapeEx64
+    /// <summary>infer shape of unknown input shapes given the known one.
+    /// The shapes are packed into a CSR matrix represented by arg_ind_ptr and arg_shape_data
+    /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
+    /// <param name="sym">symbol handle</param>
+    /// <param name="keys">the key of keyword args (optional)</param>
+    /// <param name="arg_ind_ptr">the head pointer of the rows in CSR</param>
+    /// <param name="arg_shape_data">the content of the CSR</param>
+    /// <returns>input, output and aux shape data in a InferShapeResult<int64> record</returns>
+    let inferShape64 sym keys arg_ind_ptr arg_shape_data = 
         let mutable in_shape_size = un
         let mutable in_shape_ndim = un
         let mutable in_shape_data = un
@@ -534,31 +568,28 @@ module MXSymbol =
         let mutable out_shape_ndim = un
         let mutable out_shape_data = un
         let mutable complete = un
-        MXSymbolInferShapeEx64(sym, num_args, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapeEx64"
+        MXSymbolInferShapeEx64(sym, ulength keys, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapeEx64"
+        let shapes sz ndim data =
+            let dims = Helper.readStructArray sz ndim : int[]
+            Helper.readPtrArray sz data
+            |> Array.mapi (fun i ptr -> Helper.readStructArray dims.[i] ptr : int64 []) 
+        {
+            Complete = complete <> 0
+            AuxShapes = shapes aux_shape_size aux_shape_ndim aux_shape_data
+            InputShapes = shapes in_shape_size in_shape_ndim in_shape_data
+            OutputShapes = shapes out_shape_size out_shape_ndim out_shape_data
+        }
   
     /// <summary>partially infer shape of unknown input shapes given the known one.
-    ///
     /// Return partially inferred results if not all shapes could be inferred.
     /// The shapes are packed into a CSR matrix represented by arg_ind_ptr and arg_shape_data
     /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
     /// <param name="sym">symbol handle</param>
-    /// <param name="num_args">numbe of input arguments.</param>
     /// <param name="keys">the key of keyword args (optional)</param>
     /// <param name="arg_ind_ptr">the head pointer of the rows in CSR</param>
     /// <param name="arg_shape_data">the content of the CSR</param>
-    /// <param name="in_shape_size">sizeof the returning array of in_shapes</param>
-    /// <param name="in_shape_ndim">returning array of shape dimensions of eachs input shape.</param>
-    /// <param name="in_shape_data">returning array of pointers to head of the input shape.</param>
-    /// <param name="out_shape_size">sizeof the returning array of out_shapes</param>
-    /// <param name="out_shape_ndim">returning array of shape dimensions of eachs input shape.</param>
-    /// <param name="out_shape_data">returning array of pointers to head of the input shape.</param>
-    /// <param name="aux_shape_size">sizeof the returning array of aux_shapes</param>
-    /// <param name="aux_shape_ndim">returning array of shape dimensions of eachs auxiliary shape.</param>
-    /// <param name="aux_shape_data">returning array of pointers to head of the auxiliary shape.</param>
-    /// <param name="complete">whether infer shape completes or more information is needed.</param>
-    /// <returns>0 when success, -1 when failure happens</returns>
-    let inferShapePartialEx sym num_args keys arg_ind_ptr arg_shape_data in_shape_size in_shape_ndim in_shape_data aux_shape_size aux_shape_ndim aux_shape_data complete = 
-        //TODO: Complete MXSymbolInferShapePartialEx
+    /// <returns>input, output and aux shape data in a InferShapeResult<uint32> record</returns>
+    let inferShapePartial sym keys arg_ind_ptr arg_shape_data = 
         let mutable in_shape_size = un
         let mutable in_shape_ndim = un
         let mutable in_shape_data = un
@@ -569,10 +600,28 @@ module MXSymbol =
         let mutable out_shape_ndim = un
         let mutable out_shape_data = un
         let mutable complete = un
-        MXSymbolInferShapePartialEx(sym, num_args, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapePartialEx"
+        MXSymbolInferShapePartialEx(sym, ulength keys, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapePartialEx"
+        let shapes sz ndim data =
+            let dims = Helper.readStructArray sz ndim : uint32[]
+            Helper.readPtrArray sz data
+            |> Array.mapi (fun i ptr -> Helper.readStructArray dims.[i] ptr : uint32 [])
+        {
+            Complete = complete <> 0
+            AuxShapes = shapes aux_shape_size aux_shape_ndim aux_shape_data
+            InputShapes = shapes in_shape_size in_shape_ndim in_shape_data
+            OutputShapes = shapes out_shape_size out_shape_ndim out_shape_data
+        }
 
-    let inferShapePartialEx64 sym num_args keys arg_ind_ptr arg_shape_data in_shape_size in_shape_ndim in_shape_data aux_shape_size aux_shape_ndim aux_shape_data complete = 
-        //TODO: Complete MXSymbolInferShapePartialEx64
+    /// <summary>partially infer shape of unknown input shapes given the known one.
+    /// Return partially inferred results if not all shapes could be inferred.
+    /// The shapes are packed into a CSR matrix represented by arg_ind_ptr and arg_shape_data
+    /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
+    /// <param name="sym">symbol handle</param>
+    /// <param name="keys">the key of keyword args (optional)</param>
+    /// <param name="arg_ind_ptr">the head pointer of the rows in CSR</param>
+    /// <param name="arg_shape_data">the content of the CSR</param>
+    /// <returns>input, output and aux shape data in a InferShapeResult<int64> record</returns>
+    let inferShapePartial64 sym keys arg_ind_ptr arg_shape_data = 
         let mutable in_shape_size = un
         let mutable in_shape_ndim = un
         let mutable in_shape_data = un
@@ -583,13 +632,22 @@ module MXSymbol =
         let mutable out_shape_ndim = un
         let mutable out_shape_data = un
         let mutable complete = un
-        MXSymbolInferShapePartialEx64(sym, num_args, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapePartialEx64"
+        MXSymbolInferShapePartialEx64(sym, ulength keys, keys, arg_ind_ptr, arg_shape_data, &in_shape_size, &in_shape_ndim, &in_shape_data, &out_shape_size, &out_shape_ndim, &out_shape_data, &aux_shape_size, &aux_shape_ndim, &aux_shape_data, &complete) |> throwOnError "MXSymbolInferShapePartialEx64"
+        let shapes sz ndim data =
+            let dims = Helper.readStructArray sz ndim : int[]
+            Helper.readPtrArray sz data
+            |> Array.mapi (fun i ptr -> Helper.readStructArray dims.[i] ptr : int64 []) 
+        {
+            Complete = complete <> 0
+            AuxShapes = shapes aux_shape_size aux_shape_ndim aux_shape_data
+            InputShapes = shapes in_shape_size in_shape_ndim in_shape_data
+            OutputShapes = shapes out_shape_size out_shape_ndim out_shape_data
+        }
 
     /// <summary>infer type of unknown input types given the known one.
     /// The types are packed into a CSR matrix represented by arg_ind_ptr and arg_type_data
     /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
     /// <param name="sym">symbol handle</param>
-    /// <param name="num_args">numbe of input arguments.</param>
     /// <param name="keys">the key of keyword args (optional)</param>
     /// <param name="arg_type_data">the content of the CSR</param>
     /// <param name="in_type_size">sizeof the returning array of in_types</param>
@@ -600,8 +658,7 @@ module MXSymbol =
     /// <param name="aux_type_data">returning array of pointers to head of the auxiliary type.</param>
     /// <param name="complete">whether infer type completes or more information is needed.</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let inferType sym num_args keys arg_type_data = 
-        //TODO: Complete MXSymbolInferType
+    let inferType sym keys arg_type_data = 
         let mutable in_type_size = un
         let mutable in_type_data = un
         let mutable aux_type_size = un
@@ -609,7 +666,13 @@ module MXSymbol =
         let mutable complete = un
         let mutable out_type_size = un
         let mutable out_type_data = un
-        MXSymbolInferType(sym, num_args, keys, arg_type_data, &in_type_size, &in_type_data, &out_type_size, &out_type_data, &aux_type_size, &aux_type_data, &complete) |> throwOnError "MXSymbolInferType"
+        MXSymbolInferType(sym, ulength keys, keys, arg_type_data, &in_type_size, &in_type_data, &out_type_size, &out_type_data, &aux_type_size, &aux_type_data, &complete) |> throwOnError "MXSymbolInferType"
+        {
+            Complete = complete <> 0
+            AuxTypes = readStructArray aux_type_size aux_type_data
+            InputTypes = readStructArray in_type_size in_type_data
+            OutputTypes = readStructArray out_type_size out_type_data
+        }
 
     /// <summary>partially infer type of unknown input types given the known one.
     ///
@@ -617,7 +680,6 @@ module MXSymbol =
     /// The types are packed into a CSR matrix represented by arg_ind_ptr and arg_type_data
     /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
     /// <param name="sym">symbol handle</param>
-    /// <param name="num_args">numbe of input arguments.</param>
     /// <param name="keys">the key of keyword args (optional)</param>
     /// <param name="arg_type_data">the content of the CSR</param>
     /// <param name="in_type_size">sizeof the returning array of in_types</param>
@@ -628,8 +690,7 @@ module MXSymbol =
     /// <param name="aux_type_data">returning array of pointers to head of the auxiliary type.</param>
     /// <param name="complete">whether infer type completes or more information is needed.</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let inferTypePartial sym num_args keys arg_type_data = 
-        //TODO: Complete MXSymbolInferTypePartial
+    let inferTypePartial sym keys arg_type_data = 
         let mutable in_type_size = un
         let mutable in_type_data = un
         let mutable aux_type_size = un
@@ -637,7 +698,13 @@ module MXSymbol =
         let mutable complete = un
         let mutable out_type_size = un
         let mutable out_type_data = un
-        MXSymbolInferTypePartial(sym, num_args, keys, arg_type_data, &in_type_size, &in_type_data, &out_type_size, &out_type_data, &aux_type_size, &aux_type_data, &complete) |> throwOnError "MXSymbolInferTypePartial"
+        MXSymbolInferTypePartial(sym, ulength keys, keys, arg_type_data, &in_type_size, &in_type_data, &out_type_size, &out_type_data, &aux_type_size, &aux_type_data, &complete) |> throwOnError "MXSymbolInferTypePartial"
+        {
+            Complete = complete <> 0
+            AuxTypes = readStructArray aux_type_size aux_type_data
+            InputTypes = readStructArray in_type_size in_type_data
+            OutputTypes = readStructArray out_type_size out_type_data
+        }
 
     /// <summary>Convert a symbol into a quantized symbol where FP32 operators are replaced with INT8</summary>
     /// <param name="sym_handle">symbol to be converted</param>
@@ -979,7 +1046,27 @@ module MXNDArray =
         let data = NativeInterop.NativePtr.toNativeInt ptr
         MXNDArraySyncCopyToCPU(handle, data, size) |> throwOnError "MXNDArraySyncCopyToCPU"
 
-    (* TODO: MXNDArrayCreateSparseEx
+    // TODO: Storag type enum?
+    /// <summary>create an empty sparse NDArray with specified shape and data type</summary>
+    /// <param name="storage_type">the storage type of the ndarray</param>
+    /// <param name="shape">the pointer to the shape</param>
+    /// <param name="dev_type">device type, specify device we want to take</param>
+    /// <param name="dev_id">the device id of the specific device</param>
+    /// <param name="delay_alloc">whether to delay allocation until
+    ///       the narray is first mutated</param>
+    /// <param name="dtype">data type of created array</param>
+    /// <param name="aux_type">data type of the aux data for the created array</param>
+    /// <param name="aux_ndims">the dimension of the shapes of aux data</param>
+    /// <param name="aux_shape">the shapes of aux data</param>
+    /// <param name="out">the returning handle</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let createSparseEx storage_type shape dev_type dev_id delay_alloc dtype aux_type (aux_shape : uint32 [][]) = 
+        let mutable out = un
+        let aux_ndims = aux_shape |> Array.map ulength
+        let aux_shape = aux_shape |> Array.concat
+        MXNDArrayCreateSparseEx(storage_type, shape, ulength shape, dev_type, dev_id, delay_alloc, dtype, ulength aux_type, aux_type, aux_ndims, aux_shape, &out) |> throwOnError "MXNDArrayCreateSparseEx"
+        out
+
     /// <summary>create an empty sparse NDArray with specified shape and data type</summary>
     /// <param name="storage_type">the storage type of the ndarray</param>
     /// <param name="shape">the pointer to the shape</param>
@@ -995,15 +1082,11 @@ module MXNDArray =
     /// <param name="aux_shape">the shapes of aux data</param>
     /// <param name="out">the returning handle</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let createSparseEx storage_type shape ndim dev_type dev_id delay_alloc dtype num_aux aux_type aux_ndims aux_shape = 
+    let createSparseEx64 storage_type shape dev_type dev_id delay_alloc dtype num_aux aux_type (aux_shape : int64 [][]) = 
         let mutable out = un
-        MXNDArrayCreateSparseEx(storage_type, shape, ulength shape, dev_type, dev_id, delay_alloc, dtype, ulength aus_type, aux_type, aux_ndims, aux_shape, &out) |> throwOnError "MXNDArrayCreateSparseEx"
-        out
-
-    let createSparseEx64 storage_type shape ndim dev_type dev_id delay_alloc dtype num_aux aux_type aux_ndims aux_shape = 
-        let mutable out = un
-        MXNDArrayCreateSparseEx64(storage_type, shape, ndim, dev_type, dev_id, delay_alloc, dtype, num_aux, aux_type, aux_ndims, aux_shape, &out) |> throwOnError "MXNDArrayCreateSparseEx64"
-    *)
+        let aux_ndims = aux_shape |> Array.map length
+        let aux_shape = aux_shape |> Array.concat
+        MXNDArrayCreateSparseEx64(storage_type, shape, length shape, dev_type, dev_id, delay_alloc, dtype, num_aux, aux_type, aux_ndims, aux_shape, &out) |> throwOnError "MXNDArrayCreateSparseEx64"
     
     /// <summary>Load list / dictionary of narrays from file content loaded into memory.
     ///This will load a list of ndarrays in a similar
@@ -1141,10 +1224,9 @@ module MXNDArray =
         MXNDArrayGetGrad(handle, &out) |> throwOnError "MXNDArrayGetGrad"
         out
 
-    // TODO: Figure out what NDArrayHandle detach outputs?
     /// <summary>detach and ndarray from computation graph by clearing entry_</summary>
     /// <param name="handle">NDArray handle</param>
-    /// <returns>0 when success, -1 when failure happens</returns>
+    /// <returns>A new NDArray detached from graph</returns>
     let detach handle = 
         let mutable out = un
         MXNDArrayDetach(handle, &out) |> throwOnError "MXNDArrayDetach"
@@ -1269,30 +1351,25 @@ module MXExecutor =
     //    let mutable out = un
     //    MXExecutorSimpleBindEx(symbol_handle, dev_type, dev_id, num_g2c_keys, g2c_keys, g2c_dev_types, g2c_dev_ids, provided_grad_req_list_len, provided_grad_req_names, provided_grad_req_types, num_provided_arg_shapes, provided_arg_shape_names, provided_arg_shape_data, provided_arg_shape_idx, num_provided_arg_dtypes, provided_arg_dtype_names, provided_arg_dtypes, num_provided_arg_stypes, provided_arg_stype_names, provided_arg_stypes, num_shared_arg_names, shared_arg_name_list, shared_buffer_len, shared_buffer_name_list, shared_buffer_handle_list, updated_shared_buffer_name_list, updated_shared_buffer_handle_list, num_in_args, in_args, arg_grads, num_aux_states, aux_states, shared_exec_handle, &out) |> throwOnError "MXExecutorSimpleBindEx"
 
-    (* TODO: MXExecutorReshapeEx
     /// <summary>Return a new executor with the same symbol and shared memory,
-    ///but different input/output shapes.</summary>
+    /// but different input/output shapes.</summary>
     /// <param name="partial_shaping">Whether to allow changing the shape of unspecified arguments.</param>
     /// <param name="allow_up_sizing">Whether to allow allocating new ndarrays that's larger than the original.</param>
     /// <param name="dev_type">device type of default context</param>
     /// <param name="dev_id">device id of default context</param>
-    /// <param name="num_map_keys">size of group2ctx map</param>
     /// <param name="map_keys">keys of group2ctx map</param>
     /// <param name="map_dev_types">device type of group2ctx map</param>
     /// <param name="map_dev_ids">device id of group2ctx map</param>
-    /// <param name="num_in_args">length of in_args</param>
     /// <param name="in_args">in args array</param>
     /// <param name="arg_grads">arg grads handle array</param>
-    /// <param name="num_aux_states">length of auxiliary states</param>
     /// <param name="aux_states">auxiliary states array</param>
     /// <param name="shared_exec">input executor handle for memory sharing</param>
     /// <param name="out">output executor handle</param>
     /// <returns>a new executor</returns>
-    let reshapeEx partial_shaping allow_up_sizing dev_type dev_id num_map_keys map_keys map_dev_types map_dev_ids num_provided_arg_shapes provided_arg_shape_names provided_arg_shape_data provided_arg_shape_idx num_in_args in_args arg_grads num_aux_states aux_states shared_exec = 
+    let reshapeEx partial_shaping allow_up_sizing dev_type dev_id map_keys map_dev_types map_dev_ids provided_arg_shape_names provided_arg_shape_data provided_arg_shape_idx in_args arg_grads aux_states shared_exec = 
+        //REVIEW: num_in_args and num_aux_states should be a ptr?
         let mutable out = un
-        MXExecutorReshapeEx(partial_shaping, allow_up_sizing, dev_type, dev_id, num_map_keys, map_keys, map_dev_types, map_dev_ids, num_provided_arg_shapes, provided_arg_shape_names, provided_arg_shape_data, provided_arg_shape_idx, num_in_args, in_args, arg_grads, num_aux_states, aux_states, shared_exec, &out) |> throwOnError "MXExecutorReshapeEx"
-    *)
-
+        MXExecutorReshapeEx(partial_shaping, allow_up_sizing, dev_type, dev_id, ulength map_keys, map_keys, map_dev_types, map_dev_ids, ulength provided_arg_shape_names, provided_arg_shape_names, provided_arg_shape_data, provided_arg_shape_idx, ulength in_args, in_args, arg_grads, ulength aux_states, aux_states, shared_exec, &out) |> throwOnError "MXExecutorReshapeEx"
     /// <summary>get optimized graph from graph executor</summary>
     let getOptimizedSymbol handle = 
         let mutable out = un
@@ -1984,3 +2061,210 @@ module MXDataIter =
         let mutable out = un
         MXDataIterGetLabel(handle, &out) |> throwOnError "MXDataIterGetLabel"
         out
+
+module MXKVStore = 
+
+    /// <summary>Initialized ps-lite environment variables</summary>
+    /// <param name="num_vars">number of variables to initialize</param>
+    /// <param name="keys">environment keys</param>
+    /// <param name="vals">environment values</param>
+    let mXInitPSEnv num_vars keys vals = 
+        MXInitPSEnv(num_vars, keys, vals) |> throwOnError "MXInitPSEnv"
+
+    /// <summary>Create a kvstore</summary>
+    /// <param name="type">the type of KVStore</param>
+    /// <param name="out">The output type of KVStore</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let create ``type`` = 
+        let mutable out = un
+        MXKVStoreCreate(``type``, &out) |> throwOnError "MXKVStoreCreate"
+
+    /// <summary>Set parameters to use low-bit compressed gradients</summary>
+    /// <param name="handle">handle to the kvstore</param>
+    /// <param name="keys">keys for compression parameters</param>
+    /// <param name="vals">values for compression parameters</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let setGradientCompression handle num_params keys vals = 
+        MXKVStoreSetGradientCompression(handle, num_params, keys, vals) |> throwOnError "MXKVStoreSetGradientCompression"
+
+    /// <summary>Delete a KVStore handle.</summary>
+    /// <param name="handle">handle to the kvstore</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let free handle = 
+        MXKVStoreFree(handle) |> throwOnError "MXKVStoreFree"
+
+    /// <summary>Init a list of (key,value) pairs in kvstore</summary>
+    /// <param name="handle">handle to the kvstore</param>
+    /// <param name="num">the number of key-value pairs</param>
+    /// <param name="keys">the list of keys</param>
+    /// <param name="vals">the list of values</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let init handle num keys vals = 
+        MXKVStoreInit(handle, num, keys, vals) |> throwOnError "MXKVStoreInit"
+
+    /// <summary>Init a list of (key,value) pairs in kvstore, where each key is a string</summary>
+    /// <param name="handle">handle to the kvstore</param>
+    /// <param name="num">the number of key-value pairs</param>
+    /// <param name="keys">the list of keys</param>
+    /// <param name="vals">the list of values</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let initEx handle num keys vals = 
+        MXKVStoreInitEx(handle, num, keys, vals) |> throwOnError "MXKVStoreInitEx"
+
+    /// <summary>Push a list of (key,value) pairs to kvstore</summary>
+    /// <param name="handle">handle to the kvstore</param>
+    /// <param name="num">the number of key-value pairs</param>
+    /// <param name="keys">the list of keys</param>
+    /// <param name="vals">the list of values</param>
+    /// <param name="priority">the priority of the action</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let push handle keys vals priority = 
+        MXKVStorePush(handle, ulength keys, keys, vals, priority) |> throwOnError "MXKVStorePush"
+
+    /// <summary>Push a list of (key,value) pairs to kvstore, where each key is a string</summary>
+    /// <param name="handle">handle to the kvstore</param>
+    /// <param name="keys">the list of keys</param>
+    /// <param name="vals">the list of values</param>
+    /// <param name="priority">the priority of the action</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let pushEx handle keys vals priority = 
+        MXKVStorePushEx(handle, ulength keys, keys, vals, priority) |> throwOnError "MXKVStorePushEx"
+
+    /// <summary>pull a list of (key, value) pairs from the kvstore</summary>
+    /// <param name="handle">handle to the kvstore</param>
+    /// <param name="keys">the list of keys</param>
+    /// <param name="vals">the list of values</param>
+    /// <param name="priority">the priority of the action</param>
+    /// <param name="ignore_sparse">whether to ignore sparse arrays in the request</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let pullWithSparse handle keys priority ignore_sparse : NDArrayHandle [] = 
+        let mutable vals = un //REVIEW is this right or should it be preallocated?
+        MXKVStorePullWithSparse(handle, ulength keys, keys, &vals, priority, ignore_sparse) |> throwOnError "MXKVStorePullWithSparse"
+        readStructArray (ulength keys) vals
+
+    /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is a string</summary>
+    /// <param name="handle">handle to the kvstore</param>
+    /// <param name="num">the number of key-value pairs</param>
+    /// <param name="keys">the list of keys</param>
+    /// <param name="vals">the list of values</param>
+    /// <param name="priority">the priority of the action</param>
+    /// <param name="ignore_sparse">whether to ignore sparse arrays in the request</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let pullWithSparseEx handle keys priority ignore_sparse : NDArrayHandle[] = 
+        let mutable vals = un //REVIEW is this right or should it be preallocated?
+        MXKVStorePullWithSparseEx(handle, ulength keys, keys, &vals, priority, ignore_sparse) |> throwOnError "MXKVStorePullWithSparseEx"
+        readStructArray (ulength keys) vals
+
+    /// <summary>pull a list of (key, value) pairs from the kvstore</summary>
+    /// <param name="handle">handle to the kvstore</param>
+    /// <param name="num">the number of key-value pairs</param>
+    /// <param name="keys">the list of keys</param>
+    /// <param name="vals">the list of values</param>
+    /// <param name="priority">the priority of the action</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let pull handle keys priority : NDArrayHandle[] = 
+        let mutable vals = un //REVIEW is this right or should it be preallocated?
+        MXKVStorePull(handle, ulength keys, keys, &vals, priority) |> throwOnError "MXKVStorePull"
+        readStructArray (ulength keys) vals
+
+    /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is a string</summary>
+    /// <param name="handle">handle to the kvstore</param>
+    /// <param name="num">the number of key-value pairs</param>
+    /// <param name="keys">the list of keys</param>
+    /// <param name="vals">the list of values</param>
+    /// <param name="priority">the priority of the action</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let pullEx handle num keys vals priority : NDArrayHandle[] = 
+        let mutable vals = un //REVIEW is this right or should it be preallocated?
+        MXKVStorePullEx(handle, ulength keys, keys, &vals, priority) |> throwOnError "MXKVStorePullEx"
+        readStructArray (ulength keys) vals
+
+    /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is an integer.
+    ///       The NDArray pulled back will be in row_sparse storage with only the specified
+    ///       row_ids present based row_ids (others rows are zeros).</summary>
+    /// <param name="handle">handle to the kvstore</param>
+    /// <param name="num">the number of key-value pairs</param>
+    /// <param name="keys">the list of keys</param>
+    /// <param name="vals">the list of values</param>
+    /// <param name="row_ids">the list of row_id NDArrays</param>
+    /// <param name="priority">the priority of the action</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let pullRowSparse handle keys priority = 
+        let mutable vals = un //REVIEW is this right or should it be preallocated?
+        let mutable row_ids = un
+        MXKVStorePullRowSparse(handle, ulength keys, keys, &vals, &row_ids, priority) |> throwOnError "MXKVStorePullRowSparse"
+        let vals = readStructArray (ulength keys) vals : NDArrayHandle[]
+        let row_ids = readStructArray (ulength keys) row_ids : NDArrayHandle[]
+        vals, row_ids
+
+    /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is a string.
+    ///       The NDArray pulled back will be in row_sparse storage with only the specified
+    ///       row_ids present based row_ids (others rows are zeros).</summary>
+    /// <param name="handle">handle to the kvstore</param>
+    /// <param name="num">the number of key-value pairs</param>
+    /// <param name="keys">the list of keys</param>
+    /// <param name="vals">the list of values</param>
+    /// <param name="row_ids">the list of row_id NDArrays</param>
+    /// <param name="priority">the priority of the action</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let pullRowSparseEx handle keys priority = 
+        let mutable vals = un //REVIEW is this right or should it be preallocated?
+        let mutable row_ids = un
+        MXKVStorePullRowSparseEx(handle, ulength keys, keys, &vals, &row_ids, priority) |> throwOnError "MXKVStorePullRowSparseEx"
+        let vals = readStructArray (ulength keys) vals : NDArrayHandle[]
+        let row_ids = readStructArray (ulength keys) row_ids : NDArrayHandle[]
+        vals, row_ids
+
+    /// <summary>push and pull a list of (key, value) pairs from the kvstore</summary>
+    /// <param name="handle">handle to the kvstore</param>
+    /// <param name="vkeys">the list of keys for the values to be pushed</param>
+    /// <param name="okeys">the list of keys for the values to be pulled</param>
+    /// <param name="vals">the list of values</param>
+    /// <param name="priority">the priority of the action</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let pushPull handle vkeys okeys vals priority : NDArrayHandle[] = 
+        let mutable outs = un
+        MXKVStorePushPull(handle, ulength vkeys, vkeys, ulength okeys, okeys, vals, &outs, priority) |> throwOnError "MXKVStorePushPull"
+        readStructArray (ulength okeys) outs
+
+    /// <summary>push and pull a list of (key, value) pairs from the kvstore,
+    ///where each key is a string</summary>
+    /// <param name="handle">handle to the kvstore</param>
+    /// <param name="vnum">the number of key-value pairs corresponding to vkeys</param>
+    /// <param name="vkeys">the list of keys for the values to be pushed</param>
+    /// <param name="onum">the number of key-value pairs corresponding to okeys</param>
+    /// <param name="okeys">the list of keys for the values to be pulled</param>
+    /// <param name="vals">the list of values</param>
+    /// <param name="outs">the list of outputs</param>
+    /// <param name="priority">the priority of the action</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let pushPullEx handle vkeys okeys vals priority = 
+        let mutable outs = un
+        MXKVStorePushPullEx(handle, ulength vkeys, vkeys, ulength okeys, okeys, vals, &outs, priority) |> throwOnError "MXKVStorePushPullEx"
+        readStructArray (ulength okeys) outs
+
+    /// <summary>register a push updater</summary>
+    /// <param name="handle">handle to the KVStore</param>
+    /// <param name="updater">udpater function</param>
+    /// <param name="updater_handle">The additional handle used to invoke the updater</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let setUpdater handle updater updater_handle = 
+        MXKVStoreSetUpdater(handle, updater, updater_handle) |> throwOnError "MXKVStoreSetUpdater"
+
+    /// <summary>register a push updater with int keys and one with string keys</summary>
+    /// <param name="handle">handle to the KVStore</param>
+    /// <param name="updater">updater function with int keys</param>
+    /// <param name="str_updater">updater function with string keys</param>
+    /// <param name="updater_handle">The additional handle used to invoke the updater</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let setUpdaterEx handle updater str_updater updater_handle = 
+        MXKVStoreSetUpdaterEx(handle, updater, str_updater, updater_handle) |> throwOnError "MXKVStoreSetUpdaterEx"
+
+    /// <summary>get the type of the kvstore</summary>
+    /// <param name="handle">handle to the KVStore</param>
+    /// <param name="type">a string type</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    let getType handle = 
+        let mutable tp = un
+        MXKVStoreGetType(handle, &tp) |> throwOnError "MXKVStoreGetType"
+        str tp

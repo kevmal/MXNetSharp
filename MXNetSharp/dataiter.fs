@@ -78,10 +78,10 @@ type DataIter(definition : DataIterDefinition) =
     member x.Reset() = 
         MXDataIter.beforeFirst iterHandle.UnsafeHandle
         atEnd <- false
-    member x.GetData() = MXDataIter.getData iterHandle.UnsafeHandle |> NDArray
+    member x.GetData() = new NDArray(MXDataIter.getData iterHandle.UnsafeHandle)
     member x.GetIndex() = MXDataIter.getIndex iterHandle.UnsafeHandle
     member x.GetPadNum() = MXDataIter.getPadNum iterHandle.UnsafeHandle
-    member x.GetLabel() = MXDataIter.getLabel iterHandle.UnsafeHandle |> NDArray
+    member x.GetLabel() = new NDArray(MXDataIter.getLabel iterHandle.UnsafeHandle)
     member x.Next() = 
         atEnd <- atEnd || not (MXDataIter.next iterHandle.UnsafeHandle > 0)
         not atEnd
@@ -334,7 +334,7 @@ type CSVIter private (creatorHandle : IntPtr, info : DataIterInfo,
             match defaultArg deviceType DeviceType.GPU with 
             | DeviceType.CPU | DeviceType.CPUPinned -> "cpu"
             | _ -> "gpu"
-        CSVIter(def.DataIterCreatorHandle, def.Info, dataCsv, dataShape, labelCsv, labelShape, batchSize, roundBatch, prefetchBuffer, deviceType, dtype)
+        new CSVIter(def.DataIterCreatorHandle, def.Info, dataCsv, dataShape, labelCsv, labelShape, batchSize, roundBatch, prefetchBuffer, deviceType, dtype)
     /// The input CSV file or a directory path.
     member x.DataCsv = dataCsv
     /// The shape of one example.
@@ -452,7 +452,7 @@ type MNISTIter private (creatorHandle : IntPtr, info : DataIterInfo,
             match defaultArg deviceType DeviceType.GPU with 
             | DeviceType.CPU | DeviceType.CPUPinned -> "cpu"
             | _ -> "gpu"
-        MNISTIter(def.DataIterCreatorHandle,def.Info,
+        new MNISTIter(def.DataIterCreatorHandle,def.Info,
                   image,
                   label,
                   batchSize,
