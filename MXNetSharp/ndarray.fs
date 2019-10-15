@@ -72,6 +72,11 @@ type NDArray(handle : SafeNDArrayHandle) =
     member x.CopyTo(destination : NDArray) = 
         MXNDArray.syncCopyFromNDArray destination.NDArrayHandle.UnsafeHandle x.NDArrayHandle.UnsafeHandle -1
 
+    member x.CopyTo(deviceContext : Context) = 
+        let destination = new NDArray(x.Shape, deviceContext, delayAlloc = true)
+        x.CopyTo(destination)
+        destination
+
     member x.SyncCopyFromCPU(data : float32 []) = MXNDArray.syncCopyFromCPU handle.UnsafeHandle data
 
     member x.Set(value : float32) =
