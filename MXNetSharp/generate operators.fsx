@@ -418,7 +418,7 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
                 (fun x ->
                     match x.SymbolOrNDArray with 
                     | Some NDArray | Some SymbolOrNDArray -> Some(quote x.Name)
-                    | Some ManySymbolOrNDArray -> Some (sprintf "yield! %s |> Array.mapi (fun i _ -> sprintf \"[%%d]arg%%d\" i i)" x.Name)
+                    | Some ManySymbolOrNDArray -> Some (sprintf "yield! %s |> Array.mapi (fun i _ -> sprintf \"arg%%d\" i)" x.Name)
                     | _ -> None
                 )
             |> arr
@@ -428,7 +428,7 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
                 (fun x ->
                     match x.SymbolOrNDArray with 
                     | Some Symbol | Some SymbolOrNDArray -> Some(quote x.Name)
-                    | Some ManySymbolOrNDArray -> Some (sprintf "yield! %s |> Array.mapi (fun i _ -> sprintf \"[%%d]arg%%d\" i i)" x.Name)
+                    | Some ManySymbolOrNDArray -> Some (sprintf "yield! %s |> Array.mapi (fun i _ -> sprintf \"arg%%d\" i)" x.Name)
                     | _ -> None
                 )
             |> arr
