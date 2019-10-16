@@ -63,7 +63,8 @@ type Symbol() =
         let n = MXSymbol.getNumOutputs x.UnsafeHandle |> int
         Array.init n 
             (fun i ->
-                MXSymbol.getOutput x.UnsafeHandle i |> make
+                let h = MXSymbol.getOutput x.UnsafeHandle i
+                new SymbolOutput(x,new SafeSymbolHandle(h, true))
             )
     abstract member Initialize : unit -> unit
     static member Empty = EmptySymbol.Instance
@@ -80,6 +81,14 @@ type Symbol() =
     member x.ArgumentNames = MXSymbol.listArguments x.UnsafeHandle
     interface IDisposable with  
         member x.Dispose() = x.Dispose()
+
+type SymbolOutput internal (parent) = 
+    inherit Symbol()
+    new(parent, handle) as this = 
+        new SymbolOutput(parent) then 
+            this.InternalHandle <- Some handle
+    override x.Initialize() = ()
+    
 
 type Variable() =
     inherit Symbol()
@@ -103,6 +112,7 @@ type SymbolFromOperator(creator : AtomicSymbolCreator, parameters, inputs) =
         match v with 
         | :? bool as x -> if x then "1" else "0"
         | :? string as x -> sprintf "%s" x
+        | :? seq<int> as x -> x |> Seq.map string |> String.concat "," |> sprintf "[%s]"
         | x -> string x
     let parametersStr = parameters |> Array.map (fun (k,v) -> k, str v)
     new(creator,pnames,ps,inames,ins) = new SymbolFromOperator(creator, Array.zip pnames ps, Array.zip inames ins)

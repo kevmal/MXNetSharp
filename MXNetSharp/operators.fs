@@ -550,7 +550,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                Array.empty,
                                Array.empty,
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (data |> Array.map (fun x -> x)))
 
     static member BackwardCachedOpNDArray() =
@@ -1609,7 +1609,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_arrays"; "init_output"|],
                                [|string numArrays; string initOutput|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (data |> Array.map (fun x -> x)))
 
     /// <summary>
@@ -2678,7 +2678,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_args"; "num_hops"; "num_neighbor"; "max_num_vertices"|],
                                [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|],
-                               [|"csrMatrix"|],
+                               [|"csrMatrix"; yield! seedArrays |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                [|csrMatrix; yield! (seedArrays |> Seq.map (fun x -> x))|])
 
     /// <summary>This operator samples sub-graph from a csr graph via an
@@ -2886,7 +2886,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_args"; "num_hops"; "num_neighbor"; "max_num_vertices"|],
                                [|string numArgs; string numHops; string numNeighbor; string maxNumVertices|],
-                               [|"csrMatrix"; "probability"|],
+                               [|"csrMatrix"; "probability"; yield! seedArrays |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                [|csrMatrix; probability; yield! (seedArrays |> Seq.map (fun x -> x))|])
 
     /// <summary>This operator constructs an induced subgraph for
@@ -3006,7 +3006,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_args"; "return_mapping"|],
                                [|string numArgs; string returnMapping|],
-                               [|"graph"|],
+                               [|"graph"; yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                [|graph; yield! (data |> Seq.map (fun x -> x))|])
 
     /// <summary>This operator implements the edge_id function for a graph
@@ -3336,7 +3336,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_args"; "return_mapping"; "graph_sizes"|],
                                [|string numArgs; string returnMapping; string graphSizes|],
-                               Array.empty,
+                               [|yield! graphData |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (graphData |> Array.map (fun x -> x)))
 
     /// <summary>This operator implements the gradient multiplier function.
@@ -3743,7 +3743,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axes"|]
-                                                 [|(axes |> Seq.map string |> String.concat ", ")|]
+                                                 [|(axes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Returns an array of indexes of the input array.
     /// 
@@ -3799,7 +3799,7 @@ type Operators() =
     static member ContribIndexArray(outputArray : NDArray seq, data : NDArray, [<Optional>] axes : int seq) =
         let creator = AtomicSymbolCreator.FromName "_contrib_index_array"
         let names = [|"axes"|]
-        let vals = [|(axes |> Seq.map string |> String.concat ", ")|]
+        let vals = [|(axes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -3861,7 +3861,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_contrib_index_array"
         new SymbolFromOperator(creator,
                                [|"axes"|],
-                               [|(axes |> Seq.map string |> String.concat ", ")|],
+                               [|(axes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|],
                                [|"data"|],
                                [|data|])
 
@@ -4150,7 +4150,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                Array.empty,
                                Array.empty,
-                               Array.empty,
+                               [|yield! args |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (args |> Array.map (fun x -> x)))
 
     /// <summary>Number of stored values for a sparse tensor, including explicit zeros.
@@ -4500,7 +4500,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; rois.NDArrayHandle.UnsafeHandle|]
                                                  [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|]
-                                                 [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale; string sampleRatio; string positionSensitive|]
+                                                 [|(pooledSize |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string spatialScale; string sampleRatio; string positionSensitive|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>
     /// This operator takes a 4D feature map as an input array and region proposals as `rois`,
@@ -4539,7 +4539,7 @@ type Operators() =
                                   [<Optional; DefaultParameterValue(false)>] positionSensitive : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_ROIAlign"
         let names = [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|]
-        let vals = [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale; string sampleRatio; string positionSensitive|]
+        let vals = [|(pooledSize |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string spatialScale; string sampleRatio; string positionSensitive|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; rois.NDArrayHandle.UnsafeHandle|]
@@ -4583,7 +4583,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_contrib_ROIAlign"
         new SymbolFromOperator(creator,
                                [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|],
-                               [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale; string sampleRatio; string positionSensitive|],
+                               [|(pooledSize |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string spatialScale; string sampleRatio; string positionSensitive|],
                                [|"data"; "rois"|],
                                [|data; rois|])
 
@@ -5183,7 +5183,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"op_type"|],
                                [|opType|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (data |> Array.map (fun x -> x)))
 
     static member BackwardCustomNDArray() =
@@ -7417,7 +7417,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_args"; "dim"|],
                                [|string numArgs; string dim|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (data |> Array.map (fun x -> x)))
 
     static member BackwardConcatNDArray() =
@@ -7480,7 +7480,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_args"; "dim"|],
                                [|string numArgs; string dim|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (data |> Array.map (fun x -> x)))
 
     /// <summary>Compute *N*-D convolution on *(N+2)*-D input.
@@ -7591,7 +7591,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+                                                 [|(kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Compute *N*-D convolution on *(N+2)*-D input.
     /// 
@@ -7701,7 +7701,7 @@ type Operators() =
                               [<Optional>] layout : ConvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "Convolution"
         let names = [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-        let vals = [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+        let vals = [|(kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
@@ -7816,7 +7816,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "Convolution"
         new SymbolFromOperator(creator,
                                [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
-                               [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
+                               [|(kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
                                [|"data"; "weight"; "bias"|],
                                [|data; weight; bias|])
 
@@ -8122,7 +8122,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "adj"; "target_shape"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", ")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+                                                 [|(kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (adj :> obj) then "[]" else (adj |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Computes 1D or 2D transposed convolution (aka fractionally strided convolution) of the input tensor. This operation can be seen as the gradient of Convolution operation with respect to its input. Convolution usually reduces the size of the input. Transposed convolution works the other way, going from a smaller input to a larger output while preserving the connectivity pattern.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -8161,7 +8161,7 @@ type Operators() =
                                 [<Optional>] layout : DeconvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "Deconvolution"
         let names = [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "adj"; "target_shape"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-        let vals = [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", ")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+        let vals = [|(kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (adj :> obj) then "[]" else (adj |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
@@ -8205,7 +8205,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "Deconvolution"
         new SymbolFromOperator(creator,
                                [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "adj"; "target_shape"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
-                               [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", ")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
+                               [|(kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (adj :> obj) then "[]" else (adj |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
                                [|"data"; "weight"; "bias"|],
                                [|data; weight; bias|])
 
@@ -8282,7 +8282,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"cudnn_off"; "p"; "mode"; "axes"|]
-                                                 [|(match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match p with None -> "0.5" | Some p -> string p); (match mode with None -> "training" | Some mode -> string mode); (match axes with None -> "[]" | Some axes -> (axes |> Seq.map string |> String.concat ", "))|]
+                                                 [|(match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match p with None -> "0.5" | Some p -> string p); (match mode with None -> "training" | Some mode -> string mode); (match axes with None -> "[]" | Some axes -> (axes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Applies dropout operation to input array.
     /// 
@@ -8330,7 +8330,7 @@ type Operators() =
                           [<Optional>] ?axes : int seq) =
         let creator = AtomicSymbolCreator.FromName "Dropout"
         let names = [|"cudnn_off"; "p"; "mode"; "axes"|]
-        let vals = [|(match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match p with None -> "0.5" | Some p -> string p); (match mode with None -> "training" | Some mode -> string mode); (match axes with None -> "[]" | Some axes -> (axes |> Seq.map string |> String.concat ", "))|]
+        let vals = [|(match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match p with None -> "0.5" | Some p -> string p); (match mode with None -> "training" | Some mode -> string mode); (match axes with None -> "[]" | Some axes -> (axes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -8383,7 +8383,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "Dropout"
         new SymbolFromOperator(creator,
                                [|"cudnn_off"; "p"; "mode"; "axes"|],
-                               [|(match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match p with None -> "0.5" | Some p -> string p); (match mode with None -> "training" | Some mode -> string mode); (match axes with None -> "[]" | Some axes -> (axes |> Seq.map string |> String.concat ", "))|],
+                               [|(match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match p with None -> "0.5" | Some p -> string p); (match mode with None -> "training" | Some mode -> string mode); (match axes with None -> "[]" | Some axes -> (axes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|],
                                [|"data"|],
                                [|data|])
 
@@ -8939,7 +8939,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axes"; "keepdims"|]
-                                                 [|(axes |> Seq.map string |> String.concat ", "); string keepdims|]
+                                                 [|(axes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>
     /// Calculate the mean and variance of `data`.
@@ -8970,7 +8970,7 @@ type Operators() =
     static member Moments(outputArray : NDArray seq, data : NDArray, [<Optional>] axes : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "moments"
         let names = [|"axes"; "keepdims"|]
-        let vals = [|(axes |> Seq.map string |> String.concat ", "); string keepdims|]
+        let vals = [|(axes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -9007,7 +9007,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "moments"
         new SymbolFromOperator(creator,
                                [|"axes"; "keepdims"|],
-                               [|(axes |> Seq.map string |> String.concat ", "); string keepdims|],
+                               [|(axes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims|],
                                [|"data"|],
                                [|data|])
 
@@ -9117,7 +9117,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|]
-                                                 [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match layout with None -> "None" | Some layout -> string layout)|]
+                                                 [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match pad with None -> "[]" | Some pad -> (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match layout with None -> "None" | Some layout -> string layout)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Performs pooling on the input.
     /// 
@@ -9198,7 +9198,7 @@ type Operators() =
                           [<Optional>] ?layout : PoolingLayout) =
         let creator = AtomicSymbolCreator.FromName "Pooling"
         let names = [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|]
-        let vals = [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match layout with None -> "None" | Some layout -> string layout)|]
+        let vals = [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match pad with None -> "[]" | Some pad -> (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match layout with None -> "None" | Some layout -> string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -9284,7 +9284,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "Pooling"
         new SymbolFromOperator(creator,
                                [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|],
-                               [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match layout with None -> "None" | Some layout -> string layout)|],
+                               [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match pad with None -> "[]" | Some pad -> (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match layout with None -> "None" | Some layout -> string layout)|],
                                [|"data"|],
                                [|data|])
 
@@ -9456,7 +9456,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                Array.empty,
                                Array.empty,
-                               Array.empty,
+                               [|yield! args |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (args |> Array.map (fun x -> x)))
 
     /// <summary>Applies the softmin function.
@@ -9603,7 +9603,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                Array.empty,
                                Array.empty,
-                               Array.empty,
+                               [|yield! args |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (args |> Array.map (fun x -> x)))
 
     /// <summary>Computes the log softmax of the input.
@@ -9720,7 +9720,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                Array.empty,
                                Array.empty,
-                               Array.empty,
+                               [|yield! args |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (args |> Array.map (fun x -> x)))
 
     /// <summary>Applies softmax activation to input. This is intended for internal layers.
@@ -10081,7 +10081,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"scale"; "sample_type"; "num_args"; "num_filter"; "multi_input_mode"; "workspace"|],
                                [|string scale; string sampleType; string numArgs; string numFilter; (if isNull (multiInputMode :> obj) then "concat" else string multiInputMode); string workspace|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (data |> Array.map (fun x -> x)))
 
     static member BackwardUpSamplingNDArray() =
@@ -12090,7 +12090,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"mode"; "pad_width"; "constant_value"|]
-                                                 [|string mode; (padWidth |> Seq.map string |> String.concat ", "); string constantValue|]
+                                                 [|string mode; (padWidth |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string constantValue|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Pads an input array with a constant or edge values of the array.
     /// 
@@ -12184,7 +12184,7 @@ type Operators() =
     static member Pad(outputArray : NDArray seq, data : NDArray, mode : PadMode, padWidth : int seq, [<Optional; DefaultParameterValue(0.0)>] constantValue : double) =
         let creator = AtomicSymbolCreator.FromName "Pad"
         let names = [|"mode"; "pad_width"; "constant_value"|]
-        let vals = [|string mode; (padWidth |> Seq.map string |> String.concat ", "); string constantValue|]
+        let vals = [|string mode; (padWidth |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string constantValue|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -12284,7 +12284,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "Pad"
         new SymbolFromOperator(creator,
                                [|"mode"; "pad_width"; "constant_value"|],
-                               [|string mode; (padWidth |> Seq.map string |> String.concat ", "); string constantValue|],
+                               [|string mode; (padWidth |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string constantValue|],
                                [|"data"|],
                                [|data|])
 
@@ -12753,7 +12753,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_args"; "dim"|],
                                [|string numArgs; string dim|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (data |> Array.map (fun x -> x)))
 
     /// <summary>Convolution operator for input, weight and bias data type of int8,
@@ -12811,7 +12811,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle; minWeight.NDArrayHandle.UnsafeHandle; maxWeight.NDArrayHandle.UnsafeHandle; minBias.NDArrayHandle.UnsafeHandle; maxBias.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+                                                 [|(kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Convolution operator for input, weight and bias data type of int8,
     /// and accumulates in type int32 for the output. For each argument, two more arguments of type
@@ -12868,7 +12868,7 @@ type Operators() =
                                        [<Optional>] layout : ContribQuantizedConvLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_conv"
         let names = [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-        let vals = [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+        let vals = [|(kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle; minWeight.NDArrayHandle.UnsafeHandle; maxWeight.NDArrayHandle.UnsafeHandle; minBias.NDArrayHandle.UnsafeHandle; maxBias.NDArrayHandle.UnsafeHandle|]
@@ -12930,7 +12930,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_conv"
         new SymbolFromOperator(creator,
                                [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
-                               [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
+                               [|(kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
                                [|"data"; "weight"; "bias"; "minData"; "maxData"; "minWeight"; "maxWeight"; "minBias"; "maxBias"|],
                                [|data; weight; bias; minData; maxData; minWeight; maxWeight; minBias; maxBias|])
 
@@ -13342,7 +13342,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
                                                  [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|]
-                                                 [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match layout with None -> "None" | Some layout -> string layout)|]
+                                                 [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match pad with None -> "[]" | Some pad -> (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match layout with None -> "None" | Some layout -> string layout)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Pooling operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
@@ -13384,7 +13384,7 @@ type Operators() =
                                           [<Optional>] ?layout : ContribQuantizedPoolingLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_pooling"
         let names = [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|]
-        let vals = [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match layout with None -> "None" | Some layout -> string layout)|]
+        let vals = [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match pad with None -> "[]" | Some pad -> (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match layout with None -> "None" | Some layout -> string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
@@ -13431,7 +13431,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_pooling"
         new SymbolFromOperator(creator,
                                [|"p_value"; "count_include_pad"; "kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "layout"|],
-                               [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", ")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", ")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", ")); (match layout with None -> "None" | Some layout -> string layout)|],
+                               [|(match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match kernel with None -> "[]" | Some kernel -> (kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match pad with None -> "[]" | Some pad -> (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match layout with None -> "None" | Some layout -> string layout)|],
                                [|"data"; "minData"; "maxData"|],
                                [|data; minData; maxData|])
 
@@ -13563,7 +13563,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|low.NDArrayHandle.UnsafeHandle; high.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Concurrent sampling from multiple
     /// uniform distributions on the intervals given by *[low,high)*.
@@ -13601,7 +13601,7 @@ type Operators() =
     static member SampleUniform(outputArray : NDArray seq, low : NDArray, high : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_uniform"
         let names = [|"shape"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let vals = [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|low.NDArrayHandle.UnsafeHandle; high.NDArrayHandle.UnsafeHandle|]
@@ -13645,7 +13645,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_sample_uniform"
         new SymbolFromOperator(creator,
                                [|"shape"; "dtype"|],
-                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|],
                                [|"low"; "high"|],
                                [|low; high|])
 
@@ -13686,7 +13686,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|mu.NDArrayHandle.UnsafeHandle; sigma.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Concurrent sampling from multiple
     /// normal distributions with parameters *mu* (mean) and *sigma* (standard deviation).
@@ -13724,7 +13724,7 @@ type Operators() =
     static member SampleNormal(outputArray : NDArray seq, mu : NDArray, sigma : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_normal"
         let names = [|"shape"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let vals = [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|mu.NDArrayHandle.UnsafeHandle; sigma.NDArrayHandle.UnsafeHandle|]
@@ -13768,7 +13768,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_sample_normal"
         new SymbolFromOperator(creator,
                                [|"shape"; "dtype"|],
-                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|],
                                [|"mu"; "sigma"|],
                                [|mu; sigma|])
 
@@ -13809,7 +13809,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|alpha.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Concurrent sampling from multiple
     /// gamma distributions with parameters *alpha* (shape) and *beta* (scale).
@@ -13847,7 +13847,7 @@ type Operators() =
     static member SampleGamma(outputArray : NDArray seq, alpha : NDArray, beta : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_gamma"
         let names = [|"shape"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let vals = [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|alpha.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
@@ -13891,7 +13891,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_sample_gamma"
         new SymbolFromOperator(creator,
                                [|"shape"; "dtype"|],
-                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|],
                                [|"alpha"; "beta"|],
                                [|alpha; beta|])
 
@@ -13930,7 +13930,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lam.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Concurrent sampling from multiple
     /// exponential distributions with parameters lambda (rate).
@@ -13966,7 +13966,7 @@ type Operators() =
     static member SampleExponential(outputArray : NDArray seq, lam : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_exponential"
         let names = [|"shape"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let vals = [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|lam.NDArrayHandle.UnsafeHandle|]
@@ -14008,7 +14008,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_sample_exponential"
         new SymbolFromOperator(creator,
                                [|"shape"; "dtype"|],
-                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|],
                                [|"lam"|],
                                [|lam|])
 
@@ -14049,7 +14049,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lam.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Concurrent sampling from multiple
     /// Poisson distributions with parameters lambda (rate).
@@ -14087,7 +14087,7 @@ type Operators() =
     static member SamplePoisson(outputArray : NDArray seq, lam : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_poisson"
         let names = [|"shape"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let vals = [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|lam.NDArrayHandle.UnsafeHandle|]
@@ -14131,7 +14131,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_sample_poisson"
         new SymbolFromOperator(creator,
                                [|"shape"; "dtype"|],
-                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|],
                                [|"lam"|],
                                [|lam|])
 
@@ -14174,7 +14174,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|k.NDArrayHandle.UnsafeHandle; p.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Concurrent sampling from multiple
     /// negative binomial distributions with parameters *k* (failure limit) and *p* (failure probability).
@@ -14214,7 +14214,7 @@ type Operators() =
     static member SampleNegativeBinomial(outputArray : NDArray seq, k : NDArray, p : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_negative_binomial"
         let names = [|"shape"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let vals = [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|k.NDArrayHandle.UnsafeHandle; p.NDArrayHandle.UnsafeHandle|]
@@ -14260,7 +14260,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_sample_negative_binomial"
         new SymbolFromOperator(creator,
                                [|"shape"; "dtype"|],
-                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|],
                                [|"k"; "p"|],
                                [|k; p|])
 
@@ -14303,7 +14303,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|mu.NDArrayHandle.UnsafeHandle; alpha.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Concurrent sampling from multiple
     /// generalized negative binomial distributions with parameters *mu* (mean) and *alpha* (dispersion).
@@ -14343,7 +14343,7 @@ type Operators() =
     static member SampleGeneralizedNegativeBinomial(outputArray : NDArray seq, mu : NDArray, alpha : NDArray, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_sample_generalized_negative_binomial"
         let names = [|"shape"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let vals = [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|mu.NDArrayHandle.UnsafeHandle; alpha.NDArrayHandle.UnsafeHandle|]
@@ -14389,7 +14389,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_sample_generalized_negative_binomial"
         new SymbolFromOperator(creator,
                                [|"shape"; "dtype"|],
-                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|],
                                [|"mu"; "alpha"|],
                                [|mu; alpha|])
 
@@ -14431,7 +14431,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "get_prob"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string getProb; (if isNull (dtype :> obj) then "int32" else string dtype)|]
+                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string getProb; (if isNull (dtype :> obj) then "int32" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Concurrent sampling from multiple multinomial distributions.
     /// 
@@ -14470,7 +14470,7 @@ type Operators() =
     static member SampleMultinomial(outputArray : NDArray seq, data : NDArray, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue(false)>] getProb : bool, [<Optional>] dtype : SampleMultinomialDtype) =
         let creator = AtomicSymbolCreator.FromName "_sample_multinomial"
         let names = [|"shape"; "get_prob"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string getProb; (if isNull (dtype :> obj) then "int32" else string dtype)|]
+        let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string getProb; (if isNull (dtype :> obj) then "int32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -14515,7 +14515,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_sample_multinomial"
         new SymbolFromOperator(creator,
                                [|"shape"; "get_prob"; "dtype"|],
-                               [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string getProb; (if isNull (dtype :> obj) then "int32" else string dtype)|],
+                               [|(if isNull (shape :> obj) then "[]" else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string getProb; (if isNull (dtype :> obj) then "int32" else string dtype)|],
                                [|"data"|],
                                [|data|])
 
@@ -14575,7 +14575,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"low"; "high"; "shape"; "ctx"; "dtype"|]
-                                                 [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|string low; string high; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Draw random samples from a uniform distribution.
     /// 
@@ -14606,7 +14606,7 @@ type Operators() =
                                 [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_uniform"
         let names = [|"low"; "high"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let vals = [|string low; string high; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -14642,7 +14642,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_random_uniform"
         new SymbolFromOperator(creator,
                                [|"low"; "high"; "shape"; "ctx"; "dtype"|],
-                               [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|string low; string high; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
                                Array.empty,
                                Array.empty)
 
@@ -14674,7 +14674,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"loc"; "scale"; "shape"; "ctx"; "dtype"|]
-                                                 [|string loc; string scale; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|string loc; string scale; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Draw random samples from a normal (Gaussian) distribution.
     /// 
@@ -14704,7 +14704,7 @@ type Operators() =
                                [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_normal"
         let names = [|"loc"; "scale"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string loc; string scale; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let vals = [|string loc; string scale; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -14739,7 +14739,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_random_normal"
         new SymbolFromOperator(creator,
                                [|"loc"; "scale"; "shape"; "ctx"; "dtype"|],
-                               [|string loc; string scale; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|string loc; string scale; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
                                Array.empty,
                                Array.empty)
 
@@ -14768,7 +14768,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"alpha"; "beta"; "shape"; "ctx"; "dtype"|]
-                                                 [|string alpha; string beta; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|string alpha; string beta; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Draw random samples from a gamma distribution.
     /// 
@@ -14795,7 +14795,7 @@ type Operators() =
                               [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_gamma"
         let names = [|"alpha"; "beta"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string alpha; string beta; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let vals = [|string alpha; string beta; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -14827,7 +14827,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_random_gamma"
         new SymbolFromOperator(creator,
                                [|"alpha"; "beta"; "shape"; "ctx"; "dtype"|],
-                               [|string alpha; string beta; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|string alpha; string beta; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
                                Array.empty,
                                Array.empty)
 
@@ -14851,7 +14851,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"lam"; "shape"; "ctx"; "dtype"|]
-                                                 [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|string lam; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Draw random samples from an exponential distribution.
     /// 
@@ -14872,7 +14872,7 @@ type Operators() =
     static member RandomExponential(outputArray : NDArray seq, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_exponential"
         let names = [|"lam"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let vals = [|string lam; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -14899,7 +14899,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_random_exponential"
         new SymbolFromOperator(creator,
                                [|"lam"; "shape"; "ctx"; "dtype"|],
-                               [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|string lam; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
                                Array.empty,
                                Array.empty)
 
@@ -14924,7 +14924,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"lam"; "shape"; "ctx"; "dtype"|]
-                                                 [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|string lam; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Draw random samples from a Poisson distribution.
     /// 
@@ -14946,7 +14946,7 @@ type Operators() =
     static member RandomPoisson(outputArray : NDArray seq, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_poisson"
         let names = [|"lam"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let vals = [|string lam; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -14974,7 +14974,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_random_poisson"
         new SymbolFromOperator(creator,
                                [|"lam"; "shape"; "ctx"; "dtype"|],
-                               [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|string lam; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
                                Array.empty,
                                Array.empty)
 
@@ -15005,7 +15005,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"k"; "p"; "shape"; "ctx"; "dtype"|]
-                                                 [|string k; string p; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|string k; string p; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Draw random samples from a negative binomial distribution.
     /// 
@@ -15034,7 +15034,7 @@ type Operators() =
                                          [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_negative_binomial"
         let names = [|"k"; "p"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string k; string p; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let vals = [|string k; string p; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -15068,7 +15068,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_random_negative_binomial"
         new SymbolFromOperator(creator,
                                [|"k"; "p"; "shape"; "ctx"; "dtype"|],
-                               [|string k; string p; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|string k; string p; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
                                Array.empty,
                                Array.empty)
 
@@ -15100,7 +15100,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"mu"; "alpha"; "shape"; "ctx"; "dtype"|]
-                                                 [|string mu; string alpha; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|string mu; string alpha; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Draw random samples from a generalized negative binomial distribution.
     /// 
@@ -15130,7 +15130,7 @@ type Operators() =
                                                     [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_generalized_negative_binomial"
         let names = [|"mu"; "alpha"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string mu; string alpha; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let vals = [|string mu; string alpha; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -15165,7 +15165,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_random_generalized_negative_binomial"
         new SymbolFromOperator(creator,
                                [|"mu"; "alpha"; "shape"; "ctx"; "dtype"|],
-                               [|string mu; string alpha; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|string mu; string alpha; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
                                Array.empty,
                                Array.empty)
 
@@ -15196,7 +15196,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"low"; "high"; "shape"; "ctx"; "dtype"|]
-                                                 [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|string low; string high; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Draw random samples from a discrete uniform distribution.
     /// 
@@ -15225,7 +15225,7 @@ type Operators() =
                                 [<Optional>] dtype : RandomRandintDtype) =
         let creator = AtomicSymbolCreator.FromName "_random_randint"
         let names = [|"low"; "high"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let vals = [|string low; string high; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -15259,7 +15259,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_random_randint"
         new SymbolFromOperator(creator,
                                [|"low"; "high"; "shape"; "ctx"; "dtype"|],
-                               [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
+                               [|string low; string high; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|],
                                Array.empty,
                                Array.empty)
 
@@ -15853,7 +15853,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"range_max"; "shape"|]
-                                                 [|string rangeMax; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|]
+                                                 [|string rangeMax; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Draw random samples from an an approximately log-uniform
     /// or Zipfian distribution without replacement.
@@ -15886,7 +15886,7 @@ type Operators() =
     static member SampleUniqueZipfian(outputArray : NDArray seq, rangeMax : int, [<Optional>] shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "_sample_unique_zipfian"
         let names = [|"range_max"; "shape"|]
-        let vals = [|string rangeMax; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|]
+        let vals = [|string rangeMax; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -15925,7 +15925,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_sample_unique_zipfian"
         new SymbolFromOperator(creator,
                                [|"range_max"; "shape"|],
-                               [|string rangeMax; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|],
+                               [|string rangeMax; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|],
                                Array.empty,
                                Array.empty)
 
@@ -17446,7 +17446,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_outputs"|],
                                [|string numOutputs|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (data |> Array.map (fun x -> x)))
 
     /// <param name="grad">Gradients</param>
@@ -17479,7 +17479,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_outputs"|],
                                [|string numOutputs|],
-                               Array.empty,
+                               [|yield! grad |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (grad |> Array.map (fun x -> x)))
 
     /// <summary>Returns indices of the maximum values along an axis.
@@ -18046,7 +18046,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+                                                 [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Computes the sum of array elements over given axes.
     /// 
@@ -18106,7 +18106,7 @@ type Operators() =
     static member Sum(outputArray : NDArray seq, data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "sum"
         let names = [|"axis"; "keepdims"; "exclude"|]
-        let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+        let vals = [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -18172,7 +18172,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "sum"
         new SymbolFromOperator(creator,
                                [|"axis"; "keepdims"; "exclude"|],
-                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|],
                                [|"data"|],
                                [|data|])
 
@@ -18228,7 +18228,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+                                                 [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Computes the mean of array elements over given axes.
     /// 
@@ -18254,7 +18254,7 @@ type Operators() =
     static member Mean(outputArray : NDArray seq, data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "mean"
         let names = [|"axis"; "keepdims"; "exclude"|]
-        let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+        let vals = [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -18286,7 +18286,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "mean"
         new SymbolFromOperator(creator,
                                [|"axis"; "keepdims"; "exclude"|],
-                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|],
                                [|"data"|],
                                [|data|])
 
@@ -18342,7 +18342,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+                                                 [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Computes the product of array elements over given axes.
     /// 
@@ -18368,7 +18368,7 @@ type Operators() =
     static member Prod(outputArray : NDArray seq, data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "prod"
         let names = [|"axis"; "keepdims"; "exclude"|]
-        let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+        let vals = [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -18400,7 +18400,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "prod"
         new SymbolFromOperator(creator,
                                [|"axis"; "keepdims"; "exclude"|],
-                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|],
                                [|"data"|],
                                [|data|])
 
@@ -18458,7 +18458,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+                                                 [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Computes the sum of array elements over given axes treating Not a Numbers (``NaN``) as zero.
     /// 
@@ -18486,7 +18486,7 @@ type Operators() =
     static member Nansum(outputArray : NDArray seq, data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "nansum"
         let names = [|"axis"; "keepdims"; "exclude"|]
-        let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+        let vals = [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -18520,7 +18520,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "nansum"
         new SymbolFromOperator(creator,
                                [|"axis"; "keepdims"; "exclude"|],
-                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|],
                                [|"data"|],
                                [|data|])
 
@@ -18578,7 +18578,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+                                                 [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Computes the product of array elements over given axes treating Not a Numbers (``NaN``) as one.
     /// 
@@ -18606,7 +18606,7 @@ type Operators() =
     static member Nanprod(outputArray : NDArray seq, data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "nanprod"
         let names = [|"axis"; "keepdims"; "exclude"|]
-        let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+        let vals = [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -18640,7 +18640,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "nanprod"
         new SymbolFromOperator(creator,
                                [|"axis"; "keepdims"; "exclude"|],
-                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|],
                                [|"data"|],
                                [|data|])
 
@@ -18696,7 +18696,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+                                                 [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Computes the max of array elements over given axes.
     /// 
@@ -18722,7 +18722,7 @@ type Operators() =
     static member Max(outputArray : NDArray seq, data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "max"
         let names = [|"axis"; "keepdims"; "exclude"|]
-        let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+        let vals = [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -18754,7 +18754,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "max"
         new SymbolFromOperator(creator,
                                [|"axis"; "keepdims"; "exclude"|],
-                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|],
                                [|"data"|],
                                [|data|])
 
@@ -18810,7 +18810,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+                                                 [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Computes the min of array elements over given axes.
     /// 
@@ -18836,7 +18836,7 @@ type Operators() =
     static member Min(outputArray : NDArray seq, data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "min"
         let names = [|"axis"; "keepdims"; "exclude"|]
-        let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+        let vals = [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -18868,7 +18868,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "min"
         new SymbolFromOperator(creator,
                                [|"axis"; "keepdims"; "exclude"|],
-                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|],
                                [|"data"|],
                                [|data|])
 
@@ -18929,7 +18929,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "size"|]
-                                                 [|(if isNull (axis :> obj) then "[]" else (axis |> Seq.map string |> String.concat ", ")); (if isNull (size :> obj) then "[]" else (size |> Seq.map string |> String.concat ", "))|]
+                                                 [|(if isNull (axis :> obj) then "[]" else (axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (size :> obj) then "[]" else (size |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Broadcasts the input array over particular axes.
     /// 
@@ -18960,7 +18960,7 @@ type Operators() =
     static member BroadcastAxis(outputArray : NDArray seq, data : NDArray, [<Optional>] axis : int seq, [<Optional>] size : int seq) =
         let creator = AtomicSymbolCreator.FromName "broadcast_axis"
         let names = [|"axis"; "size"|]
-        let vals = [|(if isNull (axis :> obj) then "[]" else (axis |> Seq.map string |> String.concat ", ")); (if isNull (size :> obj) then "[]" else (size |> Seq.map string |> String.concat ", "))|]
+        let vals = [|(if isNull (axis :> obj) then "[]" else (axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (size :> obj) then "[]" else (size |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -18997,7 +18997,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "broadcast_axis"
         new SymbolFromOperator(creator,
                                [|"axis"; "size"|],
-                               [|(if isNull (axis :> obj) then "[]" else (axis |> Seq.map string |> String.concat ", ")); (if isNull (size :> obj) then "[]" else (size |> Seq.map string |> String.concat ", "))|],
+                               [|(if isNull (axis :> obj) then "[]" else (axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (size :> obj) then "[]" else (size |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|],
                                [|"data"|],
                                [|data|])
 
@@ -19028,7 +19028,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", "))|]
+                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Broadcasts the input array to a new shape.
     /// 
@@ -19056,7 +19056,7 @@ type Operators() =
     static member BroadcastTo(outputArray : NDArray seq, data : NDArray, [<Optional>] shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "broadcast_to"
         let names = [|"shape"|]
-        let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", "))|]
+        let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -19090,7 +19090,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "broadcast_to"
         new SymbolFromOperator(creator,
                                [|"shape"|],
-                               [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", "))|],
+                               [|(if isNull (shape :> obj) then "[]" else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|],
                                [|"data"|],
                                [|data|])
 
@@ -19149,7 +19149,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"lhs_axes"; "rhs_axes"|]
-                                                 [|(lhsAxes |> Seq.map string |> String.concat ", "); (rhsAxes |> Seq.map string |> String.concat ", ")|]
+                                                 [|(lhsAxes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (rhsAxes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Broadcasts lhs to have the same shape as rhs.
     /// 
@@ -19178,7 +19178,7 @@ type Operators() =
     static member BroadcastLike(outputArray : NDArray seq, lhs : NDArray, rhs : NDArray, [<Optional>] lhsAxes : int seq, [<Optional>] rhsAxes : int seq) =
         let creator = AtomicSymbolCreator.FromName "broadcast_like"
         let names = [|"lhs_axes"; "rhs_axes"|]
-        let vals = [|(lhsAxes |> Seq.map string |> String.concat ", "); (rhsAxes |> Seq.map string |> String.concat ", ")|]
+        let vals = [|(lhsAxes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (rhsAxes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
@@ -19213,7 +19213,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "broadcast_like"
         new SymbolFromOperator(creator,
                                [|"lhs_axes"; "rhs_axes"|],
-                               [|(lhsAxes |> Seq.map string |> String.concat ", "); (rhsAxes |> Seq.map string |> String.concat ", ")|],
+                               [|(lhsAxes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (rhsAxes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|],
                                [|"lhs"; "rhs"|],
                                [|lhs; rhs|])
 
@@ -19266,7 +19266,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"ord"; "axis"; "out_dtype"; "keepdims"|]
-                                                 [|string ord; (axis |> Seq.map string |> String.concat ", "); (if isNull (outDtype :> obj) then "None" else string outDtype); string keepdims|]
+                                                 [|string ord; (axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (outDtype :> obj) then "None" else string outDtype); string keepdims|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Computes the norm on an NDArray.
     /// 
@@ -19317,7 +19317,7 @@ type Operators() =
                        [<Optional; DefaultParameterValue(false)>] keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "norm"
         let names = [|"ord"; "axis"; "out_dtype"; "keepdims"|]
-        let vals = [|string ord; (axis |> Seq.map string |> String.concat ", "); (if isNull (outDtype :> obj) then "None" else string outDtype); string keepdims|]
+        let vals = [|string ord; (axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (outDtype :> obj) then "None" else string outDtype); string keepdims|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -19373,7 +19373,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "norm"
         new SymbolFromOperator(creator,
                                [|"ord"; "axis"; "out_dtype"; "keepdims"|],
-                               [|string ord; (axis |> Seq.map string |> String.concat ", "); (if isNull (outDtype :> obj) then "None" else string outDtype); string keepdims|],
+                               [|string ord; (axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (outDtype :> obj) then "None" else string outDtype); string keepdims|],
                                [|"data"|],
                                [|data|])
 
@@ -24683,7 +24683,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                Array.empty,
                                Array.empty,
-                               Array.empty,
+                               [|yield! args |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (args |> Array.map (fun x -> x)))
 
     /// <summary>Computes rectified linear activation.
@@ -30844,7 +30844,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
-                                                 [|(shape |> Seq.map string |> String.concat ", ")|]
+                                                 [|(shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Scatters data into a new tensor according to indices.
     /// 
@@ -30897,7 +30897,7 @@ type Operators() =
     static member ScatterNd(outputArray : NDArray seq, data : NDArray, indices : NDArray, shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "scatter_nd"
         let names = [|"shape"|]
-        let vals = [|(shape |> Seq.map string |> String.concat ", ")|]
+        let vals = [|(shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
@@ -30956,7 +30956,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "scatter_nd"
         new SymbolFromOperator(creator,
                                [|"shape"|],
-                               [|(shape |> Seq.map string |> String.concat ", ")|],
+                               [|(shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|],
                                [|"data"; "indices"|],
                                [|data; indices|])
 
@@ -31000,7 +31000,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
-                                                 [|(shape |> Seq.map string |> String.concat ", ")|]
+                                                 [|(shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Accumulates data according to indices and get the result. It&#39;s the backward of
     /// `gather_nd`.
@@ -31041,7 +31041,7 @@ type Operators() =
     static member BackwardGatherNd(outputArray : NDArray seq, data : NDArray, indices : NDArray, shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "_backward_gather_nd"
         let names = [|"shape"|]
-        let vals = [|(shape |> Seq.map string |> String.concat ", ")|]
+        let vals = [|(shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
@@ -31088,7 +31088,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_backward_gather_nd"
         new SymbolFromOperator(creator,
                                [|"shape"|],
-                               [|(shape |> Seq.map string |> String.concat ", ")|],
+                               [|(shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|],
                                [|"data"; "indices"|],
                                [|data; indices|])
 
@@ -31117,7 +31117,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
-                                                 [|(shape |> Seq.map string |> String.concat ", ")|]
+                                                 [|(shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>This operator has the same functionality as scatter_nd
     /// except that it does not reset the elements not indexed by the input
@@ -31143,7 +31143,7 @@ type Operators() =
     static member ScatterSetNd(outputArray : NDArray seq, lhs : NDArray, rhs : NDArray, indices : NDArray, shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "_scatter_set_nd"
         let names = [|"shape"|]
-        let vals = [|(shape |> Seq.map string |> String.concat ", ")|]
+        let vals = [|(shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
@@ -31175,7 +31175,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_scatter_set_nd"
         new SymbolFromOperator(creator,
                                [|"shape"|],
-                               [|(shape |> Seq.map string |> String.concat ", ")|],
+                               [|(shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|],
                                [|"lhs"; "rhs"; "indices"|],
                                [|lhs; rhs; indices|])
 
@@ -31188,7 +31188,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"shape"; "ctx"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; string dtype|]
+                                                 [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; string dtype|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>fill target with zeros without default dtype</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -31198,7 +31198,7 @@ type Operators() =
     static member ZerosWithoutDtype(outputArray : NDArray seq, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional; DefaultParameterValue(-1)>] dtype : int) =
         let creator = AtomicSymbolCreator.FromName "_zeros_without_dtype"
         let names = [|"shape"; "ctx"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; string dtype|]
+        let vals = [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; string dtype|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -31214,7 +31214,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_zeros_without_dtype"
         new SymbolFromOperator(creator,
                                [|"shape"; "ctx"; "dtype"|],
-                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; string dtype|],
+                               [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; string dtype|],
                                Array.empty,
                                Array.empty)
 
@@ -31227,7 +31227,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"shape"; "ctx"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>fill target with zeros</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -31237,7 +31237,7 @@ type Operators() =
     static member Zeros(outputArray : NDArray seq, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_zeros"
         let names = [|"shape"; "ctx"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+        let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -31253,7 +31253,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_zeros"
         new SymbolFromOperator(creator,
                                [|"shape"; "ctx"; "dtype"|],
-                               [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
+                               [|(if isNull (shape :> obj) then "[]" else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
                                Array.empty,
                                Array.empty)
 
@@ -31324,7 +31324,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"shape"; "ctx"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>fill target with ones</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -31334,7 +31334,7 @@ type Operators() =
     static member Ones(outputArray : NDArray seq, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_ones"
         let names = [|"shape"; "ctx"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+        let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -31350,7 +31350,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_ones"
         new SymbolFromOperator(creator,
                                [|"shape"; "ctx"; "dtype"|],
-                               [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
+                               [|(if isNull (shape :> obj) then "[]" else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
                                Array.empty,
                                Array.empty)
 
@@ -31364,7 +31364,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"value"; "shape"; "ctx"; "dtype"|]
-                                                 [|string value; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+                                                 [|string value; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>fill target with a scalar value</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -31375,7 +31375,7 @@ type Operators() =
     static member Full(outputArray : NDArray seq, value : double, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_full"
         let names = [|"value"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string value; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+        let vals = [|string value; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -31392,7 +31392,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_full"
         new SymbolFromOperator(creator,
                                [|"value"; "shape"; "ctx"; "dtype"|],
-                               [|string value; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", ")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
+                               [|string value; (if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|],
                                Array.empty,
                                Array.empty)
 
@@ -34307,7 +34307,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "reverse"; "target_shape"; "keep_highest"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string reverse; (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string keepHighest|]
+                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string reverse; (if isNull (targetShape :> obj) then "[]" else (targetShape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string keepHighest|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Reshapes the input array.
     /// 
@@ -34387,7 +34387,7 @@ type Operators() =
                           [<Optional; DefaultParameterValue(false)>] keepHighest : bool) =
         let creator = AtomicSymbolCreator.FromName "Reshape"
         let names = [|"shape"; "reverse"; "target_shape"; "keep_highest"|]
-        let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string reverse; (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string keepHighest|]
+        let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string reverse; (if isNull (targetShape :> obj) then "[]" else (targetShape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string keepHighest|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -34472,7 +34472,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "Reshape"
         new SymbolFromOperator(creator,
                                [|"shape"; "reverse"; "target_shape"; "keep_highest"|],
-                               [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", ")); string reverse; (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", ")); string keepHighest|],
+                               [|(if isNull (shape :> obj) then "[]" else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string reverse; (if isNull (targetShape :> obj) then "[]" else (targetShape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string keepHighest|],
                                [|"data"|],
                                [|data|])
 
@@ -34513,7 +34513,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axes"|]
-                                                 [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|]
+                                                 [|(if isNull (axes :> obj) then "[]" else (axes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Permutes the dimensions of an array.
     /// 
@@ -34551,7 +34551,7 @@ type Operators() =
     static member Transpose(outputArray : NDArray seq, data : NDArray, [<Optional>] axes : int seq) =
         let creator = AtomicSymbolCreator.FromName "transpose"
         let names = [|"axes"|]
-        let vals = [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|]
+        let vals = [|(if isNull (axes :> obj) then "[]" else (axes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -34595,7 +34595,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "transpose"
         new SymbolFromOperator(creator,
                                [|"axes"|],
-                               [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|],
+                               [|(if isNull (axes :> obj) then "[]" else (axes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|],
                                [|"data"|],
                                [|data|])
 
@@ -34712,7 +34712,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"begin"; "end"; "step"|]
-                                                 [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
+                                                 [|(sliceBegin |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (step :> obj) then "[]" else (step |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Slices a region of the array.
     /// 
@@ -34769,7 +34769,7 @@ type Operators() =
     static member Slice(outputArray : NDArray seq, data : NDArray, sliceBegin : int seq, sliceEnd : int seq, [<Optional>] step : int seq) =
         let creator = AtomicSymbolCreator.FromName "slice"
         let names = [|"begin"; "end"; "step"|]
-        let vals = [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
+        let vals = [|(sliceBegin |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (step :> obj) then "[]" else (step |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -34832,7 +34832,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "slice"
         new SymbolFromOperator(creator,
                                [|"begin"; "end"; "step"|],
-                               [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|],
+                               [|(sliceBegin |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (step :> obj) then "[]" else (step |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|],
                                [|"data"|],
                                [|data|])
 
@@ -34886,7 +34886,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"begin"; "end"; "step"|]
-                                                 [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
+                                                 [|(sliceBegin |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (step :> obj) then "[]" else (step |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Assign the rhs to a cropped subset of lhs.
     /// 
@@ -34911,7 +34911,7 @@ type Operators() =
                               [<Optional>] step : int seq) =
         let creator = AtomicSymbolCreator.FromName "_slice_assign"
         let names = [|"begin"; "end"; "step"|]
-        let vals = [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
+        let vals = [|(sliceBegin |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (step :> obj) then "[]" else (step |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
@@ -34941,7 +34941,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_slice_assign"
         new SymbolFromOperator(creator,
                                [|"begin"; "end"; "step"|],
-                               [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|],
+                               [|(sliceBegin |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (step :> obj) then "[]" else (step |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|],
                                [|"lhs"; "rhs"|],
                                [|lhs; rhs|])
 
@@ -34967,7 +34967,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"begin"; "end"; "scalar"; "step"|]
-                                                 [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); string scalar; (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
+                                                 [|(sliceBegin |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string scalar; (if isNull (step :> obj) then "[]" else (step |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>(Assign the scalar to a cropped subset of the input.
     /// 
@@ -34991,7 +34991,7 @@ type Operators() =
                                     [<Optional>] step : int seq) =
         let creator = AtomicSymbolCreator.FromName "_slice_assign_scalar"
         let names = [|"begin"; "end"; "scalar"; "step"|]
-        let vals = [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); string scalar; (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|]
+        let vals = [|(sliceBegin |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string scalar; (if isNull (step :> obj) then "[]" else (step |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -35020,7 +35020,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_slice_assign_scalar"
         new SymbolFromOperator(creator,
                                [|"begin"; "end"; "scalar"; "step"|],
-                               [|(sliceBegin |> Seq.map string |> String.concat ", "); (sliceEnd |> Seq.map string |> String.concat ", "); string scalar; (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", "))|],
+                               [|(sliceBegin |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string scalar; (if isNull (step :> obj) then "[]" else (step |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|],
                                [|"data"|],
                                [|data|])
 
@@ -35223,7 +35223,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; shapeLike.NDArrayHandle.UnsafeHandle|]
                                                  [|"axes"|]
-                                                 [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|]
+                                                 [|(if isNull (axes :> obj) then "[]" else (axes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Slices a region of the array like the shape of another array.
     /// 
@@ -35285,7 +35285,7 @@ type Operators() =
     static member SliceLike(outputArray : NDArray seq, data : NDArray, shapeLike : NDArray, [<Optional>] axes : int seq) =
         let creator = AtomicSymbolCreator.FromName "slice_like"
         let names = [|"axes"|]
-        let vals = [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|]
+        let vals = [|(if isNull (axes :> obj) then "[]" else (axes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; shapeLike.NDArrayHandle.UnsafeHandle|]
@@ -35353,7 +35353,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "slice_like"
         new SymbolFromOperator(creator,
                                [|"axes"|],
-                               [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", "))|],
+                               [|(if isNull (axes :> obj) then "[]" else (axes |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|],
                                [|"data"; "shapeLike"|],
                                [|data; shapeLike|])
 
@@ -35713,7 +35713,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"reps"|]
-                                                 [|(reps |> Seq.map string |> String.concat ", ")|]
+                                                 [|(reps |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Repeats the whole array multiple times.
     /// 
@@ -35758,7 +35758,7 @@ type Operators() =
     static member Tile(outputArray : NDArray seq, data : NDArray, reps : int seq) =
         let creator = AtomicSymbolCreator.FromName "tile"
         let names = [|"reps"|]
-        let vals = [|(reps |> Seq.map string |> String.concat ", ")|]
+        let vals = [|(reps |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -35809,7 +35809,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "tile"
         new SymbolFromOperator(creator,
                                [|"reps"|],
-                               [|(reps |> Seq.map string |> String.concat ", ")|],
+                               [|(reps |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|],
                                [|"data"|],
                                [|data|])
 
@@ -35864,7 +35864,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"|]
-                                                 [|(axis |> Seq.map string |> String.concat ", ")|]
+                                                 [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Reverses the order of elements along given axis while preserving array shape.
     /// 
@@ -35889,7 +35889,7 @@ type Operators() =
     static member Reverse(outputArray : NDArray seq, data : NDArray, axis : int seq) =
         let creator = AtomicSymbolCreator.FromName "reverse"
         let names = [|"axis"|]
-        let vals = [|(axis |> Seq.map string |> String.concat ", ")|]
+        let vals = [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -35920,7 +35920,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "reverse"
         new SymbolFromOperator(creator,
                                [|"axis"|],
-                               [|(axis |> Seq.map string |> String.concat ", ")|],
+                               [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|],
                                [|"data"|],
                                [|data|])
 
@@ -36032,7 +36032,7 @@ type Operators() =
         new SymbolFromOperator(creator,
                                [|"num_args"; "axis"|],
                                [|string numArgs; string axis|],
-                               Array.empty,
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (data |> Array.map (fun x -> x)))
 
     static member BackwardStackNDArray() =
@@ -36085,7 +36085,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"axis"|]
-                                                 [|(axis |> Seq.map string |> String.concat ", ")|]
+                                                 [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Remove single-dimensional entries from the shape of an array.
     /// Same behavior of defining the output tensor shape as numpy.squeeze for the most of cases.
@@ -36109,7 +36109,7 @@ type Operators() =
     static member Squeeze(outputArray : NDArray seq, [<ParamArray>] data : NDArray[], [<Optional>] axis : int seq) =
         let creator = AtomicSymbolCreator.FromName "squeeze"
         let names = [|"axis"|]
-        let vals = [|(axis |> Seq.map string |> String.concat ", ")|]
+        let vals = [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
@@ -36139,8 +36139,8 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "squeeze"
         new SymbolFromOperator(creator,
                                [|"axis"|],
-                               [|(axis |> Seq.map string |> String.concat ", ")|],
-                               Array.empty,
+                               [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|],
+                               [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
                                (data |> Array.map (fun x -> x)))
 
     static member BackwardSqueezeNDArray() =
@@ -36535,7 +36535,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"indices"; "axis"; "squeeze_axis"; "sections"|]
-                                                 [|(indices |> Seq.map string |> String.concat ", "); string axis; string squeezeAxis; string sections|]
+                                                 [|(indices |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string axis; string squeezeAxis; string sections|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Splits an array along a particular axis into multiple sub-arrays.
     /// 
@@ -36620,7 +36620,7 @@ type Operators() =
                           [<Optional; DefaultParameterValue(0)>] sections : int) =
         let creator = AtomicSymbolCreator.FromName "_split_v2"
         let names = [|"indices"; "axis"; "squeeze_axis"; "sections"|]
-        let vals = [|(indices |> Seq.map string |> String.concat ", "); string axis; string squeezeAxis; string sections|]
+        let vals = [|(indices |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string axis; string squeezeAxis; string sections|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -36710,7 +36710,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_split_v2"
         new SymbolFromOperator(creator,
                                [|"indices"; "axis"; "squeeze_axis"; "sections"|],
-                               [|(indices |> Seq.map string |> String.concat ", "); string axis; string squeezeAxis; string sections|],
+                               [|(indices |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string axis; string squeezeAxis; string sections|],
                                [|"data"|],
                                [|data|])
 
@@ -37159,7 +37159,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
-                                                 [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|]
+                                                 [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Converts a batch of index arrays into an array of flat indices. The operator follows numpy conventions so a single multi index is given by a column of the input matrix. The leading dimension may be left unspecified by using -1 as placeholder.  
     /// 
@@ -37178,7 +37178,7 @@ type Operators() =
     static member RavelMultiIndex(outputArray : NDArray seq, data : NDArray, [<Optional>] shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "_ravel_multi_index"
         let names = [|"shape"|]
-        let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|]
+        let vals = [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -37203,7 +37203,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_ravel_multi_index"
         new SymbolFromOperator(creator,
                                [|"shape"|],
-                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|],
+                               [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|],
                                [|"data"|],
                                [|data|])
 
@@ -37225,7 +37225,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
-                                                 [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|]
+                                                 [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Converts an array of flat indices into a batch of index arrays. The operator follows numpy conventions so a single multi index is given by a column of the output matrix. The leading dimension may be left unspecified by using -1 as placeholder.  
     /// 
@@ -37244,7 +37244,7 @@ type Operators() =
     static member UnravelIndex(outputArray : NDArray seq, data : NDArray, [<Optional>] shape : int seq) =
         let creator = AtomicSymbolCreator.FromName "_unravel_index"
         let names = [|"shape"|]
-        let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|]
+        let vals = [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -37269,7 +37269,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_unravel_index"
         new SymbolFromOperator(creator,
                                [|"shape"|],
-                               [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", "))|],
+                               [|(if isNull (shape :> obj) then null else (shape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|],
                                [|"data"|],
                                [|data|])
 
@@ -37436,7 +37436,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
-                                                 [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+                                                 [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Computes the square sum of array elements over a given axis
     /// for row-sparse matrix. This is a temporary solution for fusing ops square and
@@ -37474,7 +37474,7 @@ type Operators() =
     static member SquareSum(outputArray : NDArray seq, data : NDArray, [<Optional>] axis : int seq, [<Optional; DefaultParameterValue(false)>] keepdims : bool, [<Optional; DefaultParameterValue(false)>] exclude : bool) =
         let creator = AtomicSymbolCreator.FromName "_square_sum"
         let names = [|"axis"; "keepdims"; "exclude"|]
-        let vals = [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|]
+        let vals = [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -37518,7 +37518,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_square_sum"
         new SymbolFromOperator(creator,
                                [|"axis"; "keepdims"; "exclude"|],
-                               [|(axis |> Seq.map string |> String.concat ", "); string keepdims; string exclude|],
+                               [|(axis |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string keepdims; string exclude|],
                                [|"data"|],
                                [|data|])
 
@@ -38093,7 +38093,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; offset.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "layout"|]
-                                                 [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|]
+                                                 [|(kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Compute 2-D deformable convolution on 4-D input.
     /// 
@@ -38173,7 +38173,7 @@ type Operators() =
                                                [<Optional>] layout : ContribDeformableConvolutionLayout) =
         let creator = AtomicSymbolCreator.FromName "_contrib_DeformableConvolution"
         let names = [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "layout"|]
-        let vals = [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|]
+        let vals = [|(kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; offset.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
@@ -38258,7 +38258,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "_contrib_DeformableConvolution"
         new SymbolFromOperator(creator,
                                [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "layout"|],
-                               [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|],
+                               [|(kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|],
                                [|"data"; "offset"; "weight"; "bias"|],
                                [|data; offset; weight; bias|])
 
@@ -38811,7 +38811,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-                                                 [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+                                                 [|(kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>This operator is DEPRECATED. Apply convolution to input then add a bias.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -38855,7 +38855,7 @@ type Operators() =
                                 [<Optional>] layout : ConvolutionV1Layout) =
         let creator = AtomicSymbolCreator.FromName "Convolution_v1"
         let names = [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
-        let vals = [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
+        let vals = [|(kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
@@ -38904,7 +38904,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "Convolution_v1"
         new SymbolFromOperator(creator,
                                [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|],
-                               [|(kernel |> Seq.map string |> String.concat ", "); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", ")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
+                               [|(kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|],
                                [|"data"; "weight"; "bias"|],
                                [|data; weight; bias|])
 
@@ -39284,7 +39284,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"transform_type"; "target_shape"|]
-                                                 [|string transformType; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", "))|]
+                                                 [|string transformType; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Generates 2D sampling grid for bilinear sampling.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -39294,7 +39294,7 @@ type Operators() =
     static member GridGenerator(outputArray : NDArray seq, data : NDArray, transformType : GridGeneratorTransformType, [<Optional>] targetShape : int seq) =
         let creator = AtomicSymbolCreator.FromName "GridGenerator"
         let names = [|"transform_type"; "target_shape"|]
-        let vals = [|string transformType; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", "))|]
+        let vals = [|string transformType; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -39310,7 +39310,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "GridGenerator"
         new SymbolFromOperator(creator,
                                [|"transform_type"; "target_shape"|],
-                               [|string transformType; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", "))|],
+                               [|string transformType; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|],
                                [|"data"|],
                                [|data|])
 
@@ -40062,7 +40062,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; rois.NDArrayHandle.UnsafeHandle|]
                                                  [|"pooled_size"; "spatial_scale"|]
-                                                 [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale|]
+                                                 [|(pooledSize |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string spatialScale|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Performs region of interest(ROI) pooling on the input array.
     /// 
@@ -40118,7 +40118,7 @@ type Operators() =
     static member ROIPooling(outputArray : NDArray seq, data : NDArray, rois : NDArray, pooledSize : int seq, spatialScale : float) =
         let creator = AtomicSymbolCreator.FromName "ROIPooling"
         let names = [|"pooled_size"; "spatial_scale"|]
-        let vals = [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale|]
+        let vals = [|(pooledSize |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string spatialScale|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; rois.NDArrayHandle.UnsafeHandle|]
@@ -40180,7 +40180,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "ROIPooling"
         new SymbolFromOperator(creator,
                                [|"pooled_size"; "spatial_scale"|],
-                               [|(pooledSize |> Seq.map string |> String.concat ", "); string spatialScale|],
+                               [|(pooledSize |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string spatialScale|],
                                [|"data"; "rois"|],
                                [|data; rois|])
 
@@ -41016,7 +41016,7 @@ type Operators() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; loc.NDArrayHandle.UnsafeHandle|]
                                                  [|"transform_type"; "sampler_type"; "cudnn_off"; "target_shape"|]
-                                                 [|"affine"; "bilinear"; (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match targetShape with None -> "[0,0]" | Some targetShape -> (targetShape |> Seq.map string |> String.concat ", "))|]
+                                                 [|"affine"; "bilinear"; (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match targetShape with None -> "[0,0]" | Some targetShape -> (targetShape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Applies a spatial transformer to input feature map.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -41029,7 +41029,7 @@ type Operators() =
     static member SpatialTransformer(outputArray : NDArray seq, data : NDArray, loc : NDArray, [<Optional>] ?cudnnOff : bool, [<Optional>] ?targetShape : int seq) =
         let creator = AtomicSymbolCreator.FromName "SpatialTransformer"
         let names = [|"transform_type"; "sampler_type"; "cudnn_off"; "target_shape"|]
-        let vals = [|"affine"; "bilinear"; (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match targetShape with None -> "[0,0]" | Some targetShape -> (targetShape |> Seq.map string |> String.concat ", "))|]
+        let vals = [|"affine"; "bilinear"; (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match targetShape with None -> "[0,0]" | Some targetShape -> (targetShape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; loc.NDArrayHandle.UnsafeHandle|]
@@ -41048,7 +41048,7 @@ type Operators() =
         let creator = AtomicSymbolCreator.FromName "SpatialTransformer"
         new SymbolFromOperator(creator,
                                [|"transform_type"; "sampler_type"; "cudnn_off"; "target_shape"|],
-                               [|"affine"; "bilinear"; (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match targetShape with None -> "[0,0]" | Some targetShape -> (targetShape |> Seq.map string |> String.concat ", "))|],
+                               [|"affine"; "bilinear"; (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff); (match targetShape with None -> "[0,0]" | Some targetShape -> (targetShape |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|],
                                [|"data"; "loc"|],
                                [|data; loc|])
 
@@ -41627,7 +41627,7 @@ type Operators() =
 //         new SymbolFromOperator(creator,
 //                                [|"lrs"; "wds"; "rescale_grad"; "clip_gradient"; "num_weights"|],
 //                                [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|],
-//                                Array.empty,
+//                                [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
 //                                (data |> Array.map (fun x -> x)))
 
 //     /// <summary>Momentum update function for Stochastic Gradient Descent (SGD) optimizer.
@@ -41757,7 +41757,7 @@ type Operators() =
 //         new SymbolFromOperator(creator,
 //                                [|"lrs"; "wds"; "momentum"; "rescale_grad"; "clip_gradient"; "num_weights"|],
 //                                [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|],
-//                                Array.empty,
+//                                [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
 //                                (data |> Array.map (fun x -> x)))
 
 //     /// <summary>Update function for multi-precision Stochastic Gradient Descent (SDG) optimizer.
@@ -41845,7 +41845,7 @@ type Operators() =
 //         new SymbolFromOperator(creator,
 //                                [|"lrs"; "wds"; "rescale_grad"; "clip_gradient"; "num_weights"|],
 //                                [|string lrs; string wds; string rescaleGrad; string clipGradient; string numWeights|],
-//                                Array.empty,
+//                                [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
 //                                (data |> Array.map (fun x -> x)))
 
 //     /// <summary>Momentum update function for multi-precision Stochastic Gradient Descent (SGD) optimizer.
@@ -41975,7 +41975,7 @@ type Operators() =
 //         new SymbolFromOperator(creator,
 //                                [|"lrs"; "wds"; "momentum"; "rescale_grad"; "clip_gradient"; "num_weights"|],
 //                                [|string lrs; string wds; string momentum; string rescaleGrad; string clipGradient; string numWeights|],
-//                                Array.empty,
+//                                [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
 //                                (data |> Array.map (fun x -> x)))
 
 // type IntOrFloatDType = 
@@ -42612,7 +42612,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  Array.empty
 //                                                  [|"data"; "num_args"; "offset"; "h_w"; "center_crop"|]
-//                                                  [|string data; string numArgs; (if isNull (offset :> obj) then "[0,0]" else (offset |> Seq.map string |> String.concat ", ")); (if isNull (hW :> obj) then "[0,0]" else (hW |> Seq.map string |> String.concat ", ")); string centerCrop|]
+//                                                  [|string data; string numArgs; (if isNull (offset :> obj) then "[0,0]" else (offset |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (hW :> obj) then "[0,0]" else (hW |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string centerCrop|]
 //         outputs |> Array.map (fun h -> new NDArray(h))
 //     /// <summary>
 //     /// 
@@ -42638,7 +42638,7 @@ type Operators() =
 //                        [<Optional; DefaultParameterValue(false)>] centerCrop : bool) =
 //         let creator = AtomicSymbolCreator.FromName "Crop"
 //         let names = [|"data"; "num_args"; "offset"; "h_w"; "center_crop"|]
-//         let vals = [|string data; string numArgs; (if isNull (offset :> obj) then "[0,0]" else (offset |> Seq.map string |> String.concat ", ")); (if isNull (hW :> obj) then "[0,0]" else (hW |> Seq.map string |> String.concat ", ")); string centerCrop|]
+//         let vals = [|string data; string numArgs; (if isNull (offset :> obj) then "[0,0]" else (offset |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (hW :> obj) then "[0,0]" else (hW |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string centerCrop|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
 //                                                      Array.empty
@@ -42669,7 +42669,7 @@ type Operators() =
 //         let creator = AtomicSymbolCreator.FromName "Crop"
 //         new SymbolFromOperator(creator,
 //                                [|"data"; "num_args"; "offset"; "h_w"; "center_crop"|],
-//                                [|string data; string numArgs; (if isNull (offset :> obj) then "[0,0]" else (offset |> Seq.map string |> String.concat ", ")); (if isNull (hW :> obj) then "[0,0]" else (hW |> Seq.map string |> String.concat ", ")); string centerCrop|],
+//                                [|string data; string numArgs; (if isNull (offset :> obj) then "[0,0]" else (offset |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (hW :> obj) then "[0,0]" else (hW |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string centerCrop|],
 //                                Array.empty,
 //                                Array.empty)
 
@@ -42709,7 +42709,7 @@ type Operators() =
 //         new SymbolFromOperator(creator,
 //                                [|"info"; "need_top_grad"|],
 //                                [|string info; string needTopGrad|],
-//                                Array.empty,
+//                                [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
 //                                (data |> Array.map (fun x -> x)))
 
 //     /// <summary>Stub for implementing an operator implemented in native frontend language with ndarray.</summary>
@@ -42745,7 +42745,7 @@ type Operators() =
 //         new SymbolFromOperator(creator,
 //                                [|"info"|],
 //                                [|string info|],
-//                                Array.empty,
+//                                [|yield! data |> Array.mapi (fun i _ -> sprintf "arg%d" i)|],
 //                                (data |> Array.map (fun x -> x)))
 
 // type PoolType = 
@@ -42824,7 +42824,7 @@ type Operators() =
 //         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
 //                                                  [|data.NDArrayHandle.UnsafeHandle|]
 //                                                  [|"kernel"; "pool_type"; "global_pool"; "pooling_convention"; "stride"; "pad"|]
-//                                                  [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", "))|]
+//                                                  [|(if isNull (kernel :> obj) then "[]" else (kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
 //         outputs |> Array.map (fun h -> new NDArray(h))
 //     /// <summary>This operator is DEPRECATED.
 //     /// Perform pooling on the input.
@@ -42884,7 +42884,7 @@ type Operators() =
 //                             [<Optional>] pad : int seq) =
 //         let creator = AtomicSymbolCreator.FromName "Pooling_v1"
 //         let names = [|"kernel"; "pool_type"; "global_pool"; "pooling_convention"; "stride"; "pad"|]
-//         let vals = [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", "))|]
+//         let vals = [|(if isNull (kernel :> obj) then "[]" else (kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
 //         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
 //         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
 //                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -42949,6 +42949,6 @@ type Operators() =
 //         let creator = AtomicSymbolCreator.FromName "Pooling_v1"
 //         new SymbolFromOperator(creator,
 //                                [|"kernel"; "pool_type"; "global_pool"; "pooling_convention"; "stride"; "pad"|],
-//                                [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", ")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", ")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", "))|],
+//                                [|(if isNull (kernel :> obj) then "[]" else (kernel |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|],
 //                                [|"data"|],
 //                                [|data|])
