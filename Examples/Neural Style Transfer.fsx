@@ -1,4 +1,6 @@
 ﻿open System.Drawing
+open System.Drawing.Drawing2D
+open System.Drawing.Imaging
 
 (*
 # Neural Style Transfer
@@ -55,7 +57,8 @@ let loadImage (image : Image) =
     let resized = Operators.ImageResize(im,224,224).[0]
     let s1 = Operators.SwapAxis(resized,0,2).[0]
     let s3 = Operators.SwapAxis(s1,1,2).[0]
-    s3
+    Operators.Reshape(s3, shape = [1;3;224;224]).[0]
+
 
 let vggParams = NDArray.Load vggParamsFile    
 
@@ -157,14 +160,14 @@ let loss (gram: SymbolGroup<'a>) content =
 
 
 let tvWeight = Some 1e-2    
-let stopThreshold = 0.005
+let stopThreshold = 0.0005
 let maxSize = 600
 let contentWeight = 10.0
 let styleWeight = 1.0
 let learningRate = 0.001
 
 let lrScheduleDelay = 50
-let trScheduleFactor = 0.6
+let lrScheduleFactor = 0.6
 let saveEpochs = 50
 let maxNumEpochs = 1000
 
@@ -231,7 +234,7 @@ let gradArray =
                     a.CopyTo(executor.Args.[sprintf "target_gram_%d" i])
                     //TODO: handle ctx parameters in op gen
                     let w = Operators.OnesNDArray(shape = [1], ctx = "cpu(1)")
-                    Operators.MulScalar(w, w.[0], styleWeight)
+                    Operators.MulScalar(w, w.[0], styleWeight / double gradScale.[i])
                     w.[0]
                 )
         let w = 
@@ -247,7 +250,7 @@ contentArray.CopyTo(executor.Args.["target_content"])
 let makeTvGradExecutor (img : NDArray) tvWeight = 
     match tvWeight with 
     | Some w ->
-        let nchannel = img.Shape.[0]
+        let nchannel = img.Shape.[1]
         let simg = new Variable("img")
         let skernel = new Variable("kernel")
         let channels = Operators.SliceChannel(simg, numOutputs = nchannel)
@@ -257,11 +260,11 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
                 (fun c ->
                     upcast Operators.Convolution(c, skernel, Symbol.Empty, numFilter = 1, kernel = [3;3], pad = [1;1], noBias = true, stride = [1;1])
                 )
-        let out = Operators.Concat(data = convs)
+        let out = Operators.Concat(data = convs, numArgs = convs.Length)
         let kernel = [ 0; -1;  0;
                       -1;  4; -1;
                        0; -1;  0]
-                     |> List.map (fun x -> float x / 8.0)
+                     |> List.map (fun x -> float32 x / 8.f)
                      |> (fun x -> new NDArray(x, [1;1;3;3], context))
         let out = Operators.MulScalar(out :> BaseSymbol, w)
         let inArgs,argGrad,grapReqType = 
@@ -272,7 +275,10 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
                  | "kernel" -> kernel, NDArray(), OpReqType.NullOp
                  | v -> failwithf "Unhandled arg %s" v)
             |> Array.unzip3
-        Executor(out, context, inArgs, argGrad, grapReqType, Array.empty)
+        {|
+            Executor = Executor(out, context, inArgs, argGrad, grapReqType, Array.empty)
+            KeepAlive = ([box simg; skernel; channels; convs; out; kernel] : obj list)
+        |}
         |> Some
     | None -> None
 
@@ -280,82 +286,117 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
 
 
 let img = Operators.RandomUniformNDArray(-0.1, 0.1, contentIn.Shape, ctx = "cpu(1)").[0]
-let oldImg = img.CopyTo(context)
+let mutable oldImg = img.CopyTo(context)
 let clipNorm = 1.f * (img.Shape |> Array.reduce (*) |> float32)
 let tvGradExe = makeTvGradExecutor img tvWeight
 
 
 let momentum = Operators.ZerosLike(img).[0]
-let opt w g = Operators.NagMomUpdate(w,g,momentum, learningRate, momentum = 0.95, wd = 0.0001 )
+let mutable lr = learningRate
+let opt w g = Operators.NagMomUpdate([w],w,g,momentum, lr, momentum = 0.95, wd = 0.0001 )
 
-//for i = 1 to  maxNumEpochs do 
-img.CopyTo(executor.Args.["data"])
-let outs = executor.Executor.Forward(true)
-executor.Executor.Backward(gradArray)
-let gnorm : float32 = Operators.Norm(executor.ArgGrad.["data"]).[0].ToArray().[0]
-if gnorm > clipNorm then 
-    Operators.MulScalar([executor.ArgGrad.["data"]], executor.ArgGrad.["data"], double(clipNorm / gnorm))
+// https://stackoverflow.com/questions/1922040/how-to-resize-an-image-c-sharp
+let resizeImage (image : Image) w h = 
+    let w,h = 
+        let longEdge = max w h
+        if longEdge > maxSize then 
+            let r = double maxSize / double longEdge
+            let scale x = double x * r |> round |> int
+            scale w, scale h
+        else
+            w,h
+    let destRect = Rectangle(0,0,w,h)
+    let destImage = new Bitmap(w,h)
+    destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution)
+    use g = Graphics.FromImage destImage
+    g.CompositingMode <- CompositingMode.SourceCopy
+    g.CompositingQuality <- CompositingQuality.HighQuality
+    g.InterpolationMode  <- InterpolationMode.HighQualityBicubic
+    g.SmoothingMode <- SmoothingMode.HighQuality
+    g.PixelOffsetMode <- PixelOffsetMode.HighQuality
+    use wrapMode = new ImageAttributes()
+    wrapMode.SetWrapMode(WrapMode.TileFlipXY)
+    g.DrawImage(image,destRect,0,0,image.Width,image.Height,GraphicsUnit.Pixel,wrapMode)
+    destImage
 
-match tvGradExe with 
-| Some e -> 
-    let outs = e.Forward(true)
-    //opti
-    let g = Operators.ElemwiseAdd(executor.ArgGrad.["data"], outs.[0]).[0]
-    opt img g
-| None -> 
-    opt img executor.ArgGrad.["data"]
+let save (filename : string) (img : NDArray) = 
+    printfn "Saving %s" filename
+    let img = Operators.Reshape(img, shape = [3; 224; 224]).[0]
+    let img = Operators.SwapAxis(img,1,2).[0]
+    let img = Operators.SwapAxis(img,0,2).[0]
+    let h = 224
+    let w = 224
+    //let img = Operators.ImageResize(img, contentImage.Height, contentImage.Width).[0]
+    let a : float32 [] = img.ToArray()
+    use bmp = new Bitmap(w,h,PixelFormat.Format32bppRgb)
+    let mutable i = 0
+    for y = 0 to h - 1 do
+        for x = 0 to w - 1 do
+            let r = a.[i] + 123.68f |> min 255.f |> max 0.f |> int
+            i <- i + 1
+            let g = a.[i] + 116.779f |> min 255.f |> max 0.f |> int
+            i <- i + 1
+            let b = a.[i] + 103.939f |> min 255.f |> max 0.f |> int
+            i <- i + 1
+            let c = Color.FromArgb(1,r,g,b)
+            bmp.SetPixel(x,y,c)
+    let resizedImage = resizeImage bmp contentImage.Width contentImage.Height
+    resizedImage.Save(filename, Imaging.ImageFormat.Jpeg)
 
-let diff = Operators.ElemwiseSub(oldImg, img).[0]
-let eps : float32 = Operators.ElemwiseDiv(Operators.Norm(diff).[0], Operators.Norm(img).[0]).[0].ToArray().[0]
+save "nstyle_start.jpg" img
+save "nstyle_content.jpg" contentIn
 
-Operators.Norm()
+let rec trainLoop epoch =
+    if epoch >= maxNumEpochs then 
+        printf "Max epoch hit"
+        save "nstyle_maxepoch_final.jpg" img
+    else
+        //for i = 1 to  maxNumEpochs do 
+        img.CopyTo(executor.Args.["data"])
+        let outs = executor.Executor.Forward(true)
+        executor.Executor.Backward(gradArray)
+        let gnorm : float32 = Operators.Norm(executor.ArgGrad.["data"]).[0].ToArray().[0]
+        if gnorm > clipNorm then 
+            Operators.MulScalar([executor.ArgGrad.["data"]], executor.ArgGrad.["data"], double(clipNorm / gnorm))
 
-NNVM.getOpHandle "concatenate"
-|> NNVM.getOpInfo
-let s = AtomicSymbolCreator.FromName "Concat"
+        let optResult = 
+            match tvGradExe with 
+            | Some e -> 
+                let outs = e.Executor.Forward(true)
+                //opti
+                let g = Operators.ElemwiseAdd(executor.ArgGrad.["data"], outs.[0]).[0]
+                opt img g
+            | None -> 
+                opt img executor.ArgGrad.["data"]
 
-let sym = MXSymbol.createAtomicSymbol s.AtomicSymbolCreatorHandle [|"num_args"|] [|"2"|]
+        //let newImg = optResult.[0]
+        let diff = Operators.ElemwiseSub(oldImg, img).[0]
+        let eps : float32 = Operators.ElemwiseDiv(Operators.Norm(diff).[0], Operators.Norm(img).[0]).[0].ToArray().[0]
+        oldImg <- img.CopyTo(context)
+        printfn "%5d : %f" epoch eps
+        if (epoch + 1) % lrScheduleDelay = 0 then 
+            let olr = lr
+            lr <- lr * lrScheduleFactor
+            printfn "Learning rate %f -> %f" olr lr
+        if double eps < stopThreshold then 
+            save "nstyle_eps_final.jpg" img
+        elif (epoch + 1) % saveEpochs = 0 then 
+            let filename = sprintf "nstyle_e_%d.jpg" (epoch + 1)
+            save filename img
+            trainLoop (epoch + 1)
+        else
+            trainLoop (epoch + 1)
+            
 
-let s1 = Variable("s1")
-let s2 = Variable("s2")
-
-MXSymbol.compose sym "concat" null [|s1.UnsafeHandle;s2.UnsafeHandle|]
-MXSymbol.compose sym "concat" [|"concat_arg0"; "concat_arg1"|] [|s1.UnsafeHandle;s2.UnsafeHandle|]
-MXSymbol.compose sym "concat" null null
-
-MXSymbol.getInputSymbols sym 
-MXSymbol.saveToJSON sym
-
-MXSymbol.listArguments sym
-
-MXSymbol.listArguments sym
-MXSymbol.saveToJSON sym
-
-CApi.MXSymbolCompose(sym, "concat", 2u, [|"[0]oncat_arg0"; "[0]arg1"|], [|s1.UnsafeHandle;s2.UnsafeHandle|]) |> throwOnError "MXSymbolCompose"
-
-
-/// <summary>Compose the symbol on other symbols.
-///
-/// This function will change the sym hanlde.
-/// To achieve function apply behavior, copy the symbol first
-/// before apply.</summary>
-/// <param name="sym">the symbol to apply</param>
-/// <param name="name">the name of symbol</param>
-/// <param name="num_args">number of arguments</param>
-/// <param name="keys">the key of keyword args (optional)</param>
-/// <param name="args">arguments to sym</param>
-/// <returns>0 when success, -1 when failure happens</returns>
-[<System.Runtime.InteropServices.DllImport("libmxnet", CallingConvention = System.Runtime.InteropServices.CallingConvention.Cdecl, CharSet = System.Runtime.InteropServices.CharSet.Ansi)>]
-extern int MXSymbolCompose(IntPtr sym, string name, uint32 num_args, IntPtr[] keys, IntPtr[] args)
-
-let keys = [|s.Info.KeyVarNumArgs; s.Info.KeyVarNumArgs|]
-MXSymbolCompose(sym, "concat", ulength keys, keys, args) |> throwOnError "MXSymbolCompose"
-
-
-
+trainLoop 0
 
 
-    
+//TODO: don't just save to default directory
+//TODO: show images
+
+
+
+
 
 
 
