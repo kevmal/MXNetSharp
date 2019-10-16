@@ -14,13 +14,16 @@ open System
 open System.Net
 open System.IO
 
+MXNetSharp.Interop.MXLib.getGpuCount()
+
 
 
 let context = 
     {
-        DeviceType = DeviceType.CPU
-        DeviceId = 1
+        DeviceType = DeviceType.GPU
+        DeviceId = 0
     }
+let ctxStr = "gpu(0)"
 
 let vggParamsUrl = "https://github.com/dmlc/web-data/raw/master/mxnet/neural-style/model/vgg19.params"
 let vggParamsFile = "vgg19.params"
@@ -114,7 +117,7 @@ let makeExecutor style content (inputSize : int seq) =
         |> Array.mapi 
             (fun i n -> 
                 let s = inferResult.InputShapes.[i] |> Array.map int
-                let a = Operators.ZerosNDArray(shape = s, ctx = "cpu(1)") |> Array.head
+                let a = Operators.ZerosNDArray(shape = s, ctx = ctxStr) |> Array.head
                 if n = "data" then 
                     n, a
                 else
@@ -233,12 +236,12 @@ let gradArray =
                 (fun i a ->
                     a.CopyTo(executor.Args.[sprintf "target_gram_%d" i])
                     //TODO: handle ctx parameters in op gen
-                    let w = Operators.OnesNDArray(shape = [1], ctx = "cpu(1)")
+                    let w = Operators.OnesNDArray(shape = [1], ctx = ctxStr)
                     Operators.MulScalar(w, w.[0], styleWeight / double gradScale.[i])
                     w.[0]
                 )
         let w = 
-            let w = Operators.OnesNDArray(shape = [1], ctx = "cpu(1)")
+            let w = Operators.OnesNDArray(shape = [1], ctx = ctxStr)
             Operators.MulScalar(w, w.[0], contentWeight) |> ignore
             w.[0]
         w
@@ -285,7 +288,7 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
 // Train
 
 
-let img = Operators.RandomUniformNDArray(-0.1, 0.1, contentIn.Shape, ctx = "cpu(1)").[0]
+let img = Operators.RandomUniformNDArray(-0.1, 0.1, contentIn.Shape, ctx = ctxStr).[0]
 let mutable oldImg = img.CopyTo(context)
 let clipNorm = 1.f * (img.Shape |> Array.reduce (*) |> float32)
 let tvGradExe = makeTvGradExecutor img tvWeight
