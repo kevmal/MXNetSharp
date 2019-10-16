@@ -14,16 +14,13 @@ open System
 open System.Net
 open System.IO
 
-MXNetSharp.Interop.MXLib.getGpuCount()
-
-
 
 let context = 
     {
-        DeviceType = DeviceType.GPU
+        DeviceType = DeviceType.CPU
         DeviceId = 0
     }
-let ctxStr = "gpu(0)"
+let ctxStr = "cpu(0)"
 
 let vggParamsUrl = "https://github.com/dmlc/web-data/raw/master/mxnet/neural-style/model/vgg19.params"
 let vggParamsFile = "vgg19.params"
@@ -280,7 +277,8 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
             |> Array.unzip3
         {|
             Executor = Executor(out, context, inArgs, argGrad, grapReqType, Array.empty)
-            KeepAlive = ([box simg; skernel; channels; convs; out; kernel] : obj list)
+            //KeepAlive = ([box simg; skernel; channels; convs; out; kernel] : obj list)
+            KeepAlive = ([channels] : obj list) //TODO: we should not need to ref this
         |}
         |> Some
     | None -> None

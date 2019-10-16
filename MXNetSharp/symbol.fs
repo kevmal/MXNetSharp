@@ -63,7 +63,8 @@ type Symbol() =
         let n = MXSymbol.getNumOutputs x.UnsafeHandle |> int
         Array.init n 
             (fun i ->
-                MXSymbol.getOutput x.UnsafeHandle i |> make
+                let h = MXSymbol.getOutput x.UnsafeHandle i
+                new SymbolOutput(x,new SafeSymbolHandle(h, true))
             )
     abstract member Initialize : unit -> unit
     static member Empty = EmptySymbol.Instance
@@ -80,6 +81,14 @@ type Symbol() =
     member x.ArgumentNames = MXSymbol.listArguments x.UnsafeHandle
     interface IDisposable with  
         member x.Dispose() = x.Dispose()
+
+type SymbolOutput internal (parent) = 
+    inherit Symbol()
+    new(parent, handle) as this = 
+        new SymbolOutput(parent) then 
+            this.InternalHandle <- Some handle
+    override x.Initialize() = ()
+    
 
 type Variable() =
     inherit Symbol()
