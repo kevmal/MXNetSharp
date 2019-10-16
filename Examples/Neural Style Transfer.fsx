@@ -386,6 +386,7 @@ let rec trainLoop epoch =
         elif (epoch + 1) % saveEpochs = 0 then 
             let filename = sprintf "nstyle_e_%d.jpg" (epoch + 1)
             save filename img
+            GC.Collect()
             trainLoop (epoch + 1)
         else
             trainLoop (epoch + 1)
