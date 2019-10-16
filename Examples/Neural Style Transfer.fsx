@@ -15,12 +15,8 @@ open System.Net
 open System.IO
 
 
-let context = 
-    {
-        DeviceType = DeviceType.CPU
-        DeviceId = 0
-    }
-let ctxStr = "cpu(0)"
+let context = CPU(0)
+let ctxStr = context.ToString()
 
 let vggParamsUrl = "https://github.com/dmlc/web-data/raw/master/mxnet/neural-style/model/vgg19.params"
 let vggParamsFile = "vgg19.params"
