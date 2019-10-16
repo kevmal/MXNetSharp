@@ -1707,9 +1707,9 @@ module NNSymbol =
     /// <param name="vals">the vals of the params</param>
     /// <param name="out">pointer to the created symbol handle</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let createAtomicSymbol op num_param keys vals = 
+    let createAtomicSymbol op keys vals = 
         let mutable out = un
-        NNSymbolCreateAtomicSymbol(op, num_param, keys, vals, &out) |> throwOnError "NNSymbolCreateAtomicSymbol"
+        NNSymbolCreateAtomicSymbol(op, ulength keys, keys, vals, &out) |> throwOnError "NNSymbolCreateAtomicSymbol"
         out
 
     /// <summary>Create a Variable Symbol.</summary>
@@ -1892,8 +1892,8 @@ module NNSymbol =
     /// <param name="keys">the key of keyword args (optional)</param>
     /// <param name="args">arguments to sym</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let compose sym name num_args keys args = 
-        NNSymbolCompose(sym, name, num_args, keys, args) |> throwOnError "NNSymbolCompose"
+    let compose sym name keys args = 
+        NNSymbolCompose(sym, name, ulength args, keys, args) |> throwOnError "NNSymbolCompose"
 
 module NNGraph = 
     /// <summary>create a graph handle from symbol</summary>
