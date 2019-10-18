@@ -41,7 +41,7 @@ type AtomicSymbolInfo =
         Description : string
         Arguments : ArgumentInfo []
         ReturnTypeInfo : string
-        KeyVarNumArgs : KeyVarNumArgs
+        KeyVarNumArgs : string
     }
 
 type DataIterInfo = 
@@ -236,7 +236,7 @@ module MXSymbol =
                         }
                 |]
             ReturnTypeInfo = str return_type
-            KeyVarNumArgs = readIntPtr 0 key_var_num_args
+            KeyVarNumArgs = str key_var_num_args
         }
 
 
@@ -1670,7 +1670,7 @@ module NNVM =
                         }
                 |]
             ReturnTypeInfo = str return_type
-            KeyVarNumArgs = 0n
+            KeyVarNumArgs = ""
         }
 
 module NNSymbol = 
