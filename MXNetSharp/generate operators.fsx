@@ -266,6 +266,8 @@ Mappings.Modify
                 | "boolean" -> "bool"
                 | "real_t" -> "double"
                 | "long" -> "int64"
+                | "tuple of <float>" -> "double seq"
+                | "tuple of <long>" -> "int64 seq"
                 | str -> str}
     )
 
@@ -289,6 +291,8 @@ Mappings.Modify
                 | "float" -> str.Trim ''' |> double |> dblString |> UseAttr |> Some
                 | "boolean" -> str |> toBoolVal |> UseAttr |> Some
                 | "string" -> str.Trim ''' |> quote |> UseAttr |> Some
+                | "tuple of <float>"
+                | "tuple of <long>"
                 | "Shape(tuple)" -> 
                     if str = "None" then 
                         ReplaceNull "null" |> Some
@@ -344,6 +348,9 @@ let mapAtomicSymbolInfoBase (x : AtomicSymbolInfo) =
             | [|SymbolOrNDArray; ManySymbolOrNDArray|]
             | [|ManySymbolOrNDArray; SymbolOrNDArray|]
             | [|ManySymbolOrNDArray|] -> SymbolOrNDArray
+            // In the case of _while_loop, _foreach and _cond we may have specific Symbol args
+            | [|Symbol;ManySymbolOrNDArray|] 
+            | [|ManySymbolOrNDArray; Symbol|] -> SymbolOrNDArray
             | [||] -> Neither
             | x -> failwithf "Unexpected SymbolOrNDArray %A" x
     } 
@@ -1286,23 +1293,10 @@ let skipped =
         //"multi_all_finite"
         //"_contrib_dgl_csr_neighbor_uniform_sample"
         /////////////////////////////////////////////////
-        "_arange"
-        "_linspace"
+        //"_arange"
+        //"_linspace"
         "Pooling_v1" //DEPRECATED
         "Crop" //DEPRECATED
-        "_foreach" // Need to figure out types of args
-        "_cond" // Need to figure out types of args
-        "_while_loop" // Need to figure out types of args
-        "_image_adjust_lighting" // Need to figure out types of args
-        "multi_sgd_update" // Need to figure out types of args
-        "multi_sgd_mom_update" // Need to figure out types of args
-        "multi_mp_sgd_update" // Need to figure out types of args
-        "multi_mp_sgd_mom_update" // Need to figure out types of args
-        "_contrib_MultiProposal" // Need to figure out types of args
-        "_contrib_MultiBoxDetection" // Need to figure out types of args
-        "_contrib_MultiBoxPrior" // Need to figure out types of args
-        "_contrib_Proposal" // Need to figure out types of args
-        "_contrib_MultiBoxTarget" // Need to figure out types of args
         "_NDArray" // ptr type
         "_Native" // ptr type
     ] |> Set.ofSeq
