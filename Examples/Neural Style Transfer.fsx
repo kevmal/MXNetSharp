@@ -254,7 +254,7 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
                 (fun c ->
                     upcast Operators.Convolution(c, skernel, Symbol.Empty, numFilter = 1, kernel = [3;3], pad = [1;1], noBias = true, stride = [1;1])
                 )
-        let out = Operators.Concat(data = convs, numArgs = convs.Length)
+        let out = Operators.Concat(data = convs)
         let kernel = [ 0; -1;  0;
                       -1;  4; -1;
                        0; -1;  0]
