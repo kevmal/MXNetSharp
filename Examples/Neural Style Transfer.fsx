@@ -137,7 +137,7 @@ let makeExecutor style content (inputSize : int seq) =
         Out = out
         ArgGrad = Array.zip out.ArgumentNames argGrad |> dict
         Args = args
-        Executor = Executor(out, context, inArgs, argGrad, gradReqType, Array.empty)
+        Executor = new Executor(out, context, inArgs, argGrad, gradReqType, Array.empty)
     |}
 
 let loss (gram: SymbolGroup<'a>) content = 
@@ -265,12 +265,12 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
             out.ArgumentNames
             |> Array.map 
                 (function 
-                 | "img" -> img, NDArray(), OpReqType.NullOp
-                 | "kernel" -> kernel, NDArray(), OpReqType.NullOp
+                 | "img" -> img, new NDArray(), OpReqType.NullOp
+                 | "kernel" -> kernel, new NDArray(), OpReqType.NullOp
                  | v -> failwithf "Unhandled arg %s" v)
             |> Array.unzip3
         {|
-            Executor = Executor(out, context, inArgs, argGrad, grapReqType, Array.empty)
+            Executor = new Executor(out, context, inArgs, argGrad, grapReqType, Array.empty)
             //KeepAlive = ([box simg; skernel; channels; convs; out; kernel] : obj list)
             KeepAlive = ([channels] : obj list) //TODO: we should not need to ref this
         |}

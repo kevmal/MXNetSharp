@@ -156,6 +156,6 @@ type ValueStringExtensions = ValueStringExtensions with
 
 
 module Util = 
-    let inline internal valueStringHelper (d : ^a) (x : ^b) = 
+    let inline internal valueStringHelper (_ : ^a) (x : ^b) = 
         ((^a or ^b) : (static member ValueString : ^b -> string) (x))
     let inline valueString (x : ^t) = valueStringHelper ValueStringExtensions x
