@@ -51,9 +51,7 @@ let loadImage (image : Image) =
         |]
     let im = new NDArray(dat |> Array.map float32, [image.Height; image.Width; 3], context)
     let resized = Operators.ImageResize(im,224,224).[0]
-    let s1 = Operators.SwapAxis(resized,0,2).[0]
-    let s3 = Operators.SwapAxis(s1,1,2).[0]
-    Operators.Reshape(s3, shape = [1;3;224;224]).[0]
+    resized.SwapAxis(0,2).SwapAxis(1,2).Reshape([1;3;224;224])
 
 
 let vggParams = NDArray.Load vggParamsFile    
