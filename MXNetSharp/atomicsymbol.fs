@@ -10,14 +10,26 @@ exception AtomicSymbolCreatorNotFound of string with
         | _ -> failwith "unreachable"
 
 type AtomicSymbolCreator internal (handle : MXNetSharp.Interop.CApi.AtomicSymbolCreatorHandle, info : AtomicSymbolInfo) = 
+    let aliases = ResizeArray<string>()
     static let lookup = 
-        MXSymbol.listAtomicSymbolCreators ()
+        let creators = 
+            MXSymbol.listAtomicSymbolCreators ()
+            |> Array.map 
+                (fun x -> 
+                    let info = MXSymbol.getAtomicSymbolInfo x
+                    x, AtomicSymbolCreator(x,info)
+                )
+            |> dict
+        NNVM.listAllOpNames()
         |> Array.map 
-            (fun x -> 
-                let info = MXSymbol.getAtomicSymbolInfo x
-                info.Name, AtomicSymbolCreator(x,info)
+            (fun name -> 
+                let h = NNVM.getOpHandle name
+                let c = creators.[h]
+                c.AddAlias(name)
+                name, c
             )
         |> dict
+    member internal x.AddAlias(name) = aliases.Add name
     static member FromName name = 
         let scc,v = lookup.TryGetValue(name) //REVIEW: catch and reload list?
         if scc then 
