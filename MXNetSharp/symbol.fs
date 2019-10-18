@@ -3,18 +3,6 @@ open System
 open System.Runtime.InteropServices
 open MXNetSharp.Interop
 
-type SafeSymbolHandle(owner) = 
-    inherit SafeHandle(0n, true)
-    new() = new SafeSymbolHandle(true)
-    new(ptr,owner) as this = new SafeSymbolHandle(owner) then this.SetHandle(ptr)
-    override x.IsInvalid = x.handle <= 0n
-    override x.ReleaseHandle() = CApi.MXNDArrayFree x.handle = 0
-    member internal x.UnsafeHandle = 
-        if not x.IsClosed then
-            x.handle
-        else
-            ObjectDisposedException("SafeSymbolHandle", "Symbol handle has been closed") |> raise
-
 type BaseSymbol() = class end
 
 

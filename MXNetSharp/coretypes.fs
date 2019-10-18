@@ -1,5 +1,9 @@
 ﻿namespace MXNetSharp
 
+open System.Runtime.InteropServices
+open System
+open MXNetSharp.Interop
+
 // defined in mshadow/base.h
 // https://github.com/apache/incubator-mxnet/blob/618c4811e417fb86cbb3fc0f7f38d55972eeb2af/3rdparty/mshadow/mshadow/base.h#L306
 type TypeFlag = 
@@ -99,19 +103,66 @@ type OpReqType =
         | WriteTo -> 1
         | WriteInplace -> 2
         | AddTo -> 3
+
+type SafeSymbolHandle(owner) = 
+    inherit SafeHandle(0n, true)
+    new() = new SafeSymbolHandle(true)
+    new(ptr,owner) as this = new SafeSymbolHandle(owner) then this.SetHandle(ptr)
+    override x.IsInvalid = x.handle <= 0n
+    override x.ReleaseHandle() = CApi.MXNDArrayFree x.handle = 0
+    member internal x.UnsafeHandle = 
+        if not x.IsClosed then
+            x.handle
+        else
+            ObjectDisposedException("SafeSymbolHandle", "Symbol handle has been closed") |> raise
+
+
+type SafeNDArrayHandle(owner) = 
+    inherit SafeHandle(0n, true)
+    new() = new SafeNDArrayHandle(true)
+    new(ptr,owner) as this = new SafeNDArrayHandle(owner) then this.SetHandle(ptr)
+    override x.IsInvalid = x.handle <= 0n
+    override x.ReleaseHandle() = CApi.MXNDArrayFree x.handle = 0
+    member internal x.UnsafeHandle = 
+        if not x.IsClosed then
+            x.handle
+        else
+            ObjectDisposedException("SafeNDArrayHandle", "NDArray handle has been closed") |> raise
         
 module Util = 
-    let inline internal retype (x: 'T) : 'U = (# "" x: 'U #)
-    let inline valueString (x : ^a) = 
+    //let inline internal retype (x: 'T) : 'U = (# "" x: 'U #)
+    (*
+    [<AutoOpen>]
+    type ValueString() = 
+        static member valueString(n : bool) = if n then "1" else "0"
+        static member valueString(n : int) = string n
+        static member valueString(n : double) = string n
+        static member valueString(n : string) = n
+        static member valueString(x : obj) = 
+            match x with 
+            | :? bool as x -> if x then "1" else "0"
+            | :? array<int> as x -> x |> Array.map string |> String.concat "," |> sprintf "[%s]"
+            | :? seq<int> as x -> x |> Seq.map string |> String.concat "," |> sprintf "[%s]"
+            | _ -> string x
+    *)      
+    let valueString (x : obj) = 
+        match x with 
+        | :? bool as x -> if x then "1" else "0"
+        | :? array<int> as x -> x |> Array.map string |> String.concat "," |> sprintf "[%s]"
+        | :? seq<int> as x -> x |> Seq.map string |> String.concat "," |> sprintf "[%s]"
+        | _ -> string x
+        (*
         if LanguagePrimitives.PhysicalEquality typeof< ^a> typeof<bool> then 
             if retype x then "1" else "0"
         elif LanguagePrimitives.PhysicalEquality typeof< ^a> typeof<string> then 
             retype x
         elif LanguagePrimitives.PhysicalEquality typeof< ^a> typeof<int []> then 
             retype x |> Array.map string |> String.concat "," |> sprintf "[%s]"
+        elif LanguagePrimitives.PhysicalEquality typeof< ^a> typeof<int list> then 
+            retype x |> List.map string |> String.concat "," |> sprintf "[%s]"
         elif LanguagePrimitives.PhysicalEquality typeof< ^a> typeof<int seq> then 
-            retype x |> Seq.map string |> String.concat "," |> sprintf "[%s]"
+            x |> box |> unbox |> Seq.map string |> String.concat "," |> sprintf "[%s]"
         else 
             string x
-        
+        *)
     
