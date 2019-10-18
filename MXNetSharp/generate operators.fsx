@@ -266,6 +266,7 @@ Mappings.Modify
                 | "boolean" -> "bool"
                 | "real_t" -> "double"
                 | "long" -> "int64"
+                | "tuple of <double>"
                 | "tuple of <float>" -> "double seq"
                 | "tuple of <long>" -> "int64 seq"
                 | str -> str}
@@ -867,27 +868,12 @@ Mappings.Modify(fun (x : ProcessedArg) ->
     else    
         x
     )
-
-// **************************** _contrib_dgl_graph_compact *******************************
-// graph_sizes has no type
-
-Mappings.Modify(fun (x : ProcessedArg) -> 
-    if x.Arg.AtomicSymbolInfo.Name = "_contrib_dgl_graph_compact" then
-        match x.Arg.ArgumentInfo.Name with 
-        | "graph_sizes" -> {x with TypeString = "int"}
-        | _ -> x
-    else    
-        x
-    )
-
-
 // **************************** _cvcopyMakeBorder *******************************
 
 Mappings.Modify(fun (x : ProcessedArg) -> 
     if x.Arg.AtomicSymbolInfo.Name = "_cvcopyMakeBorder"  then
         match x.Name with 
         | "type" -> {x with Name = "fillingType"} |> argDoc
-        | "values" -> {x with TypeString = "string (*REVIEW: What's the type here?*)"} 
         | _ -> x
     else    
         x
@@ -1122,16 +1108,9 @@ Mappings.Modify(fun (l : ProcessedAtomicSymbol list) ->
 
 Mappings.Modify(fun (x : ProcessedArg) -> 
     if x.TypeString = "Shape(tuple)" then 
-        match x.Arg.AtomicSymbolInfo.Name with 
-        //| "Pooling"
-        //| "Deconvolution"
-        //| "Dropout"
-        //| "Convolution" ->
-        | _ ->
-            {x with 
-                TypeString = "int seq"
-            }   
-        //| _ -> x
+        {x with 
+            TypeString = "int seq"
+        }   
     else    
         x
     )
