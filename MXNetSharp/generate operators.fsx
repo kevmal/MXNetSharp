@@ -371,6 +371,7 @@ let toNDArrayCode suffix (x : ProcessedAtomicSymbol) =
     let args = 
         x.Args 
         |> Seq.filter (fun x -> match x.CodeGenerator with ConstantArg _ -> false | _ -> true)
+        |> Seq.filter (fun a -> a.Arg.ArgumentInfo.Name <> x.AtomicSymbolInfo.KeyVarNumArgs)
         |> Seq.map 
             (fun x -> 
                 let t = 
@@ -459,6 +460,12 @@ let toNDArrayCode suffix (x : ProcessedAtomicSymbol) =
         |> Array.choose
             (fun a ->
                 match a.SymbolOrNDArray with 
+                | None when a.Arg.ArgumentInfo.Name = x.AtomicSymbolInfo.KeyVarNumArgs -> 
+                    match x.Args |> Seq.tryFind (fun a -> match a.SymbolOrNDArray with Some(ManySymbolOrNDArray) -> true | _ -> false) with 
+                    | Some (arrArg) -> 
+                        Some (sprintf "string %s.Length" arrArg.Name)
+                    | None -> //failwithf "Key var num arg with no input of type NDArray-or-Symbol[] %A" x 
+                        Some (sprintf "%s (*TODO: this should be the length of the vararg*)" a.Name) //TODO: this needs to go
                 | None -> 
                     let valueStr = 
                         match a.CodeGenerator with 
@@ -531,6 +538,7 @@ let toSymbolCode suffix (x : ProcessedAtomicSymbol) =
     let args = 
         x.Args 
         |> Seq.filter (fun x -> match x.CodeGenerator with ConstantArg _ -> false | _ -> true)
+        |> Seq.filter (fun a -> a.Arg.ArgumentInfo.Name <> x.AtomicSymbolInfo.KeyVarNumArgs)
         |> Seq.map 
             (fun x -> 
                 let t = 
@@ -619,6 +627,12 @@ let toSymbolCode suffix (x : ProcessedAtomicSymbol) =
         |> Array.choose
             (fun a ->
                 match a.SymbolOrNDArray with 
+                | None when a.Arg.ArgumentInfo.Name = x.AtomicSymbolInfo.KeyVarNumArgs -> 
+                    match x.Args |> Seq.tryFind (fun a -> match a.SymbolOrNDArray with Some(ManySymbolOrNDArray) -> true | _ -> false) with 
+                    | Some (arrArg) -> 
+                        Some (sprintf "string %s.Length" arrArg.Name)
+                    | None -> //failwithf "Key var num arg with no input of type NDArray-or-Symbol[] %A" x 
+                        Some (sprintf "%s (*TODO: this should be the length of the vararg*)" a.Name) //TODO: this needs to go
                 | None -> 
                     let valueStr = 
                         match a.CodeGenerator with 
