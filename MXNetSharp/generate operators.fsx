@@ -11,7 +11,6 @@ open System.Diagnostics
 open MXNetSharp.Interop
 open System
 
-
 type Mapper<'a> = 
     | Final of 'a
     | Mapped of 'a
@@ -266,6 +265,7 @@ Mappings.Modify
                 match x.TypeString with 
                 | "boolean" -> "bool"
                 | "real_t" -> "double"
+                | "long" -> "int64"
                 | str -> str}
     )
 
@@ -842,19 +842,6 @@ Mappings.Modify(fun (x : ProcessedArg) ->
     | _ -> x
     )
 
-// **************************** Eye *******************************
-// Blank type for some integer args
-
-Mappings.Modify(fun (x : ProcessedArg) -> 
-    if x.Arg.AtomicSymbolInfo.Name = "_eye" then
-        match x.Arg.ArgumentInfo.Name with 
-        | "N" | "M" | "k" -> {x with TypeString = "int"}
-        | _ -> x
-    else    
-        x
-    )
-
-
 // **************************** _npi_multinomial *******************************
 // Blank type for arg pvals
 
@@ -899,24 +886,6 @@ Mappings.Modify(fun (x : ProcessedArg) ->
     else    
         x
     )
-
-// **************************** _contrib_dgl_csr_neighbor_uniform_sample *******************************
-// **************************** _contrib_dgl_csr_neighbor_non_uniform_sample *******************************
-// Blank type for some integer args
-
-Mappings.Modify(fun (x : ProcessedArg) -> 
-    if x.Arg.AtomicSymbolInfo.Name = "_contrib_dgl_csr_neighbor_uniform_sample" ||
-       x.Arg.AtomicSymbolInfo.Name = "_contrib_dgl_csr_neighbor_non_uniform_sample" then
-        match x.Arg.ArgumentInfo.Name with 
-        | "num_hops" 
-        | "num_neighbor" 
-        | "max_num_vertices" -> 
-            {x with TypeString = "int"}
-        | _ -> x
-    else    
-        x
-    )
-
 
 // **************************** _contrib_dgl_graph_compact *******************************
 // graph_sizes has no type
