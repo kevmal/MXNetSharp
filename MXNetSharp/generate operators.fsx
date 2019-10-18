@@ -807,32 +807,6 @@ Mappings.Modify(fun (x : ProcessedAtomicSymbol) ->
         x
 )
 
-
-// **************************** _image_normalize *******************************
-// Blank type for mean and str
-
-Mappings.Modify(fun (x : ProcessedArg) -> 
-    if x.Arg.AtomicSymbolInfo.Name = "_image_normalize" then
-        match x.Arg.ArgumentInfo.Name with 
-        | "mean" | "std" -> {x with TypeString = "double []"}
-        | _ -> x
-    else    
-        x
-    )
-
-// **************************** _random_randint *******************************
-// Blank type for some integer args
-
-Mappings.Modify(fun (x : ProcessedArg) -> 
-    if x.Arg.AtomicSymbolInfo.Name = "_random_randint" then
-        match x.Arg.ArgumentInfo.Name with 
-        | "low" | "high" -> {x with TypeString = "int"}
-        | _ -> x
-    else    
-        x
-    )
-
-
 // **************************** Slice ops *******************************
 // begin end names 
 
@@ -1288,13 +1262,6 @@ let processed =
 // ******************************** Skip *************************************
 let skipped = 
     [
-        // Not sure how to handle NDArray-or-Symbol[] yet
-        //"_CachedOp"
-        //"multi_all_finite"
-        //"_contrib_dgl_csr_neighbor_uniform_sample"
-        /////////////////////////////////////////////////
-        //"_arange"
-        //"_linspace"
         "Pooling_v1" //DEPRECATED
         "Crop" //DEPRECATED
         "_NDArray" // ptr type
