@@ -120,6 +120,7 @@ type DefaultMode =
     | ReplaceNull of string
     | ReplaceOptionWithString of string
     | IgnoreNull
+    | IgnoreNone
 
 type Returns = 
     | Unknown 
@@ -360,12 +361,13 @@ let comment lines = lines |> List.map (fun x -> "// " + x)
 
 let toCStr (a : ProcessedArg) (str : string) = 
     match a.TypeString with 
-    | "int seq" -> sprintf "(%s |> (function null -> Seq.empty | x -> x) |> Seq.map string |> String.concat \", \" |> sprintf \"[%%s]\")" str 
+    | "int seq" -> sprintf "(%s |> Seq.map string |> String.concat \", \" |> sprintf \"[%%s]\")" str 
     //| "bool" -> sprintf "(if %s then \"1\" else \"0\")" str
     | "string" -> str
     | _ -> sprintf "string %s" str
 
-let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
+
+let toNDArrayCode suffix (x : ProcessedAtomicSymbol) =
     let args = 
         x.Args 
         |> Seq.filter (fun x -> match x.CodeGenerator with ConstantArg _ -> false | _ -> true)
@@ -373,16 +375,15 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
             (fun x -> 
                 let t = 
                     match x.SymbolOrNDArray with 
-                    | Some ManySymbolOrNDArray -> 
-                        if ndarray then "NDArray[]" else "BaseSymbol[]"
-                    | Some _ -> if ndarray then "NDArray" else "BaseSymbol"
+                    | Some ManySymbolOrNDArray -> "NDArray[]" 
+                    | Some _ -> "NDArray"
                     | _ -> x.TypeString
                 match x.DefaultMode with 
                 | Some (ReplaceOptionWithString _) -> 
                     sprintf "[<Optional>] ?%s : %s" x.Name t
                 | Some (ReplaceNull _)
-                | Some IgnoreNull -> 
-                    sprintf "[<Optional>] %s : %s" x.Name t
+                | Some IgnoreNull -> sprintf "[<Optional>] %s : %s" x.Name t
+                | Some IgnoreNone -> sprintf "[<Optional>] ?%s : %s" x.Name t
                 | None ->
                     match x.SymbolOrNDArray with 
                     | Some ManySymbolOrNDArray -> 
@@ -395,11 +396,9 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
     let define = 
         let name = 
             if suffix then 
-                if ndarray then 
-                    x.Name + "NDArray"
-                else
-                    x.Name + "Symbol"
-            else x.Name
+                x.Name + "NDArray"
+            else 
+                x.Name
         if args.Length < 5 then 
             let argStr = args |> String.concat ", "
             [sprintf "static member %s(%s) =" name argStr]
@@ -413,7 +412,6 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
             ]
     let arr x = if Array.isEmpty x then "Array.empty" else sprintf "[|%s|]" (x |> String.concat "; ")
     let inputNamesStr = 
-        if ndarray then 
             x.Args 
             |> Array.choose 
                 (fun x ->
@@ -423,23 +421,8 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
                     | _ -> None
                 )
             |> arr
-        else 
-            x.Args 
-            |> Array.choose 
-                (fun x ->
-                    match x.SymbolOrNDArray with 
-                    | Some Symbol | Some SymbolOrNDArray -> Some(quote x.Name)
-                    | Some ManySymbolOrNDArray -> Some (sprintf "yield! %s |> Array.mapi (fun i _ -> sprintf \"arg%%d\" i)" x.Name)
-                    | _ -> None
-                )
-            |> arr
-        
     let inputsStr = 
-        let handle x =  
-            if ndarray then 
-                sprintf "%s.NDArrayHandle.UnsafeHandle" x
-            else
-                sprintf "%s" x
+        let handle x = sprintf "%s.NDArrayHandle.UnsafeHandle" x
         let arr (x : _ []) = 
             match x with 
             | [| Choice2Of2 name |] -> sprintf "(%s |> Array.map (fun x -> %s))" name (handle "x")
@@ -452,26 +435,15 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
                         sprintf "yield! (%s |> Seq.map (fun x -> %s))" name (handle "x") )
                 |> String.concat "; "
                 |> sprintf "[|%s|]" 
-        if ndarray then 
-            x.Args 
-            |> Array.choose 
-                (fun x ->
-                    match x.SymbolOrNDArray with 
-                    | Some NDArray | Some SymbolOrNDArray -> Choice1Of2(handle x.Name) |> Some
-                    | Some ManySymbolOrNDArray -> Choice2Of2(x.Name) |> Some
-                    | _ -> None
-                )
-            |> arr
-        else 
-            x.Args 
-            |> Array.choose 
-                (fun x ->
-                    match x.SymbolOrNDArray with 
-                    | Some Symbol | Some SymbolOrNDArray -> Choice1Of2(handle x.Name) |> Some
-                    | Some ManySymbolOrNDArray -> Choice2Of2(x.Name) |> Some
-                    | _ -> None
-                )
-            |> arr
+        x.Args 
+        |> Array.choose 
+            (fun x ->
+                match x.SymbolOrNDArray with 
+                | Some NDArray | Some SymbolOrNDArray -> Choice1Of2(handle x.Name) |> Some
+                | Some ManySymbolOrNDArray -> Choice2Of2(x.Name) |> Some
+                | _ -> None
+            )
+        |> arr
     let paramNamesStr = 
         x.Args 
         |> Array.filter (fun x -> match x.CodeGenerator with | SkipArg -> false | _ -> true)
@@ -499,39 +471,21 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
                         valueStr |> Option.map (fun s -> sprintf "(match %s with None -> %s | Some %s -> %s)" a.Name v a.Name s) 
                     | Some(ReplaceNull v) -> 
                         valueStr |> Option.map (fun s -> sprintf "(if isNull (%s :> obj) then %s else %s)" a.Name v s)
+                    | Some(IgnoreNone) -> 
+                        valueStr |> Option.map (fun s -> sprintf "(match %s with None -> \"None\" | Some %s -> %s)" a.Name a.Name s)  //TODO: we need to just not pass the arg
                     | _ -> valueStr
                 | _ -> None
             ) 
         |> arr
     let invoke = 
-        if ndarray then 
-            [
-                sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
-                sprintf "let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle"
-                sprintf "                                         %s" inputsStr
-                sprintf "                                         %s" paramNamesStr
-                sprintf "                                         %s" paramValuesStr
-                sprintf "outputs |> Array.map (fun h -> new NDArray(h))"
-            ]
-        else
-            [
-            (* OLD
-                sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
-                sprintf "let symbol = MXSymbol.createAtomicSymbol creator.AtomicSymbolCreatorHandle"
-                sprintf "                                         %s" paramNamesStr
-                sprintf "                                         %s" paramValuesStr
-                sprintf "MXSymbol.compose symbol null %s" inputNamesStr
-                //sprintf "                             (%s |> Array.filter (fun x -> x > 0n))" inputsStr
-                sprintf "                             %s" inputsStr
-                sprintf "Symbol(symbol)"
-            *)
-                sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
-                sprintf "new SymbolFromOperator(creator,"
-                sprintf "                       %s," paramNamesStr
-                sprintf "                       %s," paramValuesStr
-                sprintf "                       %s," inputNamesStr
-                sprintf "                       %s)" inputsStr
-            ]
+        [
+            sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
+            sprintf "let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle"
+            sprintf "                                         %s" inputsStr
+            sprintf "                                         %s" paramNamesStr
+            sprintf "                                         %s" paramValuesStr
+            sprintf "outputs |> Array.map (fun h -> new NDArray(h))"
+        ]
     let defineInto = 
         let name = x.Name
         if args.Length = 0 then 
@@ -566,13 +520,138 @@ let toCodeTarget suffix ndarray (x : ProcessedAtomicSymbol) =
         yield! indent 1 (x.Args |> Array.collect (fun x -> x.Doc))
         yield! indent 1 define 
         yield! indent 2 invoke 
-        if ndarray then 
-            yield! indent 1 x.Doc
-            yield! indent 1 ["/// <param name = \"outputArray\">Array of NDArray for outputs</param>"]
-            yield! indent 1 (x.Args |> Array.collect (fun x -> x.Doc))
-            yield! indent 1 defineInto 
-            yield! indent 2 invokeInto 
-            
+        yield! indent 1 x.Doc
+        yield! indent 1 ["/// <param name = \"outputArray\">Array of NDArray for outputs</param>"]
+        yield! indent 1 (x.Args |> Array.collect (fun x -> x.Doc))
+        yield! indent 1 defineInto 
+        yield! indent 2 invokeInto 
+    ]
+
+let toSymbolCode suffix (x : ProcessedAtomicSymbol) =
+    let args = 
+        x.Args 
+        |> Seq.filter (fun x -> match x.CodeGenerator with ConstantArg _ -> false | _ -> true)
+        |> Seq.map 
+            (fun x -> 
+                let t = 
+                    match x.SymbolOrNDArray with 
+                    | Some ManySymbolOrNDArray -> "BaseSymbol[]"
+                    | Some _ -> "BaseSymbol"
+                    | _ -> x.TypeString
+                match x.DefaultMode with 
+                | Some (ReplaceOptionWithString _) -> 
+                    sprintf "[<Optional>] ?%s : %s" x.Name t
+                | Some (ReplaceNull _)
+                | Some IgnoreNull -> sprintf "[<Optional>] %s : %s" x.Name t
+                | Some IgnoreNone -> sprintf "[<Optional>] ?%s : %s" x.Name t
+                | None ->
+                    match x.SymbolOrNDArray with 
+                    | Some ManySymbolOrNDArray -> 
+                        sprintf "[<ParamArray>] %s : %s" x.Name t
+                    | _ -> sprintf "%s : %s" x.Name t
+                | Some (UseAttr d)-> 
+                    sprintf "[<Optional; DefaultParameterValue(%s)>] %s : %s" d x.Name t
+                )
+        |> Seq.toArray
+    let define = 
+        let name = 
+            if suffix then 
+                x.Name + "Symbol"
+            else 
+                x.Name
+        if args.Length < 5 then 
+            let argStr = args |> String.concat ", "
+            [sprintf "static member %s(%s) =" name argStr]
+        else
+            let dstr = sprintf "static member %s(" name
+            let indent = String.replicate dstr.Length " "
+            [
+                dstr + args.[0] + ", "
+                yield! args.[1 .. args.Length - 2] |> Seq.map (fun x -> indent + x + ", ")
+                indent + args.[args.Length - 1] + ") ="
+            ]
+    let arr x = if Array.isEmpty x then "Array.empty" else sprintf "[|%s|]" (x |> String.concat "; ")
+    let inputNamesStr = 
+        x.Args 
+        |> Array.choose 
+            (fun x ->
+                match x.SymbolOrNDArray with 
+                | Some Symbol | Some SymbolOrNDArray -> Some(quote x.Name)
+                | Some ManySymbolOrNDArray -> Some (sprintf "yield! %s |> Array.mapi (fun i _ -> sprintf \"arg%%d\" i)" x.Name)
+                | _ -> None
+            )
+        |> arr
+    let inputsStr = 
+        let handle x = sprintf "%s" x
+        let arr (x : _ []) = 
+            match x with 
+            | [| Choice2Of2 name |] -> sprintf "(%s |> Array.map (fun x -> %s))" name (handle "x")
+            | [||] -> "Array.empty"
+            | _ -> 
+                x
+                |> Array.map (function
+                    | Choice1Of2 str -> str
+                    | Choice2Of2 name -> 
+                        sprintf "yield! (%s |> Seq.map (fun x -> %s))" name (handle "x") )
+                |> String.concat "; "
+                |> sprintf "[|%s|]" 
+        x.Args 
+        |> Array.choose 
+            (fun x ->
+                match x.SymbolOrNDArray with 
+                | Some Symbol | Some SymbolOrNDArray -> Choice1Of2(handle x.Name) |> Some
+                | Some ManySymbolOrNDArray -> Choice2Of2(x.Name) |> Some
+                | _ -> None
+            )
+        |> arr
+    let paramNamesStr = 
+        x.Args 
+        |> Array.filter (fun x -> match x.CodeGenerator with | SkipArg -> false | _ -> true)
+        |> Array.choose
+            (fun a ->
+                match a.SymbolOrNDArray with 
+                | None -> Some ("\"" + a.Arg.ArgumentInfo.Name + "\"")
+                | _ -> None
+            )  
+        |> arr
+    let paramValuesStr = 
+        x.Args 
+        |> Array.choose
+            (fun a ->
+                match a.SymbolOrNDArray with 
+                | None -> 
+                    let valueStr = 
+                        match a.CodeGenerator with 
+                        | SkipArg -> None
+                        | ValueString str -> Some str
+                        | Normal -> Some (toCStr a a.Name)
+                        | ConstantArg a -> Some a
+                    match a.DefaultMode with 
+                    | Some(ReplaceOptionWithString v) -> 
+                        valueStr |> Option.map (fun s -> sprintf "(match %s with None -> %s | Some %s -> %s)" a.Name v a.Name s) 
+                    | Some(ReplaceNull v) -> 
+                        valueStr |> Option.map (fun s -> sprintf "(if isNull (%s :> obj) then %s else %s)" a.Name v s)
+                    | Some(IgnoreNone) -> 
+                        valueStr |> Option.map (fun s -> sprintf "(match %s with None -> \"None\" | Some %s -> %s)" a.Name a.Name s)  //TODO: we need to just not pass the arg
+                    | _ -> valueStr
+                | _ -> None
+            ) 
+        |> arr
+    let invoke = 
+        [
+            sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
+            sprintf "new SymbolFromOperator(creator,"
+            sprintf "                       %s," paramNamesStr
+            sprintf "                       %s," paramValuesStr
+            sprintf "                       %s," inputNamesStr
+            sprintf "                       %s)" inputsStr
+        ]
+        
+    [
+        yield! indent 1 x.Doc
+        yield! indent 1 (x.Args |> Array.collect (fun x -> x.Doc))
+        yield! indent 1 define 
+        yield! indent 2 invoke 
     ]
 
 let toCode (x : ProcessedAtomicSymbol) =
@@ -586,14 +665,14 @@ let toCode (x : ProcessedAtomicSymbol) =
         | _ -> false
     [
         if not ndArray && not symbol then 
-            yield! toCodeTarget true true x 
-            yield! toCodeTarget true false x 
+            yield! toNDArrayCode true x 
+            yield! toSymbolCode true x 
             ()
         else    
             if ndArray then 
-                yield! toCodeTarget false true x
+                yield! toNDArrayCode false x
             if symbol then 
-                yield! toCodeTarget false false x
+                yield! toSymbolCode false x
     ]
 
 let definedTypeToCode (a : ProcessedArg) =
@@ -707,18 +786,6 @@ Mappings.Modify(fun (x : ProcessedAtomicSymbol) ->
         x
 )
 
-// **************************** Sort parameters so required args appear first *******************************
-
-Mappings.Modify(fun (x : ProcessedAtomicSymbol) -> 
-    //if x.AtomicSymbolInfo.Name = "RNN" then
-        let optional, required = x.Args |> Array.partition (fun x -> x.DefaultMode.IsSome) 
-        { x  with 
-            Args = Array.append required optional
-        }
-    //else    
-    //    x
-    )
-
 
 // **************************** _image_normalize *******************************
 // Blank type for mean and str
@@ -774,6 +841,50 @@ Mappings.Modify(fun (x : ProcessedArg) ->
     )
 
 
+// **************************** _npi_multinomial *******************************
+// Blank type for arg pvals
+
+
+Mappings.Modify(fun (x : ProcessedArg) -> 
+    if x.Arg.AtomicSymbolInfo.Name = "_npi_multinomial" then
+        match x.Arg.ArgumentInfo.Name with 
+        | "pvals" -> {x with TypeString = "double seq"}
+        | _ -> x
+    else    
+        x
+    )
+
+// **************************** _npi_blackman *******************************
+// **************************** _npi_hanning *******************************
+// **************************** _npi_hamming *******************************
+// Blank type for arg M
+
+
+Mappings.Modify(fun (x : ProcessedArg) -> 
+    if x.Arg.AtomicSymbolInfo.Name = "_npi_hanning" ||
+       x.Arg.AtomicSymbolInfo.Name = "_npi_hamming" ||
+       x.Arg.AtomicSymbolInfo.Name = "_npi_blackman" then
+        match x.Arg.ArgumentInfo.Name with 
+        | "M" -> {x with TypeString = "int"}
+        | _ -> x
+    else    
+        x
+    )
+
+    
+// **************************** _npi_choice *******************************
+// Blank type for arg a and size
+
+
+Mappings.Modify(fun (x : ProcessedArg) -> 
+    if x.Arg.AtomicSymbolInfo.Name = "_npi_choice" then
+        match x.Arg.ArgumentInfo.Name with 
+        | "a" -> {x with TypeString = "int64"}
+        | "size" -> {x with TypeString = "int seq"}
+        | _ -> x
+    else    
+        x
+    )
 
 // **************************** _contrib_dgl_csr_neighbor_uniform_sample *******************************
 // **************************** _contrib_dgl_csr_neighbor_non_uniform_sample *******************************
@@ -801,22 +912,6 @@ Mappings.Modify(fun (x : ProcessedArg) ->
         match x.Arg.ArgumentInfo.Name with 
         | "graph_sizes" -> {x with TypeString = "int"}
         | _ -> x
-    else    
-        x
-    )
-
-
-// **************************** _contrib_index_array *******************************
-// Shape or None `axes` parameter
-
-
-
-Mappings.Modify(fun (x : ProcessedArg) -> 
-    if x.TypeString = "Shape or None" then 
-        {x with 
-            TypeString = "int seq"
-            DefaultMode = Some(DefaultMode.IgnoreNull)
-        }   
     else    
         x
     )
@@ -1019,18 +1114,23 @@ Mappings.Modify(fun (l : ProcessedAtomicSymbol list) ->
                                     | "boolean or None" -> 
                                         {a with 
                                             TypeString = "bool"
-                                            DefaultMode = Some(ReplaceOptionWithString "\"None\"")
+                                            DefaultMode = Some IgnoreNull
                                         }
                                     | "int or None" -> 
                                         {a with 
                                             TypeString = "int"
-                                            DefaultMode = Some(ReplaceOptionWithString "\"None\"")
+                                            DefaultMode = Some IgnoreNull
                                         }
                                     | "double or None"
                                     | "float or None" -> 
                                         {a with 
                                             TypeString = "float"
-                                            DefaultMode = Some(ReplaceOptionWithString "\"None\"")
+                                            DefaultMode = Some IgnoreNull
+                                        }
+                                    | "Shape or None" -> 
+                                        {a with 
+                                            TypeString = "int seq"
+                                            DefaultMode = Some IgnoreNull
                                         }
                                     | _ -> a
                                 )
@@ -1040,6 +1140,8 @@ Mappings.Modify(fun (l : ProcessedAtomicSymbol list) ->
                                     | Some(UseAttr d) 
                                     | Some(ReplaceNull d) ->
                                         {a with DefaultMode = Some(ReplaceOptionWithString (ensureQuote d))}
+                                    | Some(IgnoreNull) ->
+                                        {a with DefaultMode = Some(IgnoreNone)}
                                     | _ -> a
                                 )
                         }
@@ -1070,6 +1172,22 @@ Mappings.Modify(fun (x : ProcessedArg) ->
         x
     )
        
+
+// **************************** Sort parameters so required args appear first *******************************
+// Note: this is intentionally near the end of the mappings and applied to 
+// `ProcessedAtomicSymbol list` to ensure it happens on a "final" transform
+
+Mappings.Modify(fun (l : ProcessedAtomicSymbol list) -> 
+    l
+    |> List.map 
+        (fun x ->
+            let optional, required = x.Args |> Array.partition (fun x -> x.DefaultMode.IsSome) 
+            { x  with 
+                Args = Array.append required optional
+            }
+        )
+    )
+
 
 let processDefinedType (t : UnionType) (arg : ProcessedArg) =
     let (|Name|_|) name (t : UnionType,_) = if t.Name = name then Some() else None
@@ -1279,3 +1397,5 @@ type Operators() =
             
 
 System.IO.File.WriteAllLines(System.IO.Path.Combine(__SOURCE_DIRECTORY__,"operators.fs"),  generatedLines)
+
+
