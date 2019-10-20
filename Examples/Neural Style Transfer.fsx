@@ -270,7 +270,7 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
         {|
             Executor = new Executor(out, context, inArgs, argGrad, grapReqType, Array.empty)
             //KeepAlive = ([box simg; skernel; channels; convs; out; kernel] : obj list)
-            KeepAlive = ([channels] : obj list) //TODO: we should not need to ref this
+            //KeepAlive = ([channels] : obj list) //TODO: we should not need to ref this
         |}
         |> Some
     | None -> None

@@ -59,6 +59,7 @@ type SymbolOutput internal (parent) =
     new(parent, handle) as this = 
         new SymbolOutput(parent) then 
             this.InternalHandle <- Some handle
+    member x.Parent = parent
     override x.Initialize() = ()
     
 
