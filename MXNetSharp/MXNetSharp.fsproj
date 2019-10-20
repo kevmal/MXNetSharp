@@ -16,6 +16,7 @@
     <Compile Include="interop.fs" />
     <Compile Include="atomicsymbol.fs" />
     <Compile Include="operator.fs" />
+    <Compile Include="genargtypes.fs" />
     <Compile Include="symbol.fs" />
     <Compile Include="ndarray.fs" />
     <Compile Include="dataiter.fs" />

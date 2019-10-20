@@ -1647,83 +1647,122 @@ let skipped =
     ] |> Set.ofSeq
 
 
-let generatedLines = 
-    let definedTypes = HashSet()
-    let types = ResizeArray()
-    let members = ResizeArray()
-    let symboltypes = ResizeArray()
-    let errors = ResizeArray()
-    let skip = ResizeArray()
-    for b in processed do 
-        match b with 
-        | Error(x,e) -> 
-            let code = 
-                [
-                    ""
-                    "// ********************************************************************************************************"
-                    sprintf "// EXCEPTION" 
-                    sprintf "// %s" e.Message
-                    yield! (sprintf "%A" x) |> splitLines |> Array.map (fun x -> "// " + x)
-                    "// ********************************************************************************************************"
-                    ""
-                ]
-            if skipped.Contains x.Name then 
-                skip.Add code
-            else
-                errors.Add 
-                    [
-                        yield "// ========================================== Not Skipped =========================================="
-                        yield! code
-                    ]
-        | Ok(cb) when skipped.Contains cb.AtomicSymbolInfo.Name->     
-            cb.TypeDefinitions
-            |> List.map snd
-            |> List.map comment
-            |> List.iter (skip.Add)
-            cb.MemberDefinitions
-            |> List.map snd 
-            |> List.map comment
-            |> List.iter (skip.Add)
-        | Ok(cb) ->
-            cb.MemberDefinitions
-            |> List.map snd 
-            |> List.iter (members.Add)
-            cb.TypeDefinitions
-            |> List.map snd
-            |> List.filter definedTypes.Add
-            |> List.iter (types.Add)
-            cb.SymbolTypeDefinitions
-            |> List.map snd
-            |> List.iter (symboltypes.Add)
-    let concatWith sep (lines : string list list) =
-        if lines.IsEmpty then [] 
-        else 
+let definedTypes = HashSet()
+let types = ResizeArray()
+let members = ResizeArray()
+let symboltypes = ResizeArray()
+let errors = ResizeArray()
+let skip = ResizeArray()
+for b in processed do 
+    match b with 
+    | Error(x,e) -> 
+        let code = 
             [
-                yield lines.Head
-                for a in lines.Tail do
-                    yield sep
-                    yield a
-            ] |> List.concat
-    let breakBlocks x = x |> Seq.toList |> concatWith [""]
-        
+                ""
+                "// ********************************************************************************************************"
+                sprintf "// EXCEPTION" 
+                sprintf "// %s" e.Message
+                yield! (sprintf "%A" x) |> splitLines |> Array.map (fun x -> "// " + x)
+                "// ********************************************************************************************************"
+                ""
+            ]
+        if skipped.Contains x.Name then 
+            skip.Add code
+        else
+            errors.Add 
+                [
+                    yield "// ========================================== Not Skipped =========================================="
+                    yield! code
+                ]
+    | Ok(cb) when skipped.Contains cb.AtomicSymbolInfo.Name->     
+        cb.TypeDefinitions
+        |> List.map snd
+        |> List.map comment
+        |> List.iter (skip.Add)
+        cb.MemberDefinitions
+        |> List.map snd 
+        |> List.map comment
+        |> List.iter (skip.Add)
+    | Ok(cb) ->
+        cb.MemberDefinitions
+        |> List.map snd 
+        |> List.iter (members.Add)
+        cb.TypeDefinitions
+        |> List.map snd
+        |> List.filter definedTypes.Add
+        |> List.iter (types.Add)
+        cb.SymbolTypeDefinitions
+        |> List.map snd
+        |> List.iter (symboltypes.Add)
+let concatWith sep (lines : string list list) =
+    if lines.IsEmpty then [] 
+    else 
+        [
+            yield lines.Head
+            for a in lines.Tail do
+                yield sep
+                yield a
+        ] |> List.concat
+let breakBlocks x = x |> Seq.toList |> concatWith [""]
+    
+    
+System.IO.File.WriteAllLines(System.IO.Path.Combine(__SOURCE_DIRECTORY__,"operators.fs"),     
     [
         """namespace MXNetSharp
 open System
 open System.Runtime.InteropServices
 open MXNetSharp.Interop
 """
-        yield! types |> breakBlocks
+        //yield! types |> breakBlocks
         ""
-        yield! symboltypes |> Seq.filter (List.isEmpty >> not) |> breakBlocks
+        //yield! symboltypes |> Seq.filter (List.isEmpty >> not) |> breakBlocks
         """
 type Operators() =  
 """  
         yield! members |> breakBlocks
         yield! skip |> breakBlocks
         yield! errors |> breakBlocks
-    ]
+    ])
             
 
-System.IO.File.WriteAllLines(System.IO.Path.Combine(__SOURCE_DIRECTORY__,"operators.fs"),  generatedLines)
+
+System.IO.File.WriteAllLines(System.IO.Path.Combine(__SOURCE_DIRECTORY__,"genargtypes.fs"),     
+    [
+        """namespace MXNetSharp
+open System
+open System.Runtime.InteropServices
+open MXNetSharp.Interop
+
+[<AutoOpen>]
+module GeneratedArgumentTypes = 
+"""
+        yield! types |> breakBlocks |> indent 1
+        ""
+    ])
+
+let symbolsFile = System.IO.Path.Combine(__SOURCE_DIRECTORY__,"symbol.fs")
+let lines = System.IO.File.ReadAllLines(symbolsFile)
+
+let startTag = "(* GERNATED SYMBOL TYPES BEGIN *)//"
+let endTag = "(* GERNATED SYMBOL TYPES END *)//"
+System.IO.File.WriteAllLines(symbolsFile,
+    [
+        let mutable i = 0 
+        while i < lines.Length && not (lines.[i].StartsWith(startTag)) do 
+            yield lines.[i]
+            i <- i + 1
+        yield lines.[i]
+        i <- i + 1
+        yield! symboltypes |> Seq.filter (List.isEmpty >> not) |> breakBlocks
+        while i < lines.Length && not (lines.[i].StartsWith(endTag)) do 
+            i <- i + 1
+        yield lines.[i]
+        i <- i + 1
+        while i < lines.Length do 
+            yield lines.[i]
+            i <- i + 1
+    ]
+) 
+
 
 

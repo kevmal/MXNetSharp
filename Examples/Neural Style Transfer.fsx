@@ -143,10 +143,10 @@ let loss (gram: SymbolGroup<'a>) content =
         |> Array.mapi 
             (fun i oname ->
                 let gvar = new Variable(sprintf "target_gram_%d" i)
-                new Sum(new Square(new ElemwiseSub(gvar, gram.SymbolArray.[i])))
+                new Sum(new Square(gvar - gram.SymbolArray.[i]))
             )
     let cvar = new Variable("target_content")
-    let contentLoss = new Sum(new Square(new ElemwiseSub(cvar, content)))
+    let contentLoss = new Sum(new Square(cvar - content))
     new SymbolGroup<unit>((), gramLoss |> Array.map (fun x -> upcast x)), contentLoss
 
 
