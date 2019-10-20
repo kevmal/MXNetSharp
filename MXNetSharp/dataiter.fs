@@ -6,24 +6,6 @@ open MXNetSharp
 open System.Runtime.InteropServices
 
 
-type DataType = 
-    | Float16
-    | Float32
-    | Float64
-    | Int32
-    | Int64
-    | Int8
-    | UInt8
-    override x.ToString() =
-        match x with
-            | Float16 -> "float16"
-            | Float32 -> "float32"
-            | Float64 -> "float64"
-            | Int32 -> "int32"
-            | Int64 -> "int64"
-            | Int8 -> "int8"
-            | UInt8 -> "uint8"
-    
 
 exception DataIterNotFound of string with
     override x.Message = 
@@ -339,7 +321,7 @@ type CSVIter private (creatorHandle : IntPtr, info : DataIterInfo,
         ?batchSize : int, 
         ?roundBatch : bool, 
         ?prefetchBuffer : int64, 
-        ?deviceType : DeviceType, 
+        ?deviceType : DeviceTypeEnum, 
         ?dtype : DataType) =
         let def = DataIterDefinition.FromName("CSVIter")
         let dataShape = dataShape |> Seq.toArray
@@ -349,8 +331,8 @@ type CSVIter private (creatorHandle : IntPtr, info : DataIterInfo,
         let roundBatch = defaultArg roundBatch true
         let prefetchBuffer = defaultArg prefetchBuffer 4L
         let deviceType = 
-            match defaultArg deviceType DeviceType.GPU with 
-            | DeviceType.CPU | DeviceType.CPUPinned -> "cpu"
+            match defaultArg deviceType DeviceTypeEnum.GPU with 
+            | DeviceTypeEnum.CPU | DeviceTypeEnum.CPUPinned -> "cpu"
             | _ -> "gpu"
         new CSVIter(def.DataIterCreatorHandle, def.Info, dataCsv, dataShape, labelCsv, labelShape, batchSize, roundBatch, prefetchBuffer, deviceType, dtype)
     /// The input CSV file or a directory path.

@@ -4,25 +4,11 @@ open System.Runtime.InteropServices
 open MXNetSharp.Interop
 
 
-type SafeNDArrayHandle(owner) = 
-    inherit SafeHandle(0n, true)
-    new() = new SafeNDArrayHandle(true)
-    new(ptr,owner) as this = new SafeNDArrayHandle(owner) then this.SetHandle(ptr)
-    override x.IsInvalid = x.handle <= 0n
-    override x.ReleaseHandle() = CApi.MXNDArrayFree x.handle = 0
-    member internal x.UnsafeHandle = 
-        if not x.IsClosed then
-            x.handle
-        else
-            ObjectDisposedException("SafeNDArrayHandle", "NDArray handle has been closed") |> raise
 
+module internal Helper = 
+    let inline (<--) x y = x, Util.valueString y
 
-// From https://github.com/apache/incubator-mxnet/blob/225f71f744ac5e7bd29868b6d3ba0e4fe2527c43/cpp-package/include/mxnet-cpp/base.h#L39
-type OpReqType =
-    | NullOp = 0
-    | WriteTo = 1
-    | WriteInplace = 2
-    | AddTo = 3
+open Helper
 
 module internal Helper = 
     let valueString (x : obj) = 

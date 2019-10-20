@@ -20,14 +20,14 @@ type SafeExecutorHandle(owner) =
  
 type Executor(handle : SafeExecutorHandle, ?symbol, ?context, ?contextMap, ?inArgs, ?argGrad, ?gradReqType, ?auxStates) =   
     let mutable disposed = false
-    new(symbol : Symbol, context, contextMap : IDictionary<string,Context> option, inArgs, argGrad, gradReqType, auxStates, sharedExecutor : Executor option) = 
+    new(symbol : Symbol, context : Context, contextMap : IDictionary<string,Context> option, inArgs, argGrad, gradReqType, auxStates, sharedExecutor : Executor option) = 
         let inArgs = inArgs |> Seq.toArray
         let argGrad = argGrad |> Seq.toArray
         let gradReqType = gradReqType |> Seq.toArray
         let auxStates = auxStates |> Seq.toArray
         let inArgsHandles = inArgs |> Array.map (fun (x : NDArray) -> x.NDArrayHandle.UnsafeHandle)
         let argGradHandles = argGrad |> Array.map (fun (x : NDArray) -> x.NDArrayHandle.UnsafeHandle)
-        let gradReqTypeHandles = gradReqType |> Array.map (fun (x : OpReqType) -> uint32 x)
+        let gradReqTypeHandles = gradReqType |> Array.map (fun (x : OpReqType) -> uint32 x.OpReqTypeInt)
         let auxStatesHandles = auxStates |> Array.map (fun (x : NDArray) -> x.NDArrayHandle.UnsafeHandle)
         let mapKeys,mapDevTypes,mapDevIds = 
             match contextMap with 

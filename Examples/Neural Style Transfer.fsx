@@ -14,13 +14,8 @@ open System
 open System.Net
 open System.IO
 
-
-let context = 
-    {
-        DeviceType = DeviceType.CPU
-        DeviceId = 0
-    }
-let ctxStr = "cpu(0)"
+let context = CPU(0)
+let ctxStr = context.ToString()
 
 let vggParamsUrl = "https://github.com/dmlc/web-data/raw/master/mxnet/neural-style/model/vgg19.params"
 let vggParamsFile = "vgg19.params"
@@ -55,49 +50,46 @@ let loadImage (image : Image) =
         |]
     let im = new NDArray(dat |> Array.map float32, [image.Height; image.Width; 3], context)
     let resized = Operators.ImageResize(im,224,224).[0]
-    let s1 = Operators.SwapAxis(resized,0,2).[0]
-    let s3 = Operators.SwapAxis(s1,1,2).[0]
-    Operators.Reshape(s3, shape = [1;3;224;224]).[0]
+    resized.SwapAxis(0,2).SwapAxis(1,2).Reshape([1;3;224;224])
 
 
 let vggParams = NDArray.Load vggParamsFile    
 
-
 let data = new Variable("data")
-let conv1_1 = Operators.Convolution(data, Symbol.Empty, Symbol.Empty, numFilter = 64, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv1_1")
-let relu1_1 = Operators.Activation(conv1_1, actType = Relu, Name = "relu1_1")
-let conv1_2 = Operators.Convolution(relu1_1, Symbol.Empty, Symbol.Empty, numFilter = 64, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv1_2")
-let relu1_2 = Operators.Activation(conv1_2, actType = Relu, Name = "relu1_2")
-let pool1 = Operators.Pooling(relu1_2, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = Avg, Name = "pool1")
+let conv1_1 = new Convolution(data = data, numFilter = 64, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv1_1")
+let relu1_1 = new Relu(conv1_1, Name = "relu1_2")
+let conv1_2 = new Convolution(data = relu1_1, numFilter = 64, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv1_2")
+let relu1_2 = new Relu(conv1_2, Name = "relu1_2")
+let pool1 = new Pooling(relu1_2, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = Avg, Name = "pool1")
 
-let conv2_1 = Operators.Convolution(pool1, Symbol.Empty, Symbol.Empty, numFilter = 128, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv2_1")
-let relu2_1 = Operators.Activation(conv2_1, actType = Relu, Name = "relu2_1")
-let conv2_2 = Operators.Convolution(relu2_1, Symbol.Empty, Symbol.Empty, numFilter = 128, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv2_2")
-let relu2_2 = Operators.Activation(conv2_2, actType = Relu, Name = "relu2_2")
-let pool2 = Operators.Pooling(relu2_2, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = Avg, Name = "pool2")
+let conv2_1 = new Convolution(data = pool1, numFilter = 128, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv2_1")
+let relu2_1 = new Relu(conv2_1, Name = "relu2_1")
+let conv2_2 = new Convolution(data = relu2_1, numFilter = 128, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv2_2")
+let relu2_2 = new Relu(conv2_2, Name = "relu2_2")
+let pool2 = new Pooling(relu2_2, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = Avg, Name = "pool2")
 
-let conv3_1 = Operators.Convolution(pool2, Symbol.Empty, Symbol.Empty, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_1")
-let relu3_1 = Operators.Activation(conv3_1, actType = Relu, Name = "relu3_1")
-let conv3_2 = Operators.Convolution(relu3_1, Symbol.Empty, Symbol.Empty, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_2")
-let relu3_2 = Operators.Activation(conv3_2, actType = Relu, Name = "relu3_2")
-let conv3_3 = Operators.Convolution(relu3_2, Symbol.Empty, Symbol.Empty, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_3")
-let relu3_3 = Operators.Activation(conv3_3, actType = Relu, Name = "relu3_3")
-let conv3_4 = Operators.Convolution(relu3_3, Symbol.Empty, Symbol.Empty, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_4")
-let relu3_4 = Operators.Activation(conv3_4, actType = Relu, Name = "relu3_4")
-let pool3 = Operators.Pooling(relu3_4, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = Avg, Name = "pool3")
+let conv3_1 = new Convolution(data = pool2, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_1")
+let relu3_1 = new Relu(conv3_1, Name = "relu3_1")
+let conv3_2 = new Convolution(data = relu3_1, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_2")
+let relu3_2 = new Relu(conv3_2, Name = "relu3_2")
+let conv3_3 = new Convolution(data = relu3_2, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_3")
+let relu3_3 = new Relu(conv3_3, Name = "relu3_3")
+let conv3_4 = new Convolution(data = relu3_3, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_4")
+let relu3_4 = new Relu(conv3_4, Name = "relu3_4")
+let pool3 = new Pooling(relu3_4, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = Avg, Name = "pool3")
 
-let conv4_1 = Operators.Convolution(pool3, Symbol.Empty, Symbol.Empty, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_1")
-let relu4_1 = Operators.Activation(conv4_1, actType = Relu, Name = "relu4_1")
-let conv4_2 = Operators.Convolution(relu4_1, Symbol.Empty, Symbol.Empty, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_2")
-let relu4_2 = Operators.Activation(conv4_2, actType = Relu, Name = "relu4_2")
-let conv4_3 = Operators.Convolution(relu4_2, Symbol.Empty, Symbol.Empty, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_3")
-let relu4_3 = Operators.Activation(conv4_3, actType = Relu, Name = "relu4_3")
-let conv4_4 = Operators.Convolution(relu4_3, Symbol.Empty, Symbol.Empty, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_4")
-let relu4_4 = Operators.Activation(conv4_4, actType = Relu, Name = "relu4_4")
-let pool4 = Operators.Pooling(relu4_4, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = Avg, Name = "pool4")
+let conv4_1 = new Convolution(data = pool3, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_1")
+let relu4_1 = new Relu(conv4_1, Name = "relu4_1")
+let conv4_2 = new Convolution(data = relu4_1, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_2")
+let relu4_2 = new Relu(conv4_2, Name = "relu4_2")
+let conv4_3 = new Convolution(data = relu4_2, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_3")
+let relu4_3 = new Relu(conv4_3, Name = "relu4_3")
+let conv4_4 = new Convolution(data = relu4_3, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_4")
+let relu4_4 = new Relu(conv4_4, Name = "relu4_4")
+let pool4 = new Pooling(relu4_4, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = Avg, Name = "pool4")
 
-let conv5_1 = Operators.Convolution(pool4, Symbol.Empty, Symbol.Empty, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv5_1")
-let relu5_1 = Operators.Activation(conv5_1, actType = Relu, Name = "relu5_1")
+let conv5_1 = new Convolution(data = pool4, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv5_1")
+let relu5_1 = new Relu(conv5_1, Name = "relu5_1")
 
 let style = new SymbolGroup<unit>((), [|relu1_1; relu2_1; relu3_1; relu4_1; relu5_1|])
 let content = new SymbolGroup<unit>((), [| relu4_2 |])
@@ -143,7 +135,7 @@ let makeExecutor style content (inputSize : int seq) =
         Out = out
         ArgGrad = Array.zip out.ArgumentNames argGrad |> dict
         Args = args
-        Executor = Executor(out, context, inArgs, argGrad, gradReqType, Array.empty)
+        Executor = new Executor(out, context, inArgs, argGrad, gradReqType, Array.empty)
     |}
 
 let loss (gram: SymbolGroup<'a>) content = 
@@ -152,10 +144,10 @@ let loss (gram: SymbolGroup<'a>) content =
         |> Array.mapi 
             (fun i oname ->
                 let gvar = new Variable(sprintf "target_gram_%d" i)
-                Operators.Sum(Operators.Square(Operators.ElemwiseSub(gvar, gram.Symbols.[i])))
+                new Sum(new Square(new ElemwiseSub(gvar, gram.SymbolArray.[i])))
             )
     let cvar = new Variable("target_content")
-    let contentLoss = Operators.Sum(Operators.Square(Operators.ElemwiseSub(cvar, content)))
+    let contentLoss = new Sum(new Square(new ElemwiseSub(cvar, content)))
     new SymbolGroup<unit>((), gramLoss |> Array.map (fun x -> upcast x)), contentLoss
 
 
@@ -168,7 +160,7 @@ let learningRate = 0.001
 
 let lrScheduleDelay = 50
 let lrScheduleFactor = 0.6
-let saveEpochs = 50
+let saveEpochs = 5
 let maxNumEpochs = 1000
 
 let removeNoise = 0.02
@@ -190,8 +182,8 @@ let gramList, gradScale =
         (fun i outName ->
             let shape = styleInferResult.OutputShapes.[i] |> Array.map int
             let target = [shape.[1]; shape.[2 ..] |> Array.reduce (*)] 
-            let x = Operators.Reshape(style.Symbols.[i],  shape = target) //TODO: deprecate targetShape
-            let gram = Operators.FullyConnected(x,x,Symbol.Empty,noBias = true, numHidden = shape.[1])
+            let x = new Reshape(style.SymbolArray.[i], shape = target) //TODO: deprecate targetShape
+            let gram = new FullyConnected(data = x, weight = x, noBias = true, numHidden = shape.[1])
             gram, (shape.[1..] |> Array.reduce (*)) * shape.[1]
         )
     |> Array.unzip
@@ -253,32 +245,32 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
         let nchannel = img.Shape.[1]
         let simg = new Variable("img")
         let skernel = new Variable("kernel")
-        let channels = Operators.SliceChannel(simg, numOutputs = nchannel)
-        let convs : BaseSymbol [] = 
+        let channels = new SliceChannel(simg, nchannel)
+        let convs : Symbol [] = 
             channels.Outputs
             |> Array.map
                 (fun c ->
-                    upcast Operators.Convolution(c, skernel, Symbol.Empty, numFilter = 1, kernel = [3;3], pad = [1;1], noBias = true, stride = [1;1])
+                    new Convolution(data = c, weight = skernel, numFilter = 1, kernel = [3;3], pad = [1;1], noBias = true, stride = [1;1]) :> Symbol
                 )
-        let out = Operators.Concat(data = convs, numArgs = convs.Length)
+        let out = new Concat(convs, convs.Length)
         let kernel = [ 0; -1;  0;
                       -1;  4; -1;
                        0; -1;  0]
                      |> List.map (fun x -> float32 x / 8.f)
                      |> (fun x -> new NDArray(x, [1;1;3;3], context))
-        let out = Operators.MulScalar(out :> BaseSymbol, w)
+        let out = new MulScalar(out, w)
         let inArgs,argGrad,grapReqType = 
             out.ArgumentNames
             |> Array.map 
                 (function 
-                 | "img" -> img, NDArray(), OpReqType.NullOp
-                 | "kernel" -> kernel, NDArray(), OpReqType.NullOp
+                 | "img" -> img, new NDArray(), OpReqType.NullOp
+                 | "kernel" -> kernel, new NDArray(), OpReqType.NullOp
                  | v -> failwithf "Unhandled arg %s" v)
             |> Array.unzip3
         {|
-            Executor = Executor(out, context, inArgs, argGrad, grapReqType, Array.empty)
+            Executor = new Executor(out, context, inArgs, argGrad, grapReqType, Array.empty)
             //KeepAlive = ([box simg; skernel; channels; convs; out; kernel] : obj list)
-            KeepAlive = ([channels] : obj list) //TODO: we should not need to ref this
+            //KeepAlive = ([channels] : obj list) //TODO: we should not need to ref this
         |}
         |> Some
     | None -> None

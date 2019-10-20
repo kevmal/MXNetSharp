@@ -5,6 +5,7 @@
 open System
 open System.Runtime.InteropServices
 open CApi
+open MXNetSharp
 
 type KeyVarNumArgs = IntPtr
 exception MXNetException of string*string with
@@ -13,30 +14,6 @@ exception MXNetException of string*string with
         | MXNetException(call,msg) -> sprintf "%s: %s" call msg
         | _ -> failwith "unreachable"
 
-// defined in cpp-package/include/mxnet-cpp/ndarray.h
-// https://github.com/apache/incubator-mxnet/blob/745a41ca1a6d74a645911de8af46dece03db93ea/cpp-package/include/mxnet-cpp/ndarray.h#L41
-type DeviceType = 
-    | CPU = 1
-    | GPU = 2
-    | CPUPinned = 3 
-
-// defined in mshadow/base.h
-// https://github.com/apache/incubator-mxnet/blob/618c4811e417fb86cbb3fc0f7f38d55972eeb2af/3rdparty/mshadow/mshadow/base.h#L306
-type TypeFlag = 
-    | None = -1
-    | Float32 = 0
-    | Float64 = 1
-    | Float16 = 2
-    | Uint8 = 3
-    | Int32 = 4
-    | Int8  = 5
-    | Int64 = 6
-
-type Context = 
-    {
-        DeviceType : DeviceType
-        DeviceId : int
-    }
 
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type LibFeature =
@@ -64,7 +41,7 @@ type AtomicSymbolInfo =
         Description : string
         Arguments : ArgumentInfo []
         ReturnTypeInfo : string
-        KeyVarNumArgs : KeyVarNumArgs
+        KeyVarNumArgs : string
     }
 
 type DataIterInfo = 
@@ -259,7 +236,7 @@ module MXSymbol =
                         }
                 |]
             ReturnTypeInfo = str return_type
-            KeyVarNumArgs = readIntPtr 0 key_var_num_args
+            KeyVarNumArgs = str key_var_num_args
         }
 
 
@@ -284,7 +261,7 @@ module MXSymbol =
     /// <param name="args">arguments to sym</param>
     let compose sym name keys args = 
         assert(isNull keys || ulength keys = ulength args)
-        MXSymbolCompose(sym, name, ulength args, keys, args) |> throwOnError "MXSymbolCompose"
+        MXSymbolCompose(sym, name, ulength args, keys, args) |> throwOnError (sprintf "MXSymbolCompose(%s)" name)  
 
     /// <summary>Save a symbol into a json string</summary>
     /// <param name="symbol">the input symbol.</param>
@@ -819,7 +796,7 @@ module MXNDArray =
     /// <param name="dev_id">the device id of the specific device</param>
     /// <param name="delay_alloc">whether to delay allocation until
     ///   the narray is first mutated</param>
-    let inline create (shape : ^a[]) (dev_type : DeviceType) dev_id (delay_alloc : bool) : NDArrayHandle = 
+    let inline create (shape : ^a[]) (dev_type : DeviceTypeEnum) dev_id (delay_alloc : bool) : NDArrayHandle = 
         let mutable out = IntPtr.Zero 
         MXNDArrayCreate(shape |> Array.map uint32, uint32 shape.Length, int dev_type, dev_id, boolToInt delay_alloc, &out) |> throwOnError "MXNDArrayCreate"
         out
@@ -831,7 +808,7 @@ module MXNDArray =
     /// <param name="delay_alloc">whether to delay allocation until
     ///   the narray is first mutated</param>
     /// <param name="dtype">data type of created array</param>
-    let inline createEx (shape : ^a[]) (dev_type : DeviceType) dev_id (delay_alloc : bool) (dtype : TypeFlag) : NDArrayHandle = 
+    let inline createEx (shape : ^a[]) (dev_type : DeviceTypeEnum) dev_id (delay_alloc : bool) (dtype : TypeFlag) : NDArrayHandle = 
         let mutable out = IntPtr.Zero 
         MXNDArrayCreateEx(shape |> Array.map uint32, uint32 shape.Length, int dev_type, dev_id, boolToInt delay_alloc, int dtype, &out) |> throwOnError "MXNDArrayCreateEx"
         out
@@ -990,10 +967,7 @@ module MXNDArray =
         let mutable out_dev_type = un
         let mutable out_dev_id = un
         MXNDArrayGetContext(handle, &out_dev_type, &out_dev_id) |> throwOnError "MXNDArrayGetContext"
-        {
-            DeviceType = enum out_dev_type
-            DeviceId = out_dev_id
-        }
+        struct((enum out_dev_type : DeviceTypeEnum), out_dev_id)
                 
     /// <summary>get the type of the data in NDArray</summary>
     /// <param name="handle">the handle to the narray</param>
@@ -1696,7 +1670,7 @@ module NNVM =
                         }
                 |]
             ReturnTypeInfo = str return_type
-            KeyVarNumArgs = 0n
+            KeyVarNumArgs = ""
         }
 
 module NNSymbol = 
