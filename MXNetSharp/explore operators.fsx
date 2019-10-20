@@ -94,6 +94,45 @@ allNames
         //printfn "%s" g
     )
 
+let info = lookup.["_contrib_dgl_csr_neighbor_non_uniform_sample"]
+let creator = info.AtomicSymbolCreatorHandle
+
+
+open Helper
+let mutable name = un
+let mutable description = un
+let mutable numArgs = un
+let mutable argNames = un
+let mutable arg_type_infos = un
+let mutable arg_descriptions = un
+let mutable key_var_num_args = un
+let mutable return_type = un
+CApi.MXSymbolGetAtomicSymbolInfo(creator,&name,&description,&numArgs,&argNames,&arg_type_infos,&arg_descriptions,&key_var_num_args,&return_type) 
+|> throwOnError "MXSymbolGetAtomicSymbolInfo"
+
+str key_var_num_args
+{
+    Name = str name
+    Description = str description
+    Arguments = 
+        [|
+            for i = 0 to int numArgs - 1 do 
+                {
+                    Name = readString i argNames
+                    Description = readString i arg_descriptions
+                    TypeInfo = readString i arg_type_infos
+                }
+        |]
+    ReturnTypeInfo = str return_type
+    KeyVarNumArgs = readIntPtr 0 key_var_num_args
+}
+
+
+NNSymbol.listAttrs info.AtomicSymbolCreatorHandle 0
+
+
+Helper.str info.Info.KeyVarNumArgs
+
 [<Extension>]
 type Ext() =
     [<Extension>]

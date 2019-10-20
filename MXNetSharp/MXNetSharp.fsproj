@@ -15,13 +15,14 @@
     <Compile Include="coretypes.fs" />
     <Compile Include="interop.fs" />
     <Compile Include="atomicsymbol.fs" />
+    <Compile Include="operator.fs" />
     <Compile Include="symbol.fs" />
     <Compile Include="ndarray.fs" />
     <Compile Include="dataiter.fs" />
     <Compile Include="executor.fs" />
-    <Compile Include="operator.fs" />
     <Compile Include="operators.fs" />
     <None Include="explore operators.fsx" />
+    <None Include="generate symbol types.fsx" />
     <None Include="generate operators.fsx" />
     <None Include="generate data iters.fsx" />
     <None Include="load.fsx" />

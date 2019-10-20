@@ -1,5 +1,4 @@
-﻿
-open System.Runtime.InteropServices
+﻿open System.Runtime.InteropServices
 open System.Collections.Generic
 open System.Diagnostics
 
@@ -114,173 +113,7 @@ let tpinfo x =
     | [|tp; "required"|] -> tp, Required
     | [|tp; "optional"; d|] -> tp, Optional (d.Split([|'='|], 2).[1].Trim())
     | _ -> failwithf "type info str not recognized %A" x
-    
-let trimQuotes (str : string) = str.Trim [| '''; '"'|]
-//let parseInt (str : string) = str.Trim ''' |> int
-//let parseInt64 (str : string) = str.Trim ''' |> int64
-//let parseInt64 (str : string) = str.Trim ''' |> int64
-let parseBoolStr (str) = 
-    match trimQuotes str with 
-    | "true"
-    | "1" -> true
-    | "false"
-    | "0" -> false
-    | x -> failwithf "unhandled bool str %A" x
-let inline parseSeq f (str : string) = 
-    match str with 
-    | "[]" -> Array.empty
-    | _ -> 
-        str.Trim([|'['; ']'|]).Split(',')
-        |> Seq.map f
-        |> Seq.toArray
-
-type UnionType = 
-    {
-        TypeString : string
-        Name : string
-        Cases : (string*string) []
-    }
-
-
-let registeredTypes = 
-    [
-        "_npi_hanning", "M", "int"
-        "_npi_hamming", "M", "int"
-        "_npi_blackman", "M", "int"
-        "_npi_choice", "a", "int64"
-        "_npi_choice", "size", "Shape(tuple)"
-        "_histogram", "range", "Shape(tuple)" //TODO: not technically correct
-    ]
-    |> List.map (fun (n,p,t) -> (n,p), t)
-    |> dict
-
-
-type TranslatedType = 
-    | Int of int option
-    | Int64 of int64 option
-    | Double of double option
-    | Float32 of double option
-    | Bool of bool option
-    | String of string option
-    | Context of string option
-    | StringChoices of UnionType*string option
-    | TupleInt of int [] option
-    | TupleFloat of double [] option
-    | TupleInt64 of int64 [] option
-    | Opt of TranslatedType
-    member x.TargetTypeString(fsOption, tupleTypeString )= 
-        match x with 
-        | Int _ -> "int"
-        | Int64 _ -> "int64"
-        | Double _ -> "double"
-        | Float32 _ -> "double"
-        | String _ -> "string"
-        | Bool _ -> "bool"
-        | Context _ -> "Context"
-        | StringChoices(t,_) -> t.Name
-        | TupleInt _ -> "int " + tupleTypeString
-        | TupleFloat _ -> "double " + tupleTypeString
-        | TupleInt64 _ -> "int64 " + tupleTypeString
-        | Opt t -> (t.TargetTypeString(fsOption, tupleTypeString)) + " option"
-    member x.DefaultString = 
-        match x with 
-        | Int o -> o |> Option.map string
-        | Int64 o -> o |> Option.map (fun n -> string n + "L")
-        | Double o -> o |> Option.map (fun n -> n.ToString("0.0###############"))
-        | Float32 o -> o |> Option.map (fun n -> n.ToString("0.0###############"))
-        | String o -> o |> Option.map quote
-        | Bool o -> o |> Option.map (fun n -> if n then "true" else "false")
-        | Context o -> o |> Option.map string
-        | StringChoices(t,o) -> o |> Option.map (toCaseName)
-        | TupleInt o -> o |> Option.map (fun n -> n |> Array.map string |> String.concat "; " |> sprintf "[|%s|]")
-        | TupleFloat o -> o |> Option.map (fun n -> n |> Array.map (fun i -> i.ToString("0.0###############")) |> String.concat "; " |> sprintf "[|%s|]")
-        | TupleInt64 o -> o |> Option.map (fun n -> n |> Array.map (fun i -> string i + "L") |> String.concat "; " |> sprintf "[|%s|]")
-        | Opt t -> 
-            match t.DefaultString with 
-            | None -> Some "None"
-            | Some str -> Some (sprintf "Some(%s)" str)
-    static member FromArgumentInfo(s : AtomicSymbolInfo, arg : ArgumentInfo) =
-        let typeInfo = arg.TypeInfo
-        printfn "FromArgumentInfo %A" typeInfo
-        let t,ro = tpinfo typeInfo
-        let ro = 
-            match ro with
-            | Required -> None
-            | Optional s -> Some s
-        let t = 
-            if t = "" then 
-                let scc,v = registeredTypes.TryGetValue((s.Name, arg.Name))
-                if scc then 
-                    v
-                else 
-                    failwithf "Blank type %s %s %A" s.Name arg.Name typeInfo
-            else t
-        let defaultIsNone str =
-            match str with
-            | Some "None"
-            | Some "'None'" -> true //Some()
-            | _ -> false
-        let checkNone str = 
-            match str with 
-            | Some "None"
-            | Some "'None'" -> None 
-            | x -> x
-        match t with 
-        | "boolean or None" -> ro |> checkNone |> Option.map parseBoolStr |> Bool |> Opt
-        | "Shape or None" -> ro |> checkNone |> Option.map (parseSeq int) |> TupleInt |> Opt
-        | "double or None" -> ro |> checkNone |> Option.map (trimQuotes >> double) |> Double |> Opt
-        | "int or None" -> ro |> checkNone |> Option.map (trimQuotes >> int) |> Int |> Opt
-        | "float or None" -> ro |> checkNone |> Option.map (trimQuotes >> double) |> Float32 |> Opt
-        | "int (non-negative)"
-        | "int" -> ro |> Option.map (trimQuotes >> int) |> Int
-        | "long"
-        | "long (non-negative)"
-        | "int64" -> ro |> Option.map (trimQuotes >> int64) |> Int64
-        | "double" -> ro |> Option.map (trimQuotes >> double) |> Double
-        | "float" -> ro |> Option.map (trimQuotes >> double) |> Float32
-        | "boolean" -> ro |> Option.map parseBoolStr |> Bool
-        | "string" when arg.Name = "ctx" -> 
-            match ro with 
-            | Some "" -> Opt (Context None)
-            | Some str -> Context(Some str)
-            | None -> Context None
-        | "string" -> ro |> Option.map (trimQuotes) |> String
-        | "tuple of <float>" -> ro |> Option.map (parseSeq double) |> TupleFloat
-        | "Shape(tuple)" when defaultIsNone ro -> TupleInt None |> Opt
-        | "Shape(tuple)"
-        | "tuple of <int>" -> ro |> Option.map (parseSeq int) |> TupleInt
-        | "tuple of <long>" -> ro |> Option.map (parseSeq int64) |> TupleInt64
-        | t when t.StartsWith "{" -> 
-            let cases = t.Trim([|'{'; '}'|]).Split ',' |> Array.map (fun x -> x.Trim())
-            if cases |> Array.exists (fun x -> x = "None" || x = "'None'") then 
-                let ut = 
-                    {  
-                        TypeString = t
-                        Name = arg.Name |> toCaseName
-                        Cases = 
-                            cases 
-                            |> Array.filter (fun x -> x <> "None" && x <> "'None'") 
-                            |> Array.map (fun x -> toCaseName x, x.Trim ''')
-                    }
-                match ro with 
-                | None
-                | Some "None"
-                | Some "'None'" -> StringChoices(ut, None) |> Opt
-                | Some str -> StringChoices(ut, Some (trimQuotes str))
-            else
-                let ut = 
-                    {  
-                        TypeString = t
-                        Name = arg.Name |> toCaseName
-                        Cases = cases |> Array.map (fun x -> toCaseName x, x.Trim ''')
-                    }
-                StringChoices(ut, ro |> Option.map trimQuotes)
-        | p -> 
-            failwithf "Unhandled type %A" t
-           
-
-
-
+        
 type DefaultMode = 
     | UseAttr of string
     | ReplaceNull of string
@@ -305,6 +138,13 @@ type ArgCodeGen =
     | SkipArg
     | ValueString of string
     | ConstantArg of string
+
+type UnionType = 
+    {
+        TypeString : string
+        Name : string
+        Cases : (string*string) []
+    }
 
 type ProcessedArg = 
     {
@@ -333,7 +173,6 @@ type CodeBlock =
     {
         AtomicSymbolInfo : AtomicSymbolInfo
         MemberDefinitions : (ProcessedAtomicSymbol*(string list)) list
-        SymbolTypeDefinitions : (ProcessedAtomicSymbol*(String list)) list
         TypeDefinitions : (ProcessedArg*(String list)) list
     }
 
@@ -427,7 +266,6 @@ Mappings.Modify
                 | "boolean" -> "bool"
                 | "real_t" -> "double"
                 | "long" -> "int64"
-                | "tuple of <double>"
                 | "tuple of <float>" -> "double seq"
                 | "tuple of <long>" -> "int64 seq"
                 | str -> str}
@@ -837,221 +675,26 @@ let toSymbolCode suffix (x : ProcessedAtomicSymbol) =
         yield! indent 2 invoke 
     ]
 
-
-let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
-    let h = x |> List.head
+let toCode (x : ProcessedAtomicSymbol) =
     let ndArray = 
-        match h.SymbolOrNDArray with 
+        match x.SymbolOrNDArray with 
         | NDArray | SymbolOrNDArray | ManySymbolOrNDArray -> true 
         | _ -> false
     let symbol = 
-        match h.SymbolOrNDArray with 
+        match x.SymbolOrNDArray with 
         | Symbol | SymbolOrNDArray | ManySymbolOrNDArray -> true 
         | _ -> false
-    // REVIEW: we skip _make_loss in favor of MakeLoss. Is there any reason to have both?
-    if not symbol || h.AtomicSymbolInfo.Name.StartsWith "_backward_" || h.AtomicSymbolInfo.Name = "make_loss" then [] else
-    let ctor = 
-        let args = 
-            [
-                for a in h.Args do 
-                    let tp = 
-                        match a.SymbolOrNDArray with 
-                        | Some ManySymbolOrNDArray -> "Symbol seq"
-                        | Some SymbolOrNDArray
-                        | Some Symbol -> "Symbol"
-                        | _ -> a.TypeString 
-                    if a.Arg.ArgumentInfo.Name <> "ctx" then 
-                        if a.DefaultMode.IsSome then 
-                            sprintf "[<Optional>] ?%s : %s" a.Name tp
-                        else
-                            sprintf "%s : %s" a.Name tp
-            ]
-        [
-            if args.Length = 0 then 
-                "new() ="
-            elif args.Length = 1 then 
-                sprintf "new(%s) =" args.[0]
-            else
-                sprintf "new(%s," args.[0]
-                let padding = String.replicate "new(".Length " "
-                for a in args.[1.. args.Length - 2] do 
-                    sprintf "%s%s," padding a
-                sprintf "%s%s) = " padding args.[args.Length - 1]
-            yield! indent 1 
-                [
-                    sprintf "let operatorArguments = "
-                    sprintf "    ["
-                    yield! indent 2 
-                        [
-                            for a in h.Args do 
-                                if a.Arg.Name = h.AtomicSymbolInfo.KeyVarNumArgs || a.Arg.ArgumentInfo.Name = "ctx" then 
-                                    ()
-                                elif a.DefaultMode.IsSome then 
-                                    sprintf "\"%s\", %s |> Option.map box |> Parameter" a.Arg.ArgumentInfo.Name a.Name 
-                                elif a.SymbolOrNDArray.IsSome then 
-                                    match a.SymbolOrNDArray.Value with 
-                                    | ManySymbolOrNDArray ->
-                                        sprintf "\"%s\", VarArg(\"%s\", %s |> Seq.toArray)" a.Arg.ArgumentInfo.Name a.ProcessedAtomicSymbol.Value.AtomicSymbolInfo.KeyVarNumArgs a.Name 
-                                    | _ -> sprintf "\"%s\", Input %s" a.Arg.ArgumentInfo.Name a.Name 
-                                else
-                                    sprintf "\"%s\", Parameter(Some(box %s))" a.Arg.ArgumentInfo.Name a.Name 
-                                    
-                            
-                        ]
-                    sprintf "    ]"
-                    sprintf "new %s(Arguments<Symbol>(operatorArguments))" h.Name
-                ]
-        ]
-    let ins,ps = 
-        h.Args 
-        |> Array.partition 
-            (fun a ->
-                match a.SymbolOrNDArray with 
-                | Some ManySymbolOrNDArray 
-                | Some SymbolOrNDArray
-                | Some Symbol -> true
-                | _ -> false
-            )
-    let req,opt = ps |> Array.filter (fun x -> x.Arg.ArgumentInfo.Name <> "ctx") |> Array.partition (fun a -> a.DefaultMode.IsNone )
-    let ctor2 = 
-        let args = 
-            [
-                for a in req do 
-                    sprintf "%s : %s" a.Name a.TypeString 
-                for a in ins do 
-                    let tp = 
-                        match a.SymbolOrNDArray with 
-                        | Some ManySymbolOrNDArray -> "Symbol seq"
-                        | Some SymbolOrNDArray
-                        | Some Symbol -> "Symbol"
-                        | _ -> a.TypeString 
-                    sprintf "[<Optional>] ?%s : %s" a.Name tp
-                for a in opt do 
-                    sprintf "[<Optional>] ?%s : %s" a.Name a.TypeString 
-            ]
-        [
-            if args.Length = 0 then 
-                "new() ="
-            elif args.Length = 1 then 
-                sprintf "new(%s) =" args.[0]
-            else
-                sprintf "new(%s," args.[0]
-                let padding = String.replicate "new(".Length " "
-                for a in args.[1.. args.Length - 2] do 
-                    sprintf "%s%s," padding a
-                sprintf "%s%s) = " padding args.[args.Length - 1]
-            yield! indent 1 
-                [
-                    for a in ins do 
-                        match a.SymbolOrNDArray with 
-                        | Some ManySymbolOrNDArray -> sprintf "let %s = defaultArg (%s |> Option.map Seq.toArray) Array.empty" a.Name a.Name
-                        | _ -> sprintf "let %s = defaultArg %s (new ImplicitVariable() :> Symbol)" a.Name a.Name
-                    sprintf "let operatorArguments = "
-                    sprintf "    ["
-                    yield! indent 2 
-                        [
-                            for a in h.Args do 
-                                if a.Arg.ArgumentInfo.Name = "ctx" then 
-                                    ()
-                                elif a.DefaultMode.IsSome then 
-                                    sprintf "\"%s\", %s |> Option.map box |> Parameter" a.Arg.ArgumentInfo.Name a.Name 
-                                elif a.SymbolOrNDArray.IsSome then 
-                                    match a.SymbolOrNDArray.Value with 
-                                    | ManySymbolOrNDArray ->
-                                        sprintf "\"%s\", VarArg(\"%s\", %s)" a.Arg.ArgumentInfo.Name a.ProcessedAtomicSymbol.Value.AtomicSymbolInfo.KeyVarNumArgs a.Name 
-                                    | _ -> sprintf "\"%s\", Input %s" a.Arg.ArgumentInfo.Name a.Name 
-                                else
-                                    sprintf "\"%s\", Parameter(Some(box %s))" a.Arg.ArgumentInfo.Name a.Name 
-                                    
-                            
-                        ]
-                    sprintf "    ]"
-                    sprintf "new %s(Arguments<Symbol>(operatorArguments))" h.Name
-                ]
-        ]
-    let ctor3 = 
-        if opt.Length = 0 && ins.Length = 1 then 
-            match ins.[0].SymbolOrNDArray with 
-            | Some ManySymbolOrNDArray ->
-                let args = 
-                    [
-                        for a in req do 
-                            sprintf "%s : %s" a.Name a.TypeString 
-                        sprintf "[<ParamArray>] %s : Symbol[]" ins.[0].Name
-                    ]
-                [
-                    if args.Length = 0 then 
-                        "new() ="
-                    elif args.Length = 1 then 
-                        sprintf "new(%s) =" args.[0]
-                    else
-                        sprintf "new(%s," args.[0]
-                        let padding = String.replicate "new(".Length " "
-                        for a in args.[1.. args.Length - 2] do 
-                            sprintf "%s%s," padding a
-                        sprintf "%s%s) = " padding args.[args.Length - 1]
-                    yield! indent 1 
-                        [
-                            sprintf "let operatorArguments = "
-                            sprintf "    ["
-                            yield! indent 2 
-                                [
-                                    for a in h.Args do 
-                                        if a.DefaultMode.IsSome then 
-                                            sprintf "\"%s\", %s |> Option.map box |> Parameter" a.Arg.ArgumentInfo.Name a.Name 
-                                        elif a.SymbolOrNDArray.IsSome then 
-                                            match a.SymbolOrNDArray.Value with 
-                                            | ManySymbolOrNDArray ->
-                                                sprintf "\"%s\", VarArg(\"%s\", %s)" a.Arg.ArgumentInfo.Name a.ProcessedAtomicSymbol.Value.AtomicSymbolInfo.KeyVarNumArgs a.Name 
-                                            | _ -> sprintf "\"%s\", Input %s" a.Arg.ArgumentInfo.Name a.Name 
-                                        else
-                                            sprintf "\"%s\", Parameter(Some(box %s))" a.Arg.ArgumentInfo.Name a.Name 
-                                            
-                                    
-                                ]
-                            sprintf "    ]"
-                            sprintf "new %s(Arguments<Symbol>(operatorArguments))" h.Name
-                        ]
-                ]
-            | _ -> []
-        else    
-            []
-    let props = 
-        [
-            for a in opt do
-                let t = TranslatedType.FromArgumentInfo(a.ProcessedAtomicSymbol.Value.AtomicSymbolInfo, a.Arg.ArgumentInfo)
-                match t with 
-                | Opt(StringChoices _) ->
-                    match t.DefaultString.Value with 
-                    | "None" -> sprintf "static member %sDefault : %s option = None" (capitalize a.Name) a.TypeString
-                    | _ -> sprintf "static member %sDefault : %s option = %s.%s" (capitalize a.Name) a.TypeString a.TypeString t.DefaultString.Value
-                | StringChoices _ ->
-                    sprintf "static member %sDefault : %s = %s.%s" (capitalize a.Name) a.TypeString a.TypeString t.DefaultString.Value
-                | _ -> sprintf "static member %sDefault : %s = %s" (capitalize a.Name) (t.TargetTypeString(true, "[]")) t.DefaultString.Value
-            for a in ins do 
-                match a.SymbolOrNDArray with
-                | Some ManySymbolOrNDArray -> 
-                    sprintf "member __.%s = operatorArguments.GetVarArg \"%s\"" (capitalize a.Name) a.Arg.ArgumentInfo.Name
-                | _ ->
-                    sprintf "member __.%s = operatorArguments.GetInput \"%s\"" (capitalize a.Name) a.Arg.ArgumentInfo.Name
-            for a in req do 
-                sprintf "member __.%s : %s = match operatorArguments.GetParameter \"%s\" with Some(v) -> unbox v | None -> failwithf \"Required parameter %s is missing\"" (capitalize a.Name) (a.TypeString) a.Arg.ArgumentInfo.Name a.Arg.ArgumentInfo.Name
-            for a in opt do 
-                sprintf "member __.%s = operatorArguments.GetParameter(\"%s\", %s.%sDefault)" (capitalize a.Name) a.Arg.ArgumentInfo.Name h.Name (capitalize a.Name)
-
-        ]
     [
-        sprintf "type %s private (operatorArguments) = " h.Name
-        sprintf "    inherit SymbolOperator(\"%s\", operatorArguments)" h.AtomicSymbolInfo.Name
-        if req.Length = 0 then 
-            yield! indent 1 ctor2
-        else
-            yield! indent 1 ctor
-            yield! indent 1 ctor2
-        yield! indent 1 ctor3
-        yield! indent 1 props
+        if not ndArray && not symbol then 
+            yield! toNDArrayCode true x 
+            yield! toSymbolCode true x 
+            ()
+        else    
+            if ndArray then 
+                yield! toNDArrayCode false x
+            if symbol then 
+                yield! toSymbolCode false x
     ]
-    
 
 let definedTypeToCode (a : ProcessedArg) =
     match a.DefinedType with 
@@ -1078,7 +721,6 @@ let definedTypeToCode (a : ProcessedArg) =
         
             
 // **************************** remove underscores from param names *******************************
-
 Mappings.Modify(fun (x : ProcessedArg) -> {x with Name = toParamName x.Name} |> argDoc)
 
 
@@ -1224,12 +866,15 @@ Mappings.Modify(fun (x : ProcessedArg) ->
     else    
         x
     )
+
+
 // **************************** _cvcopyMakeBorder *******************************
 
 Mappings.Modify(fun (x : ProcessedArg) -> 
     if x.Arg.AtomicSymbolInfo.Name = "_cvcopyMakeBorder"  then
         match x.Name with 
         | "type" -> {x with Name = "fillingType"} |> argDoc
+        | "values" -> {x with TypeString = "string (*REVIEW: What's the type here?*)"} 
         | _ -> x
     else    
         x
@@ -1464,9 +1109,16 @@ Mappings.Modify(fun (l : ProcessedAtomicSymbol list) ->
 
 Mappings.Modify(fun (x : ProcessedArg) -> 
     if x.TypeString = "Shape(tuple)" then 
-        {x with 
-            TypeString = "int seq"
-        }   
+        match x.Arg.AtomicSymbolInfo.Name with 
+        //| "Pooling"
+        //| "Deconvolution"
+        //| "Dropout"
+        //| "Convolution" ->
+        | _ ->
+            {x with 
+                TypeString = "int seq"
+            }   
+        //| _ -> x
     else    
         x
     )
@@ -1557,45 +1209,6 @@ Mappings.Modify(fun (x : ProcessedAtomicSymbol) ->
         }
     )
 
-let toCode (x : ProcessedAtomicSymbol) =
-    let ndArray = 
-        match x.SymbolOrNDArray with 
-        | NDArray | SymbolOrNDArray | ManySymbolOrNDArray -> true 
-        | _ -> false
-    let symbol = 
-        match x.SymbolOrNDArray with 
-        | Symbol | SymbolOrNDArray | ManySymbolOrNDArray -> true 
-        | _ -> false
-    [
-        if not ndArray && not symbol then 
-            yield! toNDArrayCode true x 
-        else    
-            if ndArray then 
-                yield! toNDArrayCode false x
-    ]
-
-let toCodeOld (x : ProcessedAtomicSymbol) =
-    let ndArray = 
-        match x.SymbolOrNDArray with 
-        | NDArray | SymbolOrNDArray | ManySymbolOrNDArray -> true 
-        | _ -> false
-    let symbol = 
-        match x.SymbolOrNDArray with 
-        | Symbol | SymbolOrNDArray | ManySymbolOrNDArray -> true 
-        | _ -> false
-    [
-        if not ndArray && not symbol then 
-            yield! toNDArrayCode true x 
-            yield! toSymbolCode true x 
-            ()
-        else    
-            if ndArray then 
-                yield! toNDArrayCode false x
-            if symbol then 
-                yield! toSymbolCode false x
-    ]
-
-
 let processed = 
     creatorInfos
     |> Array.choose     
@@ -1612,7 +1225,6 @@ let processed =
         (fun result ->
             match result with 
             | x, Ok(y) -> 
-                let symbolDefs = (y.Head, toSymbolTypeCode y) |> List.singleton
                 let memberDefs = y |> List.map (fun i -> i, toCode i)
                 let typeDefs = 
                     y
@@ -1628,7 +1240,6 @@ let processed =
                     AtomicSymbolInfo = x
                     MemberDefinitions = memberDefs
                     TypeDefinitions = typeDefs
-                    SymbolTypeDefinitions = symbolDefs
                 }
                 |> Ok
             | _, Error(x,e) -> Error(x,e)
@@ -1649,7 +1260,6 @@ let generatedLines =
     let definedTypes = HashSet()
     let types = ResizeArray()
     let members = ResizeArray()
-    let symboltypes = ResizeArray()
     let errors = ResizeArray()
     let skip = ResizeArray()
     for b in processed do 
@@ -1690,9 +1300,6 @@ let generatedLines =
             |> List.map snd
             |> List.filter definedTypes.Add
             |> List.iter (types.Add)
-            cb.SymbolTypeDefinitions
-            |> List.map snd
-            |> List.iter (symboltypes.Add)
     let concatWith sep (lines : string list list) =
         if lines.IsEmpty then [] 
         else 
@@ -1711,8 +1318,6 @@ open System.Runtime.InteropServices
 open MXNetSharp.Interop
 """
         yield! types |> breakBlocks
-        ""
-        yield! symboltypes |> Seq.filter (List.isEmpty >> not) |> breakBlocks
         """
 type Operators() =  
 """  

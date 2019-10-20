@@ -3,24 +3,9 @@ open System
 open System.Runtime.InteropServices
 open MXNetSharp.Interop
 
-type BaseSymbol() = class end
-
-
-type EmptySymbol private () = 
-    inherit BaseSymbol()
-    static let instance = EmptySymbol()
-    static member Instance = instance
-
 [<AbstractClass>]
 type Symbol() =
-    inherit BaseSymbol()
     let mutable disposed = false
-    //TODO: pull this out as it's used all over
-    let str (v : obj) = 
-        match v with 
-        | :? bool as x -> if x then "1" else "0"
-        | :? string as x -> sprintf "%s" x
-        | x -> string x
     member val internal InternalName : string option = None with get,set
     member val internal InternalHandle : SafeSymbolHandle option = None with get,set
     member x.IsInitialized = x.InternalHandle.IsSome
@@ -55,7 +40,6 @@ type Symbol() =
                 new SymbolOutput(x,new SafeSymbolHandle(h, true))
             )
     abstract member Initialize : unit -> unit
-    static member Empty = EmptySymbol.Instance
     member x.Dispose(disposing) = 
         if not disposed then 
             if disposing then 
@@ -92,41 +76,88 @@ type Variable() =
                 x.InternalHandle <- Some(new SafeSymbolHandle(MXSymbol.createVariable n,true))
             | None -> failwith "Variable needs a name" //TODO: make exception or auto naming?
 
-
-type SymbolFromOperator(creator : AtomicSymbolCreator, parameters, inputs) = 
+type ImplicitVariable() = 
+    inherit Variable() 
+      
+type SymbolInitilizationException(symbol : Symbol, inner : Exception) =
+    inherit Exception(sprintf "Init failed on symbol %O" symbol)
+      
+//TODO: We should add valiation to the specific symbol types
+type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments<Symbol>) = 
     inherit Symbol()
-    //TODO: pull this out as it's used all over
-    let str (v : obj) = 
-        match v with 
-        | :? bool as x -> if x then "1" else "0"
-        | :? string as x -> sprintf "%s" x
-        | :? seq<int> as x -> x |> Seq.map string |> String.concat "," |> sprintf "[%s]"
-        | x -> string x
-    let parametersStr = parameters |> Array.map (fun (k,v) -> k, str v)
-    new(creator,pnames,ps,inames,ins) = new SymbolFromOperator(creator, Array.zip pnames ps, Array.zip inames ins)
+    //let parametersStr = parameters |> Array.map (fun (k,v) -> k, Util.valueString v)
+    new(name, args) = new SymbolOperator(AtomicSymbolCreator.FromName name, args)
+    //new(creator,pnames,ps,inames,ins) = new SymbolOperator(creator, Array.zip pnames ps, Array.zip inames ins)
     override x.Initialize() =   
         match x.InternalHandle with 
         | Some _ -> ()
-        | None -> 
-            let symbol = parametersStr |> Array.unzip ||> MXSymbol.createAtomicSymbol creator.AtomicSymbolCreatorHandle
-            let name = defaultArg x.InternalName null
-            inputs 
-            |> Array.choose 
-                (fun (k,v:BaseSymbol) -> 
-                    if Object.ReferenceEquals(v, Symbol.Empty) then 
-                        None
+        | None ->
+            try
+                //TODO: We should maybe check the varArg count parameter is not specified. Generally this should never happen
+                let inputKeys = ResizeArray()
+                let inputValues = ResizeArray()
+                let pKeys = ResizeArray()
+                let pValues = ResizeArray()
+                let name = defaultArg x.InternalName null
+                for a in creator.Info.Arguments do  
+                    let scc,v = operatorArguments.Args.TryGetValue a.Name
+                    if scc then 
+                        match v with 
+                        | Input i -> 
+                            inputKeys.Add a.Name
+                            match i with 
+                            | :? ImplicitVariable as v -> v.Name <- sprintf "%s_%s" name a.Name
+                            | _ -> ()
+                            inputValues.Add i
+                        | VarArg (count,i) -> 
+                            inputValues.AddRange i
+                            pKeys.Add count
+                            pValues.Add(i.Length.ValueString())
+                        | Parameter (Some o) -> 
+                            pKeys.Add a.Name
+                            pValues.Add(o.ValueString())
+                        | Parameter None -> ()
                     else 
-                        Some(k, (v :?> Symbol).UnsafeHandle) )
-            |> Array.unzip 
-            ||> MXSymbol.compose symbol name
-            x.InternalHandle <- Some(new SafeSymbolHandle(symbol, true))
-    
+                        match a.TypeInfo with
+                        | "NDArray-or-Symbol" //TODO: I dont like this
+                        | "Symbol" -> 
+                            inputKeys.Add(a.Name)
+                            let i = new ImplicitVariable()
+                            i.Name <- sprintf "%s_%s" name a.Name
+                            inputValues.Add(i)
+                        | _ -> ()
+                let symbol = 
+                    let keys = pKeys.ToArray()
+                    let vals = pValues.ToArray()
+                    assert (keys.Length = vals.Length)
+                    MXSymbol.createAtomicSymbol creator.AtomicSymbolCreatorHandle keys vals
+                let ivals = inputValues |> Seq.map (fun i -> i.UnsafeHandle) |> Seq.toArray
+                if inputKeys.Count <> inputValues.Count then 
+                    MXSymbol.compose symbol name null ivals
+                else //REVIEW: we could just never use keys
+                    let keys = inputKeys.ToArray()
+                    Seq.zip keys inputValues 
+                    |> Seq.filter 
+                        (fun (name,v) ->
+                            match v with 
+                            | :? ImplicitVariable -> false
+                            | _ -> true
+                        )
+                    |> Seq.map (fun (name,v) -> name, v.UnsafeHandle)
+                    |> Seq.toArray
+                    |> Array.unzip
+                    ||> MXSymbol.compose symbol name
+                x.InternalHandle <- Some(new SafeSymbolHandle(symbol, true))
+            with
+            | e -> raise(SymbolInitilizationException(x, e))
+
+
 
 
 type SymbolGroup<'a>(group : 'a, symbols : Symbol []) = 
     inherit Symbol()
-    member x.Group = group
-    member x.Symbols = symbols
+    member x.Symbol = group
+    member x.SymbolArray = symbols |> Array.copy
     override x.Initialize() =   
         match x.InternalHandle with 
         | Some _ -> ()

@@ -19,9 +19,8 @@ type VarArg<'a> =
         NumArgsName : string option
     }   
 type OpArg<'a> = 
-    | VarArg of string option * 'a[]
+    | VarArg of string * 'a[]
     | Parameter of obj option
-    | DefaultParameter of obj
     | Input of 'a
 
 module internal Dict = 
@@ -63,11 +62,6 @@ type Arguments<'a>(args : IDictionary<string, OpArg<'a>>) =
 type Operator<'a>(name : string, args : Arguments<'a>) = 
     member x.Name = name 
     member x.Arguments = args
-    static member (.>>)(o1 : Operator<'a>, position : int) = 
-        fun (o2 : Operator<'a>) ->
-            o2
-    static member (.>>)(o1 : Operator<'a>, o2 : Operator<'a>) = 
-        o2
 
     
 type Bleh<'a> private (args) = 
@@ -82,7 +76,7 @@ type Bleh<'a> private (args) =
             Arguments([
                 "csr_matrix", Input csrMatrix
                 "probability", Input probability
-                "seed_arrays", VarArg(Some "num_args", seedArrays |> Seq.toArray)
+                "seed_arrays", VarArg("num_args", seedArrays |> Seq.toArray)
                 "num_hops", numHops |> Option.map box |> Parameter
                 "num_neighbor", numNeighbor |> Option.map box |> Parameter
                 "max_num_vertices", maxNumVertices |> Option.map box |> Parameter
