@@ -10,17 +10,6 @@ module internal Helper =
 
 open Helper
 
-module internal Helper = 
-    let valueString (x : obj) = 
-        match x with 
-        | :? bool as x -> if x then "1" else "0"
-        | :? array<int> as x -> x |> Array.map string |> String.concat "," |> sprintf "[%s]"
-        | :? seq<int> as x -> x |> Seq.map string |> String.concat "," |> sprintf "[%s]"
-        | _ -> string x
-    let inline (<--) x y = x, valueString y
-
-open Helper
-
 type NDArray(handle : SafeNDArrayHandle) = 
     let mutable disposed = false
     static let invoke opName inputs parameters =

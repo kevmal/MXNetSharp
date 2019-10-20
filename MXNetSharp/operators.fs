@@ -985,23 +985,7 @@ type ContribBipartiteMatching private (operatorArguments) =
 
 type ContribDglCsrNeighborUniformSample private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_csr_neighbor_uniform_sample", operatorArguments)
-    new(csrMatrix : Symbol,
-        seedArrays : Symbol seq,
-        numArgs : int,
-        [<Optional>] ?numHops : int64,
-        [<Optional>] ?numNeighbor : int64,
-        [<Optional>] ?maxNumVertices : int64) = 
-        let operatorArguments = 
-            [
-                "csr_matrix", Input csrMatrix
-                "seed_arrays", VarArg("num_args", seedArrays |> Seq.toArray)
-                "num_hops", numHops |> Option.map box |> Parameter
-                "num_neighbor", numNeighbor |> Option.map box |> Parameter
-                "max_num_vertices", maxNumVertices |> Option.map box |> Parameter
-            ]
-        new ContribDglCsrNeighborUniformSample(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        [<Optional>] ?csrMatrix : Symbol,
+    new([<Optional>] ?csrMatrix : Symbol,
         [<Optional>] ?seedArrays : Symbol seq,
         [<Optional>] ?numHops : int64,
         [<Optional>] ?numNeighbor : int64,
@@ -1012,7 +996,6 @@ type ContribDglCsrNeighborUniformSample private (operatorArguments) =
             [
                 "csr_matrix", Input csrMatrix
                 "seed_arrays", VarArg("num_args", seedArrays)
-                "num_args", Parameter(Some(box numArgs))
                 "num_hops", numHops |> Option.map box |> Parameter
                 "num_neighbor", numNeighbor |> Option.map box |> Parameter
                 "max_num_vertices", maxNumVertices |> Option.map box |> Parameter
@@ -1023,32 +1006,13 @@ type ContribDglCsrNeighborUniformSample private (operatorArguments) =
     static member MaxNumVerticesDefault : int64 = 100L
     member __.CsrMatrix = operatorArguments.GetInput "csr_matrix"
     member __.SeedArrays = operatorArguments.GetVarArg "seed_arrays"
-    member __.NumArgs : int = match operatorArguments.GetParameter "num_args" with Some(v) -> unbox v | None -> failwithf "Required parameter num_args is missing"
     member __.NumHops = operatorArguments.GetParameter("num_hops", ContribDglCsrNeighborUniformSample.NumHopsDefault)
     member __.NumNeighbor = operatorArguments.GetParameter("num_neighbor", ContribDglCsrNeighborUniformSample.NumNeighborDefault)
     member __.MaxNumVertices = operatorArguments.GetParameter("max_num_vertices", ContribDglCsrNeighborUniformSample.MaxNumVerticesDefault)
 
 type ContribDglCsrNeighborNonUniformSample private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_csr_neighbor_non_uniform_sample", operatorArguments)
-    new(csrMatrix : Symbol,
-        probability : Symbol,
-        seedArrays : Symbol seq,
-        numArgs : int,
-        [<Optional>] ?numHops : int64,
-        [<Optional>] ?numNeighbor : int64,
-        [<Optional>] ?maxNumVertices : int64) = 
-        let operatorArguments = 
-            [
-                "csr_matrix", Input csrMatrix
-                "probability", Input probability
-                "seed_arrays", VarArg("num_args", seedArrays |> Seq.toArray)
-                "num_hops", numHops |> Option.map box |> Parameter
-                "num_neighbor", numNeighbor |> Option.map box |> Parameter
-                "max_num_vertices", maxNumVertices |> Option.map box |> Parameter
-            ]
-        new ContribDglCsrNeighborNonUniformSample(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        [<Optional>] ?csrMatrix : Symbol,
+    new([<Optional>] ?csrMatrix : Symbol,
         [<Optional>] ?probability : Symbol,
         [<Optional>] ?seedArrays : Symbol seq,
         [<Optional>] ?numHops : int64,
@@ -1062,7 +1026,6 @@ type ContribDglCsrNeighborNonUniformSample private (operatorArguments) =
                 "csr_matrix", Input csrMatrix
                 "probability", Input probability
                 "seed_arrays", VarArg("num_args", seedArrays)
-                "num_args", Parameter(Some(box numArgs))
                 "num_hops", numHops |> Option.map box |> Parameter
                 "num_neighbor", numNeighbor |> Option.map box |> Parameter
                 "max_num_vertices", maxNumVertices |> Option.map box |> Parameter
@@ -1074,7 +1037,6 @@ type ContribDglCsrNeighborNonUniformSample private (operatorArguments) =
     member __.CsrMatrix = operatorArguments.GetInput "csr_matrix"
     member __.Probability = operatorArguments.GetInput "probability"
     member __.SeedArrays = operatorArguments.GetVarArg "seed_arrays"
-    member __.NumArgs : int = match operatorArguments.GetParameter "num_args" with Some(v) -> unbox v | None -> failwithf "Required parameter num_args is missing"
     member __.NumHops = operatorArguments.GetParameter("num_hops", ContribDglCsrNeighborNonUniformSample.NumHopsDefault)
     member __.NumNeighbor = operatorArguments.GetParameter("num_neighbor", ContribDglCsrNeighborNonUniformSample.NumNeighborDefault)
     member __.MaxNumVertices = operatorArguments.GetParameter("max_num_vertices", ContribDglCsrNeighborNonUniformSample.MaxNumVerticesDefault)
@@ -1083,7 +1045,6 @@ type ContribDglSubgraph private (operatorArguments) =
     inherit SymbolOperator("_contrib_dgl_subgraph", operatorArguments)
     new(graph : Symbol,
         data : Symbol seq,
-        numArgs : int,
         returnMapping : bool) = 
         let operatorArguments = 
             [
@@ -1092,8 +1053,7 @@ type ContribDglSubgraph private (operatorArguments) =
                 "return_mapping", Parameter(Some(box returnMapping))
             ]
         new ContribDglSubgraph(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        returnMapping : bool,
+    new(returnMapping : bool,
         [<Optional>] ?graph : Symbol,
         [<Optional>] ?data : Symbol seq) = 
         let graph = defaultArg graph (new ImplicitVariable() :> Symbol)
@@ -1102,13 +1062,11 @@ type ContribDglSubgraph private (operatorArguments) =
             [
                 "graph", Input graph
                 "data", VarArg("num_args", data)
-                "num_args", Parameter(Some(box numArgs))
                 "return_mapping", Parameter(Some(box returnMapping))
             ]
         new ContribDglSubgraph(Arguments<Symbol>(operatorArguments))
     member __.Graph = operatorArguments.GetInput "graph"
     member __.Data = operatorArguments.GetVarArg "data"
-    member __.NumArgs : int = match operatorArguments.GetParameter "num_args" with Some(v) -> unbox v | None -> failwithf "Required parameter num_args is missing"
     member __.ReturnMapping : bool = match operatorArguments.GetParameter "return_mapping" with Some(v) -> unbox v | None -> failwithf "Required parameter return_mapping is missing"
 
 type ContribEdgeId private (operatorArguments) = 
@@ -1144,7 +1102,6 @@ type ContribDglAdjacency private (operatorArguments) =
 type ContribDglGraphCompact private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_graph_compact", operatorArguments)
     new(graphData : Symbol seq,
-        numArgs : int,
         returnMapping : bool,
         graphSizes : int64 seq) = 
         let operatorArguments = 
@@ -1154,33 +1111,28 @@ type ContribDglGraphCompact private (operatorArguments) =
                 "graph_sizes", Parameter(Some(box graphSizes))
             ]
         new ContribDglGraphCompact(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        returnMapping : bool,
+    new(returnMapping : bool,
         graphSizes : int64 seq,
         [<Optional>] ?graphData : Symbol seq) = 
         let graphData = defaultArg (graphData |> Option.map Seq.toArray) Array.empty
         let operatorArguments = 
             [
                 "graph_data", VarArg("num_args", graphData)
-                "num_args", Parameter(Some(box numArgs))
                 "return_mapping", Parameter(Some(box returnMapping))
                 "graph_sizes", Parameter(Some(box graphSizes))
             ]
         new ContribDglGraphCompact(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        returnMapping : bool,
+    new(returnMapping : bool,
         graphSizes : int64 seq,
         [<ParamArray>] graphData : Symbol[]) = 
         let operatorArguments = 
             [
                 "graph_data", VarArg("num_args", graphData)
-                "num_args", Parameter(Some(box numArgs))
                 "return_mapping", Parameter(Some(box returnMapping))
                 "graph_sizes", Parameter(Some(box graphSizes))
             ]
         new ContribDglGraphCompact(Arguments<Symbol>(operatorArguments))
     member __.GraphData = operatorArguments.GetVarArg "graph_data"
-    member __.NumArgs : int = match operatorArguments.GetParameter "num_args" with Some(v) -> unbox v | None -> failwithf "Required parameter num_args is missing"
     member __.ReturnMapping : bool = match operatorArguments.GetParameter "return_mapping" with Some(v) -> unbox v | None -> failwithf "Required parameter return_mapping is missing"
     member __.GraphSizes : int64 seq = match operatorArguments.GetParameter "graph_sizes" with Some(v) -> unbox v | None -> failwithf "Required parameter graph_sizes is missing"
 
@@ -1891,7 +1843,6 @@ type Foreach private (operatorArguments) =
     inherit SymbolOperator("_foreach", operatorArguments)
     new(fn : Symbol,
         data : Symbol seq,
-        numArgs : int,
         numOutputs : int,
         numOutData : int,
         inStateLocs : int64 seq,
@@ -1908,8 +1859,7 @@ type Foreach private (operatorArguments) =
                 "remain_locs", Parameter(Some(box remainLocs))
             ]
         new Foreach(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        numOutputs : int,
+    new(numOutputs : int,
         numOutData : int,
         inStateLocs : int64 seq,
         inDataLocs : int64 seq,
@@ -1922,7 +1872,6 @@ type Foreach private (operatorArguments) =
             [
                 "fn", Input fn
                 "data", VarArg("num_args", data)
-                "num_args", Parameter(Some(box numArgs))
                 "num_outputs", Parameter(Some(box numOutputs))
                 "num_out_data", Parameter(Some(box numOutData))
                 "in_state_locs", Parameter(Some(box inStateLocs))
@@ -1932,7 +1881,6 @@ type Foreach private (operatorArguments) =
         new Foreach(Arguments<Symbol>(operatorArguments))
     member __.Fn = operatorArguments.GetInput "fn"
     member __.Data = operatorArguments.GetVarArg "data"
-    member __.NumArgs : int = match operatorArguments.GetParameter "num_args" with Some(v) -> unbox v | None -> failwithf "Required parameter num_args is missing"
     member __.NumOutputs : int = match operatorArguments.GetParameter "num_outputs" with Some(v) -> unbox v | None -> failwithf "Required parameter num_outputs is missing"
     member __.NumOutData : int = match operatorArguments.GetParameter "num_out_data" with Some(v) -> unbox v | None -> failwithf "Required parameter num_out_data is missing"
     member __.InStateLocs : int64 seq = match operatorArguments.GetParameter "in_state_locs" with Some(v) -> unbox v | None -> failwithf "Required parameter in_state_locs is missing"
@@ -1944,7 +1892,6 @@ type WhileLoop private (operatorArguments) =
     new(cond : Symbol,
         func : Symbol,
         data : Symbol seq,
-        numArgs : int,
         numOutputs : int,
         numOutData : int,
         maxIterations : int,
@@ -1964,8 +1911,7 @@ type WhileLoop private (operatorArguments) =
                 "func_var_locs", Parameter(Some(box funcVarLocs))
             ]
         new WhileLoop(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        numOutputs : int,
+    new(numOutputs : int,
         numOutData : int,
         maxIterations : int,
         condInputLocs : int64 seq,
@@ -1982,7 +1928,6 @@ type WhileLoop private (operatorArguments) =
                 "cond", Input cond
                 "func", Input func
                 "data", VarArg("num_args", data)
-                "num_args", Parameter(Some(box numArgs))
                 "num_outputs", Parameter(Some(box numOutputs))
                 "num_out_data", Parameter(Some(box numOutData))
                 "max_iterations", Parameter(Some(box maxIterations))
@@ -1994,7 +1939,6 @@ type WhileLoop private (operatorArguments) =
     member __.Cond = operatorArguments.GetInput "cond"
     member __.Func = operatorArguments.GetInput "func"
     member __.Data = operatorArguments.GetVarArg "data"
-    member __.NumArgs : int = match operatorArguments.GetParameter "num_args" with Some(v) -> unbox v | None -> failwithf "Required parameter num_args is missing"
     member __.NumOutputs : int = match operatorArguments.GetParameter "num_outputs" with Some(v) -> unbox v | None -> failwithf "Required parameter num_outputs is missing"
     member __.NumOutData : int = match operatorArguments.GetParameter "num_out_data" with Some(v) -> unbox v | None -> failwithf "Required parameter num_out_data is missing"
     member __.MaxIterations : int = match operatorArguments.GetParameter "max_iterations" with Some(v) -> unbox v | None -> failwithf "Required parameter max_iterations is missing"
@@ -2008,7 +1952,6 @@ type Cond private (operatorArguments) =
         thenBranch : Symbol,
         elseBranch : Symbol,
         data : Symbol seq,
-        numArgs : int,
         numOutputs : int,
         condInputLocs : int64 seq,
         thenInputLocs : int64 seq,
@@ -2025,8 +1968,7 @@ type Cond private (operatorArguments) =
                 "else_input_locs", Parameter(Some(box elseInputLocs))
             ]
         new Cond(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        numOutputs : int,
+    new(numOutputs : int,
         condInputLocs : int64 seq,
         thenInputLocs : int64 seq,
         elseInputLocs : int64 seq,
@@ -2044,7 +1986,6 @@ type Cond private (operatorArguments) =
                 "then_branch", Input thenBranch
                 "else_branch", Input elseBranch
                 "data", VarArg("num_args", data)
-                "num_args", Parameter(Some(box numArgs))
                 "num_outputs", Parameter(Some(box numOutputs))
                 "cond_input_locs", Parameter(Some(box condInputLocs))
                 "then_input_locs", Parameter(Some(box thenInputLocs))
@@ -2055,7 +1996,6 @@ type Cond private (operatorArguments) =
     member __.ThenBranch = operatorArguments.GetInput "then_branch"
     member __.ElseBranch = operatorArguments.GetInput "else_branch"
     member __.Data = operatorArguments.GetVarArg "data"
-    member __.NumArgs : int = match operatorArguments.GetParameter "num_args" with Some(v) -> unbox v | None -> failwithf "Required parameter num_args is missing"
     member __.NumOutputs : int = match operatorArguments.GetParameter "num_outputs" with Some(v) -> unbox v | None -> failwithf "Required parameter num_outputs is missing"
     member __.CondInputLocs : int64 seq = match operatorArguments.GetParameter "cond_input_locs" with Some(v) -> unbox v | None -> failwithf "Required parameter cond_input_locs is missing"
     member __.ThenInputLocs : int64 seq = match operatorArguments.GetParameter "then_input_locs" with Some(v) -> unbox v | None -> failwithf "Required parameter then_input_locs is missing"
@@ -2563,56 +2503,32 @@ type BatchNorm private (operatorArguments) =
 
 type Concat private (operatorArguments) = 
     inherit SymbolOperator("Concat", operatorArguments)
-    new(data : Symbol seq,
-        numArgs : int,
-        [<Optional>] ?dim : int) = 
-        let operatorArguments = 
-            [
-                "data", VarArg("num_args", data |> Seq.toArray)
-                "dim", dim |> Option.map box |> Parameter
-            ]
-        new Concat(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        [<Optional>] ?data : Symbol seq,
+    new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?dim : int) = 
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
         let operatorArguments = 
             [
                 "data", VarArg("num_args", data)
-                "num_args", Parameter(Some(box numArgs))
                 "dim", dim |> Option.map box |> Parameter
             ]
         new Concat(Arguments<Symbol>(operatorArguments))
     static member DimDefault : int = 1
     member __.Data = operatorArguments.GetVarArg "data"
-    member __.NumArgs : int = match operatorArguments.GetParameter "num_args" with Some(v) -> unbox v | None -> failwithf "Required parameter num_args is missing"
     member __.Dim = operatorArguments.GetParameter("dim", Concat.DimDefault)
 
 type RnnParamConcat private (operatorArguments) = 
     inherit SymbolOperator("_rnn_param_concat", operatorArguments)
-    new(data : Symbol seq,
-        numArgs : int,
-        [<Optional>] ?dim : int) = 
-        let operatorArguments = 
-            [
-                "data", VarArg("num_args", data |> Seq.toArray)
-                "dim", dim |> Option.map box |> Parameter
-            ]
-        new RnnParamConcat(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        [<Optional>] ?data : Symbol seq,
+    new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?dim : int) = 
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
         let operatorArguments = 
             [
                 "data", VarArg("num_args", data)
-                "num_args", Parameter(Some(box numArgs))
                 "dim", dim |> Option.map box |> Parameter
             ]
         new RnnParamConcat(Arguments<Symbol>(operatorArguments))
     static member DimDefault : int = 1
     member __.Data = operatorArguments.GetVarArg "data"
-    member __.NumArgs : int = match operatorArguments.GetParameter "num_args" with Some(v) -> unbox v | None -> failwithf "Required parameter num_args is missing"
     member __.Dim = operatorArguments.GetParameter("dim", RnnParamConcat.DimDefault)
 
 type Convolution private (operatorArguments) = 
@@ -3261,7 +3177,6 @@ type UpSampling private (operatorArguments) =
     new(data : Symbol seq,
         scale : int,
         sampleType : SampleType,
-        numArgs : int,
         [<Optional>] ?numFilter : int,
         [<Optional>] ?multiInputMode : MultiInputMode,
         [<Optional>] ?workspace : int64) = 
@@ -3277,7 +3192,6 @@ type UpSampling private (operatorArguments) =
         new UpSampling(Arguments<Symbol>(operatorArguments))
     new(scale : int,
         sampleType : SampleType,
-        numArgs : int,
         [<Optional>] ?data : Symbol seq,
         [<Optional>] ?numFilter : int,
         [<Optional>] ?multiInputMode : MultiInputMode,
@@ -3288,7 +3202,6 @@ type UpSampling private (operatorArguments) =
                 "data", VarArg("num_args", data)
                 "scale", Parameter(Some(box scale))
                 "sample_type", Parameter(Some(box sampleType))
-                "num_args", Parameter(Some(box numArgs))
                 "num_filter", numFilter |> Option.map box |> Parameter
                 "multi_input_mode", multiInputMode |> Option.map box |> Parameter
                 "workspace", workspace |> Option.map box |> Parameter
@@ -3300,7 +3213,6 @@ type UpSampling private (operatorArguments) =
     member __.Data = operatorArguments.GetVarArg "data"
     member __.Scale : int = match operatorArguments.GetParameter "scale" with Some(v) -> unbox v | None -> failwithf "Required parameter scale is missing"
     member __.SampleType : SampleType = match operatorArguments.GetParameter "sample_type" with Some(v) -> unbox v | None -> failwithf "Required parameter sample_type is missing"
-    member __.NumArgs : int = match operatorArguments.GetParameter "num_args" with Some(v) -> unbox v | None -> failwithf "Required parameter num_args is missing"
     member __.NumFilter = operatorArguments.GetParameter("num_filter", UpSampling.NumFilterDefault)
     member __.MultiInputMode = operatorArguments.GetParameter("multi_input_mode", UpSampling.MultiInputModeDefault)
     member __.Workspace = operatorArguments.GetParameter("workspace", UpSampling.WorkspaceDefault)
@@ -4479,86 +4391,50 @@ type NpSqueeze private (operatorArguments) =
 
 type NpiConcatenate private (operatorArguments) = 
     inherit SymbolOperator("_npi_concatenate", operatorArguments)
-    new(data : Symbol seq,
-        numArgs : int,
-        [<Optional>] ?dim : int) = 
-        let operatorArguments = 
-            [
-                "data", VarArg("num_args", data |> Seq.toArray)
-                "dim", dim |> Option.map box |> Parameter
-            ]
-        new NpiConcatenate(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        [<Optional>] ?data : Symbol seq,
+    new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?dim : int) = 
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
         let operatorArguments = 
             [
                 "data", VarArg("num_args", data)
-                "num_args", Parameter(Some(box numArgs))
                 "dim", dim |> Option.map box |> Parameter
             ]
         new NpiConcatenate(Arguments<Symbol>(operatorArguments))
     static member DimDefault : int = 1
     member __.Data = operatorArguments.GetVarArg "data"
-    member __.NumArgs : int = match operatorArguments.GetParameter "num_args" with Some(v) -> unbox v | None -> failwithf "Required parameter num_args is missing"
     member __.Dim = operatorArguments.GetParameter("dim", NpiConcatenate.DimDefault)
 
 type NpiStack private (operatorArguments) = 
     inherit SymbolOperator("_npi_stack", operatorArguments)
-    new(data : Symbol seq,
-        numArgs : int,
-        [<Optional>] ?axis : int) = 
-        let operatorArguments = 
-            [
-                "data", VarArg("num_args", data |> Seq.toArray)
-                "axis", axis |> Option.map box |> Parameter
-            ]
-        new NpiStack(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        [<Optional>] ?data : Symbol seq,
+    new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?axis : int) = 
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
         let operatorArguments = 
             [
                 "data", VarArg("num_args", data)
-                "num_args", Parameter(Some(box numArgs))
                 "axis", axis |> Option.map box |> Parameter
             ]
         new NpiStack(Arguments<Symbol>(operatorArguments))
     static member AxisDefault : int = 0
     member __.Data = operatorArguments.GetVarArg "data"
-    member __.NumArgs : int = match operatorArguments.GetParameter "num_args" with Some(v) -> unbox v | None -> failwithf "Required parameter num_args is missing"
     member __.Axis = operatorArguments.GetParameter("axis", NpiStack.AxisDefault)
 
 type NpiVstack private (operatorArguments) = 
     inherit SymbolOperator("_npi_vstack", operatorArguments)
-    new(data : Symbol seq,
-        numArgs : int) = 
-        let operatorArguments = 
-            [
-                "data", VarArg("num_args", data |> Seq.toArray)
-            ]
-        new NpiVstack(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        [<Optional>] ?data : Symbol seq) = 
+    new([<Optional>] ?data : Symbol seq) =
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
         let operatorArguments = 
             [
                 "data", VarArg("num_args", data)
-                "num_args", Parameter(Some(box numArgs))
             ]
         new NpiVstack(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        [<ParamArray>] data : Symbol[]) = 
+    new([<ParamArray>] data : Symbol[]) =
         let operatorArguments = 
             [
                 "data", VarArg("num_args", data)
-                "num_args", Parameter(Some(box numArgs))
             ]
         new NpiVstack(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetVarArg "data"
-    member __.NumArgs : int = match operatorArguments.GetParameter "num_args" with Some(v) -> unbox v | None -> failwithf "Required parameter num_args is missing"
 
 type NpRoll private (operatorArguments) = 
     inherit SymbolOperator("_np_roll", operatorArguments)
@@ -6288,29 +6164,17 @@ type ContribQuantizedBatchNorm private (operatorArguments) =
 
 type ContribQuantizedConcat private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_concat", operatorArguments)
-    new(data : Symbol seq,
-        numArgs : int,
-        [<Optional>] ?dim : int) = 
-        let operatorArguments = 
-            [
-                "data", VarArg("num_args", data |> Seq.toArray)
-                "dim", dim |> Option.map box |> Parameter
-            ]
-        new ContribQuantizedConcat(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        [<Optional>] ?data : Symbol seq,
+    new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?dim : int) = 
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
         let operatorArguments = 
             [
                 "data", VarArg("num_args", data)
-                "num_args", Parameter(Some(box numArgs))
                 "dim", dim |> Option.map box |> Parameter
             ]
         new ContribQuantizedConcat(Arguments<Symbol>(operatorArguments))
     static member DimDefault : int = 1
     member __.Data = operatorArguments.GetVarArg "data"
-    member __.NumArgs : int = match operatorArguments.GetParameter "num_args" with Some(v) -> unbox v | None -> failwithf "Required parameter num_args is missing"
     member __.Dim = operatorArguments.GetParameter("dim", ContribQuantizedConcat.DimDefault)
 
 type ContribQuantizedConv private (operatorArguments) = 
@@ -10664,29 +10528,17 @@ type Reverse private (operatorArguments) =
 
 type Stack private (operatorArguments) = 
     inherit SymbolOperator("stack", operatorArguments)
-    new(data : Symbol seq,
-        numArgs : int,
-        [<Optional>] ?axis : int) = 
-        let operatorArguments = 
-            [
-                "data", VarArg("num_args", data |> Seq.toArray)
-                "axis", axis |> Option.map box |> Parameter
-            ]
-        new Stack(Arguments<Symbol>(operatorArguments))
-    new(numArgs : int,
-        [<Optional>] ?data : Symbol seq,
+    new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?axis : int) = 
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
         let operatorArguments = 
             [
                 "data", VarArg("num_args", data)
-                "num_args", Parameter(Some(box numArgs))
                 "axis", axis |> Option.map box |> Parameter
             ]
         new Stack(Arguments<Symbol>(operatorArguments))
     static member AxisDefault : int = 0
     member __.Data = operatorArguments.GetVarArg "data"
-    member __.NumArgs : int = match operatorArguments.GetParameter "num_args" with Some(v) -> unbox v | None -> failwithf "Required parameter num_args is missing"
     member __.Axis = operatorArguments.GetParameter("axis", Stack.AxisDefault)
 
 type Squeeze private (operatorArguments) = 

@@ -860,7 +860,7 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
                         | Some SymbolOrNDArray
                         | Some Symbol -> "Symbol"
                         | _ -> a.TypeString 
-                    if a.Arg.ArgumentInfo.Name <> "ctx" then 
+                    if a.Arg.ArgumentInfo.Name <> "ctx" && a.Arg.ArgumentInfo.Name <> h.AtomicSymbolInfo.KeyVarNumArgs then 
                         if a.DefaultMode.IsSome then 
                             sprintf "[<Optional>] ?%s : %s" a.Name tp
                         else
@@ -884,7 +884,7 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
                     yield! indent 2 
                         [
                             for a in h.Args do 
-                                if a.Arg.Name = h.AtomicSymbolInfo.KeyVarNumArgs || a.Arg.ArgumentInfo.Name = "ctx" then 
+                                if a.Arg.ArgumentInfo.Name = h.AtomicSymbolInfo.KeyVarNumArgs || a.Arg.ArgumentInfo.Name = "ctx" then 
                                     ()
                                 elif a.DefaultMode.IsSome then 
                                     sprintf "\"%s\", %s |> Option.map box |> Parameter" a.Arg.ArgumentInfo.Name a.Name 
@@ -912,7 +912,7 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
                 | Some Symbol -> true
                 | _ -> false
             )
-    let req,opt = ps |> Array.filter (fun x -> x.Arg.ArgumentInfo.Name <> "ctx") |> Array.partition (fun a -> a.DefaultMode.IsNone )
+    let req,opt = ps |> Array.filter (fun x -> x.Arg.ArgumentInfo.Name <> "ctx" && x.Arg.ArgumentInfo.Name <> h.AtomicSymbolInfo.KeyVarNumArgs) |> Array.partition (fun a -> a.DefaultMode.IsNone )
     let ctor2 = 
         let args = 
             [
@@ -951,7 +951,7 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
                     yield! indent 2 
                         [
                             for a in h.Args do 
-                                if a.Arg.ArgumentInfo.Name = "ctx" then 
+                                if a.Arg.ArgumentInfo.Name = h.AtomicSymbolInfo.KeyVarNumArgs || a.Arg.ArgumentInfo.Name = "ctx" then 
                                     ()
                                 elif a.DefaultMode.IsSome then 
                                     sprintf "\"%s\", %s |> Option.map box |> Parameter" a.Arg.ArgumentInfo.Name a.Name 
@@ -997,7 +997,9 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
                             yield! indent 2 
                                 [
                                     for a in h.Args do 
-                                        if a.DefaultMode.IsSome then 
+                                        if a.Arg.ArgumentInfo.Name = h.AtomicSymbolInfo.KeyVarNumArgs || a.Arg.ArgumentInfo.Name = "ctx" then 
+                                            ()
+                                        elif a.DefaultMode.IsSome then 
                                             sprintf "\"%s\", %s |> Option.map box |> Parameter" a.Arg.ArgumentInfo.Name a.Name 
                                         elif a.SymbolOrNDArray.IsSome then 
                                             match a.SymbolOrNDArray.Value with 

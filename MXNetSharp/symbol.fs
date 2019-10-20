@@ -3,6 +3,10 @@ open System
 open System.Runtime.InteropServices
 open MXNetSharp.Interop
 
+type SymbolInitilizationException(symbol : Symbol, inner : Exception) =
+    inherit Exception(sprintf "Init failed on symbol %O" symbol)
+
+
 [<AbstractClass>]
 type Symbol() =
     let mutable disposed = false
@@ -23,7 +27,9 @@ type Symbol() =
             x.Initialize()
             match x.InternalHandle with
             | Some h -> h
-            | None -> failwithf "Failed to initialize Symbol %s" (defaultArg x.InternalName "") //TODO: make exception
+            | None -> 
+                // We should never really get to this point. Handle should be set or another excepion already thrown.
+                raise (SymbolInitilizationException(x, null))
     member x.UnsafeHandle = x.SymbolHandle.UnsafeHandle //REVIEW: mark as internal?
     member x.Outputs = 
         let make handle =
@@ -61,7 +67,6 @@ type SymbolOutput internal (parent) =
             this.InternalHandle <- Some handle
     member x.Parent = parent
     override x.Initialize() = ()
-    
 
 type Variable() =
     inherit Symbol()
@@ -80,8 +85,6 @@ type Variable() =
 type ImplicitVariable() = 
     inherit Variable() 
       
-type SymbolInitilizationException(symbol : Symbol, inner : Exception) =
-    inherit Exception(sprintf "Init failed on symbol %O" symbol)
       
 //TODO: We should add valiation to the specific symbol types
 type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments<Symbol>) = 

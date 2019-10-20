@@ -26,7 +26,6 @@ let contentUrl = "https://github.com/dmlc/web-data/raw/master/mxnet/neural-style
 let contentFile = "IMG_4343.jpg"
 
 let ensure (url : string) file = 
-    if not(File.Exists file) then 
         use wc = new WebClient()
         wc.DownloadFile(url, file)
 
@@ -252,7 +251,7 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
                 (fun c ->
                     new Convolution(data = c, weight = skernel, numFilter = 1, kernel = [3;3], pad = [1;1], noBias = true, stride = [1;1]) :> Symbol
                 )
-        let out = new Concat(convs, convs.Length)
+        let out = new Concat(convs)
         let kernel = [ 0; -1;  0;
                       -1;  4; -1;
                        0; -1;  0]
