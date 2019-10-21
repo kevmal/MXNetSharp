@@ -13,6 +13,7 @@
     <Compile Include="cpredictapi.fs" />
     <Compile Include="cnnvmapi.fs" />
     <Compile Include="coretypes.fs" />
+    <Compile Include="primops.fs" />
     <Compile Include="interop.fs" />
     <Compile Include="atomicsymbol.fs" />
     <Compile Include="operator.fs" />

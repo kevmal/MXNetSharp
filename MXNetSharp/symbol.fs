@@ -4,7 +4,10 @@ open System.Runtime.InteropServices
 open MXNetSharp.Interop
 
 type SymbolInitilizationException(symbol : Symbol, inner : Exception) =
-    inherit Exception(sprintf "Init failed on symbol %O" symbol)
+    inherit Exception(
+        match inner  with 
+        | null -> sprintf "Init failed on symbol %O" symbol
+        | ex -> sprintf "Init failed on symbol %O: %s" symbol ex.Message)
 
 
 [<AbstractClass>]
@@ -13,8 +16,27 @@ type Symbol() =
     member val internal InternalName : string option = None with get,set
     member val internal InternalHandle : SafeSymbolHandle option = None with get,set
     member x.IsInitialized = x.InternalHandle.IsSome
+    //member internal x.CreateId() = 
+    //    assert(x.IsInitialized)
+    //    match x.Id with 
+    //    | None ->
+    //        let sid = Guid.NewGuid()
+    //        MXSymbol.setAttr x.UnsafeHandle "mxnetsharp_symbolid" (string sid)
+    //    | _ -> ()
+    member x.Id = 
+        if x.IsInitialized then 
+            MXSymbol.getAttr x.UnsafeHandle "mxnetsharp_symbolid"
+        else    
+            None
     member x.Name 
-        with get() = match x.InternalName with Some n -> n | _ -> ""
+        with get() = 
+            if x.IsInitialized then 
+                match MXSymbol.getName x.UnsafeHandle with 
+                | Some name -> name
+                | None ->
+                    match x.InternalName with Some n -> n | _ -> ""
+            else
+                match x.InternalName with Some n -> n | _ -> ""
         and set v = 
             if x.IsInitialized then
                 failwith "Cannot set name. Symbol has already been created." //TODO: make exception
@@ -45,11 +67,71 @@ type Symbol() =
                 let h = MXSymbol.getOutput x.UnsafeHandle i
                 new SymbolOutput(x,new SafeSymbolHandle(h, true))
             )
+    member x.ArgumentNames = MXSymbol.listArguments x.UnsafeHandle
+    member x.InputSymbols = MXSymbol.getInputSymbols x.UnsafeHandle |> Array.map (fun h -> new SymbolInput(x, new SafeSymbolHandle(h,true)))
     abstract member Initialize : unit -> unit
+    
+    static member (+)(x : Symbol, y : float) = new PlusScalar(x,y)
+    static member (+)(y : float, x : Symbol) = new PlusScalar(x,y)
+    static member (+)(x : Symbol, y : Symbol) = new ElemwiseAdd(x,y)
+    static member (.+)(x : Symbol, y : Symbol) = new BroadcastAdd(x,y)
+    
     static member (-)(x : Symbol, y : float) = new MinusScalar(x,y)
     static member (-)(y : float, x : Symbol) = new RminusScalar(x,y)
     static member (-)(x : Symbol, y : Symbol) = new ElemwiseSub(x,y)
     static member (.-)(x : Symbol, y : Symbol) = new BroadcastSub(x,y)
+    
+    static member (/)(x : Symbol, y : float) = new DivScalar(x,y)
+    static member (/)(y : float, x : Symbol) = new RdivScalar(x,y)
+    static member (/)(x : Symbol, y : Symbol) = new ElemwiseDiv(x,y)
+    static member (./)(x : Symbol, y : Symbol) = new BroadcastDiv(x,y)
+    
+    static member ( * )(x : Symbol, y : float) = new MulScalar(x,y)
+    static member ( * )(y : float, x : Symbol) = new MulScalar(x,y)
+    static member ( * )(x : Symbol, y : Symbol) = new ElemwiseMul(x,y)
+    static member ( .* )(x : Symbol, y : Symbol) = new BroadcastMul(x,y)
+
+    member x.Exp() = new Exp(x)
+    static member Exp(x : Symbol) = new Exp(x) :> Symbol
+    member x.Log() = new Log(x)
+    static member Log(x : Symbol) = new Log(x) :> Symbol
+    member x.Abs() = new Abs(x)
+    static member Abs(x : Symbol) = new Abs(x) :> Symbol
+    member x.Acos() = new Arccos(x)
+    static member Acos(x : Symbol) = new Arccos(x) :> Symbol
+    member x.Asin() = new Arcsin(x)
+    static member Asin(x : Symbol) = new Arcsin(x) :> Symbol
+    member x.Atan() = new Arctan(x)
+    static member Atan(x : Symbol) = new Arctan(x) :> Symbol
+    static member Atan2(x : #Symbol, y : #Symbol) = new NpiArctan2(x, y) 
+    static member Atan2(x : #Symbol, y : double) = new NpiArctan2Scalar(x, y) 
+    static member Atan2(y : double, x : #Symbol) = new NpiRarctan2Scalar(x, y) 
+    member x.Ceiling() = new Ceil(x)
+    static member Ceiling(x : Symbol) = new Ceil(x) :> Symbol
+    member x.Floor() = new Floor(x)
+    static member Floor(x : Symbol) = new Floor(x) :> Symbol
+    member x.Truncate() = new Trunc(x)
+    static member Truncate(x : Symbol) = new Trunc(x) :> Symbol
+    member x.Round() = new Round(x)
+    static member Round(x : Symbol) = new Round(x) :> Symbol
+    member x.Log10() = new Log10(x)
+    static member Log10(x : Symbol) = new Log10(x) :> Symbol
+    member x.Sqrt() = new Sqrt(x)
+    static member Sqrt(x : Symbol) = new Sqrt(x) :> Symbol
+    member x.Cos() = new Cos(x)
+    static member Cos(x : Symbol) = new Cos(x) :> Symbol
+    member x.Cosh() = new Cosh(x)
+    static member Cosh(x : Symbol) = new Cosh(x) :> Symbol
+    member x.Sin() = new Sin(x)
+    static member Sin(x : Symbol) = new Sin(x) :> Symbol
+    member x.Sinh() = new Sinh(x)
+    static member Sinh(x : Symbol) = new Sinh(x) :> Symbol
+    member x.Tan() = new Tan(x)
+    static member Tan(x : Symbol) = new Tan(x) :> Symbol
+    member x.Tanh() = new Tanh(x)
+    static member Tanh(x : Symbol) = new Tanh(x) :> Symbol
+
+
     member x.Dispose(disposing) = 
         if not disposed then 
             if disposing then 
@@ -60,14 +142,22 @@ type Symbol() =
     member x.Dispose() = 
         x.Dispose(true)
         GC.SuppressFinalize(x)
-    member x.ArgumentNames = MXSymbol.listArguments x.UnsafeHandle
     interface IDisposable with  
         member x.Dispose() = x.Dispose()
 
-type SymbolOutput internal (parent) = 
+type SymbolOutput internal (parent : Symbol) = 
     inherit Symbol()
     new(parent, handle) as this = 
         new SymbolOutput(parent) then 
+            this.InternalHandle <- Some handle
+    member x.Parent = parent
+    override x.Initialize() = ()
+
+
+type SymbolInput internal (parent : Symbol) = 
+    inherit Symbol()
+    new(parent, handle) as this = 
+        new SymbolInput(parent) then 
             this.InternalHandle <- Some handle
     member x.Parent = parent
     override x.Initialize() = ()
@@ -77,6 +167,13 @@ type Variable() =
     new (name : string) as this = 
         new Variable() then 
             this.InternalName <- Some name
+    member internal x.CreateId() = 
+        assert(x.IsInitialized)
+        match x.Id with 
+        | None ->
+            let sid = Guid.NewGuid()
+            MXSymbol.setAttr x.UnsafeHandle "mxnetsharp_symbolid" (string sid)
+        | _ -> ()
     override x.Initialize() =   
         match x.InternalHandle with 
         | Some _ -> ()
@@ -84,6 +181,7 @@ type Variable() =
             match x.InternalName with 
             | Some n -> 
                 x.InternalHandle <- Some(new SafeSymbolHandle(MXSymbol.createVariable n,true))
+                //x.CreateId()
             | None -> failwith "Variable needs a name" //TODO: make exception or auto naming?
 
 type ImplicitVariable() = 
@@ -156,6 +254,7 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
                     |> Array.unzip
                     ||> MXSymbol.compose symbol name
                 x.InternalHandle <- Some(new SafeSymbolHandle(symbol, true))
+                //x.CreateId()
             with
             | e -> raise(SymbolInitilizationException(x, e))
 
@@ -172,6 +271,7 @@ type SymbolGroup<'a>(group : 'a, symbols : Symbol []) =
         | None -> 
             let symbol = symbols |> Array.map (fun x -> x.UnsafeHandle) |> MXSymbol.createGroup 
             x.InternalHandle <- Some(new SafeSymbolHandle(symbol, true))
+            //x.CreateId()
 
 // **************************************************************************************************************************************
 // ** GENERATED SYMBOL TYPES SECTION
