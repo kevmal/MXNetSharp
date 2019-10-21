@@ -48,6 +48,7 @@ let lookup =
 
 
 lookup.Values
+|> Seq.filter (fun x -> x.Name.StartsWith "_backward_" |> not)
 |> Seq.iter 
     (fun v ->
         printfn "------------------------------------ %s ------------------------------------"  v.Name
@@ -55,6 +56,11 @@ lookup.Values
         printfn "%A" v.Info
         printfn "----------------------------------------------------------------------------" 
     )
+
+
+lookup.Values
+|> Seq.filter (fun x -> x.Name.StartsWith "_backward_" |> not)
+|> Seq.iter (fun x -> printfn "%s" x.Name)
 
 let allNames = 
     lookup.Values 

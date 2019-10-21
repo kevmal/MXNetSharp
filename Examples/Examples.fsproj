@@ -52,6 +52,7 @@
     <Content Include="packages.config" />
     <None Include="load.fsx" />
     <None Include="Neural Style Transfer.fsx" />
+    <None Include="MNIST VAE.fsx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">

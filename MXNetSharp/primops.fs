@@ -36,10 +36,11 @@ module InternalPrimitiveOperatorHelpers =
         static member inline Atan(AtanOp, x : ^T) : ^Y = (^T: (member Atan : unit -> ^Y) (x))
     let inline internal atanHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Atan : ^op * ^t -> ^y)(t,x))
 
+    //TODO: This doesn't work
     type AtanOp2 = AtanOp2 with
-        static member inline Atan2(AtanOp, x : ^T, y : ^T) : ^T = atan2 x y
-        static member inline Atan2(AtanOp, x : ^T, y : ^T2) : ^Y = (^T: (static member Atan2 : ^T * ^T2 -> ^Y) (x, y))
-    let inline internal atan2Helper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Atan2 : ^op * ^t -> ^y)(t,x))
+        static member inline Atan2(AtanOp2, x : ^T, y : ^T) : ^T = atan2 x y
+        static member inline Atan2(AtanOp2, x : ^T, y : ^T2) : ^Y = ((^T or ^T2): (static member ArcTan2 : ^T * ^T2 -> ^Y) (x, y))
+    let inline internal atan2Helper (t : ^op) (x : ^t) (y : ^t2) : ^y = ((^op or ^t or ^t2) : (static member Atan2 : ^op * ^t * ^t2-> ^y)(t, x, y))
 
     type CeilingOp = CeilingOp with
         static member inline Ceiling(CeilingOp, x : ^T) : ^T = ceil x
@@ -110,7 +111,7 @@ module PrimitiveOperators =
     let inline acos (x : ^t) : ^y =  acosHelper AcosOp x
     let inline asin (x : ^t) : ^y =  asinHelper AsinOp x
     let inline atan (x : ^t) : ^y =  atanHelper AtanOp x
-    let inline atan2 (x : ^t1) (y : ^t2) : ^y =  atanHelper AtanOp2 x y
+    let inline atan2 (x : ^t1) (y : ^t2) : ^y =  atan2Helper AtanOp2 x y
     let inline ceiling (x : ^t) : ^y =  ceilingHelper CeilingOp x
     let inline floor (x : ^t) : ^y =  floorHelper FloorOp x
     let inline truncate (x : ^t) : ^y =  truncateHelper TruncateOp x

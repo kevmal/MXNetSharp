@@ -106,6 +106,9 @@ type Symbol() =
     static member Atan2(x : #Symbol, y : #Symbol) = new NpiArctan2(x, y) 
     static member Atan2(x : #Symbol, y : double) = new NpiArctan2Scalar(x, y) 
     static member Atan2(y : double, x : #Symbol) = new NpiRarctan2Scalar(x, y) 
+    static member ArcTan2(x : #Symbol, y : #Symbol) = new NpiArctan2(x, y) 
+    static member ArcTan2(x : #Symbol, y : double) = new NpiArctan2Scalar(x, y) 
+    static member AtcTan2(y : double, x : #Symbol) = new NpiRarctan2Scalar(x, y) 
     member x.Ceiling() = new Ceil(x)
     static member Ceiling(x : Symbol) = new Ceil(x) :> Symbol
     member x.Floor() = new Floor(x)
@@ -187,7 +190,9 @@ type Variable() =
 type ImplicitVariable() = 
     inherit Variable() 
       
-      
+//TODO: ctx = '' for NDArray ops is invalid even though it's often the default
+//TODO: doc comments on generated symbols
+//TODO: add a "With" method to copy with updates      
 //TODO: We should add valiation to the specific symbol types
 type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments<Symbol>) = 
     inherit Symbol()
