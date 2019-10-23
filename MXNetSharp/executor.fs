@@ -10,7 +10,7 @@ type SafeExecutorHandle(owner) =
     new() = new SafeExecutorHandle(true)
     new(ptr,owner) as this = new SafeExecutorHandle(owner) then this.SetHandle(ptr)
     override x.IsInvalid = x.handle <= 0n
-    override x.ReleaseHandle() = CApi.MXNDArrayFree x.handle = 0
+    override x.ReleaseHandle() = CApi.MXExecutorFree x.handle = 0
     member internal x.UnsafeHandle = 
         if not x.IsClosed then
             x.handle
