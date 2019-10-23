@@ -23,11 +23,11 @@ type Symbol() =
     //        let sid = Guid.NewGuid()
     //        MXSymbol.setAttr x.UnsafeHandle "mxnetsharp_symbolid" (string sid)
     //    | _ -> ()
-    member x.Id = 
-        if x.IsInitialized then 
-            MXSymbol.getAttr x.UnsafeHandle "mxnetsharp_symbolid"
-        else    
-            None
+    //member x.Id = 
+    //    if x.IsInitialized then 
+    //        MXSymbol.getAttr x.UnsafeHandle "mxnetsharp_symbolid"
+    //    else    
+    //        None
     member x.Name 
         with get() = 
             if x.IsInitialized then 
@@ -54,13 +54,6 @@ type Symbol() =
                 raise (SymbolInitilizationException(x, null))
     member x.UnsafeHandle = x.SymbolHandle.UnsafeHandle //REVIEW: mark as internal?
     member x.Outputs = 
-        let make handle =
-            let s = 
-                {new Symbol() with 
-                    override x.Initialize() = ()
-                }
-            s.InternalHandle <- Some(new SafeSymbolHandle(handle, true))
-            s
         let n = MXSymbol.getNumOutputs x.UnsafeHandle |> int
         Array.init n 
             (fun i ->
@@ -170,13 +163,13 @@ type Variable() =
     new (name : string) as this = 
         new Variable() then 
             this.InternalName <- Some name
-    member internal x.CreateId() = 
-        assert(x.IsInitialized)
-        match x.Id with 
-        | None ->
-            let sid = Guid.NewGuid()
-            MXSymbol.setAttr x.UnsafeHandle "mxnetsharp_symbolid" (string sid)
-        | _ -> ()
+    //member internal x.CreateId() = 
+    //    assert(x.IsInitialized)
+    //    match x.Id with 
+    //    | None ->
+    //        let sid = Guid.NewGuid()
+    //        MXSymbol.setAttr x.UnsafeHandle "mxnetsharp_symbolid" (string sid)
+    //    | _ -> ()
     override x.Initialize() =   
         match x.InternalHandle with 
         | Some _ -> ()
