@@ -62,6 +62,32 @@ type CustomOperation() =
     abstract member InferType : inType : TypeFlag[] -> TypeFlag[]*TypeFlag[]*TypeFlag[]
     abstract member DeclareBackwardDependency : outGrad : int[] * inData : int[] * OutData : int[] -> int[]
     abstract member CreateOperator : context : Context * inShapes : int[][] * inDataTypes : TypeFlag[] -> ICustomOperation
+    default this.DeclareBackwardDependency(outGrad: int [], inData: int [], outData: int []): int [] = 
+        [|
+           yield! outGrad
+           yield! inData
+           yield! outData
+        |]
+    default this.InferBackwardStorageType(storageTypes : BackwardStorageTypes): unit = 
+        for i = 0 to storageTypes.Auxiliary.Length - 1 do storageTypes.Auxiliary.[i] <- StorageType.Default
+        for i = 0 to storageTypes.Input.Length - 1 do storageTypes.Input.[i] <- StorageType.Default
+        for i = 0 to storageTypes.Output.Length - 1 do storageTypes.Output.[i] <- StorageType.Default
+        for i = 0 to storageTypes.InputGrad.Length - 1 do storageTypes.InputGrad.[i] <- StorageType.Default
+        for i = 0 to storageTypes.OutputGrad.Length - 1 do storageTypes.OutputGrad.[i] <- StorageType.Default
+    default this.InferShape(inShape: int [] []): int [] [] * int [] [] * int [] [] = 
+        let outType = this.ListOutputs() |> Array.map (fun x -> inShape.[0])
+        inShape, outType, Array.empty
+    default this.InferStorageType(inputStorageTypes : StorageType []): StorageType [] * StorageType [] * StorageType [] = 
+        let outType = this.ListOutputs() |> Array.map (fun x -> StorageType.Default)
+        let auxType = this.ListAuxiliaryStates() |> Array.map (fun x -> StorageType.Default)
+        inputStorageTypes, outType, auxType
+    default this.InferType(inType: TypeFlag []): TypeFlag [] * TypeFlag [] * TypeFlag [] = 
+        let outType = this.ListOutputs() |> Array.map (fun x -> inType.[0])
+        let auxType = this.ListAuxiliaryStates() |> Array.map (fun x -> inType.[0])
+        inType, outType, auxType
+    default this.ListArguments(): string [] = [|"data"|]
+    default this.ListAuxiliaryStates(): string [] = Array.empty
+    default this.ListOutputs(): string [] = [|"output"|]
     interface ICustomOperationProperties with
         member this.CreateOperator(context: Context, inShapes: int [] [], inDataTypes: TypeFlag []): ICustomOperation = 
             this.CreateOperator(context,inShapes,inDataTypes)
