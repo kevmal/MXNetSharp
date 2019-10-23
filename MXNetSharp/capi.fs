@@ -130,7 +130,7 @@ type MXCallbackList_callbacks = delegate of unit -> int
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type MXCallbackList =
     val num_callbacks : int
-    val callbacks : MXCallbackList_callbacks[]
+    val callbacks : IntPtr
     val contexts : IntPtr
 
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -153,16 +153,16 @@ type CustomOpPropCallbacks =
     | kCustomOpPropInferType = 7
     | kCustomOpPropInferStorageType = 8
     | kCustomOpPropBackwardInferStorageType = 9
-type CustomOpFBFunc = delegate of int * IntPtr * int[] * int[] * int * IntPtr -> int
+type CustomOpFBFunc = delegate of int * IntPtr * IntPtr * IntPtr * bool * IntPtr -> int
 type CustomOpDelFunc = delegate of IntPtr -> int
-type CustomOpListFunc = delegate of string[] byref * IntPtr -> int
-type CustomOpInferShapeFunc = delegate of int * int[] * int[] byref * IntPtr -> int
-type CustomOpInferStorageTypeFunc = delegate of int * int[] * IntPtr -> int
-type CustomOpBackwardInferStorageTypeFunc = delegate of int * int[] * int[] * IntPtr -> int
-type CustomOpInferTypeFunc = delegate of int * int[] * IntPtr -> int
-type CustomOpBwdDepFunc = delegate of int[] * int[] * int[] * int[] * int[] byref * IntPtr -> int
-type CustomOpCreateFunc = delegate of string * int * int[] byref * int[] * int[] *  MXCallbackList[] * IntPtr -> int
-type CustomOpPropCreator = delegate of string * int * string[] * string[] *  MXCallbackList[] -> int
+type CustomOpListFunc = delegate of IntPtr byref * IntPtr -> int
+type CustomOpInferShapeFunc = delegate of int * IntPtr * IntPtr * IntPtr -> int
+type CustomOpInferStorageTypeFunc = delegate of int * IntPtr * IntPtr -> int
+type CustomOpBackwardInferStorageTypeFunc = delegate of int * IntPtr * IntPtr * IntPtr -> int
+type CustomOpInferTypeFunc = delegate of int * IntPtr * IntPtr -> int
+type CustomOpBwdDepFunc = delegate of IntPtr * IntPtr * IntPtr * int byref * IntPtr byref * IntPtr -> int
+type CustomOpCreateFunc = delegate of string * int * IntPtr * IntPtr * IntPtr * IntPtr byref * IntPtr -> int
+type CustomOpPropCreator = delegate of IntPtr * int * IntPtr * IntPtr * cblist : IntPtr -> int
 type CustomFunctionCallbacks =
     | kCustomFunctionBackward = 0
     | kCustomFunctionDelete = 1
@@ -2210,7 +2210,7 @@ extern int MXRtcFree__(RtcHandle handle)
  * \param creator
  *)
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXCustomOpRegister__(string op_type, CustomOpPropCreator creator)
+extern int MXCustomOpRegister(string op_type, CustomOpPropCreator creator)
 
 (*
  * \brief record custom function for backward later.
