@@ -104,13 +104,19 @@ type OpReqType =
         | WriteTo -> 1
         | WriteInplace -> 2
         | AddTo -> 3
+    static member FromInt(i : int) = 
+        match i with 
+        | 0 -> NullOp
+        | 1 -> WriteTo
+        | 2 -> WriteInplace
+        | 3 -> AddTo
 
 type SafeSymbolHandle(owner) = 
     inherit SafeHandle(0n, true)
     new() = new SafeSymbolHandle(true)
     new(ptr,owner) as this = new SafeSymbolHandle(owner) then this.SetHandle(ptr)
     override x.IsInvalid = x.handle <= 0n
-    override x.ReleaseHandle() = CApi.MXNDArrayFree x.handle = 0
+    override x.ReleaseHandle() = CApi.MXSymbolFree x.handle = 0
     member internal x.UnsafeHandle = 
         if not x.IsClosed then
             x.handle
