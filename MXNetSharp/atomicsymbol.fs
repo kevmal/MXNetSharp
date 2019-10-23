@@ -11,8 +11,8 @@ exception AtomicSymbolCreatorNotFound of string with
 
 type AtomicSymbolCreator internal (handle : MXNetSharp.Interop.CApi.AtomicSymbolCreatorHandle, info : AtomicSymbolInfo) = 
     let aliases = ResizeArray<string>()
-    static let lookup = 
-        let creators = 
+    static let lookup = Dictionary<String, AtomicSymbolCreator>()
+        (*let creators = 
             MXSymbol.listAtomicSymbolCreators ()
             |> Array.map 
                 (fun x -> 
@@ -29,13 +29,21 @@ type AtomicSymbolCreator internal (handle : MXNetSharp.Interop.CApi.AtomicSymbol
                 name, c
             )
         |> dict
+        *)
     member internal x.AddAlias(name) = aliases.Add name
     static member FromName name = 
         let scc,v = lookup.TryGetValue(name) //REVIEW: catch and reload list?
         if scc then 
             v
-        else 
-            raise(AtomicSymbolCreatorNotFound(name))
+        else    
+            try
+                let h = NNVM.getOpHandle name
+                let info = MXSymbol.getAtomicSymbolInfo h
+                let v = AtomicSymbolCreator(h,info)
+                lookup.[name] <- v
+                v
+            with 
+            | _-> raise(AtomicSymbolCreatorNotFound(name)) //TODO: inner ex
     member x.Name = info.Name
     member x.AtomicSymbolCreatorHandle = handle
     member x.Info = info

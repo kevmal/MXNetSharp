@@ -249,8 +249,8 @@ update 0
 split.KeyUp
 |> Observable.add
     (fun k ->
-        printfn  "Next test batch"
         if k.KeyCode = Windows.Forms.Keys.Space then 
+            printfn  "Next test batch"
             if not(valIter.Next()) then 
                 valIter.Reset() 
                 valIter.Next() |> ignore

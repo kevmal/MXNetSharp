@@ -131,8 +131,8 @@ let makeExecutor style content (inputSize : int seq) =
         |> Array.unzip
     {| 
         //TODO: We have to keep references alive here to prevent crashing. Need to create a test and then make sure Executor keeps handles alive
-        Out = out
-        ArgGrad = Array.zip out.ArgumentNames argGrad |> dict
+        //Out = out
+        //ArgGrad = Array.zip out.ArgumentNames argGrad |> dict
         Args = args
         Executor = new Executor(out, context, inArgs, argGrad, gradReqType, Array.empty)
     |}
