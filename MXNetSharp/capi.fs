@@ -153,21 +153,21 @@ type CustomOpPropCallbacks =
     | kCustomOpPropInferType = 7
     | kCustomOpPropInferStorageType = 8
     | kCustomOpPropBackwardInferStorageType = 9
-type CustomOpFBFunc = delegate of IntPtr * IntPtr * IntPtr * IntPtr * bool * IntPtr -> int
-type CustomOpDelFunc = delegate of IntPtr -> int
-type CustomOpListFunc = delegate of IntPtr byref * IntPtr -> int
-type CustomOpInferShapeFunc = delegate of IntPtr * IntPtr * IntPtr * IntPtr -> int
-type CustomOpInferStorageTypeFunc = delegate of IntPtr * IntPtr * IntPtr -> int
-type CustomOpBackwardInferStorageTypeFunc = delegate of IntPtr * IntPtr * IntPtr * IntPtr -> int
-type CustomOpInferTypeFunc = delegate of IntPtr * IntPtr * IntPtr -> int
-type CustomOpBwdDepFunc = delegate of IntPtr * IntPtr * IntPtr * IntPtr byref * IntPtr byref * IntPtr -> int
-type CustomOpCreateFunc = delegate of string * IntPtr * IntPtr * IntPtr * IntPtr * IntPtr * IntPtr -> int
-type CustomOpPropCreator = delegate of IntPtr * IntPtr * IntPtr * IntPtr * IntPtr -> int
+type CustomOpFBFunc = delegate of size : int64 * ptrs : IntPtr * tags : IntPtr * reqs : IntPtr * isTrain  : bool * state : IntPtr -> bool
+type CustomOpDelFunc = delegate of state : IntPtr -> bool
+type CustomOpListFunc = delegate of args : IntPtr byref * state : IntPtr -> bool
+type CustomOpInferShapeFunc = delegate of numInput : int64 * ndims : IntPtr * shapes : IntPtr * state : IntPtr -> bool
+type CustomOpInferStorageTypeFunc = delegate of numInput : int64 * stypes : IntPtr * state : IntPtr -> bool
+type CustomOpBackwardInferStorageTypeFunc = delegate of numInput : IntPtr * stypes : IntPtr * tags : IntPtr * state : IntPtr -> bool
+type CustomOpInferTypeFunc = delegate of numInput : int64 * types : IntPtr * state : IntPtr -> bool
+type CustomOpBwdDepFunc = delegate of outGrad : IntPtr * inData : IntPtr * outData :  IntPtr * numDeps : IntPtr byref * rdeps : IntPtr byref * state : IntPtr -> bool
+type CustomOpCreateFunc = delegate of context : string * numInputs : int64 * shapes : IntPtr * ndims : IntPtr * dtypes : IntPtr * ret : IntPtr * state : IntPtr -> bool
+type CustomOpPropCreator = delegate of op_type : string * numArgs : int64 * keys : IntPtr * values : IntPtr * ret : IntPtr -> bool
 type CustomFunctionCallbacks =
     | kCustomFunctionBackward = 0
     | kCustomFunctionDelete = 1
-type CustomFunctionBwdFunc = delegate of int * int * IntPtr * int[] * int * IntPtr -> int
-type CustomFunctionDelFunc = delegate of IntPtr -> int
+type CustomFunctionBwdFunc = delegate of int * int * IntPtr * int[] * int * IntPtr -> bool
+type CustomFunctionDelFunc = delegate of IntPtr -> bool
 /// <summary>return str message of the last error
 /// all function in this file will return 0 when success
 /// and -1 when an error occured,
@@ -2204,11 +2204,9 @@ extern int MXRtcPush__(RtcHandle handle, uint32 num_input, uint32 num_output, ND
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRtcFree__(RtcHandle handle)
 
-(*
- * \brief register custom operators from frontend.
- * \param op_type name of custom op
- * \param creator
- *)
+/// <summary> register custom operators from frontend.</summary>
+/// <param name = op_type>name of custom op</param>
+/// <param name = creator>creator</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXCustomOpRegister(string op_type, CustomOpPropCreator creator)
 

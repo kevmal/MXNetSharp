@@ -176,6 +176,10 @@ module MXLib =
        let mutable out_array = un
        MXListAllOpNames(&out_size, &out_array) |> throwOnError "MXListAllOpNames"
        readStringArray out_size out_array
+    
+    ///register custom operators from frontend
+    let customOpRegister opType creator = 
+        MXCustomOpRegister(opType, creator) |> throwOnError "MXCustomOpRegister"
 
 
 type InferShapeResult<'a> = 

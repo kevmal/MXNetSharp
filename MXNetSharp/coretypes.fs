@@ -4,6 +4,15 @@ open System.Runtime.InteropServices
 open System
 open MXNetSharp.Interop
 open System.Runtime.CompilerServices
+open System
+
+//https://github.com/apache/incubator-mxnet/blob/62b063802634048fe9da0a736dd6ee429e410f27/python/mxnet/ndarray/ndarray.py#L57-L60
+type StorageType = 
+    | Undefined = -1
+    | Default = 0
+    | RowSparse = 1
+    | CSR = 2
+
 
 // defined in mshadow/base.h
 // https://github.com/apache/incubator-mxnet/blob/618c4811e417fb86cbb3fc0f7f38d55972eeb2af/3rdparty/mshadow/mshadow/base.h#L306
@@ -62,6 +71,20 @@ type Context =
         | CPU n 
         | GPU n 
         | CPUPinned n -> n
+    static member TryParse(str : String) = 
+        let str2 = str.Trim().ToLower()
+        let tryPrefix (prefix : string) f = 
+            if str2.StartsWith prefix then 
+                let scc,v = Int32.TryParse(str2.Substring(prefix.Length).Trim(')'))
+                if scc then Some (f v) else None
+            else 
+                None
+        seq{
+            "cpu(", CPU
+            "gpu(", GPU
+            "cpupinned(", CPUPinned
+        }
+        |> Seq.tryPick (fun (p,f) -> tryPrefix p f)
         
 
 type DataType = 

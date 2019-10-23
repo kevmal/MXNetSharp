@@ -12,6 +12,7 @@ open System.IO.Compression
 open MXNetSharp.Interop
 open MXNetSharp.PrimitiveOperators
 open MXNetSharp.Interop.CApi
+open System.Collections.Concurrent
 
 //https://github.com/apache/incubator-mxnet/blob/62b063802634048fe9da0a736dd6ee429e410f27/python/mxnet/ndarray/ndarray.py#L57-L60
 type StorageType = 
@@ -19,6 +20,8 @@ type StorageType =
     | Default = 0
     | RowSparse = 1
     | CSR = 2
+
+
 
 type BackwardStorageTypes = 
     {
@@ -43,7 +46,7 @@ type ICustomOperation =
                                outGrad : NDArray [] *
                                auxData : NDArray [] -> unit
     
-type ICustomOperationProperties = //TODO: label args
+type ICustomOperationProperties = 
     abstract member ListArguments : unit -> string []
     abstract member ListOutputs : unit -> string []
     abstract member ListAuxiliaryStates : unit -> string []
@@ -54,6 +57,36 @@ type ICustomOperationProperties = //TODO: label args
     abstract member DeclareBackwardDependency : outGrad : int[] * inData : int[] * OutData : int[] -> int[]
     abstract member CreateOperator : context : Context * inShapes : int[][] * inDataTypes : TypeFlag[] -> ICustomOperation
     
+[<AbstractClass>]
+type CustomOperation() = 
+    abstract member ListArguments : unit -> string []
+    abstract member ListOutputs : unit -> string []
+    abstract member ListAuxiliaryStates : unit -> string []
+    abstract member InferShape : inShape : int [][] -> int[][]*int[][]*int[][]
+    abstract member InferBackwardStorageType : storageTypes : BackwardStorageTypes -> unit
+    abstract member InferStorageType : inputStorageTypes : StorageType[] -> StorageType[] *StorageType[]*StorageType[] 
+    abstract member InferType : inType : TypeFlag[] -> TypeFlag[]*TypeFlag[]*TypeFlag[]
+    abstract member DeclareBackwardDependency : outGrad : int[] * inData : int[] * OutData : int[] -> int[]
+    abstract member CreateOperator : context : Context * inShapes : int[][] * inDataTypes : TypeFlag[] -> ICustomOperation
+    interface ICustomOperationProperties with
+        member this.CreateOperator(context: Context, inShapes: int [] [], inDataTypes: TypeFlag []): ICustomOperation = 
+            this.CreateOperator(context,inShapes,inDataTypes)
+        member this.DeclareBackwardDependency(outGrad: int [], inData: int [], outData: int []): int [] = 
+            this.DeclareBackwardDependency(outGrad, inData, outData)
+        member this.InferBackwardStorageType(storageTypes: BackwardStorageTypes): unit = 
+            this.InferBackwardStorageType(storageTypes)
+        member this.InferShape(inShape: int [] []): int [] [] * int [] [] * int [] [] = 
+            this.InferShape(inShape)
+        member this.InferStorageType(inputStorageTypes: StorageType []): StorageType [] * StorageType [] * StorageType [] = 
+            this.InferStorageType(inputStorageTypes)
+        member this.InferType(inType: TypeFlag []): TypeFlag [] * TypeFlag [] * TypeFlag [] = 
+            this.InferType(inType)
+        member this.ListAuxiliaryStates(): string [] = 
+            this.ListAuxiliaryStates()
+        member this.ListOutputs(): string [] = 
+            this.ListOutputs()
+        member x.ListArguments() = 
+            x.ListArguments()
              
 let testCustomOp = 
     {new ICustomOperation with
@@ -94,9 +127,150 @@ let testOpProps =
          member this.ListOutputs(): string [] = [|"output"|]
     }
 
-let refs = ResizeArray()    
+
+type SafeHGlobal internal () = 
+    inherit SafeHandle(0n, true)
+    new(sz : int) as this = 
+        new SafeHGlobal() then 
+            this.SetHandle(Marshal.AllocHGlobal sz)
+    static member AnsiString(str : string) = 
+        let s = new SafeHGlobal()
+        s.SetHandle(Marshal.StringToHGlobalAnsi str)
+        s
+    override x.IsInvalid = x.handle <= 0n
+    override x.ReleaseHandle() = 
+        Marshal.FreeHGlobal x.handle
+        true
+    member internal x.Pointer = 
+        if not x.IsClosed then
+            x.handle
+        else
+            ObjectDisposedException("SafeHGlobal", "HGlobal ptr has been freed") |> raise
+
+type ResourceType = 
+    | Disposable of IDisposable
+    | ReferenceHolder of obj
+
+type ResourceTracker(id, name) = 
+    static let mutable idCounter = 0L
+    static let lookup = ConcurrentDictionary<int64, ResourceTracker>()
+    static let delete = 
+        CustomOpDelFunc(fun id -> 
+            let id = int64 id
+            printfn "delete %d" id
+            let scc,rt = lookup.TryGetValue(id)
+            if scc then 
+                lookup.TryRemove(id) |> ignore
+                rt.Dispose()
+                true
+            else 
+                printfn "id %d not found" id
+                false
+        )
+    let mutable disposed = false
+    let lck = obj()
+    let mutable resources = ResizeArray()
+    let cache = Dictionary<string, nativeint>()
+    static member CreateStored(name) =
+        let id = Threading.Interlocked.Increment &idCounter
+        let o = new ResourceTracker(id, name)
+        lookup.[id] <- o
+        o
+    member x.Id : int64 = id
+    member x.Alloc(size : int) = 
+        lock(lck)
+            (fun _ -> 
+                if disposed || isNull resources then 
+                    ObjectDisposedException("ResourceTracker", sprintf "ResourceTracker for %s has been disposed." name) |> raise
+                let ptr = new SafeHGlobal(size)
+                resources.Add (Disposable ptr)
+                ptr.Pointer
+            )
+    member x.StringArray(strs : string []) = 
+        lock(lck)
+            (fun _ ->   
+                if disposed || isNull resources then 
+                    ObjectDisposedException("ResourceTracker", sprintf "ResourceTracker for %s has been disposed." name) |> raise
+                let ptrs = Array.zeroCreate (strs.Length + 1) 
+                for i = 0 to strs.Length - 1 do 
+                    let strPtr = SafeHGlobal.AnsiString(strs.[i]) 
+                    ptrs.[i] <- strPtr.Pointer
+                    resources.Add (Disposable(strPtr))
+                let ptr = x.Alloc(ptrs.Length*sizeof<IntPtr>)
+                Marshal.Copy(ptrs, 0, ptr, ptrs.Length)
+                ptr
+            )
+    member x.CachedStringArray(strs : string []) = 
+        let key = strs |> Seq.map (fun x -> x.Replace("|", "||")) |> String.concat "|"
+        lock(lck)
+            (fun _ ->   
+                if disposed || isNull resources then 
+                    ObjectDisposedException("ResourceTracker", sprintf "ResourceTracker for %s has been disposed." name) |> raise
+                let scc,v = cache.TryGetValue(key)
+                if scc then 
+                    v
+                else 
+                    let ptr = x.StringArray(strs)
+                    cache.[key] <- ptr
+                    ptr
+            )
+    member x.DelgatePointer(d : Delegate) = 
+        lock(lck)
+            (fun _ ->   
+                if disposed || isNull resources then 
+                    ObjectDisposedException("ResourceTracker", sprintf "ResourceTracker for %s has been disposed." name) |> raise
+                resources.Add(ReferenceHolder d)
+            )
+        Marshal.GetFunctionPointerForDelegate d
+    member x.WriteMxCallbackList(ptr : nativeint, l : (Delegate*nativeint) []) =
+        let cbPtrArray=
+            [|
+                Marshal.GetFunctionPointerForDelegate delete
+                yield! l |> Seq.map fst |> Seq.map (x.DelgatePointer)
+            |]
+        let cbPtr = x.Alloc(cbPtrArray.Length * sizeof<IntPtr>)
+        Marshal.Copy(cbPtrArray,0,cbPtr,cbPtrArray.Length)
+        let ctxPtrArray = 
+            [|
+                nativeint id
+                yield! l |> Seq.map snd
+            |]
+        let ctxPtr = x.Alloc(ctxPtrArray.Length * sizeof<IntPtr>)
+        Marshal.Copy(ctxPtrArray,0,ctxPtr,ctxPtrArray.Length)
+        let N = cbPtrArray.Length |> int64
+        NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt ptr) 0 N
+        NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt (ptr + nativeint sizeof<int64>)) 0 cbPtr
+        NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt (ptr + nativeint (sizeof<int64> + sizeof<IntPtr>))) 0 ctxPtr
+    member x.Dispose(disposing) = 
+        if not disposed then 
+            if disposing then 
+                lock(lck)
+                    (fun _ -> 
+                        if isNull resources then () else
+                        resources
+                        |> Seq.iter 
+                            (function 
+                             | Disposable d -> 
+                                printfn "dispose"
+                                d.Dispose()
+                             | ReferenceHolder _ -> 
+                                printfn "drop ref"
+                                ()
+                            )
+                        resources.Clear()
+                        cache.Clear()
+                        resources <- null
+                    )
+            disposed <- true
+    member x.Dispose() = 
+        x.Dispose(true)
+        GC.SuppressFinalize(x)
+    interface IDisposable with  
+        member x.Dispose() = x.Dispose()
+
+
 let creator = CustomOpPropCreator(fun opType argCount keys values cbList -> 
-    let opType = Helper.str opType
+    let rt = ResourceTracker.CreateStored opType
     printfn "creating... %s" opType
     printfn "arg count %d" argCount
     let args = 
@@ -106,7 +280,6 @@ let creator = CustomOpPropCreator(fun opType argCount keys values cbList ->
         printfn "values: %A" values
         Array.zip keys values
         |> dict
-    printfn "poo"
     let op : ICustomOperationProperties = testOpProps
     let inferShape = 
         CustomOpInferShapeFunc(fun numTensor tensorDimsPtr tensorShapes state ->
@@ -118,7 +291,7 @@ let creator = CustomOpPropCreator(fun opType argCount keys values cbList ->
             let outCount = op.ListOutputs().Length
             let auxCount = op.ListAuxiliaryStates().Length
             printfn "totalCount %d" (inCount + outCount + auxCount)
-            assert(numTensor = nativeint(inCount + outCount + auxCount))
+            assert(numTensor = int64(inCount + outCount + auxCount))
             let shapePtrs : IntPtr [] = Helper.readStructArray numTensor tensorShapes
             printfn "shapePtrs: %A" shapePtrs
             let shapes : int [] [] = 
@@ -143,12 +316,12 @@ let creator = CustomOpPropCreator(fun opType argCount keys values cbList ->
                 returnShapes
                 |> Array.map 
                     (fun a ->
-                        let ptr = Marshal.AllocHGlobal(a.Length * sizeof<int>)
-                        Marshal.Copy(a,0,ptr,a.Length)
-                        ptr
+                        let mem = rt.Alloc(a.Length * sizeof<int64>)
+                        Marshal.Copy(a,0,mem,a.Length)
+                        mem
                     )
             Marshal.Copy(returnShapesPtrs, 0, tensorShapes, returnShapesPtrs.Length)
-            1
+            true
         )    
     let inferBackwardStorageType = CustomOpBackwardInferStorageTypeFunc(fun numTensor tensorTypesPtr tags state -> 
         printfn "infer back storage type func"
@@ -181,7 +354,7 @@ let creator = CustomOpPropCreator(fun opType argCount keys values cbList ->
             |]
             |> Array.map int
         Marshal.Copy(retStorageTypes, 0, tensorTypesPtr, retStorageTypes.Length) |> ignore
-        1
+        true
     )
 
     let inferStorageType = CustomOpInferStorageTypeFunc(fun numTensor stypesPtr state -> 
@@ -205,7 +378,7 @@ let creator = CustomOpPropCreator(fun opType argCount keys values cbList ->
             |]
             |> Array.map int
         Marshal.Copy(retStorageTypes, 0, stypesPtr, retStorageTypes.Length) |> ignore
-        1
+        true
     )
 
     let inferType = CustomOpInferStorageTypeFunc(fun numTensor typesPtr state -> 
@@ -218,7 +391,7 @@ let creator = CustomOpPropCreator(fun opType argCount keys values cbList ->
         printfn "totalCount %d" (inCount + outCount + auxCount)
         let dtypes : TypeFlag [] = Helper.readStructArray inCount typesPtr |> Array.map enum
         printfn "tensorDataTypes %A" dtypes
-        assert(numTensor = nativeint(inCount + outCount + auxCount))
+        assert(numTensor = int64 (inCount + outCount + auxCount))
         let inputTypes, outputTypes, auxTypes = op.InferType(dtypes)
         assert(inputTypes.Length = inCount)
         assert(outputTypes.Length = outCount)
@@ -232,47 +405,25 @@ let creator = CustomOpPropCreator(fun opType argCount keys values cbList ->
             |> Array.map int
         assert(ret.Length = int numTensor)
         Marshal.Copy(ret, 0, typesPtr, int numTensor)
-        1
+        true
     )
     let listOutputs = CustomOpListFunc(fun out _ ->
         printfn "listOutputs"
-        let ptrs = 
-            [| 
-                yield! op.ListOutputs() |> Array.map (Marshal.StringToHGlobalAnsi)
-                yield 0n
-            |]
-        let ptr = Marshal.AllocHGlobal (ptrs.Length*sizeof<IntPtr>)
-        Marshal.Copy(ptrs, 0, ptr, ptrs.Length)
-        out <- ptr
-        1)
+        let l = op.ListOutputs()
+        out <- rt.CachedStringArray(l)
+        true)
         
     let listArgs = CustomOpListFunc(fun out _ ->
         printfn "listArgs"
-        //let outStr = (op.ListArguments() |> String.concat "\u0000") + "\u0000\u0000"
-        let ptrs = 
-            [| 
-                yield! op.ListArguments() |> Array.map (Marshal.StringToHGlobalAnsi)
-                yield 0n
-            |]
-        let ptr = Marshal.AllocHGlobal (ptrs.Length*sizeof<IntPtr>)
-        Marshal.Copy(ptrs, 0, ptr, ptrs.Length)
-        out <- ptr
-        
-
-        //outStr.Replace("\u0000", "|") |> printfn "OutStr: %s"
-        //out <- Marshal.StringToHGlobalAnsi outStr
-        1)
+        let l = op.ListArguments()
+        out <- rt.CachedStringArray(l)
+        true)
 
     let listAuxStates = CustomOpListFunc(fun out _ ->
-        let ptrs = 
-            [| 
-                yield! op.ListAuxiliaryStates() |> Array.map (Marshal.StringToHGlobalAnsi)
-                yield 0n
-            |]
-        let ptr = Marshal.AllocHGlobal (ptrs.Length*sizeof<IntPtr>)
-        Marshal.Copy(ptrs, 0, ptr, ptrs.Length)
-        out <- ptr
-        1)
+        printfn "listAux"
+        let l = op.ListAuxiliaryStates()
+        out <- rt.CachedStringArray(l)
+        true)
     
     let declareBackwardDep = CustomOpBwdDepFunc(fun outGrad inData outData numDep deps state -> 
         printfn "declare backward Dep"
@@ -289,17 +440,21 @@ let creator = CustomOpPropCreator(fun opType argCount keys values cbList ->
         printfn "rdeps: %A" rdeps
         numDep <- nativeint rdeps.Length
         // REVIEW: register? see python code
-        let dptr = Marshal.AllocHGlobal(rdeps.Length*sizeof<nativeint>)
+        let dptr = rt.Alloc(rdeps.Length*sizeof<nativeint>)
         Marshal.Copy(rdeps, 0, dptr, rdeps.Length)
         deps <- dptr
-        1
+        true
     )
 
     let createOp = CustomOpCreateFunc(fun ctx numInputs shapes ndims dtypes ret state -> 
         printfn "create op"
         printfn "ctx: %A" ctx
         printfn "numInputs: %d" numInputs
-        //TODO: parse context
+        let rt = ResourceTracker.CreateStored(opType + "_createop")
+        let context = 
+            match Context.TryParse(ctx) with 
+            | Some c -> c
+            | None -> failwithf "Could not parse context '%s'" ctx
         let ndims : int [] = Helper.readStructArray numInputs ndims
         let dtypes : TypeFlag [] = Helper.readStructArray numInputs dtypes |> Array.map enum
         let shapes = 
@@ -309,7 +464,7 @@ let creator = CustomOpPropCreator(fun opType argCount keys values cbList ->
                 (fun i d ->
                     Helper.readStructArray d shapePtrs.[i]
                 )
-        let cop = op.CreateOperator(CPU(0), shapes, dtypes) //TODO: right context
+        let cop = op.CreateOperator(context, shapes, dtypes) 
         let forward = CustomOpFBFunc(fun size ptrs tags reqs isTrain state -> 
             printfn "forward"
             printfn "size %d" size
@@ -321,7 +476,7 @@ let creator = CustomOpPropCreator(fun opType argCount keys values cbList ->
                 tensors.[tags.[i]].Add(new NDArray(new SafeNDArrayHandle(ndarrs.[i], true)))
             let reqs : int [] = Helper.readStructArray tensors.[1].Count reqs
             cop.Forward(isTrain, reqs |> Array.map OpReqType.FromInt, tensors.[0].ToArray(), tensors.[1].ToArray(), tensors.[4].ToArray())
-            1
+            true
         )
         let backward = CustomOpFBFunc(fun size ptrs tags reqs isTrain state -> 
             printfn "backward"
@@ -342,59 +497,34 @@ let creator = CustomOpPropCreator(fun opType argCount keys values cbList ->
                          tensors.[2].ToArray(), 
                          tensors.[3].ToArray(), 
                          tensors.[4].ToArray())
-            1
+            true
         )
-        let delete = CustomOpDelFunc(fun _ -> printfn "delete"; 0)
-        refs.Add (delete :> Delegate)
-        refs.Add (forward :> Delegate)
-        refs.Add (backward :> Delegate)
-        // build MXCallbackList
-        let cbPtrArray=
+
+        rt.WriteMxCallbackList(ret, 
             [|
-                (Marshal.GetFunctionPointerForDelegate delete)
-                (Marshal.GetFunctionPointerForDelegate forward)
-                (Marshal.GetFunctionPointerForDelegate backward)
-            |]
-        printfn "%A" cbPtrArray
-        let cbPtr = Marshal.AllocHGlobal (cbPtrArray.Length * sizeof<IntPtr>)
-        Marshal.Copy(cbPtrArray,0,cbPtr,cbPtrArray.Length)
-        let ctxPtrArray = cbPtrArray |> Array.map (fun _ -> 0n)
-        let ctxPtr = Marshal.AllocHGlobal (ctxPtrArray.Length * sizeof<IntPtr>)
-        Marshal.Copy(ctxPtrArray,0,ctxPtr,ctxPtrArray.Length)
-        let ptr = ret
-        let N = cbPtrArray.Length |> int64
-        NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt ptr) 0 N
-        NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt (ptr + nativeint sizeof<int64>)) 0 cbPtr
-        NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt (ptr + nativeint (sizeof<int64> + sizeof<IntPtr>))) 0 ctxPtr
-        1
+                forward :> Delegate, 0n
+                backward :> Delegate, 0n
+            |])
+        true
     )
     printfn "making cb struct"
-    let delete = CustomOpDelFunc(fun _ -> printfn "delete"; 0)
-    let cbPtrArray=
+    rt.WriteMxCallbackList(cbList, 
         [|
-            (Marshal.GetFunctionPointerForDelegate delete)
-            (Marshal.GetFunctionPointerForDelegate listArgs)
-            (Marshal.GetFunctionPointerForDelegate listOutputs)
-            (Marshal.GetFunctionPointerForDelegate listAuxStates)
-            (Marshal.GetFunctionPointerForDelegate inferShape)
-            (Marshal.GetFunctionPointerForDelegate declareBackwardDep)
-            (Marshal.GetFunctionPointerForDelegate createOp)
-            (Marshal.GetFunctionPointerForDelegate inferType)
-            (Marshal.GetFunctionPointerForDelegate inferStorageType)
-            (Marshal.GetFunctionPointerForDelegate inferBackwardStorageType)
-        |]
-    let cbPtr = Marshal.AllocHGlobal (cbPtrArray.Length * sizeof<IntPtr>)
-    Marshal.Copy(cbPtrArray,0,cbPtr,cbPtrArray.Length)
-    let ctxPtrArray = cbPtrArray |> Array.map (fun _ -> 0n)
-    let ctxPtr = Marshal.AllocHGlobal (ctxPtrArray.Length * sizeof<IntPtr>)
-    Marshal.Copy(ctxPtrArray,0,ctxPtr,ctxPtrArray.Length)
-    let ptr = cbList 
-    let N = cbPtrArray.Length |> int64
-    NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt ptr) 0 N
-    NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt (ptr + nativeint sizeof<int64>)) 0 cbPtr
-    NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt (ptr + nativeint (sizeof<int64> + sizeof<IntPtr>))) 0 ctxPtr
-    1
+            listArgs :> Delegate, 0n
+            listOutputs :> Delegate, 0n
+            listAuxStates :> Delegate, 0n
+            inferShape :> Delegate, 0n
+            declareBackwardDep :> Delegate, 0n
+            createOp :> Delegate, 0n
+            inferType :> Delegate, 0n
+            inferStorageType :> Delegate, 0n
+            inferBackwardStorageType :> Delegate, 0n
+        |])
+    true
 )
+
+
+
 CApi.MXCustomOpRegister("myop", creator)
 
 let a = new Variable("a")
@@ -455,7 +585,23 @@ GC.Collect()
 printfn "9uwetr9hg"
 let poo : float32[] = argGrad.[0].ToArray()
 
+
+
+
 printfn "bbbbbbb"
+
+
+MXNotifyShutdown()
+
+
+
+
+printfn "bbbbbbb"
+
+
+
+printfn "bbbbbbb"
+
 
     
 
