@@ -35,11 +35,12 @@ module internal Dict =
             if not(d.ContainsKey kvp.Key) then 
                 d.[kvp.Key] <- kvp.Value
         d :> IDictionary<_,_>
-type Arguments<'a>(args : IDictionary<string, OpArg<'a>>) =
-    new(args : (string*OpArg<'a>) seq) = Arguments(dict args)
+type Arguments<'a>(args : IDictionary<string, OpArg<'a>>, ordering : string []) =
+    new(args : (string*OpArg<'a>) seq) = Arguments(dict args, args |> Seq.map fst |> Seq.toArray)
     member x.Args = args
-    member x.AddReplace(args2 : Arguments<'a>) = args2.Args |> Dict.addReplace args |> Arguments
-    member x.AddIgnore(args2 : Arguments<'a>) = args2.Args |> Dict.addIgnore args |> Arguments
+    member x.Ordering = ordering
+    member x.AddReplace(args2 : Arguments<'a>) = Arguments(args2.Args |> Dict.addReplace args, x.Ordering)
+    member x.AddIgnore(args2 : Arguments<'a>) = Arguments(args2.Args |> Dict.addIgnore args, x.Ordering)
     member x.GetInput(name) = 
         match args.[name] with 
         | Input a -> a
@@ -58,6 +59,15 @@ type Arguments<'a>(args : IDictionary<string, OpArg<'a>>) =
         match args.[name] with 
         | VarArg(d,v) -> v
         | w -> failwithf "Expecting %s to be a var arg but is a %A" name w
+    interface IEnumerable<string*OpArg<'a>> with
+        member x.GetEnumerator() = 
+            let d = Dictionary(args)
+            (seq {
+                yield! ordering |> Seq.map (fun m -> d.Remove(m) |> ignore; m,args.[m])
+                yield! d.Keys |> Seq.map (fun k -> k, d.[k])
+            }).GetEnumerator()
+        member this.GetEnumerator() = (this :> IEnumerable<string*OpArg<'a>>).GetEnumerator() :> Collections.IEnumerator
+           
 
 type Operator<'a>(name : string, args : Arguments<'a>) = 
     member x.Name = name 
