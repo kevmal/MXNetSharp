@@ -1045,6 +1045,7 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
     [
         sprintf "type %s private (operatorArguments) = " h.Name
         sprintf "    inherit SymbolOperator(\"%s\", operatorArguments)" h.AtomicSymbolInfo.Name
+        sprintf "    static member CreateFromArguments(args : Arguments<Symbol>) = new %s(args)" h.Name
         if req.Length = 0 then 
             yield! indent 1 ctor2
         else

@@ -12,7 +12,7 @@ type SymbolInitilizationException(symbol : Symbol, inner : Exception) =
 
 [<AbstractClass>]
 type Symbol() =
-    let mutable disposed = false
+    //let mutable disposed = false
     member val internal InternalName : string option = None with get,set
     member val internal InternalHandle : SafeSymbolHandle option = None with get,set
     member x.IsInitialized = x.InternalHandle.IsSome
@@ -127,7 +127,7 @@ type Symbol() =
     member x.Tanh() = new Tanh(x)
     static member Tanh(x : Symbol) = new Tanh(x) :> Symbol
 
-
+(*
     member x.Dispose(disposing) = 
         if not disposed then 
             if disposing then 
@@ -140,6 +140,7 @@ type Symbol() =
         GC.SuppressFinalize(x)
     interface IDisposable with  
         member x.Dispose() = x.Dispose()
+*)
 
 type SymbolOutput internal (parent : Symbol) = 
     inherit Symbol()
@@ -183,6 +184,8 @@ type Variable() =
 type ImplicitVariable() = 
     inherit Variable() 
       
+//TODO: fix histogram
+//TODO: override tostring
 //TODO: ctx = '' for NDArray ops is invalid even though it's often the default
 //TODO: doc comments on generated symbols
 //TODO: add a "With" method to copy with updates      
@@ -192,6 +195,7 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
     //let parametersStr = parameters |> Array.map (fun (k,v) -> k, Util.valueString v)
     new(name, args) = new SymbolOperator(AtomicSymbolCreator.FromName name, args)
     //new(creator,pnames,ps,inames,ins) = new SymbolOperator(creator, Array.zip pnames ps, Array.zip inames ins)
+    member x.OperatorArguments = operatorArguments
     override x.Initialize() =   
         match x.InternalHandle with 
         | Some _ -> ()
@@ -279,6 +283,7 @@ type SymbolGroup<'a>(group : 'a, symbols : Symbol []) =
 (* GERNATED SYMBOL TYPES BEGIN *)//
 type CachedOp private (operatorArguments) = 
     inherit SymbolOperator("_CachedOp", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new CachedOp(args)
     new([<Optional>] ?data : Symbol seq) =
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
         let operatorArguments = 
@@ -296,6 +301,7 @@ type CachedOp private (operatorArguments) =
 
 type BatchNormV1 private (operatorArguments) = 
     inherit SymbolOperator("BatchNorm_v1", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BatchNormV1(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?gamma : Symbol,
         [<Optional>] ?beta : Symbol,
@@ -335,6 +341,7 @@ type BatchNormV1 private (operatorArguments) =
 
 type MpAdamwUpdate private (operatorArguments) = 
     inherit SymbolOperator("_mp_adamw_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MpAdamwUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         mean : Symbol,
@@ -422,6 +429,7 @@ type MpAdamwUpdate private (operatorArguments) =
 
 type AdamwUpdate private (operatorArguments) = 
     inherit SymbolOperator("_adamw_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new AdamwUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         mean : Symbol,
@@ -503,6 +511,7 @@ type AdamwUpdate private (operatorArguments) =
 
 type ContribAdaptiveAvgPooling2D private (operatorArguments) = 
     inherit SymbolOperator("_contrib_AdaptiveAvgPooling2D", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribAdaptiveAvgPooling2D(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?outputSize : int) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -518,6 +527,7 @@ type ContribAdaptiveAvgPooling2D private (operatorArguments) =
 
 type MultiAllFinite private (operatorArguments) = 
     inherit SymbolOperator("multi_all_finite", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MultiAllFinite(args)
     new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?numArrays : int,
         [<Optional>] ?initOutput : bool) = 
@@ -537,6 +547,7 @@ type MultiAllFinite private (operatorArguments) =
 
 type ContribBilinearResize2D private (operatorArguments) = 
     inherit SymbolOperator("_contrib_BilinearResize2D", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBilinearResize2D(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?like : Symbol,
         [<Optional>] ?height : int,
@@ -572,6 +583,7 @@ type ContribBilinearResize2D private (operatorArguments) =
 
 type ContribBooleanMask private (operatorArguments) = 
     inherit SymbolOperator("_contrib_boolean_mask", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBooleanMask(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?index : Symbol,
         [<Optional>] ?axis : int) = 
@@ -591,6 +603,7 @@ type ContribBooleanMask private (operatorArguments) =
 
 type ContribBoxNms private (operatorArguments) = 
     inherit SymbolOperator("_contrib_box_nms", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBoxNms(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?overlapThresh : float,
         [<Optional>] ?validThresh : float,
@@ -642,6 +655,7 @@ type ContribBoxNms private (operatorArguments) =
 
 type ContribBoxIou private (operatorArguments) = 
     inherit SymbolOperator("_contrib_box_iou", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBoxIou(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol,
         [<Optional>] ?format : Format) = 
@@ -661,6 +675,7 @@ type ContribBoxIou private (operatorArguments) =
 
 type ContribBipartiteMatching private (operatorArguments) = 
     inherit SymbolOperator("_contrib_bipartite_matching", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBipartiteMatching(args)
     new(data : Symbol,
         threshold : float,
         [<Optional>] ?isAscend : bool,
@@ -695,6 +710,7 @@ type ContribBipartiteMatching private (operatorArguments) =
 
 type ContribDglCsrNeighborUniformSample private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_csr_neighbor_uniform_sample", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDglCsrNeighborUniformSample(args)
     new([<Optional>] ?csrMatrix : Symbol,
         [<Optional>] ?seedArrays : Symbol seq,
         [<Optional>] ?numHops : int64,
@@ -722,6 +738,7 @@ type ContribDglCsrNeighborUniformSample private (operatorArguments) =
 
 type ContribDglCsrNeighborNonUniformSample private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_csr_neighbor_non_uniform_sample", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDglCsrNeighborNonUniformSample(args)
     new([<Optional>] ?csrMatrix : Symbol,
         [<Optional>] ?probability : Symbol,
         [<Optional>] ?seedArrays : Symbol seq,
@@ -753,6 +770,7 @@ type ContribDglCsrNeighborNonUniformSample private (operatorArguments) =
 
 type ContribDglSubgraph private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_subgraph", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDglSubgraph(args)
     new(graph : Symbol,
         data : Symbol seq,
         returnMapping : bool) = 
@@ -781,6 +799,7 @@ type ContribDglSubgraph private (operatorArguments) =
 
 type ContribEdgeId private (operatorArguments) = 
     inherit SymbolOperator("_contrib_edge_id", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribEdgeId(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?u : Symbol,
         [<Optional>] ?v : Symbol) = 
@@ -800,6 +819,7 @@ type ContribEdgeId private (operatorArguments) =
 
 type ContribDglAdjacency private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_adjacency", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDglAdjacency(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -811,6 +831,7 @@ type ContribDglAdjacency private (operatorArguments) =
 
 type ContribDglGraphCompact private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_graph_compact", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDglGraphCompact(args)
     new(graphData : Symbol seq,
         returnMapping : bool,
         graphSizes : int64 seq) = 
@@ -848,6 +869,7 @@ type ContribDglGraphCompact private (operatorArguments) =
 
 type ContribGradientmultiplier private (operatorArguments) = 
     inherit SymbolOperator("_contrib_gradientmultiplier", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribGradientmultiplier(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -870,6 +892,7 @@ type ContribGradientmultiplier private (operatorArguments) =
 
 type ContribBackwardGradientmultiplier private (operatorArguments) = 
     inherit SymbolOperator("_contrib_backward_gradientmultiplier", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBackwardGradientmultiplier(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -892,6 +915,7 @@ type ContribBackwardGradientmultiplier private (operatorArguments) =
 
 type ContribHawkesll private (operatorArguments) = 
     inherit SymbolOperator("_contrib_hawkesll", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribHawkesll(args)
     new([<Optional>] ?lda : Symbol,
         [<Optional>] ?alpha : Symbol,
         [<Optional>] ?beta : Symbol,
@@ -931,6 +955,7 @@ type ContribHawkesll private (operatorArguments) =
 
 type ContribIndexArray private (operatorArguments) = 
     inherit SymbolOperator("_contrib_index_array", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribIndexArray(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axes : int seq) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -946,6 +971,7 @@ type ContribIndexArray private (operatorArguments) =
 
 type ContribIndexCopy private (operatorArguments) = 
     inherit SymbolOperator("_contrib_index_copy", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribIndexCopy(args)
     new([<Optional>] ?oldTensor : Symbol,
         [<Optional>] ?indexVector : Symbol,
         [<Optional>] ?newTensor : Symbol) = 
@@ -965,6 +991,7 @@ type ContribIndexCopy private (operatorArguments) =
 
 type KhatriRao private (operatorArguments) = 
     inherit SymbolOperator("khatri_rao", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new KhatriRao(args)
     new([<Optional>] ?args : Symbol seq) =
         let args = defaultArg (args |> Option.map Seq.toArray) Array.empty
         let operatorArguments = 
@@ -982,6 +1009,7 @@ type KhatriRao private (operatorArguments) =
 
 type MultiLars private (operatorArguments) = 
     inherit SymbolOperator("multi_lars", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MultiLars(args)
     new(lrs : Symbol,
         weightsSumSq : Symbol,
         gradsSumSq : Symbol,
@@ -1033,6 +1061,7 @@ type MultiLars private (operatorArguments) =
 
 type MultiSumSq private (operatorArguments) = 
     inherit SymbolOperator("multi_sum_sq", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MultiSumSq(args)
     new(data : Symbol seq,
         numArrays : int) = 
         let operatorArguments = 
@@ -1063,6 +1092,7 @@ type MultiSumSq private (operatorArguments) =
 
 type ContribMultiBoxDetection private (operatorArguments) = 
     inherit SymbolOperator("_contrib_MultiBoxDetection", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribMultiBoxDetection(args)
     new([<Optional>] ?clsProb : Symbol,
         [<Optional>] ?locPred : Symbol,
         [<Optional>] ?anchor : Symbol,
@@ -1110,6 +1140,7 @@ type ContribMultiBoxDetection private (operatorArguments) =
 
 type ContribMultiBoxPrior private (operatorArguments) = 
     inherit SymbolOperator("_contrib_MultiBoxPrior", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribMultiBoxPrior(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?sizes : double seq,
         [<Optional>] ?ratios : double seq,
@@ -1141,6 +1172,7 @@ type ContribMultiBoxPrior private (operatorArguments) =
 
 type ContribMultiBoxTarget private (operatorArguments) = 
     inherit SymbolOperator("_contrib_MultiBoxTarget", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribMultiBoxTarget(args)
     new([<Optional>] ?anchor : Symbol,
         [<Optional>] ?label : Symbol,
         [<Optional>] ?clsPred : Symbol,
@@ -1184,6 +1216,7 @@ type ContribMultiBoxTarget private (operatorArguments) =
 
 type ContribGetnnz private (operatorArguments) = 
     inherit SymbolOperator("_contrib_getnnz", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribGetnnz(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -1199,6 +1232,7 @@ type ContribGetnnz private (operatorArguments) =
 
 type ContribGroupAdagradUpdate private (operatorArguments) = 
     inherit SymbolOperator("_contrib_group_adagrad_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribGroupAdagradUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         history : Symbol,
@@ -1251,6 +1285,7 @@ type ContribGroupAdagradUpdate private (operatorArguments) =
 
 type PreloadedMultiSgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("preloaded_multi_sgd_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new PreloadedMultiSgdUpdate(args)
     new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?rescaleGrad : float,
         [<Optional>] ?clipGradient : float,
@@ -1274,6 +1309,7 @@ type PreloadedMultiSgdUpdate private (operatorArguments) =
 
 type PreloadedMultiSgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("preloaded_multi_sgd_mom_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new PreloadedMultiSgdMomUpdate(args)
     new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?momentum : float,
         [<Optional>] ?rescaleGrad : float,
@@ -1301,6 +1337,7 @@ type PreloadedMultiSgdMomUpdate private (operatorArguments) =
 
 type PreloadedMultiMpSgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("preloaded_multi_mp_sgd_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new PreloadedMultiMpSgdUpdate(args)
     new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?rescaleGrad : float,
         [<Optional>] ?clipGradient : float,
@@ -1324,6 +1361,7 @@ type PreloadedMultiMpSgdUpdate private (operatorArguments) =
 
 type PreloadedMultiMpSgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("preloaded_multi_mp_sgd_mom_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new PreloadedMultiMpSgdMomUpdate(args)
     new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?momentum : float,
         [<Optional>] ?rescaleGrad : float,
@@ -1351,6 +1389,7 @@ type PreloadedMultiMpSgdMomUpdate private (operatorArguments) =
 
 type ContribQuadratic private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quadratic", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuadratic(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?a : float,
         [<Optional>] ?b : float,
@@ -1374,6 +1413,7 @@ type ContribQuadratic private (operatorArguments) =
 
 type ContribROIAlign private (operatorArguments) = 
     inherit SymbolOperator("_contrib_ROIAlign", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribROIAlign(args)
     new(data : Symbol,
         rois : Symbol,
         pooledSize : int seq,
@@ -1419,6 +1459,7 @@ type ContribROIAlign private (operatorArguments) =
 
 type ContribRROIAlign private (operatorArguments) = 
     inherit SymbolOperator("_contrib_RROIAlign", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribRROIAlign(args)
     new(data : Symbol,
         rois : Symbol,
         pooledSize : int seq,
@@ -1458,6 +1499,7 @@ type ContribRROIAlign private (operatorArguments) =
 
 type ContribSyncBatchNorm private (operatorArguments) = 
     inherit SymbolOperator("_contrib_SyncBatchNorm", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribSyncBatchNorm(args)
     new(data : Symbol,
         gamma : Symbol,
         beta : Symbol,
@@ -1540,6 +1582,7 @@ type ContribSyncBatchNorm private (operatorArguments) =
 
 type ContribDivSqrtDim private (operatorArguments) = 
     inherit SymbolOperator("_contrib_div_sqrt_dim", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDivSqrtDim(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -1551,6 +1594,7 @@ type ContribDivSqrtDim private (operatorArguments) =
 
 type Foreach private (operatorArguments) = 
     inherit SymbolOperator("_foreach", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Foreach(args)
     new(fn : Symbol,
         data : Symbol seq,
         numOutputs : int,
@@ -1599,6 +1643,7 @@ type Foreach private (operatorArguments) =
 
 type WhileLoop private (operatorArguments) = 
     inherit SymbolOperator("_while_loop", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new WhileLoop(args)
     new(cond : Symbol,
         func : Symbol,
         data : Symbol seq,
@@ -1658,6 +1703,7 @@ type WhileLoop private (operatorArguments) =
 
 type Cond private (operatorArguments) = 
     inherit SymbolOperator("_cond", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Cond(args)
     new(cond : Symbol,
         thenBranch : Symbol,
         elseBranch : Symbol,
@@ -1713,6 +1759,7 @@ type Cond private (operatorArguments) =
 
 type Custom private (operatorArguments) = 
     inherit SymbolOperator("Custom", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Custom(args)
     new(data : Symbol seq,
         opType : string) = 
         let operatorArguments = 
@@ -1743,6 +1790,7 @@ type Custom private (operatorArguments) =
 
 type IdentityAttachKLSparseReg private (operatorArguments) = 
     inherit SymbolOperator("IdentityAttachKLSparseReg", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new IdentityAttachKLSparseReg(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?sparsenessTarget : float,
         [<Optional>] ?penalty : float,
@@ -1766,6 +1814,7 @@ type IdentityAttachKLSparseReg private (operatorArguments) =
 
 type ImageCrop private (operatorArguments) = 
     inherit SymbolOperator("_image_crop", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ImageCrop(args)
     new(data : Symbol,
         x : int,
         y : int,
@@ -1803,6 +1852,7 @@ type ImageCrop private (operatorArguments) =
 
 type ImageToTensor private (operatorArguments) = 
     inherit SymbolOperator("_image_to_tensor", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ImageToTensor(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -1814,6 +1864,7 @@ type ImageToTensor private (operatorArguments) =
 
 type ImageNormalize private (operatorArguments) = 
     inherit SymbolOperator("_image_normalize", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ImageNormalize(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?mean : double seq,
         [<Optional>] ?std : double seq) = 
@@ -1833,6 +1884,7 @@ type ImageNormalize private (operatorArguments) =
 
 type ImageFlipLeftRight private (operatorArguments) = 
     inherit SymbolOperator("_image_flip_left_right", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ImageFlipLeftRight(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -1844,6 +1896,7 @@ type ImageFlipLeftRight private (operatorArguments) =
 
 type ImageRandomFlipLeftRight private (operatorArguments) = 
     inherit SymbolOperator("_image_random_flip_left_right", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomFlipLeftRight(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -1855,6 +1908,7 @@ type ImageRandomFlipLeftRight private (operatorArguments) =
 
 type ImageFlipTopBottom private (operatorArguments) = 
     inherit SymbolOperator("_image_flip_top_bottom", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ImageFlipTopBottom(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -1866,6 +1920,7 @@ type ImageFlipTopBottom private (operatorArguments) =
 
 type ImageRandomFlipTopBottom private (operatorArguments) = 
     inherit SymbolOperator("_image_random_flip_top_bottom", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomFlipTopBottom(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -1877,6 +1932,7 @@ type ImageRandomFlipTopBottom private (operatorArguments) =
 
 type ImageRandomBrightness private (operatorArguments) = 
     inherit SymbolOperator("_image_random_brightness", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomBrightness(args)
     new(data : Symbol,
         minFactor : float,
         maxFactor : float) = 
@@ -1904,6 +1960,7 @@ type ImageRandomBrightness private (operatorArguments) =
 
 type ImageRandomContrast private (operatorArguments) = 
     inherit SymbolOperator("_image_random_contrast", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomContrast(args)
     new(data : Symbol,
         minFactor : float,
         maxFactor : float) = 
@@ -1931,6 +1988,7 @@ type ImageRandomContrast private (operatorArguments) =
 
 type ImageRandomSaturation private (operatorArguments) = 
     inherit SymbolOperator("_image_random_saturation", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomSaturation(args)
     new(data : Symbol,
         minFactor : float,
         maxFactor : float) = 
@@ -1958,6 +2016,7 @@ type ImageRandomSaturation private (operatorArguments) =
 
 type ImageRandomHue private (operatorArguments) = 
     inherit SymbolOperator("_image_random_hue", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomHue(args)
     new(data : Symbol,
         minFactor : float,
         maxFactor : float) = 
@@ -1985,6 +2044,7 @@ type ImageRandomHue private (operatorArguments) =
 
 type ImageRandomColorJitter private (operatorArguments) = 
     inherit SymbolOperator("_image_random_color_jitter", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomColorJitter(args)
     new(data : Symbol,
         brightness : float,
         contrast : float,
@@ -2022,6 +2082,7 @@ type ImageRandomColorJitter private (operatorArguments) =
 
 type ImageAdjustLighting private (operatorArguments) = 
     inherit SymbolOperator("_image_adjust_lighting", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ImageAdjustLighting(args)
     new(data : Symbol,
         alpha : double seq) = 
         let operatorArguments = 
@@ -2044,6 +2105,7 @@ type ImageAdjustLighting private (operatorArguments) =
 
 type ImageRandomLighting private (operatorArguments) = 
     inherit SymbolOperator("_image_random_lighting", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomLighting(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?alphaStd : float) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -2059,6 +2121,7 @@ type ImageRandomLighting private (operatorArguments) =
 
 type ImageResize private (operatorArguments) = 
     inherit SymbolOperator("_image_resize", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ImageResize(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?size : int,
         [<Optional>] ?keepRatio : bool,
@@ -2082,6 +2145,7 @@ type ImageResize private (operatorArguments) =
 
 type LeakyReLU private (operatorArguments) = 
     inherit SymbolOperator("LeakyReLU", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LeakyReLU(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?gamma : Symbol,
         [<Optional>] ?actType : LeakyReLUType,
@@ -2113,6 +2177,7 @@ type LeakyReLU private (operatorArguments) =
 
 type SoftmaxCrossEntropy private (operatorArguments) = 
     inherit SymbolOperator("softmax_cross_entropy", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SoftmaxCrossEntropy(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?label : Symbol) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -2128,6 +2193,7 @@ type SoftmaxCrossEntropy private (operatorArguments) =
 
 type Activation private (operatorArguments) = 
     inherit SymbolOperator("Activation", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Activation(args)
     new(data : Symbol,
         actType : ActType) = 
         let operatorArguments = 
@@ -2150,6 +2216,7 @@ type Activation private (operatorArguments) =
 
 type BatchNorm private (operatorArguments) = 
     inherit SymbolOperator("BatchNorm", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BatchNorm(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?gamma : Symbol,
         [<Optional>] ?beta : Symbol,
@@ -2213,6 +2280,7 @@ type BatchNorm private (operatorArguments) =
 
 type Concat private (operatorArguments) = 
     inherit SymbolOperator("Concat", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Concat(args)
     new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?dim : int) = 
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
@@ -2228,6 +2296,7 @@ type Concat private (operatorArguments) =
 
 type RnnParamConcat private (operatorArguments) = 
     inherit SymbolOperator("_rnn_param_concat", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RnnParamConcat(args)
     new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?dim : int) = 
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
@@ -2243,6 +2312,7 @@ type RnnParamConcat private (operatorArguments) =
 
 type Convolution private (operatorArguments) = 
     inherit SymbolOperator("Convolution", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Convolution(args)
     new(data : Symbol,
         weight : Symbol,
         bias : Symbol,
@@ -2336,6 +2406,7 @@ type Convolution private (operatorArguments) =
 
 type CTCLoss private (operatorArguments) = 
     inherit SymbolOperator("CTCLoss", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new CTCLoss(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?label : Symbol,
         [<Optional>] ?dataLengths : Symbol,
@@ -2371,6 +2442,7 @@ type CTCLoss private (operatorArguments) =
 
 type CuDNNBatchNorm private (operatorArguments) = 
     inherit SymbolOperator("CuDNNBatchNorm", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new CuDNNBatchNorm(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?gamma : Symbol,
         [<Optional>] ?beta : Symbol,
@@ -2434,6 +2506,7 @@ type CuDNNBatchNorm private (operatorArguments) =
 
 type Deconvolution private (operatorArguments) = 
     inherit SymbolOperator("Deconvolution", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Deconvolution(args)
     new(data : Symbol,
         weight : Symbol,
         bias : Symbol,
@@ -2539,6 +2612,7 @@ type Deconvolution private (operatorArguments) =
 
 type Dropout private (operatorArguments) = 
     inherit SymbolOperator("Dropout", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Dropout(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?p : float,
         [<Optional>] ?mode : DropoutMode,
@@ -2566,6 +2640,7 @@ type Dropout private (operatorArguments) =
 
 type FullyConnected private (operatorArguments) = 
     inherit SymbolOperator("FullyConnected", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new FullyConnected(args)
     new(data : Symbol,
         weight : Symbol,
         bias : Symbol,
@@ -2612,6 +2687,7 @@ type FullyConnected private (operatorArguments) =
 
 type GroupNorm private (operatorArguments) = 
     inherit SymbolOperator("GroupNorm", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new GroupNorm(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?gamma : Symbol,
         [<Optional>] ?beta : Symbol,
@@ -2643,6 +2719,7 @@ type GroupNorm private (operatorArguments) =
 
 type LayerNorm private (operatorArguments) = 
     inherit SymbolOperator("LayerNorm", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LayerNorm(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?gamma : Symbol,
         [<Optional>] ?beta : Symbol,
@@ -2674,6 +2751,7 @@ type LayerNorm private (operatorArguments) =
 
 type LogSoftmax private (operatorArguments) = 
     inherit SymbolOperator("log_softmax", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LogSoftmax(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int,
         [<Optional>] ?temperature : float,
@@ -2701,6 +2779,7 @@ type LogSoftmax private (operatorArguments) =
 
 type LRN private (operatorArguments) = 
     inherit SymbolOperator("LRN", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LRN(args)
     new(data : Symbol,
         nsize : int,
         [<Optional>] ?alpha : float,
@@ -2741,6 +2820,7 @@ type LRN private (operatorArguments) =
 
 type Moments private (operatorArguments) = 
     inherit SymbolOperator("moments", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Moments(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axes : int seq,
         [<Optional>] ?keepdims : bool) = 
@@ -2760,6 +2840,7 @@ type Moments private (operatorArguments) =
 
 type Pooling private (operatorArguments) = 
     inherit SymbolOperator("Pooling", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Pooling(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?kernel : int seq,
         [<Optional>] ?poolType : PoolType,
@@ -2811,6 +2892,7 @@ type Pooling private (operatorArguments) =
 
 type Softmax private (operatorArguments) = 
     inherit SymbolOperator("softmax", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Softmax(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?length : Symbol,
         [<Optional>] ?axis : int,
@@ -2842,6 +2924,7 @@ type Softmax private (operatorArguments) =
 
 type SoftmaxActivation private (operatorArguments) = 
     inherit SymbolOperator("SoftmaxActivation", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SoftmaxActivation(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?mode : SoftmaxActivationMode) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -2857,6 +2940,7 @@ type SoftmaxActivation private (operatorArguments) =
 
 type Softmin private (operatorArguments) = 
     inherit SymbolOperator("softmin", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Softmin(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int,
         [<Optional>] ?temperature : float,
@@ -2884,6 +2968,7 @@ type Softmin private (operatorArguments) =
 
 type UpSampling private (operatorArguments) = 
     inherit SymbolOperator("UpSampling", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new UpSampling(args)
     new(data : Symbol seq,
         scale : int,
         sampleType : SampleType,
@@ -2929,6 +3014,7 @@ type UpSampling private (operatorArguments) =
 
 type NpLinalgSvd private (operatorArguments) = 
     inherit SymbolOperator("_np__linalg_svd", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpLinalgSvd(args)
     new([<Optional>] ?A : Symbol) =
         let A = defaultArg A (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -2940,6 +3026,7 @@ type NpLinalgSvd private (operatorArguments) =
 
 type NpiArgmax private (operatorArguments) = 
     inherit SymbolOperator("_npi_argmax", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArgmax(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int,
         [<Optional>] ?keepdims : bool) = 
@@ -2959,6 +3046,7 @@ type NpiArgmax private (operatorArguments) =
 
 type NpSum private (operatorArguments) = 
     inherit SymbolOperator("_np_sum", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpSum(args)
     new([<Optional>] ?a : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?dtype : NpSumDtype,
@@ -2986,6 +3074,7 @@ type NpSum private (operatorArguments) =
 
 type NpMax private (operatorArguments) = 
     inherit SymbolOperator("_np_max", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpMax(args)
     new([<Optional>] ?a : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?keepdims : bool,
@@ -3009,6 +3098,7 @@ type NpMax private (operatorArguments) =
 
 type NpMin private (operatorArguments) = 
     inherit SymbolOperator("_np_min", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpMin(args)
     new([<Optional>] ?a : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?keepdims : bool,
@@ -3032,6 +3122,7 @@ type NpMin private (operatorArguments) =
 
 type NpProd private (operatorArguments) = 
     inherit SymbolOperator("_np_prod", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpProd(args)
     new([<Optional>] ?a : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?dtype : NpProdDtype,
@@ -3059,6 +3150,7 @@ type NpProd private (operatorArguments) =
 
 type NpiMean private (operatorArguments) = 
     inherit SymbolOperator("_npi_mean", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiMean(args)
     new([<Optional>] ?a : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?dtype : NpiMeanDtype,
@@ -3086,6 +3178,7 @@ type NpiMean private (operatorArguments) =
 
 type NpiStd private (operatorArguments) = 
     inherit SymbolOperator("_npi_std", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiStd(args)
     new([<Optional>] ?a : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?dtype : NpiStdDtype,
@@ -3113,6 +3206,7 @@ type NpiStd private (operatorArguments) =
 
 type NpiVar private (operatorArguments) = 
     inherit SymbolOperator("_npi_var", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiVar(args)
     new([<Optional>] ?a : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?dtype : NpiVarDtype,
@@ -3140,6 +3234,7 @@ type NpiVar private (operatorArguments) =
 
 type NpBroadcastTo private (operatorArguments) = 
     inherit SymbolOperator("_np_broadcast_to", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpBroadcastTo(args)
     new([<Optional>] ?array : Symbol,
         [<Optional>] ?shape : int seq) = 
         let array = defaultArg array (new ImplicitVariable() :> Symbol)
@@ -3155,6 +3250,7 @@ type NpBroadcastTo private (operatorArguments) =
 
 type NpCumsum private (operatorArguments) = 
     inherit SymbolOperator("_np_cumsum", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpCumsum(args)
     new([<Optional>] ?a : Symbol,
         [<Optional>] ?axis : int,
         [<Optional>] ?dtype : NpCumsumDtype) = 
@@ -3174,6 +3270,7 @@ type NpCumsum private (operatorArguments) =
 
 type NpDot private (operatorArguments) = 
     inherit SymbolOperator("_np_dot", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpDot(args)
     new([<Optional>] ?a : Symbol,
         [<Optional>] ?b : Symbol) = 
         let a = defaultArg a (new ImplicitVariable() :> Symbol)
@@ -3189,6 +3286,7 @@ type NpDot private (operatorArguments) =
 
 type NpiAdd private (operatorArguments) = 
     inherit SymbolOperator("_npi_add", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiAdd(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -3204,6 +3302,7 @@ type NpiAdd private (operatorArguments) =
 
 type NpiSubtract private (operatorArguments) = 
     inherit SymbolOperator("_npi_subtract", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSubtract(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -3219,6 +3318,7 @@ type NpiSubtract private (operatorArguments) =
 
 type NpiMultiply private (operatorArguments) = 
     inherit SymbolOperator("_npi_multiply", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiMultiply(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -3234,6 +3334,7 @@ type NpiMultiply private (operatorArguments) =
 
 type NpiMod private (operatorArguments) = 
     inherit SymbolOperator("_npi_mod", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiMod(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -3249,6 +3350,7 @@ type NpiMod private (operatorArguments) =
 
 type NpiPower private (operatorArguments) = 
     inherit SymbolOperator("_npi_power", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiPower(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -3264,6 +3366,7 @@ type NpiPower private (operatorArguments) =
 
 type NpiCopysign private (operatorArguments) = 
     inherit SymbolOperator("_npi_copysign", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCopysign(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -3279,6 +3382,7 @@ type NpiCopysign private (operatorArguments) =
 
 type NpiLcm private (operatorArguments) = 
     inherit SymbolOperator("_npi_lcm", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLcm(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -3294,6 +3398,7 @@ type NpiLcm private (operatorArguments) =
 
 type NpiAddScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_add_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiAddScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -3316,6 +3421,7 @@ type NpiAddScalar private (operatorArguments) =
 
 type NpiSubtractScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_subtract_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSubtractScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -3338,6 +3444,7 @@ type NpiSubtractScalar private (operatorArguments) =
 
 type NpiRsubtractScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rsubtract_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRsubtractScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -3360,6 +3467,7 @@ type NpiRsubtractScalar private (operatorArguments) =
 
 type NpiMultiplyScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_multiply_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiMultiplyScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -3382,6 +3490,7 @@ type NpiMultiplyScalar private (operatorArguments) =
 
 type NpiModScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_mod_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiModScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -3404,6 +3513,7 @@ type NpiModScalar private (operatorArguments) =
 
 type NpiRmodScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rmod_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRmodScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -3426,6 +3536,7 @@ type NpiRmodScalar private (operatorArguments) =
 
 type NpiPowerScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_power_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiPowerScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -3448,6 +3559,7 @@ type NpiPowerScalar private (operatorArguments) =
 
 type NpiRpowerScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rpower_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRpowerScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -3470,6 +3582,7 @@ type NpiRpowerScalar private (operatorArguments) =
 
 type NpiCopysignScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_copysign_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCopysignScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -3492,6 +3605,7 @@ type NpiCopysignScalar private (operatorArguments) =
 
 type NpiRcopysignScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rcopysign_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRcopysignScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -3514,6 +3628,7 @@ type NpiRcopysignScalar private (operatorArguments) =
 
 type NpiArctan2 private (operatorArguments) = 
     inherit SymbolOperator("_npi_arctan2", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArctan2(args)
     new([<Optional>] ?x1 : Symbol,
         [<Optional>] ?x2 : Symbol) = 
         let x1 = defaultArg x1 (new ImplicitVariable() :> Symbol)
@@ -3529,6 +3644,7 @@ type NpiArctan2 private (operatorArguments) =
 
 type NpiArctan2Scalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_arctan2_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArctan2Scalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -3551,6 +3667,7 @@ type NpiArctan2Scalar private (operatorArguments) =
 
 type NpiRarctan2Scalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rarctan2_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRarctan2Scalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -3573,6 +3690,7 @@ type NpiRarctan2Scalar private (operatorArguments) =
 
 type NpiHypot private (operatorArguments) = 
     inherit SymbolOperator("_npi_hypot", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiHypot(args)
     new([<Optional>] ?x1 : Symbol,
         [<Optional>] ?x2 : Symbol) = 
         let x1 = defaultArg x1 (new ImplicitVariable() :> Symbol)
@@ -3588,6 +3706,7 @@ type NpiHypot private (operatorArguments) =
 
 type NpiLcmScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_lcm_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLcmScalar(args)
     new(data : Symbol,
         scalar : int) = 
         let operatorArguments = 
@@ -3610,6 +3729,7 @@ type NpiLcmScalar private (operatorArguments) =
 
 type NpxRelu private (operatorArguments) = 
     inherit SymbolOperator("_npx_relu", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpxRelu(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3621,6 +3741,7 @@ type NpxRelu private (operatorArguments) =
 
 type NpxSigmoid private (operatorArguments) = 
     inherit SymbolOperator("_npx_sigmoid", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpxSigmoid(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3632,6 +3753,7 @@ type NpxSigmoid private (operatorArguments) =
 
 type NpCopy private (operatorArguments) = 
     inherit SymbolOperator("_np_copy", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpCopy(args)
     new([<Optional>] ?a : Symbol) =
         let a = defaultArg a (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3643,6 +3765,7 @@ type NpCopy private (operatorArguments) =
 
 type NpiNegative private (operatorArguments) = 
     inherit SymbolOperator("_npi_negative", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiNegative(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3654,6 +3777,7 @@ type NpiNegative private (operatorArguments) =
 
 type NpiReciprocal private (operatorArguments) = 
     inherit SymbolOperator("_npi_reciprocal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiReciprocal(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3665,6 +3789,7 @@ type NpiReciprocal private (operatorArguments) =
 
 type NpiAbsolute private (operatorArguments) = 
     inherit SymbolOperator("_npi_absolute", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiAbsolute(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3676,6 +3801,7 @@ type NpiAbsolute private (operatorArguments) =
 
 type NpiSign private (operatorArguments) = 
     inherit SymbolOperator("_npi_sign", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSign(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3687,6 +3813,7 @@ type NpiSign private (operatorArguments) =
 
 type NpiRint private (operatorArguments) = 
     inherit SymbolOperator("_npi_rint", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRint(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3698,6 +3825,7 @@ type NpiRint private (operatorArguments) =
 
 type NpiCeil private (operatorArguments) = 
     inherit SymbolOperator("_npi_ceil", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCeil(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3709,6 +3837,7 @@ type NpiCeil private (operatorArguments) =
 
 type NpiFloor private (operatorArguments) = 
     inherit SymbolOperator("_npi_floor", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiFloor(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3720,6 +3849,7 @@ type NpiFloor private (operatorArguments) =
 
 type NpiTrunc private (operatorArguments) = 
     inherit SymbolOperator("_npi_trunc", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTrunc(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3731,6 +3861,7 @@ type NpiTrunc private (operatorArguments) =
 
 type NpiFix private (operatorArguments) = 
     inherit SymbolOperator("_npi_fix", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiFix(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3742,6 +3873,7 @@ type NpiFix private (operatorArguments) =
 
 type NpiSquare private (operatorArguments) = 
     inherit SymbolOperator("_npi_square", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSquare(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3753,6 +3885,7 @@ type NpiSquare private (operatorArguments) =
 
 type NpiSqrt private (operatorArguments) = 
     inherit SymbolOperator("_npi_sqrt", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSqrt(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3764,6 +3897,7 @@ type NpiSqrt private (operatorArguments) =
 
 type NpiCbrt private (operatorArguments) = 
     inherit SymbolOperator("_npi_cbrt", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCbrt(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3775,6 +3909,7 @@ type NpiCbrt private (operatorArguments) =
 
 type NpiExp private (operatorArguments) = 
     inherit SymbolOperator("_npi_exp", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiExp(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3786,6 +3921,7 @@ type NpiExp private (operatorArguments) =
 
 type NpiLog private (operatorArguments) = 
     inherit SymbolOperator("_npi_log", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLog(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3797,6 +3933,7 @@ type NpiLog private (operatorArguments) =
 
 type NpiLog10 private (operatorArguments) = 
     inherit SymbolOperator("_npi_log10", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLog10(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3808,6 +3945,7 @@ type NpiLog10 private (operatorArguments) =
 
 type NpiLog2 private (operatorArguments) = 
     inherit SymbolOperator("_npi_log2", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLog2(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3819,6 +3957,7 @@ type NpiLog2 private (operatorArguments) =
 
 type NpiLog1p private (operatorArguments) = 
     inherit SymbolOperator("_npi_log1p", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLog1p(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3830,6 +3969,7 @@ type NpiLog1p private (operatorArguments) =
 
 type NpiExpm1 private (operatorArguments) = 
     inherit SymbolOperator("_npi_expm1", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiExpm1(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3841,6 +3981,7 @@ type NpiExpm1 private (operatorArguments) =
 
 type NpiLogicalNot private (operatorArguments) = 
     inherit SymbolOperator("_npi_logical_not", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLogicalNot(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3852,6 +3993,7 @@ type NpiLogicalNot private (operatorArguments) =
 
 type NpiSin private (operatorArguments) = 
     inherit SymbolOperator("_npi_sin", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSin(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3863,6 +4005,7 @@ type NpiSin private (operatorArguments) =
 
 type NpiCos private (operatorArguments) = 
     inherit SymbolOperator("_npi_cos", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCos(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3874,6 +4017,7 @@ type NpiCos private (operatorArguments) =
 
 type NpiTan private (operatorArguments) = 
     inherit SymbolOperator("_npi_tan", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTan(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3885,6 +4029,7 @@ type NpiTan private (operatorArguments) =
 
 type NpiArcsin private (operatorArguments) = 
     inherit SymbolOperator("_npi_arcsin", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArcsin(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3896,6 +4041,7 @@ type NpiArcsin private (operatorArguments) =
 
 type NpiArccos private (operatorArguments) = 
     inherit SymbolOperator("_npi_arccos", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArccos(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3907,6 +4053,7 @@ type NpiArccos private (operatorArguments) =
 
 type NpiArctan private (operatorArguments) = 
     inherit SymbolOperator("_npi_arctan", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArctan(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3918,6 +4065,7 @@ type NpiArctan private (operatorArguments) =
 
 type NpiDegrees private (operatorArguments) = 
     inherit SymbolOperator("_npi_degrees", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiDegrees(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3929,6 +4077,7 @@ type NpiDegrees private (operatorArguments) =
 
 type NpiRadians private (operatorArguments) = 
     inherit SymbolOperator("_npi_radians", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRadians(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3940,6 +4089,7 @@ type NpiRadians private (operatorArguments) =
 
 type NpiSinh private (operatorArguments) = 
     inherit SymbolOperator("_npi_sinh", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSinh(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3951,6 +4101,7 @@ type NpiSinh private (operatorArguments) =
 
 type NpiCosh private (operatorArguments) = 
     inherit SymbolOperator("_npi_cosh", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCosh(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3962,6 +4113,7 @@ type NpiCosh private (operatorArguments) =
 
 type NpiTanh private (operatorArguments) = 
     inherit SymbolOperator("_npi_tanh", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTanh(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3973,6 +4125,7 @@ type NpiTanh private (operatorArguments) =
 
 type NpiArcsinh private (operatorArguments) = 
     inherit SymbolOperator("_npi_arcsinh", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArcsinh(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3984,6 +4137,7 @@ type NpiArcsinh private (operatorArguments) =
 
 type NpiArccosh private (operatorArguments) = 
     inherit SymbolOperator("_npi_arccosh", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArccosh(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -3995,6 +4149,7 @@ type NpiArccosh private (operatorArguments) =
 
 type NpiArctanh private (operatorArguments) = 
     inherit SymbolOperator("_npi_arctanh", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArctanh(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -4006,6 +4161,7 @@ type NpiArctanh private (operatorArguments) =
 
 type NpiAround private (operatorArguments) = 
     inherit SymbolOperator("_npi_around", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiAround(args)
     new([<Optional>] ?x : Symbol,
         [<Optional>] ?decimals : int) = 
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -4021,6 +4177,7 @@ type NpiAround private (operatorArguments) =
 
 type NpZerosLike private (operatorArguments) = 
     inherit SymbolOperator("_np_zeros_like", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpZerosLike(args)
     new([<Optional>] ?a : Symbol) =
         let a = defaultArg a (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -4032,6 +4189,7 @@ type NpZerosLike private (operatorArguments) =
 
 type NpOnesLike private (operatorArguments) = 
     inherit SymbolOperator("_np_ones_like", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpOnesLike(args)
     new([<Optional>] ?a : Symbol) =
         let a = defaultArg a (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -4043,6 +4201,7 @@ type NpOnesLike private (operatorArguments) =
 
 type NpTranspose private (operatorArguments) = 
     inherit SymbolOperator("_np_transpose", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpTranspose(args)
     new([<Optional>] ?a : Symbol,
         [<Optional>] ?axes : int seq) = 
         let a = defaultArg a (new ImplicitVariable() :> Symbol)
@@ -4058,6 +4217,7 @@ type NpTranspose private (operatorArguments) =
 
 type NpReshape private (operatorArguments) = 
     inherit SymbolOperator("_np_reshape", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpReshape(args)
     new(a : Symbol,
         newshape : int seq,
         [<Optional>] ?order : string) = 
@@ -4086,6 +4246,7 @@ type NpReshape private (operatorArguments) =
 
 type NpSqueeze private (operatorArguments) = 
     inherit SymbolOperator("_np_squeeze", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpSqueeze(args)
     new([<Optional>] ?a : Symbol seq,
         [<Optional>] ?axis : int seq) = 
         let a = defaultArg (a |> Option.map Seq.toArray) Array.empty
@@ -4101,6 +4262,7 @@ type NpSqueeze private (operatorArguments) =
 
 type NpiConcatenate private (operatorArguments) = 
     inherit SymbolOperator("_npi_concatenate", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiConcatenate(args)
     new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?dim : int) = 
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
@@ -4116,6 +4278,7 @@ type NpiConcatenate private (operatorArguments) =
 
 type NpiStack private (operatorArguments) = 
     inherit SymbolOperator("_npi_stack", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiStack(args)
     new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?axis : int) = 
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
@@ -4131,6 +4294,7 @@ type NpiStack private (operatorArguments) =
 
 type NpiVstack private (operatorArguments) = 
     inherit SymbolOperator("_npi_vstack", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiVstack(args)
     new([<Optional>] ?data : Symbol seq) =
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
         let operatorArguments = 
@@ -4148,6 +4312,7 @@ type NpiVstack private (operatorArguments) =
 
 type NpRoll private (operatorArguments) = 
     inherit SymbolOperator("_np_roll", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpRoll(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?shift : int seq,
         [<Optional>] ?axis : int seq) = 
@@ -4167,6 +4332,7 @@ type NpRoll private (operatorArguments) =
 
 type NpiFlip private (operatorArguments) = 
     inherit SymbolOperator("_npi_flip", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiFlip(args)
     new(data : Symbol,
         axis : int seq) = 
         let operatorArguments = 
@@ -4189,6 +4355,7 @@ type NpiFlip private (operatorArguments) =
 
 type NpxNonzero private (operatorArguments) = 
     inherit SymbolOperator("_npx_nonzero", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpxNonzero(args)
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -4200,6 +4367,7 @@ type NpxNonzero private (operatorArguments) =
 
 type NpiTensordot private (operatorArguments) = 
     inherit SymbolOperator("_npi_tensordot", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTensordot(args)
     new(a : Symbol,
         b : Symbol,
         aAxesSummed : int seq,
@@ -4233,6 +4401,7 @@ type NpiTensordot private (operatorArguments) =
 
 type NpiTensordotIntAxes private (operatorArguments) = 
     inherit SymbolOperator("_npi_tensordot_int_axes", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTensordotIntAxes(args)
     new(a : Symbol,
         b : Symbol,
         axes : int) = 
@@ -4261,6 +4430,7 @@ type NpiTensordotIntAxes private (operatorArguments) =
 
 type NpTrace private (operatorArguments) = 
     inherit SymbolOperator("_np_trace", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpTrace(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?offset : int,
         [<Optional>] ?axis1 : int,
@@ -4284,6 +4454,7 @@ type NpTrace private (operatorArguments) =
 
 type NpiTril private (operatorArguments) = 
     inherit SymbolOperator("_npi_tril", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTril(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?k : int) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -4299,6 +4470,7 @@ type NpiTril private (operatorArguments) =
 
 type NpiTrueDivide private (operatorArguments) = 
     inherit SymbolOperator("_npi_true_divide", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTrueDivide(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -4314,6 +4486,7 @@ type NpiTrueDivide private (operatorArguments) =
 
 type NpiTrueDivideScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_true_divide_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTrueDivideScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -4336,6 +4509,7 @@ type NpiTrueDivideScalar private (operatorArguments) =
 
 type NpiRtrueDivideScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rtrue_divide_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRtrueDivideScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -4358,6 +4532,7 @@ type NpiRtrueDivideScalar private (operatorArguments) =
 
 type NpiUnique private (operatorArguments) = 
     inherit SymbolOperator("_npi_unique", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiUnique(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?returnIndex : bool,
         [<Optional>] ?returnInverse : bool,
@@ -4385,6 +4560,7 @@ type NpiUnique private (operatorArguments) =
 
 type NpiChoice private (operatorArguments) = 
     inherit SymbolOperator("_npi_choice", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiChoice(args)
     new(input1 : Symbol,
         input2 : Symbol,
         a : int64,
@@ -4430,6 +4606,7 @@ type NpiChoice private (operatorArguments) =
 
 type NpiMultinomial private (operatorArguments) = 
     inherit SymbolOperator("_npi_multinomial", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiMultinomial(args)
     new(a : Symbol,
         n : int,
         pvals : double seq,
@@ -4463,6 +4640,7 @@ type NpiMultinomial private (operatorArguments) =
 
 type NpiNormal private (operatorArguments) = 
     inherit SymbolOperator("_npi_normal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiNormal(args)
     new([<Optional>] ?input1 : Symbol,
         [<Optional>] ?input2 : Symbol,
         [<Optional>] ?loc : float,
@@ -4494,6 +4672,7 @@ type NpiNormal private (operatorArguments) =
 
 type NpiUniform private (operatorArguments) = 
     inherit SymbolOperator("_npi_uniform", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiUniform(args)
     new([<Optional>] ?input1 : Symbol,
         [<Optional>] ?input2 : Symbol,
         [<Optional>] ?low : float,
@@ -4525,6 +4704,7 @@ type NpiUniform private (operatorArguments) =
 
 type SignsgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("signsgd_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SignsgdUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         lr : float,
@@ -4571,6 +4751,7 @@ type SignsgdUpdate private (operatorArguments) =
 
 type SignumUpdate private (operatorArguments) = 
     inherit SymbolOperator("signum_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SignumUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         mom : Symbol,
@@ -4635,6 +4816,7 @@ type SignumUpdate private (operatorArguments) =
 
 type MultiSgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("multi_sgd_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MultiSgdUpdate(args)
     new(data : Symbol seq,
         lrs : double seq,
         wds : double seq,
@@ -4680,6 +4862,7 @@ type MultiSgdUpdate private (operatorArguments) =
 
 type MultiSgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("multi_sgd_mom_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MultiSgdMomUpdate(args)
     new(data : Symbol seq,
         lrs : double seq,
         wds : double seq,
@@ -4731,6 +4914,7 @@ type MultiSgdMomUpdate private (operatorArguments) =
 
 type MultiMpSgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("multi_mp_sgd_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MultiMpSgdUpdate(args)
     new(data : Symbol seq,
         lrs : double seq,
         wds : double seq,
@@ -4776,6 +4960,7 @@ type MultiMpSgdUpdate private (operatorArguments) =
 
 type MultiMpSgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("multi_mp_sgd_mom_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MultiMpSgdMomUpdate(args)
     new(data : Symbol seq,
         lrs : double seq,
         wds : double seq,
@@ -4827,6 +5012,7 @@ type MultiMpSgdMomUpdate private (operatorArguments) =
 
 type SgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("sgd_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SgdUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         lr : float,
@@ -4879,6 +5065,7 @@ type SgdUpdate private (operatorArguments) =
 
 type SgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("sgd_mom_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SgdMomUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         mom : Symbol,
@@ -4943,6 +5130,7 @@ type SgdMomUpdate private (operatorArguments) =
 
 type MpSgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("mp_sgd_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MpSgdUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         weight32 : Symbol,
@@ -5001,6 +5189,7 @@ type MpSgdUpdate private (operatorArguments) =
 
 type MpSgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("mp_sgd_mom_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MpSgdMomUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         mom : Symbol,
@@ -5071,6 +5260,7 @@ type MpSgdMomUpdate private (operatorArguments) =
 
 type FtmlUpdate private (operatorArguments) = 
     inherit SymbolOperator("ftml_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new FtmlUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         d : Symbol,
@@ -5158,6 +5348,7 @@ type FtmlUpdate private (operatorArguments) =
 
 type AdamUpdate private (operatorArguments) = 
     inherit SymbolOperator("adam_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new AdamUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         mean : Symbol,
@@ -5240,6 +5431,7 @@ type AdamUpdate private (operatorArguments) =
 
 type NagMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("nag_mom_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NagMomUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         mom : Symbol,
@@ -5298,6 +5490,7 @@ type NagMomUpdate private (operatorArguments) =
 
 type MpNagMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("mp_nag_mom_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MpNagMomUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         mom : Symbol,
@@ -5362,6 +5555,7 @@ type MpNagMomUpdate private (operatorArguments) =
 
 type RmspropUpdate private (operatorArguments) = 
     inherit SymbolOperator("rmsprop_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RmspropUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         n : Symbol,
@@ -5432,6 +5626,7 @@ type RmspropUpdate private (operatorArguments) =
 
 type RmspropalexUpdate private (operatorArguments) = 
     inherit SymbolOperator("rmspropalex_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RmspropalexUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         n : Symbol,
@@ -5520,6 +5715,7 @@ type RmspropalexUpdate private (operatorArguments) =
 
 type FtrlUpdate private (operatorArguments) = 
     inherit SymbolOperator("ftrl_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new FtrlUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         z : Symbol,
@@ -5590,6 +5786,7 @@ type FtrlUpdate private (operatorArguments) =
 
 type SparseAdagradUpdate private (operatorArguments) = 
     inherit SymbolOperator("_sparse_adagrad_update", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SparseAdagradUpdate(args)
     new(weight : Symbol,
         grad : Symbol,
         history : Symbol,
@@ -5648,6 +5845,7 @@ type SparseAdagradUpdate private (operatorArguments) =
 
 type Pad private (operatorArguments) = 
     inherit SymbolOperator("Pad", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Pad(args)
     new(data : Symbol,
         mode : PadMode,
         padWidth : int seq,
@@ -5681,6 +5879,7 @@ type Pad private (operatorArguments) =
 
 type ContribCalibrateEntropy private (operatorArguments) = 
     inherit SymbolOperator("_contrib_calibrate_entropy", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribCalibrateEntropy(args)
     new([<Optional>] ?hist : Symbol,
         [<Optional>] ?histEdges : Symbol,
         [<Optional>] ?numQuantizedBins : int) = 
@@ -5700,6 +5899,7 @@ type ContribCalibrateEntropy private (operatorArguments) =
 
 type ContribDequantize private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dequantize", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDequantize(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?minRange : Symbol,
         [<Optional>] ?maxRange : Symbol,
@@ -5723,6 +5923,7 @@ type ContribDequantize private (operatorArguments) =
 
 type ContribQuantize private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantize", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantize(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?minRange : Symbol,
         [<Optional>] ?maxRange : Symbol,
@@ -5746,6 +5947,7 @@ type ContribQuantize private (operatorArguments) =
 
 type ContribQuantizeV2 private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantize_v2", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizeV2(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?outType : ContribQuantizeV2OutType,
         [<Optional>] ?minCalibRange : float,
@@ -5769,6 +5971,7 @@ type ContribQuantizeV2 private (operatorArguments) =
 
 type ContribQuantizedAct private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_act", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedAct(args)
     new(data : Symbol,
         minData : Symbol,
         maxData : Symbol,
@@ -5803,6 +6006,7 @@ type ContribQuantizedAct private (operatorArguments) =
 
 type ContribQuantizedBatchNorm private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_batch_norm", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedBatchNorm(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?gamma : Symbol,
         [<Optional>] ?beta : Symbol,
@@ -5874,6 +6078,7 @@ type ContribQuantizedBatchNorm private (operatorArguments) =
 
 type ContribQuantizedConcat private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_concat", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedConcat(args)
     new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?dim : int) = 
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
@@ -5889,6 +6094,7 @@ type ContribQuantizedConcat private (operatorArguments) =
 
 type ContribQuantizedConv private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_conv", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedConv(args)
     new(data : Symbol,
         weight : Symbol,
         bias : Symbol,
@@ -6018,6 +6224,7 @@ type ContribQuantizedConv private (operatorArguments) =
 
 type ContribQuantizedElemwiseAdd private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_elemwise_add", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedElemwiseAdd(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol,
         [<Optional>] ?lhsMin : Symbol,
@@ -6049,6 +6256,7 @@ type ContribQuantizedElemwiseAdd private (operatorArguments) =
 
 type ContribQuantizedFlatten private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_flatten", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedFlatten(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?minData : Symbol,
         [<Optional>] ?maxData : Symbol) = 
@@ -6068,6 +6276,7 @@ type ContribQuantizedFlatten private (operatorArguments) =
 
 type Flatten private (operatorArguments) = 
     inherit SymbolOperator("Flatten", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Flatten(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -6079,6 +6288,7 @@ type Flatten private (operatorArguments) =
 
 type ContribQuantizedFullyConnected private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_fully_connected", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedFullyConnected(args)
     new(data : Symbol,
         weight : Symbol,
         bias : Symbol,
@@ -6161,6 +6371,7 @@ type ContribQuantizedFullyConnected private (operatorArguments) =
 
 type ContribQuantizedPooling private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_pooling", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedPooling(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?minData : Symbol,
         [<Optional>] ?maxData : Symbol,
@@ -6220,6 +6431,7 @@ type ContribQuantizedPooling private (operatorArguments) =
 
 type ContribRequantize private (operatorArguments) = 
     inherit SymbolOperator("_contrib_requantize", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribRequantize(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?minRange : Symbol,
         [<Optional>] ?maxRange : Symbol,
@@ -6251,6 +6463,7 @@ type ContribRequantize private (operatorArguments) =
 
 type SampleUniform private (operatorArguments) = 
     inherit SymbolOperator("_sample_uniform", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SampleUniform(args)
     new([<Optional>] ?low : Symbol,
         [<Optional>] ?high : Symbol,
         [<Optional>] ?shape : int seq,
@@ -6274,6 +6487,7 @@ type SampleUniform private (operatorArguments) =
 
 type SampleNormal private (operatorArguments) = 
     inherit SymbolOperator("_sample_normal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SampleNormal(args)
     new([<Optional>] ?mu : Symbol,
         [<Optional>] ?sigma : Symbol,
         [<Optional>] ?shape : int seq,
@@ -6297,6 +6511,7 @@ type SampleNormal private (operatorArguments) =
 
 type SampleGamma private (operatorArguments) = 
     inherit SymbolOperator("_sample_gamma", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SampleGamma(args)
     new([<Optional>] ?alpha : Symbol,
         [<Optional>] ?beta : Symbol,
         [<Optional>] ?shape : int seq,
@@ -6320,6 +6535,7 @@ type SampleGamma private (operatorArguments) =
 
 type SampleExponential private (operatorArguments) = 
     inherit SymbolOperator("_sample_exponential", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SampleExponential(args)
     new([<Optional>] ?lam : Symbol,
         [<Optional>] ?shape : int seq,
         [<Optional>] ?dtype : FloatDType) = 
@@ -6339,6 +6555,7 @@ type SampleExponential private (operatorArguments) =
 
 type SamplePoisson private (operatorArguments) = 
     inherit SymbolOperator("_sample_poisson", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SamplePoisson(args)
     new([<Optional>] ?lam : Symbol,
         [<Optional>] ?shape : int seq,
         [<Optional>] ?dtype : FloatDType) = 
@@ -6358,6 +6575,7 @@ type SamplePoisson private (operatorArguments) =
 
 type SampleNegativeBinomial private (operatorArguments) = 
     inherit SymbolOperator("_sample_negative_binomial", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SampleNegativeBinomial(args)
     new([<Optional>] ?k : Symbol,
         [<Optional>] ?p : Symbol,
         [<Optional>] ?shape : int seq,
@@ -6381,6 +6599,7 @@ type SampleNegativeBinomial private (operatorArguments) =
 
 type SampleGeneralizedNegativeBinomial private (operatorArguments) = 
     inherit SymbolOperator("_sample_generalized_negative_binomial", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SampleGeneralizedNegativeBinomial(args)
     new([<Optional>] ?mu : Symbol,
         [<Optional>] ?alpha : Symbol,
         [<Optional>] ?shape : int seq,
@@ -6404,6 +6623,7 @@ type SampleGeneralizedNegativeBinomial private (operatorArguments) =
 
 type RandomPdfUniform private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_uniform", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfUniform(args)
     new([<Optional>] ?sample : Symbol,
         [<Optional>] ?low : Symbol,
         [<Optional>] ?high : Symbol,
@@ -6427,6 +6647,7 @@ type RandomPdfUniform private (operatorArguments) =
 
 type RandomPdfNormal private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_normal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfNormal(args)
     new([<Optional>] ?sample : Symbol,
         [<Optional>] ?mu : Symbol,
         [<Optional>] ?sigma : Symbol,
@@ -6450,6 +6671,7 @@ type RandomPdfNormal private (operatorArguments) =
 
 type RandomPdfGamma private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_gamma", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfGamma(args)
     new([<Optional>] ?sample : Symbol,
         [<Optional>] ?alpha : Symbol,
         [<Optional>] ?beta : Symbol,
@@ -6473,6 +6695,7 @@ type RandomPdfGamma private (operatorArguments) =
 
 type RandomPdfExponential private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_exponential", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfExponential(args)
     new([<Optional>] ?sample : Symbol,
         [<Optional>] ?lam : Symbol,
         [<Optional>] ?isLog : bool) = 
@@ -6492,6 +6715,7 @@ type RandomPdfExponential private (operatorArguments) =
 
 type RandomPdfPoisson private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_poisson", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfPoisson(args)
     new([<Optional>] ?sample : Symbol,
         [<Optional>] ?lam : Symbol,
         [<Optional>] ?isLog : bool) = 
@@ -6511,6 +6735,7 @@ type RandomPdfPoisson private (operatorArguments) =
 
 type RandomPdfNegativeBinomial private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_negative_binomial", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfNegativeBinomial(args)
     new([<Optional>] ?sample : Symbol,
         [<Optional>] ?k : Symbol,
         [<Optional>] ?p : Symbol,
@@ -6534,6 +6759,7 @@ type RandomPdfNegativeBinomial private (operatorArguments) =
 
 type RandomPdfGeneralizedNegativeBinomial private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_generalized_negative_binomial", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfGeneralizedNegativeBinomial(args)
     new([<Optional>] ?sample : Symbol,
         [<Optional>] ?mu : Symbol,
         [<Optional>] ?alpha : Symbol,
@@ -6557,6 +6783,7 @@ type RandomPdfGeneralizedNegativeBinomial private (operatorArguments) =
 
 type RandomPdfDirichlet private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_dirichlet", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfDirichlet(args)
     new([<Optional>] ?sample : Symbol,
         [<Optional>] ?alpha : Symbol,
         [<Optional>] ?isLog : bool) = 
@@ -6576,6 +6803,7 @@ type RandomPdfDirichlet private (operatorArguments) =
 
 type SampleMultinomial private (operatorArguments) = 
     inherit SymbolOperator("_sample_multinomial", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SampleMultinomial(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?shape : int seq,
         [<Optional>] ?getProb : bool,
@@ -6599,6 +6827,7 @@ type SampleMultinomial private (operatorArguments) =
 
 type RandomUniformLike private (operatorArguments) = 
     inherit SymbolOperator("_random_uniform_like", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomUniformLike(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?low : float,
         [<Optional>] ?high : float) = 
@@ -6618,6 +6847,7 @@ type RandomUniformLike private (operatorArguments) =
 
 type RandomNormalLike private (operatorArguments) = 
     inherit SymbolOperator("_random_normal_like", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomNormalLike(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?loc : float,
         [<Optional>] ?scale : float) = 
@@ -6637,6 +6867,7 @@ type RandomNormalLike private (operatorArguments) =
 
 type RandomGammaLike private (operatorArguments) = 
     inherit SymbolOperator("_random_gamma_like", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomGammaLike(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?alpha : float,
         [<Optional>] ?beta : float) = 
@@ -6656,6 +6887,7 @@ type RandomGammaLike private (operatorArguments) =
 
 type RandomExponentialLike private (operatorArguments) = 
     inherit SymbolOperator("_random_exponential_like", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomExponentialLike(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?lam : float) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -6671,6 +6903,7 @@ type RandomExponentialLike private (operatorArguments) =
 
 type RandomPoissonLike private (operatorArguments) = 
     inherit SymbolOperator("_random_poisson_like", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPoissonLike(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?lam : float) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -6686,6 +6919,7 @@ type RandomPoissonLike private (operatorArguments) =
 
 type RandomNegativeBinomialLike private (operatorArguments) = 
     inherit SymbolOperator("_random_negative_binomial_like", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomNegativeBinomialLike(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?k : int,
         [<Optional>] ?p : float) = 
@@ -6705,6 +6939,7 @@ type RandomNegativeBinomialLike private (operatorArguments) =
 
 type RandomGeneralizedNegativeBinomialLike private (operatorArguments) = 
     inherit SymbolOperator("_random_generalized_negative_binomial_like", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomGeneralizedNegativeBinomialLike(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?mu : float,
         [<Optional>] ?alpha : float) = 
@@ -6724,6 +6959,7 @@ type RandomGeneralizedNegativeBinomialLike private (operatorArguments) =
 
 type Shuffle private (operatorArguments) = 
     inherit SymbolOperator("_shuffle", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Shuffle(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -6735,6 +6971,7 @@ type Shuffle private (operatorArguments) =
 
 type LinearRegressionOutput private (operatorArguments) = 
     inherit SymbolOperator("LinearRegressionOutput", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinearRegressionOutput(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?label : Symbol,
         [<Optional>] ?gradScale : float) = 
@@ -6754,6 +6991,7 @@ type LinearRegressionOutput private (operatorArguments) =
 
 type MAERegressionOutput private (operatorArguments) = 
     inherit SymbolOperator("MAERegressionOutput", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MAERegressionOutput(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?label : Symbol,
         [<Optional>] ?gradScale : float) = 
@@ -6773,6 +7011,7 @@ type MAERegressionOutput private (operatorArguments) =
 
 type LogisticRegressionOutput private (operatorArguments) = 
     inherit SymbolOperator("LogisticRegressionOutput", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LogisticRegressionOutput(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?label : Symbol,
         [<Optional>] ?gradScale : float) = 
@@ -6792,6 +7031,7 @@ type LogisticRegressionOutput private (operatorArguments) =
 
 type RNN private (operatorArguments) = 
     inherit SymbolOperator("RNN", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RNN(args)
     new(data : Symbol,
         parameters : Symbol,
         state : Symbol,
@@ -6896,6 +7136,7 @@ type RNN private (operatorArguments) =
 
 type ROIPooling private (operatorArguments) = 
     inherit SymbolOperator("ROIPooling", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ROIPooling(args)
     new(data : Symbol,
         rois : Symbol,
         pooledSize : int seq,
@@ -6929,6 +7170,7 @@ type ROIPooling private (operatorArguments) =
 
 type SequenceMask private (operatorArguments) = 
     inherit SymbolOperator("SequenceMask", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SequenceMask(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?sequenceLength : Symbol,
         [<Optional>] ?useSequenceLength : bool,
@@ -6956,6 +7198,7 @@ type SequenceMask private (operatorArguments) =
 
 type SliceChannel private (operatorArguments) = 
     inherit SymbolOperator("SliceChannel", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SliceChannel(args)
     new(data : Symbol,
         numOutputs : int,
         [<Optional>] ?axis : int,
@@ -6990,6 +7233,7 @@ type SliceChannel private (operatorArguments) =
 
 type SoftmaxOutput private (operatorArguments) = 
     inherit SymbolOperator("SoftmaxOutput", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SoftmaxOutput(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?label : Symbol,
         [<Optional>] ?gradScale : float,
@@ -7037,6 +7281,7 @@ type SoftmaxOutput private (operatorArguments) =
 
 type SwapAxis private (operatorArguments) = 
     inherit SymbolOperator("SwapAxis", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SwapAxis(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?dim1 : int,
         [<Optional>] ?dim2 : int) = 
@@ -7056,6 +7301,7 @@ type SwapAxis private (operatorArguments) =
 
 type AmpCast private (operatorArguments) = 
     inherit SymbolOperator("amp_cast", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new AmpCast(args)
     new(data : Symbol,
         dtype : IntOrFloatDType) = 
         let operatorArguments = 
@@ -7078,6 +7324,7 @@ type AmpCast private (operatorArguments) =
 
 type AmpMulticast private (operatorArguments) = 
     inherit SymbolOperator("amp_multicast", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new AmpMulticast(args)
     new(data : Symbol seq,
         numOutputs : int) = 
         let operatorArguments = 
@@ -7108,6 +7355,7 @@ type AmpMulticast private (operatorArguments) =
 
 type Max private (operatorArguments) = 
     inherit SymbolOperator("max", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Max(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?keepdims : bool,
@@ -7131,6 +7379,7 @@ type Max private (operatorArguments) =
 
 type Min private (operatorArguments) = 
     inherit SymbolOperator("min", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Min(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?keepdims : bool,
@@ -7154,6 +7403,7 @@ type Min private (operatorArguments) =
 
 type Norm private (operatorArguments) = 
     inherit SymbolOperator("norm", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Norm(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?ord : int,
         [<Optional>] ?axis : int seq,
@@ -7181,6 +7431,7 @@ type Norm private (operatorArguments) =
 
 type Argmax private (operatorArguments) = 
     inherit SymbolOperator("argmax", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Argmax(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int,
         [<Optional>] ?keepdims : bool) = 
@@ -7200,6 +7451,7 @@ type Argmax private (operatorArguments) =
 
 type Argmin private (operatorArguments) = 
     inherit SymbolOperator("argmin", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Argmin(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int,
         [<Optional>] ?keepdims : bool) = 
@@ -7219,6 +7471,7 @@ type Argmin private (operatorArguments) =
 
 type ArgmaxChannel private (operatorArguments) = 
     inherit SymbolOperator("argmax_channel", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ArgmaxChannel(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -7230,6 +7483,7 @@ type ArgmaxChannel private (operatorArguments) =
 
 type Pick private (operatorArguments) = 
     inherit SymbolOperator("pick", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Pick(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?index : Symbol,
         [<Optional>] ?axis : int,
@@ -7257,6 +7511,7 @@ type Pick private (operatorArguments) =
 
 type BroadcastAxis private (operatorArguments) = 
     inherit SymbolOperator("broadcast_axis", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastAxis(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?size : int seq) = 
@@ -7276,6 +7531,7 @@ type BroadcastAxis private (operatorArguments) =
 
 type BroadcastTo private (operatorArguments) = 
     inherit SymbolOperator("broadcast_to", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastTo(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?shape : int seq) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -7291,6 +7547,7 @@ type BroadcastTo private (operatorArguments) =
 
 type BroadcastLike private (operatorArguments) = 
     inherit SymbolOperator("broadcast_like", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastLike(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol,
         [<Optional>] ?lhsAxes : int seq,
@@ -7314,6 +7571,7 @@ type BroadcastLike private (operatorArguments) =
 
 type Prod private (operatorArguments) = 
     inherit SymbolOperator("prod", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Prod(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?keepdims : bool,
@@ -7337,6 +7595,7 @@ type Prod private (operatorArguments) =
 
 type Nanprod private (operatorArguments) = 
     inherit SymbolOperator("nanprod", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Nanprod(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?keepdims : bool,
@@ -7360,6 +7619,7 @@ type Nanprod private (operatorArguments) =
 
 type Sum private (operatorArguments) = 
     inherit SymbolOperator("sum", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Sum(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?keepdims : bool,
@@ -7383,6 +7643,7 @@ type Sum private (operatorArguments) =
 
 type Mean private (operatorArguments) = 
     inherit SymbolOperator("mean", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Mean(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?keepdims : bool,
@@ -7406,6 +7667,7 @@ type Mean private (operatorArguments) =
 
 type Nansum private (operatorArguments) = 
     inherit SymbolOperator("nansum", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Nansum(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?keepdims : bool,
@@ -7429,6 +7691,7 @@ type Nansum private (operatorArguments) =
 
 type CastStorage private (operatorArguments) = 
     inherit SymbolOperator("cast_storage", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new CastStorage(args)
     new(data : Symbol,
         stype : Stype) = 
         let operatorArguments = 
@@ -7451,6 +7714,7 @@ type CastStorage private (operatorArguments) =
 
 type Where private (operatorArguments) = 
     inherit SymbolOperator("where", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Where(args)
     new([<Optional>] ?condition : Symbol,
         [<Optional>] ?x : Symbol,
         [<Optional>] ?y : Symbol) = 
@@ -7470,6 +7734,7 @@ type Where private (operatorArguments) =
 
 type Diag private (operatorArguments) = 
     inherit SymbolOperator("diag", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Diag(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?k : int,
         [<Optional>] ?axis1 : int,
@@ -7493,6 +7758,7 @@ type Diag private (operatorArguments) =
 
 type Dot private (operatorArguments) = 
     inherit SymbolOperator("dot", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Dot(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol,
         [<Optional>] ?transposeA : bool,
@@ -7520,6 +7786,7 @@ type Dot private (operatorArguments) =
 
 type BatchDot private (operatorArguments) = 
     inherit SymbolOperator("batch_dot", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BatchDot(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol,
         [<Optional>] ?transposeA : bool,
@@ -7547,6 +7814,7 @@ type BatchDot private (operatorArguments) =
 
 type BroadcastAdd private (operatorArguments) = 
     inherit SymbolOperator("broadcast_add", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastAdd(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7562,6 +7830,7 @@ type BroadcastAdd private (operatorArguments) =
 
 type BroadcastSub private (operatorArguments) = 
     inherit SymbolOperator("broadcast_sub", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastSub(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7577,6 +7846,7 @@ type BroadcastSub private (operatorArguments) =
 
 type BroadcastMul private (operatorArguments) = 
     inherit SymbolOperator("broadcast_mul", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastMul(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7592,6 +7862,7 @@ type BroadcastMul private (operatorArguments) =
 
 type BroadcastDiv private (operatorArguments) = 
     inherit SymbolOperator("broadcast_div", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastDiv(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7607,6 +7878,7 @@ type BroadcastDiv private (operatorArguments) =
 
 type BroadcastMod private (operatorArguments) = 
     inherit SymbolOperator("broadcast_mod", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastMod(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7622,6 +7894,7 @@ type BroadcastMod private (operatorArguments) =
 
 type BroadcastPower private (operatorArguments) = 
     inherit SymbolOperator("broadcast_power", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastPower(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7637,6 +7910,7 @@ type BroadcastPower private (operatorArguments) =
 
 type BroadcastMaximum private (operatorArguments) = 
     inherit SymbolOperator("broadcast_maximum", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastMaximum(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7652,6 +7926,7 @@ type BroadcastMaximum private (operatorArguments) =
 
 type BroadcastMinimum private (operatorArguments) = 
     inherit SymbolOperator("broadcast_minimum", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastMinimum(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7667,6 +7942,7 @@ type BroadcastMinimum private (operatorArguments) =
 
 type BroadcastHypot private (operatorArguments) = 
     inherit SymbolOperator("broadcast_hypot", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastHypot(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7682,6 +7958,7 @@ type BroadcastHypot private (operatorArguments) =
 
 type BroadcastEqual private (operatorArguments) = 
     inherit SymbolOperator("broadcast_equal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastEqual(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7697,6 +7974,7 @@ type BroadcastEqual private (operatorArguments) =
 
 type BroadcastNotEqual private (operatorArguments) = 
     inherit SymbolOperator("broadcast_not_equal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastNotEqual(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7712,6 +7990,7 @@ type BroadcastNotEqual private (operatorArguments) =
 
 type BroadcastGreater private (operatorArguments) = 
     inherit SymbolOperator("broadcast_greater", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastGreater(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7727,6 +8006,7 @@ type BroadcastGreater private (operatorArguments) =
 
 type BroadcastGreaterEqual private (operatorArguments) = 
     inherit SymbolOperator("broadcast_greater_equal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastGreaterEqual(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7742,6 +8022,7 @@ type BroadcastGreaterEqual private (operatorArguments) =
 
 type BroadcastLesser private (operatorArguments) = 
     inherit SymbolOperator("broadcast_lesser", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastLesser(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7757,6 +8038,7 @@ type BroadcastLesser private (operatorArguments) =
 
 type BroadcastLesserEqual private (operatorArguments) = 
     inherit SymbolOperator("broadcast_lesser_equal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastLesserEqual(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7772,6 +8054,7 @@ type BroadcastLesserEqual private (operatorArguments) =
 
 type BroadcastLogicalAnd private (operatorArguments) = 
     inherit SymbolOperator("broadcast_logical_and", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastLogicalAnd(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7787,6 +8070,7 @@ type BroadcastLogicalAnd private (operatorArguments) =
 
 type BroadcastLogicalOr private (operatorArguments) = 
     inherit SymbolOperator("broadcast_logical_or", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastLogicalOr(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7802,6 +8086,7 @@ type BroadcastLogicalOr private (operatorArguments) =
 
 type BroadcastLogicalXor private (operatorArguments) = 
     inherit SymbolOperator("broadcast_logical_xor", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastLogicalXor(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7817,6 +8102,7 @@ type BroadcastLogicalXor private (operatorArguments) =
 
 type ElemwiseAdd private (operatorArguments) = 
     inherit SymbolOperator("elemwise_add", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ElemwiseAdd(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7832,6 +8118,7 @@ type ElemwiseAdd private (operatorArguments) =
 
 type GradAdd private (operatorArguments) = 
     inherit SymbolOperator("_grad_add", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new GradAdd(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7847,6 +8134,7 @@ type GradAdd private (operatorArguments) =
 
 type ElemwiseSub private (operatorArguments) = 
     inherit SymbolOperator("elemwise_sub", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ElemwiseSub(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7862,6 +8150,7 @@ type ElemwiseSub private (operatorArguments) =
 
 type ElemwiseMul private (operatorArguments) = 
     inherit SymbolOperator("elemwise_mul", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ElemwiseMul(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7877,6 +8166,7 @@ type ElemwiseMul private (operatorArguments) =
 
 type ElemwiseDiv private (operatorArguments) = 
     inherit SymbolOperator("elemwise_div", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ElemwiseDiv(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7892,6 +8182,7 @@ type ElemwiseDiv private (operatorArguments) =
 
 type Mod private (operatorArguments) = 
     inherit SymbolOperator("_mod", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Mod(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7907,6 +8198,7 @@ type Mod private (operatorArguments) =
 
 type Power private (operatorArguments) = 
     inherit SymbolOperator("_power", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Power(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7922,6 +8214,7 @@ type Power private (operatorArguments) =
 
 type Maximum private (operatorArguments) = 
     inherit SymbolOperator("_maximum", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Maximum(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7937,6 +8230,7 @@ type Maximum private (operatorArguments) =
 
 type Minimum private (operatorArguments) = 
     inherit SymbolOperator("_minimum", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Minimum(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7952,6 +8246,7 @@ type Minimum private (operatorArguments) =
 
 type Hypot private (operatorArguments) = 
     inherit SymbolOperator("_hypot", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Hypot(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7967,6 +8262,7 @@ type Hypot private (operatorArguments) =
 
 type Equal private (operatorArguments) = 
     inherit SymbolOperator("_equal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Equal(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7982,6 +8278,7 @@ type Equal private (operatorArguments) =
 
 type NotEqual private (operatorArguments) = 
     inherit SymbolOperator("_not_equal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NotEqual(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -7997,6 +8294,7 @@ type NotEqual private (operatorArguments) =
 
 type Greater private (operatorArguments) = 
     inherit SymbolOperator("_greater", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Greater(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -8012,6 +8310,7 @@ type Greater private (operatorArguments) =
 
 type GreaterEqual private (operatorArguments) = 
     inherit SymbolOperator("_greater_equal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new GreaterEqual(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -8027,6 +8326,7 @@ type GreaterEqual private (operatorArguments) =
 
 type Lesser private (operatorArguments) = 
     inherit SymbolOperator("_lesser", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Lesser(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -8042,6 +8342,7 @@ type Lesser private (operatorArguments) =
 
 type LesserEqual private (operatorArguments) = 
     inherit SymbolOperator("_lesser_equal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LesserEqual(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -8057,6 +8358,7 @@ type LesserEqual private (operatorArguments) =
 
 type LogicalAnd private (operatorArguments) = 
     inherit SymbolOperator("_logical_and", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalAnd(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -8072,6 +8374,7 @@ type LogicalAnd private (operatorArguments) =
 
 type LogicalOr private (operatorArguments) = 
     inherit SymbolOperator("_logical_or", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalOr(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -8087,6 +8390,7 @@ type LogicalOr private (operatorArguments) =
 
 type LogicalXor private (operatorArguments) = 
     inherit SymbolOperator("_logical_xor", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalXor(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -8102,6 +8406,7 @@ type LogicalXor private (operatorArguments) =
 
 type PlusScalar private (operatorArguments) = 
     inherit SymbolOperator("_plus_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new PlusScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8124,6 +8429,7 @@ type PlusScalar private (operatorArguments) =
 
 type MinusScalar private (operatorArguments) = 
     inherit SymbolOperator("_minus_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MinusScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8146,6 +8452,7 @@ type MinusScalar private (operatorArguments) =
 
 type RminusScalar private (operatorArguments) = 
     inherit SymbolOperator("_rminus_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RminusScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8168,6 +8475,7 @@ type RminusScalar private (operatorArguments) =
 
 type MulScalar private (operatorArguments) = 
     inherit SymbolOperator("_mul_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MulScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8190,6 +8498,7 @@ type MulScalar private (operatorArguments) =
 
 type DivScalar private (operatorArguments) = 
     inherit SymbolOperator("_div_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new DivScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8212,6 +8521,7 @@ type DivScalar private (operatorArguments) =
 
 type RdivScalar private (operatorArguments) = 
     inherit SymbolOperator("_rdiv_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RdivScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8234,6 +8544,7 @@ type RdivScalar private (operatorArguments) =
 
 type ModScalar private (operatorArguments) = 
     inherit SymbolOperator("_mod_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ModScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8256,6 +8567,7 @@ type ModScalar private (operatorArguments) =
 
 type RmodScalar private (operatorArguments) = 
     inherit SymbolOperator("_rmod_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RmodScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8278,6 +8590,7 @@ type RmodScalar private (operatorArguments) =
 
 type MaximumScalar private (operatorArguments) = 
     inherit SymbolOperator("_maximum_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MaximumScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8300,6 +8613,7 @@ type MaximumScalar private (operatorArguments) =
 
 type MinimumScalar private (operatorArguments) = 
     inherit SymbolOperator("_minimum_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MinimumScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8322,6 +8636,7 @@ type MinimumScalar private (operatorArguments) =
 
 type PowerScalar private (operatorArguments) = 
     inherit SymbolOperator("_power_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new PowerScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8344,6 +8659,7 @@ type PowerScalar private (operatorArguments) =
 
 type RpowerScalar private (operatorArguments) = 
     inherit SymbolOperator("_rpower_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RpowerScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8366,6 +8682,7 @@ type RpowerScalar private (operatorArguments) =
 
 type HypotScalar private (operatorArguments) = 
     inherit SymbolOperator("_hypot_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new HypotScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8388,6 +8705,7 @@ type HypotScalar private (operatorArguments) =
 
 type SmoothL1 private (operatorArguments) = 
     inherit SymbolOperator("smooth_l1", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SmoothL1(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8410,6 +8728,7 @@ type SmoothL1 private (operatorArguments) =
 
 type EqualScalar private (operatorArguments) = 
     inherit SymbolOperator("_equal_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new EqualScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8432,6 +8751,7 @@ type EqualScalar private (operatorArguments) =
 
 type NotEqualScalar private (operatorArguments) = 
     inherit SymbolOperator("_not_equal_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NotEqualScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8454,6 +8774,7 @@ type NotEqualScalar private (operatorArguments) =
 
 type GreaterScalar private (operatorArguments) = 
     inherit SymbolOperator("_greater_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new GreaterScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8476,6 +8797,7 @@ type GreaterScalar private (operatorArguments) =
 
 type GreaterEqualScalar private (operatorArguments) = 
     inherit SymbolOperator("_greater_equal_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new GreaterEqualScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8498,6 +8820,7 @@ type GreaterEqualScalar private (operatorArguments) =
 
 type LesserScalar private (operatorArguments) = 
     inherit SymbolOperator("_lesser_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LesserScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8520,6 +8843,7 @@ type LesserScalar private (operatorArguments) =
 
 type LesserEqualScalar private (operatorArguments) = 
     inherit SymbolOperator("_lesser_equal_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LesserEqualScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8542,6 +8866,7 @@ type LesserEqualScalar private (operatorArguments) =
 
 type LogicalAndScalar private (operatorArguments) = 
     inherit SymbolOperator("_logical_and_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalAndScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8564,6 +8889,7 @@ type LogicalAndScalar private (operatorArguments) =
 
 type LogicalOrScalar private (operatorArguments) = 
     inherit SymbolOperator("_logical_or_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalOrScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8586,6 +8912,7 @@ type LogicalOrScalar private (operatorArguments) =
 
 type LogicalXorScalar private (operatorArguments) = 
     inherit SymbolOperator("_logical_xor_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalXorScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8608,6 +8935,7 @@ type LogicalXorScalar private (operatorArguments) =
 
 type ScatterElemwiseDiv private (operatorArguments) = 
     inherit SymbolOperator("_scatter_elemwise_div", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ScatterElemwiseDiv(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -8623,6 +8951,7 @@ type ScatterElemwiseDiv private (operatorArguments) =
 
 type ScatterPlusScalar private (operatorArguments) = 
     inherit SymbolOperator("_scatter_plus_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ScatterPlusScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8645,6 +8974,7 @@ type ScatterPlusScalar private (operatorArguments) =
 
 type ScatterMinusScalar private (operatorArguments) = 
     inherit SymbolOperator("_scatter_minus_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ScatterMinusScalar(args)
     new(data : Symbol,
         scalar : float) = 
         let operatorArguments = 
@@ -8667,6 +8997,7 @@ type ScatterMinusScalar private (operatorArguments) =
 
 type AddN private (operatorArguments) = 
     inherit SymbolOperator("add_n", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new AddN(args)
     new([<Optional>] ?args : Symbol seq) =
         let args = defaultArg (args |> Option.map Seq.toArray) Array.empty
         let operatorArguments = 
@@ -8684,6 +9015,7 @@ type AddN private (operatorArguments) =
 
 type Relu private (operatorArguments) = 
     inherit SymbolOperator("relu", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Relu(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8695,6 +9027,7 @@ type Relu private (operatorArguments) =
 
 type Sigmoid private (operatorArguments) = 
     inherit SymbolOperator("sigmoid", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Sigmoid(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8706,6 +9039,7 @@ type Sigmoid private (operatorArguments) =
 
 type HardSigmoid private (operatorArguments) = 
     inherit SymbolOperator("hard_sigmoid", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new HardSigmoid(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?alpha : float,
         [<Optional>] ?beta : float) = 
@@ -8725,6 +9059,7 @@ type HardSigmoid private (operatorArguments) =
 
 type Softsign private (operatorArguments) = 
     inherit SymbolOperator("softsign", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Softsign(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8736,6 +9071,7 @@ type Softsign private (operatorArguments) =
 
 type Copy private (operatorArguments) = 
     inherit SymbolOperator("_copy", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Copy(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8747,6 +9083,7 @@ type Copy private (operatorArguments) =
 
 type BlockGrad private (operatorArguments) = 
     inherit SymbolOperator("BlockGrad", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BlockGrad(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8758,6 +9095,7 @@ type BlockGrad private (operatorArguments) =
 
 type IdentityWithAttrLikeRhs private (operatorArguments) = 
     inherit SymbolOperator("_identity_with_attr_like_rhs", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new IdentityWithAttrLikeRhs(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
@@ -8773,6 +9111,7 @@ type IdentityWithAttrLikeRhs private (operatorArguments) =
 
 type ReshapeLike private (operatorArguments) = 
     inherit SymbolOperator("reshape_like", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ReshapeLike(args)
     new([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol,
         [<Optional>] ?lhsBegin : int,
@@ -8804,6 +9143,7 @@ type ReshapeLike private (operatorArguments) =
 
 type ShapeArray private (operatorArguments) = 
     inherit SymbolOperator("shape_array", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ShapeArray(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8815,6 +9155,7 @@ type ShapeArray private (operatorArguments) =
 
 type SizeArray private (operatorArguments) = 
     inherit SymbolOperator("size_array", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SizeArray(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8826,6 +9167,7 @@ type SizeArray private (operatorArguments) =
 
 type Cast private (operatorArguments) = 
     inherit SymbolOperator("Cast", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Cast(args)
     new(data : Symbol,
         dtype : IntOrFloatDType) = 
         let operatorArguments = 
@@ -8848,6 +9190,7 @@ type Cast private (operatorArguments) =
 
 type Negative private (operatorArguments) = 
     inherit SymbolOperator("negative", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Negative(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8859,6 +9202,7 @@ type Negative private (operatorArguments) =
 
 type Abs private (operatorArguments) = 
     inherit SymbolOperator("abs", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Abs(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8870,6 +9214,7 @@ type Abs private (operatorArguments) =
 
 type Sign private (operatorArguments) = 
     inherit SymbolOperator("sign", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Sign(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8881,6 +9226,7 @@ type Sign private (operatorArguments) =
 
 type Round private (operatorArguments) = 
     inherit SymbolOperator("round", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Round(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8892,6 +9238,7 @@ type Round private (operatorArguments) =
 
 type Rint private (operatorArguments) = 
     inherit SymbolOperator("rint", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Rint(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8903,6 +9250,7 @@ type Rint private (operatorArguments) =
 
 type Ceil private (operatorArguments) = 
     inherit SymbolOperator("ceil", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Ceil(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8914,6 +9262,7 @@ type Ceil private (operatorArguments) =
 
 type Floor private (operatorArguments) = 
     inherit SymbolOperator("floor", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Floor(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8925,6 +9274,7 @@ type Floor private (operatorArguments) =
 
 type Trunc private (operatorArguments) = 
     inherit SymbolOperator("trunc", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Trunc(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8936,6 +9286,7 @@ type Trunc private (operatorArguments) =
 
 type Fix private (operatorArguments) = 
     inherit SymbolOperator("fix", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Fix(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8947,6 +9298,7 @@ type Fix private (operatorArguments) =
 
 type Erf private (operatorArguments) = 
     inherit SymbolOperator("erf", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Erf(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8958,6 +9310,7 @@ type Erf private (operatorArguments) =
 
 type Erfinv private (operatorArguments) = 
     inherit SymbolOperator("erfinv", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Erfinv(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8969,6 +9322,7 @@ type Erfinv private (operatorArguments) =
 
 type Gamma private (operatorArguments) = 
     inherit SymbolOperator("gamma", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Gamma(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8980,6 +9334,7 @@ type Gamma private (operatorArguments) =
 
 type Gammaln private (operatorArguments) = 
     inherit SymbolOperator("gammaln", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Gammaln(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -8991,6 +9346,7 @@ type Gammaln private (operatorArguments) =
 
 type LogicalNot private (operatorArguments) = 
     inherit SymbolOperator("logical_not", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalNot(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9002,6 +9358,7 @@ type LogicalNot private (operatorArguments) =
 
 type Exp private (operatorArguments) = 
     inherit SymbolOperator("exp", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Exp(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9013,6 +9370,7 @@ type Exp private (operatorArguments) =
 
 type Log private (operatorArguments) = 
     inherit SymbolOperator("log", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Log(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9024,6 +9382,7 @@ type Log private (operatorArguments) =
 
 type Log10 private (operatorArguments) = 
     inherit SymbolOperator("log10", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Log10(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9035,6 +9394,7 @@ type Log10 private (operatorArguments) =
 
 type Log2 private (operatorArguments) = 
     inherit SymbolOperator("log2", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Log2(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9046,6 +9406,7 @@ type Log2 private (operatorArguments) =
 
 type Log1p private (operatorArguments) = 
     inherit SymbolOperator("log1p", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Log1p(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9057,6 +9418,7 @@ type Log1p private (operatorArguments) =
 
 type Expm1 private (operatorArguments) = 
     inherit SymbolOperator("expm1", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Expm1(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9068,6 +9430,7 @@ type Expm1 private (operatorArguments) =
 
 type Reciprocal private (operatorArguments) = 
     inherit SymbolOperator("reciprocal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Reciprocal(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9079,6 +9442,7 @@ type Reciprocal private (operatorArguments) =
 
 type Square private (operatorArguments) = 
     inherit SymbolOperator("square", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Square(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9090,6 +9454,7 @@ type Square private (operatorArguments) =
 
 type Sqrt private (operatorArguments) = 
     inherit SymbolOperator("sqrt", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Sqrt(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9101,6 +9466,7 @@ type Sqrt private (operatorArguments) =
 
 type Rsqrt private (operatorArguments) = 
     inherit SymbolOperator("rsqrt", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Rsqrt(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9112,6 +9478,7 @@ type Rsqrt private (operatorArguments) =
 
 type Cbrt private (operatorArguments) = 
     inherit SymbolOperator("cbrt", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Cbrt(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9123,6 +9490,7 @@ type Cbrt private (operatorArguments) =
 
 type Rcbrt private (operatorArguments) = 
     inherit SymbolOperator("rcbrt", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Rcbrt(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9134,6 +9502,7 @@ type Rcbrt private (operatorArguments) =
 
 type Sin private (operatorArguments) = 
     inherit SymbolOperator("sin", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Sin(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9145,6 +9514,7 @@ type Sin private (operatorArguments) =
 
 type Cos private (operatorArguments) = 
     inherit SymbolOperator("cos", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Cos(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9156,6 +9526,7 @@ type Cos private (operatorArguments) =
 
 type Tan private (operatorArguments) = 
     inherit SymbolOperator("tan", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Tan(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9167,6 +9538,7 @@ type Tan private (operatorArguments) =
 
 type Arcsin private (operatorArguments) = 
     inherit SymbolOperator("arcsin", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Arcsin(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9178,6 +9550,7 @@ type Arcsin private (operatorArguments) =
 
 type Arccos private (operatorArguments) = 
     inherit SymbolOperator("arccos", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Arccos(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9189,6 +9562,7 @@ type Arccos private (operatorArguments) =
 
 type Arctan private (operatorArguments) = 
     inherit SymbolOperator("arctan", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Arctan(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9200,6 +9574,7 @@ type Arctan private (operatorArguments) =
 
 type Degrees private (operatorArguments) = 
     inherit SymbolOperator("degrees", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Degrees(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9211,6 +9586,7 @@ type Degrees private (operatorArguments) =
 
 type Radians private (operatorArguments) = 
     inherit SymbolOperator("radians", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Radians(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9222,6 +9598,7 @@ type Radians private (operatorArguments) =
 
 type Sinh private (operatorArguments) = 
     inherit SymbolOperator("sinh", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Sinh(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9233,6 +9610,7 @@ type Sinh private (operatorArguments) =
 
 type Cosh private (operatorArguments) = 
     inherit SymbolOperator("cosh", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Cosh(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9244,6 +9622,7 @@ type Cosh private (operatorArguments) =
 
 type Tanh private (operatorArguments) = 
     inherit SymbolOperator("tanh", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Tanh(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9255,6 +9634,7 @@ type Tanh private (operatorArguments) =
 
 type Arcsinh private (operatorArguments) = 
     inherit SymbolOperator("arcsinh", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Arcsinh(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9266,6 +9646,7 @@ type Arcsinh private (operatorArguments) =
 
 type Arccosh private (operatorArguments) = 
     inherit SymbolOperator("arccosh", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Arccosh(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9277,6 +9658,7 @@ type Arccosh private (operatorArguments) =
 
 type Arctanh private (operatorArguments) = 
     inherit SymbolOperator("arctanh", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Arctanh(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9288,6 +9670,7 @@ type Arctanh private (operatorArguments) =
 
 type Histogram private (operatorArguments) = 
     inherit SymbolOperator("_histogram", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Histogram(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?bins : Symbol,
         [<Optional>] ?binCnt : int,
@@ -9311,6 +9694,7 @@ type Histogram private (operatorArguments) =
 
 type Embedding private (operatorArguments) = 
     inherit SymbolOperator("Embedding", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Embedding(args)
     new(data : Symbol,
         weight : Symbol,
         inputDim : int,
@@ -9356,6 +9740,7 @@ type Embedding private (operatorArguments) =
 
 type ContribSparseEmbedding private (operatorArguments) = 
     inherit SymbolOperator("_contrib_SparseEmbedding", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribSparseEmbedding(args)
     new(data : Symbol,
         weight : Symbol,
         inputDim : int,
@@ -9401,6 +9786,7 @@ type ContribSparseEmbedding private (operatorArguments) =
 
 type Take private (operatorArguments) = 
     inherit SymbolOperator("take", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Take(args)
     new([<Optional>] ?a : Symbol,
         [<Optional>] ?indices : Symbol,
         [<Optional>] ?axis : int,
@@ -9424,6 +9810,7 @@ type Take private (operatorArguments) =
 
 type BatchTake private (operatorArguments) = 
     inherit SymbolOperator("batch_take", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BatchTake(args)
     new([<Optional>] ?a : Symbol,
         [<Optional>] ?indices : Symbol) = 
         let a = defaultArg a (new ImplicitVariable() :> Symbol)
@@ -9439,6 +9826,7 @@ type BatchTake private (operatorArguments) =
 
 type OneHot private (operatorArguments) = 
     inherit SymbolOperator("one_hot", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new OneHot(args)
     new(indices : Symbol,
         depth : int,
         [<Optional>] ?onValue : double,
@@ -9479,6 +9867,7 @@ type OneHot private (operatorArguments) =
 
 type GatherNd private (operatorArguments) = 
     inherit SymbolOperator("gather_nd", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new GatherNd(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?indices : Symbol) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -9494,6 +9883,7 @@ type GatherNd private (operatorArguments) =
 
 type ScatterNd private (operatorArguments) = 
     inherit SymbolOperator("scatter_nd", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ScatterNd(args)
     new(data : Symbol,
         indices : Symbol,
         shape : int seq) = 
@@ -9522,6 +9912,7 @@ type ScatterNd private (operatorArguments) =
 
 type ScatterSetNd private (operatorArguments) = 
     inherit SymbolOperator("_scatter_set_nd", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ScatterSetNd(args)
     new(lhs : Symbol,
         rhs : Symbol,
         indices : Symbol,
@@ -9556,6 +9947,7 @@ type ScatterSetNd private (operatorArguments) =
 
 type ContribArangeLike private (operatorArguments) = 
     inherit SymbolOperator("_contrib_arange_like", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribArangeLike(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?start : double,
         [<Optional>] ?step : double,
@@ -9583,6 +9975,7 @@ type ContribArangeLike private (operatorArguments) =
 
 type ZerosLike private (operatorArguments) = 
     inherit SymbolOperator("zeros_like", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ZerosLike(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9594,6 +9987,7 @@ type ZerosLike private (operatorArguments) =
 
 type OnesLike private (operatorArguments) = 
     inherit SymbolOperator("ones_like", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new OnesLike(args)
     new([<Optional>] ?data : Symbol) =
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9605,6 +9999,7 @@ type OnesLike private (operatorArguments) =
 
 type LinalgGemm private (operatorArguments) = 
     inherit SymbolOperator("_linalg_gemm", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgGemm(args)
     new([<Optional>] ?A : Symbol,
         [<Optional>] ?B : Symbol,
         [<Optional>] ?C : Symbol,
@@ -9644,6 +10039,7 @@ type LinalgGemm private (operatorArguments) =
 
 type LinalgGemm2 private (operatorArguments) = 
     inherit SymbolOperator("_linalg_gemm2", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgGemm2(args)
     new([<Optional>] ?A : Symbol,
         [<Optional>] ?B : Symbol,
         [<Optional>] ?transposeA : bool,
@@ -9675,6 +10071,7 @@ type LinalgGemm2 private (operatorArguments) =
 
 type LinalgPotrf private (operatorArguments) = 
     inherit SymbolOperator("_linalg_potrf", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgPotrf(args)
     new([<Optional>] ?A : Symbol) =
         let A = defaultArg A (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9686,6 +10083,7 @@ type LinalgPotrf private (operatorArguments) =
 
 type LinalgPotri private (operatorArguments) = 
     inherit SymbolOperator("_linalg_potri", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgPotri(args)
     new([<Optional>] ?A : Symbol) =
         let A = defaultArg A (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9697,6 +10095,7 @@ type LinalgPotri private (operatorArguments) =
 
 type LinalgTrmm private (operatorArguments) = 
     inherit SymbolOperator("_linalg_trmm", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgTrmm(args)
     new([<Optional>] ?A : Symbol,
         [<Optional>] ?B : Symbol,
         [<Optional>] ?transpose : bool,
@@ -9728,6 +10127,7 @@ type LinalgTrmm private (operatorArguments) =
 
 type LinalgTrsm private (operatorArguments) = 
     inherit SymbolOperator("_linalg_trsm", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgTrsm(args)
     new([<Optional>] ?A : Symbol,
         [<Optional>] ?B : Symbol,
         [<Optional>] ?transpose : bool,
@@ -9759,6 +10159,7 @@ type LinalgTrsm private (operatorArguments) =
 
 type LinalgSumlogdiag private (operatorArguments) = 
     inherit SymbolOperator("_linalg_sumlogdiag", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgSumlogdiag(args)
     new([<Optional>] ?A : Symbol) =
         let A = defaultArg A (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9770,6 +10171,7 @@ type LinalgSumlogdiag private (operatorArguments) =
 
 type LinalgExtractdiag private (operatorArguments) = 
     inherit SymbolOperator("_linalg_extractdiag", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgExtractdiag(args)
     new([<Optional>] ?A : Symbol,
         [<Optional>] ?offset : int) = 
         let A = defaultArg A (new ImplicitVariable() :> Symbol)
@@ -9785,6 +10187,7 @@ type LinalgExtractdiag private (operatorArguments) =
 
 type LinalgMakediag private (operatorArguments) = 
     inherit SymbolOperator("_linalg_makediag", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgMakediag(args)
     new([<Optional>] ?A : Symbol,
         [<Optional>] ?offset : int) = 
         let A = defaultArg A (new ImplicitVariable() :> Symbol)
@@ -9800,6 +10203,7 @@ type LinalgMakediag private (operatorArguments) =
 
 type LinalgExtracttrian private (operatorArguments) = 
     inherit SymbolOperator("_linalg_extracttrian", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgExtracttrian(args)
     new([<Optional>] ?A : Symbol,
         [<Optional>] ?offset : int,
         [<Optional>] ?lower : bool) = 
@@ -9819,6 +10223,7 @@ type LinalgExtracttrian private (operatorArguments) =
 
 type LinalgMaketrian private (operatorArguments) = 
     inherit SymbolOperator("_linalg_maketrian", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgMaketrian(args)
     new([<Optional>] ?A : Symbol,
         [<Optional>] ?offset : int,
         [<Optional>] ?lower : bool) = 
@@ -9838,6 +10243,7 @@ type LinalgMaketrian private (operatorArguments) =
 
 type LinalgSyrk private (operatorArguments) = 
     inherit SymbolOperator("_linalg_syrk", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgSyrk(args)
     new([<Optional>] ?A : Symbol,
         [<Optional>] ?transpose : bool,
         [<Optional>] ?alpha : double) = 
@@ -9857,6 +10263,7 @@ type LinalgSyrk private (operatorArguments) =
 
 type LinalgGelqf private (operatorArguments) = 
     inherit SymbolOperator("_linalg_gelqf", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgGelqf(args)
     new([<Optional>] ?A : Symbol) =
         let A = defaultArg A (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9868,6 +10275,7 @@ type LinalgGelqf private (operatorArguments) =
 
 type LinalgSyevd private (operatorArguments) = 
     inherit SymbolOperator("_linalg_syevd", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgSyevd(args)
     new([<Optional>] ?A : Symbol) =
         let A = defaultArg A (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9879,6 +10287,7 @@ type LinalgSyevd private (operatorArguments) =
 
 type LinalgInverse private (operatorArguments) = 
     inherit SymbolOperator("_linalg_inverse", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgInverse(args)
     new([<Optional>] ?A : Symbol) =
         let A = defaultArg A (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9890,6 +10299,7 @@ type LinalgInverse private (operatorArguments) =
 
 type LinalgDet private (operatorArguments) = 
     inherit SymbolOperator("_linalg_det", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgDet(args)
     new([<Optional>] ?A : Symbol) =
         let A = defaultArg A (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9901,6 +10311,7 @@ type LinalgDet private (operatorArguments) =
 
 type LinalgSlogdet private (operatorArguments) = 
     inherit SymbolOperator("_linalg_slogdet", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgSlogdet(args)
     new([<Optional>] ?A : Symbol) =
         let A = defaultArg A (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -9912,6 +10323,7 @@ type LinalgSlogdet private (operatorArguments) =
 
 type Reshape private (operatorArguments) = 
     inherit SymbolOperator("Reshape", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Reshape(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?shape : int seq,
         [<Optional>] ?reverse : bool,
@@ -9939,6 +10351,7 @@ type Reshape private (operatorArguments) =
 
 type Transpose private (operatorArguments) = 
     inherit SymbolOperator("transpose", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Transpose(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axes : int seq) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -9954,6 +10367,7 @@ type Transpose private (operatorArguments) =
 
 type ExpandDims private (operatorArguments) = 
     inherit SymbolOperator("expand_dims", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ExpandDims(args)
     new(data : Symbol,
         axis : int) = 
         let operatorArguments = 
@@ -9976,6 +10390,7 @@ type ExpandDims private (operatorArguments) =
 
 type Slice private (operatorArguments) = 
     inherit SymbolOperator("slice", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Slice(args)
     new(data : Symbol,
         sliceBegin : int seq,
         sliceEnd : int seq,
@@ -10009,6 +10424,7 @@ type Slice private (operatorArguments) =
 
 type SliceAssign private (operatorArguments) = 
     inherit SymbolOperator("_slice_assign", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SliceAssign(args)
     new(lhs : Symbol,
         rhs : Symbol,
         sliceBegin : int seq,
@@ -10048,6 +10464,7 @@ type SliceAssign private (operatorArguments) =
 
 type SliceAssignScalar private (operatorArguments) = 
     inherit SymbolOperator("_slice_assign_scalar", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SliceAssignScalar(args)
     new(data : Symbol,
         sliceBegin : int seq,
         sliceEnd : int seq,
@@ -10087,6 +10504,7 @@ type SliceAssignScalar private (operatorArguments) =
 
 type SliceAxis private (operatorArguments) = 
     inherit SymbolOperator("slice_axis", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SliceAxis(args)
     new(data : Symbol,
         axis : int,
         sliceBegin : int,
@@ -10120,6 +10538,7 @@ type SliceAxis private (operatorArguments) =
 
 type SliceLike private (operatorArguments) = 
     inherit SymbolOperator("slice_like", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SliceLike(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?shapeLike : Symbol,
         [<Optional>] ?axes : int seq) = 
@@ -10139,6 +10558,7 @@ type SliceLike private (operatorArguments) =
 
 type Clip private (operatorArguments) = 
     inherit SymbolOperator("clip", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Clip(args)
     new(data : Symbol,
         aMin : float,
         aMax : float) = 
@@ -10166,6 +10586,7 @@ type Clip private (operatorArguments) =
 
 type Repeat private (operatorArguments) = 
     inherit SymbolOperator("repeat", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Repeat(args)
     new(data : Symbol,
         repeats : int,
         [<Optional>] ?axis : int) = 
@@ -10194,6 +10615,7 @@ type Repeat private (operatorArguments) =
 
 type Tile private (operatorArguments) = 
     inherit SymbolOperator("tile", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Tile(args)
     new(data : Symbol,
         reps : int seq) = 
         let operatorArguments = 
@@ -10216,6 +10638,7 @@ type Tile private (operatorArguments) =
 
 type Reverse private (operatorArguments) = 
     inherit SymbolOperator("reverse", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Reverse(args)
     new(data : Symbol,
         axis : int seq) = 
         let operatorArguments = 
@@ -10238,6 +10661,7 @@ type Reverse private (operatorArguments) =
 
 type Stack private (operatorArguments) = 
     inherit SymbolOperator("stack", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Stack(args)
     new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?axis : int) = 
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
@@ -10253,6 +10677,7 @@ type Stack private (operatorArguments) =
 
 type Squeeze private (operatorArguments) = 
     inherit SymbolOperator("squeeze", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Squeeze(args)
     new([<Optional>] ?data : Symbol seq,
         [<Optional>] ?axis : int seq) = 
         let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
@@ -10268,6 +10693,7 @@ type Squeeze private (operatorArguments) =
 
 type DepthToSpace private (operatorArguments) = 
     inherit SymbolOperator("depth_to_space", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new DepthToSpace(args)
     new(data : Symbol,
         blockSize : int) = 
         let operatorArguments = 
@@ -10290,6 +10716,7 @@ type DepthToSpace private (operatorArguments) =
 
 type SpaceToDepth private (operatorArguments) = 
     inherit SymbolOperator("space_to_depth", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SpaceToDepth(args)
     new(data : Symbol,
         blockSize : int) = 
         let operatorArguments = 
@@ -10312,6 +10739,7 @@ type SpaceToDepth private (operatorArguments) =
 
 type SplitV2 private (operatorArguments) = 
     inherit SymbolOperator("_split_v2", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SplitV2(args)
     new(data : Symbol,
         indices : int seq,
         [<Optional>] ?axis : int,
@@ -10352,6 +10780,7 @@ type SplitV2 private (operatorArguments) =
 
 type Topk private (operatorArguments) = 
     inherit SymbolOperator("topk", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Topk(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int,
         [<Optional>] ?k : int,
@@ -10383,6 +10812,7 @@ type Topk private (operatorArguments) =
 
 type Sort private (operatorArguments) = 
     inherit SymbolOperator("sort", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Sort(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int,
         [<Optional>] ?isAscend : bool) = 
@@ -10402,6 +10832,7 @@ type Sort private (operatorArguments) =
 
 type Argsort private (operatorArguments) = 
     inherit SymbolOperator("argsort", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Argsort(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int,
         [<Optional>] ?isAscend : bool,
@@ -10425,6 +10856,7 @@ type Argsort private (operatorArguments) =
 
 type RavelMultiIndex private (operatorArguments) = 
     inherit SymbolOperator("_ravel_multi_index", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RavelMultiIndex(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?shape : int seq) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -10440,6 +10872,7 @@ type RavelMultiIndex private (operatorArguments) =
 
 type UnravelIndex private (operatorArguments) = 
     inherit SymbolOperator("_unravel_index", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new UnravelIndex(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?shape : int seq) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -10455,6 +10888,7 @@ type UnravelIndex private (operatorArguments) =
 
 type SparseRetain private (operatorArguments) = 
     inherit SymbolOperator("_sparse_retain", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SparseRetain(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?indices : Symbol) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -10470,6 +10904,7 @@ type SparseRetain private (operatorArguments) =
 
 type SquareSum private (operatorArguments) = 
     inherit SymbolOperator("_square_sum", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SquareSum(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?axis : int seq,
         [<Optional>] ?keepdims : bool,
@@ -10493,6 +10928,7 @@ type SquareSum private (operatorArguments) =
 
 type BilinearSampler private (operatorArguments) = 
     inherit SymbolOperator("BilinearSampler", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BilinearSampler(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?grid : Symbol,
         [<Optional>] ?cudnnOff : bool) = 
@@ -10512,6 +10948,7 @@ type BilinearSampler private (operatorArguments) =
 
 type ContribCountSketch private (operatorArguments) = 
     inherit SymbolOperator("_contrib_count_sketch", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribCountSketch(args)
     new(data : Symbol,
         h : Symbol,
         s : Symbol,
@@ -10552,6 +10989,7 @@ type ContribCountSketch private (operatorArguments) =
 
 type ContribDeformableConvolution private (operatorArguments) = 
     inherit SymbolOperator("_contrib_DeformableConvolution", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDeformableConvolution(args)
     new(data : Symbol,
         offset : Symbol,
         weight : Symbol,
@@ -10645,6 +11083,7 @@ type ContribDeformableConvolution private (operatorArguments) =
 
 type ContribDeformablePSROIPooling private (operatorArguments) = 
     inherit SymbolOperator("_contrib_DeformablePSROIPooling", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDeformablePSROIPooling(args)
     new(data : Symbol,
         rois : Symbol,
         trans : Symbol,
@@ -10718,6 +11157,7 @@ type ContribDeformablePSROIPooling private (operatorArguments) =
 
 type ContribFft private (operatorArguments) = 
     inherit SymbolOperator("_contrib_fft", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribFft(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?computeSize : int) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -10733,6 +11173,7 @@ type ContribFft private (operatorArguments) =
 
 type ContribIfft private (operatorArguments) = 
     inherit SymbolOperator("_contrib_ifft", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribIfft(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?computeSize : int) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -10748,6 +11189,7 @@ type ContribIfft private (operatorArguments) =
 
 type ContribMultiProposal private (operatorArguments) = 
     inherit SymbolOperator("_contrib_MultiProposal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribMultiProposal(args)
     new([<Optional>] ?clsProb : Symbol,
         [<Optional>] ?bboxPred : Symbol,
         [<Optional>] ?imInfo : Symbol,
@@ -10803,6 +11245,7 @@ type ContribMultiProposal private (operatorArguments) =
 
 type ContribProposal private (operatorArguments) = 
     inherit SymbolOperator("_contrib_Proposal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribProposal(args)
     new([<Optional>] ?clsProb : Symbol,
         [<Optional>] ?bboxPred : Symbol,
         [<Optional>] ?imInfo : Symbol,
@@ -10858,6 +11301,7 @@ type ContribProposal private (operatorArguments) =
 
 type ContribPSROIPooling private (operatorArguments) = 
     inherit SymbolOperator("_contrib_PSROIPooling", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribPSROIPooling(args)
     new(data : Symbol,
         rois : Symbol,
         spatialScale : float,
@@ -10902,6 +11346,7 @@ type ContribPSROIPooling private (operatorArguments) =
 
 type ConvolutionV1 private (operatorArguments) = 
     inherit SymbolOperator("Convolution_v1", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ConvolutionV1(args)
     new(data : Symbol,
         weight : Symbol,
         bias : Symbol,
@@ -10995,6 +11440,7 @@ type ConvolutionV1 private (operatorArguments) =
 
 type Correlation private (operatorArguments) = 
     inherit SymbolOperator("Correlation", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Correlation(args)
     new([<Optional>] ?data1 : Symbol,
         [<Optional>] ?data2 : Symbol,
         [<Optional>] ?kernelSize : int,
@@ -11034,6 +11480,7 @@ type Correlation private (operatorArguments) =
 
 type GridGenerator private (operatorArguments) = 
     inherit SymbolOperator("GridGenerator", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new GridGenerator(args)
     new(data : Symbol,
         transformType : GridGeneratorTransformType,
         [<Optional>] ?targetShape : int seq) = 
@@ -11062,6 +11509,7 @@ type GridGenerator private (operatorArguments) =
 
 type InstanceNorm private (operatorArguments) = 
     inherit SymbolOperator("InstanceNorm", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new InstanceNorm(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?gamma : Symbol,
         [<Optional>] ?beta : Symbol,
@@ -11085,6 +11533,7 @@ type InstanceNorm private (operatorArguments) =
 
 type L2Normalization private (operatorArguments) = 
     inherit SymbolOperator("L2Normalization", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new L2Normalization(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?eps : float,
         [<Optional>] ?mode : L2NormalizationMode) = 
@@ -11104,6 +11553,7 @@ type L2Normalization private (operatorArguments) =
 
 type MakeLoss private (operatorArguments) = 
     inherit SymbolOperator("MakeLoss", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new MakeLoss(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?gradScale : float,
         [<Optional>] ?validThresh : float,
@@ -11127,6 +11577,7 @@ type MakeLoss private (operatorArguments) =
 
 type SequenceLast private (operatorArguments) = 
     inherit SymbolOperator("SequenceLast", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SequenceLast(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?sequenceLength : Symbol,
         [<Optional>] ?useSequenceLength : bool,
@@ -11150,6 +11601,7 @@ type SequenceLast private (operatorArguments) =
 
 type SequenceReverse private (operatorArguments) = 
     inherit SymbolOperator("SequenceReverse", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SequenceReverse(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?sequenceLength : Symbol,
         [<Optional>] ?useSequenceLength : bool,
@@ -11173,6 +11625,7 @@ type SequenceReverse private (operatorArguments) =
 
 type SpatialTransformer private (operatorArguments) = 
     inherit SymbolOperator("SpatialTransformer", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SpatialTransformer(args)
     new(data : Symbol,
         loc : Symbol,
         transformType : SpatialTransformerTransformType,
@@ -11218,6 +11671,7 @@ type SpatialTransformer private (operatorArguments) =
 
 type SVMOutput private (operatorArguments) = 
     inherit SymbolOperator("SVMOutput", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SVMOutput(args)
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?label : Symbol,
         [<Optional>] ?margin : float,
@@ -11245,6 +11699,7 @@ type SVMOutput private (operatorArguments) =
 
 type Imdecode private (operatorArguments) = 
     inherit SymbolOperator("_imdecode", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Imdecode(args)
     new(mean : Symbol,
         index : int,
         x0 : int,

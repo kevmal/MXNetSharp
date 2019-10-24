@@ -55,6 +55,7 @@
     <None Include="MNIST VAE.fsx" />
     <None Include="TCN.fsx" />
     <None Include="CustomOp.fsx" />
+    <None Include="CGAN.fsx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">

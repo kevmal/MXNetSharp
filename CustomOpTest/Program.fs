@@ -104,7 +104,7 @@ let testOpProps =
                 yield! outGrad
                 yield! inData
                 yield! outData
-             |]
+             |] 
          member this.InferBackwardStorageType(storageTypes : BackwardStorageTypes): unit = 
              for i = 0 to storageTypes.Auxiliary.Length - 1 do storageTypes.Auxiliary.[i] <- StorageType.Default
              for i = 0 to storageTypes.Input.Length - 1 do storageTypes.Input.[i] <- StorageType.Default
@@ -222,7 +222,7 @@ type ResourceTracker(id, name) =
                 resources.Add(ReferenceHolder d)
             )
         Marshal.GetFunctionPointerForDelegate d
-    member x.WriteMxCallbackList(ptr : nativeint, l : (Delegate*nativeint) []) =
+    member x.WriteMxCallbackList(ptr : MXCallbackList byref, l : (Delegate*nativeint) []) =
         let cbPtrArray=
             [|
                 Marshal.GetFunctionPointerForDelegate delete
@@ -237,10 +237,13 @@ type ResourceTracker(id, name) =
             |]
         let ctxPtr = x.Alloc(ctxPtrArray.Length * sizeof<IntPtr>)
         Marshal.Copy(ctxPtrArray,0,ctxPtr,ctxPtrArray.Length)
-        let N = cbPtrArray.Length |> int64
-        NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt ptr) 0 N
-        NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt (ptr + nativeint sizeof<int64>)) 0 cbPtr
-        NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt (ptr + nativeint (sizeof<int64> + sizeof<IntPtr>))) 0 ctxPtr
+        let N = cbPtrArray.Length
+        //NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt ptr) 0 N
+        //NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt (ptr + nativeint sizeof<int64>)) 0 cbPtr
+        //NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt (ptr + nativeint (sizeof<int64> + sizeof<IntPtr>))) 0 ctxPtr
+        ptr.num_callbacks <- N
+        ptr.callbacks <- cbPtr
+        ptr.contexts <- ctxPtr
     member x.Dispose(disposing) = 
         if not disposed then 
             if disposing then 
@@ -429,18 +432,16 @@ let creator = CustomOpPropCreator(fun opType argCount keys values cbList ->
         printfn "declare backward Dep"
         let inCount = op.ListArguments().Length
         let outCount = op.ListOutputs().Length
-        let outGrad : nativeint [] = Helper.readStructArray outCount outGrad
-        let inData : nativeint [] = Helper.readStructArray inCount inData
-        let outData : nativeint [] = Helper.readStructArray outCount outData
+        let outGrad : int [] = Helper.readStructArray outCount outGrad
+        let inData : int [] = Helper.readStructArray inCount inData
+        let outData : int [] = Helper.readStructArray outCount outData
         printfn "outGrad: %A" outGrad
         printfn "inData: %A" inData
         printfn "outData: %A" outData
-        let rdeps = op.DeclareBackwardDependency(outGrad |> Array.map int, inData |> Array.map int, outData |> Array.map int)
-                    |> Array.map nativeint
+        let rdeps = op.DeclareBackwardDependency(outGrad, inData, outData) |> Array.map int64
         printfn "rdeps: %A" rdeps
-        numDep <- nativeint rdeps.Length
-        // REVIEW: register? see python code
-        let dptr = rt.Alloc(rdeps.Length*sizeof<nativeint>)
+        numDep <- int64 rdeps.Length
+        let dptr = rt.Alloc(rdeps.Length*sizeof<int64>)
         Marshal.Copy(rdeps, 0, dptr, rdeps.Length)
         deps <- dptr
         true
@@ -500,7 +501,7 @@ let creator = CustomOpPropCreator(fun opType argCount keys values cbList ->
             true
         )
 
-        rt.WriteMxCallbackList(ret, 
+        rt.WriteMxCallbackList(&ret, 
             [|
                 forward :> Delegate, 0n
                 backward :> Delegate, 0n
@@ -508,7 +509,7 @@ let creator = CustomOpPropCreator(fun opType argCount keys values cbList ->
         true
     )
     printfn "making cb struct"
-    rt.WriteMxCallbackList(cbList, 
+    rt.WriteMxCallbackList(&cbList, 
         [|
             listArgs :> Delegate, 0n
             listOutputs :> Delegate, 0n
