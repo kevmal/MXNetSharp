@@ -380,13 +380,12 @@ module CustomOp =
             let declareBackwardDep = CustomOpBwdDepFunc(fun outGrad inData outData numDep deps state -> 
                 let inCount = opProp.ListArguments().Length
                 let outCount = opProp.ListOutputs().Length
-                let outGrad : nativeint [] = Helper.readStructArray outCount outGrad
-                let inData : nativeint [] = Helper.readStructArray inCount inData
-                let outData : nativeint [] = Helper.readStructArray outCount outData
+                let outGrad : int64 [] = Helper.readStructArray outCount outGrad
+                let inData : int64 [] = Helper.readStructArray inCount inData
+                let outData : int64 [] = Helper.readStructArray outCount outData
                 let rdeps = opProp.DeclareBackwardDependency(outGrad |> Array.map int, inData |> Array.map int, outData |> Array.map int)
-                            |> Array.map nativeint
-                numDep <- nativeint rdeps.Length
-                // REVIEW: register? see python code
+                            |> Array.map int64
+                numDep <- int64 rdeps.Length
                 let dptr = rt.Alloc(rdeps.Length*sizeof<nativeint>)
                 Marshal.Copy(rdeps, 0, dptr, rdeps.Length)
                 deps <- dptr
