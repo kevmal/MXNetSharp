@@ -9,8 +9,6 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "MXNETSharp.Tests", "MXNETSh
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Examples", "Examples\Examples.fsproj", "{EEC1C0B7-FE1F-454B-BE71-2863E4C26BF5}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CustomOpTest", "CustomOpTest\CustomOpTest.fsproj", "{BED903E5-B132-49BA-997D-B768156275E9}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{EEC1C0B7-FE1F-454B-BE71-2863E4C26BF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEC1C0B7-FE1F-454B-BE71-2863E4C26BF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEC1C0B7-FE1F-454B-BE71-2863E4C26BF5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BED903E5-B132-49BA-997D-B768156275E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BED903E5-B132-49BA-997D-B768156275E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BED903E5-B132-49BA-997D-B768156275E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BED903E5-B132-49BA-997D-B768156275E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
