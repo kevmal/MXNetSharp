@@ -24,10 +24,11 @@
     <Compile Include="dataiter.fs" />
     <Compile Include="executor.fs" />
     <Compile Include="operators.fs" />
-    <None Include="load.fsx" />
     <None Include="explore operators.fsx" />
+    <None Include="generate symbol types.fsx" />
     <None Include="generate operators.fsx" />
     <None Include="generate data iters.fsx" />
+    <None Include="load.fsx" />
   </ItemGroup>
 
 </Project>
