@@ -200,7 +200,7 @@ type ResourceTracker(id, name) =
                 resources.Add(ReferenceHolder d)
             )
         Marshal.GetFunctionPointerForDelegate d
-    member x.WriteMxCallbackList(ptr : nativeint, l : (Delegate*nativeint) []) =
+    member x.WriteMxCallbackList(ptr :  MXCallbackList byref, l : (Delegate*nativeint) []) =
         let cbPtrArray=
             [|
                 Marshal.GetFunctionPointerForDelegate delete
@@ -215,10 +215,10 @@ type ResourceTracker(id, name) =
             |]
         let ctxPtr = x.Alloc(ctxPtrArray.Length * sizeof<IntPtr>)
         Marshal.Copy(ctxPtrArray,0,ctxPtr,ctxPtrArray.Length)
-        let N = cbPtrArray.Length |> int64
-        NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt ptr) 0 N
-        NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt (ptr + nativeint sizeof<int64>)) 0 cbPtr
-        NativeInterop.NativePtr.set (NativeInterop.NativePtr.ofNativeInt (ptr + nativeint (sizeof<int64> + sizeof<IntPtr>))) 0 ctxPtr
+        let N = cbPtrArray.Length
+        ptr.num_callbacks <- N
+        ptr.callbacks <- cbPtr
+        ptr.contexts <- ctxPtr
     member x.Dispose(disposing) = 
         if not disposed then 
             if disposing then 
@@ -261,7 +261,7 @@ module CustomOp =
                     let inCount = opProp.ListArguments().Length
                     let outCount = opProp.ListOutputs().Length
                     let auxCount = opProp.ListAuxiliaryStates().Length
-                    assert(numTensor = int64(inCount + outCount + auxCount))
+                    assert(numTensor = inCount + outCount + auxCount)
                     let shapePtrs : IntPtr [] = Helper.readStructArray numTensor tensorShapes
                     let shapes : int [] [] = 
                         [|
@@ -284,7 +284,7 @@ module CustomOp =
                         returnShapes
                         |> Array.map 
                             (fun a ->
-                                let mem = rt.Alloc(a.Length * sizeof<int64>)
+                                let mem = rt.Alloc(a.Length * sizeof<int>)
                                 Marshal.Copy(a,0,mem,a.Length)
                                 mem
                             )
@@ -346,7 +346,7 @@ module CustomOp =
                 let outCount = opProp.ListOutputs().Length
                 let auxCount = opProp.ListAuxiliaryStates().Length
                 let dtypes : TypeFlag [] = Helper.readStructArray inCount typesPtr |> Array.map enum
-                assert(numTensor = int64 (inCount + outCount + auxCount))
+                assert(numTensor = int (inCount + outCount + auxCount))
                 let inputTypes, outputTypes, auxTypes = opProp.InferType(dtypes)
                 assert(inputTypes.Length = inCount)
                 assert(outputTypes.Length = outCount)
@@ -380,13 +380,12 @@ module CustomOp =
             let declareBackwardDep = CustomOpBwdDepFunc(fun outGrad inData outData numDep deps state -> 
                 let inCount = opProp.ListArguments().Length
                 let outCount = opProp.ListOutputs().Length
-                let outGrad : int64 [] = Helper.readStructArray outCount outGrad
-                let inData : int64 [] = Helper.readStructArray inCount inData
-                let outData : int64 [] = Helper.readStructArray outCount outData
+                let outGrad : int [] = Helper.readStructArray outCount outGrad
+                let inData : int [] = Helper.readStructArray inCount inData
+                let outData : int [] = Helper.readStructArray outCount outData
                 let rdeps = opProp.DeclareBackwardDependency(outGrad |> Array.map int, inData |> Array.map int, outData |> Array.map int)
-                            |> Array.map int64
-                numDep <- int64 rdeps.Length
-                let dptr = rt.Alloc(rdeps.Length*sizeof<nativeint>)
+                numDep <- rdeps.Length
+                let dptr = rt.Alloc(rdeps.Length*sizeof<int>)
                 Marshal.Copy(rdeps, 0, dptr, rdeps.Length)
                 deps <- dptr
                 true
@@ -437,14 +436,14 @@ module CustomOp =
                     true
                 )
 
-                rt.WriteMxCallbackList(ret, 
+                rt.WriteMxCallbackList(&ret, 
                     [|
                         forward :> Delegate, 0n
                         backward :> Delegate, 0n
                     |])
                 true
             )
-            rt.WriteMxCallbackList(cbList, 
+            rt.WriteMxCallbackList(&cbList, 
                 [|
                     listArgs :> Delegate, 0n
                     listOutputs :> Delegate, 0n

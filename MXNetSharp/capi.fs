@@ -127,11 +127,11 @@ type NDArrayOpInfo =
 
 type MXGenericCallback = delegate of unit -> int
 type MXCallbackList_callbacks = delegate of unit -> int
-[<Struct; StructLayout(LayoutKind.Sequential)>]
+[<Struct; StructLayout(LayoutKind.Sequential, Pack = 8)>]
 type MXCallbackList =
-    val num_callbacks : int
-    val callbacks : IntPtr
-    val contexts : IntPtr
+    val mutable num_callbacks : int
+    val mutable callbacks : IntPtr
+    val mutable contexts : IntPtr
 
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type LibFeature =
@@ -153,16 +153,16 @@ type CustomOpPropCallbacks =
     | kCustomOpPropInferType = 7
     | kCustomOpPropInferStorageType = 8
     | kCustomOpPropBackwardInferStorageType = 9
-type CustomOpFBFunc = delegate of size : int64 * ptrs : IntPtr * tags : IntPtr * reqs : IntPtr * isTrain  : bool * state : IntPtr -> bool
+type CustomOpFBFunc = delegate of size : int * ptrs : IntPtr * tags : IntPtr * reqs : IntPtr * isTrain  : bool * state : IntPtr -> bool
 type CustomOpDelFunc = delegate of state : IntPtr -> bool
 type CustomOpListFunc = delegate of args : IntPtr byref * state : IntPtr -> bool
-type CustomOpInferShapeFunc = delegate of numInput : int64 * ndims : IntPtr * shapes : IntPtr * state : IntPtr -> bool
-type CustomOpInferStorageTypeFunc = delegate of numInput : int64 * stypes : IntPtr * state : IntPtr -> bool
+type CustomOpInferShapeFunc = delegate of numInput : int * ndims : IntPtr * shapes : IntPtr * state : IntPtr -> bool
+type CustomOpInferStorageTypeFunc = delegate of numInput : int * stypes : IntPtr * state : IntPtr -> bool
 type CustomOpBackwardInferStorageTypeFunc = delegate of numInput : IntPtr * stypes : IntPtr * tags : IntPtr * state : IntPtr -> bool
-type CustomOpInferTypeFunc = delegate of numInput : int64 * types : IntPtr * state : IntPtr -> bool
-type CustomOpBwdDepFunc = delegate of outGrad : IntPtr * inData : IntPtr * outData :  IntPtr * numDeps : IntPtr byref * rdeps : IntPtr byref * state : IntPtr -> bool
-type CustomOpCreateFunc = delegate of context : string * numInputs : int64 * shapes : IntPtr * ndims : IntPtr * dtypes : IntPtr * ret : IntPtr * state : IntPtr -> bool
-type CustomOpPropCreator = delegate of op_type : string * numArgs : int64 * keys : IntPtr * values : IntPtr * ret : IntPtr -> bool
+type CustomOpInferTypeFunc = delegate of numInput : int * types : IntPtr * state : IntPtr -> bool
+type CustomOpBwdDepFunc = delegate of outGrad : IntPtr * inData : IntPtr * outData :  IntPtr * numDeps : int byref * rdeps : IntPtr byref * state : IntPtr -> bool
+type CustomOpCreateFunc = delegate of context : string * numInputs : int * shapes : IntPtr * ndims : IntPtr * dtypes : IntPtr * ret :  MXCallbackList byref * state : IntPtr -> bool
+type CustomOpPropCreator = delegate of op_type : string * numArgs : int * keys : IntPtr * values : IntPtr * ret : MXCallbackList byref -> bool
 type CustomFunctionCallbacks =
     | kCustomFunctionBackward = 0
     | kCustomFunctionDelete = 1
