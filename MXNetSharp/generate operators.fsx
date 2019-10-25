@@ -867,6 +867,10 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
                             sprintf "%s : %s" a.Name tp
             ]
         [
+            yield! h.Doc
+            yield! h.Args 
+                   |> Array.filter (fun a -> a.Arg.ArgumentInfo.Name <> "ctx" && a.Arg.ArgumentInfo.Name <> h.AtomicSymbolInfo.KeyVarNumArgs ) 
+                   |> Array.collect (fun x -> x.Doc)
             if args.Length = 0 then 
                 "new() ="
             elif args.Length = 1 then 
@@ -914,10 +918,10 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
             )
     let req,opt = ps |> Array.filter (fun x -> x.Arg.ArgumentInfo.Name <> "ctx" && x.Arg.ArgumentInfo.Name <> h.AtomicSymbolInfo.KeyVarNumArgs) |> Array.partition (fun a -> a.DefaultMode.IsNone )
     let ctor2 = 
-        let args = 
+        let hargs, args = 
             [
                 for a in req do 
-                    sprintf "%s : %s" a.Name a.TypeString 
+                    a, sprintf "%s : %s" a.Name a.TypeString 
                 for a in ins do 
                     let tp = 
                         match a.SymbolOrNDArray with 
@@ -925,11 +929,15 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
                         | Some SymbolOrNDArray
                         | Some Symbol -> "Symbol"
                         | _ -> a.TypeString 
-                    sprintf "[<Optional>] ?%s : %s" a.Name tp
+                    a,sprintf "[<Optional>] ?%s : %s" a.Name tp
                 for a in opt do 
-                    sprintf "[<Optional>] ?%s : %s" a.Name a.TypeString 
-            ]
+                    a,sprintf "[<Optional>] ?%s : %s" a.Name a.TypeString 
+            ] |> List.unzip
         [
+            yield! h.Doc
+            yield! hargs
+                   |> Seq.filter (fun a -> a.Arg.ArgumentInfo.Name <> "ctx" && a.Arg.ArgumentInfo.Name <> h.AtomicSymbolInfo.KeyVarNumArgs ) 
+                   |> Seq.collect (fun x -> x.Doc)
             if args.Length = 0 then 
                 "new() ="
             elif args.Length = 1 then 
@@ -973,13 +981,17 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
         if opt.Length = 0 && ins.Length = 1 then 
             match ins.[0].SymbolOrNDArray with 
             | Some ManySymbolOrNDArray ->
-                let args = 
+                let hargs, args = 
                     [
                         for a in req do 
-                            sprintf "%s : %s" a.Name a.TypeString 
-                        sprintf "[<ParamArray>] %s : Symbol[]" ins.[0].Name
-                    ]
+                            a, sprintf "%s : %s" a.Name a.TypeString 
+                        ins.[0], sprintf "[<ParamArray>] %s : Symbol[]" ins.[0].Name
+                    ] |> List.unzip
                 [
+                    yield! h.Doc
+                    yield! hargs
+                           |> Seq.filter (fun a -> a.Arg.ArgumentInfo.Name <> "ctx" && a.Arg.ArgumentInfo.Name <> h.AtomicSymbolInfo.KeyVarNumArgs ) 
+                           |> Seq.collect (fun x -> x.Doc)
                     if args.Length = 0 then 
                         "new() ="
                     elif args.Length = 1 then 
@@ -1032,6 +1044,10 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
                         sprintf "[<Optional>] ?%s : %s" a.Name tp
             ]
         [
+            sprintf """/// <summary>Copy %s instance with updated inputs/parameters.</summary>""" h.Name
+            yield! h.Args
+                   |> Seq.filter (fun a -> a.Arg.ArgumentInfo.Name <> "ctx" && a.Arg.ArgumentInfo.Name <> h.AtomicSymbolInfo.KeyVarNumArgs ) 
+                   |> Seq.collect (fun x -> x.Doc)
             if args.Length = 0 then 
                 ()
             elif args.Length = 1 then 
@@ -1064,10 +1080,23 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
                 ]
         ]
     
+    let stripParam (lines : string []) = 
+        lines 
+        |> Array.map 
+            (fun x ->
+                let x = x.Replace("</param>", "")
+                let i = x.IndexOf "<param name="
+                if i >= 0 then 
+                    let j = x.IndexOf('>', i)
+                    x.Remove(i, j - i + 1)
+                else x
+            )
     let props = 
         [
             for a in opt do
                 let t = TranslatedType.FromArgumentInfo(a.ProcessedAtomicSymbol.Value.AtomicSymbolInfo, a.Arg.ArgumentInfo)
+                sprintf "/// Default value for %s" (capitalize a.Name)
+                yield! (stripParam a.Doc)
                 match t with 
                 | Opt(StringChoices _) ->
                     match t.DefaultString.Value with 
@@ -1077,14 +1106,17 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
                     sprintf "static member %sDefault : %s = %s.%s" (capitalize a.Name) a.TypeString a.TypeString t.DefaultString.Value
                 | _ -> sprintf "static member %sDefault : %s = %s" (capitalize a.Name) (t.TargetTypeString(true, "[]")) t.DefaultString.Value
             for a in ins do 
+                yield! (stripParam a.Doc)
                 match a.SymbolOrNDArray with
                 | Some ManySymbolOrNDArray -> 
                     sprintf "member __.%s = operatorArguments.GetVarArg \"%s\"" (capitalize a.Name) a.Arg.ArgumentInfo.Name
                 | _ ->
                     sprintf "member __.%s = operatorArguments.GetInput \"%s\"" (capitalize a.Name) a.Arg.ArgumentInfo.Name
             for a in req do 
+                yield! (stripParam a.Doc)
                 sprintf "member __.%s : %s = match operatorArguments.GetParameter \"%s\" with Some(v) -> unbox v | None -> failwithf \"Required parameter %s is missing\"" (capitalize a.Name) (a.TypeString) a.Arg.ArgumentInfo.Name a.Arg.ArgumentInfo.Name
             for a in opt do 
+                yield! (stripParam a.Doc)
                 sprintf "member __.%s = operatorArguments.GetParameter(\"%s\", %s.%sDefault)" (capitalize a.Name) a.Arg.ArgumentInfo.Name h.Name (capitalize a.Name)
 
         ]
