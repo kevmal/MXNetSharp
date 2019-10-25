@@ -849,7 +849,7 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
         | Symbol | SymbolOrNDArray | ManySymbolOrNDArray -> true 
         | _ -> false
     // REVIEW: we skip _make_loss in favor of MakeLoss. Is there any reason to have both?
-    if not symbol || h.AtomicSymbolInfo.Name.StartsWith "_backward_" || h.AtomicSymbolInfo.Name = "make_loss" then [] else
+    if (not symbol && ndArray) || h.AtomicSymbolInfo.Name.StartsWith "_backward_" || h.AtomicSymbolInfo.Name = "make_loss" then [] else
     let ctor = 
         let args = 
             [
@@ -1044,21 +1044,14 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
                         sprintf "[<Optional>] ?%s : %s" a.Name tp
             ]
         [
-            sprintf """/// <summary>Copy %s instance with updated inputs/parameters.</summary>""" h.Name
-            yield! h.Args
-                   |> Seq.filter (fun a -> a.Arg.ArgumentInfo.Name <> "ctx" && a.Arg.ArgumentInfo.Name <> h.AtomicSymbolInfo.KeyVarNumArgs ) 
-                   |> Seq.collect (fun x -> x.Doc)
-            if args.Length = 0 then 
-                ()
-            elif args.Length = 1 then 
-                sprintf "member this.With(%s) =" args.[0]
-            else
-                sprintf "member this.With(%s," args.[0]
-                let padding = String.replicate "new(".Length " "
-                for a in args.[1.. args.Length - 2] do 
-                    sprintf "%s%s," padding a
-                sprintf "%s%s) = " padding args.[args.Length - 1]
-            yield! indent 1 
+            let docs = 
+                [
+                    sprintf """/// <summary>Copy %s instance with updated inputs/parameters.</summary>""" h.Name
+                    yield! h.Args
+                           |> Seq.filter (fun a -> a.Arg.ArgumentInfo.Name <> "ctx" && a.Arg.ArgumentInfo.Name <> h.AtomicSymbolInfo.KeyVarNumArgs ) 
+                           |> Seq.collect (fun x -> x.Doc)
+                ]
+            let call =
                 [
                     sprintf "let operatorArguments = "
                     sprintf "    ["
@@ -1078,6 +1071,20 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
                     sprintf "    ] |> List.choose id"
                     sprintf "new %s(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))" h.Name
                 ]
+            if args.Length = 0 then 
+                ()
+            elif args.Length = 1 then 
+                yield! docs
+                sprintf "member this.With(%s) =" args.[0]
+                yield! indent 1 call
+            else
+                yield! docs
+                sprintf "member this.With(%s," args.[0]
+                let padding = String.replicate "new(".Length " "
+                for a in args.[1.. args.Length - 2] do 
+                    sprintf "%s%s," padding a
+                sprintf "%s%s) = " padding args.[args.Length - 1]
+                yield! indent 1 call
         ]
     
     let stripParam (lines : string []) = 
@@ -1124,7 +1131,7 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
         sprintf "type %s private (operatorArguments) = " h.Name
         sprintf "    inherit SymbolOperator(\"%s\", operatorArguments)" h.AtomicSymbolInfo.Name
         sprintf "    static member CreateFromArguments(args : Arguments<Symbol>) = new %s(args)" h.Name
-        if req.Length = 0 then 
+        if req.Length = 0 || ins.Length = 0 then 
             yield! indent 1 ctor2
         else
             yield! indent 1 ctor
