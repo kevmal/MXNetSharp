@@ -133,6 +133,7 @@ type OpReqType =
         | 1 -> WriteTo
         | 2 -> WriteInplace
         | 3 -> AddTo
+        | _ -> invalidArg "i" (sprintf "OpReqType must be in {0,1,2,3}. Received %d" i)
 
 type SafeSymbolHandle(owner) = 
     inherit SafeHandle(0n, true)

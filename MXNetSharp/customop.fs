@@ -127,6 +127,7 @@ type SafeHGlobal internal () =
         else
             ObjectDisposedException("SafeHGlobal", "HGlobal ptr has been freed") |> raise
 
+[<NoComparison>]
 type ResourceType = 
     | Disposable of IDisposable
     | ReferenceHolder of obj

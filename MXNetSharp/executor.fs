@@ -55,9 +55,7 @@ type Executor(handle : SafeExecutorHandle, ?symbol, ?context, ?contextMap, ?inAr
     member x.Forward(isTraining : bool) = 
         let isTrain = if isTraining then 1 else 0
         MXExecutor.forward handle.UnsafeHandle isTrain
-        //REVIEW: Can we own these handles?
-        MXExecutor.outputs handle.UnsafeHandle
-        |> Array.map NDArray
+        MXExecutor.outputs handle.UnsafeHandle |> Array.map (fun h -> new NDArray(h))
     member x.Backward() = 
         MXExecutor.backward handle.UnsafeHandle null
     member x.Backward(grads) = 

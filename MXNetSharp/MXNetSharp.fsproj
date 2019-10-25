@@ -6,6 +6,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>\MXNetSharp.XML</DocumentationFile>
+    <WarningLevel>5</WarningLevel>
   </PropertyGroup>
 
   <ItemGroup>

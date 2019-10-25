@@ -89,7 +89,7 @@ type NativeOpInfo_backward = delegate of int * float32[] byref * int[] * int[] b
 type NativeOpInfo_infer_shape = delegate of int * int[] * int[] byref * IntPtr -> unit
 type NativeOpInfo_list_outputs = delegate of string[] byref * IntPtr -> unit
 type NativeOpInfo_list_arguments = delegate of string[] byref * IntPtr -> unit
-[<Struct; StructLayout(LayoutKind.Sequential)>]
+[<Struct; StructLayout(LayoutKind.Sequential); NoComparison>]
 type NativeOpInfo =
     val forward : NativeOpInfo_forward
     val backward : NativeOpInfo_backward
@@ -109,7 +109,7 @@ type NDArrayOpInfo_infer_shape = delegate of int * int[] * int[] byref * IntPtr 
 type NDArrayOpInfo_list_outputs = delegate of string[] byref * IntPtr -> bool
 type NDArrayOpInfo_list_arguments = delegate of string[] byref * IntPtr -> bool
 type NDArrayOpInfo_declare_backward_dependency = delegate of int[] * int[] * int[] * int[] * int[] byref * IntPtr -> bool
-[<Struct; StructLayout(LayoutKind.Sequential)>]
+[<Struct; StructLayout(LayoutKind.Sequential); NoComparison>]
 type NDArrayOpInfo =
     val forward : NDArrayOpInfo_forward
     val backward : NDArrayOpInfo_backward

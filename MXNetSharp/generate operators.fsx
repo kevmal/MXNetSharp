@@ -537,6 +537,7 @@ let toCStr (a : ProcessedArg) (str : string) =
 
 
 let toNDArrayCode suffix (x : ProcessedAtomicSymbol) =
+    if x.AtomicSymbolInfo.Name.StartsWith "_backward_" then [] else
     let args = 
         x.Args 
         |> Seq.filter (fun x -> match x.CodeGenerator with ConstantArg _ -> false | _ -> true)
@@ -703,140 +704,119 @@ let toNDArrayCode suffix (x : ProcessedAtomicSymbol) =
         yield! indent 2 invokeInto 
     ]
 
-let toSymbolCode suffix (x : ProcessedAtomicSymbol) =
-    let args = 
-        x.Args 
-        |> Seq.filter (fun x -> match x.CodeGenerator with ConstantArg _ -> false | _ -> true)
-        |> Seq.filter (fun a -> a.Arg.ArgumentInfo.Name <> x.AtomicSymbolInfo.KeyVarNumArgs)
-        |> Seq.map 
-            (fun x -> 
-                let t = 
-                    match x.SymbolOrNDArray with 
-                    | Some ManySymbolOrNDArray -> "BaseSymbol[]"
-                    | Some _ -> "BaseSymbol"
-                    | _ -> x.TypeString
-                match x.DefaultMode with 
-                | Some (ReplaceOptionWithString _) -> 
-                    sprintf "[<Optional>] ?%s : %s" x.Name t
-                | Some (ReplaceNull _)
-                | Some IgnoreNull -> sprintf "[<Optional>] %s : %s" x.Name t
-                | Some IgnoreNone -> sprintf "[<Optional>] ?%s : %s" x.Name t
-                | None ->
-                    match x.SymbolOrNDArray with 
-                    | Some ManySymbolOrNDArray -> 
-                        sprintf "[<ParamArray>] %s : %s" x.Name t
-                    | _ -> sprintf "%s : %s" x.Name t
-                | Some (UseAttr d)-> 
-                    sprintf "[<Optional; DefaultParameterValue(%s)>] %s : %s" d x.Name t
-                )
-        |> Seq.toArray
-    let define = 
-        let name = 
-            if suffix then 
-                x.Name + "Symbol"
-            else 
-                x.Name
-        if args.Length < 5 then 
-            let argStr = args |> String.concat ", "
-            [sprintf "static member %s(%s) =" name argStr]
-        else
-            let dstr = sprintf "static member %s(" name
-            let indent = String.replicate dstr.Length " "
-            [
-                dstr + args.[0] + ", "
-                yield! args.[1 .. args.Length - 2] |> Seq.map (fun x -> indent + x + ", ")
-                indent + args.[args.Length - 1] + ") ="
-            ]
-    let arr x = if Array.isEmpty x then "Array.empty" else sprintf "[|%s|]" (x |> String.concat "; ")
-    let inputNamesStr = 
-        x.Args 
-        |> Array.choose 
-            (fun x ->
-                match x.SymbolOrNDArray with 
-                | Some Symbol | Some SymbolOrNDArray -> Some(quote x.Name)
-                | Some ManySymbolOrNDArray -> Some (sprintf "yield! %s |> Array.mapi (fun i _ -> sprintf \"arg%%d\" i)" x.Name)
-                | _ -> None
-            )
-        |> arr
-    let inputsStr = 
-        let handle x = sprintf "%s" x
-        let arr (x : _ []) = 
-            match x with 
-            | [| Choice2Of2 name |] -> sprintf "(%s |> Array.map (fun x -> %s))" name (handle "x")
-            | [||] -> "Array.empty"
-            | _ -> 
-                x
-                |> Array.map (function
-                    | Choice1Of2 str -> str
-                    | Choice2Of2 name -> 
-                        sprintf "yield! (%s |> Seq.map (fun x -> %s))" name (handle "x") )
-                |> String.concat "; "
-                |> sprintf "[|%s|]" 
-        x.Args 
-        |> Array.choose 
-            (fun x ->
-                match x.SymbolOrNDArray with 
-                | Some Symbol | Some SymbolOrNDArray -> Choice1Of2(handle x.Name) |> Some
-                | Some ManySymbolOrNDArray -> Choice2Of2(x.Name) |> Some
-                | _ -> None
-            )
-        |> arr
-    let paramNamesStr = 
-        x.Args 
-        |> Array.filter (fun x -> match x.CodeGenerator with | SkipArg -> false | _ -> true)
-        |> Array.choose
-            (fun a ->
-                match a.SymbolOrNDArray with 
-                | None -> Some ("\"" + a.Arg.ArgumentInfo.Name + "\"")
-                | _ -> None
-            )  
-        |> arr
-    let paramValuesStr = 
-        x.Args 
-        |> Array.choose
-            (fun a ->
-                match a.SymbolOrNDArray with 
-                | None when a.Arg.ArgumentInfo.Name = x.AtomicSymbolInfo.KeyVarNumArgs -> 
-                    match x.Args |> Seq.tryFind (fun a -> match a.SymbolOrNDArray with Some(ManySymbolOrNDArray) -> true | _ -> false) with 
-                    | Some (arrArg) -> 
-                        Some (sprintf "string %s.Length" arrArg.Name)
-                    | None -> //failwithf "Key var num arg with no input of type NDArray-or-Symbol[] %A" x 
-                        Some (sprintf "%s (*TODO: this should be the length of the vararg*)" a.Name) //TODO: this needs to go
-                | None -> 
-                    let valueStr = 
-                        match a.CodeGenerator with 
-                        | SkipArg -> None
-                        | ValueString str -> Some str
-                        | Normal -> Some (toCStr a a.Name)
-                        | ConstantArg a -> Some a
-                    match a.DefaultMode with 
-                    | Some(ReplaceOptionWithString v) -> 
-                        valueStr |> Option.map (fun s -> sprintf "(match %s with None -> %s | Some %s -> %s)" a.Name v a.Name s) 
-                    | Some(ReplaceNull v) -> 
-                        valueStr |> Option.map (fun s -> sprintf "(if isNull (%s :> obj) then %s else %s)" a.Name v s)
-                    | Some(IgnoreNone) -> 
-                        valueStr |> Option.map (fun s -> sprintf "(match %s with None -> \"None\" | Some %s -> %s)" a.Name a.Name s)  //TODO: we need to just not pass the arg
-                    | _ -> valueStr
-                | _ -> None
-            ) 
-        |> arr
-    let invoke = 
+let toSymbolCode suffix (h : ProcessedAtomicSymbol) =
+    if h.AtomicSymbolInfo.Name.StartsWith "_backward_" then [] else
+    let trim (x : string) = x.TrimStart('?')
+    let make doc hargs (args : _ list) =
         [
-            sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
-            sprintf "new SymbolFromOperator(creator,"
-            sprintf "                       %s," paramNamesStr
-            sprintf "                       %s," paramValuesStr
-            sprintf "                       %s," inputNamesStr
-            sprintf "                       %s)" inputsStr
+            yield! doc
+            yield! hargs 
+                   |> Array.filter (fun a -> a.Arg.ArgumentInfo.Name <> "ctx" && a.Arg.ArgumentInfo.Name <> h.AtomicSymbolInfo.KeyVarNumArgs ) 
+                   |> Array.collect (fun x -> x.Doc)
+            if args.Length = 0 then 
+                sprintf "static member %s() =" h.Name
+            else
+                sprintf "static member %s(%s) =" h.Name (args |> String.concat ", ")
+            yield! indent 1 
+                [
+                    let toparam (x : string) =     
+                        let p = x.Replace("[<Optional>] ", "").Split(':').[0].Trim()
+                        if not(x.Contains "?") then
+                            p
+                        else
+                            sprintf "%s = %s" p (trim p)
+                    sprintf "%s(%s)" h.Name (args |> Seq.map toparam |> String.concat ", ")
+                ]
         ]
-        
+    let meth = 
+        let args = 
+            [
+                for a in h.Args do 
+                    let tp = 
+                        match a.SymbolOrNDArray with 
+                        | Some ManySymbolOrNDArray -> "Symbol seq"
+                        | Some SymbolOrNDArray
+                        | Some Symbol -> "Symbol"
+                        | _ -> a.TypeString 
+                    if a.Arg.ArgumentInfo.Name <> "ctx" && a.Arg.ArgumentInfo.Name <> h.AtomicSymbolInfo.KeyVarNumArgs then 
+                        if a.DefaultMode.IsSome then 
+                            sprintf "[<Optional>] ?%s : %s" a.Name tp
+                        else
+                            sprintf "%s : %s" a.Name tp
+            ]
+        make h.Doc h.Args args
+    let ins,ps = 
+        h.Args 
+        |> Array.partition 
+            (fun a ->
+                match a.SymbolOrNDArray with 
+                | Some ManySymbolOrNDArray 
+                | Some SymbolOrNDArray
+                | Some Symbol -> true
+                | _ -> false
+            )
+    let req,opt = ps |> Array.filter (fun x -> x.Arg.ArgumentInfo.Name <> "ctx" && x.Arg.ArgumentInfo.Name <> h.AtomicSymbolInfo.KeyVarNumArgs) |> Array.partition (fun a -> a.DefaultMode.IsNone )
+    let meth2 = 
+        let hargs, args = 
+            [
+                for a in req do 
+                    a, sprintf "%s : %s" a.Name a.TypeString 
+                for a in ins do 
+                    let tp = 
+                        match a.SymbolOrNDArray with 
+                        | Some ManySymbolOrNDArray -> "Symbol seq"
+                        | Some SymbolOrNDArray
+                        | Some Symbol -> "Symbol"
+                        | _ -> a.TypeString 
+                    a,sprintf "[<Optional>] ?%s : %s" a.Name tp
+                for a in opt do 
+                    a,sprintf "[<Optional>] ?%s : %s" a.Name a.TypeString 
+            ] |> List.unzip
+        make h.Doc (List.toArray hargs) args
+    let meth3 = 
+        if opt.Length = 0 && ins.Length = 1 then 
+            match ins.[0].SymbolOrNDArray with 
+            | Some ManySymbolOrNDArray ->
+                let hargs, args = 
+                    [
+                        for a in req do 
+                            a, sprintf "%s : %s" a.Name a.TypeString 
+                        ins.[0], sprintf "[<ParamArray>] %s : Symbol[]" ins.[0].Name
+                    ] |> List.unzip
+                [
+                    yield! h.Doc
+                    yield! hargs
+                           |> Seq.filter (fun a -> a.Arg.ArgumentInfo.Name <> "ctx" && a.Arg.ArgumentInfo.Name <> h.AtomicSymbolInfo.KeyVarNumArgs ) 
+                           |> Seq.collect (fun x -> x.Doc)
+                    if args.Length = 0 then 
+                        sprintf "static member %s() =" h.Name
+                    else
+                        sprintf "static member %s(%s) =" h.Name (args |> String.concat ", ")
+                    yield! indent 1 
+                        [
+                            let toparam (x : string) =     
+                                let p = x.Replace("[<ParamArray>] ","").Replace("[<Optional>] ", "").Split(':').[0].Trim()
+                                if not(x.Contains "?") then
+                                    p
+                                else
+                                    sprintf "%s = %s" p (trim p)
+                            sprintf "%s(%s)" h.Name (args |> Seq.map toparam |> String.concat ", ")
+                        ]
+                ]
+            | _ -> []
+        else    
+            []
     [
-        yield! indent 1 x.Doc
-        yield! indent 1 (x.Args |> Array.collect (fun x -> x.Doc))
-        yield! indent 1 define 
-        yield! indent 2 invoke 
+        if req.Length = 0 && ins.Length = 1 && meth3.Length > 0 then 
+            yield! indent 1 meth3
+        else   
+            if req.Length = 0 || ins.Length = 0 then 
+                yield! indent 1 meth2
+            else
+                yield! indent 1 meth
+                yield! indent 1 meth2
+            yield! indent 1 meth3
     ]
-
 
 let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
     let h = x |> List.head
@@ -1131,12 +1111,15 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
         sprintf "type %s private (operatorArguments) = " h.Name
         sprintf "    inherit SymbolOperator(\"%s\", operatorArguments)" h.AtomicSymbolInfo.Name
         sprintf "    static member CreateFromArguments(args : Arguments<Symbol>) = new %s(args)" h.Name
-        if req.Length = 0 || ins.Length = 0 then 
-            yield! indent 1 ctor2
-        else
-            yield! indent 1 ctor
-            yield! indent 1 ctor2
-        yield! indent 1 ctor3
+        if req.Length = 0 && ins.Length = 1 && ctor3.Length > 0 then 
+            yield! indent 1 ctor3
+        else   
+            if req.Length = 0 || ins.Length = 0 then 
+                yield! indent 1 ctor2
+            else
+                yield! indent 1 ctor
+                yield! indent 1 ctor2
+            yield! indent 1 ctor3
         yield! indent 1 props
         yield! indent 1 withMethod
     ]
@@ -1195,25 +1178,14 @@ Mappings.Modify(fun (x : ProcessedAtomicSymbol list) ->
                     else 
                         a
                 )
-        let vtupleDef = 
-            {h with 
-                Args = replaceArg (fun a -> 
-                    {a with 
-                        TypeString = "struct(float*float)"
-                        DefaultMode = Some(ReplaceNull "\"None\"")
-                    })
-            }
-        let tupleDef = 
-            {h with 
-                Args = replaceArg (fun a -> 
-                    {a with 
-                        TypeString = "float*float"
-                        DefaultMode = Some(ReplaceNull "\"None\"")
-                    })
-            }
         [
-            vtupleDef
-            tupleDef
+            {h with 
+                Args = replaceArg (fun a -> 
+                    {a with 
+                        TypeString = "float seq"
+                        DefaultMode = Some(ReplaceNull "\"None\"")
+                    })
+            }
         ]
     | _ -> x
     )
@@ -1322,173 +1294,6 @@ Mappings.Modify(fun (x : ProcessedArg) ->
         | _ -> x
     else    
         x
-    )
-
-// **************************** _contrib_ROIAlign *******************************
-
-// output_size can be either a size (int) or heigh(int)/width(int)
-Mappings.Modify(fun (x : ProcessedAtomicSymbol list) ->
-    match x with 
-    | [h] when h.AtomicSymbolInfo.Name = "_contrib_ROIAlign" -> 
-        let replaceArg f = 
-            h.Args 
-            |> Array.map 
-                (fun a ->
-                    if a.Arg.ArgumentInfo.Name = "pooled_size" then 
-                        f a
-                    else 
-                        a
-                )
-        let sizeDef = 
-            {h with 
-                Args = replaceArg (fun a -> 
-                    {a with 
-                        TypeString = "int seq"
-                    })
-            }
-        let heighWidthDef = 
-            let args = 
-                replaceArg (fun a -> 
-                    {a with 
-                        TypeString = "int"
-                        Name = "height"
-                        Doc = [|"""/// <param name="height">ROI Align output roi feature map height</param>"""|]
-                        CodeGenerator = ValueString("(height, width).ToString()")
-                    }
-                )
-            let args = 
-                [|
-                    for a in args do 
-                        yield a
-                        if a.Name = "height" then 
-                            yield
-                                {a with 
-                                    TypeString = "int"
-                                    Name = "width"
-                                    Doc = [|"""/// <param name="width">ROI Align output roi feature map width</param>"""|]
-                                    CodeGenerator = SkipArg
-                                }
-                |]
-            {h with 
-                Args = args}
-        [
-            sizeDef
-            heighWidthDef
-        ]
-    | _ -> x
-    )
-
-
-
-// **************************** _image_resize *******************************
-
-
-// output_size can be either a size (int) or heigh(int)/width(int)
-Mappings.Modify(fun (x : ProcessedAtomicSymbol list) ->
-    match x with 
-    | [h] when h.AtomicSymbolInfo.Name = "_image_resize" -> 
-        let replaceArg f = 
-            h.Args 
-            |> Array.map 
-                (fun a ->
-                    if a.Arg.ArgumentInfo.Name = "size" then 
-                        f a
-                    else 
-                        a
-                )
-        let sizeDef = 
-            {h with 
-                Args = replaceArg (fun a -> 
-                    {a with 
-                        TypeString = "int"
-                        Name = "size"
-                        Doc = [|"""/// <param name="outputSize">Size of new image</param>"""|]
-                    })
-            }
-        let heighWidthDef = 
-            let args = 
-                replaceArg (fun a -> 
-                    {a with 
-                        TypeString = "int"
-                        Name = "height"
-                        Doc = [|"""/// <param name="height">Height of new image</param>"""|]
-                        CodeGenerator = ValueString("(height, width).ToString()")
-                    }
-                )
-            let args = 
-                [|
-                    for a in args do 
-                        yield a
-                        if a.Name = "height" then 
-                            yield
-                                {a with 
-                                    TypeString = "int"
-                                    Name = "width"
-                                    Doc = [|"""/// <param name="width">ROI Align output roi feature map width</param>"""|]
-                                    CodeGenerator = SkipArg
-                                }
-                |]
-            {h with 
-                Args = args}
-        [
-            sizeDef
-            heighWidthDef
-        ]
-    | _ -> x
-    )
-
-// **************************** _contrib_AdaptiveAvgPooling2D *******************************
-
-
-// output_size can be either a size (int) or heigh(int)/width(int)
-Mappings.Modify(fun (x : ProcessedAtomicSymbol list) ->
-    match x with 
-    | [h] when h.AtomicSymbolInfo.Name = "_contrib_AdaptiveAvgPooling2D" -> 
-        let replaceArg f = 
-            h.Args 
-            |> Array.map 
-                (fun a ->
-                    if a.Arg.ArgumentInfo.Name = "output_size" then 
-                        f a
-                    else 
-                        a
-                )
-        let sizeDef = 
-            {h with 
-                Args = replaceArg (fun a -> 
-                    {a with 
-                        TypeString = "int"
-                        Name = "outputSize"
-                        Doc = [|"""/// <param name="outputSize">output size</param>"""|]
-                    })
-            }
-        let heighWidthDef = 
-            let args = 
-                replaceArg (fun a -> 
-                    {a with 
-                        TypeString = "int"
-                        Name = "height"
-                        Doc = [|"""/// <param name="height">height</param>"""|]
-                        CodeGenerator = ValueString("(height, width).ToString()")
-                    }
-                )
-            let args = 
-                [|
-                    yield! args
-                    {args.[args.Length - 1] with 
-                        TypeString = "int"
-                        Name = "width"
-                        Doc = [|"""/// <param name="width">width</param>"""|]
-                        CodeGenerator = SkipArg
-                    }
-                |]
-            {h with 
-                Args = args}
-        [
-            sizeDef
-            heighWidthDef
-        ]
-    | _ -> x
     )
 
 // **************************** "or None" handling *******************************
@@ -1658,9 +1463,12 @@ let toCode (x : ProcessedAtomicSymbol) =
     [
         if not ndArray && not symbol then 
             yield! toNDArrayCode true x 
+            yield! toSymbolCode true x 
         else    
             if ndArray then 
                 yield! toNDArrayCode false x
+            if symbol then 
+                yield! toSymbolCode false x
     ]
 
 let toCodeOld (x : ProcessedAtomicSymbol) =

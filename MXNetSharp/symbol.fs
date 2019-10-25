@@ -280,17 +280,18 @@ type SymbolGroup<'a>(group : 'a, symbols : Symbol []) =
 // **************************************************************************************************************************************
 
 (* GERNATED SYMBOL TYPES BEGIN *)//
+type CustomFunction private (operatorArguments) = 
+    inherit SymbolOperator("_CustomFunction", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new CustomFunction(args)
+    new() =
+        let operatorArguments = 
+            [
+            ]
+        new CustomFunction(Arguments<Symbol>(operatorArguments))
+
 type CachedOp private (operatorArguments) = 
     inherit SymbolOperator("_CachedOp", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new CachedOp(args)
-    /// <param name="data">input data list</param>
-    new([<Optional>] ?data : Symbol seq) =
-        let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
-        let operatorArguments = 
-            [
-                "data", VarArg("", data)
-            ]
-        new CachedOp(Arguments<Symbol>(operatorArguments))
     /// <param name="data">input data list</param>
     new([<ParamArray>] data : Symbol[]) =
         let operatorArguments = 
@@ -308,6 +309,61 @@ type CachedOp private (operatorArguments) =
                 data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
             ] |> List.choose id
         new CachedOp(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type Cvimread private (operatorArguments) = 
+    inherit SymbolOperator("_cvimread", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Cvimread(args)
+    /// <summary>Read and decode image with OpenCV. 
+    /// Note: return image in RGB by default, instead of OpenCV&#39;s default BGR.</summary>
+    /// <param name="filename">Name of the image file to be loaded.</param>
+    /// <param name="flag">Convert decoded image to grayscale (0) or color (1).</param>
+    /// <param name="toRgb">Whether to convert decoded image to mxnet&#39;s default RGB format (instead of opencv&#39;s default BGR).</param>
+    new(filename : string,
+        [<Optional>] ?flag : int,
+        [<Optional>] ?toRgb : bool) = 
+        let operatorArguments = 
+            [
+                "filename", Parameter(Some(box filename))
+                "flag", flag |> Option.map box |> Parameter
+                "to_rgb", toRgb |> Option.map box |> Parameter
+            ]
+        new Cvimread(Arguments<Symbol>(operatorArguments))
+    /// Default value for Flag
+    /// Convert decoded image to grayscale (0) or color (1).
+    static member FlagDefault : int = 1
+    /// Default value for ToRgb
+    /// Whether to convert decoded image to mxnet&#39;s default RGB format (instead of opencv&#39;s default BGR).
+    static member ToRgbDefault : bool = true
+    /// Name of the image file to be loaded.
+    member __.Filename : string = match operatorArguments.GetParameter "filename" with Some(v) -> unbox v | None -> failwithf "Required parameter filename is missing"
+    /// Convert decoded image to grayscale (0) or color (1).
+    member __.Flag = operatorArguments.GetParameter("flag", Cvimread.FlagDefault)
+    /// Whether to convert decoded image to mxnet&#39;s default RGB format (instead of opencv&#39;s default BGR).
+    member __.ToRgb = operatorArguments.GetParameter("to_rgb", Cvimread.ToRgbDefault)
+    /// <summary>Copy Cvimread instance with updated inputs/parameters.</summary>
+    /// <param name="filename">Name of the image file to be loaded.</param>
+    /// <param name="flag">Convert decoded image to grayscale (0) or color (1).</param>
+    /// <param name="toRgb">Whether to convert decoded image to mxnet&#39;s default RGB format (instead of opencv&#39;s default BGR).</param>
+    member this.With([<Optional>] ?filename : string,
+        [<Optional>] ?flag : int,
+        [<Optional>] ?toRgb : bool) = 
+        let operatorArguments = 
+            [
+                filename |> Option.map (fun x -> "filename", Parameter(Some (box x)))
+                flag |> Option.map (fun x -> "flag", Parameter(Some (box x)))
+                toRgb |> Option.map (fun x -> "to_rgb", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Cvimread(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type NoGradient private (operatorArguments) = 
+    inherit SymbolOperator("_NoGradient", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NoGradient(args)
+    /// <summary>Place holder for variable who cannot perform gradient</summary>
+    new() =
+        let operatorArguments = 
+            [
+            ]
+        new NoGradient(Arguments<Symbol>(operatorArguments))
 
 type BatchNormV1 private (operatorArguments) = 
     inherit SymbolOperator("BatchNorm_v1", operatorArguments)
@@ -919,9 +975,9 @@ type ContribAdaptiveAvgPooling2D private (operatorArguments) =
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adaptive_avg_pooling.cc:L214</summary>
     /// <param name="data">Input data</param>
-    /// <param name="outputSize">output size</param>
+    /// <param name="outputSize">int (output size) or a tuple of int for output (height, width).</param>
     new([<Optional>] ?data : Symbol,
-        [<Optional>] ?outputSize : int) = 
+        [<Optional>] ?outputSize : int seq) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
             [
@@ -930,17 +986,17 @@ type ContribAdaptiveAvgPooling2D private (operatorArguments) =
             ]
         new ContribAdaptiveAvgPooling2D(Arguments<Symbol>(operatorArguments))
     /// Default value for OutputSize
-    /// output size
+    /// int (output size) or a tuple of int for output (height, width).
     static member OutputSizeDefault : int [] = [||]
     /// Input data
     member __.Data = operatorArguments.GetInput "data"
-    /// output size
+    /// int (output size) or a tuple of int for output (height, width).
     member __.OutputSize = operatorArguments.GetParameter("output_size", ContribAdaptiveAvgPooling2D.OutputSizeDefault)
     /// <summary>Copy ContribAdaptiveAvgPooling2D instance with updated inputs/parameters.</summary>
     /// <param name="data">Input data</param>
-    /// <param name="outputSize">output size</param>
+    /// <param name="outputSize">int (output size) or a tuple of int for output (height, width).</param>
     member this.With([<Optional>] ?data : Symbol,
-        [<Optional>] ?outputSize : int) = 
+        [<Optional>] ?outputSize : int seq) = 
         let operatorArguments = 
             [
                 data |> Option.map (fun x -> "data", Input x)
@@ -2363,6 +2419,15 @@ type ContribHawkesll private (operatorArguments) =
             ] |> List.choose id
         new ContribHawkesll(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
+type ContribBackwardHawkesll private (operatorArguments) = 
+    inherit SymbolOperator("_contrib_backward_hawkesll", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBackwardHawkesll(args)
+    new() =
+        let operatorArguments = 
+            [
+            ]
+        new ContribBackwardHawkesll(Arguments<Symbol>(operatorArguments))
+
 type ContribIndexArray private (operatorArguments) = 
     inherit SymbolOperator("_contrib_index_array", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribIndexArray(args)
@@ -2514,52 +2579,18 @@ type ContribIndexCopy private (operatorArguments) =
             ] |> List.choose id
         new ContribIndexCopy(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
+type ContribBackwardIndexCopy private (operatorArguments) = 
+    inherit SymbolOperator("_contrib_backward_index_copy", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBackwardIndexCopy(args)
+    new() =
+        let operatorArguments = 
+            [
+            ]
+        new ContribBackwardIndexCopy(Arguments<Symbol>(operatorArguments))
+
 type KhatriRao private (operatorArguments) = 
     inherit SymbolOperator("khatri_rao", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new KhatriRao(args)
-    /// <summary>Computes the Khatri-Rao product of the input matrices.
-    /// 
-    /// Given a collection of :math:`n` input matrices,
-    /// 
-    /// .. math::
-    ///    A_1 \in \mathbb{R}^{M_1 \times M}, \ldots, A_n \in \mathbb{R}^{M_n \times N},
-    /// 
-    /// the (column-wise) Khatri-Rao product is defined as the matrix,
-    /// 
-    /// .. math::
-    ///    X = A_1 \otimes \cdots \otimes A_n \in \mathbb{R}^{(M_1 \cdots M_n) \times N},
-    /// 
-    /// where the :math:`k` th column is equal to the column-wise outer product
-    /// :math:`{A_1}_k \otimes \cdots \otimes {A_n}_k` where :math:`{A_i}_k` is the kth
-    /// column of the ith matrix.
-    /// 
-    /// Example::
-    /// 
-    ///   &gt;&gt;&gt; A = mx.nd.array([[1, -1],
-    ///   &gt;&gt;&gt;                  [2, -3]])
-    ///   &gt;&gt;&gt; B = mx.nd.array([[1, 4],
-    ///   &gt;&gt;&gt;                  [2, 5],
-    ///   &gt;&gt;&gt;                  [3, 6]])
-    ///   &gt;&gt;&gt; C = mx.nd.khatri_rao(A, B)
-    ///   &gt;&gt;&gt; print(C.asnumpy())
-    ///   [[  1.  -4.]
-    ///    [  2.  -5.]
-    ///    [  3.  -6.]
-    ///    [  2. -12.]
-    ///    [  4. -15.]
-    ///    [  6. -18.]]
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\krprod.cc:L108</summary>
-    /// <param name="args">Positional input matrices</param>
-    new([<Optional>] ?args : Symbol seq) =
-        let args = defaultArg (args |> Option.map Seq.toArray) Array.empty
-        let operatorArguments = 
-            [
-                "args", VarArg("num_args", args)
-            ]
-        new KhatriRao(Arguments<Symbol>(operatorArguments))
     /// <summary>Computes the Khatri-Rao product of the input matrices.
     /// 
     /// Given a collection of :math:`n` input matrices,
@@ -3650,6 +3681,15 @@ type ContribQuadratic private (operatorArguments) =
                 c |> Option.map (fun x -> "c", Parameter(Some (box x)))
             ] |> List.choose id
         new ContribQuadratic(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type ContribBackwardQuadratic private (operatorArguments) = 
+    inherit SymbolOperator("_contrib_backward_quadratic", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBackwardQuadratic(args)
+    new() =
+        let operatorArguments = 
+            [
+            ]
+        new ContribBackwardQuadratic(Arguments<Symbol>(operatorArguments))
 
 type ContribROIAlign private (operatorArguments) = 
     inherit SymbolOperator("_contrib_ROIAlign", operatorArguments)
@@ -5524,11 +5564,11 @@ type ImageResize private (operatorArguments) =
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\resize.cc:L71</summary>
     /// <param name="data">The input.</param>
-    /// <param name="outputSize">Size of new image</param>
+    /// <param name="size">Size of new image. Could be (width, height) or (size)</param>
     /// <param name="keepRatio">Whether to resize the short edge or both edges to `size`, if size is give as an integer.</param>
     /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu</param>
     new([<Optional>] ?data : Symbol,
-        [<Optional>] ?size : int,
+        [<Optional>] ?size : int seq,
         [<Optional>] ?keepRatio : bool,
         [<Optional>] ?interp : int) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -5541,7 +5581,7 @@ type ImageResize private (operatorArguments) =
             ]
         new ImageResize(Arguments<Symbol>(operatorArguments))
     /// Default value for Size
-    /// Size of new image
+    /// Size of new image. Could be (width, height) or (size)
     static member SizeDefault : int [] = [||]
     /// Default value for KeepRatio
     /// Whether to resize the short edge or both edges to `size`, if size is give as an integer.
@@ -5551,7 +5591,7 @@ type ImageResize private (operatorArguments) =
     static member InterpDefault : int = 1
     /// The input.
     member __.Data = operatorArguments.GetInput "data"
-    /// Size of new image
+    /// Size of new image. Could be (width, height) or (size)
     member __.Size = operatorArguments.GetParameter("size", ImageResize.SizeDefault)
     /// Whether to resize the short edge or both edges to `size`, if size is give as an integer.
     member __.KeepRatio = operatorArguments.GetParameter("keep_ratio", ImageResize.KeepRatioDefault)
@@ -5559,11 +5599,11 @@ type ImageResize private (operatorArguments) =
     member __.Interp = operatorArguments.GetParameter("interp", ImageResize.InterpDefault)
     /// <summary>Copy ImageResize instance with updated inputs/parameters.</summary>
     /// <param name="data">The input.</param>
-    /// <param name="outputSize">Size of new image</param>
+    /// <param name="size">Size of new image. Could be (width, height) or (size)</param>
     /// <param name="keepRatio">Whether to resize the short edge or both edges to `size`, if size is give as an integer.</param>
     /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu</param>
     member this.With([<Optional>] ?data : Symbol,
-        [<Optional>] ?size : int,
+        [<Optional>] ?size : int seq,
         [<Optional>] ?keepRatio : bool,
         [<Optional>] ?interp : int) = 
         let operatorArguments = 
@@ -10815,6 +10855,113 @@ type NpiAround private (operatorArguments) =
             ] |> List.choose id
         new NpiAround(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
+type NpiZeros private (operatorArguments) = 
+    inherit SymbolOperator("_npi_zeros", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiZeros(args)
+    /// <param name="shape">The shape of the output</param>
+    /// <param name="dtype">Target data type.</param>
+    new([<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                "shape", shape |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new NpiZeros(Arguments<Symbol>(operatorArguments))
+    /// Default value for Shape
+    /// The shape of the output
+    static member ShapeDefault : int [] = [||]
+    /// Default value for Dtype
+    /// Target data type.
+    static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+    /// The shape of the output
+    member __.Shape = operatorArguments.GetParameter("shape", NpiZeros.ShapeDefault)
+    /// Target data type.
+    member __.Dtype = operatorArguments.GetParameter("dtype", NpiZeros.DtypeDefault)
+    /// <summary>Copy NpiZeros instance with updated inputs/parameters.</summary>
+    /// <param name="shape">The shape of the output</param>
+    /// <param name="dtype">Target data type.</param>
+    member this.With([<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiZeros(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type NpiOnes private (operatorArguments) = 
+    inherit SymbolOperator("_npi_ones", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiOnes(args)
+    /// <summary>Return a new array of given shape, type, and context, filled with ones.</summary>
+    /// <param name="shape">The shape of the output</param>
+    /// <param name="dtype">Target data type.</param>
+    new([<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                "shape", shape |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new NpiOnes(Arguments<Symbol>(operatorArguments))
+    /// Default value for Shape
+    /// The shape of the output
+    static member ShapeDefault : int [] = [||]
+    /// Default value for Dtype
+    /// Target data type.
+    static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+    /// The shape of the output
+    member __.Shape = operatorArguments.GetParameter("shape", NpiOnes.ShapeDefault)
+    /// Target data type.
+    member __.Dtype = operatorArguments.GetParameter("dtype", NpiOnes.DtypeDefault)
+    /// <summary>Copy NpiOnes instance with updated inputs/parameters.</summary>
+    /// <param name="shape">The shape of the output</param>
+    /// <param name="dtype">Target data type.</param>
+    member this.With([<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiOnes(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type NpiIdentity private (operatorArguments) = 
+    inherit SymbolOperator("_npi_identity", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiIdentity(args)
+    /// <summary>Return a new identity array of given shape, type, and context.</summary>
+    /// <param name="shape">The shape of the output</param>
+    /// <param name="dtype">Target data type.</param>
+    new([<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                "shape", shape |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new NpiIdentity(Arguments<Symbol>(operatorArguments))
+    /// Default value for Shape
+    /// The shape of the output
+    static member ShapeDefault : int [] = [||]
+    /// Default value for Dtype
+    /// Target data type.
+    static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+    /// The shape of the output
+    member __.Shape = operatorArguments.GetParameter("shape", NpiIdentity.ShapeDefault)
+    /// Target data type.
+    member __.Dtype = operatorArguments.GetParameter("dtype", NpiIdentity.DtypeDefault)
+    /// <summary>Copy NpiIdentity instance with updated inputs/parameters.</summary>
+    /// <param name="shape">The shape of the output</param>
+    /// <param name="dtype">Target data type.</param>
+    member this.With([<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiIdentity(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
 type NpZerosLike private (operatorArguments) = 
     inherit SymbolOperator("_np_zeros_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpZerosLike(args)
@@ -10858,6 +11005,115 @@ type NpOnesLike private (operatorArguments) =
                 a |> Option.map (fun x -> "a", Input x)
             ] |> List.choose id
         new NpOnesLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type NpiArange private (operatorArguments) = 
+    inherit SymbolOperator("_npi_arange", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArange(args)
+    /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
+    /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
+    /// <param name="step">Spacing between values.</param>
+    /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
+    /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
+    /// <param name="dtype">Target data type.</param>
+    new(start : double,
+        [<Optional>] ?stop : float,
+        [<Optional>] ?step : double,
+        [<Optional>] ?repeat : int,
+        [<Optional>] ?inferRange : bool,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                "start", Parameter(Some(box start))
+                "stop", stop |> Option.map box |> Parameter
+                "step", step |> Option.map box |> Parameter
+                "repeat", repeat |> Option.map box |> Parameter
+                "infer_range", inferRange |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new NpiArange(Arguments<Symbol>(operatorArguments))
+    /// Default value for Stop
+    /// End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.
+    static member StopDefault : double option = None
+    /// Default value for Step
+    /// Spacing between values.
+    static member StepDefault : double = 1.0
+    /// Default value for Repeat
+    /// The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.
+    static member RepeatDefault : int = 1
+    /// Default value for InferRange
+    /// When set to True, infer the stop position from the start, step, repeat, and output tensor size.
+    static member InferRangeDefault : bool = false
+    /// Default value for Dtype
+    /// Target data type.
+    static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+    /// Start of interval. The interval includes this value. The default start value is 0.
+    member __.Start : double = match operatorArguments.GetParameter "start" with Some(v) -> unbox v | None -> failwithf "Required parameter start is missing"
+    /// End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.
+    member __.Stop = operatorArguments.GetParameter("stop", NpiArange.StopDefault)
+    /// Spacing between values.
+    member __.Step = operatorArguments.GetParameter("step", NpiArange.StepDefault)
+    /// The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.
+    member __.Repeat = operatorArguments.GetParameter("repeat", NpiArange.RepeatDefault)
+    /// When set to True, infer the stop position from the start, step, repeat, and output tensor size.
+    member __.InferRange = operatorArguments.GetParameter("infer_range", NpiArange.InferRangeDefault)
+    /// Target data type.
+    member __.Dtype = operatorArguments.GetParameter("dtype", NpiArange.DtypeDefault)
+    /// <summary>Copy NpiArange instance with updated inputs/parameters.</summary>
+    /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
+    /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
+    /// <param name="step">Spacing between values.</param>
+    /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
+    /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
+    /// <param name="dtype">Target data type.</param>
+    member this.With([<Optional>] ?start : double,
+        [<Optional>] ?stop : float,
+        [<Optional>] ?step : double,
+        [<Optional>] ?repeat : int,
+        [<Optional>] ?inferRange : bool,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                start |> Option.map (fun x -> "start", Parameter(Some (box x)))
+                stop |> Option.map (fun x -> "stop", Parameter(Some (box x)))
+                step |> Option.map (fun x -> "step", Parameter(Some (box x)))
+                repeat |> Option.map (fun x -> "repeat", Parameter(Some (box x)))
+                inferRange |> Option.map (fun x -> "infer_range", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiArange(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type NpiIndices private (operatorArguments) = 
+    inherit SymbolOperator("_npi_indices", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiIndices(args)
+    /// <summary>Return an array representing the indices of a grid.</summary>
+    /// <param name="dimensions">The shape of the grid.</param>
+    /// <param name="dtype">Target data type.</param>
+    new(dimensions : int seq,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                "dimensions", Parameter(Some(box dimensions))
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new NpiIndices(Arguments<Symbol>(operatorArguments))
+    /// Default value for Dtype
+    /// Target data type.
+    static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Int32
+    /// The shape of the grid.
+    member __.Dimensions : int seq = match operatorArguments.GetParameter "dimensions" with Some(v) -> unbox v | None -> failwithf "Required parameter dimensions is missing"
+    /// Target data type.
+    member __.Dtype = operatorArguments.GetParameter("dtype", NpiIndices.DtypeDefault)
+    /// <summary>Copy NpiIndices instance with updated inputs/parameters.</summary>
+    /// <param name="dimensions">The shape of the grid.</param>
+    /// <param name="dtype">Target data type.</param>
+    member this.With([<Optional>] ?dimensions : int seq,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                dimensions |> Option.map (fun x -> "dimensions", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiIndices(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpTranspose private (operatorArguments) = 
     inherit SymbolOperator("_np_transpose", operatorArguments)
@@ -11073,17 +11329,6 @@ type NpiStack private (operatorArguments) =
 type NpiVstack private (operatorArguments) = 
     inherit SymbolOperator("_npi_vstack", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiVstack(args)
-    /// <summary>
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L459</summary>
-    /// <param name="data">List of arrays to vstack</param>
-    new([<Optional>] ?data : Symbol seq) =
-        let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
-        let operatorArguments = 
-            [
-                "data", VarArg("num_args", data)
-            ]
-        new NpiVstack(Arguments<Symbol>(operatorArguments))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L459</summary>
@@ -11629,6 +11874,105 @@ type NpiUnique private (operatorArguments) =
                 axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
             ] |> List.choose id
         new NpiUnique(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type NpiHanning private (operatorArguments) = 
+    inherit SymbolOperator("_npi_hanning", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiHanning(args)
+    /// <summary>Return the Hanning window.The Hanning window is a taper formed by using a weighted cosine.</summary>
+    /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
+    /// <param name="dtype">Data-type of the returned array.</param>
+    new(M : int,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                "M", Parameter(Some(box M))
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new NpiHanning(Arguments<Symbol>(operatorArguments))
+    /// Default value for Dtype
+    /// Data-type of the returned array.
+    static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+    /// Number of points in the output window. If zero or less, an empty array is returned.
+    member __.M : int = match operatorArguments.GetParameter "M" with Some(v) -> unbox v | None -> failwithf "Required parameter M is missing"
+    /// Data-type of the returned array.
+    member __.Dtype = operatorArguments.GetParameter("dtype", NpiHanning.DtypeDefault)
+    /// <summary>Copy NpiHanning instance with updated inputs/parameters.</summary>
+    /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
+    /// <param name="dtype">Data-type of the returned array.</param>
+    member this.With([<Optional>] ?M : int,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                M |> Option.map (fun x -> "M", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiHanning(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type NpiHamming private (operatorArguments) = 
+    inherit SymbolOperator("_npi_hamming", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiHamming(args)
+    /// <summary>Return the Hamming window.The Hamming window is a taper formed by using a weighted cosine.</summary>
+    /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
+    /// <param name="dtype">Data-type of the returned array.</param>
+    new(M : int,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                "M", Parameter(Some(box M))
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new NpiHamming(Arguments<Symbol>(operatorArguments))
+    /// Default value for Dtype
+    /// Data-type of the returned array.
+    static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+    /// Number of points in the output window. If zero or less, an empty array is returned.
+    member __.M : int = match operatorArguments.GetParameter "M" with Some(v) -> unbox v | None -> failwithf "Required parameter M is missing"
+    /// Data-type of the returned array.
+    member __.Dtype = operatorArguments.GetParameter("dtype", NpiHamming.DtypeDefault)
+    /// <summary>Copy NpiHamming instance with updated inputs/parameters.</summary>
+    /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
+    /// <param name="dtype">Data-type of the returned array.</param>
+    member this.With([<Optional>] ?M : int,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                M |> Option.map (fun x -> "M", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiHamming(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type NpiBlackman private (operatorArguments) = 
+    inherit SymbolOperator("_npi_blackman", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBlackman(args)
+    /// <summary>Return the Blackman window.The Blackman window is a taper formed by using a weighted cosine.</summary>
+    /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
+    /// <param name="dtype">Data-type of the returned array.</param>
+    new(M : int,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                "M", Parameter(Some(box M))
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new NpiBlackman(Arguments<Symbol>(operatorArguments))
+    /// Default value for Dtype
+    /// Data-type of the returned array.
+    static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+    /// Number of points in the output window. If zero or less, an empty array is returned.
+    member __.M : int = match operatorArguments.GetParameter "M" with Some(v) -> unbox v | None -> failwithf "Required parameter M is missing"
+    /// Data-type of the returned array.
+    member __.Dtype = operatorArguments.GetParameter("dtype", NpiBlackman.DtypeDefault)
+    /// <summary>Copy NpiBlackman instance with updated inputs/parameters.</summary>
+    /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
+    /// <param name="dtype">Data-type of the returned array.</param>
+    member this.With([<Optional>] ?M : int,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                M |> Option.map (fun x -> "M", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiBlackman(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiChoice private (operatorArguments) = 
     inherit SymbolOperator("_npi_choice", operatorArguments)
@@ -17852,6 +18196,537 @@ type SampleMultinomial private (operatorArguments) =
             ] |> List.choose id
         new SampleMultinomial(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
+type RandomUniform private (operatorArguments) = 
+    inherit SymbolOperator("_random_uniform", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomUniform(args)
+    /// <summary>Draw random samples from a uniform distribution.
+    /// 
+    /// .. note:: The existing alias ``uniform`` is deprecated.
+    /// 
+    /// Samples are uniformly distributed over the half-open interval *[low, high)*
+    /// (includes *low*, but excludes *high*).
+    /// 
+    /// Example::
+    /// 
+    ///    uniform(low=0, high=1, shape=(2,2)) = [[ 0.60276335,  0.85794562],
+    ///                                           [ 0.54488319,  0.84725171]]
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L97</summary>
+    /// <param name="low">Lower bound of the distribution.</param>
+    /// <param name="high">Upper bound of the distribution.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    new([<Optional>] ?low : float,
+        [<Optional>] ?high : float,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                "low", low |> Option.map box |> Parameter
+                "high", high |> Option.map box |> Parameter
+                "shape", shape |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new RandomUniform(Arguments<Symbol>(operatorArguments))
+    /// Default value for Low
+    /// Lower bound of the distribution.
+    static member LowDefault : double = 0.0
+    /// Default value for High
+    /// Upper bound of the distribution.
+    static member HighDefault : double = 1.0
+    /// Default value for Shape
+    /// Shape of the output.
+    static member ShapeDefault : int [] option = None
+    /// Default value for Dtype
+    /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+    static member DtypeDefault : FloatDType option = None
+    /// Lower bound of the distribution.
+    member __.Low = operatorArguments.GetParameter("low", RandomUniform.LowDefault)
+    /// Upper bound of the distribution.
+    member __.High = operatorArguments.GetParameter("high", RandomUniform.HighDefault)
+    /// Shape of the output.
+    member __.Shape = operatorArguments.GetParameter("shape", RandomUniform.ShapeDefault)
+    /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+    member __.Dtype = operatorArguments.GetParameter("dtype", RandomUniform.DtypeDefault)
+    /// <summary>Copy RandomUniform instance with updated inputs/parameters.</summary>
+    /// <param name="low">Lower bound of the distribution.</param>
+    /// <param name="high">Upper bound of the distribution.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    member this.With([<Optional>] ?low : float,
+        [<Optional>] ?high : float,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                low |> Option.map (fun x -> "low", Parameter(Some (box x)))
+                high |> Option.map (fun x -> "high", Parameter(Some (box x)))
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomUniform(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type RandomNormal private (operatorArguments) = 
+    inherit SymbolOperator("_random_normal", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomNormal(args)
+    /// <summary>Draw random samples from a normal (Gaussian) distribution.
+    /// 
+    /// .. note:: The existing alias ``normal`` is deprecated.
+    /// 
+    /// Samples are distributed according to a normal distribution parametrized by *loc* (mean) and *scale*
+    /// (standard deviation).
+    /// 
+    /// Example::
+    /// 
+    ///    normal(loc=0, scale=1, shape=(2,2)) = [[ 1.89171135, -1.16881478],
+    ///                                           [-1.23474145,  1.55807114]]
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L115</summary>
+    /// <param name="loc">Mean of the distribution.</param>
+    /// <param name="scale">Standard deviation of the distribution.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    new([<Optional>] ?loc : float,
+        [<Optional>] ?scale : float,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                "loc", loc |> Option.map box |> Parameter
+                "scale", scale |> Option.map box |> Parameter
+                "shape", shape |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new RandomNormal(Arguments<Symbol>(operatorArguments))
+    /// Default value for Loc
+    /// Mean of the distribution.
+    static member LocDefault : double = 0.0
+    /// Default value for Scale
+    /// Standard deviation of the distribution.
+    static member ScaleDefault : double = 1.0
+    /// Default value for Shape
+    /// Shape of the output.
+    static member ShapeDefault : int [] option = None
+    /// Default value for Dtype
+    /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+    static member DtypeDefault : FloatDType option = None
+    /// Mean of the distribution.
+    member __.Loc = operatorArguments.GetParameter("loc", RandomNormal.LocDefault)
+    /// Standard deviation of the distribution.
+    member __.Scale = operatorArguments.GetParameter("scale", RandomNormal.ScaleDefault)
+    /// Shape of the output.
+    member __.Shape = operatorArguments.GetParameter("shape", RandomNormal.ShapeDefault)
+    /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+    member __.Dtype = operatorArguments.GetParameter("dtype", RandomNormal.DtypeDefault)
+    /// <summary>Copy RandomNormal instance with updated inputs/parameters.</summary>
+    /// <param name="loc">Mean of the distribution.</param>
+    /// <param name="scale">Standard deviation of the distribution.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    member this.With([<Optional>] ?loc : float,
+        [<Optional>] ?scale : float,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                loc |> Option.map (fun x -> "loc", Parameter(Some (box x)))
+                scale |> Option.map (fun x -> "scale", Parameter(Some (box x)))
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomNormal(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type RandomGamma private (operatorArguments) = 
+    inherit SymbolOperator("_random_gamma", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomGamma(args)
+    /// <summary>Draw random samples from a gamma distribution.
+    /// 
+    /// Samples are distributed according to a gamma distribution parametrized by *alpha* (shape) and *beta* (scale).
+    /// 
+    /// Example::
+    /// 
+    ///    gamma(alpha=9, beta=0.5, shape=(2,2)) = [[ 7.10486984,  3.37695289],
+    ///                                             [ 3.91697288,  3.65933681]]
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L127</summary>
+    /// <param name="alpha">Alpha parameter (shape) of the gamma distribution.</param>
+    /// <param name="beta">Beta parameter (scale) of the gamma distribution.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    new([<Optional>] ?alpha : float,
+        [<Optional>] ?beta : float,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                "alpha", alpha |> Option.map box |> Parameter
+                "beta", beta |> Option.map box |> Parameter
+                "shape", shape |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new RandomGamma(Arguments<Symbol>(operatorArguments))
+    /// Default value for Alpha
+    /// Alpha parameter (shape) of the gamma distribution.
+    static member AlphaDefault : double = 1.0
+    /// Default value for Beta
+    /// Beta parameter (scale) of the gamma distribution.
+    static member BetaDefault : double = 1.0
+    /// Default value for Shape
+    /// Shape of the output.
+    static member ShapeDefault : int [] option = None
+    /// Default value for Dtype
+    /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+    static member DtypeDefault : FloatDType option = None
+    /// Alpha parameter (shape) of the gamma distribution.
+    member __.Alpha = operatorArguments.GetParameter("alpha", RandomGamma.AlphaDefault)
+    /// Beta parameter (scale) of the gamma distribution.
+    member __.Beta = operatorArguments.GetParameter("beta", RandomGamma.BetaDefault)
+    /// Shape of the output.
+    member __.Shape = operatorArguments.GetParameter("shape", RandomGamma.ShapeDefault)
+    /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+    member __.Dtype = operatorArguments.GetParameter("dtype", RandomGamma.DtypeDefault)
+    /// <summary>Copy RandomGamma instance with updated inputs/parameters.</summary>
+    /// <param name="alpha">Alpha parameter (shape) of the gamma distribution.</param>
+    /// <param name="beta">Beta parameter (scale) of the gamma distribution.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    member this.With([<Optional>] ?alpha : float,
+        [<Optional>] ?beta : float,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                alpha |> Option.map (fun x -> "alpha", Parameter(Some (box x)))
+                beta |> Option.map (fun x -> "beta", Parameter(Some (box x)))
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomGamma(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type RandomExponential private (operatorArguments) = 
+    inherit SymbolOperator("_random_exponential", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomExponential(args)
+    /// <summary>Draw random samples from an exponential distribution.
+    /// 
+    /// Samples are distributed according to an exponential distribution parametrized by *lambda* (rate).
+    /// 
+    /// Example::
+    /// 
+    ///    exponential(lam=4, shape=(2,2)) = [[ 0.0097189 ,  0.08999364],
+    ///                                       [ 0.04146638,  0.31715935]]
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L139</summary>
+    /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    new([<Optional>] ?lam : float,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                "lam", lam |> Option.map box |> Parameter
+                "shape", shape |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new RandomExponential(Arguments<Symbol>(operatorArguments))
+    /// Default value for Lam
+    /// Lambda parameter (rate) of the exponential distribution.
+    static member LamDefault : double = 1.0
+    /// Default value for Shape
+    /// Shape of the output.
+    static member ShapeDefault : int [] option = None
+    /// Default value for Dtype
+    /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+    static member DtypeDefault : FloatDType option = None
+    /// Lambda parameter (rate) of the exponential distribution.
+    member __.Lam = operatorArguments.GetParameter("lam", RandomExponential.LamDefault)
+    /// Shape of the output.
+    member __.Shape = operatorArguments.GetParameter("shape", RandomExponential.ShapeDefault)
+    /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+    member __.Dtype = operatorArguments.GetParameter("dtype", RandomExponential.DtypeDefault)
+    /// <summary>Copy RandomExponential instance with updated inputs/parameters.</summary>
+    /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    member this.With([<Optional>] ?lam : float,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                lam |> Option.map (fun x -> "lam", Parameter(Some (box x)))
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomExponential(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type RandomPoisson private (operatorArguments) = 
+    inherit SymbolOperator("_random_poisson", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPoisson(args)
+    /// <summary>Draw random samples from a Poisson distribution.
+    /// 
+    /// Samples are distributed according to a Poisson distribution parametrized by *lambda* (rate).
+    /// Samples will always be returned as a floating point data type.
+    /// 
+    /// Example::
+    /// 
+    ///    poisson(lam=4, shape=(2,2)) = [[ 5.,  2.],
+    ///                                   [ 4.,  6.]]
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L152</summary>
+    /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    new([<Optional>] ?lam : float,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                "lam", lam |> Option.map box |> Parameter
+                "shape", shape |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new RandomPoisson(Arguments<Symbol>(operatorArguments))
+    /// Default value for Lam
+    /// Lambda parameter (rate) of the Poisson distribution.
+    static member LamDefault : double = 1.0
+    /// Default value for Shape
+    /// Shape of the output.
+    static member ShapeDefault : int [] option = None
+    /// Default value for Dtype
+    /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+    static member DtypeDefault : FloatDType option = None
+    /// Lambda parameter (rate) of the Poisson distribution.
+    member __.Lam = operatorArguments.GetParameter("lam", RandomPoisson.LamDefault)
+    /// Shape of the output.
+    member __.Shape = operatorArguments.GetParameter("shape", RandomPoisson.ShapeDefault)
+    /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+    member __.Dtype = operatorArguments.GetParameter("dtype", RandomPoisson.DtypeDefault)
+    /// <summary>Copy RandomPoisson instance with updated inputs/parameters.</summary>
+    /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    member this.With([<Optional>] ?lam : float,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                lam |> Option.map (fun x -> "lam", Parameter(Some (box x)))
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomPoisson(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type RandomNegativeBinomial private (operatorArguments) = 
+    inherit SymbolOperator("_random_negative_binomial", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomNegativeBinomial(args)
+    /// <summary>Draw random samples from a negative binomial distribution.
+    /// 
+    /// Samples are distributed according to a negative binomial distribution parametrized by
+    /// *k* (limit of unsuccessful experiments) and *p* (failure probability in each experiment).
+    /// Samples will always be returned as a floating point data type.
+    /// 
+    /// Example::
+    /// 
+    ///    negative_binomial(k=3, p=0.4, shape=(2,2)) = [[ 4.,  7.],
+    ///                                                  [ 2.,  5.]]
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L166</summary>
+    /// <param name="k">Limit of unsuccessful experiments.</param>
+    /// <param name="p">Failure probability in each experiment.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    new([<Optional>] ?k : int,
+        [<Optional>] ?p : float,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                "k", k |> Option.map box |> Parameter
+                "p", p |> Option.map box |> Parameter
+                "shape", shape |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new RandomNegativeBinomial(Arguments<Symbol>(operatorArguments))
+    /// Default value for K
+    /// Limit of unsuccessful experiments.
+    static member KDefault : int = 1
+    /// Default value for P
+    /// Failure probability in each experiment.
+    static member PDefault : double = 1.0
+    /// Default value for Shape
+    /// Shape of the output.
+    static member ShapeDefault : int [] option = None
+    /// Default value for Dtype
+    /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+    static member DtypeDefault : FloatDType option = None
+    /// Limit of unsuccessful experiments.
+    member __.K = operatorArguments.GetParameter("k", RandomNegativeBinomial.KDefault)
+    /// Failure probability in each experiment.
+    member __.P = operatorArguments.GetParameter("p", RandomNegativeBinomial.PDefault)
+    /// Shape of the output.
+    member __.Shape = operatorArguments.GetParameter("shape", RandomNegativeBinomial.ShapeDefault)
+    /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+    member __.Dtype = operatorArguments.GetParameter("dtype", RandomNegativeBinomial.DtypeDefault)
+    /// <summary>Copy RandomNegativeBinomial instance with updated inputs/parameters.</summary>
+    /// <param name="k">Limit of unsuccessful experiments.</param>
+    /// <param name="p">Failure probability in each experiment.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    member this.With([<Optional>] ?k : int,
+        [<Optional>] ?p : float,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                k |> Option.map (fun x -> "k", Parameter(Some (box x)))
+                p |> Option.map (fun x -> "p", Parameter(Some (box x)))
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomNegativeBinomial(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type RandomGeneralizedNegativeBinomial private (operatorArguments) = 
+    inherit SymbolOperator("_random_generalized_negative_binomial", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomGeneralizedNegativeBinomial(args)
+    /// <summary>Draw random samples from a generalized negative binomial distribution.
+    /// 
+    /// Samples are distributed according to a generalized negative binomial distribution parametrized by
+    /// *mu* (mean) and *alpha* (dispersion). *alpha* is defined as *1/k* where *k* is the failure limit of the
+    /// number of unsuccessful experiments (generalized to real numbers).
+    /// Samples will always be returned as a floating point data type.
+    /// 
+    /// Example::
+    /// 
+    ///    generalized_negative_binomial(mu=2.0, alpha=0.3, shape=(2,2)) = [[ 2.,  1.],
+    ///                                                                     [ 6.,  4.]]
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L181</summary>
+    /// <param name="mu">Mean of the negative binomial distribution.</param>
+    /// <param name="alpha">Alpha (dispersion) parameter of the negative binomial distribution.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    new([<Optional>] ?mu : float,
+        [<Optional>] ?alpha : float,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                "mu", mu |> Option.map box |> Parameter
+                "alpha", alpha |> Option.map box |> Parameter
+                "shape", shape |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new RandomGeneralizedNegativeBinomial(Arguments<Symbol>(operatorArguments))
+    /// Default value for Mu
+    /// Mean of the negative binomial distribution.
+    static member MuDefault : double = 1.0
+    /// Default value for Alpha
+    /// Alpha (dispersion) parameter of the negative binomial distribution.
+    static member AlphaDefault : double = 1.0
+    /// Default value for Shape
+    /// Shape of the output.
+    static member ShapeDefault : int [] option = None
+    /// Default value for Dtype
+    /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+    static member DtypeDefault : FloatDType option = None
+    /// Mean of the negative binomial distribution.
+    member __.Mu = operatorArguments.GetParameter("mu", RandomGeneralizedNegativeBinomial.MuDefault)
+    /// Alpha (dispersion) parameter of the negative binomial distribution.
+    member __.Alpha = operatorArguments.GetParameter("alpha", RandomGeneralizedNegativeBinomial.AlphaDefault)
+    /// Shape of the output.
+    member __.Shape = operatorArguments.GetParameter("shape", RandomGeneralizedNegativeBinomial.ShapeDefault)
+    /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+    member __.Dtype = operatorArguments.GetParameter("dtype", RandomGeneralizedNegativeBinomial.DtypeDefault)
+    /// <summary>Copy RandomGeneralizedNegativeBinomial instance with updated inputs/parameters.</summary>
+    /// <param name="mu">Mean of the negative binomial distribution.</param>
+    /// <param name="alpha">Alpha (dispersion) parameter of the negative binomial distribution.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    member this.With([<Optional>] ?mu : float,
+        [<Optional>] ?alpha : float,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                mu |> Option.map (fun x -> "mu", Parameter(Some (box x)))
+                alpha |> Option.map (fun x -> "alpha", Parameter(Some (box x)))
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomGeneralizedNegativeBinomial(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type RandomRandint private (operatorArguments) = 
+    inherit SymbolOperator("_random_randint", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new RandomRandint(args)
+    /// <summary>Draw random samples from a discrete uniform distribution.
+    /// 
+    /// Samples are uniformly distributed over the half-open interval *[low, high)*
+    /// (includes *low*, but excludes *high*).
+    /// 
+    /// Example::
+    /// 
+    ///    randint(low=0, high=5, shape=(2,2)) = [[ 0,  2],
+    ///                                           [ 3,  1]]
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L196</summary>
+    /// <param name="low">Lower bound of the distribution.</param>
+    /// <param name="high">Upper bound of the distribution.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to int32 if not defined (dtype=None).</param>
+    new(low : int64,
+        high : int64,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : RandomRandintDtype) = 
+        let operatorArguments = 
+            [
+                "low", Parameter(Some(box low))
+                "high", Parameter(Some(box high))
+                "shape", shape |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new RandomRandint(Arguments<Symbol>(operatorArguments))
+    /// Default value for Shape
+    /// Shape of the output.
+    static member ShapeDefault : int [] option = None
+    /// Default value for Dtype
+    /// DType of the output in case this can&#39;t be inferred. Defaults to int32 if not defined (dtype=None).
+    static member DtypeDefault : RandomRandintDtype option = None
+    /// Lower bound of the distribution.
+    member __.Low : int64 = match operatorArguments.GetParameter "low" with Some(v) -> unbox v | None -> failwithf "Required parameter low is missing"
+    /// Upper bound of the distribution.
+    member __.High : int64 = match operatorArguments.GetParameter "high" with Some(v) -> unbox v | None -> failwithf "Required parameter high is missing"
+    /// Shape of the output.
+    member __.Shape = operatorArguments.GetParameter("shape", RandomRandint.ShapeDefault)
+    /// DType of the output in case this can&#39;t be inferred. Defaults to int32 if not defined (dtype=None).
+    member __.Dtype = operatorArguments.GetParameter("dtype", RandomRandint.DtypeDefault)
+    /// <summary>Copy RandomRandint instance with updated inputs/parameters.</summary>
+    /// <param name="low">Lower bound of the distribution.</param>
+    /// <param name="high">Upper bound of the distribution.</param>
+    /// <param name="shape">Shape of the output.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to int32 if not defined (dtype=None).</param>
+    member this.With([<Optional>] ?low : int64,
+        [<Optional>] ?high : int64,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : RandomRandintDtype) = 
+        let operatorArguments = 
+            [
+                low |> Option.map (fun x -> "low", Parameter(Some (box x)))
+                high |> Option.map (fun x -> "high", Parameter(Some (box x)))
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomRandint(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
 type RandomUniformLike private (operatorArguments) = 
     inherit SymbolOperator("_random_uniform_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomUniformLike(args)
@@ -18253,6 +19128,63 @@ type Shuffle private (operatorArguments) =
                 data |> Option.map (fun x -> "data", Input x)
             ] |> List.choose id
         new Shuffle(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type SampleUniqueZipfian private (operatorArguments) = 
+    inherit SymbolOperator("_sample_unique_zipfian", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SampleUniqueZipfian(args)
+    /// <summary>Draw random samples from an an approximately log-uniform
+    /// or Zipfian distribution without replacement.
+    /// 
+    /// This operation takes a 2-D shape `(batch_size, num_sampled)`,
+    /// and randomly generates *num_sampled* samples from the range of integers [0, range_max)
+    /// for each instance in the batch.
+    /// 
+    /// The elements in each instance are drawn without replacement from the base distribution.
+    /// The base distribution for this operator is an approximately log-uniform or Zipfian distribution:
+    /// 
+    ///   P(class) = (log(class + 2) - log(class + 1)) / log(range_max + 1)
+    /// 
+    /// Additionaly, it also returns the number of trials used to obtain `num_sampled` samples for
+    /// each instance in the batch.
+    /// 
+    /// Example::
+    /// 
+    ///    samples, trials = _sample_unique_zipfian(750000, shape=(4, 8192))
+    ///    unique(samples[0]) = 8192
+    ///    unique(samples[3]) = 8192
+    ///    trials[0] = 16435
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\unique_sample_op.cc:L66</summary>
+    /// <param name="rangeMax">The number of possible classes.</param>
+    /// <param name="shape">2-D shape of the output, where shape[0] is the batch size, and shape[1] is the number of candidates to sample for each batch.</param>
+    new(rangeMax : int,
+        [<Optional>] ?shape : int seq) = 
+        let operatorArguments = 
+            [
+                "range_max", Parameter(Some(box rangeMax))
+                "shape", shape |> Option.map box |> Parameter
+            ]
+        new SampleUniqueZipfian(Arguments<Symbol>(operatorArguments))
+    /// Default value for Shape
+    /// 2-D shape of the output, where shape[0] is the batch size, and shape[1] is the number of candidates to sample for each batch.
+    static member ShapeDefault : int [] option = None
+    /// The number of possible classes.
+    member __.RangeMax : int = match operatorArguments.GetParameter "range_max" with Some(v) -> unbox v | None -> failwithf "Required parameter range_max is missing"
+    /// 2-D shape of the output, where shape[0] is the batch size, and shape[1] is the number of candidates to sample for each batch.
+    member __.Shape = operatorArguments.GetParameter("shape", SampleUniqueZipfian.ShapeDefault)
+    /// <summary>Copy SampleUniqueZipfian instance with updated inputs/parameters.</summary>
+    /// <param name="rangeMax">The number of possible classes.</param>
+    /// <param name="shape">2-D shape of the output, where shape[0] is the batch size, and shape[1] is the number of candidates to sample for each batch.</param>
+    member this.With([<Optional>] ?rangeMax : int,
+        [<Optional>] ?shape : int seq) = 
+        let operatorArguments = 
+            [
+                rangeMax |> Option.map (fun x -> "range_max", Parameter(Some (box x)))
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SampleUniqueZipfian(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinearRegressionOutput private (operatorArguments) = 
     inherit SymbolOperator("LinearRegressionOutput", operatorArguments)
@@ -20386,6 +21318,15 @@ type BroadcastTo private (operatorArguments) =
                 shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
             ] |> List.choose id
         new BroadcastTo(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type BroadcastBackward private (operatorArguments) = 
+    inherit SymbolOperator("_broadcast_backward", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastBackward(args)
+    new() =
+        let operatorArguments = 
+            [
+            ]
+        new BroadcastBackward(Arguments<Symbol>(operatorArguments))
 
 type BroadcastLike private (operatorArguments) = 
     inherit SymbolOperator("broadcast_like", operatorArguments)
@@ -24252,31 +25193,6 @@ type AddN private (operatorArguments) =
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_sum.cc:L155</summary>
     /// <param name="args">Positional input arguments</param>
-    new([<Optional>] ?args : Symbol seq) =
-        let args = defaultArg (args |> Option.map Seq.toArray) Array.empty
-        let operatorArguments = 
-            [
-                "args", VarArg("num_args", args)
-            ]
-        new AddN(Arguments<Symbol>(operatorArguments))
-    /// <summary>Adds all input arguments element-wise.
-    /// 
-    /// .. math::
-    ///    add\_n(a_1, a_2, ..., a_n) = a_1 + a_2 + ... + a_n
-    /// 
-    /// ``add_n`` is potentially more efficient than calling ``add`` by `n` times.
-    /// 
-    /// The storage type of ``add_n`` output depends on storage types of inputs
-    /// 
-    /// - add_n(row_sparse, row_sparse, ..) = row_sparse
-    /// - add_n(default, csr, default) = default
-    /// - add_n(any input combinations longer than 4 (&gt;4) with at least one default type) = default
-    /// - otherwise, ``add_n`` falls all inputs back to default storage and generates default storage
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_sum.cc:L155</summary>
-    /// <param name="args">Positional input arguments</param>
     new([<ParamArray>] args : Symbol[]) =
         let operatorArguments = 
             [
@@ -26210,7 +27126,7 @@ type Histogram private (operatorArguments) =
     new([<Optional>] ?data : Symbol,
         [<Optional>] ?bins : Symbol,
         [<Optional>] ?binCnt : int,
-        [<Optional>] ?range : struct(float*float)) = 
+        [<Optional>] ?range : float seq) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let bins = defaultArg bins (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -26243,7 +27159,7 @@ type Histogram private (operatorArguments) =
     member this.With([<Optional>] ?data : Symbol,
         [<Optional>] ?bins : Symbol,
         [<Optional>] ?binCnt : int,
-        [<Optional>] ?range : struct(float*float)) = 
+        [<Optional>] ?range : float seq) = 
         let operatorArguments = 
             [
                 data |> Option.map (fun x -> "data", Input x)
@@ -27249,6 +28165,290 @@ type ScatterSetNd private (operatorArguments) =
             ] |> List.choose id
         new ScatterSetNd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
+type ZerosWithoutDtype private (operatorArguments) = 
+    inherit SymbolOperator("_zeros_without_dtype", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new ZerosWithoutDtype(args)
+    /// <summary>fill target with zeros without default dtype</summary>
+    /// <param name="shape">The shape of the output</param>
+    /// <param name="dtype">Target data type.</param>
+    new([<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : int) = 
+        let operatorArguments = 
+            [
+                "shape", shape |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new ZerosWithoutDtype(Arguments<Symbol>(operatorArguments))
+    /// Default value for Shape
+    /// The shape of the output
+    static member ShapeDefault : int [] option = None
+    /// Default value for Dtype
+    /// Target data type.
+    static member DtypeDefault : int = -1
+    /// The shape of the output
+    member __.Shape = operatorArguments.GetParameter("shape", ZerosWithoutDtype.ShapeDefault)
+    /// Target data type.
+    member __.Dtype = operatorArguments.GetParameter("dtype", ZerosWithoutDtype.DtypeDefault)
+    /// <summary>Copy ZerosWithoutDtype instance with updated inputs/parameters.</summary>
+    /// <param name="shape">The shape of the output</param>
+    /// <param name="dtype">Target data type.</param>
+    member this.With([<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : int) = 
+        let operatorArguments = 
+            [
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ZerosWithoutDtype(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type Zeros private (operatorArguments) = 
+    inherit SymbolOperator("_zeros", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Zeros(args)
+    /// <summary>fill target with zeros</summary>
+    /// <param name="shape">The shape of the output</param>
+    /// <param name="dtype">Target data type.</param>
+    new([<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                "shape", shape |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new Zeros(Arguments<Symbol>(operatorArguments))
+    /// Default value for Shape
+    /// The shape of the output
+    static member ShapeDefault : int [] = [||]
+    /// Default value for Dtype
+    /// Target data type.
+    static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+    /// The shape of the output
+    member __.Shape = operatorArguments.GetParameter("shape", Zeros.ShapeDefault)
+    /// Target data type.
+    member __.Dtype = operatorArguments.GetParameter("dtype", Zeros.DtypeDefault)
+    /// <summary>Copy Zeros instance with updated inputs/parameters.</summary>
+    /// <param name="shape">The shape of the output</param>
+    /// <param name="dtype">Target data type.</param>
+    member this.With([<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Zeros(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type Eye private (operatorArguments) = 
+    inherit SymbolOperator("_eye", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Eye(args)
+    /// <summary>Return a 2-D array with ones on the diagonal and zeros elsewhere.</summary>
+    /// <param name="N">Number of rows in the output.</param>
+    /// <param name="M">Number of columns in the output. If 0, defaults to N</param>
+    /// <param name="k">Index of the diagonal. 0 (the default) refers to the main diagonal.A positive value refers to an upper diagonal.A negative value to a lower diagonal.</param>
+    /// <param name="dtype">Target data type.</param>
+    new(N : int64,
+        [<Optional>] ?M : int64,
+        [<Optional>] ?k : int64,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                "N", Parameter(Some(box N))
+                "M", M |> Option.map box |> Parameter
+                "k", k |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new Eye(Arguments<Symbol>(operatorArguments))
+    /// Default value for M
+    /// Number of columns in the output. If 0, defaults to N
+    static member MDefault : int64 = 0L
+    /// Default value for K
+    /// Index of the diagonal. 0 (the default) refers to the main diagonal.A positive value refers to an upper diagonal.A negative value to a lower diagonal.
+    static member KDefault : int64 = 0L
+    /// Default value for Dtype
+    /// Target data type.
+    static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+    /// Number of rows in the output.
+    member __.N : int64 = match operatorArguments.GetParameter "N" with Some(v) -> unbox v | None -> failwithf "Required parameter N is missing"
+    /// Number of columns in the output. If 0, defaults to N
+    member __.M = operatorArguments.GetParameter("M", Eye.MDefault)
+    /// Index of the diagonal. 0 (the default) refers to the main diagonal.A positive value refers to an upper diagonal.A negative value to a lower diagonal.
+    member __.K = operatorArguments.GetParameter("k", Eye.KDefault)
+    /// Target data type.
+    member __.Dtype = operatorArguments.GetParameter("dtype", Eye.DtypeDefault)
+    /// <summary>Copy Eye instance with updated inputs/parameters.</summary>
+    /// <param name="N">Number of rows in the output.</param>
+    /// <param name="M">Number of columns in the output. If 0, defaults to N</param>
+    /// <param name="k">Index of the diagonal. 0 (the default) refers to the main diagonal.A positive value refers to an upper diagonal.A negative value to a lower diagonal.</param>
+    /// <param name="dtype">Target data type.</param>
+    member this.With([<Optional>] ?N : int64,
+        [<Optional>] ?M : int64,
+        [<Optional>] ?k : int64,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                N |> Option.map (fun x -> "N", Parameter(Some (box x)))
+                M |> Option.map (fun x -> "M", Parameter(Some (box x)))
+                k |> Option.map (fun x -> "k", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Eye(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type Ones private (operatorArguments) = 
+    inherit SymbolOperator("_ones", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Ones(args)
+    /// <summary>fill target with ones</summary>
+    /// <param name="shape">The shape of the output</param>
+    /// <param name="dtype">Target data type.</param>
+    new([<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                "shape", shape |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new Ones(Arguments<Symbol>(operatorArguments))
+    /// Default value for Shape
+    /// The shape of the output
+    static member ShapeDefault : int [] = [||]
+    /// Default value for Dtype
+    /// Target data type.
+    static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+    /// The shape of the output
+    member __.Shape = operatorArguments.GetParameter("shape", Ones.ShapeDefault)
+    /// Target data type.
+    member __.Dtype = operatorArguments.GetParameter("dtype", Ones.DtypeDefault)
+    /// <summary>Copy Ones instance with updated inputs/parameters.</summary>
+    /// <param name="shape">The shape of the output</param>
+    /// <param name="dtype">Target data type.</param>
+    member this.With([<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Ones(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type Full private (operatorArguments) = 
+    inherit SymbolOperator("_full", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Full(args)
+    /// <summary>fill target with a scalar value</summary>
+    /// <param name="value">Value with which to fill newly created tensor</param>
+    /// <param name="shape">The shape of the output</param>
+    /// <param name="dtype">Target data type.</param>
+    new(value : double,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                "value", Parameter(Some(box value))
+                "shape", shape |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new Full(Arguments<Symbol>(operatorArguments))
+    /// Default value for Shape
+    /// The shape of the output
+    static member ShapeDefault : int [] option = None
+    /// Default value for Dtype
+    /// Target data type.
+    static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+    /// Value with which to fill newly created tensor
+    member __.Value : double = match operatorArguments.GetParameter "value" with Some(v) -> unbox v | None -> failwithf "Required parameter value is missing"
+    /// The shape of the output
+    member __.Shape = operatorArguments.GetParameter("shape", Full.ShapeDefault)
+    /// Target data type.
+    member __.Dtype = operatorArguments.GetParameter("dtype", Full.DtypeDefault)
+    /// <summary>Copy Full instance with updated inputs/parameters.</summary>
+    /// <param name="value">Value with which to fill newly created tensor</param>
+    /// <param name="shape">The shape of the output</param>
+    /// <param name="dtype">Target data type.</param>
+    member this.With([<Optional>] ?value : double,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                value |> Option.map (fun x -> "value", Parameter(Some (box x)))
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Full(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type Arange private (operatorArguments) = 
+    inherit SymbolOperator("_arange", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Arange(args)
+    /// <summary>Return evenly spaced values within a given interval. Similar to Numpy</summary>
+    /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
+    /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
+    /// <param name="step">Spacing between values.</param>
+    /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
+    /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
+    /// <param name="dtype">Target data type.</param>
+    new(start : double,
+        [<Optional>] ?stop : float,
+        [<Optional>] ?step : double,
+        [<Optional>] ?repeat : int,
+        [<Optional>] ?inferRange : bool,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                "start", Parameter(Some(box start))
+                "stop", stop |> Option.map box |> Parameter
+                "step", step |> Option.map box |> Parameter
+                "repeat", repeat |> Option.map box |> Parameter
+                "infer_range", inferRange |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new Arange(Arguments<Symbol>(operatorArguments))
+    /// Default value for Stop
+    /// End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.
+    static member StopDefault : double option = None
+    /// Default value for Step
+    /// Spacing between values.
+    static member StepDefault : double = 1.0
+    /// Default value for Repeat
+    /// The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.
+    static member RepeatDefault : int = 1
+    /// Default value for InferRange
+    /// When set to True, infer the stop position from the start, step, repeat, and output tensor size.
+    static member InferRangeDefault : bool = false
+    /// Default value for Dtype
+    /// Target data type.
+    static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+    /// Start of interval. The interval includes this value. The default start value is 0.
+    member __.Start : double = match operatorArguments.GetParameter "start" with Some(v) -> unbox v | None -> failwithf "Required parameter start is missing"
+    /// End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.
+    member __.Stop = operatorArguments.GetParameter("stop", Arange.StopDefault)
+    /// Spacing between values.
+    member __.Step = operatorArguments.GetParameter("step", Arange.StepDefault)
+    /// The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.
+    member __.Repeat = operatorArguments.GetParameter("repeat", Arange.RepeatDefault)
+    /// When set to True, infer the stop position from the start, step, repeat, and output tensor size.
+    member __.InferRange = operatorArguments.GetParameter("infer_range", Arange.InferRangeDefault)
+    /// Target data type.
+    member __.Dtype = operatorArguments.GetParameter("dtype", Arange.DtypeDefault)
+    /// <summary>Copy Arange instance with updated inputs/parameters.</summary>
+    /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
+    /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
+    /// <param name="step">Spacing between values.</param>
+    /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
+    /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
+    /// <param name="dtype">Target data type.</param>
+    member this.With([<Optional>] ?start : double,
+        [<Optional>] ?stop : float,
+        [<Optional>] ?step : double,
+        [<Optional>] ?repeat : int,
+        [<Optional>] ?inferRange : bool,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                start |> Option.map (fun x -> "start", Parameter(Some (box x)))
+                stop |> Option.map (fun x -> "stop", Parameter(Some (box x)))
+                step |> Option.map (fun x -> "step", Parameter(Some (box x)))
+                repeat |> Option.map (fun x -> "repeat", Parameter(Some (box x)))
+                inferRange |> Option.map (fun x -> "infer_range", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Arange(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
 type ContribArangeLike private (operatorArguments) = 
     inherit SymbolOperator("_contrib_arange_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribArangeLike(args)
@@ -27337,6 +28537,83 @@ type ContribArangeLike private (operatorArguments) =
                 axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
             ] |> List.choose id
         new ContribArangeLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type Linspace private (operatorArguments) = 
+    inherit SymbolOperator("_linspace", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new Linspace(args)
+    /// <summary>Return evenly spaced numbers over a specified interval. Similar to Numpy</summary>
+    /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
+    /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
+    /// <param name="step">Spacing between values.</param>
+    /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
+    /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
+    /// <param name="dtype">Target data type.</param>
+    new(start : double,
+        [<Optional>] ?stop : float,
+        [<Optional>] ?step : double,
+        [<Optional>] ?repeat : int,
+        [<Optional>] ?inferRange : bool,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                "start", Parameter(Some(box start))
+                "stop", stop |> Option.map box |> Parameter
+                "step", step |> Option.map box |> Parameter
+                "repeat", repeat |> Option.map box |> Parameter
+                "infer_range", inferRange |> Option.map box |> Parameter
+                "dtype", dtype |> Option.map box |> Parameter
+            ]
+        new Linspace(Arguments<Symbol>(operatorArguments))
+    /// Default value for Stop
+    /// End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.
+    static member StopDefault : double option = None
+    /// Default value for Step
+    /// Spacing between values.
+    static member StepDefault : double = 1.0
+    /// Default value for Repeat
+    /// The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.
+    static member RepeatDefault : int = 1
+    /// Default value for InferRange
+    /// When set to True, infer the stop position from the start, step, repeat, and output tensor size.
+    static member InferRangeDefault : bool = false
+    /// Default value for Dtype
+    /// Target data type.
+    static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+    /// Start of interval. The interval includes this value. The default start value is 0.
+    member __.Start : double = match operatorArguments.GetParameter "start" with Some(v) -> unbox v | None -> failwithf "Required parameter start is missing"
+    /// End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.
+    member __.Stop = operatorArguments.GetParameter("stop", Linspace.StopDefault)
+    /// Spacing between values.
+    member __.Step = operatorArguments.GetParameter("step", Linspace.StepDefault)
+    /// The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.
+    member __.Repeat = operatorArguments.GetParameter("repeat", Linspace.RepeatDefault)
+    /// When set to True, infer the stop position from the start, step, repeat, and output tensor size.
+    member __.InferRange = operatorArguments.GetParameter("infer_range", Linspace.InferRangeDefault)
+    /// Target data type.
+    member __.Dtype = operatorArguments.GetParameter("dtype", Linspace.DtypeDefault)
+    /// <summary>Copy Linspace instance with updated inputs/parameters.</summary>
+    /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
+    /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
+    /// <param name="step">Spacing between values.</param>
+    /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
+    /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
+    /// <param name="dtype">Target data type.</param>
+    member this.With([<Optional>] ?start : double,
+        [<Optional>] ?stop : float,
+        [<Optional>] ?step : double,
+        [<Optional>] ?repeat : int,
+        [<Optional>] ?inferRange : bool,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                start |> Option.map (fun x -> "start", Parameter(Some (box x)))
+                stop |> Option.map (fun x -> "stop", Parameter(Some (box x)))
+                step |> Option.map (fun x -> "step", Parameter(Some (box x)))
+                repeat |> Option.map (fun x -> "repeat", Parameter(Some (box x)))
+                inferRange |> Option.map (fun x -> "infer_range", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Linspace(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ZerosLike private (operatorArguments) = 
     inherit SymbolOperator("zeros_like", operatorArguments)
@@ -30477,6 +31754,15 @@ type SplitV2 private (operatorArguments) =
             ] |> List.choose id
         new SplitV2(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
+type SplitV2Backward private (operatorArguments) = 
+    inherit SymbolOperator("_split_v2_backward", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SplitV2Backward(args)
+    new() =
+        let operatorArguments = 
+            [
+            ]
+        new SplitV2Backward(Arguments<Symbol>(operatorArguments))
+
 type Topk private (operatorArguments) = 
     inherit SymbolOperator("topk", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Topk(args)
@@ -32537,6 +33823,16 @@ type Correlation private (operatorArguments) =
             ] |> List.choose id
         new Correlation(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
+type CrossDeviceCopy private (operatorArguments) = 
+    inherit SymbolOperator("_CrossDeviceCopy", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new CrossDeviceCopy(args)
+    /// <summary>Special op to copy data cross device</summary>
+    new() =
+        let operatorArguments = 
+            [
+            ]
+        new CrossDeviceCopy(Arguments<Symbol>(operatorArguments))
+
 type GridGenerator private (operatorArguments) = 
     inherit SymbolOperator("GridGenerator", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new GridGenerator(args)
@@ -33247,6 +34543,27 @@ type SVMOutput private (operatorArguments) =
                 useLinear |> Option.map (fun x -> "use_linear", Parameter(Some (box x)))
             ] |> List.choose id
         new SVMOutput(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+
+type SetValue private (operatorArguments) = 
+    inherit SymbolOperator("_set_value", operatorArguments)
+    static member CreateFromArguments(args : Arguments<Symbol>) = new SetValue(args)
+    /// <param name="src">Source input to the function.</param>
+    new(src : double) =
+        let operatorArguments = 
+            [
+                "src", Parameter(Some(box src))
+            ]
+        new SetValue(Arguments<Symbol>(operatorArguments))
+    /// Source input to the function.
+    member __.Src : double = match operatorArguments.GetParameter "src" with Some(v) -> unbox v | None -> failwithf "Required parameter src is missing"
+    /// <summary>Copy SetValue instance with updated inputs/parameters.</summary>
+    /// <param name="src">Source input to the function.</param>
+    member this.With([<Optional>] ?src : double) =
+        let operatorArguments = 
+            [
+                src |> Option.map (fun x -> "src", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SetValue(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Imdecode private (operatorArguments) = 
     inherit SymbolOperator("_imdecode", operatorArguments)

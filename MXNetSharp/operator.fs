@@ -9,6 +9,7 @@ type VarArg<'a> =
         NumArgsName : string option
     }   
 
+[<NoComparison>]
 type OpArg<'a> = 
     | VarArg of string * 'a[]
     | Parameter of obj option
