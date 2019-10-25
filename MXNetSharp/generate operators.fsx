@@ -1018,6 +1018,52 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
             | _ -> []
         else    
             []
+    let withMethod = 
+        let args = 
+            [
+                for a in h.Args do 
+                    let tp = 
+                        match a.SymbolOrNDArray with 
+                        | Some ManySymbolOrNDArray -> "Symbol seq"
+                        | Some SymbolOrNDArray
+                        | Some Symbol -> "Symbol"
+                        | _ -> a.TypeString 
+                    if a.Arg.ArgumentInfo.Name <> "ctx" && a.Arg.ArgumentInfo.Name <> h.AtomicSymbolInfo.KeyVarNumArgs then 
+                        sprintf "[<Optional>] ?%s : %s" a.Name tp
+            ]
+        [
+            if args.Length = 0 then 
+                ()
+            elif args.Length = 1 then 
+                sprintf "member this.With(%s) =" args.[0]
+            else
+                sprintf "member this.With(%s," args.[0]
+                let padding = String.replicate "new(".Length " "
+                for a in args.[1.. args.Length - 2] do 
+                    sprintf "%s%s," padding a
+                sprintf "%s%s) = " padding args.[args.Length - 1]
+            yield! indent 1 
+                [
+                    sprintf "let operatorArguments = "
+                    sprintf "    ["
+                    yield! indent 2 
+                        [
+                            for a in h.Args do 
+                                if a.Arg.ArgumentInfo.Name = h.AtomicSymbolInfo.KeyVarNumArgs || a.Arg.ArgumentInfo.Name = "ctx" then 
+                                    ()
+                                elif a.SymbolOrNDArray.IsSome then 
+                                    match a.SymbolOrNDArray.Value with 
+                                    | ManySymbolOrNDArray ->
+                                        sprintf "%s |> Option.map (fun x -> \"%s\", VarArg(\"%s\", Seq.toArray x))" a.Name a.Arg.ArgumentInfo.Name a.ProcessedAtomicSymbol.Value.AtomicSymbolInfo.KeyVarNumArgs
+                                    | _ -> sprintf "%s |> Option.map (fun x -> \"%s\", Input x)" a.Name a.Arg.ArgumentInfo.Name
+                                else
+                                    sprintf "%s |> Option.map (fun x -> \"%s\", Parameter(Some (box x)))" a.Name a.Arg.ArgumentInfo.Name
+                        ]
+                    sprintf "    ] |> List.choose id"
+                    sprintf "new %s(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))" h.Name
+                ]
+        ]
+    
     let props = 
         [
             for a in opt do
@@ -1053,6 +1099,7 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
             yield! indent 1 ctor2
         yield! indent 1 ctor3
         yield! indent 1 props
+        yield! indent 1 withMethod
     ]
     
 

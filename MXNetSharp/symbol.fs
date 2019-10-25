@@ -188,7 +188,6 @@ type ImplicitVariable() =
 //TODO: override tostring
 //TODO: ctx = '' for NDArray ops is invalid even though it's often the default
 //TODO: doc comments on generated symbols
-//TODO: add a "With" method to copy with updates      
 //TODO: We should add valiation to the specific symbol types
 type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments<Symbol>) = 
     inherit Symbol()
@@ -298,6 +297,12 @@ type CachedOp private (operatorArguments) =
             ]
         new CachedOp(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetVarArg "data"
+    member this.With([<Optional>] ?data : Symbol seq) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+            ] |> List.choose id
+        new CachedOp(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BatchNormV1 private (operatorArguments) = 
     inherit SymbolOperator("BatchNorm_v1", operatorArguments)
@@ -338,6 +343,26 @@ type BatchNormV1 private (operatorArguments) =
     member __.FixGamma = operatorArguments.GetParameter("fix_gamma", BatchNormV1.FixGammaDefault)
     member __.UseGlobalStats = operatorArguments.GetParameter("use_global_stats", BatchNormV1.UseGlobalStatsDefault)
     member __.OutputMeanVar = operatorArguments.GetParameter("output_mean_var", BatchNormV1.OutputMeanVarDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?gamma : Symbol,
+        [<Optional>] ?beta : Symbol,
+        [<Optional>] ?eps : float,
+        [<Optional>] ?momentum : float,
+        [<Optional>] ?fixGamma : bool,
+        [<Optional>] ?useGlobalStats : bool,
+        [<Optional>] ?outputMeanVar : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                gamma |> Option.map (fun x -> "gamma", Input x)
+                beta |> Option.map (fun x -> "beta", Input x)
+                eps |> Option.map (fun x -> "eps", Parameter(Some (box x)))
+                momentum |> Option.map (fun x -> "momentum", Parameter(Some (box x)))
+                fixGamma |> Option.map (fun x -> "fix_gamma", Parameter(Some (box x)))
+                useGlobalStats |> Option.map (fun x -> "use_global_stats", Parameter(Some (box x)))
+                outputMeanVar |> Option.map (fun x -> "output_mean_var", Parameter(Some (box x)))
+            ] |> List.choose id
+        new BatchNormV1(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MpAdamwUpdate private (operatorArguments) = 
     inherit SymbolOperator("_mp_adamw_update", operatorArguments)
@@ -426,6 +451,36 @@ type MpAdamwUpdate private (operatorArguments) =
     member __.Epsilon = operatorArguments.GetParameter("epsilon", MpAdamwUpdate.EpsilonDefault)
     member __.Wd = operatorArguments.GetParameter("wd", MpAdamwUpdate.WdDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", MpAdamwUpdate.ClipGradientDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?mean : Symbol,
+        [<Optional>] ?var : Symbol,
+        [<Optional>] ?weight32 : Symbol,
+        [<Optional>] ?rescaleGrad : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?eta : float,
+        [<Optional>] ?beta1 : float,
+        [<Optional>] ?beta2 : float,
+        [<Optional>] ?epsilon : float,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?clipGradient : float) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                mean |> Option.map (fun x -> "mean", Input x)
+                var |> Option.map (fun x -> "var", Input x)
+                weight32 |> Option.map (fun x -> "weight32", Input x)
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                eta |> Option.map (fun x -> "eta", Parameter(Some (box x)))
+                beta1 |> Option.map (fun x -> "beta1", Parameter(Some (box x)))
+                beta2 |> Option.map (fun x -> "beta2", Parameter(Some (box x)))
+                epsilon |> Option.map (fun x -> "epsilon", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MpAdamwUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type AdamwUpdate private (operatorArguments) = 
     inherit SymbolOperator("_adamw_update", operatorArguments)
@@ -508,6 +563,34 @@ type AdamwUpdate private (operatorArguments) =
     member __.Epsilon = operatorArguments.GetParameter("epsilon", AdamwUpdate.EpsilonDefault)
     member __.Wd = operatorArguments.GetParameter("wd", AdamwUpdate.WdDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", AdamwUpdate.ClipGradientDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?mean : Symbol,
+        [<Optional>] ?var : Symbol,
+        [<Optional>] ?rescaleGrad : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?eta : float,
+        [<Optional>] ?beta1 : float,
+        [<Optional>] ?beta2 : float,
+        [<Optional>] ?epsilon : float,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?clipGradient : float) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                mean |> Option.map (fun x -> "mean", Input x)
+                var |> Option.map (fun x -> "var", Input x)
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                eta |> Option.map (fun x -> "eta", Parameter(Some (box x)))
+                beta1 |> Option.map (fun x -> "beta1", Parameter(Some (box x)))
+                beta2 |> Option.map (fun x -> "beta2", Parameter(Some (box x)))
+                epsilon |> Option.map (fun x -> "epsilon", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+            ] |> List.choose id
+        new AdamwUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribAdaptiveAvgPooling2D private (operatorArguments) = 
     inherit SymbolOperator("_contrib_AdaptiveAvgPooling2D", operatorArguments)
@@ -524,6 +607,14 @@ type ContribAdaptiveAvgPooling2D private (operatorArguments) =
     static member OutputSizeDefault : int [] = [||]
     member __.Data = operatorArguments.GetInput "data"
     member __.OutputSize = operatorArguments.GetParameter("output_size", ContribAdaptiveAvgPooling2D.OutputSizeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?outputSize : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                outputSize |> Option.map (fun x -> "output_size", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribAdaptiveAvgPooling2D(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MultiAllFinite private (operatorArguments) = 
     inherit SymbolOperator("multi_all_finite", operatorArguments)
@@ -544,6 +635,16 @@ type MultiAllFinite private (operatorArguments) =
     member __.Data = operatorArguments.GetVarArg "data"
     member __.NumArrays = operatorArguments.GetParameter("num_arrays", MultiAllFinite.NumArraysDefault)
     member __.InitOutput = operatorArguments.GetParameter("init_output", MultiAllFinite.InitOutputDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?numArrays : int,
+        [<Optional>] ?initOutput : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                numArrays |> Option.map (fun x -> "num_arrays", Parameter(Some (box x)))
+                initOutput |> Option.map (fun x -> "init_output", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MultiAllFinite(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribBilinearResize2D private (operatorArguments) = 
     inherit SymbolOperator("_contrib_BilinearResize2D", operatorArguments)
@@ -580,6 +681,24 @@ type ContribBilinearResize2D private (operatorArguments) =
     member __.ScaleHeight = operatorArguments.GetParameter("scale_height", ContribBilinearResize2D.ScaleHeightDefault)
     member __.ScaleWidth = operatorArguments.GetParameter("scale_width", ContribBilinearResize2D.ScaleWidthDefault)
     member __.Mode = operatorArguments.GetParameter("mode", ContribBilinearResize2D.ModeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?like : Symbol,
+        [<Optional>] ?height : int,
+        [<Optional>] ?width : int,
+        [<Optional>] ?scaleHeight : float,
+        [<Optional>] ?scaleWidth : float,
+        [<Optional>] ?mode : ContribBilinearResize2DMode) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                like |> Option.map (fun x -> "like", Input x)
+                height |> Option.map (fun x -> "height", Parameter(Some (box x)))
+                width |> Option.map (fun x -> "width", Parameter(Some (box x)))
+                scaleHeight |> Option.map (fun x -> "scale_height", Parameter(Some (box x)))
+                scaleWidth |> Option.map (fun x -> "scale_width", Parameter(Some (box x)))
+                mode |> Option.map (fun x -> "mode", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribBilinearResize2D(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribBooleanMask private (operatorArguments) = 
     inherit SymbolOperator("_contrib_boolean_mask", operatorArguments)
@@ -600,6 +719,16 @@ type ContribBooleanMask private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Index = operatorArguments.GetInput "index"
     member __.Axis = operatorArguments.GetParameter("axis", ContribBooleanMask.AxisDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?index : Symbol,
+        [<Optional>] ?axis : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                index |> Option.map (fun x -> "index", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribBooleanMask(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribBoxNms private (operatorArguments) = 
     inherit SymbolOperator("_contrib_box_nms", operatorArguments)
@@ -652,6 +781,32 @@ type ContribBoxNms private (operatorArguments) =
     member __.ForceSuppress = operatorArguments.GetParameter("force_suppress", ContribBoxNms.ForceSuppressDefault)
     member __.InFormat = operatorArguments.GetParameter("in_format", ContribBoxNms.InFormatDefault)
     member __.OutFormat = operatorArguments.GetParameter("out_format", ContribBoxNms.OutFormatDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?overlapThresh : float,
+        [<Optional>] ?validThresh : float,
+        [<Optional>] ?topk : int,
+        [<Optional>] ?coordStart : int,
+        [<Optional>] ?scoreIndex : int,
+        [<Optional>] ?idIndex : int,
+        [<Optional>] ?backgroundId : int,
+        [<Optional>] ?forceSuppress : bool,
+        [<Optional>] ?inFormat : Format,
+        [<Optional>] ?outFormat : Format) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                overlapThresh |> Option.map (fun x -> "overlap_thresh", Parameter(Some (box x)))
+                validThresh |> Option.map (fun x -> "valid_thresh", Parameter(Some (box x)))
+                topk |> Option.map (fun x -> "topk", Parameter(Some (box x)))
+                coordStart |> Option.map (fun x -> "coord_start", Parameter(Some (box x)))
+                scoreIndex |> Option.map (fun x -> "score_index", Parameter(Some (box x)))
+                idIndex |> Option.map (fun x -> "id_index", Parameter(Some (box x)))
+                backgroundId |> Option.map (fun x -> "background_id", Parameter(Some (box x)))
+                forceSuppress |> Option.map (fun x -> "force_suppress", Parameter(Some (box x)))
+                inFormat |> Option.map (fun x -> "in_format", Parameter(Some (box x)))
+                outFormat |> Option.map (fun x -> "out_format", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribBoxNms(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribBoxIou private (operatorArguments) = 
     inherit SymbolOperator("_contrib_box_iou", operatorArguments)
@@ -672,6 +827,16 @@ type ContribBoxIou private (operatorArguments) =
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
     member __.Format = operatorArguments.GetParameter("format", ContribBoxIou.FormatDefault)
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol,
+        [<Optional>] ?format : Format) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+                format |> Option.map (fun x -> "format", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribBoxIou(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribBipartiteMatching private (operatorArguments) = 
     inherit SymbolOperator("_contrib_bipartite_matching", operatorArguments)
@@ -707,6 +872,18 @@ type ContribBipartiteMatching private (operatorArguments) =
     member __.Threshold : float = match operatorArguments.GetParameter "threshold" with Some(v) -> unbox v | None -> failwithf "Required parameter threshold is missing"
     member __.IsAscend = operatorArguments.GetParameter("is_ascend", ContribBipartiteMatching.IsAscendDefault)
     member __.Topk = operatorArguments.GetParameter("topk", ContribBipartiteMatching.TopkDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?threshold : float,
+        [<Optional>] ?isAscend : bool,
+        [<Optional>] ?topk : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                threshold |> Option.map (fun x -> "threshold", Parameter(Some (box x)))
+                isAscend |> Option.map (fun x -> "is_ascend", Parameter(Some (box x)))
+                topk |> Option.map (fun x -> "topk", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribBipartiteMatching(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribDglCsrNeighborUniformSample private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_csr_neighbor_uniform_sample", operatorArguments)
@@ -735,6 +912,20 @@ type ContribDglCsrNeighborUniformSample private (operatorArguments) =
     member __.NumHops = operatorArguments.GetParameter("num_hops", ContribDglCsrNeighborUniformSample.NumHopsDefault)
     member __.NumNeighbor = operatorArguments.GetParameter("num_neighbor", ContribDglCsrNeighborUniformSample.NumNeighborDefault)
     member __.MaxNumVertices = operatorArguments.GetParameter("max_num_vertices", ContribDglCsrNeighborUniformSample.MaxNumVerticesDefault)
+    member this.With([<Optional>] ?csrMatrix : Symbol,
+        [<Optional>] ?seedArrays : Symbol seq,
+        [<Optional>] ?numHops : int64,
+        [<Optional>] ?numNeighbor : int64,
+        [<Optional>] ?maxNumVertices : int64) = 
+        let operatorArguments = 
+            [
+                csrMatrix |> Option.map (fun x -> "csr_matrix", Input x)
+                seedArrays |> Option.map (fun x -> "seed_arrays", VarArg("num_args", Seq.toArray x))
+                numHops |> Option.map (fun x -> "num_hops", Parameter(Some (box x)))
+                numNeighbor |> Option.map (fun x -> "num_neighbor", Parameter(Some (box x)))
+                maxNumVertices |> Option.map (fun x -> "max_num_vertices", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribDglCsrNeighborUniformSample(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribDglCsrNeighborNonUniformSample private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_csr_neighbor_non_uniform_sample", operatorArguments)
@@ -767,6 +958,22 @@ type ContribDglCsrNeighborNonUniformSample private (operatorArguments) =
     member __.NumHops = operatorArguments.GetParameter("num_hops", ContribDglCsrNeighborNonUniformSample.NumHopsDefault)
     member __.NumNeighbor = operatorArguments.GetParameter("num_neighbor", ContribDglCsrNeighborNonUniformSample.NumNeighborDefault)
     member __.MaxNumVertices = operatorArguments.GetParameter("max_num_vertices", ContribDglCsrNeighborNonUniformSample.MaxNumVerticesDefault)
+    member this.With([<Optional>] ?csrMatrix : Symbol,
+        [<Optional>] ?probability : Symbol,
+        [<Optional>] ?seedArrays : Symbol seq,
+        [<Optional>] ?numHops : int64,
+        [<Optional>] ?numNeighbor : int64,
+        [<Optional>] ?maxNumVertices : int64) = 
+        let operatorArguments = 
+            [
+                csrMatrix |> Option.map (fun x -> "csr_matrix", Input x)
+                probability |> Option.map (fun x -> "probability", Input x)
+                seedArrays |> Option.map (fun x -> "seed_arrays", VarArg("num_args", Seq.toArray x))
+                numHops |> Option.map (fun x -> "num_hops", Parameter(Some (box x)))
+                numNeighbor |> Option.map (fun x -> "num_neighbor", Parameter(Some (box x)))
+                maxNumVertices |> Option.map (fun x -> "max_num_vertices", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribDglCsrNeighborNonUniformSample(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribDglSubgraph private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_subgraph", operatorArguments)
@@ -796,6 +1003,16 @@ type ContribDglSubgraph private (operatorArguments) =
     member __.Graph = operatorArguments.GetInput "graph"
     member __.Data = operatorArguments.GetVarArg "data"
     member __.ReturnMapping : bool = match operatorArguments.GetParameter "return_mapping" with Some(v) -> unbox v | None -> failwithf "Required parameter return_mapping is missing"
+    member this.With([<Optional>] ?graph : Symbol,
+        [<Optional>] ?data : Symbol seq,
+        [<Optional>] ?returnMapping : bool) = 
+        let operatorArguments = 
+            [
+                graph |> Option.map (fun x -> "graph", Input x)
+                data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+                returnMapping |> Option.map (fun x -> "return_mapping", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribDglSubgraph(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribEdgeId private (operatorArguments) = 
     inherit SymbolOperator("_contrib_edge_id", operatorArguments)
@@ -816,6 +1033,16 @@ type ContribEdgeId private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.U = operatorArguments.GetInput "u"
     member __.V = operatorArguments.GetInput "v"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?u : Symbol,
+        [<Optional>] ?v : Symbol) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                u |> Option.map (fun x -> "u", Input x)
+                v |> Option.map (fun x -> "v", Input x)
+            ] |> List.choose id
+        new ContribEdgeId(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribDglAdjacency private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_adjacency", operatorArguments)
@@ -828,6 +1055,12 @@ type ContribDglAdjacency private (operatorArguments) =
             ]
         new ContribDglAdjacency(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new ContribDglAdjacency(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribDglGraphCompact private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_graph_compact", operatorArguments)
@@ -866,6 +1099,16 @@ type ContribDglGraphCompact private (operatorArguments) =
     member __.GraphData = operatorArguments.GetVarArg "graph_data"
     member __.ReturnMapping : bool = match operatorArguments.GetParameter "return_mapping" with Some(v) -> unbox v | None -> failwithf "Required parameter return_mapping is missing"
     member __.GraphSizes : int64 seq = match operatorArguments.GetParameter "graph_sizes" with Some(v) -> unbox v | None -> failwithf "Required parameter graph_sizes is missing"
+    member this.With([<Optional>] ?graphData : Symbol seq,
+        [<Optional>] ?returnMapping : bool,
+        [<Optional>] ?graphSizes : int64 seq) = 
+        let operatorArguments = 
+            [
+                graphData |> Option.map (fun x -> "graph_data", VarArg("num_args", Seq.toArray x))
+                returnMapping |> Option.map (fun x -> "return_mapping", Parameter(Some (box x)))
+                graphSizes |> Option.map (fun x -> "graph_sizes", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribDglGraphCompact(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribGradientmultiplier private (operatorArguments) = 
     inherit SymbolOperator("_contrib_gradientmultiplier", operatorArguments)
@@ -889,6 +1132,14 @@ type ContribGradientmultiplier private (operatorArguments) =
         new ContribGradientmultiplier(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribGradientmultiplier(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribBackwardGradientmultiplier private (operatorArguments) = 
     inherit SymbolOperator("_contrib_backward_gradientmultiplier", operatorArguments)
@@ -912,6 +1163,14 @@ type ContribBackwardGradientmultiplier private (operatorArguments) =
         new ContribBackwardGradientmultiplier(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribBackwardGradientmultiplier(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribHawkesll private (operatorArguments) = 
     inherit SymbolOperator("_contrib_hawkesll", operatorArguments)
@@ -952,6 +1211,26 @@ type ContribHawkesll private (operatorArguments) =
     member __.Marks = operatorArguments.GetInput "marks"
     member __.ValidLength = operatorArguments.GetInput "valid_length"
     member __.MaxTime = operatorArguments.GetInput "max_time"
+    member this.With([<Optional>] ?lda : Symbol,
+        [<Optional>] ?alpha : Symbol,
+        [<Optional>] ?beta : Symbol,
+        [<Optional>] ?state : Symbol,
+        [<Optional>] ?lags : Symbol,
+        [<Optional>] ?marks : Symbol,
+        [<Optional>] ?validLength : Symbol,
+        [<Optional>] ?maxTime : Symbol) = 
+        let operatorArguments = 
+            [
+                lda |> Option.map (fun x -> "lda", Input x)
+                alpha |> Option.map (fun x -> "alpha", Input x)
+                beta |> Option.map (fun x -> "beta", Input x)
+                state |> Option.map (fun x -> "state", Input x)
+                lags |> Option.map (fun x -> "lags", Input x)
+                marks |> Option.map (fun x -> "marks", Input x)
+                validLength |> Option.map (fun x -> "valid_length", Input x)
+                maxTime |> Option.map (fun x -> "max_time", Input x)
+            ] |> List.choose id
+        new ContribHawkesll(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribIndexArray private (operatorArguments) = 
     inherit SymbolOperator("_contrib_index_array", operatorArguments)
@@ -968,6 +1247,14 @@ type ContribIndexArray private (operatorArguments) =
     static member AxesDefault : int [] option = None
     member __.Data = operatorArguments.GetInput "data"
     member __.Axes = operatorArguments.GetParameter("axes", ContribIndexArray.AxesDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axes : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axes |> Option.map (fun x -> "axes", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribIndexArray(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribIndexCopy private (operatorArguments) = 
     inherit SymbolOperator("_contrib_index_copy", operatorArguments)
@@ -988,6 +1275,16 @@ type ContribIndexCopy private (operatorArguments) =
     member __.OldTensor = operatorArguments.GetInput "old_tensor"
     member __.IndexVector = operatorArguments.GetInput "index_vector"
     member __.NewTensor = operatorArguments.GetInput "new_tensor"
+    member this.With([<Optional>] ?oldTensor : Symbol,
+        [<Optional>] ?indexVector : Symbol,
+        [<Optional>] ?newTensor : Symbol) = 
+        let operatorArguments = 
+            [
+                oldTensor |> Option.map (fun x -> "old_tensor", Input x)
+                indexVector |> Option.map (fun x -> "index_vector", Input x)
+                newTensor |> Option.map (fun x -> "new_tensor", Input x)
+            ] |> List.choose id
+        new ContribIndexCopy(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type KhatriRao private (operatorArguments) = 
     inherit SymbolOperator("khatri_rao", operatorArguments)
@@ -1006,6 +1303,12 @@ type KhatriRao private (operatorArguments) =
             ]
         new KhatriRao(Arguments<Symbol>(operatorArguments))
     member __.Args = operatorArguments.GetVarArg "args"
+    member this.With([<Optional>] ?args : Symbol seq) =
+        let operatorArguments = 
+            [
+                args |> Option.map (fun x -> "args", VarArg("num_args", Seq.toArray x))
+            ] |> List.choose id
+        new KhatriRao(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MultiLars private (operatorArguments) = 
     inherit SymbolOperator("multi_lars", operatorArguments)
@@ -1058,6 +1361,24 @@ type MultiLars private (operatorArguments) =
     member __.Eta : float = match operatorArguments.GetParameter "eta" with Some(v) -> unbox v | None -> failwithf "Required parameter eta is missing"
     member __.Eps : float = match operatorArguments.GetParameter "eps" with Some(v) -> unbox v | None -> failwithf "Required parameter eps is missing"
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", MultiLars.RescaleGradDefault)
+    member this.With([<Optional>] ?lrs : Symbol,
+        [<Optional>] ?weightsSumSq : Symbol,
+        [<Optional>] ?gradsSumSq : Symbol,
+        [<Optional>] ?wds : Symbol,
+        [<Optional>] ?eta : float,
+        [<Optional>] ?eps : float,
+        [<Optional>] ?rescaleGrad : float) = 
+        let operatorArguments = 
+            [
+                lrs |> Option.map (fun x -> "lrs", Input x)
+                weightsSumSq |> Option.map (fun x -> "weights_sum_sq", Input x)
+                gradsSumSq |> Option.map (fun x -> "grads_sum_sq", Input x)
+                wds |> Option.map (fun x -> "wds", Input x)
+                eta |> Option.map (fun x -> "eta", Parameter(Some (box x)))
+                eps |> Option.map (fun x -> "eps", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MultiLars(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MultiSumSq private (operatorArguments) = 
     inherit SymbolOperator("multi_sum_sq", operatorArguments)
@@ -1089,6 +1410,14 @@ type MultiSumSq private (operatorArguments) =
         new MultiSumSq(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetVarArg "data"
     member __.NumArrays : int = match operatorArguments.GetParameter "num_arrays" with Some(v) -> unbox v | None -> failwithf "Required parameter num_arrays is missing"
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?numArrays : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                numArrays |> Option.map (fun x -> "num_arrays", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MultiSumSq(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribMultiBoxDetection private (operatorArguments) = 
     inherit SymbolOperator("_contrib_MultiBoxDetection", operatorArguments)
@@ -1137,6 +1466,30 @@ type ContribMultiBoxDetection private (operatorArguments) =
     member __.ForceSuppress = operatorArguments.GetParameter("force_suppress", ContribMultiBoxDetection.ForceSuppressDefault)
     member __.Variances = operatorArguments.GetParameter("variances", ContribMultiBoxDetection.VariancesDefault)
     member __.NmsTopk = operatorArguments.GetParameter("nms_topk", ContribMultiBoxDetection.NmsTopkDefault)
+    member this.With([<Optional>] ?clsProb : Symbol,
+        [<Optional>] ?locPred : Symbol,
+        [<Optional>] ?anchor : Symbol,
+        [<Optional>] ?clip : bool,
+        [<Optional>] ?threshold : float,
+        [<Optional>] ?backgroundId : int,
+        [<Optional>] ?nmsThreshold : float,
+        [<Optional>] ?forceSuppress : bool,
+        [<Optional>] ?variances : double seq,
+        [<Optional>] ?nmsTopk : int) = 
+        let operatorArguments = 
+            [
+                clsProb |> Option.map (fun x -> "cls_prob", Input x)
+                locPred |> Option.map (fun x -> "loc_pred", Input x)
+                anchor |> Option.map (fun x -> "anchor", Input x)
+                clip |> Option.map (fun x -> "clip", Parameter(Some (box x)))
+                threshold |> Option.map (fun x -> "threshold", Parameter(Some (box x)))
+                backgroundId |> Option.map (fun x -> "background_id", Parameter(Some (box x)))
+                nmsThreshold |> Option.map (fun x -> "nms_threshold", Parameter(Some (box x)))
+                forceSuppress |> Option.map (fun x -> "force_suppress", Parameter(Some (box x)))
+                variances |> Option.map (fun x -> "variances", Parameter(Some (box x)))
+                nmsTopk |> Option.map (fun x -> "nms_topk", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribMultiBoxDetection(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribMultiBoxPrior private (operatorArguments) = 
     inherit SymbolOperator("_contrib_MultiBoxPrior", operatorArguments)
@@ -1169,6 +1522,22 @@ type ContribMultiBoxPrior private (operatorArguments) =
     member __.Clip = operatorArguments.GetParameter("clip", ContribMultiBoxPrior.ClipDefault)
     member __.Steps = operatorArguments.GetParameter("steps", ContribMultiBoxPrior.StepsDefault)
     member __.Offsets = operatorArguments.GetParameter("offsets", ContribMultiBoxPrior.OffsetsDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?sizes : double seq,
+        [<Optional>] ?ratios : double seq,
+        [<Optional>] ?clip : bool,
+        [<Optional>] ?steps : double seq,
+        [<Optional>] ?offsets : double seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                sizes |> Option.map (fun x -> "sizes", Parameter(Some (box x)))
+                ratios |> Option.map (fun x -> "ratios", Parameter(Some (box x)))
+                clip |> Option.map (fun x -> "clip", Parameter(Some (box x)))
+                steps |> Option.map (fun x -> "steps", Parameter(Some (box x)))
+                offsets |> Option.map (fun x -> "offsets", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribMultiBoxPrior(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribMultiBoxTarget private (operatorArguments) = 
     inherit SymbolOperator("_contrib_MultiBoxTarget", operatorArguments)
@@ -1213,6 +1582,28 @@ type ContribMultiBoxTarget private (operatorArguments) =
     member __.NegativeMiningThresh = operatorArguments.GetParameter("negative_mining_thresh", ContribMultiBoxTarget.NegativeMiningThreshDefault)
     member __.MinimumNegativeSamples = operatorArguments.GetParameter("minimum_negative_samples", ContribMultiBoxTarget.MinimumNegativeSamplesDefault)
     member __.Variances = operatorArguments.GetParameter("variances", ContribMultiBoxTarget.VariancesDefault)
+    member this.With([<Optional>] ?anchor : Symbol,
+        [<Optional>] ?label : Symbol,
+        [<Optional>] ?clsPred : Symbol,
+        [<Optional>] ?overlapThreshold : float,
+        [<Optional>] ?ignoreLabel : float,
+        [<Optional>] ?negativeMiningRatio : float,
+        [<Optional>] ?negativeMiningThresh : float,
+        [<Optional>] ?minimumNegativeSamples : int,
+        [<Optional>] ?variances : double seq) = 
+        let operatorArguments = 
+            [
+                anchor |> Option.map (fun x -> "anchor", Input x)
+                label |> Option.map (fun x -> "label", Input x)
+                clsPred |> Option.map (fun x -> "cls_pred", Input x)
+                overlapThreshold |> Option.map (fun x -> "overlap_threshold", Parameter(Some (box x)))
+                ignoreLabel |> Option.map (fun x -> "ignore_label", Parameter(Some (box x)))
+                negativeMiningRatio |> Option.map (fun x -> "negative_mining_ratio", Parameter(Some (box x)))
+                negativeMiningThresh |> Option.map (fun x -> "negative_mining_thresh", Parameter(Some (box x)))
+                minimumNegativeSamples |> Option.map (fun x -> "minimum_negative_samples", Parameter(Some (box x)))
+                variances |> Option.map (fun x -> "variances", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribMultiBoxTarget(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribGetnnz private (operatorArguments) = 
     inherit SymbolOperator("_contrib_getnnz", operatorArguments)
@@ -1229,6 +1620,14 @@ type ContribGetnnz private (operatorArguments) =
     static member AxisDefault : int option = None
     member __.Data = operatorArguments.GetInput "data"
     member __.Axis = operatorArguments.GetParameter("axis", ContribGetnnz.AxisDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribGetnnz(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribGroupAdagradUpdate private (operatorArguments) = 
     inherit SymbolOperator("_contrib_group_adagrad_update", operatorArguments)
@@ -1282,6 +1681,24 @@ type ContribGroupAdagradUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", ContribGroupAdagradUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", ContribGroupAdagradUpdate.ClipGradientDefault)
     member __.Epsilon = operatorArguments.GetParameter("epsilon", ContribGroupAdagradUpdate.EpsilonDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?history : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?epsilon : float) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                history |> Option.map (fun x -> "history", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                epsilon |> Option.map (fun x -> "epsilon", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribGroupAdagradUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type PreloadedMultiSgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("preloaded_multi_sgd_update", operatorArguments)
@@ -1306,6 +1723,18 @@ type PreloadedMultiSgdUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", PreloadedMultiSgdUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", PreloadedMultiSgdUpdate.ClipGradientDefault)
     member __.NumWeights = operatorArguments.GetParameter("num_weights", PreloadedMultiSgdUpdate.NumWeightsDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?numWeights : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                numWeights |> Option.map (fun x -> "num_weights", Parameter(Some (box x)))
+            ] |> List.choose id
+        new PreloadedMultiSgdUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type PreloadedMultiSgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("preloaded_multi_sgd_mom_update", operatorArguments)
@@ -1334,6 +1763,20 @@ type PreloadedMultiSgdMomUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", PreloadedMultiSgdMomUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", PreloadedMultiSgdMomUpdate.ClipGradientDefault)
     member __.NumWeights = operatorArguments.GetParameter("num_weights", PreloadedMultiSgdMomUpdate.NumWeightsDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?momentum : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?numWeights : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                momentum |> Option.map (fun x -> "momentum", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                numWeights |> Option.map (fun x -> "num_weights", Parameter(Some (box x)))
+            ] |> List.choose id
+        new PreloadedMultiSgdMomUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type PreloadedMultiMpSgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("preloaded_multi_mp_sgd_update", operatorArguments)
@@ -1358,6 +1801,18 @@ type PreloadedMultiMpSgdUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", PreloadedMultiMpSgdUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", PreloadedMultiMpSgdUpdate.ClipGradientDefault)
     member __.NumWeights = operatorArguments.GetParameter("num_weights", PreloadedMultiMpSgdUpdate.NumWeightsDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?numWeights : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                numWeights |> Option.map (fun x -> "num_weights", Parameter(Some (box x)))
+            ] |> List.choose id
+        new PreloadedMultiMpSgdUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type PreloadedMultiMpSgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("preloaded_multi_mp_sgd_mom_update", operatorArguments)
@@ -1386,6 +1841,20 @@ type PreloadedMultiMpSgdMomUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", PreloadedMultiMpSgdMomUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", PreloadedMultiMpSgdMomUpdate.ClipGradientDefault)
     member __.NumWeights = operatorArguments.GetParameter("num_weights", PreloadedMultiMpSgdMomUpdate.NumWeightsDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?momentum : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?numWeights : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                momentum |> Option.map (fun x -> "momentum", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                numWeights |> Option.map (fun x -> "num_weights", Parameter(Some (box x)))
+            ] |> List.choose id
+        new PreloadedMultiMpSgdMomUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribQuadratic private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quadratic", operatorArguments)
@@ -1410,6 +1879,18 @@ type ContribQuadratic private (operatorArguments) =
     member __.A = operatorArguments.GetParameter("a", ContribQuadratic.ADefault)
     member __.B = operatorArguments.GetParameter("b", ContribQuadratic.BDefault)
     member __.C = operatorArguments.GetParameter("c", ContribQuadratic.CDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?a : float,
+        [<Optional>] ?b : float,
+        [<Optional>] ?c : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                a |> Option.map (fun x -> "a", Parameter(Some (box x)))
+                b |> Option.map (fun x -> "b", Parameter(Some (box x)))
+                c |> Option.map (fun x -> "c", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribQuadratic(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribROIAlign private (operatorArguments) = 
     inherit SymbolOperator("_contrib_ROIAlign", operatorArguments)
@@ -1456,6 +1937,22 @@ type ContribROIAlign private (operatorArguments) =
     member __.SpatialScale : float = match operatorArguments.GetParameter "spatial_scale" with Some(v) -> unbox v | None -> failwithf "Required parameter spatial_scale is missing"
     member __.SampleRatio = operatorArguments.GetParameter("sample_ratio", ContribROIAlign.SampleRatioDefault)
     member __.PositionSensitive = operatorArguments.GetParameter("position_sensitive", ContribROIAlign.PositionSensitiveDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?rois : Symbol,
+        [<Optional>] ?pooledSize : int seq,
+        [<Optional>] ?spatialScale : float,
+        [<Optional>] ?sampleRatio : int,
+        [<Optional>] ?positionSensitive : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                rois |> Option.map (fun x -> "rois", Input x)
+                pooledSize |> Option.map (fun x -> "pooled_size", Parameter(Some (box x)))
+                spatialScale |> Option.map (fun x -> "spatial_scale", Parameter(Some (box x)))
+                sampleRatio |> Option.map (fun x -> "sample_ratio", Parameter(Some (box x)))
+                positionSensitive |> Option.map (fun x -> "position_sensitive", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribROIAlign(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribRROIAlign private (operatorArguments) = 
     inherit SymbolOperator("_contrib_RROIAlign", operatorArguments)
@@ -1496,6 +1993,20 @@ type ContribRROIAlign private (operatorArguments) =
     member __.PooledSize : int seq = match operatorArguments.GetParameter "pooled_size" with Some(v) -> unbox v | None -> failwithf "Required parameter pooled_size is missing"
     member __.SpatialScale : float = match operatorArguments.GetParameter "spatial_scale" with Some(v) -> unbox v | None -> failwithf "Required parameter spatial_scale is missing"
     member __.SamplingRatio = operatorArguments.GetParameter("sampling_ratio", ContribRROIAlign.SamplingRatioDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?rois : Symbol,
+        [<Optional>] ?pooledSize : int seq,
+        [<Optional>] ?spatialScale : float,
+        [<Optional>] ?samplingRatio : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                rois |> Option.map (fun x -> "rois", Input x)
+                pooledSize |> Option.map (fun x -> "pooled_size", Parameter(Some (box x)))
+                spatialScale |> Option.map (fun x -> "spatial_scale", Parameter(Some (box x)))
+                samplingRatio |> Option.map (fun x -> "sampling_ratio", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribRROIAlign(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribSyncBatchNorm private (operatorArguments) = 
     inherit SymbolOperator("_contrib_SyncBatchNorm", operatorArguments)
@@ -1579,6 +2090,34 @@ type ContribSyncBatchNorm private (operatorArguments) =
     member __.UseGlobalStats = operatorArguments.GetParameter("use_global_stats", ContribSyncBatchNorm.UseGlobalStatsDefault)
     member __.OutputMeanVar = operatorArguments.GetParameter("output_mean_var", ContribSyncBatchNorm.OutputMeanVarDefault)
     member __.Ndev = operatorArguments.GetParameter("ndev", ContribSyncBatchNorm.NdevDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?gamma : Symbol,
+        [<Optional>] ?beta : Symbol,
+        [<Optional>] ?movingMean : Symbol,
+        [<Optional>] ?movingVar : Symbol,
+        [<Optional>] ?key : string,
+        [<Optional>] ?eps : float,
+        [<Optional>] ?momentum : float,
+        [<Optional>] ?fixGamma : bool,
+        [<Optional>] ?useGlobalStats : bool,
+        [<Optional>] ?outputMeanVar : bool,
+        [<Optional>] ?ndev : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                gamma |> Option.map (fun x -> "gamma", Input x)
+                beta |> Option.map (fun x -> "beta", Input x)
+                movingMean |> Option.map (fun x -> "moving_mean", Input x)
+                movingVar |> Option.map (fun x -> "moving_var", Input x)
+                key |> Option.map (fun x -> "key", Parameter(Some (box x)))
+                eps |> Option.map (fun x -> "eps", Parameter(Some (box x)))
+                momentum |> Option.map (fun x -> "momentum", Parameter(Some (box x)))
+                fixGamma |> Option.map (fun x -> "fix_gamma", Parameter(Some (box x)))
+                useGlobalStats |> Option.map (fun x -> "use_global_stats", Parameter(Some (box x)))
+                outputMeanVar |> Option.map (fun x -> "output_mean_var", Parameter(Some (box x)))
+                ndev |> Option.map (fun x -> "ndev", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribSyncBatchNorm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribDivSqrtDim private (operatorArguments) = 
     inherit SymbolOperator("_contrib_div_sqrt_dim", operatorArguments)
@@ -1591,6 +2130,12 @@ type ContribDivSqrtDim private (operatorArguments) =
             ]
         new ContribDivSqrtDim(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new ContribDivSqrtDim(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Foreach private (operatorArguments) = 
     inherit SymbolOperator("_foreach", operatorArguments)
@@ -1640,6 +2185,24 @@ type Foreach private (operatorArguments) =
     member __.InStateLocs : int64 seq = match operatorArguments.GetParameter "in_state_locs" with Some(v) -> unbox v | None -> failwithf "Required parameter in_state_locs is missing"
     member __.InDataLocs : int64 seq = match operatorArguments.GetParameter "in_data_locs" with Some(v) -> unbox v | None -> failwithf "Required parameter in_data_locs is missing"
     member __.RemainLocs : int64 seq = match operatorArguments.GetParameter "remain_locs" with Some(v) -> unbox v | None -> failwithf "Required parameter remain_locs is missing"
+    member this.With([<Optional>] ?fn : Symbol,
+        [<Optional>] ?data : Symbol seq,
+        [<Optional>] ?numOutputs : int,
+        [<Optional>] ?numOutData : int,
+        [<Optional>] ?inStateLocs : int64 seq,
+        [<Optional>] ?inDataLocs : int64 seq,
+        [<Optional>] ?remainLocs : int64 seq) = 
+        let operatorArguments = 
+            [
+                fn |> Option.map (fun x -> "fn", Input x)
+                data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+                numOutputs |> Option.map (fun x -> "num_outputs", Parameter(Some (box x)))
+                numOutData |> Option.map (fun x -> "num_out_data", Parameter(Some (box x)))
+                inStateLocs |> Option.map (fun x -> "in_state_locs", Parameter(Some (box x)))
+                inDataLocs |> Option.map (fun x -> "in_data_locs", Parameter(Some (box x)))
+                remainLocs |> Option.map (fun x -> "remain_locs", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Foreach(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type WhileLoop private (operatorArguments) = 
     inherit SymbolOperator("_while_loop", operatorArguments)
@@ -1700,6 +2263,28 @@ type WhileLoop private (operatorArguments) =
     member __.CondInputLocs : int64 seq = match operatorArguments.GetParameter "cond_input_locs" with Some(v) -> unbox v | None -> failwithf "Required parameter cond_input_locs is missing"
     member __.FuncInputLocs : int64 seq = match operatorArguments.GetParameter "func_input_locs" with Some(v) -> unbox v | None -> failwithf "Required parameter func_input_locs is missing"
     member __.FuncVarLocs : int64 seq = match operatorArguments.GetParameter "func_var_locs" with Some(v) -> unbox v | None -> failwithf "Required parameter func_var_locs is missing"
+    member this.With([<Optional>] ?cond : Symbol,
+        [<Optional>] ?func : Symbol,
+        [<Optional>] ?data : Symbol seq,
+        [<Optional>] ?numOutputs : int,
+        [<Optional>] ?numOutData : int,
+        [<Optional>] ?maxIterations : int,
+        [<Optional>] ?condInputLocs : int64 seq,
+        [<Optional>] ?funcInputLocs : int64 seq,
+        [<Optional>] ?funcVarLocs : int64 seq) = 
+        let operatorArguments = 
+            [
+                cond |> Option.map (fun x -> "cond", Input x)
+                func |> Option.map (fun x -> "func", Input x)
+                data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+                numOutputs |> Option.map (fun x -> "num_outputs", Parameter(Some (box x)))
+                numOutData |> Option.map (fun x -> "num_out_data", Parameter(Some (box x)))
+                maxIterations |> Option.map (fun x -> "max_iterations", Parameter(Some (box x)))
+                condInputLocs |> Option.map (fun x -> "cond_input_locs", Parameter(Some (box x)))
+                funcInputLocs |> Option.map (fun x -> "func_input_locs", Parameter(Some (box x)))
+                funcVarLocs |> Option.map (fun x -> "func_var_locs", Parameter(Some (box x)))
+            ] |> List.choose id
+        new WhileLoop(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Cond private (operatorArguments) = 
     inherit SymbolOperator("_cond", operatorArguments)
@@ -1756,6 +2341,26 @@ type Cond private (operatorArguments) =
     member __.CondInputLocs : int64 seq = match operatorArguments.GetParameter "cond_input_locs" with Some(v) -> unbox v | None -> failwithf "Required parameter cond_input_locs is missing"
     member __.ThenInputLocs : int64 seq = match operatorArguments.GetParameter "then_input_locs" with Some(v) -> unbox v | None -> failwithf "Required parameter then_input_locs is missing"
     member __.ElseInputLocs : int64 seq = match operatorArguments.GetParameter "else_input_locs" with Some(v) -> unbox v | None -> failwithf "Required parameter else_input_locs is missing"
+    member this.With([<Optional>] ?cond : Symbol,
+        [<Optional>] ?thenBranch : Symbol,
+        [<Optional>] ?elseBranch : Symbol,
+        [<Optional>] ?data : Symbol seq,
+        [<Optional>] ?numOutputs : int,
+        [<Optional>] ?condInputLocs : int64 seq,
+        [<Optional>] ?thenInputLocs : int64 seq,
+        [<Optional>] ?elseInputLocs : int64 seq) = 
+        let operatorArguments = 
+            [
+                cond |> Option.map (fun x -> "cond", Input x)
+                thenBranch |> Option.map (fun x -> "then_branch", Input x)
+                elseBranch |> Option.map (fun x -> "else_branch", Input x)
+                data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+                numOutputs |> Option.map (fun x -> "num_outputs", Parameter(Some (box x)))
+                condInputLocs |> Option.map (fun x -> "cond_input_locs", Parameter(Some (box x)))
+                thenInputLocs |> Option.map (fun x -> "then_input_locs", Parameter(Some (box x)))
+                elseInputLocs |> Option.map (fun x -> "else_input_locs", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Cond(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Custom private (operatorArguments) = 
     inherit SymbolOperator("Custom", operatorArguments)
@@ -1787,6 +2392,14 @@ type Custom private (operatorArguments) =
         new Custom(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetVarArg "data"
     member __.OpType : string = match operatorArguments.GetParameter "op_type" with Some(v) -> unbox v | None -> failwithf "Required parameter op_type is missing"
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?opType : string) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                opType |> Option.map (fun x -> "op_type", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Custom(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type IdentityAttachKLSparseReg private (operatorArguments) = 
     inherit SymbolOperator("IdentityAttachKLSparseReg", operatorArguments)
@@ -1811,6 +2424,18 @@ type IdentityAttachKLSparseReg private (operatorArguments) =
     member __.SparsenessTarget = operatorArguments.GetParameter("sparseness_target", IdentityAttachKLSparseReg.SparsenessTargetDefault)
     member __.Penalty = operatorArguments.GetParameter("penalty", IdentityAttachKLSparseReg.PenaltyDefault)
     member __.Momentum = operatorArguments.GetParameter("momentum", IdentityAttachKLSparseReg.MomentumDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?sparsenessTarget : float,
+        [<Optional>] ?penalty : float,
+        [<Optional>] ?momentum : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                sparsenessTarget |> Option.map (fun x -> "sparseness_target", Parameter(Some (box x)))
+                penalty |> Option.map (fun x -> "penalty", Parameter(Some (box x)))
+                momentum |> Option.map (fun x -> "momentum", Parameter(Some (box x)))
+            ] |> List.choose id
+        new IdentityAttachKLSparseReg(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ImageCrop private (operatorArguments) = 
     inherit SymbolOperator("_image_crop", operatorArguments)
@@ -1849,6 +2474,20 @@ type ImageCrop private (operatorArguments) =
     member __.Y : int = match operatorArguments.GetParameter "y" with Some(v) -> unbox v | None -> failwithf "Required parameter y is missing"
     member __.Width : int = match operatorArguments.GetParameter "width" with Some(v) -> unbox v | None -> failwithf "Required parameter width is missing"
     member __.Height : int = match operatorArguments.GetParameter "height" with Some(v) -> unbox v | None -> failwithf "Required parameter height is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?x : int,
+        [<Optional>] ?y : int,
+        [<Optional>] ?width : int,
+        [<Optional>] ?height : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                x |> Option.map (fun x -> "x", Parameter(Some (box x)))
+                y |> Option.map (fun x -> "y", Parameter(Some (box x)))
+                width |> Option.map (fun x -> "width", Parameter(Some (box x)))
+                height |> Option.map (fun x -> "height", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ImageCrop(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ImageToTensor private (operatorArguments) = 
     inherit SymbolOperator("_image_to_tensor", operatorArguments)
@@ -1861,6 +2500,12 @@ type ImageToTensor private (operatorArguments) =
             ]
         new ImageToTensor(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new ImageToTensor(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ImageNormalize private (operatorArguments) = 
     inherit SymbolOperator("_image_normalize", operatorArguments)
@@ -1881,6 +2526,16 @@ type ImageNormalize private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Mean = operatorArguments.GetParameter("mean", ImageNormalize.MeanDefault)
     member __.Std = operatorArguments.GetParameter("std", ImageNormalize.StdDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?mean : double seq,
+        [<Optional>] ?std : double seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                mean |> Option.map (fun x -> "mean", Parameter(Some (box x)))
+                std |> Option.map (fun x -> "std", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ImageNormalize(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ImageFlipLeftRight private (operatorArguments) = 
     inherit SymbolOperator("_image_flip_left_right", operatorArguments)
@@ -1893,6 +2548,12 @@ type ImageFlipLeftRight private (operatorArguments) =
             ]
         new ImageFlipLeftRight(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new ImageFlipLeftRight(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ImageRandomFlipLeftRight private (operatorArguments) = 
     inherit SymbolOperator("_image_random_flip_left_right", operatorArguments)
@@ -1905,6 +2566,12 @@ type ImageRandomFlipLeftRight private (operatorArguments) =
             ]
         new ImageRandomFlipLeftRight(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new ImageRandomFlipLeftRight(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ImageFlipTopBottom private (operatorArguments) = 
     inherit SymbolOperator("_image_flip_top_bottom", operatorArguments)
@@ -1917,6 +2584,12 @@ type ImageFlipTopBottom private (operatorArguments) =
             ]
         new ImageFlipTopBottom(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new ImageFlipTopBottom(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ImageRandomFlipTopBottom private (operatorArguments) = 
     inherit SymbolOperator("_image_random_flip_top_bottom", operatorArguments)
@@ -1929,6 +2602,12 @@ type ImageRandomFlipTopBottom private (operatorArguments) =
             ]
         new ImageRandomFlipTopBottom(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new ImageRandomFlipTopBottom(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ImageRandomBrightness private (operatorArguments) = 
     inherit SymbolOperator("_image_random_brightness", operatorArguments)
@@ -1957,6 +2636,16 @@ type ImageRandomBrightness private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.MinFactor : float = match operatorArguments.GetParameter "min_factor" with Some(v) -> unbox v | None -> failwithf "Required parameter min_factor is missing"
     member __.MaxFactor : float = match operatorArguments.GetParameter "max_factor" with Some(v) -> unbox v | None -> failwithf "Required parameter max_factor is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?minFactor : float,
+        [<Optional>] ?maxFactor : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                minFactor |> Option.map (fun x -> "min_factor", Parameter(Some (box x)))
+                maxFactor |> Option.map (fun x -> "max_factor", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ImageRandomBrightness(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ImageRandomContrast private (operatorArguments) = 
     inherit SymbolOperator("_image_random_contrast", operatorArguments)
@@ -1985,6 +2674,16 @@ type ImageRandomContrast private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.MinFactor : float = match operatorArguments.GetParameter "min_factor" with Some(v) -> unbox v | None -> failwithf "Required parameter min_factor is missing"
     member __.MaxFactor : float = match operatorArguments.GetParameter "max_factor" with Some(v) -> unbox v | None -> failwithf "Required parameter max_factor is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?minFactor : float,
+        [<Optional>] ?maxFactor : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                minFactor |> Option.map (fun x -> "min_factor", Parameter(Some (box x)))
+                maxFactor |> Option.map (fun x -> "max_factor", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ImageRandomContrast(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ImageRandomSaturation private (operatorArguments) = 
     inherit SymbolOperator("_image_random_saturation", operatorArguments)
@@ -2013,6 +2712,16 @@ type ImageRandomSaturation private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.MinFactor : float = match operatorArguments.GetParameter "min_factor" with Some(v) -> unbox v | None -> failwithf "Required parameter min_factor is missing"
     member __.MaxFactor : float = match operatorArguments.GetParameter "max_factor" with Some(v) -> unbox v | None -> failwithf "Required parameter max_factor is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?minFactor : float,
+        [<Optional>] ?maxFactor : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                minFactor |> Option.map (fun x -> "min_factor", Parameter(Some (box x)))
+                maxFactor |> Option.map (fun x -> "max_factor", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ImageRandomSaturation(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ImageRandomHue private (operatorArguments) = 
     inherit SymbolOperator("_image_random_hue", operatorArguments)
@@ -2041,6 +2750,16 @@ type ImageRandomHue private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.MinFactor : float = match operatorArguments.GetParameter "min_factor" with Some(v) -> unbox v | None -> failwithf "Required parameter min_factor is missing"
     member __.MaxFactor : float = match operatorArguments.GetParameter "max_factor" with Some(v) -> unbox v | None -> failwithf "Required parameter max_factor is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?minFactor : float,
+        [<Optional>] ?maxFactor : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                minFactor |> Option.map (fun x -> "min_factor", Parameter(Some (box x)))
+                maxFactor |> Option.map (fun x -> "max_factor", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ImageRandomHue(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ImageRandomColorJitter private (operatorArguments) = 
     inherit SymbolOperator("_image_random_color_jitter", operatorArguments)
@@ -2079,6 +2798,20 @@ type ImageRandomColorJitter private (operatorArguments) =
     member __.Contrast : float = match operatorArguments.GetParameter "contrast" with Some(v) -> unbox v | None -> failwithf "Required parameter contrast is missing"
     member __.Saturation : float = match operatorArguments.GetParameter "saturation" with Some(v) -> unbox v | None -> failwithf "Required parameter saturation is missing"
     member __.Hue : float = match operatorArguments.GetParameter "hue" with Some(v) -> unbox v | None -> failwithf "Required parameter hue is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?brightness : float,
+        [<Optional>] ?contrast : float,
+        [<Optional>] ?saturation : float,
+        [<Optional>] ?hue : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                brightness |> Option.map (fun x -> "brightness", Parameter(Some (box x)))
+                contrast |> Option.map (fun x -> "contrast", Parameter(Some (box x)))
+                saturation |> Option.map (fun x -> "saturation", Parameter(Some (box x)))
+                hue |> Option.map (fun x -> "hue", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ImageRandomColorJitter(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ImageAdjustLighting private (operatorArguments) = 
     inherit SymbolOperator("_image_adjust_lighting", operatorArguments)
@@ -2102,6 +2835,14 @@ type ImageAdjustLighting private (operatorArguments) =
         new ImageAdjustLighting(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Alpha : double seq = match operatorArguments.GetParameter "alpha" with Some(v) -> unbox v | None -> failwithf "Required parameter alpha is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?alpha : double seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                alpha |> Option.map (fun x -> "alpha", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ImageAdjustLighting(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ImageRandomLighting private (operatorArguments) = 
     inherit SymbolOperator("_image_random_lighting", operatorArguments)
@@ -2118,6 +2859,14 @@ type ImageRandomLighting private (operatorArguments) =
     static member AlphaStdDefault : double = 0.0500000007
     member __.Data = operatorArguments.GetInput "data"
     member __.AlphaStd = operatorArguments.GetParameter("alpha_std", ImageRandomLighting.AlphaStdDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?alphaStd : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                alphaStd |> Option.map (fun x -> "alpha_std", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ImageRandomLighting(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ImageResize private (operatorArguments) = 
     inherit SymbolOperator("_image_resize", operatorArguments)
@@ -2142,6 +2891,18 @@ type ImageResize private (operatorArguments) =
     member __.Size = operatorArguments.GetParameter("size", ImageResize.SizeDefault)
     member __.KeepRatio = operatorArguments.GetParameter("keep_ratio", ImageResize.KeepRatioDefault)
     member __.Interp = operatorArguments.GetParameter("interp", ImageResize.InterpDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?size : int,
+        [<Optional>] ?keepRatio : bool,
+        [<Optional>] ?interp : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                keepRatio |> Option.map (fun x -> "keep_ratio", Parameter(Some (box x)))
+                interp |> Option.map (fun x -> "interp", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ImageResize(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LeakyReLU private (operatorArguments) = 
     inherit SymbolOperator("LeakyReLU", operatorArguments)
@@ -2174,6 +2935,22 @@ type LeakyReLU private (operatorArguments) =
     member __.Slope = operatorArguments.GetParameter("slope", LeakyReLU.SlopeDefault)
     member __.LowerBound = operatorArguments.GetParameter("lower_bound", LeakyReLU.LowerBoundDefault)
     member __.UpperBound = operatorArguments.GetParameter("upper_bound", LeakyReLU.UpperBoundDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?gamma : Symbol,
+        [<Optional>] ?actType : LeakyReLUType,
+        [<Optional>] ?slope : float,
+        [<Optional>] ?lowerBound : float,
+        [<Optional>] ?upperBound : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                gamma |> Option.map (fun x -> "gamma", Input x)
+                actType |> Option.map (fun x -> "act_type", Parameter(Some (box x)))
+                slope |> Option.map (fun x -> "slope", Parameter(Some (box x)))
+                lowerBound |> Option.map (fun x -> "lower_bound", Parameter(Some (box x)))
+                upperBound |> Option.map (fun x -> "upper_bound", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LeakyReLU(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SoftmaxCrossEntropy private (operatorArguments) = 
     inherit SymbolOperator("softmax_cross_entropy", operatorArguments)
@@ -2190,6 +2967,14 @@ type SoftmaxCrossEntropy private (operatorArguments) =
         new SoftmaxCrossEntropy(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Label = operatorArguments.GetInput "label"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?label : Symbol) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                label |> Option.map (fun x -> "label", Input x)
+            ] |> List.choose id
+        new SoftmaxCrossEntropy(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Activation private (operatorArguments) = 
     inherit SymbolOperator("Activation", operatorArguments)
@@ -2213,6 +2998,14 @@ type Activation private (operatorArguments) =
         new Activation(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.ActType : ActType = match operatorArguments.GetParameter "act_type" with Some(v) -> unbox v | None -> failwithf "Required parameter act_type is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?actType : ActType) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                actType |> Option.map (fun x -> "act_type", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Activation(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BatchNorm private (operatorArguments) = 
     inherit SymbolOperator("BatchNorm", operatorArguments)
@@ -2277,6 +3070,38 @@ type BatchNorm private (operatorArguments) =
     member __.CudnnOff = operatorArguments.GetParameter("cudnn_off", BatchNorm.CudnnOffDefault)
     member __.MinCalibRange = operatorArguments.GetParameter("min_calib_range", BatchNorm.MinCalibRangeDefault)
     member __.MaxCalibRange = operatorArguments.GetParameter("max_calib_range", BatchNorm.MaxCalibRangeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?gamma : Symbol,
+        [<Optional>] ?beta : Symbol,
+        [<Optional>] ?movingMean : Symbol,
+        [<Optional>] ?movingVar : Symbol,
+        [<Optional>] ?eps : double,
+        [<Optional>] ?momentum : float,
+        [<Optional>] ?fixGamma : bool,
+        [<Optional>] ?useGlobalStats : bool,
+        [<Optional>] ?outputMeanVar : bool,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?cudnnOff : bool,
+        [<Optional>] ?minCalibRange : float,
+        [<Optional>] ?maxCalibRange : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                gamma |> Option.map (fun x -> "gamma", Input x)
+                beta |> Option.map (fun x -> "beta", Input x)
+                movingMean |> Option.map (fun x -> "moving_mean", Input x)
+                movingVar |> Option.map (fun x -> "moving_var", Input x)
+                eps |> Option.map (fun x -> "eps", Parameter(Some (box x)))
+                momentum |> Option.map (fun x -> "momentum", Parameter(Some (box x)))
+                fixGamma |> Option.map (fun x -> "fix_gamma", Parameter(Some (box x)))
+                useGlobalStats |> Option.map (fun x -> "use_global_stats", Parameter(Some (box x)))
+                outputMeanVar |> Option.map (fun x -> "output_mean_var", Parameter(Some (box x)))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                cudnnOff |> Option.map (fun x -> "cudnn_off", Parameter(Some (box x)))
+                minCalibRange |> Option.map (fun x -> "min_calib_range", Parameter(Some (box x)))
+                maxCalibRange |> Option.map (fun x -> "max_calib_range", Parameter(Some (box x)))
+            ] |> List.choose id
+        new BatchNorm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Concat private (operatorArguments) = 
     inherit SymbolOperator("Concat", operatorArguments)
@@ -2293,6 +3118,14 @@ type Concat private (operatorArguments) =
     static member DimDefault : int = 1
     member __.Data = operatorArguments.GetVarArg "data"
     member __.Dim = operatorArguments.GetParameter("dim", Concat.DimDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?dim : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+                dim |> Option.map (fun x -> "dim", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Concat(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RnnParamConcat private (operatorArguments) = 
     inherit SymbolOperator("_rnn_param_concat", operatorArguments)
@@ -2309,6 +3142,14 @@ type RnnParamConcat private (operatorArguments) =
     static member DimDefault : int = 1
     member __.Data = operatorArguments.GetVarArg "data"
     member __.Dim = operatorArguments.GetParameter("dim", RnnParamConcat.DimDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?dim : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+                dim |> Option.map (fun x -> "dim", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RnnParamConcat(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Convolution private (operatorArguments) = 
     inherit SymbolOperator("Convolution", operatorArguments)
@@ -2403,6 +3244,38 @@ type Convolution private (operatorArguments) =
     member __.CudnnTune = operatorArguments.GetParameter("cudnn_tune", Convolution.CudnnTuneDefault)
     member __.CudnnOff = operatorArguments.GetParameter("cudnn_off", Convolution.CudnnOffDefault)
     member __.Layout = operatorArguments.GetParameter("layout", Convolution.LayoutDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?weight : Symbol,
+        [<Optional>] ?bias : Symbol,
+        [<Optional>] ?kernel : int seq,
+        [<Optional>] ?numFilter : int,
+        [<Optional>] ?stride : int seq,
+        [<Optional>] ?dilate : int seq,
+        [<Optional>] ?pad : int seq,
+        [<Optional>] ?numGroup : int,
+        [<Optional>] ?workspace : int64,
+        [<Optional>] ?noBias : bool,
+        [<Optional>] ?cudnnTune : CudnnTune,
+        [<Optional>] ?cudnnOff : bool,
+        [<Optional>] ?layout : ConvolutionLayout) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                weight |> Option.map (fun x -> "weight", Input x)
+                bias |> Option.map (fun x -> "bias", Input x)
+                kernel |> Option.map (fun x -> "kernel", Parameter(Some (box x)))
+                numFilter |> Option.map (fun x -> "num_filter", Parameter(Some (box x)))
+                stride |> Option.map (fun x -> "stride", Parameter(Some (box x)))
+                dilate |> Option.map (fun x -> "dilate", Parameter(Some (box x)))
+                pad |> Option.map (fun x -> "pad", Parameter(Some (box x)))
+                numGroup |> Option.map (fun x -> "num_group", Parameter(Some (box x)))
+                workspace |> Option.map (fun x -> "workspace", Parameter(Some (box x)))
+                noBias |> Option.map (fun x -> "no_bias", Parameter(Some (box x)))
+                cudnnTune |> Option.map (fun x -> "cudnn_tune", Parameter(Some (box x)))
+                cudnnOff |> Option.map (fun x -> "cudnn_off", Parameter(Some (box x)))
+                layout |> Option.map (fun x -> "layout", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Convolution(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type CTCLoss private (operatorArguments) = 
     inherit SymbolOperator("CTCLoss", operatorArguments)
@@ -2439,6 +3312,24 @@ type CTCLoss private (operatorArguments) =
     member __.UseDataLengths = operatorArguments.GetParameter("use_data_lengths", CTCLoss.UseDataLengthsDefault)
     member __.UseLabelLengths = operatorArguments.GetParameter("use_label_lengths", CTCLoss.UseLabelLengthsDefault)
     member __.BlankLabel = operatorArguments.GetParameter("blank_label", CTCLoss.BlankLabelDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?label : Symbol,
+        [<Optional>] ?dataLengths : Symbol,
+        [<Optional>] ?labelLengths : Symbol,
+        [<Optional>] ?useDataLengths : bool,
+        [<Optional>] ?useLabelLengths : bool,
+        [<Optional>] ?blankLabel : BlankLabel) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                label |> Option.map (fun x -> "label", Input x)
+                dataLengths |> Option.map (fun x -> "data_lengths", Input x)
+                labelLengths |> Option.map (fun x -> "label_lengths", Input x)
+                useDataLengths |> Option.map (fun x -> "use_data_lengths", Parameter(Some (box x)))
+                useLabelLengths |> Option.map (fun x -> "use_label_lengths", Parameter(Some (box x)))
+                blankLabel |> Option.map (fun x -> "blank_label", Parameter(Some (box x)))
+            ] |> List.choose id
+        new CTCLoss(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type CuDNNBatchNorm private (operatorArguments) = 
     inherit SymbolOperator("CuDNNBatchNorm", operatorArguments)
@@ -2503,6 +3394,38 @@ type CuDNNBatchNorm private (operatorArguments) =
     member __.CudnnOff = operatorArguments.GetParameter("cudnn_off", CuDNNBatchNorm.CudnnOffDefault)
     member __.MinCalibRange = operatorArguments.GetParameter("min_calib_range", CuDNNBatchNorm.MinCalibRangeDefault)
     member __.MaxCalibRange = operatorArguments.GetParameter("max_calib_range", CuDNNBatchNorm.MaxCalibRangeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?gamma : Symbol,
+        [<Optional>] ?beta : Symbol,
+        [<Optional>] ?movingMean : Symbol,
+        [<Optional>] ?movingVar : Symbol,
+        [<Optional>] ?eps : double,
+        [<Optional>] ?momentum : float,
+        [<Optional>] ?fixGamma : bool,
+        [<Optional>] ?useGlobalStats : bool,
+        [<Optional>] ?outputMeanVar : bool,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?cudnnOff : bool,
+        [<Optional>] ?minCalibRange : float,
+        [<Optional>] ?maxCalibRange : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                gamma |> Option.map (fun x -> "gamma", Input x)
+                beta |> Option.map (fun x -> "beta", Input x)
+                movingMean |> Option.map (fun x -> "moving_mean", Input x)
+                movingVar |> Option.map (fun x -> "moving_var", Input x)
+                eps |> Option.map (fun x -> "eps", Parameter(Some (box x)))
+                momentum |> Option.map (fun x -> "momentum", Parameter(Some (box x)))
+                fixGamma |> Option.map (fun x -> "fix_gamma", Parameter(Some (box x)))
+                useGlobalStats |> Option.map (fun x -> "use_global_stats", Parameter(Some (box x)))
+                outputMeanVar |> Option.map (fun x -> "output_mean_var", Parameter(Some (box x)))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                cudnnOff |> Option.map (fun x -> "cudnn_off", Parameter(Some (box x)))
+                minCalibRange |> Option.map (fun x -> "min_calib_range", Parameter(Some (box x)))
+                maxCalibRange |> Option.map (fun x -> "max_calib_range", Parameter(Some (box x)))
+            ] |> List.choose id
+        new CuDNNBatchNorm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Deconvolution private (operatorArguments) = 
     inherit SymbolOperator("Deconvolution", operatorArguments)
@@ -2609,6 +3532,42 @@ type Deconvolution private (operatorArguments) =
     member __.CudnnTune = operatorArguments.GetParameter("cudnn_tune", Deconvolution.CudnnTuneDefault)
     member __.CudnnOff = operatorArguments.GetParameter("cudnn_off", Deconvolution.CudnnOffDefault)
     member __.Layout = operatorArguments.GetParameter("layout", Deconvolution.LayoutDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?weight : Symbol,
+        [<Optional>] ?bias : Symbol,
+        [<Optional>] ?kernel : int seq,
+        [<Optional>] ?numFilter : int,
+        [<Optional>] ?stride : int seq,
+        [<Optional>] ?dilate : int seq,
+        [<Optional>] ?pad : int seq,
+        [<Optional>] ?adj : int seq,
+        [<Optional>] ?targetShape : int seq,
+        [<Optional>] ?numGroup : int,
+        [<Optional>] ?workspace : int64,
+        [<Optional>] ?noBias : bool,
+        [<Optional>] ?cudnnTune : CudnnTune,
+        [<Optional>] ?cudnnOff : bool,
+        [<Optional>] ?layout : DeconvolutionLayout) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                weight |> Option.map (fun x -> "weight", Input x)
+                bias |> Option.map (fun x -> "bias", Input x)
+                kernel |> Option.map (fun x -> "kernel", Parameter(Some (box x)))
+                numFilter |> Option.map (fun x -> "num_filter", Parameter(Some (box x)))
+                stride |> Option.map (fun x -> "stride", Parameter(Some (box x)))
+                dilate |> Option.map (fun x -> "dilate", Parameter(Some (box x)))
+                pad |> Option.map (fun x -> "pad", Parameter(Some (box x)))
+                adj |> Option.map (fun x -> "adj", Parameter(Some (box x)))
+                targetShape |> Option.map (fun x -> "target_shape", Parameter(Some (box x)))
+                numGroup |> Option.map (fun x -> "num_group", Parameter(Some (box x)))
+                workspace |> Option.map (fun x -> "workspace", Parameter(Some (box x)))
+                noBias |> Option.map (fun x -> "no_bias", Parameter(Some (box x)))
+                cudnnTune |> Option.map (fun x -> "cudnn_tune", Parameter(Some (box x)))
+                cudnnOff |> Option.map (fun x -> "cudnn_off", Parameter(Some (box x)))
+                layout |> Option.map (fun x -> "layout", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Deconvolution(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Dropout private (operatorArguments) = 
     inherit SymbolOperator("Dropout", operatorArguments)
@@ -2637,6 +3596,20 @@ type Dropout private (operatorArguments) =
     member __.Mode = operatorArguments.GetParameter("mode", Dropout.ModeDefault)
     member __.Axes = operatorArguments.GetParameter("axes", Dropout.AxesDefault)
     member __.CudnnOff = operatorArguments.GetParameter("cudnn_off", Dropout.CudnnOffDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?p : float,
+        [<Optional>] ?mode : DropoutMode,
+        [<Optional>] ?axes : int seq,
+        [<Optional>] ?cudnnOff : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                p |> Option.map (fun x -> "p", Parameter(Some (box x)))
+                mode |> Option.map (fun x -> "mode", Parameter(Some (box x)))
+                axes |> Option.map (fun x -> "axes", Parameter(Some (box x)))
+                cudnnOff |> Option.map (fun x -> "cudnn_off", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Dropout(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type FullyConnected private (operatorArguments) = 
     inherit SymbolOperator("FullyConnected", operatorArguments)
@@ -2684,6 +3657,22 @@ type FullyConnected private (operatorArguments) =
     member __.NumHidden : int = match operatorArguments.GetParameter "num_hidden" with Some(v) -> unbox v | None -> failwithf "Required parameter num_hidden is missing"
     member __.NoBias = operatorArguments.GetParameter("no_bias", FullyConnected.NoBiasDefault)
     member __.Flatten = operatorArguments.GetParameter("flatten", FullyConnected.FlattenDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?weight : Symbol,
+        [<Optional>] ?bias : Symbol,
+        [<Optional>] ?numHidden : int,
+        [<Optional>] ?noBias : bool,
+        [<Optional>] ?flatten : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                weight |> Option.map (fun x -> "weight", Input x)
+                bias |> Option.map (fun x -> "bias", Input x)
+                numHidden |> Option.map (fun x -> "num_hidden", Parameter(Some (box x)))
+                noBias |> Option.map (fun x -> "no_bias", Parameter(Some (box x)))
+                flatten |> Option.map (fun x -> "flatten", Parameter(Some (box x)))
+            ] |> List.choose id
+        new FullyConnected(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type GroupNorm private (operatorArguments) = 
     inherit SymbolOperator("GroupNorm", operatorArguments)
@@ -2716,6 +3705,22 @@ type GroupNorm private (operatorArguments) =
     member __.NumGroups = operatorArguments.GetParameter("num_groups", GroupNorm.NumGroupsDefault)
     member __.Eps = operatorArguments.GetParameter("eps", GroupNorm.EpsDefault)
     member __.OutputMeanVar = operatorArguments.GetParameter("output_mean_var", GroupNorm.OutputMeanVarDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?gamma : Symbol,
+        [<Optional>] ?beta : Symbol,
+        [<Optional>] ?numGroups : int,
+        [<Optional>] ?eps : float,
+        [<Optional>] ?outputMeanVar : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                gamma |> Option.map (fun x -> "gamma", Input x)
+                beta |> Option.map (fun x -> "beta", Input x)
+                numGroups |> Option.map (fun x -> "num_groups", Parameter(Some (box x)))
+                eps |> Option.map (fun x -> "eps", Parameter(Some (box x)))
+                outputMeanVar |> Option.map (fun x -> "output_mean_var", Parameter(Some (box x)))
+            ] |> List.choose id
+        new GroupNorm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LayerNorm private (operatorArguments) = 
     inherit SymbolOperator("LayerNorm", operatorArguments)
@@ -2748,6 +3753,22 @@ type LayerNorm private (operatorArguments) =
     member __.Axis = operatorArguments.GetParameter("axis", LayerNorm.AxisDefault)
     member __.Eps = operatorArguments.GetParameter("eps", LayerNorm.EpsDefault)
     member __.OutputMeanVar = operatorArguments.GetParameter("output_mean_var", LayerNorm.OutputMeanVarDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?gamma : Symbol,
+        [<Optional>] ?beta : Symbol,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?eps : float,
+        [<Optional>] ?outputMeanVar : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                gamma |> Option.map (fun x -> "gamma", Input x)
+                beta |> Option.map (fun x -> "beta", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                eps |> Option.map (fun x -> "eps", Parameter(Some (box x)))
+                outputMeanVar |> Option.map (fun x -> "output_mean_var", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LayerNorm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LogSoftmax private (operatorArguments) = 
     inherit SymbolOperator("log_softmax", operatorArguments)
@@ -2776,6 +3797,20 @@ type LogSoftmax private (operatorArguments) =
     member __.Temperature = operatorArguments.GetParameter("temperature", LogSoftmax.TemperatureDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", LogSoftmax.DtypeDefault)
     member __.UseLength = operatorArguments.GetParameter("use_length", LogSoftmax.UseLengthDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?temperature : float,
+        [<Optional>] ?dtype : FloatDType,
+        [<Optional>] ?useLength : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                temperature |> Option.map (fun x -> "temperature", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                useLength |> Option.map (fun x -> "use_length", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LogSoftmax(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LRN private (operatorArguments) = 
     inherit SymbolOperator("LRN", operatorArguments)
@@ -2817,6 +3852,20 @@ type LRN private (operatorArguments) =
     member __.Alpha = operatorArguments.GetParameter("alpha", LRN.AlphaDefault)
     member __.Beta = operatorArguments.GetParameter("beta", LRN.BetaDefault)
     member __.Knorm = operatorArguments.GetParameter("knorm", LRN.KnormDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?nsize : int,
+        [<Optional>] ?alpha : float,
+        [<Optional>] ?beta : float,
+        [<Optional>] ?knorm : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                nsize |> Option.map (fun x -> "nsize", Parameter(Some (box x)))
+                alpha |> Option.map (fun x -> "alpha", Parameter(Some (box x)))
+                beta |> Option.map (fun x -> "beta", Parameter(Some (box x)))
+                knorm |> Option.map (fun x -> "knorm", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LRN(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Moments private (operatorArguments) = 
     inherit SymbolOperator("moments", operatorArguments)
@@ -2837,6 +3886,16 @@ type Moments private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Axes = operatorArguments.GetParameter("axes", Moments.AxesDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", Moments.KeepdimsDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axes : int seq,
+        [<Optional>] ?keepdims : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axes |> Option.map (fun x -> "axes", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Moments(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Pooling private (operatorArguments) = 
     inherit SymbolOperator("Pooling", operatorArguments)
@@ -2889,6 +3948,32 @@ type Pooling private (operatorArguments) =
     member __.PValue = operatorArguments.GetParameter("p_value", Pooling.PValueDefault)
     member __.CountIncludePad = operatorArguments.GetParameter("count_include_pad", Pooling.CountIncludePadDefault)
     member __.Layout = operatorArguments.GetParameter("layout", Pooling.LayoutDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?kernel : int seq,
+        [<Optional>] ?poolType : PoolType,
+        [<Optional>] ?globalPool : bool,
+        [<Optional>] ?cudnnOff : bool,
+        [<Optional>] ?poolingConvention : PoolingConvention,
+        [<Optional>] ?stride : int seq,
+        [<Optional>] ?pad : int seq,
+        [<Optional>] ?pValue : int,
+        [<Optional>] ?countIncludePad : bool,
+        [<Optional>] ?layout : PoolingLayout) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                kernel |> Option.map (fun x -> "kernel", Parameter(Some (box x)))
+                poolType |> Option.map (fun x -> "pool_type", Parameter(Some (box x)))
+                globalPool |> Option.map (fun x -> "global_pool", Parameter(Some (box x)))
+                cudnnOff |> Option.map (fun x -> "cudnn_off", Parameter(Some (box x)))
+                poolingConvention |> Option.map (fun x -> "pooling_convention", Parameter(Some (box x)))
+                stride |> Option.map (fun x -> "stride", Parameter(Some (box x)))
+                pad |> Option.map (fun x -> "pad", Parameter(Some (box x)))
+                pValue |> Option.map (fun x -> "p_value", Parameter(Some (box x)))
+                countIncludePad |> Option.map (fun x -> "count_include_pad", Parameter(Some (box x)))
+                layout |> Option.map (fun x -> "layout", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Pooling(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Softmax private (operatorArguments) = 
     inherit SymbolOperator("softmax", operatorArguments)
@@ -2921,6 +4006,22 @@ type Softmax private (operatorArguments) =
     member __.Temperature = operatorArguments.GetParameter("temperature", Softmax.TemperatureDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", Softmax.DtypeDefault)
     member __.UseLength = operatorArguments.GetParameter("use_length", Softmax.UseLengthDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?length : Symbol,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?temperature : float,
+        [<Optional>] ?dtype : FloatDType,
+        [<Optional>] ?useLength : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                length |> Option.map (fun x -> "length", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                temperature |> Option.map (fun x -> "temperature", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                useLength |> Option.map (fun x -> "use_length", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Softmax(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SoftmaxActivation private (operatorArguments) = 
     inherit SymbolOperator("SoftmaxActivation", operatorArguments)
@@ -2937,6 +4038,14 @@ type SoftmaxActivation private (operatorArguments) =
     static member ModeDefault : SoftmaxActivationMode = SoftmaxActivationMode.Instance
     member __.Data = operatorArguments.GetInput "data"
     member __.Mode = operatorArguments.GetParameter("mode", SoftmaxActivation.ModeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?mode : SoftmaxActivationMode) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                mode |> Option.map (fun x -> "mode", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SoftmaxActivation(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Softmin private (operatorArguments) = 
     inherit SymbolOperator("softmin", operatorArguments)
@@ -2965,6 +4074,20 @@ type Softmin private (operatorArguments) =
     member __.Temperature = operatorArguments.GetParameter("temperature", Softmin.TemperatureDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", Softmin.DtypeDefault)
     member __.UseLength = operatorArguments.GetParameter("use_length", Softmin.UseLengthDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?temperature : float,
+        [<Optional>] ?dtype : FloatDType,
+        [<Optional>] ?useLength : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                temperature |> Option.map (fun x -> "temperature", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                useLength |> Option.map (fun x -> "use_length", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Softmin(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type UpSampling private (operatorArguments) = 
     inherit SymbolOperator("UpSampling", operatorArguments)
@@ -3011,6 +4134,22 @@ type UpSampling private (operatorArguments) =
     member __.NumFilter = operatorArguments.GetParameter("num_filter", UpSampling.NumFilterDefault)
     member __.MultiInputMode = operatorArguments.GetParameter("multi_input_mode", UpSampling.MultiInputModeDefault)
     member __.Workspace = operatorArguments.GetParameter("workspace", UpSampling.WorkspaceDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?scale : int,
+        [<Optional>] ?sampleType : SampleType,
+        [<Optional>] ?numFilter : int,
+        [<Optional>] ?multiInputMode : MultiInputMode,
+        [<Optional>] ?workspace : int64) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+                scale |> Option.map (fun x -> "scale", Parameter(Some (box x)))
+                sampleType |> Option.map (fun x -> "sample_type", Parameter(Some (box x)))
+                numFilter |> Option.map (fun x -> "num_filter", Parameter(Some (box x)))
+                multiInputMode |> Option.map (fun x -> "multi_input_mode", Parameter(Some (box x)))
+                workspace |> Option.map (fun x -> "workspace", Parameter(Some (box x)))
+            ] |> List.choose id
+        new UpSampling(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpLinalgSvd private (operatorArguments) = 
     inherit SymbolOperator("_np__linalg_svd", operatorArguments)
@@ -3023,6 +4162,12 @@ type NpLinalgSvd private (operatorArguments) =
             ]
         new NpLinalgSvd(Arguments<Symbol>(operatorArguments))
     member __.A = operatorArguments.GetInput "A"
+    member this.With([<Optional>] ?A : Symbol) =
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+            ] |> List.choose id
+        new NpLinalgSvd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiArgmax private (operatorArguments) = 
     inherit SymbolOperator("_npi_argmax", operatorArguments)
@@ -3043,6 +4188,16 @@ type NpiArgmax private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Axis = operatorArguments.GetParameter("axis", NpiArgmax.AxisDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", NpiArgmax.KeepdimsDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?keepdims : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiArgmax(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpSum private (operatorArguments) = 
     inherit SymbolOperator("_np_sum", operatorArguments)
@@ -3071,6 +4226,20 @@ type NpSum private (operatorArguments) =
     member __.Dtype = operatorArguments.GetParameter("dtype", NpSum.DtypeDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", NpSum.KeepdimsDefault)
     member __.Initial = operatorArguments.GetParameter("initial", NpSum.InitialDefault)
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?dtype : NpSumDtype,
+        [<Optional>] ?keepdims : bool,
+        [<Optional>] ?initial : float) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                initial |> Option.map (fun x -> "initial", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpSum(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpMax private (operatorArguments) = 
     inherit SymbolOperator("_np_max", operatorArguments)
@@ -3095,6 +4264,18 @@ type NpMax private (operatorArguments) =
     member __.Axis = operatorArguments.GetParameter("axis", NpMax.AxisDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", NpMax.KeepdimsDefault)
     member __.Initial = operatorArguments.GetParameter("initial", NpMax.InitialDefault)
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?keepdims : bool,
+        [<Optional>] ?initial : float) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                initial |> Option.map (fun x -> "initial", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpMax(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpMin private (operatorArguments) = 
     inherit SymbolOperator("_np_min", operatorArguments)
@@ -3119,6 +4300,18 @@ type NpMin private (operatorArguments) =
     member __.Axis = operatorArguments.GetParameter("axis", NpMin.AxisDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", NpMin.KeepdimsDefault)
     member __.Initial = operatorArguments.GetParameter("initial", NpMin.InitialDefault)
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?keepdims : bool,
+        [<Optional>] ?initial : float) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                initial |> Option.map (fun x -> "initial", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpMin(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpProd private (operatorArguments) = 
     inherit SymbolOperator("_np_prod", operatorArguments)
@@ -3147,6 +4340,20 @@ type NpProd private (operatorArguments) =
     member __.Dtype = operatorArguments.GetParameter("dtype", NpProd.DtypeDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", NpProd.KeepdimsDefault)
     member __.Initial = operatorArguments.GetParameter("initial", NpProd.InitialDefault)
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?dtype : NpProdDtype,
+        [<Optional>] ?keepdims : bool,
+        [<Optional>] ?initial : float) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                initial |> Option.map (fun x -> "initial", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpProd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiMean private (operatorArguments) = 
     inherit SymbolOperator("_npi_mean", operatorArguments)
@@ -3175,6 +4382,20 @@ type NpiMean private (operatorArguments) =
     member __.Dtype = operatorArguments.GetParameter("dtype", NpiMean.DtypeDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", NpiMean.KeepdimsDefault)
     member __.Initial = operatorArguments.GetParameter("initial", NpiMean.InitialDefault)
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?dtype : NpiMeanDtype,
+        [<Optional>] ?keepdims : bool,
+        [<Optional>] ?initial : float) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                initial |> Option.map (fun x -> "initial", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiMean(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiStd private (operatorArguments) = 
     inherit SymbolOperator("_npi_std", operatorArguments)
@@ -3203,6 +4424,20 @@ type NpiStd private (operatorArguments) =
     member __.Dtype = operatorArguments.GetParameter("dtype", NpiStd.DtypeDefault)
     member __.Ddof = operatorArguments.GetParameter("ddof", NpiStd.DdofDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", NpiStd.KeepdimsDefault)
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?dtype : NpiStdDtype,
+        [<Optional>] ?ddof : int,
+        [<Optional>] ?keepdims : bool) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                ddof |> Option.map (fun x -> "ddof", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiStd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiVar private (operatorArguments) = 
     inherit SymbolOperator("_npi_var", operatorArguments)
@@ -3231,6 +4466,20 @@ type NpiVar private (operatorArguments) =
     member __.Dtype = operatorArguments.GetParameter("dtype", NpiVar.DtypeDefault)
     member __.Ddof = operatorArguments.GetParameter("ddof", NpiVar.DdofDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", NpiVar.KeepdimsDefault)
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?dtype : NpiVarDtype,
+        [<Optional>] ?ddof : int,
+        [<Optional>] ?keepdims : bool) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                ddof |> Option.map (fun x -> "ddof", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiVar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpBroadcastTo private (operatorArguments) = 
     inherit SymbolOperator("_np_broadcast_to", operatorArguments)
@@ -3247,6 +4496,14 @@ type NpBroadcastTo private (operatorArguments) =
     static member ShapeDefault : int [] = [||]
     member __.Array = operatorArguments.GetInput "array"
     member __.Shape = operatorArguments.GetParameter("shape", NpBroadcastTo.ShapeDefault)
+    member this.With([<Optional>] ?array : Symbol,
+        [<Optional>] ?shape : int seq) = 
+        let operatorArguments = 
+            [
+                array |> Option.map (fun x -> "array", Input x)
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpBroadcastTo(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpCumsum private (operatorArguments) = 
     inherit SymbolOperator("_np_cumsum", operatorArguments)
@@ -3267,6 +4524,16 @@ type NpCumsum private (operatorArguments) =
     member __.A = operatorArguments.GetInput "a"
     member __.Axis = operatorArguments.GetParameter("axis", NpCumsum.AxisDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", NpCumsum.DtypeDefault)
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?dtype : NpCumsumDtype) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpCumsum(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpDot private (operatorArguments) = 
     inherit SymbolOperator("_np_dot", operatorArguments)
@@ -3283,6 +4550,14 @@ type NpDot private (operatorArguments) =
         new NpDot(Arguments<Symbol>(operatorArguments))
     member __.A = operatorArguments.GetInput "a"
     member __.B = operatorArguments.GetInput "b"
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?b : Symbol) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                b |> Option.map (fun x -> "b", Input x)
+            ] |> List.choose id
+        new NpDot(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiAdd private (operatorArguments) = 
     inherit SymbolOperator("_npi_add", operatorArguments)
@@ -3299,6 +4574,14 @@ type NpiAdd private (operatorArguments) =
         new NpiAdd(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new NpiAdd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiSubtract private (operatorArguments) = 
     inherit SymbolOperator("_npi_subtract", operatorArguments)
@@ -3315,6 +4598,14 @@ type NpiSubtract private (operatorArguments) =
         new NpiSubtract(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new NpiSubtract(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiMultiply private (operatorArguments) = 
     inherit SymbolOperator("_npi_multiply", operatorArguments)
@@ -3331,6 +4622,14 @@ type NpiMultiply private (operatorArguments) =
         new NpiMultiply(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new NpiMultiply(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiMod private (operatorArguments) = 
     inherit SymbolOperator("_npi_mod", operatorArguments)
@@ -3347,6 +4646,14 @@ type NpiMod private (operatorArguments) =
         new NpiMod(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new NpiMod(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiPower private (operatorArguments) = 
     inherit SymbolOperator("_npi_power", operatorArguments)
@@ -3363,6 +4670,14 @@ type NpiPower private (operatorArguments) =
         new NpiPower(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new NpiPower(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiCopysign private (operatorArguments) = 
     inherit SymbolOperator("_npi_copysign", operatorArguments)
@@ -3379,6 +4694,14 @@ type NpiCopysign private (operatorArguments) =
         new NpiCopysign(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new NpiCopysign(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiLcm private (operatorArguments) = 
     inherit SymbolOperator("_npi_lcm", operatorArguments)
@@ -3395,6 +4718,14 @@ type NpiLcm private (operatorArguments) =
         new NpiLcm(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new NpiLcm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiAddScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_add_scalar", operatorArguments)
@@ -3418,6 +4749,14 @@ type NpiAddScalar private (operatorArguments) =
         new NpiAddScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiAddScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiSubtractScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_subtract_scalar", operatorArguments)
@@ -3441,6 +4780,14 @@ type NpiSubtractScalar private (operatorArguments) =
         new NpiSubtractScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiSubtractScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiRsubtractScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rsubtract_scalar", operatorArguments)
@@ -3464,6 +4811,14 @@ type NpiRsubtractScalar private (operatorArguments) =
         new NpiRsubtractScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiRsubtractScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiMultiplyScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_multiply_scalar", operatorArguments)
@@ -3487,6 +4842,14 @@ type NpiMultiplyScalar private (operatorArguments) =
         new NpiMultiplyScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiMultiplyScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiModScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_mod_scalar", operatorArguments)
@@ -3510,6 +4873,14 @@ type NpiModScalar private (operatorArguments) =
         new NpiModScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiModScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiRmodScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rmod_scalar", operatorArguments)
@@ -3533,6 +4904,14 @@ type NpiRmodScalar private (operatorArguments) =
         new NpiRmodScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiRmodScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiPowerScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_power_scalar", operatorArguments)
@@ -3556,6 +4935,14 @@ type NpiPowerScalar private (operatorArguments) =
         new NpiPowerScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiPowerScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiRpowerScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rpower_scalar", operatorArguments)
@@ -3579,6 +4966,14 @@ type NpiRpowerScalar private (operatorArguments) =
         new NpiRpowerScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiRpowerScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiCopysignScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_copysign_scalar", operatorArguments)
@@ -3602,6 +4997,14 @@ type NpiCopysignScalar private (operatorArguments) =
         new NpiCopysignScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiCopysignScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiRcopysignScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rcopysign_scalar", operatorArguments)
@@ -3625,6 +5028,14 @@ type NpiRcopysignScalar private (operatorArguments) =
         new NpiRcopysignScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiRcopysignScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiArctan2 private (operatorArguments) = 
     inherit SymbolOperator("_npi_arctan2", operatorArguments)
@@ -3641,6 +5052,14 @@ type NpiArctan2 private (operatorArguments) =
         new NpiArctan2(Arguments<Symbol>(operatorArguments))
     member __.X1 = operatorArguments.GetInput "x1"
     member __.X2 = operatorArguments.GetInput "x2"
+    member this.With([<Optional>] ?x1 : Symbol,
+        [<Optional>] ?x2 : Symbol) = 
+        let operatorArguments = 
+            [
+                x1 |> Option.map (fun x -> "x1", Input x)
+                x2 |> Option.map (fun x -> "x2", Input x)
+            ] |> List.choose id
+        new NpiArctan2(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiArctan2Scalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_arctan2_scalar", operatorArguments)
@@ -3664,6 +5083,14 @@ type NpiArctan2Scalar private (operatorArguments) =
         new NpiArctan2Scalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiArctan2Scalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiRarctan2Scalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rarctan2_scalar", operatorArguments)
@@ -3687,6 +5114,14 @@ type NpiRarctan2Scalar private (operatorArguments) =
         new NpiRarctan2Scalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiRarctan2Scalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiHypot private (operatorArguments) = 
     inherit SymbolOperator("_npi_hypot", operatorArguments)
@@ -3703,6 +5138,14 @@ type NpiHypot private (operatorArguments) =
         new NpiHypot(Arguments<Symbol>(operatorArguments))
     member __.X1 = operatorArguments.GetInput "x1"
     member __.X2 = operatorArguments.GetInput "x2"
+    member this.With([<Optional>] ?x1 : Symbol,
+        [<Optional>] ?x2 : Symbol) = 
+        let operatorArguments = 
+            [
+                x1 |> Option.map (fun x -> "x1", Input x)
+                x2 |> Option.map (fun x -> "x2", Input x)
+            ] |> List.choose id
+        new NpiHypot(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiLcmScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_lcm_scalar", operatorArguments)
@@ -3726,6 +5169,14 @@ type NpiLcmScalar private (operatorArguments) =
         new NpiLcmScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : int = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiLcmScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpxRelu private (operatorArguments) = 
     inherit SymbolOperator("_npx_relu", operatorArguments)
@@ -3738,6 +5189,12 @@ type NpxRelu private (operatorArguments) =
             ]
         new NpxRelu(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new NpxRelu(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpxSigmoid private (operatorArguments) = 
     inherit SymbolOperator("_npx_sigmoid", operatorArguments)
@@ -3750,6 +5207,12 @@ type NpxSigmoid private (operatorArguments) =
             ]
         new NpxSigmoid(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new NpxSigmoid(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpCopy private (operatorArguments) = 
     inherit SymbolOperator("_np_copy", operatorArguments)
@@ -3762,6 +5225,12 @@ type NpCopy private (operatorArguments) =
             ]
         new NpCopy(Arguments<Symbol>(operatorArguments))
     member __.A = operatorArguments.GetInput "a"
+    member this.With([<Optional>] ?a : Symbol) =
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+            ] |> List.choose id
+        new NpCopy(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiNegative private (operatorArguments) = 
     inherit SymbolOperator("_npi_negative", operatorArguments)
@@ -3774,6 +5243,12 @@ type NpiNegative private (operatorArguments) =
             ]
         new NpiNegative(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiNegative(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiReciprocal private (operatorArguments) = 
     inherit SymbolOperator("_npi_reciprocal", operatorArguments)
@@ -3786,6 +5261,12 @@ type NpiReciprocal private (operatorArguments) =
             ]
         new NpiReciprocal(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiReciprocal(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiAbsolute private (operatorArguments) = 
     inherit SymbolOperator("_npi_absolute", operatorArguments)
@@ -3798,6 +5279,12 @@ type NpiAbsolute private (operatorArguments) =
             ]
         new NpiAbsolute(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiAbsolute(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiSign private (operatorArguments) = 
     inherit SymbolOperator("_npi_sign", operatorArguments)
@@ -3810,6 +5297,12 @@ type NpiSign private (operatorArguments) =
             ]
         new NpiSign(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiSign(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiRint private (operatorArguments) = 
     inherit SymbolOperator("_npi_rint", operatorArguments)
@@ -3822,6 +5315,12 @@ type NpiRint private (operatorArguments) =
             ]
         new NpiRint(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiRint(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiCeil private (operatorArguments) = 
     inherit SymbolOperator("_npi_ceil", operatorArguments)
@@ -3834,6 +5333,12 @@ type NpiCeil private (operatorArguments) =
             ]
         new NpiCeil(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiCeil(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiFloor private (operatorArguments) = 
     inherit SymbolOperator("_npi_floor", operatorArguments)
@@ -3846,6 +5351,12 @@ type NpiFloor private (operatorArguments) =
             ]
         new NpiFloor(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiFloor(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiTrunc private (operatorArguments) = 
     inherit SymbolOperator("_npi_trunc", operatorArguments)
@@ -3858,6 +5369,12 @@ type NpiTrunc private (operatorArguments) =
             ]
         new NpiTrunc(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiTrunc(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiFix private (operatorArguments) = 
     inherit SymbolOperator("_npi_fix", operatorArguments)
@@ -3870,6 +5387,12 @@ type NpiFix private (operatorArguments) =
             ]
         new NpiFix(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiFix(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiSquare private (operatorArguments) = 
     inherit SymbolOperator("_npi_square", operatorArguments)
@@ -3882,6 +5405,12 @@ type NpiSquare private (operatorArguments) =
             ]
         new NpiSquare(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiSquare(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiSqrt private (operatorArguments) = 
     inherit SymbolOperator("_npi_sqrt", operatorArguments)
@@ -3894,6 +5423,12 @@ type NpiSqrt private (operatorArguments) =
             ]
         new NpiSqrt(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiSqrt(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiCbrt private (operatorArguments) = 
     inherit SymbolOperator("_npi_cbrt", operatorArguments)
@@ -3906,6 +5441,12 @@ type NpiCbrt private (operatorArguments) =
             ]
         new NpiCbrt(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiCbrt(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiExp private (operatorArguments) = 
     inherit SymbolOperator("_npi_exp", operatorArguments)
@@ -3918,6 +5459,12 @@ type NpiExp private (operatorArguments) =
             ]
         new NpiExp(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiExp(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiLog private (operatorArguments) = 
     inherit SymbolOperator("_npi_log", operatorArguments)
@@ -3930,6 +5477,12 @@ type NpiLog private (operatorArguments) =
             ]
         new NpiLog(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiLog(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiLog10 private (operatorArguments) = 
     inherit SymbolOperator("_npi_log10", operatorArguments)
@@ -3942,6 +5495,12 @@ type NpiLog10 private (operatorArguments) =
             ]
         new NpiLog10(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiLog10(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiLog2 private (operatorArguments) = 
     inherit SymbolOperator("_npi_log2", operatorArguments)
@@ -3954,6 +5513,12 @@ type NpiLog2 private (operatorArguments) =
             ]
         new NpiLog2(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiLog2(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiLog1p private (operatorArguments) = 
     inherit SymbolOperator("_npi_log1p", operatorArguments)
@@ -3966,6 +5531,12 @@ type NpiLog1p private (operatorArguments) =
             ]
         new NpiLog1p(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiLog1p(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiExpm1 private (operatorArguments) = 
     inherit SymbolOperator("_npi_expm1", operatorArguments)
@@ -3978,6 +5549,12 @@ type NpiExpm1 private (operatorArguments) =
             ]
         new NpiExpm1(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiExpm1(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiLogicalNot private (operatorArguments) = 
     inherit SymbolOperator("_npi_logical_not", operatorArguments)
@@ -3990,6 +5567,12 @@ type NpiLogicalNot private (operatorArguments) =
             ]
         new NpiLogicalNot(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiLogicalNot(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiSin private (operatorArguments) = 
     inherit SymbolOperator("_npi_sin", operatorArguments)
@@ -4002,6 +5585,12 @@ type NpiSin private (operatorArguments) =
             ]
         new NpiSin(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiSin(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiCos private (operatorArguments) = 
     inherit SymbolOperator("_npi_cos", operatorArguments)
@@ -4014,6 +5603,12 @@ type NpiCos private (operatorArguments) =
             ]
         new NpiCos(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiCos(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiTan private (operatorArguments) = 
     inherit SymbolOperator("_npi_tan", operatorArguments)
@@ -4026,6 +5621,12 @@ type NpiTan private (operatorArguments) =
             ]
         new NpiTan(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiTan(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiArcsin private (operatorArguments) = 
     inherit SymbolOperator("_npi_arcsin", operatorArguments)
@@ -4038,6 +5639,12 @@ type NpiArcsin private (operatorArguments) =
             ]
         new NpiArcsin(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiArcsin(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiArccos private (operatorArguments) = 
     inherit SymbolOperator("_npi_arccos", operatorArguments)
@@ -4050,6 +5657,12 @@ type NpiArccos private (operatorArguments) =
             ]
         new NpiArccos(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiArccos(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiArctan private (operatorArguments) = 
     inherit SymbolOperator("_npi_arctan", operatorArguments)
@@ -4062,6 +5675,12 @@ type NpiArctan private (operatorArguments) =
             ]
         new NpiArctan(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiArctan(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiDegrees private (operatorArguments) = 
     inherit SymbolOperator("_npi_degrees", operatorArguments)
@@ -4074,6 +5693,12 @@ type NpiDegrees private (operatorArguments) =
             ]
         new NpiDegrees(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiDegrees(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiRadians private (operatorArguments) = 
     inherit SymbolOperator("_npi_radians", operatorArguments)
@@ -4086,6 +5711,12 @@ type NpiRadians private (operatorArguments) =
             ]
         new NpiRadians(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiRadians(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiSinh private (operatorArguments) = 
     inherit SymbolOperator("_npi_sinh", operatorArguments)
@@ -4098,6 +5729,12 @@ type NpiSinh private (operatorArguments) =
             ]
         new NpiSinh(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiSinh(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiCosh private (operatorArguments) = 
     inherit SymbolOperator("_npi_cosh", operatorArguments)
@@ -4110,6 +5747,12 @@ type NpiCosh private (operatorArguments) =
             ]
         new NpiCosh(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiCosh(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiTanh private (operatorArguments) = 
     inherit SymbolOperator("_npi_tanh", operatorArguments)
@@ -4122,6 +5765,12 @@ type NpiTanh private (operatorArguments) =
             ]
         new NpiTanh(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiTanh(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiArcsinh private (operatorArguments) = 
     inherit SymbolOperator("_npi_arcsinh", operatorArguments)
@@ -4134,6 +5783,12 @@ type NpiArcsinh private (operatorArguments) =
             ]
         new NpiArcsinh(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiArcsinh(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiArccosh private (operatorArguments) = 
     inherit SymbolOperator("_npi_arccosh", operatorArguments)
@@ -4146,6 +5801,12 @@ type NpiArccosh private (operatorArguments) =
             ]
         new NpiArccosh(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiArccosh(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiArctanh private (operatorArguments) = 
     inherit SymbolOperator("_npi_arctanh", operatorArguments)
@@ -4158,6 +5819,12 @@ type NpiArctanh private (operatorArguments) =
             ]
         new NpiArctanh(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpiArctanh(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiAround private (operatorArguments) = 
     inherit SymbolOperator("_npi_around", operatorArguments)
@@ -4174,6 +5841,14 @@ type NpiAround private (operatorArguments) =
     static member DecimalsDefault : int = 0
     member __.X = operatorArguments.GetInput "x"
     member __.Decimals = operatorArguments.GetParameter("decimals", NpiAround.DecimalsDefault)
+    member this.With([<Optional>] ?x : Symbol,
+        [<Optional>] ?decimals : int) = 
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+                decimals |> Option.map (fun x -> "decimals", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiAround(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpZerosLike private (operatorArguments) = 
     inherit SymbolOperator("_np_zeros_like", operatorArguments)
@@ -4186,6 +5861,12 @@ type NpZerosLike private (operatorArguments) =
             ]
         new NpZerosLike(Arguments<Symbol>(operatorArguments))
     member __.A = operatorArguments.GetInput "a"
+    member this.With([<Optional>] ?a : Symbol) =
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+            ] |> List.choose id
+        new NpZerosLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpOnesLike private (operatorArguments) = 
     inherit SymbolOperator("_np_ones_like", operatorArguments)
@@ -4198,6 +5879,12 @@ type NpOnesLike private (operatorArguments) =
             ]
         new NpOnesLike(Arguments<Symbol>(operatorArguments))
     member __.A = operatorArguments.GetInput "a"
+    member this.With([<Optional>] ?a : Symbol) =
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+            ] |> List.choose id
+        new NpOnesLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpTranspose private (operatorArguments) = 
     inherit SymbolOperator("_np_transpose", operatorArguments)
@@ -4214,6 +5901,14 @@ type NpTranspose private (operatorArguments) =
     static member AxesDefault : int [] option = None
     member __.A = operatorArguments.GetInput "a"
     member __.Axes = operatorArguments.GetParameter("axes", NpTranspose.AxesDefault)
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?axes : int seq) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                axes |> Option.map (fun x -> "axes", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpTranspose(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpReshape private (operatorArguments) = 
     inherit SymbolOperator("_np_reshape", operatorArguments)
@@ -4243,6 +5938,16 @@ type NpReshape private (operatorArguments) =
     member __.A = operatorArguments.GetInput "a"
     member __.Newshape : int seq = match operatorArguments.GetParameter "newshape" with Some(v) -> unbox v | None -> failwithf "Required parameter newshape is missing"
     member __.Order = operatorArguments.GetParameter("order", NpReshape.OrderDefault)
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?newshape : int seq,
+        [<Optional>] ?order : string) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                newshape |> Option.map (fun x -> "newshape", Parameter(Some (box x)))
+                order |> Option.map (fun x -> "order", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpReshape(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpSqueeze private (operatorArguments) = 
     inherit SymbolOperator("_np_squeeze", operatorArguments)
@@ -4259,6 +5964,14 @@ type NpSqueeze private (operatorArguments) =
     static member AxisDefault : int [] option = None
     member __.A = operatorArguments.GetVarArg "a"
     member __.Axis = operatorArguments.GetParameter("axis", NpSqueeze.AxisDefault)
+    member this.With([<Optional>] ?a : Symbol seq,
+        [<Optional>] ?axis : int seq) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", VarArg("", Seq.toArray x))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpSqueeze(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiConcatenate private (operatorArguments) = 
     inherit SymbolOperator("_npi_concatenate", operatorArguments)
@@ -4275,6 +5988,14 @@ type NpiConcatenate private (operatorArguments) =
     static member DimDefault : int = 1
     member __.Data = operatorArguments.GetVarArg "data"
     member __.Dim = operatorArguments.GetParameter("dim", NpiConcatenate.DimDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?dim : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+                dim |> Option.map (fun x -> "dim", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiConcatenate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiStack private (operatorArguments) = 
     inherit SymbolOperator("_npi_stack", operatorArguments)
@@ -4291,6 +6012,14 @@ type NpiStack private (operatorArguments) =
     static member AxisDefault : int = 0
     member __.Data = operatorArguments.GetVarArg "data"
     member __.Axis = operatorArguments.GetParameter("axis", NpiStack.AxisDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?axis : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiStack(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiVstack private (operatorArguments) = 
     inherit SymbolOperator("_npi_vstack", operatorArguments)
@@ -4309,6 +6038,12 @@ type NpiVstack private (operatorArguments) =
             ]
         new NpiVstack(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetVarArg "data"
+    member this.With([<Optional>] ?data : Symbol seq) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+            ] |> List.choose id
+        new NpiVstack(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpRoll private (operatorArguments) = 
     inherit SymbolOperator("_np_roll", operatorArguments)
@@ -4329,6 +6064,16 @@ type NpRoll private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Shift = operatorArguments.GetParameter("shift", NpRoll.ShiftDefault)
     member __.Axis = operatorArguments.GetParameter("axis", NpRoll.AxisDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?shift : int seq,
+        [<Optional>] ?axis : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                shift |> Option.map (fun x -> "shift", Parameter(Some (box x)))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpRoll(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiFlip private (operatorArguments) = 
     inherit SymbolOperator("_npi_flip", operatorArguments)
@@ -4352,6 +6097,14 @@ type NpiFlip private (operatorArguments) =
         new NpiFlip(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Axis : int seq = match operatorArguments.GetParameter "axis" with Some(v) -> unbox v | None -> failwithf "Required parameter axis is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiFlip(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpxNonzero private (operatorArguments) = 
     inherit SymbolOperator("_npx_nonzero", operatorArguments)
@@ -4364,6 +6117,12 @@ type NpxNonzero private (operatorArguments) =
             ]
         new NpxNonzero(Arguments<Symbol>(operatorArguments))
     member __.X = operatorArguments.GetInput "x"
+    member this.With([<Optional>] ?x : Symbol) =
+        let operatorArguments = 
+            [
+                x |> Option.map (fun x -> "x", Input x)
+            ] |> List.choose id
+        new NpxNonzero(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiTensordot private (operatorArguments) = 
     inherit SymbolOperator("_npi_tensordot", operatorArguments)
@@ -4398,6 +6157,18 @@ type NpiTensordot private (operatorArguments) =
     member __.B = operatorArguments.GetInput "b"
     member __.AAxesSummed : int seq = match operatorArguments.GetParameter "a_axes_summed" with Some(v) -> unbox v | None -> failwithf "Required parameter a_axes_summed is missing"
     member __.BAxesSummed : int seq = match operatorArguments.GetParameter "b_axes_summed" with Some(v) -> unbox v | None -> failwithf "Required parameter b_axes_summed is missing"
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?b : Symbol,
+        [<Optional>] ?aAxesSummed : int seq,
+        [<Optional>] ?bAxesSummed : int seq) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                b |> Option.map (fun x -> "b", Input x)
+                aAxesSummed |> Option.map (fun x -> "a_axes_summed", Parameter(Some (box x)))
+                bAxesSummed |> Option.map (fun x -> "b_axes_summed", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiTensordot(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiTensordotIntAxes private (operatorArguments) = 
     inherit SymbolOperator("_npi_tensordot_int_axes", operatorArguments)
@@ -4427,6 +6198,16 @@ type NpiTensordotIntAxes private (operatorArguments) =
     member __.A = operatorArguments.GetInput "a"
     member __.B = operatorArguments.GetInput "b"
     member __.Axes : int = match operatorArguments.GetParameter "axes" with Some(v) -> unbox v | None -> failwithf "Required parameter axes is missing"
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?b : Symbol,
+        [<Optional>] ?axes : int) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                b |> Option.map (fun x -> "b", Input x)
+                axes |> Option.map (fun x -> "axes", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiTensordotIntAxes(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpTrace private (operatorArguments) = 
     inherit SymbolOperator("_np_trace", operatorArguments)
@@ -4451,6 +6232,18 @@ type NpTrace private (operatorArguments) =
     member __.Offset = operatorArguments.GetParameter("offset", NpTrace.OffsetDefault)
     member __.Axis1 = operatorArguments.GetParameter("axis1", NpTrace.Axis1Default)
     member __.Axis2 = operatorArguments.GetParameter("axis2", NpTrace.Axis2Default)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?offset : int,
+        [<Optional>] ?axis1 : int,
+        [<Optional>] ?axis2 : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                offset |> Option.map (fun x -> "offset", Parameter(Some (box x)))
+                axis1 |> Option.map (fun x -> "axis1", Parameter(Some (box x)))
+                axis2 |> Option.map (fun x -> "axis2", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpTrace(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiTril private (operatorArguments) = 
     inherit SymbolOperator("_npi_tril", operatorArguments)
@@ -4467,6 +6260,14 @@ type NpiTril private (operatorArguments) =
     static member KDefault : int = 0
     member __.Data = operatorArguments.GetInput "data"
     member __.K = operatorArguments.GetParameter("k", NpiTril.KDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?k : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                k |> Option.map (fun x -> "k", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiTril(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiTrueDivide private (operatorArguments) = 
     inherit SymbolOperator("_npi_true_divide", operatorArguments)
@@ -4483,6 +6284,14 @@ type NpiTrueDivide private (operatorArguments) =
         new NpiTrueDivide(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new NpiTrueDivide(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiTrueDivideScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_true_divide_scalar", operatorArguments)
@@ -4506,6 +6315,14 @@ type NpiTrueDivideScalar private (operatorArguments) =
         new NpiTrueDivideScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiTrueDivideScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiRtrueDivideScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rtrue_divide_scalar", operatorArguments)
@@ -4529,6 +6346,14 @@ type NpiRtrueDivideScalar private (operatorArguments) =
         new NpiRtrueDivideScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiRtrueDivideScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiUnique private (operatorArguments) = 
     inherit SymbolOperator("_npi_unique", operatorArguments)
@@ -4557,6 +6382,20 @@ type NpiUnique private (operatorArguments) =
     member __.ReturnInverse = operatorArguments.GetParameter("return_inverse", NpiUnique.ReturnInverseDefault)
     member __.ReturnCounts = operatorArguments.GetParameter("return_counts", NpiUnique.ReturnCountsDefault)
     member __.Axis = operatorArguments.GetParameter("axis", NpiUnique.AxisDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?returnIndex : bool,
+        [<Optional>] ?returnInverse : bool,
+        [<Optional>] ?returnCounts : bool,
+        [<Optional>] ?axis : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                returnIndex |> Option.map (fun x -> "return_index", Parameter(Some (box x)))
+                returnInverse |> Option.map (fun x -> "return_inverse", Parameter(Some (box x)))
+                returnCounts |> Option.map (fun x -> "return_counts", Parameter(Some (box x)))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiUnique(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiChoice private (operatorArguments) = 
     inherit SymbolOperator("_npi_choice", operatorArguments)
@@ -4603,6 +6442,22 @@ type NpiChoice private (operatorArguments) =
     member __.Size : int seq = match operatorArguments.GetParameter "size" with Some(v) -> unbox v | None -> failwithf "Required parameter size is missing"
     member __.Replace = operatorArguments.GetParameter("replace", NpiChoice.ReplaceDefault)
     member __.Weighted = operatorArguments.GetParameter("weighted", NpiChoice.WeightedDefault)
+    member this.With([<Optional>] ?input1 : Symbol,
+        [<Optional>] ?input2 : Symbol,
+        [<Optional>] ?a : int64,
+        [<Optional>] ?size : int seq,
+        [<Optional>] ?replace : bool,
+        [<Optional>] ?weighted : bool) = 
+        let operatorArguments = 
+            [
+                input1 |> Option.map (fun x -> "input1", Input x)
+                input2 |> Option.map (fun x -> "input2", Input x)
+                a |> Option.map (fun x -> "a", Parameter(Some (box x)))
+                size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                replace |> Option.map (fun x -> "replace", Parameter(Some (box x)))
+                weighted |> Option.map (fun x -> "weighted", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiChoice(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiMultinomial private (operatorArguments) = 
     inherit SymbolOperator("_npi_multinomial", operatorArguments)
@@ -4637,6 +6492,18 @@ type NpiMultinomial private (operatorArguments) =
     member __.N : int = match operatorArguments.GetParameter "n" with Some(v) -> unbox v | None -> failwithf "Required parameter n is missing"
     member __.Pvals : double seq = match operatorArguments.GetParameter "pvals" with Some(v) -> unbox v | None -> failwithf "Required parameter pvals is missing"
     member __.Size = operatorArguments.GetParameter("size", NpiMultinomial.SizeDefault)
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?n : int,
+        [<Optional>] ?pvals : double seq,
+        [<Optional>] ?size : int seq) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                n |> Option.map (fun x -> "n", Parameter(Some (box x)))
+                pvals |> Option.map (fun x -> "pvals", Parameter(Some (box x)))
+                size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiMultinomial(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiNormal private (operatorArguments) = 
     inherit SymbolOperator("_npi_normal", operatorArguments)
@@ -4669,6 +6536,22 @@ type NpiNormal private (operatorArguments) =
     member __.Scale = operatorArguments.GetParameter("scale", NpiNormal.ScaleDefault)
     member __.Size = operatorArguments.GetParameter("size", NpiNormal.SizeDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", NpiNormal.DtypeDefault)
+    member this.With([<Optional>] ?input1 : Symbol,
+        [<Optional>] ?input2 : Symbol,
+        [<Optional>] ?loc : float,
+        [<Optional>] ?scale : float,
+        [<Optional>] ?size : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                input1 |> Option.map (fun x -> "input1", Input x)
+                input2 |> Option.map (fun x -> "input2", Input x)
+                loc |> Option.map (fun x -> "loc", Parameter(Some (box x)))
+                scale |> Option.map (fun x -> "scale", Parameter(Some (box x)))
+                size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiNormal(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NpiUniform private (operatorArguments) = 
     inherit SymbolOperator("_npi_uniform", operatorArguments)
@@ -4701,6 +6584,22 @@ type NpiUniform private (operatorArguments) =
     member __.High = operatorArguments.GetParameter("high", NpiUniform.HighDefault)
     member __.Size = operatorArguments.GetParameter("size", NpiUniform.SizeDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", NpiUniform.DtypeDefault)
+    member this.With([<Optional>] ?input1 : Symbol,
+        [<Optional>] ?input2 : Symbol,
+        [<Optional>] ?low : float,
+        [<Optional>] ?high : float,
+        [<Optional>] ?size : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                input1 |> Option.map (fun x -> "input1", Input x)
+                input2 |> Option.map (fun x -> "input2", Input x)
+                low |> Option.map (fun x -> "low", Parameter(Some (box x)))
+                high |> Option.map (fun x -> "high", Parameter(Some (box x)))
+                size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NpiUniform(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SignsgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("signsgd_update", operatorArguments)
@@ -4748,6 +6647,22 @@ type SignsgdUpdate private (operatorArguments) =
     member __.Wd = operatorArguments.GetParameter("wd", SignsgdUpdate.WdDefault)
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", SignsgdUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", SignsgdUpdate.ClipGradientDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SignsgdUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SignumUpdate private (operatorArguments) = 
     inherit SymbolOperator("signum_update", operatorArguments)
@@ -4813,6 +6728,28 @@ type SignumUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", SignumUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", SignumUpdate.ClipGradientDefault)
     member __.WdLh = operatorArguments.GetParameter("wd_lh", SignumUpdate.WdLhDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?mom : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?momentum : float,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?wdLh : float) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                mom |> Option.map (fun x -> "mom", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                momentum |> Option.map (fun x -> "momentum", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                wdLh |> Option.map (fun x -> "wd_lh", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SignumUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MultiSgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("multi_sgd_update", operatorArguments)
@@ -4859,6 +6796,22 @@ type MultiSgdUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", MultiSgdUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", MultiSgdUpdate.ClipGradientDefault)
     member __.NumWeights = operatorArguments.GetParameter("num_weights", MultiSgdUpdate.NumWeightsDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?lrs : double seq,
+        [<Optional>] ?wds : double seq,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?numWeights : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                lrs |> Option.map (fun x -> "lrs", Parameter(Some (box x)))
+                wds |> Option.map (fun x -> "wds", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                numWeights |> Option.map (fun x -> "num_weights", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MultiSgdUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MultiSgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("multi_sgd_mom_update", operatorArguments)
@@ -4911,6 +6864,24 @@ type MultiSgdMomUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", MultiSgdMomUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", MultiSgdMomUpdate.ClipGradientDefault)
     member __.NumWeights = operatorArguments.GetParameter("num_weights", MultiSgdMomUpdate.NumWeightsDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?lrs : double seq,
+        [<Optional>] ?wds : double seq,
+        [<Optional>] ?momentum : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?numWeights : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                lrs |> Option.map (fun x -> "lrs", Parameter(Some (box x)))
+                wds |> Option.map (fun x -> "wds", Parameter(Some (box x)))
+                momentum |> Option.map (fun x -> "momentum", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                numWeights |> Option.map (fun x -> "num_weights", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MultiSgdMomUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MultiMpSgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("multi_mp_sgd_update", operatorArguments)
@@ -4957,6 +6928,22 @@ type MultiMpSgdUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", MultiMpSgdUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", MultiMpSgdUpdate.ClipGradientDefault)
     member __.NumWeights = operatorArguments.GetParameter("num_weights", MultiMpSgdUpdate.NumWeightsDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?lrs : double seq,
+        [<Optional>] ?wds : double seq,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?numWeights : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                lrs |> Option.map (fun x -> "lrs", Parameter(Some (box x)))
+                wds |> Option.map (fun x -> "wds", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                numWeights |> Option.map (fun x -> "num_weights", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MultiMpSgdUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MultiMpSgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("multi_mp_sgd_mom_update", operatorArguments)
@@ -5009,6 +6996,24 @@ type MultiMpSgdMomUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", MultiMpSgdMomUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", MultiMpSgdMomUpdate.ClipGradientDefault)
     member __.NumWeights = operatorArguments.GetParameter("num_weights", MultiMpSgdMomUpdate.NumWeightsDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?lrs : double seq,
+        [<Optional>] ?wds : double seq,
+        [<Optional>] ?momentum : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?numWeights : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                lrs |> Option.map (fun x -> "lrs", Parameter(Some (box x)))
+                wds |> Option.map (fun x -> "wds", Parameter(Some (box x)))
+                momentum |> Option.map (fun x -> "momentum", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                numWeights |> Option.map (fun x -> "num_weights", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MultiMpSgdMomUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("sgd_update", operatorArguments)
@@ -5062,6 +7067,24 @@ type SgdUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", SgdUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", SgdUpdate.ClipGradientDefault)
     member __.LazyUpdate = operatorArguments.GetParameter("lazy_update", SgdUpdate.LazyUpdateDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?lazyUpdate : bool) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                lazyUpdate |> Option.map (fun x -> "lazy_update", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SgdUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("sgd_mom_update", operatorArguments)
@@ -5127,6 +7150,28 @@ type SgdMomUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", SgdMomUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", SgdMomUpdate.ClipGradientDefault)
     member __.LazyUpdate = operatorArguments.GetParameter("lazy_update", SgdMomUpdate.LazyUpdateDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?mom : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?momentum : float,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?lazyUpdate : bool) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                mom |> Option.map (fun x -> "mom", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                momentum |> Option.map (fun x -> "momentum", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                lazyUpdate |> Option.map (fun x -> "lazy_update", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SgdMomUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MpSgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("mp_sgd_update", operatorArguments)
@@ -5186,6 +7231,26 @@ type MpSgdUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", MpSgdUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", MpSgdUpdate.ClipGradientDefault)
     member __.LazyUpdate = operatorArguments.GetParameter("lazy_update", MpSgdUpdate.LazyUpdateDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?weight32 : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?lazyUpdate : bool) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                weight32 |> Option.map (fun x -> "weight32", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                lazyUpdate |> Option.map (fun x -> "lazy_update", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MpSgdUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MpSgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("mp_sgd_mom_update", operatorArguments)
@@ -5257,6 +7322,30 @@ type MpSgdMomUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", MpSgdMomUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", MpSgdMomUpdate.ClipGradientDefault)
     member __.LazyUpdate = operatorArguments.GetParameter("lazy_update", MpSgdMomUpdate.LazyUpdateDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?mom : Symbol,
+        [<Optional>] ?weight32 : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?momentum : float,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?lazyUpdate : bool) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                mom |> Option.map (fun x -> "mom", Input x)
+                weight32 |> Option.map (fun x -> "weight32", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                momentum |> Option.map (fun x -> "momentum", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                lazyUpdate |> Option.map (fun x -> "lazy_update", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MpSgdMomUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type FtmlUpdate private (operatorArguments) = 
     inherit SymbolOperator("ftml_update", operatorArguments)
@@ -5345,6 +7434,36 @@ type FtmlUpdate private (operatorArguments) =
     member __.Wd = operatorArguments.GetParameter("wd", FtmlUpdate.WdDefault)
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", FtmlUpdate.RescaleGradDefault)
     member __.ClipGrad = operatorArguments.GetParameter("clip_grad", FtmlUpdate.ClipGradDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?d : Symbol,
+        [<Optional>] ?v : Symbol,
+        [<Optional>] ?z : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?t : int,
+        [<Optional>] ?beta1 : float,
+        [<Optional>] ?beta2 : float,
+        [<Optional>] ?epsilon : double,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGrad : float) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                d |> Option.map (fun x -> "d", Input x)
+                v |> Option.map (fun x -> "v", Input x)
+                z |> Option.map (fun x -> "z", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                t |> Option.map (fun x -> "t", Parameter(Some (box x)))
+                beta1 |> Option.map (fun x -> "beta1", Parameter(Some (box x)))
+                beta2 |> Option.map (fun x -> "beta2", Parameter(Some (box x)))
+                epsilon |> Option.map (fun x -> "epsilon", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGrad |> Option.map (fun x -> "clip_grad", Parameter(Some (box x)))
+            ] |> List.choose id
+        new FtmlUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type AdamUpdate private (operatorArguments) = 
     inherit SymbolOperator("adam_update", operatorArguments)
@@ -5428,6 +7547,34 @@ type AdamUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", AdamUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", AdamUpdate.ClipGradientDefault)
     member __.LazyUpdate = operatorArguments.GetParameter("lazy_update", AdamUpdate.LazyUpdateDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?mean : Symbol,
+        [<Optional>] ?var : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?beta1 : float,
+        [<Optional>] ?beta2 : float,
+        [<Optional>] ?epsilon : float,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?lazyUpdate : bool) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                mean |> Option.map (fun x -> "mean", Input x)
+                var |> Option.map (fun x -> "var", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                beta1 |> Option.map (fun x -> "beta1", Parameter(Some (box x)))
+                beta2 |> Option.map (fun x -> "beta2", Parameter(Some (box x)))
+                epsilon |> Option.map (fun x -> "epsilon", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                lazyUpdate |> Option.map (fun x -> "lazy_update", Parameter(Some (box x)))
+            ] |> List.choose id
+        new AdamUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NagMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("nag_mom_update", operatorArguments)
@@ -5487,6 +7634,26 @@ type NagMomUpdate private (operatorArguments) =
     member __.Wd = operatorArguments.GetParameter("wd", NagMomUpdate.WdDefault)
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", NagMomUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", NagMomUpdate.ClipGradientDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?mom : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?momentum : float,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                mom |> Option.map (fun x -> "mom", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                momentum |> Option.map (fun x -> "momentum", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NagMomUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MpNagMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("mp_nag_mom_update", operatorArguments)
@@ -5552,6 +7719,28 @@ type MpNagMomUpdate private (operatorArguments) =
     member __.Wd = operatorArguments.GetParameter("wd", MpNagMomUpdate.WdDefault)
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", MpNagMomUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", MpNagMomUpdate.ClipGradientDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?mom : Symbol,
+        [<Optional>] ?weight32 : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?momentum : float,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                mom |> Option.map (fun x -> "mom", Input x)
+                weight32 |> Option.map (fun x -> "weight32", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                momentum |> Option.map (fun x -> "momentum", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MpNagMomUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RmspropUpdate private (operatorArguments) = 
     inherit SymbolOperator("rmsprop_update", operatorArguments)
@@ -5623,6 +7812,30 @@ type RmspropUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", RmspropUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", RmspropUpdate.ClipGradientDefault)
     member __.ClipWeights = operatorArguments.GetParameter("clip_weights", RmspropUpdate.ClipWeightsDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?n : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?gamma1 : float,
+        [<Optional>] ?epsilon : float,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?clipWeights : float) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                n |> Option.map (fun x -> "n", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                gamma1 |> Option.map (fun x -> "gamma1", Parameter(Some (box x)))
+                epsilon |> Option.map (fun x -> "epsilon", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                clipWeights |> Option.map (fun x -> "clip_weights", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RmspropUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RmspropalexUpdate private (operatorArguments) = 
     inherit SymbolOperator("rmspropalex_update", operatorArguments)
@@ -5712,6 +7925,36 @@ type RmspropalexUpdate private (operatorArguments) =
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", RmspropalexUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", RmspropalexUpdate.ClipGradientDefault)
     member __.ClipWeights = operatorArguments.GetParameter("clip_weights", RmspropalexUpdate.ClipWeightsDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?n : Symbol,
+        [<Optional>] ?g : Symbol,
+        [<Optional>] ?delta : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?gamma1 : float,
+        [<Optional>] ?gamma2 : float,
+        [<Optional>] ?epsilon : float,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float,
+        [<Optional>] ?clipWeights : float) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                n |> Option.map (fun x -> "n", Input x)
+                g |> Option.map (fun x -> "g", Input x)
+                delta |> Option.map (fun x -> "delta", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                gamma1 |> Option.map (fun x -> "gamma1", Parameter(Some (box x)))
+                gamma2 |> Option.map (fun x -> "gamma2", Parameter(Some (box x)))
+                epsilon |> Option.map (fun x -> "epsilon", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                clipWeights |> Option.map (fun x -> "clip_weights", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RmspropalexUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type FtrlUpdate private (operatorArguments) = 
     inherit SymbolOperator("ftrl_update", operatorArguments)
@@ -5783,6 +8026,30 @@ type FtrlUpdate private (operatorArguments) =
     member __.Wd = operatorArguments.GetParameter("wd", FtrlUpdate.WdDefault)
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", FtrlUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", FtrlUpdate.ClipGradientDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?z : Symbol,
+        [<Optional>] ?n : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?lamda1 : float,
+        [<Optional>] ?beta : float,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                z |> Option.map (fun x -> "z", Input x)
+                n |> Option.map (fun x -> "n", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                lamda1 |> Option.map (fun x -> "lamda1", Parameter(Some (box x)))
+                beta |> Option.map (fun x -> "beta", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+            ] |> List.choose id
+        new FtrlUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SparseAdagradUpdate private (operatorArguments) = 
     inherit SymbolOperator("_sparse_adagrad_update", operatorArguments)
@@ -5842,6 +8109,26 @@ type SparseAdagradUpdate private (operatorArguments) =
     member __.Wd = operatorArguments.GetParameter("wd", SparseAdagradUpdate.WdDefault)
     member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", SparseAdagradUpdate.RescaleGradDefault)
     member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", SparseAdagradUpdate.ClipGradientDefault)
+    member this.With([<Optional>] ?weight : Symbol,
+        [<Optional>] ?grad : Symbol,
+        [<Optional>] ?history : Symbol,
+        [<Optional>] ?lr : float,
+        [<Optional>] ?epsilon : float,
+        [<Optional>] ?wd : float,
+        [<Optional>] ?rescaleGrad : float,
+        [<Optional>] ?clipGradient : float) = 
+        let operatorArguments = 
+            [
+                weight |> Option.map (fun x -> "weight", Input x)
+                grad |> Option.map (fun x -> "grad", Input x)
+                history |> Option.map (fun x -> "history", Input x)
+                lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                epsilon |> Option.map (fun x -> "epsilon", Parameter(Some (box x)))
+                wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SparseAdagradUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Pad private (operatorArguments) = 
     inherit SymbolOperator("Pad", operatorArguments)
@@ -5876,6 +8163,18 @@ type Pad private (operatorArguments) =
     member __.Mode : PadMode = match operatorArguments.GetParameter "mode" with Some(v) -> unbox v | None -> failwithf "Required parameter mode is missing"
     member __.PadWidth : int seq = match operatorArguments.GetParameter "pad_width" with Some(v) -> unbox v | None -> failwithf "Required parameter pad_width is missing"
     member __.ConstantValue = operatorArguments.GetParameter("constant_value", Pad.ConstantValueDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?mode : PadMode,
+        [<Optional>] ?padWidth : int seq,
+        [<Optional>] ?constantValue : double) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                mode |> Option.map (fun x -> "mode", Parameter(Some (box x)))
+                padWidth |> Option.map (fun x -> "pad_width", Parameter(Some (box x)))
+                constantValue |> Option.map (fun x -> "constant_value", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Pad(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribCalibrateEntropy private (operatorArguments) = 
     inherit SymbolOperator("_contrib_calibrate_entropy", operatorArguments)
@@ -5896,6 +8195,16 @@ type ContribCalibrateEntropy private (operatorArguments) =
     member __.Hist = operatorArguments.GetInput "hist"
     member __.HistEdges = operatorArguments.GetInput "hist_edges"
     member __.NumQuantizedBins = operatorArguments.GetParameter("num_quantized_bins", ContribCalibrateEntropy.NumQuantizedBinsDefault)
+    member this.With([<Optional>] ?hist : Symbol,
+        [<Optional>] ?histEdges : Symbol,
+        [<Optional>] ?numQuantizedBins : int) = 
+        let operatorArguments = 
+            [
+                hist |> Option.map (fun x -> "hist", Input x)
+                histEdges |> Option.map (fun x -> "hist_edges", Input x)
+                numQuantizedBins |> Option.map (fun x -> "num_quantized_bins", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribCalibrateEntropy(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribDequantize private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dequantize", operatorArguments)
@@ -5920,6 +8229,18 @@ type ContribDequantize private (operatorArguments) =
     member __.MinRange = operatorArguments.GetInput "min_range"
     member __.MaxRange = operatorArguments.GetInput "max_range"
     member __.OutType = operatorArguments.GetParameter("out_type", ContribDequantize.OutTypeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?minRange : Symbol,
+        [<Optional>] ?maxRange : Symbol,
+        [<Optional>] ?outType : ContribDequantizeOutType) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                minRange |> Option.map (fun x -> "min_range", Input x)
+                maxRange |> Option.map (fun x -> "max_range", Input x)
+                outType |> Option.map (fun x -> "out_type", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribDequantize(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribQuantize private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantize", operatorArguments)
@@ -5944,6 +8265,18 @@ type ContribQuantize private (operatorArguments) =
     member __.MinRange = operatorArguments.GetInput "min_range"
     member __.MaxRange = operatorArguments.GetInput "max_range"
     member __.OutType = operatorArguments.GetParameter("out_type", ContribQuantize.OutTypeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?minRange : Symbol,
+        [<Optional>] ?maxRange : Symbol,
+        [<Optional>] ?outType : ContribQuantizeOutType) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                minRange |> Option.map (fun x -> "min_range", Input x)
+                maxRange |> Option.map (fun x -> "max_range", Input x)
+                outType |> Option.map (fun x -> "out_type", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribQuantize(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribQuantizeV2 private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantize_v2", operatorArguments)
@@ -5968,6 +8301,18 @@ type ContribQuantizeV2 private (operatorArguments) =
     member __.OutType = operatorArguments.GetParameter("out_type", ContribQuantizeV2.OutTypeDefault)
     member __.MinCalibRange = operatorArguments.GetParameter("min_calib_range", ContribQuantizeV2.MinCalibRangeDefault)
     member __.MaxCalibRange = operatorArguments.GetParameter("max_calib_range", ContribQuantizeV2.MaxCalibRangeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?outType : ContribQuantizeV2OutType,
+        [<Optional>] ?minCalibRange : float,
+        [<Optional>] ?maxCalibRange : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                outType |> Option.map (fun x -> "out_type", Parameter(Some (box x)))
+                minCalibRange |> Option.map (fun x -> "min_calib_range", Parameter(Some (box x)))
+                maxCalibRange |> Option.map (fun x -> "max_calib_range", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribQuantizeV2(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribQuantizedAct private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_act", operatorArguments)
@@ -6003,6 +8348,18 @@ type ContribQuantizedAct private (operatorArguments) =
     member __.MinData = operatorArguments.GetInput "min_data"
     member __.MaxData = operatorArguments.GetInput "max_data"
     member __.ActType : ActType = match operatorArguments.GetParameter "act_type" with Some(v) -> unbox v | None -> failwithf "Required parameter act_type is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?minData : Symbol,
+        [<Optional>] ?maxData : Symbol,
+        [<Optional>] ?actType : ActType) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                minData |> Option.map (fun x -> "min_data", Input x)
+                maxData |> Option.map (fun x -> "max_data", Input x)
+                actType |> Option.map (fun x -> "act_type", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribQuantizedAct(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribQuantizedBatchNorm private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_batch_norm", operatorArguments)
@@ -6075,6 +8432,42 @@ type ContribQuantizedBatchNorm private (operatorArguments) =
     member __.CudnnOff = operatorArguments.GetParameter("cudnn_off", ContribQuantizedBatchNorm.CudnnOffDefault)
     member __.MinCalibRange = operatorArguments.GetParameter("min_calib_range", ContribQuantizedBatchNorm.MinCalibRangeDefault)
     member __.MaxCalibRange = operatorArguments.GetParameter("max_calib_range", ContribQuantizedBatchNorm.MaxCalibRangeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?gamma : Symbol,
+        [<Optional>] ?beta : Symbol,
+        [<Optional>] ?movingMean : Symbol,
+        [<Optional>] ?movingVar : Symbol,
+        [<Optional>] ?minData : Symbol,
+        [<Optional>] ?maxData : Symbol,
+        [<Optional>] ?eps : double,
+        [<Optional>] ?momentum : float,
+        [<Optional>] ?fixGamma : bool,
+        [<Optional>] ?useGlobalStats : bool,
+        [<Optional>] ?outputMeanVar : bool,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?cudnnOff : bool,
+        [<Optional>] ?minCalibRange : float,
+        [<Optional>] ?maxCalibRange : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                gamma |> Option.map (fun x -> "gamma", Input x)
+                beta |> Option.map (fun x -> "beta", Input x)
+                movingMean |> Option.map (fun x -> "moving_mean", Input x)
+                movingVar |> Option.map (fun x -> "moving_var", Input x)
+                minData |> Option.map (fun x -> "min_data", Input x)
+                maxData |> Option.map (fun x -> "max_data", Input x)
+                eps |> Option.map (fun x -> "eps", Parameter(Some (box x)))
+                momentum |> Option.map (fun x -> "momentum", Parameter(Some (box x)))
+                fixGamma |> Option.map (fun x -> "fix_gamma", Parameter(Some (box x)))
+                useGlobalStats |> Option.map (fun x -> "use_global_stats", Parameter(Some (box x)))
+                outputMeanVar |> Option.map (fun x -> "output_mean_var", Parameter(Some (box x)))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                cudnnOff |> Option.map (fun x -> "cudnn_off", Parameter(Some (box x)))
+                minCalibRange |> Option.map (fun x -> "min_calib_range", Parameter(Some (box x)))
+                maxCalibRange |> Option.map (fun x -> "max_calib_range", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribQuantizedBatchNorm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribQuantizedConcat private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_concat", operatorArguments)
@@ -6091,6 +8484,14 @@ type ContribQuantizedConcat private (operatorArguments) =
     static member DimDefault : int = 1
     member __.Data = operatorArguments.GetVarArg "data"
     member __.Dim = operatorArguments.GetParameter("dim", ContribQuantizedConcat.DimDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?dim : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+                dim |> Option.map (fun x -> "dim", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribQuantizedConcat(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribQuantizedConv private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_conv", operatorArguments)
@@ -6221,6 +8622,50 @@ type ContribQuantizedConv private (operatorArguments) =
     member __.CudnnTune = operatorArguments.GetParameter("cudnn_tune", ContribQuantizedConv.CudnnTuneDefault)
     member __.CudnnOff = operatorArguments.GetParameter("cudnn_off", ContribQuantizedConv.CudnnOffDefault)
     member __.Layout = operatorArguments.GetParameter("layout", ContribQuantizedConv.LayoutDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?weight : Symbol,
+        [<Optional>] ?bias : Symbol,
+        [<Optional>] ?minData : Symbol,
+        [<Optional>] ?maxData : Symbol,
+        [<Optional>] ?minWeight : Symbol,
+        [<Optional>] ?maxWeight : Symbol,
+        [<Optional>] ?minBias : Symbol,
+        [<Optional>] ?maxBias : Symbol,
+        [<Optional>] ?kernel : int seq,
+        [<Optional>] ?numFilter : int,
+        [<Optional>] ?stride : int seq,
+        [<Optional>] ?dilate : int seq,
+        [<Optional>] ?pad : int seq,
+        [<Optional>] ?numGroup : int,
+        [<Optional>] ?workspace : int64,
+        [<Optional>] ?noBias : bool,
+        [<Optional>] ?cudnnTune : CudnnTune,
+        [<Optional>] ?cudnnOff : bool,
+        [<Optional>] ?layout : ContribQuantizedConvLayout) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                weight |> Option.map (fun x -> "weight", Input x)
+                bias |> Option.map (fun x -> "bias", Input x)
+                minData |> Option.map (fun x -> "min_data", Input x)
+                maxData |> Option.map (fun x -> "max_data", Input x)
+                minWeight |> Option.map (fun x -> "min_weight", Input x)
+                maxWeight |> Option.map (fun x -> "max_weight", Input x)
+                minBias |> Option.map (fun x -> "min_bias", Input x)
+                maxBias |> Option.map (fun x -> "max_bias", Input x)
+                kernel |> Option.map (fun x -> "kernel", Parameter(Some (box x)))
+                numFilter |> Option.map (fun x -> "num_filter", Parameter(Some (box x)))
+                stride |> Option.map (fun x -> "stride", Parameter(Some (box x)))
+                dilate |> Option.map (fun x -> "dilate", Parameter(Some (box x)))
+                pad |> Option.map (fun x -> "pad", Parameter(Some (box x)))
+                numGroup |> Option.map (fun x -> "num_group", Parameter(Some (box x)))
+                workspace |> Option.map (fun x -> "workspace", Parameter(Some (box x)))
+                noBias |> Option.map (fun x -> "no_bias", Parameter(Some (box x)))
+                cudnnTune |> Option.map (fun x -> "cudnn_tune", Parameter(Some (box x)))
+                cudnnOff |> Option.map (fun x -> "cudnn_off", Parameter(Some (box x)))
+                layout |> Option.map (fun x -> "layout", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribQuantizedConv(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribQuantizedElemwiseAdd private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_elemwise_add", operatorArguments)
@@ -6253,6 +8698,22 @@ type ContribQuantizedElemwiseAdd private (operatorArguments) =
     member __.LhsMax = operatorArguments.GetInput "lhs_max"
     member __.RhsMin = operatorArguments.GetInput "rhs_min"
     member __.RhsMax = operatorArguments.GetInput "rhs_max"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol,
+        [<Optional>] ?lhsMin : Symbol,
+        [<Optional>] ?lhsMax : Symbol,
+        [<Optional>] ?rhsMin : Symbol,
+        [<Optional>] ?rhsMax : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+                lhsMin |> Option.map (fun x -> "lhs_min", Input x)
+                lhsMax |> Option.map (fun x -> "lhs_max", Input x)
+                rhsMin |> Option.map (fun x -> "rhs_min", Input x)
+                rhsMax |> Option.map (fun x -> "rhs_max", Input x)
+            ] |> List.choose id
+        new ContribQuantizedElemwiseAdd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribQuantizedFlatten private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_flatten", operatorArguments)
@@ -6273,6 +8734,16 @@ type ContribQuantizedFlatten private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.MinData = operatorArguments.GetInput "min_data"
     member __.MaxData = operatorArguments.GetInput "max_data"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?minData : Symbol,
+        [<Optional>] ?maxData : Symbol) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                minData |> Option.map (fun x -> "min_data", Input x)
+                maxData |> Option.map (fun x -> "max_data", Input x)
+            ] |> List.choose id
+        new ContribQuantizedFlatten(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Flatten private (operatorArguments) = 
     inherit SymbolOperator("Flatten", operatorArguments)
@@ -6285,6 +8756,12 @@ type Flatten private (operatorArguments) =
             ]
         new Flatten(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Flatten(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribQuantizedFullyConnected private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_fully_connected", operatorArguments)
@@ -6368,6 +8845,34 @@ type ContribQuantizedFullyConnected private (operatorArguments) =
     member __.NumHidden : int = match operatorArguments.GetParameter "num_hidden" with Some(v) -> unbox v | None -> failwithf "Required parameter num_hidden is missing"
     member __.NoBias = operatorArguments.GetParameter("no_bias", ContribQuantizedFullyConnected.NoBiasDefault)
     member __.Flatten = operatorArguments.GetParameter("flatten", ContribQuantizedFullyConnected.FlattenDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?weight : Symbol,
+        [<Optional>] ?bias : Symbol,
+        [<Optional>] ?minData : Symbol,
+        [<Optional>] ?maxData : Symbol,
+        [<Optional>] ?minWeight : Symbol,
+        [<Optional>] ?maxWeight : Symbol,
+        [<Optional>] ?minBias : Symbol,
+        [<Optional>] ?maxBias : Symbol,
+        [<Optional>] ?numHidden : int,
+        [<Optional>] ?noBias : bool,
+        [<Optional>] ?flatten : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                weight |> Option.map (fun x -> "weight", Input x)
+                bias |> Option.map (fun x -> "bias", Input x)
+                minData |> Option.map (fun x -> "min_data", Input x)
+                maxData |> Option.map (fun x -> "max_data", Input x)
+                minWeight |> Option.map (fun x -> "min_weight", Input x)
+                maxWeight |> Option.map (fun x -> "max_weight", Input x)
+                minBias |> Option.map (fun x -> "min_bias", Input x)
+                maxBias |> Option.map (fun x -> "max_bias", Input x)
+                numHidden |> Option.map (fun x -> "num_hidden", Parameter(Some (box x)))
+                noBias |> Option.map (fun x -> "no_bias", Parameter(Some (box x)))
+                flatten |> Option.map (fun x -> "flatten", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribQuantizedFullyConnected(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribQuantizedPooling private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_pooling", operatorArguments)
@@ -6428,6 +8933,36 @@ type ContribQuantizedPooling private (operatorArguments) =
     member __.PValue = operatorArguments.GetParameter("p_value", ContribQuantizedPooling.PValueDefault)
     member __.CountIncludePad = operatorArguments.GetParameter("count_include_pad", ContribQuantizedPooling.CountIncludePadDefault)
     member __.Layout = operatorArguments.GetParameter("layout", ContribQuantizedPooling.LayoutDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?minData : Symbol,
+        [<Optional>] ?maxData : Symbol,
+        [<Optional>] ?kernel : int seq,
+        [<Optional>] ?poolType : PoolType,
+        [<Optional>] ?globalPool : bool,
+        [<Optional>] ?cudnnOff : bool,
+        [<Optional>] ?poolingConvention : PoolingConvention,
+        [<Optional>] ?stride : int seq,
+        [<Optional>] ?pad : int seq,
+        [<Optional>] ?pValue : int,
+        [<Optional>] ?countIncludePad : bool,
+        [<Optional>] ?layout : ContribQuantizedPoolingLayout) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                minData |> Option.map (fun x -> "min_data", Input x)
+                maxData |> Option.map (fun x -> "max_data", Input x)
+                kernel |> Option.map (fun x -> "kernel", Parameter(Some (box x)))
+                poolType |> Option.map (fun x -> "pool_type", Parameter(Some (box x)))
+                globalPool |> Option.map (fun x -> "global_pool", Parameter(Some (box x)))
+                cudnnOff |> Option.map (fun x -> "cudnn_off", Parameter(Some (box x)))
+                poolingConvention |> Option.map (fun x -> "pooling_convention", Parameter(Some (box x)))
+                stride |> Option.map (fun x -> "stride", Parameter(Some (box x)))
+                pad |> Option.map (fun x -> "pad", Parameter(Some (box x)))
+                pValue |> Option.map (fun x -> "p_value", Parameter(Some (box x)))
+                countIncludePad |> Option.map (fun x -> "count_include_pad", Parameter(Some (box x)))
+                layout |> Option.map (fun x -> "layout", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribQuantizedPooling(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribRequantize private (operatorArguments) = 
     inherit SymbolOperator("_contrib_requantize", operatorArguments)
@@ -6460,6 +8995,22 @@ type ContribRequantize private (operatorArguments) =
     member __.OutType = operatorArguments.GetParameter("out_type", ContribRequantize.OutTypeDefault)
     member __.MinCalibRange = operatorArguments.GetParameter("min_calib_range", ContribRequantize.MinCalibRangeDefault)
     member __.MaxCalibRange = operatorArguments.GetParameter("max_calib_range", ContribRequantize.MaxCalibRangeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?minRange : Symbol,
+        [<Optional>] ?maxRange : Symbol,
+        [<Optional>] ?outType : ContribRequantizeOutType,
+        [<Optional>] ?minCalibRange : float,
+        [<Optional>] ?maxCalibRange : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                minRange |> Option.map (fun x -> "min_range", Input x)
+                maxRange |> Option.map (fun x -> "max_range", Input x)
+                outType |> Option.map (fun x -> "out_type", Parameter(Some (box x)))
+                minCalibRange |> Option.map (fun x -> "min_calib_range", Parameter(Some (box x)))
+                maxCalibRange |> Option.map (fun x -> "max_calib_range", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribRequantize(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SampleUniform private (operatorArguments) = 
     inherit SymbolOperator("_sample_uniform", operatorArguments)
@@ -6484,6 +9035,18 @@ type SampleUniform private (operatorArguments) =
     member __.High = operatorArguments.GetInput "high"
     member __.Shape = operatorArguments.GetParameter("shape", SampleUniform.ShapeDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", SampleUniform.DtypeDefault)
+    member this.With([<Optional>] ?low : Symbol,
+        [<Optional>] ?high : Symbol,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                low |> Option.map (fun x -> "low", Input x)
+                high |> Option.map (fun x -> "high", Input x)
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SampleUniform(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SampleNormal private (operatorArguments) = 
     inherit SymbolOperator("_sample_normal", operatorArguments)
@@ -6508,6 +9071,18 @@ type SampleNormal private (operatorArguments) =
     member __.Sigma = operatorArguments.GetInput "sigma"
     member __.Shape = operatorArguments.GetParameter("shape", SampleNormal.ShapeDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", SampleNormal.DtypeDefault)
+    member this.With([<Optional>] ?mu : Symbol,
+        [<Optional>] ?sigma : Symbol,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                mu |> Option.map (fun x -> "mu", Input x)
+                sigma |> Option.map (fun x -> "sigma", Input x)
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SampleNormal(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SampleGamma private (operatorArguments) = 
     inherit SymbolOperator("_sample_gamma", operatorArguments)
@@ -6532,6 +9107,18 @@ type SampleGamma private (operatorArguments) =
     member __.Beta = operatorArguments.GetInput "beta"
     member __.Shape = operatorArguments.GetParameter("shape", SampleGamma.ShapeDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", SampleGamma.DtypeDefault)
+    member this.With([<Optional>] ?alpha : Symbol,
+        [<Optional>] ?beta : Symbol,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                alpha |> Option.map (fun x -> "alpha", Input x)
+                beta |> Option.map (fun x -> "beta", Input x)
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SampleGamma(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SampleExponential private (operatorArguments) = 
     inherit SymbolOperator("_sample_exponential", operatorArguments)
@@ -6552,6 +9139,16 @@ type SampleExponential private (operatorArguments) =
     member __.Lam = operatorArguments.GetInput "lam"
     member __.Shape = operatorArguments.GetParameter("shape", SampleExponential.ShapeDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", SampleExponential.DtypeDefault)
+    member this.With([<Optional>] ?lam : Symbol,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                lam |> Option.map (fun x -> "lam", Input x)
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SampleExponential(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SamplePoisson private (operatorArguments) = 
     inherit SymbolOperator("_sample_poisson", operatorArguments)
@@ -6572,6 +9169,16 @@ type SamplePoisson private (operatorArguments) =
     member __.Lam = operatorArguments.GetInput "lam"
     member __.Shape = operatorArguments.GetParameter("shape", SamplePoisson.ShapeDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", SamplePoisson.DtypeDefault)
+    member this.With([<Optional>] ?lam : Symbol,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                lam |> Option.map (fun x -> "lam", Input x)
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SamplePoisson(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SampleNegativeBinomial private (operatorArguments) = 
     inherit SymbolOperator("_sample_negative_binomial", operatorArguments)
@@ -6596,6 +9203,18 @@ type SampleNegativeBinomial private (operatorArguments) =
     member __.P = operatorArguments.GetInput "p"
     member __.Shape = operatorArguments.GetParameter("shape", SampleNegativeBinomial.ShapeDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", SampleNegativeBinomial.DtypeDefault)
+    member this.With([<Optional>] ?k : Symbol,
+        [<Optional>] ?p : Symbol,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                k |> Option.map (fun x -> "k", Input x)
+                p |> Option.map (fun x -> "p", Input x)
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SampleNegativeBinomial(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SampleGeneralizedNegativeBinomial private (operatorArguments) = 
     inherit SymbolOperator("_sample_generalized_negative_binomial", operatorArguments)
@@ -6620,6 +9239,18 @@ type SampleGeneralizedNegativeBinomial private (operatorArguments) =
     member __.Alpha = operatorArguments.GetInput "alpha"
     member __.Shape = operatorArguments.GetParameter("shape", SampleGeneralizedNegativeBinomial.ShapeDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", SampleGeneralizedNegativeBinomial.DtypeDefault)
+    member this.With([<Optional>] ?mu : Symbol,
+        [<Optional>] ?alpha : Symbol,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?dtype : FloatDType) = 
+        let operatorArguments = 
+            [
+                mu |> Option.map (fun x -> "mu", Input x)
+                alpha |> Option.map (fun x -> "alpha", Input x)
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SampleGeneralizedNegativeBinomial(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RandomPdfUniform private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_uniform", operatorArguments)
@@ -6644,6 +9275,18 @@ type RandomPdfUniform private (operatorArguments) =
     member __.Low = operatorArguments.GetInput "low"
     member __.High = operatorArguments.GetInput "high"
     member __.IsLog = operatorArguments.GetParameter("is_log", RandomPdfUniform.IsLogDefault)
+    member this.With([<Optional>] ?sample : Symbol,
+        [<Optional>] ?low : Symbol,
+        [<Optional>] ?high : Symbol,
+        [<Optional>] ?isLog : bool) = 
+        let operatorArguments = 
+            [
+                sample |> Option.map (fun x -> "sample", Input x)
+                low |> Option.map (fun x -> "low", Input x)
+                high |> Option.map (fun x -> "high", Input x)
+                isLog |> Option.map (fun x -> "is_log", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomPdfUniform(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RandomPdfNormal private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_normal", operatorArguments)
@@ -6668,6 +9311,18 @@ type RandomPdfNormal private (operatorArguments) =
     member __.Mu = operatorArguments.GetInput "mu"
     member __.Sigma = operatorArguments.GetInput "sigma"
     member __.IsLog = operatorArguments.GetParameter("is_log", RandomPdfNormal.IsLogDefault)
+    member this.With([<Optional>] ?sample : Symbol,
+        [<Optional>] ?mu : Symbol,
+        [<Optional>] ?sigma : Symbol,
+        [<Optional>] ?isLog : bool) = 
+        let operatorArguments = 
+            [
+                sample |> Option.map (fun x -> "sample", Input x)
+                mu |> Option.map (fun x -> "mu", Input x)
+                sigma |> Option.map (fun x -> "sigma", Input x)
+                isLog |> Option.map (fun x -> "is_log", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomPdfNormal(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RandomPdfGamma private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_gamma", operatorArguments)
@@ -6692,6 +9347,18 @@ type RandomPdfGamma private (operatorArguments) =
     member __.Alpha = operatorArguments.GetInput "alpha"
     member __.Beta = operatorArguments.GetInput "beta"
     member __.IsLog = operatorArguments.GetParameter("is_log", RandomPdfGamma.IsLogDefault)
+    member this.With([<Optional>] ?sample : Symbol,
+        [<Optional>] ?alpha : Symbol,
+        [<Optional>] ?beta : Symbol,
+        [<Optional>] ?isLog : bool) = 
+        let operatorArguments = 
+            [
+                sample |> Option.map (fun x -> "sample", Input x)
+                alpha |> Option.map (fun x -> "alpha", Input x)
+                beta |> Option.map (fun x -> "beta", Input x)
+                isLog |> Option.map (fun x -> "is_log", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomPdfGamma(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RandomPdfExponential private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_exponential", operatorArguments)
@@ -6712,6 +9379,16 @@ type RandomPdfExponential private (operatorArguments) =
     member __.Sample = operatorArguments.GetInput "sample"
     member __.Lam = operatorArguments.GetInput "lam"
     member __.IsLog = operatorArguments.GetParameter("is_log", RandomPdfExponential.IsLogDefault)
+    member this.With([<Optional>] ?sample : Symbol,
+        [<Optional>] ?lam : Symbol,
+        [<Optional>] ?isLog : bool) = 
+        let operatorArguments = 
+            [
+                sample |> Option.map (fun x -> "sample", Input x)
+                lam |> Option.map (fun x -> "lam", Input x)
+                isLog |> Option.map (fun x -> "is_log", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomPdfExponential(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RandomPdfPoisson private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_poisson", operatorArguments)
@@ -6732,6 +9409,16 @@ type RandomPdfPoisson private (operatorArguments) =
     member __.Sample = operatorArguments.GetInput "sample"
     member __.Lam = operatorArguments.GetInput "lam"
     member __.IsLog = operatorArguments.GetParameter("is_log", RandomPdfPoisson.IsLogDefault)
+    member this.With([<Optional>] ?sample : Symbol,
+        [<Optional>] ?lam : Symbol,
+        [<Optional>] ?isLog : bool) = 
+        let operatorArguments = 
+            [
+                sample |> Option.map (fun x -> "sample", Input x)
+                lam |> Option.map (fun x -> "lam", Input x)
+                isLog |> Option.map (fun x -> "is_log", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomPdfPoisson(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RandomPdfNegativeBinomial private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_negative_binomial", operatorArguments)
@@ -6756,6 +9443,18 @@ type RandomPdfNegativeBinomial private (operatorArguments) =
     member __.K = operatorArguments.GetInput "k"
     member __.P = operatorArguments.GetInput "p"
     member __.IsLog = operatorArguments.GetParameter("is_log", RandomPdfNegativeBinomial.IsLogDefault)
+    member this.With([<Optional>] ?sample : Symbol,
+        [<Optional>] ?k : Symbol,
+        [<Optional>] ?p : Symbol,
+        [<Optional>] ?isLog : bool) = 
+        let operatorArguments = 
+            [
+                sample |> Option.map (fun x -> "sample", Input x)
+                k |> Option.map (fun x -> "k", Input x)
+                p |> Option.map (fun x -> "p", Input x)
+                isLog |> Option.map (fun x -> "is_log", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomPdfNegativeBinomial(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RandomPdfGeneralizedNegativeBinomial private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_generalized_negative_binomial", operatorArguments)
@@ -6780,6 +9479,18 @@ type RandomPdfGeneralizedNegativeBinomial private (operatorArguments) =
     member __.Mu = operatorArguments.GetInput "mu"
     member __.Alpha = operatorArguments.GetInput "alpha"
     member __.IsLog = operatorArguments.GetParameter("is_log", RandomPdfGeneralizedNegativeBinomial.IsLogDefault)
+    member this.With([<Optional>] ?sample : Symbol,
+        [<Optional>] ?mu : Symbol,
+        [<Optional>] ?alpha : Symbol,
+        [<Optional>] ?isLog : bool) = 
+        let operatorArguments = 
+            [
+                sample |> Option.map (fun x -> "sample", Input x)
+                mu |> Option.map (fun x -> "mu", Input x)
+                alpha |> Option.map (fun x -> "alpha", Input x)
+                isLog |> Option.map (fun x -> "is_log", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomPdfGeneralizedNegativeBinomial(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RandomPdfDirichlet private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_dirichlet", operatorArguments)
@@ -6800,6 +9511,16 @@ type RandomPdfDirichlet private (operatorArguments) =
     member __.Sample = operatorArguments.GetInput "sample"
     member __.Alpha = operatorArguments.GetInput "alpha"
     member __.IsLog = operatorArguments.GetParameter("is_log", RandomPdfDirichlet.IsLogDefault)
+    member this.With([<Optional>] ?sample : Symbol,
+        [<Optional>] ?alpha : Symbol,
+        [<Optional>] ?isLog : bool) = 
+        let operatorArguments = 
+            [
+                sample |> Option.map (fun x -> "sample", Input x)
+                alpha |> Option.map (fun x -> "alpha", Input x)
+                isLog |> Option.map (fun x -> "is_log", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomPdfDirichlet(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SampleMultinomial private (operatorArguments) = 
     inherit SymbolOperator("_sample_multinomial", operatorArguments)
@@ -6824,6 +9545,18 @@ type SampleMultinomial private (operatorArguments) =
     member __.Shape = operatorArguments.GetParameter("shape", SampleMultinomial.ShapeDefault)
     member __.GetProb = operatorArguments.GetParameter("get_prob", SampleMultinomial.GetProbDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", SampleMultinomial.DtypeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?getProb : bool,
+        [<Optional>] ?dtype : SampleMultinomialDtype) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                getProb |> Option.map (fun x -> "get_prob", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SampleMultinomial(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RandomUniformLike private (operatorArguments) = 
     inherit SymbolOperator("_random_uniform_like", operatorArguments)
@@ -6844,6 +9577,16 @@ type RandomUniformLike private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Low = operatorArguments.GetParameter("low", RandomUniformLike.LowDefault)
     member __.High = operatorArguments.GetParameter("high", RandomUniformLike.HighDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?low : float,
+        [<Optional>] ?high : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                low |> Option.map (fun x -> "low", Parameter(Some (box x)))
+                high |> Option.map (fun x -> "high", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomUniformLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RandomNormalLike private (operatorArguments) = 
     inherit SymbolOperator("_random_normal_like", operatorArguments)
@@ -6864,6 +9607,16 @@ type RandomNormalLike private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Loc = operatorArguments.GetParameter("loc", RandomNormalLike.LocDefault)
     member __.Scale = operatorArguments.GetParameter("scale", RandomNormalLike.ScaleDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?loc : float,
+        [<Optional>] ?scale : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                loc |> Option.map (fun x -> "loc", Parameter(Some (box x)))
+                scale |> Option.map (fun x -> "scale", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomNormalLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RandomGammaLike private (operatorArguments) = 
     inherit SymbolOperator("_random_gamma_like", operatorArguments)
@@ -6884,6 +9637,16 @@ type RandomGammaLike private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Alpha = operatorArguments.GetParameter("alpha", RandomGammaLike.AlphaDefault)
     member __.Beta = operatorArguments.GetParameter("beta", RandomGammaLike.BetaDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?alpha : float,
+        [<Optional>] ?beta : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                alpha |> Option.map (fun x -> "alpha", Parameter(Some (box x)))
+                beta |> Option.map (fun x -> "beta", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomGammaLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RandomExponentialLike private (operatorArguments) = 
     inherit SymbolOperator("_random_exponential_like", operatorArguments)
@@ -6900,6 +9663,14 @@ type RandomExponentialLike private (operatorArguments) =
     static member LamDefault : double = 1.0
     member __.Data = operatorArguments.GetInput "data"
     member __.Lam = operatorArguments.GetParameter("lam", RandomExponentialLike.LamDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?lam : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                lam |> Option.map (fun x -> "lam", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomExponentialLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RandomPoissonLike private (operatorArguments) = 
     inherit SymbolOperator("_random_poisson_like", operatorArguments)
@@ -6916,6 +9687,14 @@ type RandomPoissonLike private (operatorArguments) =
     static member LamDefault : double = 1.0
     member __.Data = operatorArguments.GetInput "data"
     member __.Lam = operatorArguments.GetParameter("lam", RandomPoissonLike.LamDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?lam : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                lam |> Option.map (fun x -> "lam", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomPoissonLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RandomNegativeBinomialLike private (operatorArguments) = 
     inherit SymbolOperator("_random_negative_binomial_like", operatorArguments)
@@ -6936,6 +9715,16 @@ type RandomNegativeBinomialLike private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.K = operatorArguments.GetParameter("k", RandomNegativeBinomialLike.KDefault)
     member __.P = operatorArguments.GetParameter("p", RandomNegativeBinomialLike.PDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?k : int,
+        [<Optional>] ?p : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                k |> Option.map (fun x -> "k", Parameter(Some (box x)))
+                p |> Option.map (fun x -> "p", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomNegativeBinomialLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RandomGeneralizedNegativeBinomialLike private (operatorArguments) = 
     inherit SymbolOperator("_random_generalized_negative_binomial_like", operatorArguments)
@@ -6956,6 +9745,16 @@ type RandomGeneralizedNegativeBinomialLike private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Mu = operatorArguments.GetParameter("mu", RandomGeneralizedNegativeBinomialLike.MuDefault)
     member __.Alpha = operatorArguments.GetParameter("alpha", RandomGeneralizedNegativeBinomialLike.AlphaDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?mu : float,
+        [<Optional>] ?alpha : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                mu |> Option.map (fun x -> "mu", Parameter(Some (box x)))
+                alpha |> Option.map (fun x -> "alpha", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RandomGeneralizedNegativeBinomialLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Shuffle private (operatorArguments) = 
     inherit SymbolOperator("_shuffle", operatorArguments)
@@ -6968,6 +9767,12 @@ type Shuffle private (operatorArguments) =
             ]
         new Shuffle(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Shuffle(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinearRegressionOutput private (operatorArguments) = 
     inherit SymbolOperator("LinearRegressionOutput", operatorArguments)
@@ -6988,6 +9793,16 @@ type LinearRegressionOutput private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Label = operatorArguments.GetInput "label"
     member __.GradScale = operatorArguments.GetParameter("grad_scale", LinearRegressionOutput.GradScaleDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?label : Symbol,
+        [<Optional>] ?gradScale : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                label |> Option.map (fun x -> "label", Input x)
+                gradScale |> Option.map (fun x -> "grad_scale", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LinearRegressionOutput(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MAERegressionOutput private (operatorArguments) = 
     inherit SymbolOperator("MAERegressionOutput", operatorArguments)
@@ -7008,6 +9823,16 @@ type MAERegressionOutput private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Label = operatorArguments.GetInput "label"
     member __.GradScale = operatorArguments.GetParameter("grad_scale", MAERegressionOutput.GradScaleDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?label : Symbol,
+        [<Optional>] ?gradScale : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                label |> Option.map (fun x -> "label", Input x)
+                gradScale |> Option.map (fun x -> "grad_scale", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MAERegressionOutput(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LogisticRegressionOutput private (operatorArguments) = 
     inherit SymbolOperator("LogisticRegressionOutput", operatorArguments)
@@ -7028,6 +9853,16 @@ type LogisticRegressionOutput private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Label = operatorArguments.GetInput "label"
     member __.GradScale = operatorArguments.GetParameter("grad_scale", LogisticRegressionOutput.GradScaleDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?label : Symbol,
+        [<Optional>] ?gradScale : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                label |> Option.map (fun x -> "label", Input x)
+                gradScale |> Option.map (fun x -> "grad_scale", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LogisticRegressionOutput(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RNN private (operatorArguments) = 
     inherit SymbolOperator("RNN", operatorArguments)
@@ -7133,6 +9968,42 @@ type RNN private (operatorArguments) =
     member __.LstmStateClipMax = operatorArguments.GetParameter("lstm_state_clip_max", RNN.LstmStateClipMaxDefault)
     member __.LstmStateClipNan = operatorArguments.GetParameter("lstm_state_clip_nan", RNN.LstmStateClipNanDefault)
     member __.UseSequenceLength = operatorArguments.GetParameter("use_sequence_length", RNN.UseSequenceLengthDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?parameters : Symbol,
+        [<Optional>] ?state : Symbol,
+        [<Optional>] ?stateCell : Symbol,
+        [<Optional>] ?sequenceLength : Symbol,
+        [<Optional>] ?stateSize : int,
+        [<Optional>] ?numLayers : int,
+        [<Optional>] ?mode : RNNMode,
+        [<Optional>] ?bidirectional : bool,
+        [<Optional>] ?p : float,
+        [<Optional>] ?stateOutputs : bool,
+        [<Optional>] ?projectionSize : int,
+        [<Optional>] ?lstmStateClipMin : float,
+        [<Optional>] ?lstmStateClipMax : float,
+        [<Optional>] ?lstmStateClipNan : bool,
+        [<Optional>] ?useSequenceLength : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                parameters |> Option.map (fun x -> "parameters", Input x)
+                state |> Option.map (fun x -> "state", Input x)
+                stateCell |> Option.map (fun x -> "state_cell", Input x)
+                sequenceLength |> Option.map (fun x -> "sequence_length", Input x)
+                stateSize |> Option.map (fun x -> "state_size", Parameter(Some (box x)))
+                numLayers |> Option.map (fun x -> "num_layers", Parameter(Some (box x)))
+                mode |> Option.map (fun x -> "mode", Parameter(Some (box x)))
+                bidirectional |> Option.map (fun x -> "bidirectional", Parameter(Some (box x)))
+                p |> Option.map (fun x -> "p", Parameter(Some (box x)))
+                stateOutputs |> Option.map (fun x -> "state_outputs", Parameter(Some (box x)))
+                projectionSize |> Option.map (fun x -> "projection_size", Parameter(Some (box x)))
+                lstmStateClipMin |> Option.map (fun x -> "lstm_state_clip_min", Parameter(Some (box x)))
+                lstmStateClipMax |> Option.map (fun x -> "lstm_state_clip_max", Parameter(Some (box x)))
+                lstmStateClipNan |> Option.map (fun x -> "lstm_state_clip_nan", Parameter(Some (box x)))
+                useSequenceLength |> Option.map (fun x -> "use_sequence_length", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RNN(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ROIPooling private (operatorArguments) = 
     inherit SymbolOperator("ROIPooling", operatorArguments)
@@ -7167,6 +10038,18 @@ type ROIPooling private (operatorArguments) =
     member __.Rois = operatorArguments.GetInput "rois"
     member __.PooledSize : int seq = match operatorArguments.GetParameter "pooled_size" with Some(v) -> unbox v | None -> failwithf "Required parameter pooled_size is missing"
     member __.SpatialScale : float = match operatorArguments.GetParameter "spatial_scale" with Some(v) -> unbox v | None -> failwithf "Required parameter spatial_scale is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?rois : Symbol,
+        [<Optional>] ?pooledSize : int seq,
+        [<Optional>] ?spatialScale : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                rois |> Option.map (fun x -> "rois", Input x)
+                pooledSize |> Option.map (fun x -> "pooled_size", Parameter(Some (box x)))
+                spatialScale |> Option.map (fun x -> "spatial_scale", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ROIPooling(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SequenceMask private (operatorArguments) = 
     inherit SymbolOperator("SequenceMask", operatorArguments)
@@ -7195,6 +10078,20 @@ type SequenceMask private (operatorArguments) =
     member __.UseSequenceLength = operatorArguments.GetParameter("use_sequence_length", SequenceMask.UseSequenceLengthDefault)
     member __.Value = operatorArguments.GetParameter("value", SequenceMask.ValueDefault)
     member __.Axis = operatorArguments.GetParameter("axis", SequenceMask.AxisDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?sequenceLength : Symbol,
+        [<Optional>] ?useSequenceLength : bool,
+        [<Optional>] ?value : float,
+        [<Optional>] ?axis : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                sequenceLength |> Option.map (fun x -> "sequence_length", Input x)
+                useSequenceLength |> Option.map (fun x -> "use_sequence_length", Parameter(Some (box x)))
+                value |> Option.map (fun x -> "value", Parameter(Some (box x)))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SequenceMask(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SliceChannel private (operatorArguments) = 
     inherit SymbolOperator("SliceChannel", operatorArguments)
@@ -7230,6 +10127,18 @@ type SliceChannel private (operatorArguments) =
     member __.NumOutputs : int = match operatorArguments.GetParameter "num_outputs" with Some(v) -> unbox v | None -> failwithf "Required parameter num_outputs is missing"
     member __.Axis = operatorArguments.GetParameter("axis", SliceChannel.AxisDefault)
     member __.SqueezeAxis = operatorArguments.GetParameter("squeeze_axis", SliceChannel.SqueezeAxisDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?numOutputs : int,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?squeezeAxis : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                numOutputs |> Option.map (fun x -> "num_outputs", Parameter(Some (box x)))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                squeezeAxis |> Option.map (fun x -> "squeeze_axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SliceChannel(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SoftmaxOutput private (operatorArguments) = 
     inherit SymbolOperator("SoftmaxOutput", operatorArguments)
@@ -7278,6 +10187,30 @@ type SoftmaxOutput private (operatorArguments) =
     member __.Normalization = operatorArguments.GetParameter("normalization", SoftmaxOutput.NormalizationDefault)
     member __.OutGrad = operatorArguments.GetParameter("out_grad", SoftmaxOutput.OutGradDefault)
     member __.SmoothAlpha = operatorArguments.GetParameter("smooth_alpha", SoftmaxOutput.SmoothAlphaDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?label : Symbol,
+        [<Optional>] ?gradScale : float,
+        [<Optional>] ?ignoreLabel : float,
+        [<Optional>] ?multiOutput : bool,
+        [<Optional>] ?useIgnore : bool,
+        [<Optional>] ?preserveShape : bool,
+        [<Optional>] ?normalization : Normalization,
+        [<Optional>] ?outGrad : bool,
+        [<Optional>] ?smoothAlpha : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                label |> Option.map (fun x -> "label", Input x)
+                gradScale |> Option.map (fun x -> "grad_scale", Parameter(Some (box x)))
+                ignoreLabel |> Option.map (fun x -> "ignore_label", Parameter(Some (box x)))
+                multiOutput |> Option.map (fun x -> "multi_output", Parameter(Some (box x)))
+                useIgnore |> Option.map (fun x -> "use_ignore", Parameter(Some (box x)))
+                preserveShape |> Option.map (fun x -> "preserve_shape", Parameter(Some (box x)))
+                normalization |> Option.map (fun x -> "normalization", Parameter(Some (box x)))
+                outGrad |> Option.map (fun x -> "out_grad", Parameter(Some (box x)))
+                smoothAlpha |> Option.map (fun x -> "smooth_alpha", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SoftmaxOutput(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SwapAxis private (operatorArguments) = 
     inherit SymbolOperator("SwapAxis", operatorArguments)
@@ -7298,6 +10231,16 @@ type SwapAxis private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Dim1 = operatorArguments.GetParameter("dim1", SwapAxis.Dim1Default)
     member __.Dim2 = operatorArguments.GetParameter("dim2", SwapAxis.Dim2Default)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?dim1 : int,
+        [<Optional>] ?dim2 : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                dim1 |> Option.map (fun x -> "dim1", Parameter(Some (box x)))
+                dim2 |> Option.map (fun x -> "dim2", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SwapAxis(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type AmpCast private (operatorArguments) = 
     inherit SymbolOperator("amp_cast", operatorArguments)
@@ -7321,6 +10264,14 @@ type AmpCast private (operatorArguments) =
         new AmpCast(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Dtype : IntOrFloatDType = match operatorArguments.GetParameter "dtype" with Some(v) -> unbox v | None -> failwithf "Required parameter dtype is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new AmpCast(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type AmpMulticast private (operatorArguments) = 
     inherit SymbolOperator("amp_multicast", operatorArguments)
@@ -7352,6 +10303,14 @@ type AmpMulticast private (operatorArguments) =
         new AmpMulticast(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetVarArg "data"
     member __.NumOutputs : int = match operatorArguments.GetParameter "num_outputs" with Some(v) -> unbox v | None -> failwithf "Required parameter num_outputs is missing"
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?numOutputs : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                numOutputs |> Option.map (fun x -> "num_outputs", Parameter(Some (box x)))
+            ] |> List.choose id
+        new AmpMulticast(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Max private (operatorArguments) = 
     inherit SymbolOperator("max", operatorArguments)
@@ -7376,6 +10335,18 @@ type Max private (operatorArguments) =
     member __.Axis = operatorArguments.GetParameter("axis", Max.AxisDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", Max.KeepdimsDefault)
     member __.Exclude = operatorArguments.GetParameter("exclude", Max.ExcludeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?keepdims : bool,
+        [<Optional>] ?exclude : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                exclude |> Option.map (fun x -> "exclude", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Max(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Min private (operatorArguments) = 
     inherit SymbolOperator("min", operatorArguments)
@@ -7400,6 +10371,18 @@ type Min private (operatorArguments) =
     member __.Axis = operatorArguments.GetParameter("axis", Min.AxisDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", Min.KeepdimsDefault)
     member __.Exclude = operatorArguments.GetParameter("exclude", Min.ExcludeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?keepdims : bool,
+        [<Optional>] ?exclude : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                exclude |> Option.map (fun x -> "exclude", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Min(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Norm private (operatorArguments) = 
     inherit SymbolOperator("norm", operatorArguments)
@@ -7428,6 +10411,20 @@ type Norm private (operatorArguments) =
     member __.Axis = operatorArguments.GetParameter("axis", Norm.AxisDefault)
     member __.OutDtype = operatorArguments.GetParameter("out_dtype", Norm.OutDtypeDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", Norm.KeepdimsDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?ord : int,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?outDtype : OutDtype,
+        [<Optional>] ?keepdims : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                ord |> Option.map (fun x -> "ord", Parameter(Some (box x)))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                outDtype |> Option.map (fun x -> "out_dtype", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Norm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Argmax private (operatorArguments) = 
     inherit SymbolOperator("argmax", operatorArguments)
@@ -7448,6 +10445,16 @@ type Argmax private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Axis = operatorArguments.GetParameter("axis", Argmax.AxisDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", Argmax.KeepdimsDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?keepdims : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Argmax(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Argmin private (operatorArguments) = 
     inherit SymbolOperator("argmin", operatorArguments)
@@ -7468,6 +10475,16 @@ type Argmin private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Axis = operatorArguments.GetParameter("axis", Argmin.AxisDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", Argmin.KeepdimsDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?keepdims : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Argmin(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ArgmaxChannel private (operatorArguments) = 
     inherit SymbolOperator("argmax_channel", operatorArguments)
@@ -7480,6 +10497,12 @@ type ArgmaxChannel private (operatorArguments) =
             ]
         new ArgmaxChannel(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new ArgmaxChannel(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Pick private (operatorArguments) = 
     inherit SymbolOperator("pick", operatorArguments)
@@ -7508,6 +10531,20 @@ type Pick private (operatorArguments) =
     member __.Axis = operatorArguments.GetParameter("axis", Pick.AxisDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", Pick.KeepdimsDefault)
     member __.Mode = operatorArguments.GetParameter("mode", Pick.ModeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?index : Symbol,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?keepdims : bool,
+        [<Optional>] ?mode : PickMode) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                index |> Option.map (fun x -> "index", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                mode |> Option.map (fun x -> "mode", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Pick(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastAxis private (operatorArguments) = 
     inherit SymbolOperator("broadcast_axis", operatorArguments)
@@ -7528,6 +10565,16 @@ type BroadcastAxis private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Axis = operatorArguments.GetParameter("axis", BroadcastAxis.AxisDefault)
     member __.Size = operatorArguments.GetParameter("size", BroadcastAxis.SizeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?size : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+            ] |> List.choose id
+        new BroadcastAxis(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastTo private (operatorArguments) = 
     inherit SymbolOperator("broadcast_to", operatorArguments)
@@ -7544,6 +10591,14 @@ type BroadcastTo private (operatorArguments) =
     static member ShapeDefault : int [] = [||]
     member __.Data = operatorArguments.GetInput "data"
     member __.Shape = operatorArguments.GetParameter("shape", BroadcastTo.ShapeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?shape : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+            ] |> List.choose id
+        new BroadcastTo(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastLike private (operatorArguments) = 
     inherit SymbolOperator("broadcast_like", operatorArguments)
@@ -7568,6 +10623,18 @@ type BroadcastLike private (operatorArguments) =
     member __.Rhs = operatorArguments.GetInput "rhs"
     member __.LhsAxes = operatorArguments.GetParameter("lhs_axes", BroadcastLike.LhsAxesDefault)
     member __.RhsAxes = operatorArguments.GetParameter("rhs_axes", BroadcastLike.RhsAxesDefault)
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol,
+        [<Optional>] ?lhsAxes : int seq,
+        [<Optional>] ?rhsAxes : int seq) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+                lhsAxes |> Option.map (fun x -> "lhs_axes", Parameter(Some (box x)))
+                rhsAxes |> Option.map (fun x -> "rhs_axes", Parameter(Some (box x)))
+            ] |> List.choose id
+        new BroadcastLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Prod private (operatorArguments) = 
     inherit SymbolOperator("prod", operatorArguments)
@@ -7592,6 +10659,18 @@ type Prod private (operatorArguments) =
     member __.Axis = operatorArguments.GetParameter("axis", Prod.AxisDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", Prod.KeepdimsDefault)
     member __.Exclude = operatorArguments.GetParameter("exclude", Prod.ExcludeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?keepdims : bool,
+        [<Optional>] ?exclude : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                exclude |> Option.map (fun x -> "exclude", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Prod(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Nanprod private (operatorArguments) = 
     inherit SymbolOperator("nanprod", operatorArguments)
@@ -7616,6 +10695,18 @@ type Nanprod private (operatorArguments) =
     member __.Axis = operatorArguments.GetParameter("axis", Nanprod.AxisDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", Nanprod.KeepdimsDefault)
     member __.Exclude = operatorArguments.GetParameter("exclude", Nanprod.ExcludeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?keepdims : bool,
+        [<Optional>] ?exclude : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                exclude |> Option.map (fun x -> "exclude", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Nanprod(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Sum private (operatorArguments) = 
     inherit SymbolOperator("sum", operatorArguments)
@@ -7640,6 +10731,18 @@ type Sum private (operatorArguments) =
     member __.Axis = operatorArguments.GetParameter("axis", Sum.AxisDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", Sum.KeepdimsDefault)
     member __.Exclude = operatorArguments.GetParameter("exclude", Sum.ExcludeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?keepdims : bool,
+        [<Optional>] ?exclude : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                exclude |> Option.map (fun x -> "exclude", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Sum(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Mean private (operatorArguments) = 
     inherit SymbolOperator("mean", operatorArguments)
@@ -7664,6 +10767,18 @@ type Mean private (operatorArguments) =
     member __.Axis = operatorArguments.GetParameter("axis", Mean.AxisDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", Mean.KeepdimsDefault)
     member __.Exclude = operatorArguments.GetParameter("exclude", Mean.ExcludeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?keepdims : bool,
+        [<Optional>] ?exclude : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                exclude |> Option.map (fun x -> "exclude", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Mean(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Nansum private (operatorArguments) = 
     inherit SymbolOperator("nansum", operatorArguments)
@@ -7688,6 +10803,18 @@ type Nansum private (operatorArguments) =
     member __.Axis = operatorArguments.GetParameter("axis", Nansum.AxisDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", Nansum.KeepdimsDefault)
     member __.Exclude = operatorArguments.GetParameter("exclude", Nansum.ExcludeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?keepdims : bool,
+        [<Optional>] ?exclude : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                exclude |> Option.map (fun x -> "exclude", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Nansum(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type CastStorage private (operatorArguments) = 
     inherit SymbolOperator("cast_storage", operatorArguments)
@@ -7711,6 +10838,14 @@ type CastStorage private (operatorArguments) =
         new CastStorage(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Stype : Stype = match operatorArguments.GetParameter "stype" with Some(v) -> unbox v | None -> failwithf "Required parameter stype is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?stype : Stype) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                stype |> Option.map (fun x -> "stype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new CastStorage(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Where private (operatorArguments) = 
     inherit SymbolOperator("where", operatorArguments)
@@ -7731,6 +10866,16 @@ type Where private (operatorArguments) =
     member __.Condition = operatorArguments.GetInput "condition"
     member __.X = operatorArguments.GetInput "x"
     member __.Y = operatorArguments.GetInput "y"
+    member this.With([<Optional>] ?condition : Symbol,
+        [<Optional>] ?x : Symbol,
+        [<Optional>] ?y : Symbol) = 
+        let operatorArguments = 
+            [
+                condition |> Option.map (fun x -> "condition", Input x)
+                x |> Option.map (fun x -> "x", Input x)
+                y |> Option.map (fun x -> "y", Input x)
+            ] |> List.choose id
+        new Where(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Diag private (operatorArguments) = 
     inherit SymbolOperator("diag", operatorArguments)
@@ -7755,6 +10900,18 @@ type Diag private (operatorArguments) =
     member __.K = operatorArguments.GetParameter("k", Diag.KDefault)
     member __.Axis1 = operatorArguments.GetParameter("axis1", Diag.Axis1Default)
     member __.Axis2 = operatorArguments.GetParameter("axis2", Diag.Axis2Default)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?k : int,
+        [<Optional>] ?axis1 : int,
+        [<Optional>] ?axis2 : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                k |> Option.map (fun x -> "k", Parameter(Some (box x)))
+                axis1 |> Option.map (fun x -> "axis1", Parameter(Some (box x)))
+                axis2 |> Option.map (fun x -> "axis2", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Diag(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Dot private (operatorArguments) = 
     inherit SymbolOperator("dot", operatorArguments)
@@ -7783,6 +10940,20 @@ type Dot private (operatorArguments) =
     member __.TransposeA = operatorArguments.GetParameter("transpose_a", Dot.TransposeADefault)
     member __.TransposeB = operatorArguments.GetParameter("transpose_b", Dot.TransposeBDefault)
     member __.ForwardStype = operatorArguments.GetParameter("forward_stype", Dot.ForwardStypeDefault)
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol,
+        [<Optional>] ?transposeA : bool,
+        [<Optional>] ?transposeB : bool,
+        [<Optional>] ?forwardStype : ForwardStype) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+                transposeA |> Option.map (fun x -> "transpose_a", Parameter(Some (box x)))
+                transposeB |> Option.map (fun x -> "transpose_b", Parameter(Some (box x)))
+                forwardStype |> Option.map (fun x -> "forward_stype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Dot(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BatchDot private (operatorArguments) = 
     inherit SymbolOperator("batch_dot", operatorArguments)
@@ -7811,6 +10982,20 @@ type BatchDot private (operatorArguments) =
     member __.TransposeA = operatorArguments.GetParameter("transpose_a", BatchDot.TransposeADefault)
     member __.TransposeB = operatorArguments.GetParameter("transpose_b", BatchDot.TransposeBDefault)
     member __.ForwardStype = operatorArguments.GetParameter("forward_stype", BatchDot.ForwardStypeDefault)
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol,
+        [<Optional>] ?transposeA : bool,
+        [<Optional>] ?transposeB : bool,
+        [<Optional>] ?forwardStype : ForwardStype) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+                transposeA |> Option.map (fun x -> "transpose_a", Parameter(Some (box x)))
+                transposeB |> Option.map (fun x -> "transpose_b", Parameter(Some (box x)))
+                forwardStype |> Option.map (fun x -> "forward_stype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new BatchDot(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastAdd private (operatorArguments) = 
     inherit SymbolOperator("broadcast_add", operatorArguments)
@@ -7827,6 +11012,14 @@ type BroadcastAdd private (operatorArguments) =
         new BroadcastAdd(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastAdd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastSub private (operatorArguments) = 
     inherit SymbolOperator("broadcast_sub", operatorArguments)
@@ -7843,6 +11036,14 @@ type BroadcastSub private (operatorArguments) =
         new BroadcastSub(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastSub(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastMul private (operatorArguments) = 
     inherit SymbolOperator("broadcast_mul", operatorArguments)
@@ -7859,6 +11060,14 @@ type BroadcastMul private (operatorArguments) =
         new BroadcastMul(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastMul(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastDiv private (operatorArguments) = 
     inherit SymbolOperator("broadcast_div", operatorArguments)
@@ -7875,6 +11084,14 @@ type BroadcastDiv private (operatorArguments) =
         new BroadcastDiv(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastDiv(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastMod private (operatorArguments) = 
     inherit SymbolOperator("broadcast_mod", operatorArguments)
@@ -7891,6 +11108,14 @@ type BroadcastMod private (operatorArguments) =
         new BroadcastMod(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastMod(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastPower private (operatorArguments) = 
     inherit SymbolOperator("broadcast_power", operatorArguments)
@@ -7907,6 +11132,14 @@ type BroadcastPower private (operatorArguments) =
         new BroadcastPower(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastPower(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastMaximum private (operatorArguments) = 
     inherit SymbolOperator("broadcast_maximum", operatorArguments)
@@ -7923,6 +11156,14 @@ type BroadcastMaximum private (operatorArguments) =
         new BroadcastMaximum(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastMaximum(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastMinimum private (operatorArguments) = 
     inherit SymbolOperator("broadcast_minimum", operatorArguments)
@@ -7939,6 +11180,14 @@ type BroadcastMinimum private (operatorArguments) =
         new BroadcastMinimum(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastMinimum(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastHypot private (operatorArguments) = 
     inherit SymbolOperator("broadcast_hypot", operatorArguments)
@@ -7955,6 +11204,14 @@ type BroadcastHypot private (operatorArguments) =
         new BroadcastHypot(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastHypot(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastEqual private (operatorArguments) = 
     inherit SymbolOperator("broadcast_equal", operatorArguments)
@@ -7971,6 +11228,14 @@ type BroadcastEqual private (operatorArguments) =
         new BroadcastEqual(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastEqual(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastNotEqual private (operatorArguments) = 
     inherit SymbolOperator("broadcast_not_equal", operatorArguments)
@@ -7987,6 +11252,14 @@ type BroadcastNotEqual private (operatorArguments) =
         new BroadcastNotEqual(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastNotEqual(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastGreater private (operatorArguments) = 
     inherit SymbolOperator("broadcast_greater", operatorArguments)
@@ -8003,6 +11276,14 @@ type BroadcastGreater private (operatorArguments) =
         new BroadcastGreater(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastGreater(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastGreaterEqual private (operatorArguments) = 
     inherit SymbolOperator("broadcast_greater_equal", operatorArguments)
@@ -8019,6 +11300,14 @@ type BroadcastGreaterEqual private (operatorArguments) =
         new BroadcastGreaterEqual(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastGreaterEqual(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastLesser private (operatorArguments) = 
     inherit SymbolOperator("broadcast_lesser", operatorArguments)
@@ -8035,6 +11324,14 @@ type BroadcastLesser private (operatorArguments) =
         new BroadcastLesser(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastLesser(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastLesserEqual private (operatorArguments) = 
     inherit SymbolOperator("broadcast_lesser_equal", operatorArguments)
@@ -8051,6 +11348,14 @@ type BroadcastLesserEqual private (operatorArguments) =
         new BroadcastLesserEqual(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastLesserEqual(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastLogicalAnd private (operatorArguments) = 
     inherit SymbolOperator("broadcast_logical_and", operatorArguments)
@@ -8067,6 +11372,14 @@ type BroadcastLogicalAnd private (operatorArguments) =
         new BroadcastLogicalAnd(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastLogicalAnd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastLogicalOr private (operatorArguments) = 
     inherit SymbolOperator("broadcast_logical_or", operatorArguments)
@@ -8083,6 +11396,14 @@ type BroadcastLogicalOr private (operatorArguments) =
         new BroadcastLogicalOr(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastLogicalOr(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BroadcastLogicalXor private (operatorArguments) = 
     inherit SymbolOperator("broadcast_logical_xor", operatorArguments)
@@ -8099,6 +11420,14 @@ type BroadcastLogicalXor private (operatorArguments) =
         new BroadcastLogicalXor(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new BroadcastLogicalXor(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ElemwiseAdd private (operatorArguments) = 
     inherit SymbolOperator("elemwise_add", operatorArguments)
@@ -8115,6 +11444,14 @@ type ElemwiseAdd private (operatorArguments) =
         new ElemwiseAdd(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new ElemwiseAdd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type GradAdd private (operatorArguments) = 
     inherit SymbolOperator("_grad_add", operatorArguments)
@@ -8131,6 +11468,14 @@ type GradAdd private (operatorArguments) =
         new GradAdd(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new GradAdd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ElemwiseSub private (operatorArguments) = 
     inherit SymbolOperator("elemwise_sub", operatorArguments)
@@ -8147,6 +11492,14 @@ type ElemwiseSub private (operatorArguments) =
         new ElemwiseSub(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new ElemwiseSub(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ElemwiseMul private (operatorArguments) = 
     inherit SymbolOperator("elemwise_mul", operatorArguments)
@@ -8163,6 +11516,14 @@ type ElemwiseMul private (operatorArguments) =
         new ElemwiseMul(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new ElemwiseMul(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ElemwiseDiv private (operatorArguments) = 
     inherit SymbolOperator("elemwise_div", operatorArguments)
@@ -8179,6 +11540,14 @@ type ElemwiseDiv private (operatorArguments) =
         new ElemwiseDiv(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new ElemwiseDiv(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Mod private (operatorArguments) = 
     inherit SymbolOperator("_mod", operatorArguments)
@@ -8195,6 +11564,14 @@ type Mod private (operatorArguments) =
         new Mod(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new Mod(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Power private (operatorArguments) = 
     inherit SymbolOperator("_power", operatorArguments)
@@ -8211,6 +11588,14 @@ type Power private (operatorArguments) =
         new Power(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new Power(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Maximum private (operatorArguments) = 
     inherit SymbolOperator("_maximum", operatorArguments)
@@ -8227,6 +11612,14 @@ type Maximum private (operatorArguments) =
         new Maximum(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new Maximum(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Minimum private (operatorArguments) = 
     inherit SymbolOperator("_minimum", operatorArguments)
@@ -8243,6 +11636,14 @@ type Minimum private (operatorArguments) =
         new Minimum(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new Minimum(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Hypot private (operatorArguments) = 
     inherit SymbolOperator("_hypot", operatorArguments)
@@ -8259,6 +11660,14 @@ type Hypot private (operatorArguments) =
         new Hypot(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new Hypot(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Equal private (operatorArguments) = 
     inherit SymbolOperator("_equal", operatorArguments)
@@ -8275,6 +11684,14 @@ type Equal private (operatorArguments) =
         new Equal(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new Equal(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NotEqual private (operatorArguments) = 
     inherit SymbolOperator("_not_equal", operatorArguments)
@@ -8291,6 +11708,14 @@ type NotEqual private (operatorArguments) =
         new NotEqual(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new NotEqual(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Greater private (operatorArguments) = 
     inherit SymbolOperator("_greater", operatorArguments)
@@ -8307,6 +11732,14 @@ type Greater private (operatorArguments) =
         new Greater(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new Greater(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type GreaterEqual private (operatorArguments) = 
     inherit SymbolOperator("_greater_equal", operatorArguments)
@@ -8323,6 +11756,14 @@ type GreaterEqual private (operatorArguments) =
         new GreaterEqual(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new GreaterEqual(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Lesser private (operatorArguments) = 
     inherit SymbolOperator("_lesser", operatorArguments)
@@ -8339,6 +11780,14 @@ type Lesser private (operatorArguments) =
         new Lesser(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new Lesser(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LesserEqual private (operatorArguments) = 
     inherit SymbolOperator("_lesser_equal", operatorArguments)
@@ -8355,6 +11804,14 @@ type LesserEqual private (operatorArguments) =
         new LesserEqual(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new LesserEqual(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LogicalAnd private (operatorArguments) = 
     inherit SymbolOperator("_logical_and", operatorArguments)
@@ -8371,6 +11828,14 @@ type LogicalAnd private (operatorArguments) =
         new LogicalAnd(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new LogicalAnd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LogicalOr private (operatorArguments) = 
     inherit SymbolOperator("_logical_or", operatorArguments)
@@ -8387,6 +11852,14 @@ type LogicalOr private (operatorArguments) =
         new LogicalOr(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new LogicalOr(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LogicalXor private (operatorArguments) = 
     inherit SymbolOperator("_logical_xor", operatorArguments)
@@ -8403,6 +11876,14 @@ type LogicalXor private (operatorArguments) =
         new LogicalXor(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new LogicalXor(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type PlusScalar private (operatorArguments) = 
     inherit SymbolOperator("_plus_scalar", operatorArguments)
@@ -8426,6 +11907,14 @@ type PlusScalar private (operatorArguments) =
         new PlusScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new PlusScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MinusScalar private (operatorArguments) = 
     inherit SymbolOperator("_minus_scalar", operatorArguments)
@@ -8449,6 +11938,14 @@ type MinusScalar private (operatorArguments) =
         new MinusScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MinusScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RminusScalar private (operatorArguments) = 
     inherit SymbolOperator("_rminus_scalar", operatorArguments)
@@ -8472,6 +11969,14 @@ type RminusScalar private (operatorArguments) =
         new RminusScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RminusScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MulScalar private (operatorArguments) = 
     inherit SymbolOperator("_mul_scalar", operatorArguments)
@@ -8495,6 +12000,14 @@ type MulScalar private (operatorArguments) =
         new MulScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MulScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type DivScalar private (operatorArguments) = 
     inherit SymbolOperator("_div_scalar", operatorArguments)
@@ -8518,6 +12031,14 @@ type DivScalar private (operatorArguments) =
         new DivScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new DivScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RdivScalar private (operatorArguments) = 
     inherit SymbolOperator("_rdiv_scalar", operatorArguments)
@@ -8541,6 +12062,14 @@ type RdivScalar private (operatorArguments) =
         new RdivScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RdivScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ModScalar private (operatorArguments) = 
     inherit SymbolOperator("_mod_scalar", operatorArguments)
@@ -8564,6 +12093,14 @@ type ModScalar private (operatorArguments) =
         new ModScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ModScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RmodScalar private (operatorArguments) = 
     inherit SymbolOperator("_rmod_scalar", operatorArguments)
@@ -8587,6 +12124,14 @@ type RmodScalar private (operatorArguments) =
         new RmodScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RmodScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MaximumScalar private (operatorArguments) = 
     inherit SymbolOperator("_maximum_scalar", operatorArguments)
@@ -8610,6 +12155,14 @@ type MaximumScalar private (operatorArguments) =
         new MaximumScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MaximumScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MinimumScalar private (operatorArguments) = 
     inherit SymbolOperator("_minimum_scalar", operatorArguments)
@@ -8633,6 +12186,14 @@ type MinimumScalar private (operatorArguments) =
         new MinimumScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MinimumScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type PowerScalar private (operatorArguments) = 
     inherit SymbolOperator("_power_scalar", operatorArguments)
@@ -8656,6 +12217,14 @@ type PowerScalar private (operatorArguments) =
         new PowerScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new PowerScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RpowerScalar private (operatorArguments) = 
     inherit SymbolOperator("_rpower_scalar", operatorArguments)
@@ -8679,6 +12248,14 @@ type RpowerScalar private (operatorArguments) =
         new RpowerScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RpowerScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type HypotScalar private (operatorArguments) = 
     inherit SymbolOperator("_hypot_scalar", operatorArguments)
@@ -8702,6 +12279,14 @@ type HypotScalar private (operatorArguments) =
         new HypotScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new HypotScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SmoothL1 private (operatorArguments) = 
     inherit SymbolOperator("smooth_l1", operatorArguments)
@@ -8725,6 +12310,14 @@ type SmoothL1 private (operatorArguments) =
         new SmoothL1(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SmoothL1(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type EqualScalar private (operatorArguments) = 
     inherit SymbolOperator("_equal_scalar", operatorArguments)
@@ -8748,6 +12341,14 @@ type EqualScalar private (operatorArguments) =
         new EqualScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new EqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type NotEqualScalar private (operatorArguments) = 
     inherit SymbolOperator("_not_equal_scalar", operatorArguments)
@@ -8771,6 +12372,14 @@ type NotEqualScalar private (operatorArguments) =
         new NotEqualScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new NotEqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type GreaterScalar private (operatorArguments) = 
     inherit SymbolOperator("_greater_scalar", operatorArguments)
@@ -8794,6 +12403,14 @@ type GreaterScalar private (operatorArguments) =
         new GreaterScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new GreaterScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type GreaterEqualScalar private (operatorArguments) = 
     inherit SymbolOperator("_greater_equal_scalar", operatorArguments)
@@ -8817,6 +12434,14 @@ type GreaterEqualScalar private (operatorArguments) =
         new GreaterEqualScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new GreaterEqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LesserScalar private (operatorArguments) = 
     inherit SymbolOperator("_lesser_scalar", operatorArguments)
@@ -8840,6 +12465,14 @@ type LesserScalar private (operatorArguments) =
         new LesserScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LesserScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LesserEqualScalar private (operatorArguments) = 
     inherit SymbolOperator("_lesser_equal_scalar", operatorArguments)
@@ -8863,6 +12496,14 @@ type LesserEqualScalar private (operatorArguments) =
         new LesserEqualScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LesserEqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LogicalAndScalar private (operatorArguments) = 
     inherit SymbolOperator("_logical_and_scalar", operatorArguments)
@@ -8886,6 +12527,14 @@ type LogicalAndScalar private (operatorArguments) =
         new LogicalAndScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LogicalAndScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LogicalOrScalar private (operatorArguments) = 
     inherit SymbolOperator("_logical_or_scalar", operatorArguments)
@@ -8909,6 +12558,14 @@ type LogicalOrScalar private (operatorArguments) =
         new LogicalOrScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LogicalOrScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LogicalXorScalar private (operatorArguments) = 
     inherit SymbolOperator("_logical_xor_scalar", operatorArguments)
@@ -8932,6 +12589,14 @@ type LogicalXorScalar private (operatorArguments) =
         new LogicalXorScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LogicalXorScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ScatterElemwiseDiv private (operatorArguments) = 
     inherit SymbolOperator("_scatter_elemwise_div", operatorArguments)
@@ -8948,6 +12613,14 @@ type ScatterElemwiseDiv private (operatorArguments) =
         new ScatterElemwiseDiv(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new ScatterElemwiseDiv(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ScatterPlusScalar private (operatorArguments) = 
     inherit SymbolOperator("_scatter_plus_scalar", operatorArguments)
@@ -8971,6 +12644,14 @@ type ScatterPlusScalar private (operatorArguments) =
         new ScatterPlusScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ScatterPlusScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ScatterMinusScalar private (operatorArguments) = 
     inherit SymbolOperator("_scatter_minus_scalar", operatorArguments)
@@ -8994,6 +12675,14 @@ type ScatterMinusScalar private (operatorArguments) =
         new ScatterMinusScalar(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?scalar : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ScatterMinusScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type AddN private (operatorArguments) = 
     inherit SymbolOperator("add_n", operatorArguments)
@@ -9012,6 +12701,12 @@ type AddN private (operatorArguments) =
             ]
         new AddN(Arguments<Symbol>(operatorArguments))
     member __.Args = operatorArguments.GetVarArg "args"
+    member this.With([<Optional>] ?args : Symbol seq) =
+        let operatorArguments = 
+            [
+                args |> Option.map (fun x -> "args", VarArg("num_args", Seq.toArray x))
+            ] |> List.choose id
+        new AddN(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Relu private (operatorArguments) = 
     inherit SymbolOperator("relu", operatorArguments)
@@ -9024,6 +12719,12 @@ type Relu private (operatorArguments) =
             ]
         new Relu(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Relu(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Sigmoid private (operatorArguments) = 
     inherit SymbolOperator("sigmoid", operatorArguments)
@@ -9036,6 +12737,12 @@ type Sigmoid private (operatorArguments) =
             ]
         new Sigmoid(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Sigmoid(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type HardSigmoid private (operatorArguments) = 
     inherit SymbolOperator("hard_sigmoid", operatorArguments)
@@ -9056,6 +12763,16 @@ type HardSigmoid private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Alpha = operatorArguments.GetParameter("alpha", HardSigmoid.AlphaDefault)
     member __.Beta = operatorArguments.GetParameter("beta", HardSigmoid.BetaDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?alpha : float,
+        [<Optional>] ?beta : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                alpha |> Option.map (fun x -> "alpha", Parameter(Some (box x)))
+                beta |> Option.map (fun x -> "beta", Parameter(Some (box x)))
+            ] |> List.choose id
+        new HardSigmoid(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Softsign private (operatorArguments) = 
     inherit SymbolOperator("softsign", operatorArguments)
@@ -9068,6 +12785,12 @@ type Softsign private (operatorArguments) =
             ]
         new Softsign(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Softsign(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Copy private (operatorArguments) = 
     inherit SymbolOperator("_copy", operatorArguments)
@@ -9080,6 +12803,12 @@ type Copy private (operatorArguments) =
             ]
         new Copy(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Copy(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BlockGrad private (operatorArguments) = 
     inherit SymbolOperator("BlockGrad", operatorArguments)
@@ -9092,6 +12821,12 @@ type BlockGrad private (operatorArguments) =
             ]
         new BlockGrad(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new BlockGrad(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type IdentityWithAttrLikeRhs private (operatorArguments) = 
     inherit SymbolOperator("_identity_with_attr_like_rhs", operatorArguments)
@@ -9108,6 +12843,14 @@ type IdentityWithAttrLikeRhs private (operatorArguments) =
         new IdentityWithAttrLikeRhs(Arguments<Symbol>(operatorArguments))
     member __.Lhs = operatorArguments.GetInput "lhs"
     member __.Rhs = operatorArguments.GetInput "rhs"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+            ] |> List.choose id
+        new IdentityWithAttrLikeRhs(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ReshapeLike private (operatorArguments) = 
     inherit SymbolOperator("reshape_like", operatorArguments)
@@ -9140,6 +12883,22 @@ type ReshapeLike private (operatorArguments) =
     member __.LhsEnd = operatorArguments.GetParameter("lhs_end", ReshapeLike.LhsEndDefault)
     member __.RhsBegin = operatorArguments.GetParameter("rhs_begin", ReshapeLike.RhsBeginDefault)
     member __.RhsEnd = operatorArguments.GetParameter("rhs_end", ReshapeLike.RhsEndDefault)
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol,
+        [<Optional>] ?lhsBegin : int,
+        [<Optional>] ?lhsEnd : int,
+        [<Optional>] ?rhsBegin : int,
+        [<Optional>] ?rhsEnd : int) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+                lhsBegin |> Option.map (fun x -> "lhs_begin", Parameter(Some (box x)))
+                lhsEnd |> Option.map (fun x -> "lhs_end", Parameter(Some (box x)))
+                rhsBegin |> Option.map (fun x -> "rhs_begin", Parameter(Some (box x)))
+                rhsEnd |> Option.map (fun x -> "rhs_end", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ReshapeLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ShapeArray private (operatorArguments) = 
     inherit SymbolOperator("shape_array", operatorArguments)
@@ -9152,6 +12911,12 @@ type ShapeArray private (operatorArguments) =
             ]
         new ShapeArray(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new ShapeArray(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SizeArray private (operatorArguments) = 
     inherit SymbolOperator("size_array", operatorArguments)
@@ -9164,6 +12929,12 @@ type SizeArray private (operatorArguments) =
             ]
         new SizeArray(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new SizeArray(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Cast private (operatorArguments) = 
     inherit SymbolOperator("Cast", operatorArguments)
@@ -9187,6 +12958,14 @@ type Cast private (operatorArguments) =
         new Cast(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Dtype : IntOrFloatDType = match operatorArguments.GetParameter "dtype" with Some(v) -> unbox v | None -> failwithf "Required parameter dtype is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Cast(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Negative private (operatorArguments) = 
     inherit SymbolOperator("negative", operatorArguments)
@@ -9199,6 +12978,12 @@ type Negative private (operatorArguments) =
             ]
         new Negative(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Negative(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Abs private (operatorArguments) = 
     inherit SymbolOperator("abs", operatorArguments)
@@ -9211,6 +12996,12 @@ type Abs private (operatorArguments) =
             ]
         new Abs(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Abs(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Sign private (operatorArguments) = 
     inherit SymbolOperator("sign", operatorArguments)
@@ -9223,6 +13014,12 @@ type Sign private (operatorArguments) =
             ]
         new Sign(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Sign(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Round private (operatorArguments) = 
     inherit SymbolOperator("round", operatorArguments)
@@ -9235,6 +13032,12 @@ type Round private (operatorArguments) =
             ]
         new Round(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Round(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Rint private (operatorArguments) = 
     inherit SymbolOperator("rint", operatorArguments)
@@ -9247,6 +13050,12 @@ type Rint private (operatorArguments) =
             ]
         new Rint(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Rint(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Ceil private (operatorArguments) = 
     inherit SymbolOperator("ceil", operatorArguments)
@@ -9259,6 +13068,12 @@ type Ceil private (operatorArguments) =
             ]
         new Ceil(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Ceil(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Floor private (operatorArguments) = 
     inherit SymbolOperator("floor", operatorArguments)
@@ -9271,6 +13086,12 @@ type Floor private (operatorArguments) =
             ]
         new Floor(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Floor(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Trunc private (operatorArguments) = 
     inherit SymbolOperator("trunc", operatorArguments)
@@ -9283,6 +13104,12 @@ type Trunc private (operatorArguments) =
             ]
         new Trunc(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Trunc(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Fix private (operatorArguments) = 
     inherit SymbolOperator("fix", operatorArguments)
@@ -9295,6 +13122,12 @@ type Fix private (operatorArguments) =
             ]
         new Fix(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Fix(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Erf private (operatorArguments) = 
     inherit SymbolOperator("erf", operatorArguments)
@@ -9307,6 +13140,12 @@ type Erf private (operatorArguments) =
             ]
         new Erf(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Erf(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Erfinv private (operatorArguments) = 
     inherit SymbolOperator("erfinv", operatorArguments)
@@ -9319,6 +13158,12 @@ type Erfinv private (operatorArguments) =
             ]
         new Erfinv(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Erfinv(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Gamma private (operatorArguments) = 
     inherit SymbolOperator("gamma", operatorArguments)
@@ -9331,6 +13176,12 @@ type Gamma private (operatorArguments) =
             ]
         new Gamma(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Gamma(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Gammaln private (operatorArguments) = 
     inherit SymbolOperator("gammaln", operatorArguments)
@@ -9343,6 +13194,12 @@ type Gammaln private (operatorArguments) =
             ]
         new Gammaln(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Gammaln(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LogicalNot private (operatorArguments) = 
     inherit SymbolOperator("logical_not", operatorArguments)
@@ -9355,6 +13212,12 @@ type LogicalNot private (operatorArguments) =
             ]
         new LogicalNot(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new LogicalNot(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Exp private (operatorArguments) = 
     inherit SymbolOperator("exp", operatorArguments)
@@ -9367,6 +13230,12 @@ type Exp private (operatorArguments) =
             ]
         new Exp(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Exp(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Log private (operatorArguments) = 
     inherit SymbolOperator("log", operatorArguments)
@@ -9379,6 +13248,12 @@ type Log private (operatorArguments) =
             ]
         new Log(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Log(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Log10 private (operatorArguments) = 
     inherit SymbolOperator("log10", operatorArguments)
@@ -9391,6 +13266,12 @@ type Log10 private (operatorArguments) =
             ]
         new Log10(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Log10(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Log2 private (operatorArguments) = 
     inherit SymbolOperator("log2", operatorArguments)
@@ -9403,6 +13284,12 @@ type Log2 private (operatorArguments) =
             ]
         new Log2(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Log2(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Log1p private (operatorArguments) = 
     inherit SymbolOperator("log1p", operatorArguments)
@@ -9415,6 +13302,12 @@ type Log1p private (operatorArguments) =
             ]
         new Log1p(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Log1p(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Expm1 private (operatorArguments) = 
     inherit SymbolOperator("expm1", operatorArguments)
@@ -9427,6 +13320,12 @@ type Expm1 private (operatorArguments) =
             ]
         new Expm1(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Expm1(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Reciprocal private (operatorArguments) = 
     inherit SymbolOperator("reciprocal", operatorArguments)
@@ -9439,6 +13338,12 @@ type Reciprocal private (operatorArguments) =
             ]
         new Reciprocal(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Reciprocal(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Square private (operatorArguments) = 
     inherit SymbolOperator("square", operatorArguments)
@@ -9451,6 +13356,12 @@ type Square private (operatorArguments) =
             ]
         new Square(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Square(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Sqrt private (operatorArguments) = 
     inherit SymbolOperator("sqrt", operatorArguments)
@@ -9463,6 +13374,12 @@ type Sqrt private (operatorArguments) =
             ]
         new Sqrt(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Sqrt(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Rsqrt private (operatorArguments) = 
     inherit SymbolOperator("rsqrt", operatorArguments)
@@ -9475,6 +13392,12 @@ type Rsqrt private (operatorArguments) =
             ]
         new Rsqrt(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Rsqrt(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Cbrt private (operatorArguments) = 
     inherit SymbolOperator("cbrt", operatorArguments)
@@ -9487,6 +13410,12 @@ type Cbrt private (operatorArguments) =
             ]
         new Cbrt(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Cbrt(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Rcbrt private (operatorArguments) = 
     inherit SymbolOperator("rcbrt", operatorArguments)
@@ -9499,6 +13428,12 @@ type Rcbrt private (operatorArguments) =
             ]
         new Rcbrt(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Rcbrt(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Sin private (operatorArguments) = 
     inherit SymbolOperator("sin", operatorArguments)
@@ -9511,6 +13446,12 @@ type Sin private (operatorArguments) =
             ]
         new Sin(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Sin(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Cos private (operatorArguments) = 
     inherit SymbolOperator("cos", operatorArguments)
@@ -9523,6 +13464,12 @@ type Cos private (operatorArguments) =
             ]
         new Cos(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Cos(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Tan private (operatorArguments) = 
     inherit SymbolOperator("tan", operatorArguments)
@@ -9535,6 +13482,12 @@ type Tan private (operatorArguments) =
             ]
         new Tan(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Tan(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Arcsin private (operatorArguments) = 
     inherit SymbolOperator("arcsin", operatorArguments)
@@ -9547,6 +13500,12 @@ type Arcsin private (operatorArguments) =
             ]
         new Arcsin(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Arcsin(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Arccos private (operatorArguments) = 
     inherit SymbolOperator("arccos", operatorArguments)
@@ -9559,6 +13518,12 @@ type Arccos private (operatorArguments) =
             ]
         new Arccos(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Arccos(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Arctan private (operatorArguments) = 
     inherit SymbolOperator("arctan", operatorArguments)
@@ -9571,6 +13536,12 @@ type Arctan private (operatorArguments) =
             ]
         new Arctan(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Arctan(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Degrees private (operatorArguments) = 
     inherit SymbolOperator("degrees", operatorArguments)
@@ -9583,6 +13554,12 @@ type Degrees private (operatorArguments) =
             ]
         new Degrees(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Degrees(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Radians private (operatorArguments) = 
     inherit SymbolOperator("radians", operatorArguments)
@@ -9595,6 +13572,12 @@ type Radians private (operatorArguments) =
             ]
         new Radians(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Radians(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Sinh private (operatorArguments) = 
     inherit SymbolOperator("sinh", operatorArguments)
@@ -9607,6 +13590,12 @@ type Sinh private (operatorArguments) =
             ]
         new Sinh(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Sinh(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Cosh private (operatorArguments) = 
     inherit SymbolOperator("cosh", operatorArguments)
@@ -9619,6 +13608,12 @@ type Cosh private (operatorArguments) =
             ]
         new Cosh(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Cosh(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Tanh private (operatorArguments) = 
     inherit SymbolOperator("tanh", operatorArguments)
@@ -9631,6 +13626,12 @@ type Tanh private (operatorArguments) =
             ]
         new Tanh(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Tanh(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Arcsinh private (operatorArguments) = 
     inherit SymbolOperator("arcsinh", operatorArguments)
@@ -9643,6 +13644,12 @@ type Arcsinh private (operatorArguments) =
             ]
         new Arcsinh(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Arcsinh(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Arccosh private (operatorArguments) = 
     inherit SymbolOperator("arccosh", operatorArguments)
@@ -9655,6 +13662,12 @@ type Arccosh private (operatorArguments) =
             ]
         new Arccosh(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Arccosh(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Arctanh private (operatorArguments) = 
     inherit SymbolOperator("arctanh", operatorArguments)
@@ -9667,6 +13680,12 @@ type Arctanh private (operatorArguments) =
             ]
         new Arctanh(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new Arctanh(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Histogram private (operatorArguments) = 
     inherit SymbolOperator("_histogram", operatorArguments)
@@ -9691,6 +13710,18 @@ type Histogram private (operatorArguments) =
     member __.Bins = operatorArguments.GetInput "bins"
     member __.BinCnt = operatorArguments.GetParameter("bin_cnt", Histogram.BinCntDefault)
     member __.Range = operatorArguments.GetParameter("range", Histogram.RangeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?bins : Symbol,
+        [<Optional>] ?binCnt : int,
+        [<Optional>] ?range : struct(float*float)) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                bins |> Option.map (fun x -> "bins", Input x)
+                binCnt |> Option.map (fun x -> "bin_cnt", Parameter(Some (box x)))
+                range |> Option.map (fun x -> "range", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Histogram(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Embedding private (operatorArguments) = 
     inherit SymbolOperator("Embedding", operatorArguments)
@@ -9737,6 +13768,22 @@ type Embedding private (operatorArguments) =
     member __.OutputDim : int = match operatorArguments.GetParameter "output_dim" with Some(v) -> unbox v | None -> failwithf "Required parameter output_dim is missing"
     member __.Dtype = operatorArguments.GetParameter("dtype", Embedding.DtypeDefault)
     member __.SparseGrad = operatorArguments.GetParameter("sparse_grad", Embedding.SparseGradDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?weight : Symbol,
+        [<Optional>] ?inputDim : int,
+        [<Optional>] ?outputDim : int,
+        [<Optional>] ?dtype : IntOrFloatDType,
+        [<Optional>] ?sparseGrad : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                weight |> Option.map (fun x -> "weight", Input x)
+                inputDim |> Option.map (fun x -> "input_dim", Parameter(Some (box x)))
+                outputDim |> Option.map (fun x -> "output_dim", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                sparseGrad |> Option.map (fun x -> "sparse_grad", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Embedding(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribSparseEmbedding private (operatorArguments) = 
     inherit SymbolOperator("_contrib_SparseEmbedding", operatorArguments)
@@ -9783,6 +13830,22 @@ type ContribSparseEmbedding private (operatorArguments) =
     member __.OutputDim : int = match operatorArguments.GetParameter "output_dim" with Some(v) -> unbox v | None -> failwithf "Required parameter output_dim is missing"
     member __.Dtype = operatorArguments.GetParameter("dtype", ContribSparseEmbedding.DtypeDefault)
     member __.SparseGrad = operatorArguments.GetParameter("sparse_grad", ContribSparseEmbedding.SparseGradDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?weight : Symbol,
+        [<Optional>] ?inputDim : int,
+        [<Optional>] ?outputDim : int,
+        [<Optional>] ?dtype : IntOrFloatDType,
+        [<Optional>] ?sparseGrad : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                weight |> Option.map (fun x -> "weight", Input x)
+                inputDim |> Option.map (fun x -> "input_dim", Parameter(Some (box x)))
+                outputDim |> Option.map (fun x -> "output_dim", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                sparseGrad |> Option.map (fun x -> "sparse_grad", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribSparseEmbedding(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Take private (operatorArguments) = 
     inherit SymbolOperator("take", operatorArguments)
@@ -9807,6 +13870,18 @@ type Take private (operatorArguments) =
     member __.Indices = operatorArguments.GetInput "indices"
     member __.Axis = operatorArguments.GetParameter("axis", Take.AxisDefault)
     member __.Mode = operatorArguments.GetParameter("mode", Take.ModeDefault)
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?indices : Symbol,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?mode : TakeMode) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                indices |> Option.map (fun x -> "indices", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                mode |> Option.map (fun x -> "mode", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Take(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BatchTake private (operatorArguments) = 
     inherit SymbolOperator("batch_take", operatorArguments)
@@ -9823,6 +13898,14 @@ type BatchTake private (operatorArguments) =
         new BatchTake(Arguments<Symbol>(operatorArguments))
     member __.A = operatorArguments.GetInput "a"
     member __.Indices = operatorArguments.GetInput "indices"
+    member this.With([<Optional>] ?a : Symbol,
+        [<Optional>] ?indices : Symbol) = 
+        let operatorArguments = 
+            [
+                a |> Option.map (fun x -> "a", Input x)
+                indices |> Option.map (fun x -> "indices", Input x)
+            ] |> List.choose id
+        new BatchTake(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type OneHot private (operatorArguments) = 
     inherit SymbolOperator("one_hot", operatorArguments)
@@ -9864,6 +13947,20 @@ type OneHot private (operatorArguments) =
     member __.OnValue = operatorArguments.GetParameter("on_value", OneHot.OnValueDefault)
     member __.OffValue = operatorArguments.GetParameter("off_value", OneHot.OffValueDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", OneHot.DtypeDefault)
+    member this.With([<Optional>] ?indices : Symbol,
+        [<Optional>] ?depth : int,
+        [<Optional>] ?onValue : double,
+        [<Optional>] ?offValue : double,
+        [<Optional>] ?dtype : IntOrFloatDType) = 
+        let operatorArguments = 
+            [
+                indices |> Option.map (fun x -> "indices", Input x)
+                depth |> Option.map (fun x -> "depth", Parameter(Some (box x)))
+                onValue |> Option.map (fun x -> "on_value", Parameter(Some (box x)))
+                offValue |> Option.map (fun x -> "off_value", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new OneHot(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type GatherNd private (operatorArguments) = 
     inherit SymbolOperator("gather_nd", operatorArguments)
@@ -9880,6 +13977,14 @@ type GatherNd private (operatorArguments) =
         new GatherNd(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Indices = operatorArguments.GetInput "indices"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?indices : Symbol) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                indices |> Option.map (fun x -> "indices", Input x)
+            ] |> List.choose id
+        new GatherNd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ScatterNd private (operatorArguments) = 
     inherit SymbolOperator("scatter_nd", operatorArguments)
@@ -9909,6 +14014,16 @@ type ScatterNd private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Indices = operatorArguments.GetInput "indices"
     member __.Shape : int seq = match operatorArguments.GetParameter "shape" with Some(v) -> unbox v | None -> failwithf "Required parameter shape is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?indices : Symbol,
+        [<Optional>] ?shape : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                indices |> Option.map (fun x -> "indices", Input x)
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ScatterNd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ScatterSetNd private (operatorArguments) = 
     inherit SymbolOperator("_scatter_set_nd", operatorArguments)
@@ -9944,6 +14059,18 @@ type ScatterSetNd private (operatorArguments) =
     member __.Rhs = operatorArguments.GetInput "rhs"
     member __.Indices = operatorArguments.GetInput "indices"
     member __.Shape : int seq = match operatorArguments.GetParameter "shape" with Some(v) -> unbox v | None -> failwithf "Required parameter shape is missing"
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol,
+        [<Optional>] ?indices : Symbol,
+        [<Optional>] ?shape : int seq) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+                indices |> Option.map (fun x -> "indices", Input x)
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ScatterSetNd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribArangeLike private (operatorArguments) = 
     inherit SymbolOperator("_contrib_arange_like", operatorArguments)
@@ -9972,6 +14099,20 @@ type ContribArangeLike private (operatorArguments) =
     member __.Step = operatorArguments.GetParameter("step", ContribArangeLike.StepDefault)
     member __.Repeat = operatorArguments.GetParameter("repeat", ContribArangeLike.RepeatDefault)
     member __.Axis = operatorArguments.GetParameter("axis", ContribArangeLike.AxisDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?start : double,
+        [<Optional>] ?step : double,
+        [<Optional>] ?repeat : int,
+        [<Optional>] ?axis : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                start |> Option.map (fun x -> "start", Parameter(Some (box x)))
+                step |> Option.map (fun x -> "step", Parameter(Some (box x)))
+                repeat |> Option.map (fun x -> "repeat", Parameter(Some (box x)))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribArangeLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ZerosLike private (operatorArguments) = 
     inherit SymbolOperator("zeros_like", operatorArguments)
@@ -9984,6 +14125,12 @@ type ZerosLike private (operatorArguments) =
             ]
         new ZerosLike(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new ZerosLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type OnesLike private (operatorArguments) = 
     inherit SymbolOperator("ones_like", operatorArguments)
@@ -9996,6 +14143,12 @@ type OnesLike private (operatorArguments) =
             ]
         new OnesLike(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
+    member this.With([<Optional>] ?data : Symbol) =
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+            ] |> List.choose id
+        new OnesLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgGemm private (operatorArguments) = 
     inherit SymbolOperator("_linalg_gemm", operatorArguments)
@@ -10036,6 +14189,26 @@ type LinalgGemm private (operatorArguments) =
     member __.Alpha = operatorArguments.GetParameter("alpha", LinalgGemm.AlphaDefault)
     member __.Beta = operatorArguments.GetParameter("beta", LinalgGemm.BetaDefault)
     member __.Axis = operatorArguments.GetParameter("axis", LinalgGemm.AxisDefault)
+    member this.With([<Optional>] ?A : Symbol,
+        [<Optional>] ?B : Symbol,
+        [<Optional>] ?C : Symbol,
+        [<Optional>] ?transposeA : bool,
+        [<Optional>] ?transposeB : bool,
+        [<Optional>] ?alpha : double,
+        [<Optional>] ?beta : double,
+        [<Optional>] ?axis : int) = 
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+                B |> Option.map (fun x -> "B", Input x)
+                C |> Option.map (fun x -> "C", Input x)
+                transposeA |> Option.map (fun x -> "transpose_a", Parameter(Some (box x)))
+                transposeB |> Option.map (fun x -> "transpose_b", Parameter(Some (box x)))
+                alpha |> Option.map (fun x -> "alpha", Parameter(Some (box x)))
+                beta |> Option.map (fun x -> "beta", Parameter(Some (box x)))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LinalgGemm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgGemm2 private (operatorArguments) = 
     inherit SymbolOperator("_linalg_gemm2", operatorArguments)
@@ -10068,6 +14241,22 @@ type LinalgGemm2 private (operatorArguments) =
     member __.TransposeB = operatorArguments.GetParameter("transpose_b", LinalgGemm2.TransposeBDefault)
     member __.Alpha = operatorArguments.GetParameter("alpha", LinalgGemm2.AlphaDefault)
     member __.Axis = operatorArguments.GetParameter("axis", LinalgGemm2.AxisDefault)
+    member this.With([<Optional>] ?A : Symbol,
+        [<Optional>] ?B : Symbol,
+        [<Optional>] ?transposeA : bool,
+        [<Optional>] ?transposeB : bool,
+        [<Optional>] ?alpha : double,
+        [<Optional>] ?axis : int) = 
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+                B |> Option.map (fun x -> "B", Input x)
+                transposeA |> Option.map (fun x -> "transpose_a", Parameter(Some (box x)))
+                transposeB |> Option.map (fun x -> "transpose_b", Parameter(Some (box x)))
+                alpha |> Option.map (fun x -> "alpha", Parameter(Some (box x)))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LinalgGemm2(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgPotrf private (operatorArguments) = 
     inherit SymbolOperator("_linalg_potrf", operatorArguments)
@@ -10080,6 +14269,12 @@ type LinalgPotrf private (operatorArguments) =
             ]
         new LinalgPotrf(Arguments<Symbol>(operatorArguments))
     member __.A = operatorArguments.GetInput "A"
+    member this.With([<Optional>] ?A : Symbol) =
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+            ] |> List.choose id
+        new LinalgPotrf(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgPotri private (operatorArguments) = 
     inherit SymbolOperator("_linalg_potri", operatorArguments)
@@ -10092,6 +14287,12 @@ type LinalgPotri private (operatorArguments) =
             ]
         new LinalgPotri(Arguments<Symbol>(operatorArguments))
     member __.A = operatorArguments.GetInput "A"
+    member this.With([<Optional>] ?A : Symbol) =
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+            ] |> List.choose id
+        new LinalgPotri(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgTrmm private (operatorArguments) = 
     inherit SymbolOperator("_linalg_trmm", operatorArguments)
@@ -10124,6 +14325,22 @@ type LinalgTrmm private (operatorArguments) =
     member __.Rightside = operatorArguments.GetParameter("rightside", LinalgTrmm.RightsideDefault)
     member __.Lower = operatorArguments.GetParameter("lower", LinalgTrmm.LowerDefault)
     member __.Alpha = operatorArguments.GetParameter("alpha", LinalgTrmm.AlphaDefault)
+    member this.With([<Optional>] ?A : Symbol,
+        [<Optional>] ?B : Symbol,
+        [<Optional>] ?transpose : bool,
+        [<Optional>] ?rightside : bool,
+        [<Optional>] ?lower : bool,
+        [<Optional>] ?alpha : double) = 
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+                B |> Option.map (fun x -> "B", Input x)
+                transpose |> Option.map (fun x -> "transpose", Parameter(Some (box x)))
+                rightside |> Option.map (fun x -> "rightside", Parameter(Some (box x)))
+                lower |> Option.map (fun x -> "lower", Parameter(Some (box x)))
+                alpha |> Option.map (fun x -> "alpha", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LinalgTrmm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgTrsm private (operatorArguments) = 
     inherit SymbolOperator("_linalg_trsm", operatorArguments)
@@ -10156,6 +14373,22 @@ type LinalgTrsm private (operatorArguments) =
     member __.Rightside = operatorArguments.GetParameter("rightside", LinalgTrsm.RightsideDefault)
     member __.Lower = operatorArguments.GetParameter("lower", LinalgTrsm.LowerDefault)
     member __.Alpha = operatorArguments.GetParameter("alpha", LinalgTrsm.AlphaDefault)
+    member this.With([<Optional>] ?A : Symbol,
+        [<Optional>] ?B : Symbol,
+        [<Optional>] ?transpose : bool,
+        [<Optional>] ?rightside : bool,
+        [<Optional>] ?lower : bool,
+        [<Optional>] ?alpha : double) = 
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+                B |> Option.map (fun x -> "B", Input x)
+                transpose |> Option.map (fun x -> "transpose", Parameter(Some (box x)))
+                rightside |> Option.map (fun x -> "rightside", Parameter(Some (box x)))
+                lower |> Option.map (fun x -> "lower", Parameter(Some (box x)))
+                alpha |> Option.map (fun x -> "alpha", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LinalgTrsm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgSumlogdiag private (operatorArguments) = 
     inherit SymbolOperator("_linalg_sumlogdiag", operatorArguments)
@@ -10168,6 +14401,12 @@ type LinalgSumlogdiag private (operatorArguments) =
             ]
         new LinalgSumlogdiag(Arguments<Symbol>(operatorArguments))
     member __.A = operatorArguments.GetInput "A"
+    member this.With([<Optional>] ?A : Symbol) =
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+            ] |> List.choose id
+        new LinalgSumlogdiag(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgExtractdiag private (operatorArguments) = 
     inherit SymbolOperator("_linalg_extractdiag", operatorArguments)
@@ -10184,6 +14423,14 @@ type LinalgExtractdiag private (operatorArguments) =
     static member OffsetDefault : int = 0
     member __.A = operatorArguments.GetInput "A"
     member __.Offset = operatorArguments.GetParameter("offset", LinalgExtractdiag.OffsetDefault)
+    member this.With([<Optional>] ?A : Symbol,
+        [<Optional>] ?offset : int) = 
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+                offset |> Option.map (fun x -> "offset", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LinalgExtractdiag(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgMakediag private (operatorArguments) = 
     inherit SymbolOperator("_linalg_makediag", operatorArguments)
@@ -10200,6 +14447,14 @@ type LinalgMakediag private (operatorArguments) =
     static member OffsetDefault : int = 0
     member __.A = operatorArguments.GetInput "A"
     member __.Offset = operatorArguments.GetParameter("offset", LinalgMakediag.OffsetDefault)
+    member this.With([<Optional>] ?A : Symbol,
+        [<Optional>] ?offset : int) = 
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+                offset |> Option.map (fun x -> "offset", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LinalgMakediag(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgExtracttrian private (operatorArguments) = 
     inherit SymbolOperator("_linalg_extracttrian", operatorArguments)
@@ -10220,6 +14475,16 @@ type LinalgExtracttrian private (operatorArguments) =
     member __.A = operatorArguments.GetInput "A"
     member __.Offset = operatorArguments.GetParameter("offset", LinalgExtracttrian.OffsetDefault)
     member __.Lower = operatorArguments.GetParameter("lower", LinalgExtracttrian.LowerDefault)
+    member this.With([<Optional>] ?A : Symbol,
+        [<Optional>] ?offset : int,
+        [<Optional>] ?lower : bool) = 
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+                offset |> Option.map (fun x -> "offset", Parameter(Some (box x)))
+                lower |> Option.map (fun x -> "lower", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LinalgExtracttrian(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgMaketrian private (operatorArguments) = 
     inherit SymbolOperator("_linalg_maketrian", operatorArguments)
@@ -10240,6 +14505,16 @@ type LinalgMaketrian private (operatorArguments) =
     member __.A = operatorArguments.GetInput "A"
     member __.Offset = operatorArguments.GetParameter("offset", LinalgMaketrian.OffsetDefault)
     member __.Lower = operatorArguments.GetParameter("lower", LinalgMaketrian.LowerDefault)
+    member this.With([<Optional>] ?A : Symbol,
+        [<Optional>] ?offset : int,
+        [<Optional>] ?lower : bool) = 
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+                offset |> Option.map (fun x -> "offset", Parameter(Some (box x)))
+                lower |> Option.map (fun x -> "lower", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LinalgMaketrian(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgSyrk private (operatorArguments) = 
     inherit SymbolOperator("_linalg_syrk", operatorArguments)
@@ -10260,6 +14535,16 @@ type LinalgSyrk private (operatorArguments) =
     member __.A = operatorArguments.GetInput "A"
     member __.Transpose = operatorArguments.GetParameter("transpose", LinalgSyrk.TransposeDefault)
     member __.Alpha = operatorArguments.GetParameter("alpha", LinalgSyrk.AlphaDefault)
+    member this.With([<Optional>] ?A : Symbol,
+        [<Optional>] ?transpose : bool,
+        [<Optional>] ?alpha : double) = 
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+                transpose |> Option.map (fun x -> "transpose", Parameter(Some (box x)))
+                alpha |> Option.map (fun x -> "alpha", Parameter(Some (box x)))
+            ] |> List.choose id
+        new LinalgSyrk(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgGelqf private (operatorArguments) = 
     inherit SymbolOperator("_linalg_gelqf", operatorArguments)
@@ -10272,6 +14557,12 @@ type LinalgGelqf private (operatorArguments) =
             ]
         new LinalgGelqf(Arguments<Symbol>(operatorArguments))
     member __.A = operatorArguments.GetInput "A"
+    member this.With([<Optional>] ?A : Symbol) =
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+            ] |> List.choose id
+        new LinalgGelqf(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgSyevd private (operatorArguments) = 
     inherit SymbolOperator("_linalg_syevd", operatorArguments)
@@ -10284,6 +14575,12 @@ type LinalgSyevd private (operatorArguments) =
             ]
         new LinalgSyevd(Arguments<Symbol>(operatorArguments))
     member __.A = operatorArguments.GetInput "A"
+    member this.With([<Optional>] ?A : Symbol) =
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+            ] |> List.choose id
+        new LinalgSyevd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgInverse private (operatorArguments) = 
     inherit SymbolOperator("_linalg_inverse", operatorArguments)
@@ -10296,6 +14593,12 @@ type LinalgInverse private (operatorArguments) =
             ]
         new LinalgInverse(Arguments<Symbol>(operatorArguments))
     member __.A = operatorArguments.GetInput "A"
+    member this.With([<Optional>] ?A : Symbol) =
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+            ] |> List.choose id
+        new LinalgInverse(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgDet private (operatorArguments) = 
     inherit SymbolOperator("_linalg_det", operatorArguments)
@@ -10308,6 +14611,12 @@ type LinalgDet private (operatorArguments) =
             ]
         new LinalgDet(Arguments<Symbol>(operatorArguments))
     member __.A = operatorArguments.GetInput "A"
+    member this.With([<Optional>] ?A : Symbol) =
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+            ] |> List.choose id
+        new LinalgDet(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type LinalgSlogdet private (operatorArguments) = 
     inherit SymbolOperator("_linalg_slogdet", operatorArguments)
@@ -10320,6 +14629,12 @@ type LinalgSlogdet private (operatorArguments) =
             ]
         new LinalgSlogdet(Arguments<Symbol>(operatorArguments))
     member __.A = operatorArguments.GetInput "A"
+    member this.With([<Optional>] ?A : Symbol) =
+        let operatorArguments = 
+            [
+                A |> Option.map (fun x -> "A", Input x)
+            ] |> List.choose id
+        new LinalgSlogdet(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Reshape private (operatorArguments) = 
     inherit SymbolOperator("Reshape", operatorArguments)
@@ -10348,6 +14663,20 @@ type Reshape private (operatorArguments) =
     member __.Reverse = operatorArguments.GetParameter("reverse", Reshape.ReverseDefault)
     member __.TargetShape = operatorArguments.GetParameter("target_shape", Reshape.TargetShapeDefault)
     member __.KeepHighest = operatorArguments.GetParameter("keep_highest", Reshape.KeepHighestDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?shape : int seq,
+        [<Optional>] ?reverse : bool,
+        [<Optional>] ?targetShape : int seq,
+        [<Optional>] ?keepHighest : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                reverse |> Option.map (fun x -> "reverse", Parameter(Some (box x)))
+                targetShape |> Option.map (fun x -> "target_shape", Parameter(Some (box x)))
+                keepHighest |> Option.map (fun x -> "keep_highest", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Reshape(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Transpose private (operatorArguments) = 
     inherit SymbolOperator("transpose", operatorArguments)
@@ -10364,6 +14693,14 @@ type Transpose private (operatorArguments) =
     static member AxesDefault : int [] = [||]
     member __.Data = operatorArguments.GetInput "data"
     member __.Axes = operatorArguments.GetParameter("axes", Transpose.AxesDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axes : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axes |> Option.map (fun x -> "axes", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Transpose(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ExpandDims private (operatorArguments) = 
     inherit SymbolOperator("expand_dims", operatorArguments)
@@ -10387,6 +14724,14 @@ type ExpandDims private (operatorArguments) =
         new ExpandDims(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Axis : int = match operatorArguments.GetParameter "axis" with Some(v) -> unbox v | None -> failwithf "Required parameter axis is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ExpandDims(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Slice private (operatorArguments) = 
     inherit SymbolOperator("slice", operatorArguments)
@@ -10421,6 +14766,18 @@ type Slice private (operatorArguments) =
     member __.SliceBegin : int seq = match operatorArguments.GetParameter "begin" with Some(v) -> unbox v | None -> failwithf "Required parameter begin is missing"
     member __.SliceEnd : int seq = match operatorArguments.GetParameter "end" with Some(v) -> unbox v | None -> failwithf "Required parameter end is missing"
     member __.Step = operatorArguments.GetParameter("step", Slice.StepDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?sliceBegin : int seq,
+        [<Optional>] ?sliceEnd : int seq,
+        [<Optional>] ?step : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                sliceBegin |> Option.map (fun x -> "begin", Parameter(Some (box x)))
+                sliceEnd |> Option.map (fun x -> "end", Parameter(Some (box x)))
+                step |> Option.map (fun x -> "step", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Slice(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SliceAssign private (operatorArguments) = 
     inherit SymbolOperator("_slice_assign", operatorArguments)
@@ -10461,6 +14818,20 @@ type SliceAssign private (operatorArguments) =
     member __.SliceBegin : int seq = match operatorArguments.GetParameter "begin" with Some(v) -> unbox v | None -> failwithf "Required parameter begin is missing"
     member __.SliceEnd : int seq = match operatorArguments.GetParameter "end" with Some(v) -> unbox v | None -> failwithf "Required parameter end is missing"
     member __.Step = operatorArguments.GetParameter("step", SliceAssign.StepDefault)
+    member this.With([<Optional>] ?lhs : Symbol,
+        [<Optional>] ?rhs : Symbol,
+        [<Optional>] ?sliceBegin : int seq,
+        [<Optional>] ?sliceEnd : int seq,
+        [<Optional>] ?step : int seq) = 
+        let operatorArguments = 
+            [
+                lhs |> Option.map (fun x -> "lhs", Input x)
+                rhs |> Option.map (fun x -> "rhs", Input x)
+                sliceBegin |> Option.map (fun x -> "begin", Parameter(Some (box x)))
+                sliceEnd |> Option.map (fun x -> "end", Parameter(Some (box x)))
+                step |> Option.map (fun x -> "step", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SliceAssign(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SliceAssignScalar private (operatorArguments) = 
     inherit SymbolOperator("_slice_assign_scalar", operatorArguments)
@@ -10501,6 +14872,20 @@ type SliceAssignScalar private (operatorArguments) =
     member __.SliceEnd : int seq = match operatorArguments.GetParameter "end" with Some(v) -> unbox v | None -> failwithf "Required parameter end is missing"
     member __.Scalar = operatorArguments.GetParameter("scalar", SliceAssignScalar.ScalarDefault)
     member __.Step = operatorArguments.GetParameter("step", SliceAssignScalar.StepDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?sliceBegin : int seq,
+        [<Optional>] ?sliceEnd : int seq,
+        [<Optional>] ?scalar : double,
+        [<Optional>] ?step : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                sliceBegin |> Option.map (fun x -> "begin", Parameter(Some (box x)))
+                sliceEnd |> Option.map (fun x -> "end", Parameter(Some (box x)))
+                scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                step |> Option.map (fun x -> "step", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SliceAssignScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SliceAxis private (operatorArguments) = 
     inherit SymbolOperator("slice_axis", operatorArguments)
@@ -10535,6 +14920,18 @@ type SliceAxis private (operatorArguments) =
     member __.Axis : int = match operatorArguments.GetParameter "axis" with Some(v) -> unbox v | None -> failwithf "Required parameter axis is missing"
     member __.SliceBegin : int = match operatorArguments.GetParameter "begin" with Some(v) -> unbox v | None -> failwithf "Required parameter begin is missing"
     member __.SliceEnd = operatorArguments.GetParameter("end", SliceAxis.SliceEndDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?sliceBegin : int,
+        [<Optional>] ?sliceEnd : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                sliceBegin |> Option.map (fun x -> "begin", Parameter(Some (box x)))
+                sliceEnd |> Option.map (fun x -> "end", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SliceAxis(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SliceLike private (operatorArguments) = 
     inherit SymbolOperator("slice_like", operatorArguments)
@@ -10555,6 +14952,16 @@ type SliceLike private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.ShapeLike = operatorArguments.GetInput "shape_like"
     member __.Axes = operatorArguments.GetParameter("axes", SliceLike.AxesDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?shapeLike : Symbol,
+        [<Optional>] ?axes : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                shapeLike |> Option.map (fun x -> "shape_like", Input x)
+                axes |> Option.map (fun x -> "axes", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SliceLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Clip private (operatorArguments) = 
     inherit SymbolOperator("clip", operatorArguments)
@@ -10583,6 +14990,16 @@ type Clip private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.AMin : float = match operatorArguments.GetParameter "a_min" with Some(v) -> unbox v | None -> failwithf "Required parameter a_min is missing"
     member __.AMax : float = match operatorArguments.GetParameter "a_max" with Some(v) -> unbox v | None -> failwithf "Required parameter a_max is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?aMin : float,
+        [<Optional>] ?aMax : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                aMin |> Option.map (fun x -> "a_min", Parameter(Some (box x)))
+                aMax |> Option.map (fun x -> "a_max", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Clip(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Repeat private (operatorArguments) = 
     inherit SymbolOperator("repeat", operatorArguments)
@@ -10612,6 +15029,16 @@ type Repeat private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Repeats : int = match operatorArguments.GetParameter "repeats" with Some(v) -> unbox v | None -> failwithf "Required parameter repeats is missing"
     member __.Axis = operatorArguments.GetParameter("axis", Repeat.AxisDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?repeats : int,
+        [<Optional>] ?axis : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                repeats |> Option.map (fun x -> "repeats", Parameter(Some (box x)))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Repeat(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Tile private (operatorArguments) = 
     inherit SymbolOperator("tile", operatorArguments)
@@ -10635,6 +15062,14 @@ type Tile private (operatorArguments) =
         new Tile(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Reps : int seq = match operatorArguments.GetParameter "reps" with Some(v) -> unbox v | None -> failwithf "Required parameter reps is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?reps : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                reps |> Option.map (fun x -> "reps", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Tile(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Reverse private (operatorArguments) = 
     inherit SymbolOperator("reverse", operatorArguments)
@@ -10658,6 +15093,14 @@ type Reverse private (operatorArguments) =
         new Reverse(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Axis : int seq = match operatorArguments.GetParameter "axis" with Some(v) -> unbox v | None -> failwithf "Required parameter axis is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Reverse(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Stack private (operatorArguments) = 
     inherit SymbolOperator("stack", operatorArguments)
@@ -10674,6 +15117,14 @@ type Stack private (operatorArguments) =
     static member AxisDefault : int = 0
     member __.Data = operatorArguments.GetVarArg "data"
     member __.Axis = operatorArguments.GetParameter("axis", Stack.AxisDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?axis : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Stack(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Squeeze private (operatorArguments) = 
     inherit SymbolOperator("squeeze", operatorArguments)
@@ -10690,6 +15141,14 @@ type Squeeze private (operatorArguments) =
     static member AxisDefault : int [] option = None
     member __.Data = operatorArguments.GetVarArg "data"
     member __.Axis = operatorArguments.GetParameter("axis", Squeeze.AxisDefault)
+    member this.With([<Optional>] ?data : Symbol seq,
+        [<Optional>] ?axis : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Squeeze(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type DepthToSpace private (operatorArguments) = 
     inherit SymbolOperator("depth_to_space", operatorArguments)
@@ -10713,6 +15172,14 @@ type DepthToSpace private (operatorArguments) =
         new DepthToSpace(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.BlockSize : int = match operatorArguments.GetParameter "block_size" with Some(v) -> unbox v | None -> failwithf "Required parameter block_size is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?blockSize : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                blockSize |> Option.map (fun x -> "block_size", Parameter(Some (box x)))
+            ] |> List.choose id
+        new DepthToSpace(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SpaceToDepth private (operatorArguments) = 
     inherit SymbolOperator("space_to_depth", operatorArguments)
@@ -10736,6 +15203,14 @@ type SpaceToDepth private (operatorArguments) =
         new SpaceToDepth(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.BlockSize : int = match operatorArguments.GetParameter "block_size" with Some(v) -> unbox v | None -> failwithf "Required parameter block_size is missing"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?blockSize : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                blockSize |> Option.map (fun x -> "block_size", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SpaceToDepth(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SplitV2 private (operatorArguments) = 
     inherit SymbolOperator("_split_v2", operatorArguments)
@@ -10777,6 +15252,20 @@ type SplitV2 private (operatorArguments) =
     member __.Axis = operatorArguments.GetParameter("axis", SplitV2.AxisDefault)
     member __.SqueezeAxis = operatorArguments.GetParameter("squeeze_axis", SplitV2.SqueezeAxisDefault)
     member __.Sections = operatorArguments.GetParameter("sections", SplitV2.SectionsDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?indices : int seq,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?squeezeAxis : bool,
+        [<Optional>] ?sections : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                indices |> Option.map (fun x -> "indices", Parameter(Some (box x)))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                squeezeAxis |> Option.map (fun x -> "squeeze_axis", Parameter(Some (box x)))
+                sections |> Option.map (fun x -> "sections", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SplitV2(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Topk private (operatorArguments) = 
     inherit SymbolOperator("topk", operatorArguments)
@@ -10809,6 +15298,22 @@ type Topk private (operatorArguments) =
     member __.RetTyp = operatorArguments.GetParameter("ret_typ", Topk.RetTypDefault)
     member __.IsAscend = operatorArguments.GetParameter("is_ascend", Topk.IsAscendDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", Topk.DtypeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?k : int,
+        [<Optional>] ?retTyp : RetTyp,
+        [<Optional>] ?isAscend : bool,
+        [<Optional>] ?dtype : TopkDtype) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                k |> Option.map (fun x -> "k", Parameter(Some (box x)))
+                retTyp |> Option.map (fun x -> "ret_typ", Parameter(Some (box x)))
+                isAscend |> Option.map (fun x -> "is_ascend", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Topk(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Sort private (operatorArguments) = 
     inherit SymbolOperator("sort", operatorArguments)
@@ -10829,6 +15334,16 @@ type Sort private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Axis = operatorArguments.GetParameter("axis", Sort.AxisDefault)
     member __.IsAscend = operatorArguments.GetParameter("is_ascend", Sort.IsAscendDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?isAscend : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                isAscend |> Option.map (fun x -> "is_ascend", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Sort(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Argsort private (operatorArguments) = 
     inherit SymbolOperator("argsort", operatorArguments)
@@ -10853,6 +15368,18 @@ type Argsort private (operatorArguments) =
     member __.Axis = operatorArguments.GetParameter("axis", Argsort.AxisDefault)
     member __.IsAscend = operatorArguments.GetParameter("is_ascend", Argsort.IsAscendDefault)
     member __.Dtype = operatorArguments.GetParameter("dtype", Argsort.DtypeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int,
+        [<Optional>] ?isAscend : bool,
+        [<Optional>] ?dtype : ArgsortDtype) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                isAscend |> Option.map (fun x -> "is_ascend", Parameter(Some (box x)))
+                dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Argsort(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type RavelMultiIndex private (operatorArguments) = 
     inherit SymbolOperator("_ravel_multi_index", operatorArguments)
@@ -10869,6 +15396,14 @@ type RavelMultiIndex private (operatorArguments) =
     static member ShapeDefault : int [] option = None
     member __.Data = operatorArguments.GetInput "data"
     member __.Shape = operatorArguments.GetParameter("shape", RavelMultiIndex.ShapeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?shape : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+            ] |> List.choose id
+        new RavelMultiIndex(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type UnravelIndex private (operatorArguments) = 
     inherit SymbolOperator("_unravel_index", operatorArguments)
@@ -10885,6 +15420,14 @@ type UnravelIndex private (operatorArguments) =
     static member ShapeDefault : int [] option = None
     member __.Data = operatorArguments.GetInput "data"
     member __.Shape = operatorArguments.GetParameter("shape", UnravelIndex.ShapeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?shape : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+            ] |> List.choose id
+        new UnravelIndex(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SparseRetain private (operatorArguments) = 
     inherit SymbolOperator("_sparse_retain", operatorArguments)
@@ -10901,6 +15444,14 @@ type SparseRetain private (operatorArguments) =
         new SparseRetain(Arguments<Symbol>(operatorArguments))
     member __.Data = operatorArguments.GetInput "data"
     member __.Indices = operatorArguments.GetInput "indices"
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?indices : Symbol) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                indices |> Option.map (fun x -> "indices", Input x)
+            ] |> List.choose id
+        new SparseRetain(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SquareSum private (operatorArguments) = 
     inherit SymbolOperator("_square_sum", operatorArguments)
@@ -10925,6 +15476,18 @@ type SquareSum private (operatorArguments) =
     member __.Axis = operatorArguments.GetParameter("axis", SquareSum.AxisDefault)
     member __.Keepdims = operatorArguments.GetParameter("keepdims", SquareSum.KeepdimsDefault)
     member __.Exclude = operatorArguments.GetParameter("exclude", SquareSum.ExcludeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?axis : int seq,
+        [<Optional>] ?keepdims : bool,
+        [<Optional>] ?exclude : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                exclude |> Option.map (fun x -> "exclude", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SquareSum(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type BilinearSampler private (operatorArguments) = 
     inherit SymbolOperator("BilinearSampler", operatorArguments)
@@ -10945,6 +15508,16 @@ type BilinearSampler private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Grid = operatorArguments.GetInput "grid"
     member __.CudnnOff = operatorArguments.GetParameter("cudnn_off", BilinearSampler.CudnnOffDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?grid : Symbol,
+        [<Optional>] ?cudnnOff : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                grid |> Option.map (fun x -> "grid", Input x)
+                cudnnOff |> Option.map (fun x -> "cudnn_off", Parameter(Some (box x)))
+            ] |> List.choose id
+        new BilinearSampler(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribCountSketch private (operatorArguments) = 
     inherit SymbolOperator("_contrib_count_sketch", operatorArguments)
@@ -10986,6 +15559,20 @@ type ContribCountSketch private (operatorArguments) =
     member __.S = operatorArguments.GetInput "s"
     member __.OutDim : int = match operatorArguments.GetParameter "out_dim" with Some(v) -> unbox v | None -> failwithf "Required parameter out_dim is missing"
     member __.ProcessingBatchSize = operatorArguments.GetParameter("processing_batch_size", ContribCountSketch.ProcessingBatchSizeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?h : Symbol,
+        [<Optional>] ?s : Symbol,
+        [<Optional>] ?outDim : int,
+        [<Optional>] ?processingBatchSize : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                h |> Option.map (fun x -> "h", Input x)
+                s |> Option.map (fun x -> "s", Input x)
+                outDim |> Option.map (fun x -> "out_dim", Parameter(Some (box x)))
+                processingBatchSize |> Option.map (fun x -> "processing_batch_size", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribCountSketch(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribDeformableConvolution private (operatorArguments) = 
     inherit SymbolOperator("_contrib_DeformableConvolution", operatorArguments)
@@ -11080,6 +15667,38 @@ type ContribDeformableConvolution private (operatorArguments) =
     member __.Workspace = operatorArguments.GetParameter("workspace", ContribDeformableConvolution.WorkspaceDefault)
     member __.NoBias = operatorArguments.GetParameter("no_bias", ContribDeformableConvolution.NoBiasDefault)
     member __.Layout = operatorArguments.GetParameter("layout", ContribDeformableConvolution.LayoutDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?offset : Symbol,
+        [<Optional>] ?weight : Symbol,
+        [<Optional>] ?bias : Symbol,
+        [<Optional>] ?kernel : int seq,
+        [<Optional>] ?numFilter : int,
+        [<Optional>] ?stride : int seq,
+        [<Optional>] ?dilate : int seq,
+        [<Optional>] ?pad : int seq,
+        [<Optional>] ?numGroup : int,
+        [<Optional>] ?numDeformableGroup : int,
+        [<Optional>] ?workspace : int64,
+        [<Optional>] ?noBias : bool,
+        [<Optional>] ?layout : ContribDeformableConvolutionLayout) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                offset |> Option.map (fun x -> "offset", Input x)
+                weight |> Option.map (fun x -> "weight", Input x)
+                bias |> Option.map (fun x -> "bias", Input x)
+                kernel |> Option.map (fun x -> "kernel", Parameter(Some (box x)))
+                numFilter |> Option.map (fun x -> "num_filter", Parameter(Some (box x)))
+                stride |> Option.map (fun x -> "stride", Parameter(Some (box x)))
+                dilate |> Option.map (fun x -> "dilate", Parameter(Some (box x)))
+                pad |> Option.map (fun x -> "pad", Parameter(Some (box x)))
+                numGroup |> Option.map (fun x -> "num_group", Parameter(Some (box x)))
+                numDeformableGroup |> Option.map (fun x -> "num_deformable_group", Parameter(Some (box x)))
+                workspace |> Option.map (fun x -> "workspace", Parameter(Some (box x)))
+                noBias |> Option.map (fun x -> "no_bias", Parameter(Some (box x)))
+                layout |> Option.map (fun x -> "layout", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribDeformableConvolution(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribDeformablePSROIPooling private (operatorArguments) = 
     inherit SymbolOperator("_contrib_DeformablePSROIPooling", operatorArguments)
@@ -11154,6 +15773,32 @@ type ContribDeformablePSROIPooling private (operatorArguments) =
     member __.SamplePerPart = operatorArguments.GetParameter("sample_per_part", ContribDeformablePSROIPooling.SamplePerPartDefault)
     member __.TransStd = operatorArguments.GetParameter("trans_std", ContribDeformablePSROIPooling.TransStdDefault)
     member __.NoTrans = operatorArguments.GetParameter("no_trans", ContribDeformablePSROIPooling.NoTransDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?rois : Symbol,
+        [<Optional>] ?trans : Symbol,
+        [<Optional>] ?spatialScale : float,
+        [<Optional>] ?outputDim : int,
+        [<Optional>] ?groupSize : int,
+        [<Optional>] ?pooledSize : int,
+        [<Optional>] ?partSize : int,
+        [<Optional>] ?samplePerPart : int,
+        [<Optional>] ?transStd : float,
+        [<Optional>] ?noTrans : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                rois |> Option.map (fun x -> "rois", Input x)
+                trans |> Option.map (fun x -> "trans", Input x)
+                spatialScale |> Option.map (fun x -> "spatial_scale", Parameter(Some (box x)))
+                outputDim |> Option.map (fun x -> "output_dim", Parameter(Some (box x)))
+                groupSize |> Option.map (fun x -> "group_size", Parameter(Some (box x)))
+                pooledSize |> Option.map (fun x -> "pooled_size", Parameter(Some (box x)))
+                partSize |> Option.map (fun x -> "part_size", Parameter(Some (box x)))
+                samplePerPart |> Option.map (fun x -> "sample_per_part", Parameter(Some (box x)))
+                transStd |> Option.map (fun x -> "trans_std", Parameter(Some (box x)))
+                noTrans |> Option.map (fun x -> "no_trans", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribDeformablePSROIPooling(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribFft private (operatorArguments) = 
     inherit SymbolOperator("_contrib_fft", operatorArguments)
@@ -11170,6 +15815,14 @@ type ContribFft private (operatorArguments) =
     static member ComputeSizeDefault : int = 128
     member __.Data = operatorArguments.GetInput "data"
     member __.ComputeSize = operatorArguments.GetParameter("compute_size", ContribFft.ComputeSizeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?computeSize : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                computeSize |> Option.map (fun x -> "compute_size", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribFft(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribIfft private (operatorArguments) = 
     inherit SymbolOperator("_contrib_ifft", operatorArguments)
@@ -11186,6 +15839,14 @@ type ContribIfft private (operatorArguments) =
     static member ComputeSizeDefault : int = 128
     member __.Data = operatorArguments.GetInput "data"
     member __.ComputeSize = operatorArguments.GetParameter("compute_size", ContribIfft.ComputeSizeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?computeSize : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                computeSize |> Option.map (fun x -> "compute_size", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribIfft(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribMultiProposal private (operatorArguments) = 
     inherit SymbolOperator("_contrib_MultiProposal", operatorArguments)
@@ -11242,6 +15903,34 @@ type ContribMultiProposal private (operatorArguments) =
     member __.FeatureStride = operatorArguments.GetParameter("feature_stride", ContribMultiProposal.FeatureStrideDefault)
     member __.OutputScore = operatorArguments.GetParameter("output_score", ContribMultiProposal.OutputScoreDefault)
     member __.IouLoss = operatorArguments.GetParameter("iou_loss", ContribMultiProposal.IouLossDefault)
+    member this.With([<Optional>] ?clsProb : Symbol,
+        [<Optional>] ?bboxPred : Symbol,
+        [<Optional>] ?imInfo : Symbol,
+        [<Optional>] ?rpnPreNmsTopN : int,
+        [<Optional>] ?rpnPostNmsTopN : int,
+        [<Optional>] ?threshold : float,
+        [<Optional>] ?rpnMinSize : int,
+        [<Optional>] ?scales : double seq,
+        [<Optional>] ?ratios : double seq,
+        [<Optional>] ?featureStride : int,
+        [<Optional>] ?outputScore : bool,
+        [<Optional>] ?iouLoss : bool) = 
+        let operatorArguments = 
+            [
+                clsProb |> Option.map (fun x -> "cls_prob", Input x)
+                bboxPred |> Option.map (fun x -> "bbox_pred", Input x)
+                imInfo |> Option.map (fun x -> "im_info", Input x)
+                rpnPreNmsTopN |> Option.map (fun x -> "rpn_pre_nms_top_n", Parameter(Some (box x)))
+                rpnPostNmsTopN |> Option.map (fun x -> "rpn_post_nms_top_n", Parameter(Some (box x)))
+                threshold |> Option.map (fun x -> "threshold", Parameter(Some (box x)))
+                rpnMinSize |> Option.map (fun x -> "rpn_min_size", Parameter(Some (box x)))
+                scales |> Option.map (fun x -> "scales", Parameter(Some (box x)))
+                ratios |> Option.map (fun x -> "ratios", Parameter(Some (box x)))
+                featureStride |> Option.map (fun x -> "feature_stride", Parameter(Some (box x)))
+                outputScore |> Option.map (fun x -> "output_score", Parameter(Some (box x)))
+                iouLoss |> Option.map (fun x -> "iou_loss", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribMultiProposal(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribProposal private (operatorArguments) = 
     inherit SymbolOperator("_contrib_Proposal", operatorArguments)
@@ -11298,6 +15987,34 @@ type ContribProposal private (operatorArguments) =
     member __.FeatureStride = operatorArguments.GetParameter("feature_stride", ContribProposal.FeatureStrideDefault)
     member __.OutputScore = operatorArguments.GetParameter("output_score", ContribProposal.OutputScoreDefault)
     member __.IouLoss = operatorArguments.GetParameter("iou_loss", ContribProposal.IouLossDefault)
+    member this.With([<Optional>] ?clsProb : Symbol,
+        [<Optional>] ?bboxPred : Symbol,
+        [<Optional>] ?imInfo : Symbol,
+        [<Optional>] ?rpnPreNmsTopN : int,
+        [<Optional>] ?rpnPostNmsTopN : int,
+        [<Optional>] ?threshold : float,
+        [<Optional>] ?rpnMinSize : int,
+        [<Optional>] ?scales : double seq,
+        [<Optional>] ?ratios : double seq,
+        [<Optional>] ?featureStride : int,
+        [<Optional>] ?outputScore : bool,
+        [<Optional>] ?iouLoss : bool) = 
+        let operatorArguments = 
+            [
+                clsProb |> Option.map (fun x -> "cls_prob", Input x)
+                bboxPred |> Option.map (fun x -> "bbox_pred", Input x)
+                imInfo |> Option.map (fun x -> "im_info", Input x)
+                rpnPreNmsTopN |> Option.map (fun x -> "rpn_pre_nms_top_n", Parameter(Some (box x)))
+                rpnPostNmsTopN |> Option.map (fun x -> "rpn_post_nms_top_n", Parameter(Some (box x)))
+                threshold |> Option.map (fun x -> "threshold", Parameter(Some (box x)))
+                rpnMinSize |> Option.map (fun x -> "rpn_min_size", Parameter(Some (box x)))
+                scales |> Option.map (fun x -> "scales", Parameter(Some (box x)))
+                ratios |> Option.map (fun x -> "ratios", Parameter(Some (box x)))
+                featureStride |> Option.map (fun x -> "feature_stride", Parameter(Some (box x)))
+                outputScore |> Option.map (fun x -> "output_score", Parameter(Some (box x)))
+                iouLoss |> Option.map (fun x -> "iou_loss", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribProposal(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ContribPSROIPooling private (operatorArguments) = 
     inherit SymbolOperator("_contrib_PSROIPooling", operatorArguments)
@@ -11343,6 +16060,22 @@ type ContribPSROIPooling private (operatorArguments) =
     member __.OutputDim : int = match operatorArguments.GetParameter "output_dim" with Some(v) -> unbox v | None -> failwithf "Required parameter output_dim is missing"
     member __.PooledSize : int = match operatorArguments.GetParameter "pooled_size" with Some(v) -> unbox v | None -> failwithf "Required parameter pooled_size is missing"
     member __.GroupSize = operatorArguments.GetParameter("group_size", ContribPSROIPooling.GroupSizeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?rois : Symbol,
+        [<Optional>] ?spatialScale : float,
+        [<Optional>] ?outputDim : int,
+        [<Optional>] ?pooledSize : int,
+        [<Optional>] ?groupSize : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                rois |> Option.map (fun x -> "rois", Input x)
+                spatialScale |> Option.map (fun x -> "spatial_scale", Parameter(Some (box x)))
+                outputDim |> Option.map (fun x -> "output_dim", Parameter(Some (box x)))
+                pooledSize |> Option.map (fun x -> "pooled_size", Parameter(Some (box x)))
+                groupSize |> Option.map (fun x -> "group_size", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ContribPSROIPooling(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type ConvolutionV1 private (operatorArguments) = 
     inherit SymbolOperator("Convolution_v1", operatorArguments)
@@ -11437,6 +16170,38 @@ type ConvolutionV1 private (operatorArguments) =
     member __.CudnnTune = operatorArguments.GetParameter("cudnn_tune", ConvolutionV1.CudnnTuneDefault)
     member __.CudnnOff = operatorArguments.GetParameter("cudnn_off", ConvolutionV1.CudnnOffDefault)
     member __.Layout = operatorArguments.GetParameter("layout", ConvolutionV1.LayoutDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?weight : Symbol,
+        [<Optional>] ?bias : Symbol,
+        [<Optional>] ?kernel : int seq,
+        [<Optional>] ?numFilter : int,
+        [<Optional>] ?stride : int seq,
+        [<Optional>] ?dilate : int seq,
+        [<Optional>] ?pad : int seq,
+        [<Optional>] ?numGroup : int,
+        [<Optional>] ?workspace : int64,
+        [<Optional>] ?noBias : bool,
+        [<Optional>] ?cudnnTune : CudnnTune,
+        [<Optional>] ?cudnnOff : bool,
+        [<Optional>] ?layout : ConvolutionV1Layout) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                weight |> Option.map (fun x -> "weight", Input x)
+                bias |> Option.map (fun x -> "bias", Input x)
+                kernel |> Option.map (fun x -> "kernel", Parameter(Some (box x)))
+                numFilter |> Option.map (fun x -> "num_filter", Parameter(Some (box x)))
+                stride |> Option.map (fun x -> "stride", Parameter(Some (box x)))
+                dilate |> Option.map (fun x -> "dilate", Parameter(Some (box x)))
+                pad |> Option.map (fun x -> "pad", Parameter(Some (box x)))
+                numGroup |> Option.map (fun x -> "num_group", Parameter(Some (box x)))
+                workspace |> Option.map (fun x -> "workspace", Parameter(Some (box x)))
+                noBias |> Option.map (fun x -> "no_bias", Parameter(Some (box x)))
+                cudnnTune |> Option.map (fun x -> "cudnn_tune", Parameter(Some (box x)))
+                cudnnOff |> Option.map (fun x -> "cudnn_off", Parameter(Some (box x)))
+                layout |> Option.map (fun x -> "layout", Parameter(Some (box x)))
+            ] |> List.choose id
+        new ConvolutionV1(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Correlation private (operatorArguments) = 
     inherit SymbolOperator("Correlation", operatorArguments)
@@ -11477,6 +16242,26 @@ type Correlation private (operatorArguments) =
     member __.Stride2 = operatorArguments.GetParameter("stride2", Correlation.Stride2Default)
     member __.PadSize = operatorArguments.GetParameter("pad_size", Correlation.PadSizeDefault)
     member __.IsMultiply = operatorArguments.GetParameter("is_multiply", Correlation.IsMultiplyDefault)
+    member this.With([<Optional>] ?data1 : Symbol,
+        [<Optional>] ?data2 : Symbol,
+        [<Optional>] ?kernelSize : int,
+        [<Optional>] ?maxDisplacement : int,
+        [<Optional>] ?stride1 : int,
+        [<Optional>] ?stride2 : int,
+        [<Optional>] ?padSize : int,
+        [<Optional>] ?isMultiply : bool) = 
+        let operatorArguments = 
+            [
+                data1 |> Option.map (fun x -> "data1", Input x)
+                data2 |> Option.map (fun x -> "data2", Input x)
+                kernelSize |> Option.map (fun x -> "kernel_size", Parameter(Some (box x)))
+                maxDisplacement |> Option.map (fun x -> "max_displacement", Parameter(Some (box x)))
+                stride1 |> Option.map (fun x -> "stride1", Parameter(Some (box x)))
+                stride2 |> Option.map (fun x -> "stride2", Parameter(Some (box x)))
+                padSize |> Option.map (fun x -> "pad_size", Parameter(Some (box x)))
+                isMultiply |> Option.map (fun x -> "is_multiply", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Correlation(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type GridGenerator private (operatorArguments) = 
     inherit SymbolOperator("GridGenerator", operatorArguments)
@@ -11506,6 +16291,16 @@ type GridGenerator private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.TransformType : GridGeneratorTransformType = match operatorArguments.GetParameter "transform_type" with Some(v) -> unbox v | None -> failwithf "Required parameter transform_type is missing"
     member __.TargetShape = operatorArguments.GetParameter("target_shape", GridGenerator.TargetShapeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?transformType : GridGeneratorTransformType,
+        [<Optional>] ?targetShape : int seq) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                transformType |> Option.map (fun x -> "transform_type", Parameter(Some (box x)))
+                targetShape |> Option.map (fun x -> "target_shape", Parameter(Some (box x)))
+            ] |> List.choose id
+        new GridGenerator(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type InstanceNorm private (operatorArguments) = 
     inherit SymbolOperator("InstanceNorm", operatorArguments)
@@ -11530,6 +16325,18 @@ type InstanceNorm private (operatorArguments) =
     member __.Gamma = operatorArguments.GetInput "gamma"
     member __.Beta = operatorArguments.GetInput "beta"
     member __.Eps = operatorArguments.GetParameter("eps", InstanceNorm.EpsDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?gamma : Symbol,
+        [<Optional>] ?beta : Symbol,
+        [<Optional>] ?eps : float) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                gamma |> Option.map (fun x -> "gamma", Input x)
+                beta |> Option.map (fun x -> "beta", Input x)
+                eps |> Option.map (fun x -> "eps", Parameter(Some (box x)))
+            ] |> List.choose id
+        new InstanceNorm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type L2Normalization private (operatorArguments) = 
     inherit SymbolOperator("L2Normalization", operatorArguments)
@@ -11550,6 +16357,16 @@ type L2Normalization private (operatorArguments) =
     member __.Data = operatorArguments.GetInput "data"
     member __.Eps = operatorArguments.GetParameter("eps", L2Normalization.EpsDefault)
     member __.Mode = operatorArguments.GetParameter("mode", L2Normalization.ModeDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?eps : float,
+        [<Optional>] ?mode : L2NormalizationMode) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                eps |> Option.map (fun x -> "eps", Parameter(Some (box x)))
+                mode |> Option.map (fun x -> "mode", Parameter(Some (box x)))
+            ] |> List.choose id
+        new L2Normalization(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type MakeLoss private (operatorArguments) = 
     inherit SymbolOperator("MakeLoss", operatorArguments)
@@ -11574,6 +16391,18 @@ type MakeLoss private (operatorArguments) =
     member __.GradScale = operatorArguments.GetParameter("grad_scale", MakeLoss.GradScaleDefault)
     member __.ValidThresh = operatorArguments.GetParameter("valid_thresh", MakeLoss.ValidThreshDefault)
     member __.Normalization = operatorArguments.GetParameter("normalization", MakeLoss.NormalizationDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?gradScale : float,
+        [<Optional>] ?validThresh : float,
+        [<Optional>] ?normalization : Normalization) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                gradScale |> Option.map (fun x -> "grad_scale", Parameter(Some (box x)))
+                validThresh |> Option.map (fun x -> "valid_thresh", Parameter(Some (box x)))
+                normalization |> Option.map (fun x -> "normalization", Parameter(Some (box x)))
+            ] |> List.choose id
+        new MakeLoss(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SequenceLast private (operatorArguments) = 
     inherit SymbolOperator("SequenceLast", operatorArguments)
@@ -11598,6 +16427,18 @@ type SequenceLast private (operatorArguments) =
     member __.SequenceLength = operatorArguments.GetInput "sequence_length"
     member __.UseSequenceLength = operatorArguments.GetParameter("use_sequence_length", SequenceLast.UseSequenceLengthDefault)
     member __.Axis = operatorArguments.GetParameter("axis", SequenceLast.AxisDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?sequenceLength : Symbol,
+        [<Optional>] ?useSequenceLength : bool,
+        [<Optional>] ?axis : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                sequenceLength |> Option.map (fun x -> "sequence_length", Input x)
+                useSequenceLength |> Option.map (fun x -> "use_sequence_length", Parameter(Some (box x)))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SequenceLast(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SequenceReverse private (operatorArguments) = 
     inherit SymbolOperator("SequenceReverse", operatorArguments)
@@ -11622,6 +16463,18 @@ type SequenceReverse private (operatorArguments) =
     member __.SequenceLength = operatorArguments.GetInput "sequence_length"
     member __.UseSequenceLength = operatorArguments.GetParameter("use_sequence_length", SequenceReverse.UseSequenceLengthDefault)
     member __.Axis = operatorArguments.GetParameter("axis", SequenceReverse.AxisDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?sequenceLength : Symbol,
+        [<Optional>] ?useSequenceLength : bool,
+        [<Optional>] ?axis : int) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                sequenceLength |> Option.map (fun x -> "sequence_length", Input x)
+                useSequenceLength |> Option.map (fun x -> "use_sequence_length", Parameter(Some (box x)))
+                axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SequenceReverse(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SpatialTransformer private (operatorArguments) = 
     inherit SymbolOperator("SpatialTransformer", operatorArguments)
@@ -11668,6 +16521,22 @@ type SpatialTransformer private (operatorArguments) =
     member __.SamplerType : SamplerType = match operatorArguments.GetParameter "sampler_type" with Some(v) -> unbox v | None -> failwithf "Required parameter sampler_type is missing"
     member __.TargetShape = operatorArguments.GetParameter("target_shape", SpatialTransformer.TargetShapeDefault)
     member __.CudnnOff = operatorArguments.GetParameter("cudnn_off", SpatialTransformer.CudnnOffDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?loc : Symbol,
+        [<Optional>] ?transformType : SpatialTransformerTransformType,
+        [<Optional>] ?samplerType : SamplerType,
+        [<Optional>] ?targetShape : int seq,
+        [<Optional>] ?cudnnOff : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                loc |> Option.map (fun x -> "loc", Input x)
+                transformType |> Option.map (fun x -> "transform_type", Parameter(Some (box x)))
+                samplerType |> Option.map (fun x -> "sampler_type", Parameter(Some (box x)))
+                targetShape |> Option.map (fun x -> "target_shape", Parameter(Some (box x)))
+                cudnnOff |> Option.map (fun x -> "cudnn_off", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SpatialTransformer(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type SVMOutput private (operatorArguments) = 
     inherit SymbolOperator("SVMOutput", operatorArguments)
@@ -11696,6 +16565,20 @@ type SVMOutput private (operatorArguments) =
     member __.Margin = operatorArguments.GetParameter("margin", SVMOutput.MarginDefault)
     member __.RegularizationCoefficient = operatorArguments.GetParameter("regularization_coefficient", SVMOutput.RegularizationCoefficientDefault)
     member __.UseLinear = operatorArguments.GetParameter("use_linear", SVMOutput.UseLinearDefault)
+    member this.With([<Optional>] ?data : Symbol,
+        [<Optional>] ?label : Symbol,
+        [<Optional>] ?margin : float,
+        [<Optional>] ?regularizationCoefficient : float,
+        [<Optional>] ?useLinear : bool) = 
+        let operatorArguments = 
+            [
+                data |> Option.map (fun x -> "data", Input x)
+                label |> Option.map (fun x -> "label", Input x)
+                margin |> Option.map (fun x -> "margin", Parameter(Some (box x)))
+                regularizationCoefficient |> Option.map (fun x -> "regularization_coefficient", Parameter(Some (box x)))
+                useLinear |> Option.map (fun x -> "use_linear", Parameter(Some (box x)))
+            ] |> List.choose id
+        new SVMOutput(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 
 type Imdecode private (operatorArguments) = 
     inherit SymbolOperator("_imdecode", operatorArguments)
@@ -11749,5 +16632,25 @@ type Imdecode private (operatorArguments) =
     member __.Y1 : int = match operatorArguments.GetParameter "y1" with Some(v) -> unbox v | None -> failwithf "Required parameter y1 is missing"
     member __.C : int = match operatorArguments.GetParameter "c" with Some(v) -> unbox v | None -> failwithf "Required parameter c is missing"
     member __.Size : int = match operatorArguments.GetParameter "size" with Some(v) -> unbox v | None -> failwithf "Required parameter size is missing"
+    member this.With([<Optional>] ?mean : Symbol,
+        [<Optional>] ?index : int,
+        [<Optional>] ?x0 : int,
+        [<Optional>] ?y0 : int,
+        [<Optional>] ?x1 : int,
+        [<Optional>] ?y1 : int,
+        [<Optional>] ?c : int,
+        [<Optional>] ?size : int) = 
+        let operatorArguments = 
+            [
+                mean |> Option.map (fun x -> "mean", Input x)
+                index |> Option.map (fun x -> "index", Parameter(Some (box x)))
+                x0 |> Option.map (fun x -> "x0", Parameter(Some (box x)))
+                y0 |> Option.map (fun x -> "y0", Parameter(Some (box x)))
+                x1 |> Option.map (fun x -> "x1", Parameter(Some (box x)))
+                y1 |> Option.map (fun x -> "y1", Parameter(Some (box x)))
+                c |> Option.map (fun x -> "c", Parameter(Some (box x)))
+                size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+            ] |> List.choose id
+        new Imdecode(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
 (* GERNATED SYMBOL TYPES END *)//
 
