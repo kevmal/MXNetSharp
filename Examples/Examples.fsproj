@@ -54,6 +54,7 @@
     <None Include="Neural Style Transfer.fsx" />
     <None Include="MNIST VAE.fsx" />
     <None Include="TCN.fsx" />
+    <None Include="MNIST VAE2.fsx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">

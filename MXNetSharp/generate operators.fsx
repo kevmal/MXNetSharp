@@ -1111,6 +1111,7 @@ let toSymbolTypeCode (x : ProcessedAtomicSymbol list) =
         sprintf "type %s private (operatorArguments) = " h.Name
         sprintf "    inherit SymbolOperator(\"%s\", operatorArguments)" h.AtomicSymbolInfo.Name
         sprintf "    static member CreateFromArguments(args : Arguments<Symbol>) = new %s(args)" h.Name
+        sprintf "    override this.WithArguments(args : Arguments<Symbol>) = new %s(this.OperatorArguments.AddReplace(args)) :> Symbol" h.Name
         if req.Length = 0 && ins.Length = 1 && ctor3.Length > 0 then 
             yield! indent 1 ctor3
         else   
@@ -1631,7 +1632,7 @@ open MXNetSharp.Interop
 [<AutoOpen>]
 module GeneratedArgumentTypes = 
 """
-        yield! types |> breakBlocks |> indent 1
+        yield! types |> Seq.filter (fun x -> Seq.isEmpty x |> not) |> Seq.map (fun x -> ["[<RequireQualifiedAccess>]"; yield! x]) |> breakBlocks |> indent 1
         ""
     ])
 

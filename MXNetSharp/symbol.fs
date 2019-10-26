@@ -195,6 +195,24 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
     new(name, args) = new SymbolOperator(AtomicSymbolCreator.FromName name, args)
     //new(creator,pnames,ps,inames,ins) = new SymbolOperator(creator, Array.zip pnames ps, Array.zip inames ins)
     member x.OperatorArguments = operatorArguments
+    abstract member WithArguments : operatorArguments : Arguments<Symbol> -> Symbol
+    default x.WithArguments(args) = new SymbolOperator(creator, args) :> Symbol
+    member x.ComposedWith(symbol : Symbol) = 
+        let mutable inserted = false
+        let args = 
+            operatorArguments
+            |> Seq.map 
+                (fun x -> 
+                    match x with 
+                    | name, Input(:? ImplicitVariable) when not inserted -> 
+                       inserted <- true
+                       name, Input(symbol)
+                    | x -> x
+                )
+        if inserted then 
+            x.WithArguments(Arguments<Symbol>(args))
+        else
+            failwithf "Could not compose %O with %O" x  symbol
     override x.Initialize() =   
         match x.InternalHandle with 
         | Some _ -> ()
@@ -283,6 +301,7 @@ type SymbolGroup<'a>(group : 'a, symbols : Symbol []) =
 type CustomFunction private (operatorArguments) = 
     inherit SymbolOperator("_CustomFunction", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new CustomFunction(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new CustomFunction(this.OperatorArguments.AddReplace(args)) :> Symbol
     new() =
         let operatorArguments = 
             [
@@ -292,6 +311,7 @@ type CustomFunction private (operatorArguments) =
 type CachedOp private (operatorArguments) = 
     inherit SymbolOperator("_CachedOp", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new CachedOp(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new CachedOp(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">input data list</param>
     new([<ParamArray>] data : Symbol[]) =
         let operatorArguments = 
@@ -313,6 +333,7 @@ type CachedOp private (operatorArguments) =
 type Cvimread private (operatorArguments) = 
     inherit SymbolOperator("_cvimread", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Cvimread(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Cvimread(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Read and decode image with OpenCV. 
     /// Note: return image in RGB by default, instead of OpenCV&#39;s default BGR.</summary>
     /// <param name="filename">Name of the image file to be loaded.</param>
@@ -358,6 +379,7 @@ type Cvimread private (operatorArguments) =
 type NoGradient private (operatorArguments) = 
     inherit SymbolOperator("_NoGradient", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NoGradient(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NoGradient(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Place holder for variable who cannot perform gradient</summary>
     new() =
         let operatorArguments = 
@@ -368,6 +390,7 @@ type NoGradient private (operatorArguments) =
 type BatchNormV1 private (operatorArguments) = 
     inherit SymbolOperator("BatchNorm_v1", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BatchNormV1(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BatchNormV1(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Batch normalization.
     /// 
     /// This operator is DEPRECATED. Perform BatchNorm on the input.
@@ -511,6 +534,7 @@ type BatchNormV1 private (operatorArguments) =
 type MpAdamwUpdate private (operatorArguments) = 
     inherit SymbolOperator("_mp_adamw_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MpAdamwUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MpAdamwUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for multi-precision AdamW optimizer.
     /// 
     /// AdamW is seen as a modification of Adam by decoupling the weight decay from the
@@ -744,6 +768,7 @@ type MpAdamwUpdate private (operatorArguments) =
 type AdamwUpdate private (operatorArguments) = 
     inherit SymbolOperator("_adamw_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new AdamwUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new AdamwUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for AdamW optimizer. AdamW is seen as a modification of
     /// Adam by decoupling the weight decay from the optimization steps taken w.r.t. the loss function.
     /// 
@@ -961,6 +986,7 @@ type AdamwUpdate private (operatorArguments) =
 type ContribAdaptiveAvgPooling2D private (operatorArguments) = 
     inherit SymbolOperator("_contrib_AdaptiveAvgPooling2D", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribAdaptiveAvgPooling2D(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribAdaptiveAvgPooling2D(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// Applies a 2D adaptive average pooling over a 4D input with the shape of (NCHW).
     /// The pooling kernel and stride sizes are automatically chosen for desired output sizes.
@@ -1007,6 +1033,7 @@ type ContribAdaptiveAvgPooling2D private (operatorArguments) =
 type MultiAllFinite private (operatorArguments) = 
     inherit SymbolOperator("multi_all_finite", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MultiAllFinite(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MultiAllFinite(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Check if all the float numbers in all the arrays are finite (used for AMP)
     /// 
     /// 
@@ -1055,6 +1082,7 @@ type MultiAllFinite private (operatorArguments) =
 type ContribBilinearResize2D private (operatorArguments) = 
     inherit SymbolOperator("_contrib_BilinearResize2D", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBilinearResize2D(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribBilinearResize2D(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// Perform 2D resizing (upsampling or downsampling) for 4D input using bilinear interpolation.
     /// 
@@ -1153,6 +1181,7 @@ type ContribBilinearResize2D private (operatorArguments) =
 type ContribBooleanMask private (operatorArguments) = 
     inherit SymbolOperator("_contrib_boolean_mask", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBooleanMask(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribBooleanMask(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// Given an n-d NDArray data, and a 1-d NDArray index,
     /// the operator produces an un-predeterminable shaped n-d NDArray out,
@@ -1211,6 +1240,7 @@ type ContribBooleanMask private (operatorArguments) =
 type ContribBoxNms private (operatorArguments) = 
     inherit SymbolOperator("_contrib_box_nms", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBoxNms(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribBoxNms(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Apply non-maximum suppression to input.
     /// 
     /// The output will be sorted in descending order according to `score`. Boxes with
@@ -1409,6 +1439,7 @@ type ContribBoxNms private (operatorArguments) =
 type ContribBoxIou private (operatorArguments) = 
     inherit SymbolOperator("_contrib_box_iou", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBoxIou(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribBoxIou(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Bounding box overlap of two arrays.
     ///   The overlap is defined as Intersection-over-Union, aka, IOU.
     ///   - lhs: (a_1, a_2, ..., a_n, 4) array
@@ -1474,6 +1505,7 @@ type ContribBoxIou private (operatorArguments) =
 type ContribBipartiteMatching private (operatorArguments) = 
     inherit SymbolOperator("_contrib_bipartite_matching", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBipartiteMatching(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribBipartiteMatching(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Compute bipartite matching.
     ///   The matching is performed on score matrix with shape [B, N, M]
     ///   - B: batch_size
@@ -1590,6 +1622,7 @@ type ContribBipartiteMatching private (operatorArguments) =
 type ContribDglCsrNeighborUniformSample private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_csr_neighbor_uniform_sample", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDglCsrNeighborUniformSample(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribDglCsrNeighborUniformSample(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>This operator samples sub-graphs from a csr graph via an
     /// uniform probability. The operator is designed for DGL.
     /// 
@@ -1696,6 +1729,7 @@ type ContribDglCsrNeighborUniformSample private (operatorArguments) =
 type ContribDglCsrNeighborNonUniformSample private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_csr_neighbor_non_uniform_sample", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDglCsrNeighborNonUniformSample(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribDglCsrNeighborNonUniformSample(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>This operator samples sub-graph from a csr graph via an
     /// non-uniform probability. The operator is designed for DGL.
     /// 
@@ -1816,6 +1850,7 @@ type ContribDglCsrNeighborNonUniformSample private (operatorArguments) =
 type ContribDglSubgraph private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_subgraph", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDglSubgraph(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribDglSubgraph(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>This operator constructs an induced subgraph for
     /// a given set of vertices from a graph. The operator accepts multiple
     /// sets of vertices as input. For each set of vertices, it returns a pair
@@ -1922,6 +1957,7 @@ type ContribDglSubgraph private (operatorArguments) =
 type ContribEdgeId private (operatorArguments) = 
     inherit SymbolOperator("_contrib_edge_id", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribEdgeId(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribEdgeId(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>This operator implements the edge_id function for a graph
     /// stored in a CSR matrix (the value of the CSR stores the edge Id of the graph).
     /// output[i] = input[u[i], v[i]] if there is an edge between u[i] and v[i]],
@@ -1985,6 +2021,7 @@ type ContribEdgeId private (operatorArguments) =
 type ContribDglAdjacency private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_adjacency", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDglAdjacency(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribDglAdjacency(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>This operator converts a CSR matrix whose values are edge Ids
     /// to an adjacency matrix whose values are ones. The output CSR matrix always has
     /// the data value of float32.
@@ -2026,6 +2063,7 @@ type ContribDglAdjacency private (operatorArguments) =
 type ContribDglGraphCompact private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dgl_graph_compact", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDglGraphCompact(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribDglGraphCompact(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>This operator compacts a CSR matrix generated by
     /// dgl_csr_neighbor_uniform_sample and dgl_csr_neighbor_non_uniform_sample.
     /// The CSR matrices generated by these two operators may have many empty
@@ -2189,6 +2227,7 @@ type ContribDglGraphCompact private (operatorArguments) =
 type ContribGradientmultiplier private (operatorArguments) = 
     inherit SymbolOperator("_contrib_gradientmultiplier", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribGradientmultiplier(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribGradientmultiplier(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>This operator implements the gradient multiplier function.
     /// In forward pass it acts as an identity transform. During backpropagation it
     /// multiplies the gradient from the subsequent level by a scalar factor lambda and passes it to
@@ -2243,6 +2282,7 @@ type ContribGradientmultiplier private (operatorArguments) =
 type ContribBackwardGradientmultiplier private (operatorArguments) = 
     inherit SymbolOperator("_contrib_backward_gradientmultiplier", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBackwardGradientmultiplier(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribBackwardGradientmultiplier(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -2283,6 +2323,7 @@ type ContribBackwardGradientmultiplier private (operatorArguments) =
 type ContribHawkesll private (operatorArguments) = 
     inherit SymbolOperator("_contrib_hawkesll", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribHawkesll(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribHawkesll(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the log likelihood of a univariate Hawkes process.
     /// 
     /// The log likelihood is calculated on point process observations represented
@@ -2422,6 +2463,7 @@ type ContribHawkesll private (operatorArguments) =
 type ContribBackwardHawkesll private (operatorArguments) = 
     inherit SymbolOperator("_contrib_backward_hawkesll", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBackwardHawkesll(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribBackwardHawkesll(this.OperatorArguments.AddReplace(args)) :> Symbol
     new() =
         let operatorArguments = 
             [
@@ -2431,6 +2473,7 @@ type ContribBackwardHawkesll private (operatorArguments) =
 type ContribIndexArray private (operatorArguments) = 
     inherit SymbolOperator("_contrib_index_array", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribIndexArray(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribIndexArray(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns an array of indexes of the input array.
     /// 
     /// For an input array with shape  :math:`(d_1, d_2, ..., d_n)`, `index_array` returns a
@@ -2512,6 +2555,7 @@ type ContribIndexArray private (operatorArguments) =
 type ContribIndexCopy private (operatorArguments) = 
     inherit SymbolOperator("_contrib_index_copy", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribIndexCopy(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribIndexCopy(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Copies the elements of a `new_tensor` into the `old_tensor`.
     /// 
     /// This operator copies the elements by selecting the indices in the order given in `index`.
@@ -2582,6 +2626,7 @@ type ContribIndexCopy private (operatorArguments) =
 type ContribBackwardIndexCopy private (operatorArguments) = 
     inherit SymbolOperator("_contrib_backward_index_copy", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBackwardIndexCopy(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribBackwardIndexCopy(this.OperatorArguments.AddReplace(args)) :> Symbol
     new() =
         let operatorArguments = 
             [
@@ -2591,6 +2636,7 @@ type ContribBackwardIndexCopy private (operatorArguments) =
 type KhatriRao private (operatorArguments) = 
     inherit SymbolOperator("khatri_rao", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new KhatriRao(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new KhatriRao(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the Khatri-Rao product of the input matrices.
     /// 
     /// Given a collection of :math:`n` input matrices,
@@ -2647,6 +2693,7 @@ type KhatriRao private (operatorArguments) =
 type MultiLars private (operatorArguments) = 
     inherit SymbolOperator("multi_lars", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MultiLars(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MultiLars(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Compute the LARS coefficients of multiple weights and grads from their sums of square&quot;
     /// 
     /// 
@@ -2756,6 +2803,7 @@ type MultiLars private (operatorArguments) =
 type MultiSumSq private (operatorArguments) = 
     inherit SymbolOperator("multi_sum_sq", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MultiSumSq(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MultiSumSq(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Compute the sums of squares of multiple arrays
     /// 
     /// 
@@ -2818,6 +2866,7 @@ type MultiSumSq private (operatorArguments) =
 type ContribMultiBoxDetection private (operatorArguments) = 
     inherit SymbolOperator("_contrib_MultiBoxDetection", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribMultiBoxDetection(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribMultiBoxDetection(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Convert multibox detection predictions.</summary>
     /// <param name="clsProb">Class probabilities.</param>
     /// <param name="locPred">Location regression predictions.</param>
@@ -2936,6 +2985,7 @@ type ContribMultiBoxDetection private (operatorArguments) =
 type ContribMultiBoxPrior private (operatorArguments) = 
     inherit SymbolOperator("_contrib_MultiBoxPrior", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribMultiBoxPrior(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribMultiBoxPrior(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Generate prior(anchor) boxes from data, sizes and ratios.</summary>
     /// <param name="data">Input data.</param>
     /// <param name="sizes">List of sizes of generated MultiBoxPriores.</param>
@@ -3014,6 +3064,7 @@ type ContribMultiBoxPrior private (operatorArguments) =
 type ContribMultiBoxTarget private (operatorArguments) = 
     inherit SymbolOperator("_contrib_MultiBoxTarget", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribMultiBoxTarget(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribMultiBoxTarget(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Compute Multibox training targets</summary>
     /// <param name="anchor">Generated anchor boxes.</param>
     /// <param name="label">Object detection labels.</param>
@@ -3121,6 +3172,7 @@ type ContribMultiBoxTarget private (operatorArguments) =
 type ContribGetnnz private (operatorArguments) = 
     inherit SymbolOperator("_contrib_getnnz", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribGetnnz(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribGetnnz(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Number of stored values for a sparse tensor, including explicit zeros.
     /// 
     /// This operator only supports CSR matrix on CPU.
@@ -3161,6 +3213,7 @@ type ContribGetnnz private (operatorArguments) =
 type ContribGroupAdagradUpdate private (operatorArguments) = 
     inherit SymbolOperator("_contrib_group_adagrad_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribGroupAdagradUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribGroupAdagradUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for Group AdaGrad optimizer.
     /// 
     /// Referenced from *Adaptive Subgradient Methods for Online Learning and Stochastic Optimization*,
@@ -3307,6 +3360,7 @@ type ContribGroupAdagradUpdate private (operatorArguments) =
 type PreloadedMultiSgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("preloaded_multi_sgd_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new PreloadedMultiSgdUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new PreloadedMultiSgdUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for Stochastic Gradient Descent (SDG) optimizer.
     /// 
     /// It updates the weights using::
@@ -3371,6 +3425,7 @@ type PreloadedMultiSgdUpdate private (operatorArguments) =
 type PreloadedMultiSgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("preloaded_multi_sgd_mom_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new PreloadedMultiSgdMomUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new PreloadedMultiSgdMomUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Momentum update function for Stochastic Gradient Descent (SGD) optimizer.
     /// 
     /// Momentum update has better convergence rates on neural networks. Mathematically it looks
@@ -3458,6 +3513,7 @@ type PreloadedMultiSgdMomUpdate private (operatorArguments) =
 type PreloadedMultiMpSgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("preloaded_multi_mp_sgd_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new PreloadedMultiMpSgdUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new PreloadedMultiMpSgdUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for multi-precision Stochastic Gradient Descent (SDG) optimizer.
     /// 
     /// It updates the weights using::
@@ -3522,6 +3578,7 @@ type PreloadedMultiMpSgdUpdate private (operatorArguments) =
 type PreloadedMultiMpSgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("preloaded_multi_mp_sgd_mom_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new PreloadedMultiMpSgdMomUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new PreloadedMultiMpSgdMomUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Momentum update function for multi-precision Stochastic Gradient Descent (SGD) optimizer.
     /// 
     /// Momentum update has better convergence rates on neural networks. Mathematically it looks
@@ -3609,6 +3666,7 @@ type PreloadedMultiMpSgdMomUpdate private (operatorArguments) =
 type ContribQuadratic private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quadratic", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuadratic(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribQuadratic(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>This operators implements the quadratic function.
     /// 
     /// .. math::
@@ -3685,6 +3743,7 @@ type ContribQuadratic private (operatorArguments) =
 type ContribBackwardQuadratic private (operatorArguments) = 
     inherit SymbolOperator("_contrib_backward_quadratic", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBackwardQuadratic(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribBackwardQuadratic(this.OperatorArguments.AddReplace(args)) :> Symbol
     new() =
         let operatorArguments = 
             [
@@ -3694,6 +3753,7 @@ type ContribBackwardQuadratic private (operatorArguments) =
 type ContribROIAlign private (operatorArguments) = 
     inherit SymbolOperator("_contrib_ROIAlign", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribROIAlign(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribROIAlign(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// This operator takes a 4D feature map as an input array and region proposals as `rois`,
     /// then align the feature map over sub-regions of input and produces a fixed-sized output array.
@@ -3827,6 +3887,7 @@ type ContribROIAlign private (operatorArguments) =
 type ContribRROIAlign private (operatorArguments) = 
     inherit SymbolOperator("_contrib_RROIAlign", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribRROIAlign(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribRROIAlign(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Performs Rotated ROI Align on the input array.
     /// 
     /// This operator takes a 4D feature map as an input array and region proposals as `rois`,
@@ -3946,6 +4007,7 @@ type ContribRROIAlign private (operatorArguments) =
 type ContribSyncBatchNorm private (operatorArguments) = 
     inherit SymbolOperator("_contrib_SyncBatchNorm", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribSyncBatchNorm(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribSyncBatchNorm(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Batch normalization.
     /// 
     /// Normalizes a data batch by mean and variance, and applies a scale ``gamma`` as
@@ -4220,6 +4282,7 @@ type ContribSyncBatchNorm private (operatorArguments) =
 type ContribDivSqrtDim private (operatorArguments) = 
     inherit SymbolOperator("_contrib_div_sqrt_dim", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDivSqrtDim(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribDivSqrtDim(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Rescale the input by the square root of the channel dimension.
     /// 
     ///    out = data / sqrt(data.shape[-1])
@@ -4249,6 +4312,7 @@ type ContribDivSqrtDim private (operatorArguments) =
 type Foreach private (operatorArguments) = 
     inherit SymbolOperator("_foreach", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Foreach(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Foreach(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Run a for loop over an NDArray with user-defined computation
     /// 
     /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\control_flow.cc:1090</summary>
@@ -4351,6 +4415,7 @@ type Foreach private (operatorArguments) =
 type WhileLoop private (operatorArguments) = 
     inherit SymbolOperator("_while_loop", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new WhileLoop(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new WhileLoop(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Run a while loop over with user-defined condition and computation
     /// 
     /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\control_flow.cc:1151</summary>
@@ -4476,6 +4541,7 @@ type WhileLoop private (operatorArguments) =
 type Cond private (operatorArguments) = 
     inherit SymbolOperator("_cond", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Cond(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Cond(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Run a if-then-else using user-defined condition and computation
     /// 
     /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\control_flow.cc:1212</summary>
@@ -4591,6 +4657,7 @@ type Cond private (operatorArguments) =
 type Custom private (operatorArguments) = 
     inherit SymbolOperator("Custom", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Custom(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Custom(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Apply a custom operator implemented in a frontend language (like Python).
     /// 
     /// Custom operators should override required methods like `forward` and `backward`.
@@ -4668,6 +4735,7 @@ type Custom private (operatorArguments) =
 type IdentityAttachKLSparseReg private (operatorArguments) = 
     inherit SymbolOperator("IdentityAttachKLSparseReg", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new IdentityAttachKLSparseReg(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new IdentityAttachKLSparseReg(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Apply a sparse regularization to the output a sigmoid activation function.</summary>
     /// <param name="data">Input data.</param>
     /// <param name="sparsenessTarget">The sparseness target</param>
@@ -4724,6 +4792,7 @@ type IdentityAttachKLSparseReg private (operatorArguments) =
 type ImageCrop private (operatorArguments) = 
     inherit SymbolOperator("_image_crop", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ImageCrop(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ImageCrop(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Crop an image NDArray of shape (H x W x C) or (N x H x W x C) 
     /// to the given size.
     /// Example:
@@ -4857,6 +4926,7 @@ type ImageCrop private (operatorArguments) =
 type ImageToTensor private (operatorArguments) = 
     inherit SymbolOperator("_image_to_tensor", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ImageToTensor(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ImageToTensor(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Converts an image NDArray of shape (H x W x C) or (N x H x W x C) 
     /// with values in the range [0, 255] to a tensor NDArray of shape (C x H x W) or (N x C x H x W)
     /// with values in the range [0, 1]
@@ -4931,6 +5001,7 @@ type ImageToTensor private (operatorArguments) =
 type ImageNormalize private (operatorArguments) = 
     inherit SymbolOperator("_image_normalize", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ImageNormalize(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ImageNormalize(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Normalize an tensor of shape (C x H x W) or (N x C x H x W) with mean and
     ///     standard deviation.
     /// 
@@ -5038,6 +5109,7 @@ type ImageNormalize private (operatorArguments) =
 type ImageFlipLeftRight private (operatorArguments) = 
     inherit SymbolOperator("_image_flip_left_right", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ImageFlipLeftRight(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ImageFlipLeftRight(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L195</summary>
@@ -5063,6 +5135,7 @@ type ImageFlipLeftRight private (operatorArguments) =
 type ImageRandomFlipLeftRight private (operatorArguments) = 
     inherit SymbolOperator("_image_random_flip_left_right", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomFlipLeftRight(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ImageRandomFlipLeftRight(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L200</summary>
@@ -5088,6 +5161,7 @@ type ImageRandomFlipLeftRight private (operatorArguments) =
 type ImageFlipTopBottom private (operatorArguments) = 
     inherit SymbolOperator("_image_flip_top_bottom", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ImageFlipTopBottom(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ImageFlipTopBottom(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L205</summary>
@@ -5113,6 +5187,7 @@ type ImageFlipTopBottom private (operatorArguments) =
 type ImageRandomFlipTopBottom private (operatorArguments) = 
     inherit SymbolOperator("_image_random_flip_top_bottom", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomFlipTopBottom(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ImageRandomFlipTopBottom(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L210</summary>
@@ -5138,6 +5213,7 @@ type ImageRandomFlipTopBottom private (operatorArguments) =
 type ImageRandomBrightness private (operatorArguments) = 
     inherit SymbolOperator("_image_random_brightness", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomBrightness(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ImageRandomBrightness(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L215</summary>
@@ -5195,6 +5271,7 @@ type ImageRandomBrightness private (operatorArguments) =
 type ImageRandomContrast private (operatorArguments) = 
     inherit SymbolOperator("_image_random_contrast", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomContrast(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ImageRandomContrast(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L222</summary>
@@ -5252,6 +5329,7 @@ type ImageRandomContrast private (operatorArguments) =
 type ImageRandomSaturation private (operatorArguments) = 
     inherit SymbolOperator("_image_random_saturation", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomSaturation(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ImageRandomSaturation(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L230</summary>
@@ -5309,6 +5387,7 @@ type ImageRandomSaturation private (operatorArguments) =
 type ImageRandomHue private (operatorArguments) = 
     inherit SymbolOperator("_image_random_hue", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomHue(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ImageRandomHue(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L238</summary>
@@ -5366,6 +5445,7 @@ type ImageRandomHue private (operatorArguments) =
 type ImageRandomColorJitter private (operatorArguments) = 
     inherit SymbolOperator("_image_random_color_jitter", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomColorJitter(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ImageRandomColorJitter(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L246</summary>
@@ -5445,6 +5525,7 @@ type ImageRandomColorJitter private (operatorArguments) =
 type ImageAdjustLighting private (operatorArguments) = 
     inherit SymbolOperator("_image_adjust_lighting", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ImageAdjustLighting(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ImageAdjustLighting(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Adjust the lighting level of the input. Follow the AlexNet style.
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L254</summary>
@@ -5491,6 +5572,7 @@ type ImageAdjustLighting private (operatorArguments) =
 type ImageRandomLighting private (operatorArguments) = 
     inherit SymbolOperator("_image_random_lighting", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ImageRandomLighting(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ImageRandomLighting(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Randomly add PCA noise. Follow the AlexNet style.
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L262</summary>
@@ -5527,6 +5609,7 @@ type ImageRandomLighting private (operatorArguments) =
 type ImageResize private (operatorArguments) = 
     inherit SymbolOperator("_image_resize", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ImageResize(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ImageResize(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Resize an image NDArray of shape (H x W x C) or (N x H x W x C) 
     /// to the given size
     /// Example:
@@ -5618,6 +5701,7 @@ type ImageResize private (operatorArguments) =
 type LeakyReLU private (operatorArguments) = 
     inherit SymbolOperator("LeakyReLU", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LeakyReLU(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LeakyReLU(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Applies Leaky rectified linear unit activation element-wise to the input.
     /// 
     /// Leaky ReLUs attempt to fix the &quot;dying ReLU&quot; problem by allowing a small `slope`
@@ -5712,6 +5796,7 @@ type LeakyReLU private (operatorArguments) =
 type SoftmaxCrossEntropy private (operatorArguments) = 
     inherit SymbolOperator("softmax_cross_entropy", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SoftmaxCrossEntropy(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SoftmaxCrossEntropy(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Calculate cross entropy of softmax output and one-hot label.
     /// 
     /// - This operator computes the cross entropy in two steps:
@@ -5774,6 +5859,7 @@ type SoftmaxCrossEntropy private (operatorArguments) =
 type Activation private (operatorArguments) = 
     inherit SymbolOperator("Activation", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Activation(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Activation(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Applies an activation function element-wise to the input.
     /// 
     /// The following activation functions are supported:
@@ -5840,6 +5926,7 @@ type Activation private (operatorArguments) =
 type BatchNorm private (operatorArguments) = 
     inherit SymbolOperator("BatchNorm", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BatchNorm(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BatchNorm(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Batch normalization.
     /// 
     /// Normalizes a data batch by mean and variance, and applies a scale ``gamma`` as
@@ -6049,6 +6136,7 @@ type BatchNorm private (operatorArguments) =
 type Concat private (operatorArguments) = 
     inherit SymbolOperator("Concat", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Concat(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Concat(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Joins input arrays along a given axis.
     /// 
     /// .. note:: `Concat` is deprecated. Use `concat` instead.
@@ -6121,6 +6209,7 @@ type Concat private (operatorArguments) =
 type RnnParamConcat private (operatorArguments) = 
     inherit SymbolOperator("_rnn_param_concat", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RnnParamConcat(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RnnParamConcat(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="dim">the dimension to be concated.</param>
     new([<Optional>] ?data : Symbol seq,
@@ -6154,6 +6243,7 @@ type RnnParamConcat private (operatorArguments) =
 type Convolution private (operatorArguments) = 
     inherit SymbolOperator("Convolution", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Convolution(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Convolution(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Compute *N*-D convolution on *(N+2)*-D input.
     /// 
     /// In the 2-D convolution, given input data with shape *(batch_size,
@@ -6510,6 +6600,7 @@ type Convolution private (operatorArguments) =
 type CTCLoss private (operatorArguments) = 
     inherit SymbolOperator("CTCLoss", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new CTCLoss(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new CTCLoss(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Connectionist Temporal Classification Loss.
     /// 
     /// .. note:: The existing alias ``contrib_CTCLoss`` is deprecated.
@@ -6640,6 +6731,7 @@ type CTCLoss private (operatorArguments) =
 type CuDNNBatchNorm private (operatorArguments) = 
     inherit SymbolOperator("CuDNNBatchNorm", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new CuDNNBatchNorm(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new CuDNNBatchNorm(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Apply batch normalization to input.</summary>
     /// <param name="data">Input data to batch normalization</param>
     /// <param name="gamma">gamma array</param>
@@ -6798,6 +6890,7 @@ type CuDNNBatchNorm private (operatorArguments) =
 type Deconvolution private (operatorArguments) = 
     inherit SymbolOperator("Deconvolution", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Deconvolution(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Deconvolution(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes 1D or 2D transposed convolution (aka fractionally strided convolution) of the input tensor. This operation can be seen as the gradient of Convolution operation with respect to its input. Convolution usually reduces the size of the input. Transposed convolution works the other way, going from a smaller input to a larger output while preserving the connectivity pattern.</summary>
     /// <param name="data">Input tensor to the deconvolution operation.</param>
     /// <param name="weight">Weights representing the kernel.</param>
@@ -7029,6 +7122,7 @@ type Deconvolution private (operatorArguments) =
 type Dropout private (operatorArguments) = 
     inherit SymbolOperator("Dropout", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Dropout(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Dropout(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Applies dropout operation to input array.
     /// 
     /// - During training, each element of the input is set to zero with probability p.
@@ -7127,6 +7221,7 @@ type Dropout private (operatorArguments) =
 type FullyConnected private (operatorArguments) = 
     inherit SymbolOperator("FullyConnected", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new FullyConnected(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new FullyConnected(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Applies a linear transformation: :math:`Y = XW^T + b`.
     /// 
     /// If ``flatten`` is set to be true, then the shapes are:
@@ -7285,6 +7380,7 @@ type FullyConnected private (operatorArguments) =
 type GroupNorm private (operatorArguments) = 
     inherit SymbolOperator("GroupNorm", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new GroupNorm(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new GroupNorm(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Group normalization.
     /// 
     /// The input channels are separated into ``num_groups`` groups, each containing ``num_channels / num_groups`` channels.
@@ -7373,6 +7469,7 @@ type GroupNorm private (operatorArguments) =
 type LayerNorm private (operatorArguments) = 
     inherit SymbolOperator("LayerNorm", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LayerNorm(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LayerNorm(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Layer normalization.
     /// 
     /// Normalizes the channels of the input tensor by mean and variance, and applies a scale ``gamma`` as
@@ -7474,6 +7571,7 @@ type LayerNorm private (operatorArguments) =
 type LogSoftmax private (operatorArguments) = 
     inherit SymbolOperator("log_softmax", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LogSoftmax(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LogSoftmax(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the log softmax of the input.
     /// This is equivalent to computing softmax followed by log.
     /// 
@@ -7556,6 +7654,7 @@ type LogSoftmax private (operatorArguments) =
 type LRN private (operatorArguments) = 
     inherit SymbolOperator("LRN", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LRN(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LRN(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Applies local response normalization to the input.
     /// 
     /// The local response normalization layer performs &quot;lateral inhibition&quot; by normalizing
@@ -7674,6 +7773,7 @@ type LRN private (operatorArguments) =
 type Moments private (operatorArguments) = 
     inherit SymbolOperator("moments", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Moments(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Moments(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// Calculate the mean and variance of `data`.
     /// 
@@ -7740,6 +7840,7 @@ type Moments private (operatorArguments) =
 type Pooling private (operatorArguments) = 
     inherit SymbolOperator("Pooling", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Pooling(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Pooling(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Performs pooling on the input.
     /// 
     /// The shapes for 1-D pooling are
@@ -7928,6 +8029,7 @@ type Pooling private (operatorArguments) =
 type Softmax private (operatorArguments) = 
     inherit SymbolOperator("softmax", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Softmax(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Softmax(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Applies the softmax function.
     /// 
     /// The resulting array contains elements in the range (0,1) and the elements along the given axis sum up to 1.
@@ -8028,6 +8130,7 @@ type Softmax private (operatorArguments) =
 type SoftmaxActivation private (operatorArguments) = 
     inherit SymbolOperator("SoftmaxActivation", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SoftmaxActivation(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SoftmaxActivation(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Applies softmax activation to input. This is intended for internal layers.
     /// 
     /// .. note::
@@ -8087,6 +8190,7 @@ type SoftmaxActivation private (operatorArguments) =
 type Softmin private (operatorArguments) = 
     inherit SymbolOperator("softmin", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Softmin(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Softmin(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Applies the softmin function.
     /// 
     /// The resulting array contains elements in the range (0,1) and the elements along the given axis sum
@@ -8179,6 +8283,7 @@ type Softmin private (operatorArguments) =
 type UpSampling private (operatorArguments) = 
     inherit SymbolOperator("UpSampling", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new UpSampling(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new UpSampling(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Upsamples the given input data.
     /// 
     /// Two algorithms (``sample_type``) are available for upsampling:
@@ -8376,6 +8481,7 @@ type UpSampling private (operatorArguments) =
 type NpLinalgSvd private (operatorArguments) = 
     inherit SymbolOperator("_np__linalg_svd", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpLinalgSvd(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpLinalgSvd(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\linalg\np_gesvd.cc:L93</summary>
@@ -8401,6 +8507,7 @@ type NpLinalgSvd private (operatorArguments) =
 type NpiArgmax private (operatorArguments) = 
     inherit SymbolOperator("_npi_argmax", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArgmax(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiArgmax(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
@@ -8445,6 +8552,7 @@ type NpiArgmax private (operatorArguments) =
 type NpSum private (operatorArguments) = 
     inherit SymbolOperator("_np_sum", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpSum(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpSum(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L53</summary>
@@ -8514,6 +8622,7 @@ type NpSum private (operatorArguments) =
 type NpMax private (operatorArguments) = 
     inherit SymbolOperator("_np_max", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpMax(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpMax(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L91</summary>
@@ -8572,6 +8681,7 @@ type NpMax private (operatorArguments) =
 type NpMin private (operatorArguments) = 
     inherit SymbolOperator("_np_min", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpMin(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpMin(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L118</summary>
@@ -8630,6 +8740,7 @@ type NpMin private (operatorArguments) =
 type NpProd private (operatorArguments) = 
     inherit SymbolOperator("_np_prod", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpProd(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpProd(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
@@ -8696,6 +8807,7 @@ type NpProd private (operatorArguments) =
 type NpiMean private (operatorArguments) = 
     inherit SymbolOperator("_npi_mean", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiMean(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiMean(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
@@ -8762,6 +8874,7 @@ type NpiMean private (operatorArguments) =
 type NpiStd private (operatorArguments) = 
     inherit SymbolOperator("_npi_std", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiStd(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiStd(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
@@ -8828,6 +8941,7 @@ type NpiStd private (operatorArguments) =
 type NpiVar private (operatorArguments) = 
     inherit SymbolOperator("_npi_var", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiVar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiVar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
@@ -8894,6 +9008,7 @@ type NpiVar private (operatorArguments) =
 type NpBroadcastTo private (operatorArguments) = 
     inherit SymbolOperator("_np_broadcast_to", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpBroadcastTo(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpBroadcastTo(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="array">The input</param>
     /// <param name="shape">The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.</param>
     new([<Optional>] ?array : Symbol,
@@ -8927,6 +9042,7 @@ type NpBroadcastTo private (operatorArguments) =
 type NpCumsum private (operatorArguments) = 
     inherit SymbolOperator("_np_cumsum", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpCumsum(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpCumsum(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return the cumulative sum of the elements along a given axis.
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_cumsum.cc:L67</summary>
@@ -8974,6 +9090,7 @@ type NpCumsum private (operatorArguments) =
 type NpDot private (operatorArguments) = 
     inherit SymbolOperator("_np_dot", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpDot(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpDot(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Dot product of two arrays. Specifically,
     /// 
     /// - If both a and b are 1-D arrays, it is inner product of vectors.
@@ -9024,6 +9141,7 @@ type NpDot private (operatorArguments) =
 type NpiAdd private (operatorArguments) = 
     inherit SymbolOperator("_npi_add", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiAdd(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiAdd(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     new([<Optional>] ?lhs : Symbol,
@@ -9055,6 +9173,7 @@ type NpiAdd private (operatorArguments) =
 type NpiSubtract private (operatorArguments) = 
     inherit SymbolOperator("_npi_subtract", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSubtract(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiSubtract(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     new([<Optional>] ?lhs : Symbol,
@@ -9086,6 +9205,7 @@ type NpiSubtract private (operatorArguments) =
 type NpiMultiply private (operatorArguments) = 
     inherit SymbolOperator("_npi_multiply", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiMultiply(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiMultiply(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     new([<Optional>] ?lhs : Symbol,
@@ -9117,6 +9237,7 @@ type NpiMultiply private (operatorArguments) =
 type NpiMod private (operatorArguments) = 
     inherit SymbolOperator("_npi_mod", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiMod(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiMod(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     new([<Optional>] ?lhs : Symbol,
@@ -9148,6 +9269,7 @@ type NpiMod private (operatorArguments) =
 type NpiPower private (operatorArguments) = 
     inherit SymbolOperator("_npi_power", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiPower(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiPower(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     new([<Optional>] ?lhs : Symbol,
@@ -9179,6 +9301,7 @@ type NpiPower private (operatorArguments) =
 type NpiCopysign private (operatorArguments) = 
     inherit SymbolOperator("_npi_copysign", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCopysign(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiCopysign(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_broadcast_op.cc:L80</summary>
@@ -9213,6 +9336,7 @@ type NpiCopysign private (operatorArguments) =
 type NpiLcm private (operatorArguments) = 
     inherit SymbolOperator("_npi_lcm", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLcm(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiLcm(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     new([<Optional>] ?lhs : Symbol,
@@ -9244,6 +9368,7 @@ type NpiLcm private (operatorArguments) =
 type NpiAddScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_add_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiAddScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiAddScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -9284,6 +9409,7 @@ type NpiAddScalar private (operatorArguments) =
 type NpiSubtractScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_subtract_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSubtractScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiSubtractScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -9324,6 +9450,7 @@ type NpiSubtractScalar private (operatorArguments) =
 type NpiRsubtractScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rsubtract_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRsubtractScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiRsubtractScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -9364,6 +9491,7 @@ type NpiRsubtractScalar private (operatorArguments) =
 type NpiMultiplyScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_multiply_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiMultiplyScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiMultiplyScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -9404,6 +9532,7 @@ type NpiMultiplyScalar private (operatorArguments) =
 type NpiModScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_mod_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiModScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiModScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -9444,6 +9573,7 @@ type NpiModScalar private (operatorArguments) =
 type NpiRmodScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rmod_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRmodScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiRmodScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -9484,6 +9614,7 @@ type NpiRmodScalar private (operatorArguments) =
 type NpiPowerScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_power_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiPowerScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiPowerScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -9524,6 +9655,7 @@ type NpiPowerScalar private (operatorArguments) =
 type NpiRpowerScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rpower_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRpowerScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiRpowerScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -9564,6 +9696,7 @@ type NpiRpowerScalar private (operatorArguments) =
 type NpiCopysignScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_copysign_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCopysignScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiCopysignScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -9604,6 +9737,7 @@ type NpiCopysignScalar private (operatorArguments) =
 type NpiRcopysignScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rcopysign_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRcopysignScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiRcopysignScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -9644,6 +9778,7 @@ type NpiRcopysignScalar private (operatorArguments) =
 type NpiArctan2 private (operatorArguments) = 
     inherit SymbolOperator("_npi_arctan2", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArctan2(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiArctan2(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="x1">The input array</param>
     /// <param name="x2">The input array</param>
     new([<Optional>] ?x1 : Symbol,
@@ -9675,6 +9810,7 @@ type NpiArctan2 private (operatorArguments) =
 type NpiArctan2Scalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_arctan2_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArctan2Scalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiArctan2Scalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -9715,6 +9851,7 @@ type NpiArctan2Scalar private (operatorArguments) =
 type NpiRarctan2Scalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rarctan2_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRarctan2Scalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiRarctan2Scalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -9755,6 +9892,7 @@ type NpiRarctan2Scalar private (operatorArguments) =
 type NpiHypot private (operatorArguments) = 
     inherit SymbolOperator("_npi_hypot", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiHypot(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiHypot(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="x1">The input array</param>
     /// <param name="x2">The input array</param>
     new([<Optional>] ?x1 : Symbol,
@@ -9786,6 +9924,7 @@ type NpiHypot private (operatorArguments) =
 type NpiLcmScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_lcm_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLcmScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiLcmScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -9826,6 +9965,7 @@ type NpiLcmScalar private (operatorArguments) =
 type NpxRelu private (operatorArguments) = 
     inherit SymbolOperator("_npx_relu", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpxRelu(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpxRelu(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes rectified linear activation.
     /// .. math::
     ///    max(features, 0)
@@ -9854,6 +9994,7 @@ type NpxRelu private (operatorArguments) =
 type NpxSigmoid private (operatorArguments) = 
     inherit SymbolOperator("_npx_sigmoid", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpxSigmoid(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpxSigmoid(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes sigmoid of x element-wise.
     /// .. math::
     ///    y = 1 / (1 + exp(-x))
@@ -9882,6 +10023,7 @@ type NpxSigmoid private (operatorArguments) =
 type NpCopy private (operatorArguments) = 
     inherit SymbolOperator("_np_copy", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpCopy(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpCopy(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return an array copy of the given object.
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L47</summary>
@@ -9907,6 +10049,7 @@ type NpCopy private (operatorArguments) =
 type NpiNegative private (operatorArguments) = 
     inherit SymbolOperator("_npi_negative", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiNegative(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiNegative(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Numerical negative, element-wise.
     /// Example::
     ///     negative([1.,  -1.]) = [-1.,  1.]
@@ -9933,6 +10076,7 @@ type NpiNegative private (operatorArguments) =
 type NpiReciprocal private (operatorArguments) = 
     inherit SymbolOperator("_npi_reciprocal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiReciprocal(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiReciprocal(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return the reciprocal of the argument, element-wise.
     /// Example::
     ///     reciprocal([-2, 1, 3, 1.6, 0.2]) = [-0.5, 1.0, 0.33333334, 0.625, 5.0]
@@ -9959,6 +10103,7 @@ type NpiReciprocal private (operatorArguments) =
 type NpiAbsolute private (operatorArguments) = 
     inherit SymbolOperator("_npi_absolute", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiAbsolute(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiAbsolute(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise absolute value of the input.
     /// Example::
     ///    absolute([-2, 0, 3]) = [2, 0, 3]
@@ -9987,6 +10132,7 @@ type NpiAbsolute private (operatorArguments) =
 type NpiSign private (operatorArguments) = 
     inherit SymbolOperator("_npi_sign", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSign(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiSign(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns an element-wise indication of the sign of a number.
     /// The sign function returns -1 if x &lt; 0, 0 if x==0, 1 if x &gt; 0.
     /// Example::
@@ -10016,6 +10162,7 @@ type NpiSign private (operatorArguments) =
 type NpiRint private (operatorArguments) = 
     inherit SymbolOperator("_npi_rint", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRint(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiRint(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Round elements of the array to the nearest integer.
     /// Example::
     ///    rint([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -0.,  0.,  2.,  2.,  2.]
@@ -10044,6 +10191,7 @@ type NpiRint private (operatorArguments) =
 type NpiCeil private (operatorArguments) = 
     inherit SymbolOperator("_npi_ceil", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCeil(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiCeil(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return the ceiling of the input, element-wise.
     /// The ceil of the scalar x is the smallest integer i, such that i &gt;= x.
     /// Example::
@@ -10073,6 +10221,7 @@ type NpiCeil private (operatorArguments) =
 type NpiFloor private (operatorArguments) = 
     inherit SymbolOperator("_npi_floor", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiFloor(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiFloor(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return the floor of the input, element-wise.
     /// The floor of the scalar x is the largest integer i, such that i &lt;= x.
     /// Example::
@@ -10102,6 +10251,7 @@ type NpiFloor private (operatorArguments) =
 type NpiTrunc private (operatorArguments) = 
     inherit SymbolOperator("_npi_trunc", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTrunc(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiTrunc(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return the truncated value of the input, element-wise.
     /// The truncated value of the scalar x is the nearest integer i which is closer to
     /// zero than x is. In short, the fractional part of the signed number x is discarded.
@@ -10132,6 +10282,7 @@ type NpiTrunc private (operatorArguments) =
 type NpiFix private (operatorArguments) = 
     inherit SymbolOperator("_npi_fix", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiFix(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiFix(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Round to nearest integer towards zero.
     /// Round an array of floats element-wise to nearest integer towards zero.
     /// The rounded values are returned as floats.
@@ -10162,6 +10313,7 @@ type NpiFix private (operatorArguments) =
 type NpiSquare private (operatorArguments) = 
     inherit SymbolOperator("_npi_square", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSquare(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiSquare(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return the element-wise square of the input.
     /// Example::
     ///    square([2, 3, 4]) = [4, 9, 16]
@@ -10190,6 +10342,7 @@ type NpiSquare private (operatorArguments) =
 type NpiSqrt private (operatorArguments) = 
     inherit SymbolOperator("_npi_sqrt", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSqrt(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiSqrt(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return the non-negative square-root of an array, element-wise.
     /// Example::
     ///    sqrt([4, 9, 16]) = [2, 3, 4]
@@ -10218,6 +10371,7 @@ type NpiSqrt private (operatorArguments) =
 type NpiCbrt private (operatorArguments) = 
     inherit SymbolOperator("_npi_cbrt", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCbrt(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiCbrt(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return the cube-root of an array, element-wise.
     /// Example::
     ///    cbrt([1, 8, -125]) = [1, 2, -5]
@@ -10246,6 +10400,7 @@ type NpiCbrt private (operatorArguments) =
 type NpiExp private (operatorArguments) = 
     inherit SymbolOperator("_npi_exp", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiExp(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiExp(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Calculate the exponential of all elements in the input array.
     /// Example::
     ///    exp([0, 1, 2]) = [1., 2.71828175, 7.38905621]
@@ -10274,6 +10429,7 @@ type NpiExp private (operatorArguments) =
 type NpiLog private (operatorArguments) = 
     inherit SymbolOperator("_npi_log", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLog(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiLog(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise Natural logarithmic value of the input.
     /// The natural logarithm is logarithm in base *e*, so that ``log(exp(x)) = x``
     /// 
@@ -10301,6 +10457,7 @@ type NpiLog private (operatorArguments) =
 type NpiLog10 private (operatorArguments) = 
     inherit SymbolOperator("_npi_log10", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLog10(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiLog10(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise Base-10 logarithmic value of the input.
     /// ``10**log10(x) = x``
     /// 
@@ -10328,6 +10485,7 @@ type NpiLog10 private (operatorArguments) =
 type NpiLog2 private (operatorArguments) = 
     inherit SymbolOperator("_npi_log2", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLog2(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiLog2(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise Base-2 logarithmic value of the input.
     /// ``2**log2(x) = x``
     /// 
@@ -10355,6 +10513,7 @@ type NpiLog2 private (operatorArguments) =
 type NpiLog1p private (operatorArguments) = 
     inherit SymbolOperator("_npi_log1p", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLog1p(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiLog1p(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return the natural logarithm of one plus the input array, element-wise.
     /// Calculates ``log(1 + x)``.
     /// 
@@ -10382,6 +10541,7 @@ type NpiLog1p private (operatorArguments) =
 type NpiExpm1 private (operatorArguments) = 
     inherit SymbolOperator("_npi_expm1", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiExpm1(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiExpm1(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Calculate ``exp(x) - 1`` for all elements in the array.
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L241</summary>
@@ -10407,6 +10567,7 @@ type NpiExpm1 private (operatorArguments) =
 type NpiLogicalNot private (operatorArguments) = 
     inherit SymbolOperator("_npi_logical_not", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLogicalNot(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiLogicalNot(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Compute the truth value of NOT x element-wise.
     /// Example::
     ///   logical_not([-2., 0., 1.]) = [0., 1., 0.]
@@ -10433,6 +10594,7 @@ type NpiLogicalNot private (operatorArguments) =
 type NpiSin private (operatorArguments) = 
     inherit SymbolOperator("_npi_sin", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSin(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiSin(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Trigonometric sine, element-wise.
     /// .. math::
     ///    sin([0, \pi/4, \pi/2]) = [0, 0.707, 1]
@@ -10461,6 +10623,7 @@ type NpiSin private (operatorArguments) =
 type NpiCos private (operatorArguments) = 
     inherit SymbolOperator("_npi_cos", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCos(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiCos(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the element-wise cosine of the input array.
     /// .. math::
     ///    cos([0, \pi/4, \pi/2]) = [1, 0.707, 0]
@@ -10489,6 +10652,7 @@ type NpiCos private (operatorArguments) =
 type NpiTan private (operatorArguments) = 
     inherit SymbolOperator("_npi_tan", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTan(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiTan(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the element-wise tangent of the input array.
     /// .. math::
     ///    tan([0, \pi/4, \pi/2]) = [0, 1, -inf]
@@ -10517,6 +10681,7 @@ type NpiTan private (operatorArguments) =
 type NpiArcsin private (operatorArguments) = 
     inherit SymbolOperator("_npi_arcsin", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArcsin(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiArcsin(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise inverse sine of the input array.
     /// .. math::
     ///    arcsin([-1, -.707, 0, .707, 1]) = [-\pi/2, -\pi/4, 0, \pi/4, \pi/2]
@@ -10545,6 +10710,7 @@ type NpiArcsin private (operatorArguments) =
 type NpiArccos private (operatorArguments) = 
     inherit SymbolOperator("_npi_arccos", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArccos(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiArccos(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise inverse cosine of the input array.
     /// The input should be in range `[-1, 1]`.
     /// The output is in the closed interval :math:`[0, \pi]`
@@ -10576,6 +10742,7 @@ type NpiArccos private (operatorArguments) =
 type NpiArctan private (operatorArguments) = 
     inherit SymbolOperator("_npi_arctan", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArctan(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiArctan(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise inverse tangent of the input array.
     /// .. math::
     ///    arctan([-1, 0, 1]) = [-\pi/4, 0, \pi/4]
@@ -10604,6 +10771,7 @@ type NpiArctan private (operatorArguments) =
 type NpiDegrees private (operatorArguments) = 
     inherit SymbolOperator("_npi_degrees", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiDegrees(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiDegrees(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Converts each element of the input array from radians to degrees.
     /// .. math::
     ///    degrees([0, \pi/2, \pi, 3\pi/2, 2\pi]) = [0, 90, 180, 270, 360]
@@ -10632,6 +10800,7 @@ type NpiDegrees private (operatorArguments) =
 type NpiRadians private (operatorArguments) = 
     inherit SymbolOperator("_npi_radians", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRadians(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiRadians(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Converts each element of the input array from degrees to radians.
     /// .. math::
     ///    radians([0, 90, 180, 270, 360]) = [0, \pi/2, \pi, 3\pi/2, 2\pi]
@@ -10660,6 +10829,7 @@ type NpiRadians private (operatorArguments) =
 type NpiSinh private (operatorArguments) = 
     inherit SymbolOperator("_npi_sinh", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSinh(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiSinh(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the hyperbolic sine of the input array, computed element-wise.
     /// .. math::
     ///    sinh(x) = 0.5\times(exp(x) - exp(-x))
@@ -10688,6 +10858,7 @@ type NpiSinh private (operatorArguments) =
 type NpiCosh private (operatorArguments) = 
     inherit SymbolOperator("_npi_cosh", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCosh(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiCosh(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the hyperbolic cosine  of the input array, computed element-wise.
     /// .. math::
     ///    cosh(x) = 0.5\times(exp(x) + exp(-x))
@@ -10716,6 +10887,7 @@ type NpiCosh private (operatorArguments) =
 type NpiTanh private (operatorArguments) = 
     inherit SymbolOperator("_npi_tanh", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTanh(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiTanh(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the hyperbolic tangent of the input array, computed element-wise.
     /// .. math::
     ///    tanh(x) = sinh(x) / cosh(x)
@@ -10744,6 +10916,7 @@ type NpiTanh private (operatorArguments) =
 type NpiArcsinh private (operatorArguments) = 
     inherit SymbolOperator("_npi_arcsinh", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArcsinh(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiArcsinh(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the element-wise inverse hyperbolic sine of the input array, \
     /// computed element-wise.
     /// 
@@ -10771,6 +10944,7 @@ type NpiArcsinh private (operatorArguments) =
 type NpiArccosh private (operatorArguments) = 
     inherit SymbolOperator("_npi_arccosh", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArccosh(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiArccosh(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the element-wise inverse hyperbolic cosine of the input array, \
     /// computed element-wise.
     /// 
@@ -10798,6 +10972,7 @@ type NpiArccosh private (operatorArguments) =
 type NpiArctanh private (operatorArguments) = 
     inherit SymbolOperator("_npi_arctanh", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArctanh(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiArctanh(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the element-wise inverse hyperbolic tangent of the input array, \
     /// computed element-wise.
     /// 
@@ -10825,6 +11000,7 @@ type NpiArctanh private (operatorArguments) =
 type NpiAround private (operatorArguments) = 
     inherit SymbolOperator("_npi_around", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiAround(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiAround(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="x">Input ndarray</param>
     /// <param name="decimals">Number of decimal places to round to.</param>
     new([<Optional>] ?x : Symbol,
@@ -10858,6 +11034,7 @@ type NpiAround private (operatorArguments) =
 type NpiZeros private (operatorArguments) = 
     inherit SymbolOperator("_npi_zeros", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiZeros(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiZeros(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
     new([<Optional>] ?shape : int seq,
@@ -10893,6 +11070,7 @@ type NpiZeros private (operatorArguments) =
 type NpiOnes private (operatorArguments) = 
     inherit SymbolOperator("_npi_ones", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiOnes(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiOnes(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return a new array of given shape, type, and context, filled with ones.</summary>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
@@ -10929,6 +11107,7 @@ type NpiOnes private (operatorArguments) =
 type NpiIdentity private (operatorArguments) = 
     inherit SymbolOperator("_npi_identity", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiIdentity(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiIdentity(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return a new identity array of given shape, type, and context.</summary>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
@@ -10965,6 +11144,7 @@ type NpiIdentity private (operatorArguments) =
 type NpZerosLike private (operatorArguments) = 
     inherit SymbolOperator("_np_zeros_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpZerosLike(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpZerosLike(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
     new([<Optional>] ?a : Symbol) =
         let a = defaultArg a (new ImplicitVariable() :> Symbol)
@@ -10987,6 +11167,7 @@ type NpZerosLike private (operatorArguments) =
 type NpOnesLike private (operatorArguments) = 
     inherit SymbolOperator("_np_ones_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpOnesLike(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpOnesLike(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
     new([<Optional>] ?a : Symbol) =
         let a = defaultArg a (new ImplicitVariable() :> Symbol)
@@ -11009,6 +11190,7 @@ type NpOnesLike private (operatorArguments) =
 type NpiArange private (operatorArguments) = 
     inherit SymbolOperator("_npi_arange", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArange(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiArange(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
     /// <param name="step">Spacing between values.</param>
@@ -11085,6 +11267,7 @@ type NpiArange private (operatorArguments) =
 type NpiIndices private (operatorArguments) = 
     inherit SymbolOperator("_npi_indices", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiIndices(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiIndices(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return an array representing the indices of a grid.</summary>
     /// <param name="dimensions">The shape of the grid.</param>
     /// <param name="dtype">Target data type.</param>
@@ -11118,6 +11301,7 @@ type NpiIndices private (operatorArguments) =
 type NpTranspose private (operatorArguments) = 
     inherit SymbolOperator("_np_transpose", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpTranspose(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpTranspose(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="a">Source input</param>
     /// <param name="axes">By default, reverse the dimensions, otherwise permute the axes according to the values given.</param>
     new([<Optional>] ?a : Symbol,
@@ -11151,6 +11335,7 @@ type NpTranspose private (operatorArguments) =
 type NpReshape private (operatorArguments) = 
     inherit SymbolOperator("_np_reshape", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpReshape(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpReshape(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L167</summary>
@@ -11211,6 +11396,7 @@ type NpReshape private (operatorArguments) =
 type NpSqueeze private (operatorArguments) = 
     inherit SymbolOperator("_np_squeeze", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpSqueeze(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpSqueeze(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="a">data to squeeze</param>
     /// <param name="axis">Selects a subset of the single-dimensional entries in the shape. If an axis is selected with shape entry greater than one, an error is raised.</param>
     new([<Optional>] ?a : Symbol seq,
@@ -11244,6 +11430,7 @@ type NpSqueeze private (operatorArguments) =
 type NpiConcatenate private (operatorArguments) = 
     inherit SymbolOperator("_npi_concatenate", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiConcatenate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiConcatenate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Join a sequence of arrays along an existing axis.
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L274</summary>
@@ -11280,6 +11467,7 @@ type NpiConcatenate private (operatorArguments) =
 type NpiStack private (operatorArguments) = 
     inherit SymbolOperator("_npi_stack", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiStack(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiStack(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Join a sequence of arrays along a new axis.
     /// 
     /// The axis parameter specifies the index of the new axis in the dimensions of the
@@ -11329,6 +11517,7 @@ type NpiStack private (operatorArguments) =
 type NpiVstack private (operatorArguments) = 
     inherit SymbolOperator("_npi_vstack", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiVstack(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiVstack(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L459</summary>
@@ -11353,6 +11542,7 @@ type NpiVstack private (operatorArguments) =
 type NpRoll private (operatorArguments) = 
     inherit SymbolOperator("_np_roll", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpRoll(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpRoll(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">Input ndarray</param>
     /// <param name="shift">The number of places by which elements are shifted. If a tuple,then axis must be a tuple of the same size, and each of the given axes is shiftedby the corresponding number. If an int while axis is a tuple of ints, then the same value is used for all given axes.</param>
     /// <param name="axis">Axis or axes along which elements are shifted. By default, the array is flattenedbefore shifting, after which the original shape is restored.</param>
@@ -11397,6 +11587,7 @@ type NpRoll private (operatorArguments) =
 type NpiFlip private (operatorArguments) = 
     inherit SymbolOperator("_npi_flip", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiFlip(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiFlip(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">Input data array</param>
     /// <param name="axis">The axis which to flip elements.</param>
     new(data : Symbol,
@@ -11437,6 +11628,7 @@ type NpiFlip private (operatorArguments) =
 type NpxNonzero private (operatorArguments) = 
     inherit SymbolOperator("_npx_nonzero", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpxNonzero(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpxNonzero(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="x">The input array.</param>
     new([<Optional>] ?x : Symbol) =
         let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -11459,6 +11651,7 @@ type NpxNonzero private (operatorArguments) =
 type NpiTensordot private (operatorArguments) = 
     inherit SymbolOperator("_npi_tensordot", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTensordot(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiTensordot(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="a">First input</param>
     /// <param name="b">Second input</param>
     /// <param name="aAxesSummed"></param>
@@ -11522,6 +11715,7 @@ type NpiTensordot private (operatorArguments) =
 type NpiTensordotIntAxes private (operatorArguments) = 
     inherit SymbolOperator("_npi_tensordot_int_axes", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTensordotIntAxes(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiTensordotIntAxes(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="a">First input</param>
     /// <param name="b">Second input</param>
     /// <param name="axes"></param>
@@ -11574,6 +11768,7 @@ type NpiTensordotIntAxes private (operatorArguments) =
 type NpTrace private (operatorArguments) = 
     inherit SymbolOperator("_np_trace", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpTrace(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpTrace(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the sum of the diagonal elements of a matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -11649,6 +11844,7 @@ type NpTrace private (operatorArguments) =
 type NpiTril private (operatorArguments) = 
     inherit SymbolOperator("_npi_tril", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTril(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiTril(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">Input ndarray</param>
     /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. If input has shape (S0 S1) k must be between -S0 and S1</param>
     new([<Optional>] ?data : Symbol,
@@ -11682,6 +11878,7 @@ type NpiTril private (operatorArguments) =
 type NpiTrueDivide private (operatorArguments) = 
     inherit SymbolOperator("_npi_true_divide", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTrueDivide(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiTrueDivide(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>
     /// Returns a true division of the inputs, element-wise.
     /// 
@@ -11732,6 +11929,7 @@ type NpiTrueDivide private (operatorArguments) =
 type NpiTrueDivideScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_true_divide_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTrueDivideScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiTrueDivideScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -11772,6 +11970,7 @@ type NpiTrueDivideScalar private (operatorArguments) =
 type NpiRtrueDivideScalar private (operatorArguments) = 
     inherit SymbolOperator("_npi_rtrue_divide_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRtrueDivideScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiRtrueDivideScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -11812,6 +12011,7 @@ type NpiRtrueDivideScalar private (operatorArguments) =
 type NpiUnique private (operatorArguments) = 
     inherit SymbolOperator("_npi_unique", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiUnique(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiUnique(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">The input array</param>
     /// <param name="returnIndex">If true, return the indices of the input.</param>
     /// <param name="returnInverse">If true, return the indices of the input.</param>
@@ -11878,6 +12078,7 @@ type NpiUnique private (operatorArguments) =
 type NpiHanning private (operatorArguments) = 
     inherit SymbolOperator("_npi_hanning", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiHanning(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiHanning(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return the Hanning window.The Hanning window is a taper formed by using a weighted cosine.</summary>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
@@ -11911,6 +12112,7 @@ type NpiHanning private (operatorArguments) =
 type NpiHamming private (operatorArguments) = 
     inherit SymbolOperator("_npi_hamming", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiHamming(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiHamming(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return the Hamming window.The Hamming window is a taper formed by using a weighted cosine.</summary>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
@@ -11944,6 +12146,7 @@ type NpiHamming private (operatorArguments) =
 type NpiBlackman private (operatorArguments) = 
     inherit SymbolOperator("_npi_blackman", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBlackman(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiBlackman(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return the Blackman window.The Blackman window is a taper formed by using a weighted cosine.</summary>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
@@ -11977,6 +12180,7 @@ type NpiBlackman private (operatorArguments) =
 type NpiChoice private (operatorArguments) = 
     inherit SymbolOperator("_npi_choice", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiChoice(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiChoice(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>random choice</summary>
     /// <param name="input1">Source input</param>
     /// <param name="input2">Source input</param>
@@ -12070,6 +12274,7 @@ type NpiChoice private (operatorArguments) =
 type NpiMultinomial private (operatorArguments) = 
     inherit SymbolOperator("_npi_multinomial", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiMultinomial(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiMultinomial(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw samples from a multinomial distribution. &quot;
     /// &quot;The multinomial distribution is a multivariate generalisation of the binomial distribution. &quot;
     /// &quot;Take an experiment with one of p possible outcomes. &quot;
@@ -12149,6 +12354,7 @@ type NpiMultinomial private (operatorArguments) =
 type NpiNormal private (operatorArguments) = 
     inherit SymbolOperator("_npi_normal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiNormal(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiNormal(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Numpy behavior normal</summary>
     /// <param name="input1">Source input</param>
     /// <param name="input2">Source input</param>
@@ -12225,6 +12431,7 @@ type NpiNormal private (operatorArguments) =
 type NpiUniform private (operatorArguments) = 
     inherit SymbolOperator("_npi_uniform", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NpiUniform(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NpiUniform(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>numpy behavior uniform</summary>
     /// <param name="input1">Source input</param>
     /// <param name="input2">Source input</param>
@@ -12301,6 +12508,7 @@ type NpiUniform private (operatorArguments) =
 type SignsgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("signsgd_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SignsgdUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SignsgdUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for SignSGD optimizer.
     /// 
     /// .. math::
@@ -12427,6 +12635,7 @@ type SignsgdUpdate private (operatorArguments) =
 type SignumUpdate private (operatorArguments) = 
     inherit SymbolOperator("signum_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SignumUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SignumUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>SIGN momentUM (Signum) optimizer.
     /// 
     /// .. math::
@@ -12599,6 +12808,7 @@ type SignumUpdate private (operatorArguments) =
 type MultiSgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("multi_sgd_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MultiSgdUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MultiSgdUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for Stochastic Gradient Descent (SDG) optimizer.
     /// 
     /// It updates the weights using::
@@ -12710,6 +12920,7 @@ type MultiSgdUpdate private (operatorArguments) =
 type MultiSgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("multi_sgd_mom_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MultiSgdMomUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MultiSgdMomUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Momentum update function for Stochastic Gradient Descent (SGD) optimizer.
     /// 
     /// Momentum update has better convergence rates on neural networks. Mathematically it looks
@@ -12859,6 +13070,7 @@ type MultiSgdMomUpdate private (operatorArguments) =
 type MultiMpSgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("multi_mp_sgd_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MultiMpSgdUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MultiMpSgdUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for multi-precision Stochastic Gradient Descent (SDG) optimizer.
     /// 
     /// It updates the weights using::
@@ -12970,6 +13182,7 @@ type MultiMpSgdUpdate private (operatorArguments) =
 type MultiMpSgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("multi_mp_sgd_mom_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MultiMpSgdMomUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MultiMpSgdMomUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Momentum update function for multi-precision Stochastic Gradient Descent (SGD) optimizer.
     /// 
     /// Momentum update has better convergence rates on neural networks. Mathematically it looks
@@ -13119,6 +13332,7 @@ type MultiMpSgdMomUpdate private (operatorArguments) =
 type SgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("sgd_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SgdUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SgdUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for Stochastic Gradient Descent (SGD) optimizer.
     /// 
     /// It updates the weights using::
@@ -13257,6 +13471,7 @@ type SgdUpdate private (operatorArguments) =
 type SgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("sgd_mom_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SgdMomUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SgdMomUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Momentum update function for Stochastic Gradient Descent (SGD) optimizer.
     /// 
     /// Momentum update has better convergence rates on neural networks. Mathematically it looks
@@ -13449,6 +13664,7 @@ type SgdMomUpdate private (operatorArguments) =
 type MpSgdUpdate private (operatorArguments) = 
     inherit SymbolOperator("mp_sgd_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MpSgdUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MpSgdUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Updater function for multi-precision sgd optimizer</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">gradient</param>
@@ -13571,6 +13787,7 @@ type MpSgdUpdate private (operatorArguments) =
 type MpSgdMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("mp_sgd_mom_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MpSgdMomUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MpSgdMomUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Updater function for multi-precision sgd optimizer</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -13719,6 +13936,7 @@ type MpSgdMomUpdate private (operatorArguments) =
 type FtmlUpdate private (operatorArguments) = 
     inherit SymbolOperator("ftml_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new FtmlUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new FtmlUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>The FTML optimizer described in
     /// *FTML - Follow the Moving Leader in Deep Learning*,
     /// available at http://proceedings.mlr.press/v70/zheng17a/zheng17a.pdf.
@@ -13934,6 +14152,7 @@ type FtmlUpdate private (operatorArguments) =
 type AdamUpdate private (operatorArguments) = 
     inherit SymbolOperator("adam_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new AdamUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new AdamUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for Adam optimizer. Adam is seen as a generalization
     /// of AdaGrad.
     /// 
@@ -14170,6 +14389,7 @@ type AdamUpdate private (operatorArguments) =
 type NagMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("nag_mom_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NagMomUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NagMomUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for Nesterov Accelerated Gradient( NAG) optimizer.
     /// It updates the weights using the following formula,
     /// 
@@ -14322,6 +14542,7 @@ type NagMomUpdate private (operatorArguments) =
 type MpNagMomUpdate private (operatorArguments) = 
     inherit SymbolOperator("mp_nag_mom_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MpNagMomUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MpNagMomUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for multi-precision Nesterov Accelerated Gradient( NAG) optimizer.
     /// 
     /// 
@@ -14462,6 +14683,7 @@ type MpNagMomUpdate private (operatorArguments) =
 type RmspropUpdate private (operatorArguments) = 
     inherit SymbolOperator("rmsprop_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RmspropUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RmspropUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for `RMSProp` optimizer.
     /// 
     /// `RMSprop` is a variant of stochastic gradient descent where the gradients are
@@ -14682,6 +14904,7 @@ type RmspropUpdate private (operatorArguments) =
 type RmspropalexUpdate private (operatorArguments) = 
     inherit SymbolOperator("rmspropalex_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RmspropalexUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RmspropalexUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for RMSPropAlex optimizer.
     /// 
     /// `RMSPropAlex` is non-centered version of `RMSProp`.
@@ -14918,6 +15141,7 @@ type RmspropalexUpdate private (operatorArguments) =
 type FtrlUpdate private (operatorArguments) = 
     inherit SymbolOperator("ftrl_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new FtrlUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new FtrlUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for Ftrl optimizer.
     /// Referenced from *Ad Click Prediction: a View from the Trenches*, available at
     /// http://dl.acm.org/citation.cfm?id=2488200.
@@ -15110,6 +15334,7 @@ type FtrlUpdate private (operatorArguments) =
 type SparseAdagradUpdate private (operatorArguments) = 
     inherit SymbolOperator("_sparse_adagrad_update", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SparseAdagradUpdate(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SparseAdagradUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Update function for AdaGrad optimizer.
     /// 
     /// Referenced from *Adaptive Subgradient Methods for Online Learning and Stochastic Optimization*,
@@ -15262,6 +15487,7 @@ type SparseAdagradUpdate private (operatorArguments) =
 type Pad private (operatorArguments) = 
     inherit SymbolOperator("Pad", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Pad(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Pad(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Pads an input array with a constant or edge values of the array.
     /// 
     /// .. note:: `Pad` is deprecated. Use `pad` instead.
@@ -15495,6 +15721,7 @@ type Pad private (operatorArguments) =
 type ContribCalibrateEntropy private (operatorArguments) = 
     inherit SymbolOperator("_contrib_calibrate_entropy", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribCalibrateEntropy(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribCalibrateEntropy(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Provide calibrated min/max for input histogram.
     /// 
     /// .. Note::
@@ -15543,6 +15770,7 @@ type ContribCalibrateEntropy private (operatorArguments) =
 type ContribDequantize private (operatorArguments) = 
     inherit SymbolOperator("_contrib_dequantize", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDequantize(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribDequantize(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Dequantize the input tensor into a float tensor.
     /// min_range and max_range are scalar floats that specify the range for
     /// the output data.
@@ -15612,6 +15840,7 @@ type ContribDequantize private (operatorArguments) =
 type ContribQuantize private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantize", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantize(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantize(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Quantize a input tensor from float to `out_type`,
     /// with user-specified `min_range` and `max_range`.
     /// 
@@ -15688,6 +15917,7 @@ type ContribQuantize private (operatorArguments) =
 type ContribQuantizeV2 private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantize_v2", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizeV2(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantizeV2(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Quantize a input tensor from float to `out_type`,
     /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
     /// 
@@ -15771,6 +16001,7 @@ type ContribQuantizeV2 private (operatorArguments) =
 type ContribQuantizedAct private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_act", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedAct(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantizedAct(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Activation operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
     /// the float32 data into int8.
@@ -15853,6 +16084,7 @@ type ContribQuantizedAct private (operatorArguments) =
 type ContribQuantizedBatchNorm private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_batch_norm", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedBatchNorm(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantizedBatchNorm(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>BatchNorm operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
     /// the float32 data into int8.
@@ -16037,6 +16269,7 @@ type ContribQuantizedBatchNorm private (operatorArguments) =
 type ContribQuantizedConcat private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_concat", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedConcat(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantizedConcat(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Joins input arrays along a given axis.
     /// 
     /// The dimensions of the input arrays should be the same except the axis along
@@ -16082,6 +16315,7 @@ type ContribQuantizedConcat private (operatorArguments) =
 type ContribQuantizedConv private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_conv", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedConv(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantizedConv(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Convolution operator for input, weight and bias data type of int8,
     /// and accumulates in type int32 for the output. For each argument, two more arguments of type
     /// float32 must be provided representing the thresholds of quantizing argument from data
@@ -16380,6 +16614,7 @@ type ContribQuantizedConv private (operatorArguments) =
 type ContribQuantizedElemwiseAdd private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_elemwise_add", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedElemwiseAdd(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantizedElemwiseAdd(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>elemwise_add operator for input dataA and input dataB data type of int8,
     /// and accumulates in type int32 for the output. For each argument, two more arguments of type
     /// float32 must be provided representing the thresholds of quantizing argument from data
@@ -16457,6 +16692,7 @@ type ContribQuantizedElemwiseAdd private (operatorArguments) =
 type ContribQuantizedFlatten private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_flatten", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedFlatten(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantizedFlatten(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">A ndarray/symbol of type `float32`</param>
     /// <param name="minData">The minimum scalar value possibly produced for the data</param>
     /// <param name="maxData">The maximum scalar value possibly produced for the data</param>
@@ -16497,6 +16733,7 @@ type ContribQuantizedFlatten private (operatorArguments) =
 type Flatten private (operatorArguments) = 
     inherit SymbolOperator("Flatten", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Flatten(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Flatten(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Flattens the input array into a 2-D array by collapsing the higher dimensions.
     /// 
     /// .. note:: `Flatten` is deprecated. Use `flatten` instead.
@@ -16547,6 +16784,7 @@ type Flatten private (operatorArguments) =
 type ContribQuantizedFullyConnected private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_fully_connected", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedFullyConnected(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantizedFullyConnected(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Fully Connected operator for input, weight and bias data type of int8,
     /// and accumulates in type int32 for the output. For each argument, two more arguments of type
     /// float32 must be provided representing the thresholds of quantizing argument from data
@@ -16731,6 +16969,7 @@ type ContribQuantizedFullyConnected private (operatorArguments) =
 type ContribQuantizedPooling private (operatorArguments) = 
     inherit SymbolOperator("_contrib_quantized_pooling", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedPooling(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantizedPooling(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Pooling operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
     /// the float32 data into int8.
@@ -16894,6 +17133,7 @@ type ContribQuantizedPooling private (operatorArguments) =
 type ContribRequantize private (operatorArguments) = 
     inherit SymbolOperator("_contrib_requantize", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribRequantize(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribRequantize(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Given data that is quantized in int32 and the corresponding thresholds,
     /// requantize the data into int8 using min and max thresholds either calculated at runtime
     /// or from calibration. It&#39;s highly recommended to pre-calucate the min and max thresholds
@@ -16977,6 +17217,7 @@ type ContribRequantize private (operatorArguments) =
 type SampleUniform private (operatorArguments) = 
     inherit SymbolOperator("_sample_uniform", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SampleUniform(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SampleUniform(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Concurrent sampling from multiple
     /// uniform distributions on the intervals given by *[low,high)*.
     /// 
@@ -17058,6 +17299,7 @@ type SampleUniform private (operatorArguments) =
 type SampleNormal private (operatorArguments) = 
     inherit SymbolOperator("_sample_normal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SampleNormal(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SampleNormal(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Concurrent sampling from multiple
     /// normal distributions with parameters *mu* (mean) and *sigma* (standard deviation).
     /// 
@@ -17139,6 +17381,7 @@ type SampleNormal private (operatorArguments) =
 type SampleGamma private (operatorArguments) = 
     inherit SymbolOperator("_sample_gamma", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SampleGamma(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SampleGamma(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Concurrent sampling from multiple
     /// gamma distributions with parameters *alpha* (shape) and *beta* (scale).
     /// 
@@ -17220,6 +17463,7 @@ type SampleGamma private (operatorArguments) =
 type SampleExponential private (operatorArguments) = 
     inherit SymbolOperator("_sample_exponential", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SampleExponential(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SampleExponential(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Concurrent sampling from multiple
     /// exponential distributions with parameters lambda (rate).
     /// 
@@ -17291,6 +17535,7 @@ type SampleExponential private (operatorArguments) =
 type SamplePoisson private (operatorArguments) = 
     inherit SymbolOperator("_sample_poisson", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SamplePoisson(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SamplePoisson(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Concurrent sampling from multiple
     /// Poisson distributions with parameters lambda (rate).
     /// 
@@ -17364,6 +17609,7 @@ type SamplePoisson private (operatorArguments) =
 type SampleNegativeBinomial private (operatorArguments) = 
     inherit SymbolOperator("_sample_negative_binomial", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SampleNegativeBinomial(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SampleNegativeBinomial(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Concurrent sampling from multiple
     /// negative binomial distributions with parameters *k* (failure limit) and *p* (failure probability).
     /// 
@@ -17447,6 +17693,7 @@ type SampleNegativeBinomial private (operatorArguments) =
 type SampleGeneralizedNegativeBinomial private (operatorArguments) = 
     inherit SymbolOperator("_sample_generalized_negative_binomial", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SampleGeneralizedNegativeBinomial(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SampleGeneralizedNegativeBinomial(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Concurrent sampling from multiple
     /// generalized negative binomial distributions with parameters *mu* (mean) and *alpha* (dispersion).
     /// 
@@ -17530,6 +17777,7 @@ type SampleGeneralizedNegativeBinomial private (operatorArguments) =
 type RandomPdfUniform private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_uniform", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfUniform(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomPdfUniform(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the value of the PDF of *sample* of
     /// uniform distributions on the intervals given by *[low,high)*.
     /// 
@@ -17612,6 +17860,7 @@ type RandomPdfUniform private (operatorArguments) =
 type RandomPdfNormal private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_normal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfNormal(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomPdfNormal(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the value of the PDF of *sample* of
     /// normal distributions with parameters *mu* (mean) and *sigma* (standard deviation).
     /// 
@@ -17685,6 +17934,7 @@ type RandomPdfNormal private (operatorArguments) =
 type RandomPdfGamma private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_gamma", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfGamma(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomPdfGamma(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the value of the PDF of *sample* of
     /// gamma distributions with parameters *alpha* (shape) and *beta* (rate).
     /// 
@@ -17762,6 +18012,7 @@ type RandomPdfGamma private (operatorArguments) =
 type RandomPdfExponential private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_exponential", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfExponential(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomPdfExponential(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the value of the PDF of *sample* of
     /// exponential distributions with parameters *lam* (rate).
     /// 
@@ -17830,6 +18081,7 @@ type RandomPdfExponential private (operatorArguments) =
 type RandomPdfPoisson private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_poisson", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfPoisson(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomPdfPoisson(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the value of the PDF of *sample* of
     /// Poisson distributions with parameters *lam* (rate).
     /// 
@@ -17898,6 +18150,7 @@ type RandomPdfPoisson private (operatorArguments) =
 type RandomPdfNegativeBinomial private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_negative_binomial", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfNegativeBinomial(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomPdfNegativeBinomial(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the value of the PDF of samples of
     /// negative binomial distributions with parameters *k* (failure limit) and *p* (failure probability).
     /// 
@@ -17973,6 +18226,7 @@ type RandomPdfNegativeBinomial private (operatorArguments) =
 type RandomPdfGeneralizedNegativeBinomial private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_generalized_negative_binomial", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfGeneralizedNegativeBinomial(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomPdfGeneralizedNegativeBinomial(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the value of the PDF of *sample* of
     /// generalized negative binomial distributions with parameters *mu* (mean)
     /// and *alpha* (dispersion).  This can be understood as a reparameterization of
@@ -18049,6 +18303,7 @@ type RandomPdfGeneralizedNegativeBinomial private (operatorArguments) =
 type RandomPdfDirichlet private (operatorArguments) = 
     inherit SymbolOperator("_random_pdf_dirichlet", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPdfDirichlet(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomPdfDirichlet(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the value of the PDF of *sample* of
     /// Dirichlet distributions with parameter *alpha*.
     /// 
@@ -18115,6 +18370,7 @@ type RandomPdfDirichlet private (operatorArguments) =
 type SampleMultinomial private (operatorArguments) = 
     inherit SymbolOperator("_sample_multinomial", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SampleMultinomial(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SampleMultinomial(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Concurrent sampling from multiple multinomial distributions.
     /// 
     /// *data* is an *n* dimensional array whose last dimension has length *k*, where
@@ -18199,6 +18455,7 @@ type SampleMultinomial private (operatorArguments) =
 type RandomUniform private (operatorArguments) = 
     inherit SymbolOperator("_random_uniform", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomUniform(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomUniform(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from a uniform distribution.
     /// 
     /// .. note:: The existing alias ``uniform`` is deprecated.
@@ -18271,6 +18528,7 @@ type RandomUniform private (operatorArguments) =
 type RandomNormal private (operatorArguments) = 
     inherit SymbolOperator("_random_normal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomNormal(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomNormal(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from a normal (Gaussian) distribution.
     /// 
     /// .. note:: The existing alias ``normal`` is deprecated.
@@ -18342,6 +18600,7 @@ type RandomNormal private (operatorArguments) =
 type RandomGamma private (operatorArguments) = 
     inherit SymbolOperator("_random_gamma", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomGamma(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomGamma(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from a gamma distribution.
     /// 
     /// Samples are distributed according to a gamma distribution parametrized by *alpha* (shape) and *beta* (scale).
@@ -18410,6 +18669,7 @@ type RandomGamma private (operatorArguments) =
 type RandomExponential private (operatorArguments) = 
     inherit SymbolOperator("_random_exponential", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomExponential(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomExponential(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from an exponential distribution.
     /// 
     /// Samples are distributed according to an exponential distribution parametrized by *lambda* (rate).
@@ -18467,6 +18727,7 @@ type RandomExponential private (operatorArguments) =
 type RandomPoisson private (operatorArguments) = 
     inherit SymbolOperator("_random_poisson", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPoisson(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomPoisson(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from a Poisson distribution.
     /// 
     /// Samples are distributed according to a Poisson distribution parametrized by *lambda* (rate).
@@ -18525,6 +18786,7 @@ type RandomPoisson private (operatorArguments) =
 type RandomNegativeBinomial private (operatorArguments) = 
     inherit SymbolOperator("_random_negative_binomial", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomNegativeBinomial(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomNegativeBinomial(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from a negative binomial distribution.
     /// 
     /// Samples are distributed according to a negative binomial distribution parametrized by
@@ -18595,6 +18857,7 @@ type RandomNegativeBinomial private (operatorArguments) =
 type RandomGeneralizedNegativeBinomial private (operatorArguments) = 
     inherit SymbolOperator("_random_generalized_negative_binomial", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomGeneralizedNegativeBinomial(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomGeneralizedNegativeBinomial(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from a generalized negative binomial distribution.
     /// 
     /// Samples are distributed according to a generalized negative binomial distribution parametrized by
@@ -18666,6 +18929,7 @@ type RandomGeneralizedNegativeBinomial private (operatorArguments) =
 type RandomRandint private (operatorArguments) = 
     inherit SymbolOperator("_random_randint", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomRandint(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomRandint(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from a discrete uniform distribution.
     /// 
     /// Samples are uniformly distributed over the half-open interval *[low, high)*
@@ -18730,6 +18994,7 @@ type RandomRandint private (operatorArguments) =
 type RandomUniformLike private (operatorArguments) = 
     inherit SymbolOperator("_random_uniform_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomUniformLike(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomUniformLike(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from a uniform distribution according to the input array shape.
     /// 
     /// Samples are uniformly distributed over the half-open interval *[low, high)*
@@ -18787,6 +19052,7 @@ type RandomUniformLike private (operatorArguments) =
 type RandomNormalLike private (operatorArguments) = 
     inherit SymbolOperator("_random_normal_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomNormalLike(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomNormalLike(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from a normal (Gaussian) distribution according to the input array shape.
     /// 
     /// Samples are distributed according to a normal distribution parametrized by *loc* (mean) and *scale*
@@ -18843,6 +19109,7 @@ type RandomNormalLike private (operatorArguments) =
 type RandomGammaLike private (operatorArguments) = 
     inherit SymbolOperator("_random_gamma_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomGammaLike(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomGammaLike(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from a gamma distribution according to the input array shape.
     /// 
     /// Samples are distributed according to a gamma distribution parametrized by *alpha* (shape) and *beta* (scale).
@@ -18898,6 +19165,7 @@ type RandomGammaLike private (operatorArguments) =
 type RandomExponentialLike private (operatorArguments) = 
     inherit SymbolOperator("_random_exponential_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomExponentialLike(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomExponentialLike(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from an exponential distribution according to the input array shape.
     /// 
     /// Samples are distributed according to an exponential distribution parametrized by *lambda* (rate).
@@ -18942,6 +19210,7 @@ type RandomExponentialLike private (operatorArguments) =
 type RandomPoissonLike private (operatorArguments) = 
     inherit SymbolOperator("_random_poisson_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomPoissonLike(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomPoissonLike(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from a Poisson distribution according to the input array shape.
     /// 
     /// Samples are distributed according to a Poisson distribution parametrized by *lambda* (rate).
@@ -18987,6 +19256,7 @@ type RandomPoissonLike private (operatorArguments) =
 type RandomNegativeBinomialLike private (operatorArguments) = 
     inherit SymbolOperator("_random_negative_binomial_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomNegativeBinomialLike(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomNegativeBinomialLike(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from a negative binomial distribution according to the input array shape.
     /// 
     /// Samples are distributed according to a negative binomial distribution parametrized by
@@ -19044,6 +19314,7 @@ type RandomNegativeBinomialLike private (operatorArguments) =
 type RandomGeneralizedNegativeBinomialLike private (operatorArguments) = 
     inherit SymbolOperator("_random_generalized_negative_binomial_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RandomGeneralizedNegativeBinomialLike(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RandomGeneralizedNegativeBinomialLike(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from a generalized negative binomial distribution according to the
     /// input array shape.
     /// 
@@ -19103,6 +19374,7 @@ type RandomGeneralizedNegativeBinomialLike private (operatorArguments) =
 type Shuffle private (operatorArguments) = 
     inherit SymbolOperator("_shuffle", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Shuffle(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Shuffle(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Randomly shuffle the elements.
     /// 
     /// This shuffles the array along the first axis.
@@ -19132,6 +19404,7 @@ type Shuffle private (operatorArguments) =
 type SampleUniqueZipfian private (operatorArguments) = 
     inherit SymbolOperator("_sample_unique_zipfian", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SampleUniqueZipfian(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SampleUniqueZipfian(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Draw random samples from an an approximately log-uniform
     /// or Zipfian distribution without replacement.
     /// 
@@ -19189,6 +19462,7 @@ type SampleUniqueZipfian private (operatorArguments) =
 type LinearRegressionOutput private (operatorArguments) = 
     inherit SymbolOperator("LinearRegressionOutput", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinearRegressionOutput(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinearRegressionOutput(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes and optimizes for squared loss during backward propagation.
     /// Just outputs ``data`` during forward propagation.
     /// 
@@ -19253,6 +19527,7 @@ type LinearRegressionOutput private (operatorArguments) =
 type MAERegressionOutput private (operatorArguments) = 
     inherit SymbolOperator("MAERegressionOutput", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MAERegressionOutput(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MAERegressionOutput(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes mean absolute error of the input.
     /// 
     /// MAE is a risk metric corresponding to the expected value of the absolute error.
@@ -19318,6 +19593,7 @@ type MAERegressionOutput private (operatorArguments) =
 type LogisticRegressionOutput private (operatorArguments) = 
     inherit SymbolOperator("LogisticRegressionOutput", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LogisticRegressionOutput(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LogisticRegressionOutput(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Applies a logistic function to the input.
     /// 
     /// The logistic function, also known as the sigmoid function, is computed as
@@ -19387,6 +19663,7 @@ type LogisticRegressionOutput private (operatorArguments) =
 type RNN private (operatorArguments) = 
     inherit SymbolOperator("RNN", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RNN(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RNN(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Applies recurrent layers to input data. Currently, vanilla RNN, LSTM and GRU are
     /// implemented, with both multi-layer and bidirectional support.
     /// 
@@ -19721,6 +19998,7 @@ type RNN private (operatorArguments) =
 type ROIPooling private (operatorArguments) = 
     inherit SymbolOperator("ROIPooling", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ROIPooling(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ROIPooling(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Performs region of interest(ROI) pooling on the input array.
     /// 
     /// ROI pooling is a variant of a max pooling layer, in which the output size is fixed and
@@ -19876,6 +20154,7 @@ type ROIPooling private (operatorArguments) =
 type SequenceMask private (operatorArguments) = 
     inherit SymbolOperator("SequenceMask", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SequenceMask(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SequenceMask(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Sets all elements outside the sequence to a constant value.
     /// 
     /// This function takes an n-dimensional input array of the form
@@ -20009,6 +20288,7 @@ type SequenceMask private (operatorArguments) =
 type SliceChannel private (operatorArguments) = 
     inherit SymbolOperator("SliceChannel", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SliceChannel(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SliceChannel(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Splits an array along a particular axis into multiple sub-arrays.
     /// 
     /// .. note:: ``SliceChannel`` is deprecated. Use ``split`` instead.
@@ -20199,6 +20479,7 @@ type SliceChannel private (operatorArguments) =
 type SoftmaxOutput private (operatorArguments) = 
     inherit SymbolOperator("SoftmaxOutput", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SoftmaxOutput(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SoftmaxOutput(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the gradient of cross entropy loss with respect to softmax output.
     /// 
     /// - This operator computes the gradient in two steps.
@@ -20396,6 +20677,7 @@ type SoftmaxOutput private (operatorArguments) =
 type SwapAxis private (operatorArguments) = 
     inherit SymbolOperator("SwapAxis", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SwapAxis(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SwapAxis(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Interchanges two axes of an array.
     /// 
     /// Examples::
@@ -20461,6 +20743,7 @@ type SwapAxis private (operatorArguments) =
 type AmpCast private (operatorArguments) = 
     inherit SymbolOperator("amp_cast", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new AmpCast(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new AmpCast(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Cast function between low precision float/FP32 used by AMP.
     /// 
     /// It casts only between low precision float/FP32 and does not do anything for other types.
@@ -20513,6 +20796,7 @@ type AmpCast private (operatorArguments) =
 type AmpMulticast private (operatorArguments) = 
     inherit SymbolOperator("amp_multicast", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new AmpMulticast(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new AmpMulticast(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Cast function used by AMP, that casts its inputs to the common widest type.
     /// 
     /// It casts only between low precision float/FP32 and does not do anything for other types.
@@ -20584,6 +20868,7 @@ type AmpMulticast private (operatorArguments) =
 type Max private (operatorArguments) = 
     inherit SymbolOperator("max", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Max(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Max(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the max of array elements over given axes.
     /// 
     /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L32</summary>
@@ -20694,6 +20979,7 @@ type Max private (operatorArguments) =
 type Min private (operatorArguments) = 
     inherit SymbolOperator("min", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Min(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Min(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the min of array elements over given axes.
     /// 
     /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L46</summary>
@@ -20804,6 +21090,7 @@ type Min private (operatorArguments) =
 type Norm private (operatorArguments) = 
     inherit SymbolOperator("norm", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Norm(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Norm(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the norm on an NDArray.
     /// 
     /// This operator computes the norm on an NDArray with the specified axis, depending
@@ -20920,6 +21207,7 @@ type Norm private (operatorArguments) =
 type Argmax private (operatorArguments) = 
     inherit SymbolOperator("argmax", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Argmax(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Argmax(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns indices of the maximum values along an axis.
     /// 
     /// In the case of multiple occurrences of maximum values, the indices corresponding to the first occurrence
@@ -20987,6 +21275,7 @@ type Argmax private (operatorArguments) =
 type Argmin private (operatorArguments) = 
     inherit SymbolOperator("argmin", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Argmin(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Argmin(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns indices of the minimum values along an axis.
     /// 
     /// In the case of multiple occurrences of minimum values, the indices corresponding to the first occurrence
@@ -21054,6 +21343,7 @@ type Argmin private (operatorArguments) =
 type ArgmaxChannel private (operatorArguments) = 
     inherit SymbolOperator("argmax_channel", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ArgmaxChannel(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ArgmaxChannel(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns argmax indices of each channel from the input array.
     /// 
     /// The result will be an NDArray of shape (num_channel,).
@@ -21093,6 +21383,7 @@ type ArgmaxChannel private (operatorArguments) =
 type Pick private (operatorArguments) = 
     inherit SymbolOperator("pick", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Pick(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Pick(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Picks elements from an input array according to the input indices along the given axis.
     /// 
     /// Given an input array of shape ``(d0, d1)`` and indices of shape ``(i0,)``, the result will be
@@ -21201,6 +21492,7 @@ type Pick private (operatorArguments) =
 type BroadcastAxis private (operatorArguments) = 
     inherit SymbolOperator("broadcast_axis", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastAxis(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastAxis(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Broadcasts the input array over particular axes.
     /// 
     /// Broadcasting is allowed on axes with size 1, such as from `(2,1,3,1)` to
@@ -21269,6 +21561,7 @@ type BroadcastAxis private (operatorArguments) =
 type BroadcastTo private (operatorArguments) = 
     inherit SymbolOperator("broadcast_to", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastTo(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastTo(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Broadcasts the input array to a new shape.
     /// 
     /// Broadcasting is a mechanism that allows NDArrays to perform arithmetic operations
@@ -21322,6 +21615,7 @@ type BroadcastTo private (operatorArguments) =
 type BroadcastBackward private (operatorArguments) = 
     inherit SymbolOperator("_broadcast_backward", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastBackward(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastBackward(this.OperatorArguments.AddReplace(args)) :> Symbol
     new() =
         let operatorArguments = 
             [
@@ -21331,6 +21625,7 @@ type BroadcastBackward private (operatorArguments) =
 type BroadcastLike private (operatorArguments) = 
     inherit SymbolOperator("broadcast_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastLike(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastLike(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Broadcasts lhs to have the same shape as rhs.
     /// 
     /// Broadcasting is a mechanism that allows NDArrays to perform arithmetic operations
@@ -21403,6 +21698,7 @@ type BroadcastLike private (operatorArguments) =
 type Prod private (operatorArguments) = 
     inherit SymbolOperator("prod", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Prod(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Prod(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the product of array elements over given axes.
     /// 
     /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L31</summary>
@@ -21513,6 +21809,7 @@ type Prod private (operatorArguments) =
 type Nanprod private (operatorArguments) = 
     inherit SymbolOperator("nanprod", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Nanprod(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Nanprod(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the product of array elements over given axes treating Not a Numbers (``NaN``) as one.
     /// 
     /// 
@@ -21625,6 +21922,7 @@ type Nanprod private (operatorArguments) =
 type Sum private (operatorArguments) = 
     inherit SymbolOperator("sum", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Sum(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Sum(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the sum of array elements over given axes.
     /// 
     /// .. Note::
@@ -21769,6 +22067,7 @@ type Sum private (operatorArguments) =
 type Mean private (operatorArguments) = 
     inherit SymbolOperator("mean", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Mean(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Mean(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the mean of array elements over given axes.
     /// 
     /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L83</summary>
@@ -21879,6 +22178,7 @@ type Mean private (operatorArguments) =
 type Nansum private (operatorArguments) = 
     inherit SymbolOperator("nansum", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Nansum(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Nansum(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the sum of array elements over given axes treating Not a Numbers (``NaN``) as zero.
     /// 
     /// 
@@ -21991,6 +22291,7 @@ type Nansum private (operatorArguments) =
 type CastStorage private (operatorArguments) = 
     inherit SymbolOperator("cast_storage", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new CastStorage(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new CastStorage(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Casts tensor storage type to the new type.
     /// 
     /// When an NDArray with default storage type is cast to csr or row_sparse storage,
@@ -22109,6 +22410,7 @@ type CastStorage private (operatorArguments) =
 type Where private (operatorArguments) = 
     inherit SymbolOperator("where", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Where(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Where(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return the elements, either from x or y, depending on the condition.
     /// 
     /// Given three ndarrays, condition, x, and y, return an ndarray with the elements from x or y,
@@ -22177,6 +22479,7 @@ type Where private (operatorArguments) =
 type Diag private (operatorArguments) = 
     inherit SymbolOperator("diag", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Diag(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Diag(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Extracts a diagonal or constructs a diagonal array.
     /// 
     /// ``diag``&#39;s behavior depends on the input array dimensions:
@@ -22287,6 +22590,7 @@ type Diag private (operatorArguments) =
 type Dot private (operatorArguments) = 
     inherit SymbolOperator("dot", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Dot(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Dot(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Dot product of two arrays.
     /// 
     /// ``dot``&#39;s behavior depends on the input array dimensions:
@@ -22398,6 +22702,7 @@ type Dot private (operatorArguments) =
 type BatchDot private (operatorArguments) = 
     inherit SymbolOperator("batch_dot", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BatchDot(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BatchDot(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Batchwise dot product.
     /// 
     /// ``batch_dot`` is used to compute dot product of ``x`` and ``y`` when ``x`` and
@@ -22476,6 +22781,7 @@ type BatchDot private (operatorArguments) =
 type BroadcastAdd private (operatorArguments) = 
     inherit SymbolOperator("broadcast_add", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastAdd(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastAdd(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise sum of the input arrays with broadcasting.
     /// 
     /// `broadcast_plus` is an alias to the function `broadcast_add`.
@@ -22533,6 +22839,7 @@ type BroadcastAdd private (operatorArguments) =
 type BroadcastSub private (operatorArguments) = 
     inherit SymbolOperator("broadcast_sub", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastSub(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastSub(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise difference of the input arrays with broadcasting.
     /// 
     /// `broadcast_minus` is an alias to the function `broadcast_sub`.
@@ -22590,6 +22897,7 @@ type BroadcastSub private (operatorArguments) =
 type BroadcastMul private (operatorArguments) = 
     inherit SymbolOperator("broadcast_mul", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastMul(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastMul(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise product of the input arrays with broadcasting.
     /// 
     /// Example::
@@ -22641,6 +22949,7 @@ type BroadcastMul private (operatorArguments) =
 type BroadcastDiv private (operatorArguments) = 
     inherit SymbolOperator("broadcast_div", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastDiv(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastDiv(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise division of the input arrays with broadcasting.
     /// 
     /// Example::
@@ -22692,6 +23001,7 @@ type BroadcastDiv private (operatorArguments) =
 type BroadcastMod private (operatorArguments) = 
     inherit SymbolOperator("broadcast_mod", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastMod(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastMod(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise modulo of the input arrays with broadcasting.
     /// 
     /// Example::
@@ -22739,6 +23049,7 @@ type BroadcastMod private (operatorArguments) =
 type BroadcastPower private (operatorArguments) = 
     inherit SymbolOperator("broadcast_power", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastPower(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastPower(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns result of first array elements raised to powers from second array, element-wise with broadcasting.
     /// 
     /// Example::
@@ -22786,6 +23097,7 @@ type BroadcastPower private (operatorArguments) =
 type BroadcastMaximum private (operatorArguments) = 
     inherit SymbolOperator("broadcast_maximum", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastMaximum(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastMaximum(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise maximum of the input arrays with broadcasting.
     /// 
     /// This function compares two input arrays and returns a new array having the element-wise maxima.
@@ -22835,6 +23147,7 @@ type BroadcastMaximum private (operatorArguments) =
 type BroadcastMinimum private (operatorArguments) = 
     inherit SymbolOperator("broadcast_minimum", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastMinimum(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastMinimum(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise minimum of the input arrays with broadcasting.
     /// 
     /// This function compares two input arrays and returns a new array having the element-wise minima.
@@ -22884,6 +23197,7 @@ type BroadcastMinimum private (operatorArguments) =
 type BroadcastHypot private (operatorArguments) = 
     inherit SymbolOperator("broadcast_hypot", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastHypot(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastHypot(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary> Returns the hypotenuse of a right angled triangle, given its &quot;legs&quot;
     /// with broadcasting.
     /// 
@@ -22939,6 +23253,7 @@ type BroadcastHypot private (operatorArguments) =
 type BroadcastEqual private (operatorArguments) = 
     inherit SymbolOperator("broadcast_equal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastEqual(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastEqual(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the result of element-wise **equal to** (==) comparison operation with broadcasting.
     /// 
     /// Example::
@@ -22986,6 +23301,7 @@ type BroadcastEqual private (operatorArguments) =
 type BroadcastNotEqual private (operatorArguments) = 
     inherit SymbolOperator("broadcast_not_equal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastNotEqual(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastNotEqual(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the result of element-wise **not equal to** (!=) comparison operation with broadcasting.
     /// 
     /// Example::
@@ -23033,6 +23349,7 @@ type BroadcastNotEqual private (operatorArguments) =
 type BroadcastGreater private (operatorArguments) = 
     inherit SymbolOperator("broadcast_greater", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastGreater(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastGreater(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the result of element-wise **greater than** (&gt;) comparison operation with broadcasting.
     /// 
     /// Example::
@@ -23080,6 +23397,7 @@ type BroadcastGreater private (operatorArguments) =
 type BroadcastGreaterEqual private (operatorArguments) = 
     inherit SymbolOperator("broadcast_greater_equal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastGreaterEqual(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastGreaterEqual(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the result of element-wise **greater than or equal to** (&gt;=) comparison operation with broadcasting.
     /// 
     /// Example::
@@ -23127,6 +23445,7 @@ type BroadcastGreaterEqual private (operatorArguments) =
 type BroadcastLesser private (operatorArguments) = 
     inherit SymbolOperator("broadcast_lesser", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastLesser(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastLesser(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the result of element-wise **lesser than** (&lt;) comparison operation with broadcasting.
     /// 
     /// Example::
@@ -23174,6 +23493,7 @@ type BroadcastLesser private (operatorArguments) =
 type BroadcastLesserEqual private (operatorArguments) = 
     inherit SymbolOperator("broadcast_lesser_equal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastLesserEqual(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastLesserEqual(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the result of element-wise **lesser than or equal to** (&lt;=) comparison operation with broadcasting.
     /// 
     /// Example::
@@ -23221,6 +23541,7 @@ type BroadcastLesserEqual private (operatorArguments) =
 type BroadcastLogicalAnd private (operatorArguments) = 
     inherit SymbolOperator("broadcast_logical_and", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastLogicalAnd(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastLogicalAnd(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the result of element-wise **logical and** with broadcasting.
     /// 
     /// Example::
@@ -23268,6 +23589,7 @@ type BroadcastLogicalAnd private (operatorArguments) =
 type BroadcastLogicalOr private (operatorArguments) = 
     inherit SymbolOperator("broadcast_logical_or", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastLogicalOr(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastLogicalOr(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the result of element-wise **logical or** with broadcasting.
     /// 
     /// Example::
@@ -23315,6 +23637,7 @@ type BroadcastLogicalOr private (operatorArguments) =
 type BroadcastLogicalXor private (operatorArguments) = 
     inherit SymbolOperator("broadcast_logical_xor", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BroadcastLogicalXor(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BroadcastLogicalXor(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the result of element-wise **logical xor** with broadcasting.
     /// 
     /// Example::
@@ -23362,6 +23685,7 @@ type BroadcastLogicalXor private (operatorArguments) =
 type ElemwiseAdd private (operatorArguments) = 
     inherit SymbolOperator("elemwise_add", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ElemwiseAdd(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ElemwiseAdd(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Adds arguments element-wise.
     /// 
     /// The storage type of ``elemwise_add`` output depends on storage types of inputs
@@ -23406,6 +23730,7 @@ type ElemwiseAdd private (operatorArguments) =
 type GradAdd private (operatorArguments) = 
     inherit SymbolOperator("_grad_add", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new GradAdd(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new GradAdd(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     new([<Optional>] ?lhs : Symbol,
@@ -23437,6 +23762,7 @@ type GradAdd private (operatorArguments) =
 type ElemwiseSub private (operatorArguments) = 
     inherit SymbolOperator("elemwise_sub", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ElemwiseSub(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ElemwiseSub(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Subtracts arguments element-wise.
     /// 
     /// The storage type of ``elemwise_sub`` output depends on storage types of inputs
@@ -23481,6 +23807,7 @@ type ElemwiseSub private (operatorArguments) =
 type ElemwiseMul private (operatorArguments) = 
     inherit SymbolOperator("elemwise_mul", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ElemwiseMul(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ElemwiseMul(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Multiplies arguments element-wise.
     /// 
     /// The storage type of ``elemwise_mul`` output depends on storage types of inputs
@@ -23524,6 +23851,7 @@ type ElemwiseMul private (operatorArguments) =
 type ElemwiseDiv private (operatorArguments) = 
     inherit SymbolOperator("elemwise_div", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ElemwiseDiv(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ElemwiseDiv(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Divides arguments element-wise.
     /// 
     /// The storage type of ``elemwise_div`` output is always dense
@@ -23560,6 +23888,7 @@ type ElemwiseDiv private (operatorArguments) =
 type Mod private (operatorArguments) = 
     inherit SymbolOperator("_mod", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Mod(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Mod(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     new([<Optional>] ?lhs : Symbol,
@@ -23591,6 +23920,7 @@ type Mod private (operatorArguments) =
 type Power private (operatorArguments) = 
     inherit SymbolOperator("_power", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Power(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Power(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     new([<Optional>] ?lhs : Symbol,
@@ -23622,6 +23952,7 @@ type Power private (operatorArguments) =
 type Maximum private (operatorArguments) = 
     inherit SymbolOperator("_maximum", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Maximum(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Maximum(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     new([<Optional>] ?lhs : Symbol,
@@ -23653,6 +23984,7 @@ type Maximum private (operatorArguments) =
 type Minimum private (operatorArguments) = 
     inherit SymbolOperator("_minimum", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Minimum(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Minimum(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     new([<Optional>] ?lhs : Symbol,
@@ -23684,6 +24016,7 @@ type Minimum private (operatorArguments) =
 type Hypot private (operatorArguments) = 
     inherit SymbolOperator("_hypot", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Hypot(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Hypot(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Given the &quot;legs&quot; of a right triangle, return its hypotenuse.
     /// 
     /// 
@@ -23720,6 +24053,7 @@ type Hypot private (operatorArguments) =
 type Equal private (operatorArguments) = 
     inherit SymbolOperator("_equal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Equal(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Equal(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     new([<Optional>] ?lhs : Symbol,
@@ -23751,6 +24085,7 @@ type Equal private (operatorArguments) =
 type NotEqual private (operatorArguments) = 
     inherit SymbolOperator("_not_equal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NotEqual(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NotEqual(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     new([<Optional>] ?lhs : Symbol,
@@ -23782,6 +24117,7 @@ type NotEqual private (operatorArguments) =
 type Greater private (operatorArguments) = 
     inherit SymbolOperator("_greater", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Greater(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Greater(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     new([<Optional>] ?lhs : Symbol,
@@ -23813,6 +24149,7 @@ type Greater private (operatorArguments) =
 type GreaterEqual private (operatorArguments) = 
     inherit SymbolOperator("_greater_equal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new GreaterEqual(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new GreaterEqual(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     new([<Optional>] ?lhs : Symbol,
@@ -23844,6 +24181,7 @@ type GreaterEqual private (operatorArguments) =
 type Lesser private (operatorArguments) = 
     inherit SymbolOperator("_lesser", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Lesser(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Lesser(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     new([<Optional>] ?lhs : Symbol,
@@ -23875,6 +24213,7 @@ type Lesser private (operatorArguments) =
 type LesserEqual private (operatorArguments) = 
     inherit SymbolOperator("_lesser_equal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LesserEqual(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LesserEqual(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     new([<Optional>] ?lhs : Symbol,
@@ -23906,6 +24245,7 @@ type LesserEqual private (operatorArguments) =
 type LogicalAnd private (operatorArguments) = 
     inherit SymbolOperator("_logical_and", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalAnd(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LogicalAnd(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     new([<Optional>] ?lhs : Symbol,
@@ -23937,6 +24277,7 @@ type LogicalAnd private (operatorArguments) =
 type LogicalOr private (operatorArguments) = 
     inherit SymbolOperator("_logical_or", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalOr(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LogicalOr(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     new([<Optional>] ?lhs : Symbol,
@@ -23968,6 +24309,7 @@ type LogicalOr private (operatorArguments) =
 type LogicalXor private (operatorArguments) = 
     inherit SymbolOperator("_logical_xor", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalXor(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LogicalXor(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     new([<Optional>] ?lhs : Symbol,
@@ -23999,6 +24341,7 @@ type LogicalXor private (operatorArguments) =
 type PlusScalar private (operatorArguments) = 
     inherit SymbolOperator("_plus_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new PlusScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new PlusScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24039,6 +24382,7 @@ type PlusScalar private (operatorArguments) =
 type MinusScalar private (operatorArguments) = 
     inherit SymbolOperator("_minus_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MinusScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MinusScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24079,6 +24423,7 @@ type MinusScalar private (operatorArguments) =
 type RminusScalar private (operatorArguments) = 
     inherit SymbolOperator("_rminus_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RminusScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RminusScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24119,6 +24464,7 @@ type RminusScalar private (operatorArguments) =
 type MulScalar private (operatorArguments) = 
     inherit SymbolOperator("_mul_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MulScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MulScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Multiply an array with a scalar.
     /// 
     /// ``_mul_scalar`` only operates on data array of input if input is sparse.
@@ -24181,6 +24527,7 @@ type MulScalar private (operatorArguments) =
 type DivScalar private (operatorArguments) = 
     inherit SymbolOperator("_div_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new DivScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new DivScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Divide an array with a scalar.
     /// 
     /// ``_div_scalar`` only operates on data array of input if input is sparse.
@@ -24243,6 +24590,7 @@ type DivScalar private (operatorArguments) =
 type RdivScalar private (operatorArguments) = 
     inherit SymbolOperator("_rdiv_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RdivScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RdivScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24283,6 +24631,7 @@ type RdivScalar private (operatorArguments) =
 type ModScalar private (operatorArguments) = 
     inherit SymbolOperator("_mod_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ModScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ModScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24323,6 +24672,7 @@ type ModScalar private (operatorArguments) =
 type RmodScalar private (operatorArguments) = 
     inherit SymbolOperator("_rmod_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RmodScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RmodScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24363,6 +24713,7 @@ type RmodScalar private (operatorArguments) =
 type MaximumScalar private (operatorArguments) = 
     inherit SymbolOperator("_maximum_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MaximumScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MaximumScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24403,6 +24754,7 @@ type MaximumScalar private (operatorArguments) =
 type MinimumScalar private (operatorArguments) = 
     inherit SymbolOperator("_minimum_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MinimumScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MinimumScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24443,6 +24795,7 @@ type MinimumScalar private (operatorArguments) =
 type PowerScalar private (operatorArguments) = 
     inherit SymbolOperator("_power_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new PowerScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new PowerScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24483,6 +24836,7 @@ type PowerScalar private (operatorArguments) =
 type RpowerScalar private (operatorArguments) = 
     inherit SymbolOperator("_rpower_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RpowerScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RpowerScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24523,6 +24877,7 @@ type RpowerScalar private (operatorArguments) =
 type HypotScalar private (operatorArguments) = 
     inherit SymbolOperator("_hypot_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new HypotScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new HypotScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24563,6 +24918,7 @@ type HypotScalar private (operatorArguments) =
 type SmoothL1 private (operatorArguments) = 
     inherit SymbolOperator("smooth_l1", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SmoothL1(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SmoothL1(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Calculate Smooth L1 Loss(lhs, scalar) by summing
     /// 
     /// .. math::
@@ -24643,6 +24999,7 @@ type SmoothL1 private (operatorArguments) =
 type EqualScalar private (operatorArguments) = 
     inherit SymbolOperator("_equal_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new EqualScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new EqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24683,6 +25040,7 @@ type EqualScalar private (operatorArguments) =
 type NotEqualScalar private (operatorArguments) = 
     inherit SymbolOperator("_not_equal_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new NotEqualScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new NotEqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24723,6 +25081,7 @@ type NotEqualScalar private (operatorArguments) =
 type GreaterScalar private (operatorArguments) = 
     inherit SymbolOperator("_greater_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new GreaterScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new GreaterScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24763,6 +25122,7 @@ type GreaterScalar private (operatorArguments) =
 type GreaterEqualScalar private (operatorArguments) = 
     inherit SymbolOperator("_greater_equal_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new GreaterEqualScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new GreaterEqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24803,6 +25163,7 @@ type GreaterEqualScalar private (operatorArguments) =
 type LesserScalar private (operatorArguments) = 
     inherit SymbolOperator("_lesser_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LesserScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LesserScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24843,6 +25204,7 @@ type LesserScalar private (operatorArguments) =
 type LesserEqualScalar private (operatorArguments) = 
     inherit SymbolOperator("_lesser_equal_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LesserEqualScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LesserEqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24883,6 +25245,7 @@ type LesserEqualScalar private (operatorArguments) =
 type LogicalAndScalar private (operatorArguments) = 
     inherit SymbolOperator("_logical_and_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalAndScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LogicalAndScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24923,6 +25286,7 @@ type LogicalAndScalar private (operatorArguments) =
 type LogicalOrScalar private (operatorArguments) = 
     inherit SymbolOperator("_logical_or_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalOrScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LogicalOrScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -24963,6 +25327,7 @@ type LogicalOrScalar private (operatorArguments) =
 type LogicalXorScalar private (operatorArguments) = 
     inherit SymbolOperator("_logical_xor_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalXorScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LogicalXorScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     new(data : Symbol,
@@ -25003,6 +25368,7 @@ type LogicalXorScalar private (operatorArguments) =
 type ScatterElemwiseDiv private (operatorArguments) = 
     inherit SymbolOperator("_scatter_elemwise_div", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ScatterElemwiseDiv(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ScatterElemwiseDiv(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Divides arguments element-wise.  If the left-hand-side input is &#39;row_sparse&#39;, then
     /// only the values which exist in the left-hand sparse array are computed.  The &#39;missing&#39; values
     /// are ignored.
@@ -25047,6 +25413,7 @@ type ScatterElemwiseDiv private (operatorArguments) =
 type ScatterPlusScalar private (operatorArguments) = 
     inherit SymbolOperator("_scatter_plus_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ScatterPlusScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ScatterPlusScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Adds a scalar to a tensor element-wise.  If the left-hand-side input is
     /// &#39;row_sparse&#39; or &#39;csr&#39;, then only the values which exist in the left-hand sparse array are computed.
     /// The &#39;missing&#39; values are ignored.
@@ -25111,6 +25478,7 @@ type ScatterPlusScalar private (operatorArguments) =
 type ScatterMinusScalar private (operatorArguments) = 
     inherit SymbolOperator("_scatter_minus_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ScatterMinusScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ScatterMinusScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Subtracts a scalar to a tensor element-wise.  If the left-hand-side input is
     /// &#39;row_sparse&#39; or &#39;csr&#39;, then only the values which exist in the left-hand sparse array are computed.
     /// The &#39;missing&#39; values are ignored.
@@ -25175,6 +25543,7 @@ type ScatterMinusScalar private (operatorArguments) =
 type AddN private (operatorArguments) = 
     inherit SymbolOperator("add_n", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new AddN(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new AddN(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Adds all input arguments element-wise.
     /// 
     /// .. math::
@@ -25213,6 +25582,7 @@ type AddN private (operatorArguments) =
 type Relu private (operatorArguments) = 
     inherit SymbolOperator("relu", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Relu(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Relu(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes rectified linear activation.
     /// 
     /// .. math::
@@ -25249,6 +25619,7 @@ type Relu private (operatorArguments) =
 type Sigmoid private (operatorArguments) = 
     inherit SymbolOperator("sigmoid", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Sigmoid(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Sigmoid(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes sigmoid of x element-wise.
     /// 
     /// .. math::
@@ -25281,6 +25652,7 @@ type Sigmoid private (operatorArguments) =
 type HardSigmoid private (operatorArguments) = 
     inherit SymbolOperator("hard_sigmoid", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new HardSigmoid(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new HardSigmoid(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes hard sigmoid of x element-wise.
     /// 
     /// .. math::
@@ -25333,6 +25705,7 @@ type HardSigmoid private (operatorArguments) =
 type Softsign private (operatorArguments) = 
     inherit SymbolOperator("softsign", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Softsign(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Softsign(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes softsign of x element-wise.
     /// 
     /// .. math::
@@ -25365,6 +25738,7 @@ type Softsign private (operatorArguments) =
 type Copy private (operatorArguments) = 
     inherit SymbolOperator("_copy", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Copy(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Copy(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns a copy of the input.
     /// 
     /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:246</summary>
@@ -25390,6 +25764,7 @@ type Copy private (operatorArguments) =
 type BlockGrad private (operatorArguments) = 
     inherit SymbolOperator("BlockGrad", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BlockGrad(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BlockGrad(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Stops gradient computation.
     /// 
     /// Stops the accumulated gradient of the inputs from flowing through this operator
@@ -25440,6 +25815,7 @@ type BlockGrad private (operatorArguments) =
 type IdentityWithAttrLikeRhs private (operatorArguments) = 
     inherit SymbolOperator("_identity_with_attr_like_rhs", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new IdentityWithAttrLikeRhs(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new IdentityWithAttrLikeRhs(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="lhs">First input.</param>
     /// <param name="rhs">Second input.</param>
     new([<Optional>] ?lhs : Symbol,
@@ -25471,6 +25847,7 @@ type IdentityWithAttrLikeRhs private (operatorArguments) =
 type ReshapeLike private (operatorArguments) = 
     inherit SymbolOperator("reshape_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ReshapeLike(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ReshapeLike(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Reshape some or all dimensions of `lhs` to have the same shape as some or all dimensions of `rhs`.
     /// 
     /// Returns a **view** of the `lhs` array with a new shape without altering any data.
@@ -25574,6 +25951,7 @@ type ReshapeLike private (operatorArguments) =
 type ShapeArray private (operatorArguments) = 
     inherit SymbolOperator("shape_array", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ShapeArray(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ShapeArray(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns a 1D int64 array containing the shape of data.
     /// 
     /// Example::
@@ -25605,6 +25983,7 @@ type ShapeArray private (operatorArguments) =
 type SizeArray private (operatorArguments) = 
     inherit SymbolOperator("size_array", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SizeArray(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SizeArray(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns a 1D int64 array containing the size of data.
     /// 
     /// Example::
@@ -25636,6 +26015,7 @@ type SizeArray private (operatorArguments) =
 type Cast private (operatorArguments) = 
     inherit SymbolOperator("Cast", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Cast(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Cast(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Casts all elements of the input to a new type.
     /// 
     /// .. note:: ``Cast`` is deprecated. Use ``cast`` instead.
@@ -25702,6 +26082,7 @@ type Cast private (operatorArguments) =
 type Negative private (operatorArguments) = 
     inherit SymbolOperator("negative", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Negative(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Negative(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Numerical negative of the argument, element-wise.
     /// 
     /// The storage type of ``negative`` output depends upon the input storage type:
@@ -25733,6 +26114,7 @@ type Negative private (operatorArguments) =
 type Abs private (operatorArguments) = 
     inherit SymbolOperator("abs", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Abs(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Abs(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise absolute value of the input.
     /// 
     /// Example::
@@ -25770,6 +26152,7 @@ type Abs private (operatorArguments) =
 type Sign private (operatorArguments) = 
     inherit SymbolOperator("sign", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Sign(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Sign(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise sign of the input.
     /// 
     /// Example::
@@ -25807,6 +26190,7 @@ type Sign private (operatorArguments) =
 type Round private (operatorArguments) = 
     inherit SymbolOperator("round", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Round(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Round(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise rounded value to the nearest integer of the input.
     /// 
     /// Example::
@@ -25844,6 +26228,7 @@ type Round private (operatorArguments) =
 type Rint private (operatorArguments) = 
     inherit SymbolOperator("rint", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Rint(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Rint(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise rounded value to the nearest integer of the input.
     /// 
     /// .. note::
@@ -25885,6 +26270,7 @@ type Rint private (operatorArguments) =
 type Ceil private (operatorArguments) = 
     inherit SymbolOperator("ceil", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Ceil(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Ceil(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise ceiling of the input.
     /// 
     /// The ceil of the scalar x is the smallest integer i, such that i &gt;= x.
@@ -25924,6 +26310,7 @@ type Ceil private (operatorArguments) =
 type Floor private (operatorArguments) = 
     inherit SymbolOperator("floor", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Floor(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Floor(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise floor of the input.
     /// 
     /// The floor of the scalar x is the largest integer i, such that i &lt;= x.
@@ -25963,6 +26350,7 @@ type Floor private (operatorArguments) =
 type Trunc private (operatorArguments) = 
     inherit SymbolOperator("trunc", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Trunc(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Trunc(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return the element-wise truncated value of the input.
     /// 
     /// The truncated value of the scalar x is the nearest integer i which is closer to
@@ -26003,6 +26391,7 @@ type Trunc private (operatorArguments) =
 type Fix private (operatorArguments) = 
     inherit SymbolOperator("fix", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Fix(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Fix(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise rounded value to the nearest \
     /// integer towards zero of the input.
     /// 
@@ -26041,6 +26430,7 @@ type Fix private (operatorArguments) =
 type Erf private (operatorArguments) = 
     inherit SymbolOperator("erf", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Erf(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Erf(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise gauss error function of the input.
     /// 
     /// Example::
@@ -26072,6 +26462,7 @@ type Erf private (operatorArguments) =
 type Erfinv private (operatorArguments) = 
     inherit SymbolOperator("erfinv", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Erfinv(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Erfinv(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise inverse gauss error function of the input.
     /// 
     /// Example::
@@ -26103,6 +26494,7 @@ type Erfinv private (operatorArguments) =
 type Gamma private (operatorArguments) = 
     inherit SymbolOperator("gamma", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Gamma(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Gamma(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the gamma function (extension of the factorial function \
     /// to the reals), computed element-wise on the input array.
     /// 
@@ -26131,6 +26523,7 @@ type Gamma private (operatorArguments) =
 type Gammaln private (operatorArguments) = 
     inherit SymbolOperator("gammaln", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Gammaln(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Gammaln(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise log of the absolute value of the gamma function \
     /// of the input.
     /// 
@@ -26159,6 +26552,7 @@ type Gammaln private (operatorArguments) =
 type LogicalNot private (operatorArguments) = 
     inherit SymbolOperator("logical_not", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalNot(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LogicalNot(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the result of logical NOT (!) function
     /// 
     /// Example:
@@ -26187,6 +26581,7 @@ type LogicalNot private (operatorArguments) =
 type Exp private (operatorArguments) = 
     inherit SymbolOperator("exp", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Exp(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Exp(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise exponential value of the input.
     /// 
     /// .. math::
@@ -26223,6 +26618,7 @@ type Exp private (operatorArguments) =
 type Log private (operatorArguments) = 
     inherit SymbolOperator("log", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Log(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Log(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise Natural logarithmic value of the input.
     /// 
     /// The natural logarithm is logarithm in base *e*, so that ``log(exp(x)) = x``
@@ -26254,6 +26650,7 @@ type Log private (operatorArguments) =
 type Log10 private (operatorArguments) = 
     inherit SymbolOperator("log10", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Log10(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Log10(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise Base-10 logarithmic value of the input.
     /// 
     /// ``10**log10(x) = x``
@@ -26285,6 +26682,7 @@ type Log10 private (operatorArguments) =
 type Log2 private (operatorArguments) = 
     inherit SymbolOperator("log2", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Log2(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Log2(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise Base-2 logarithmic value of the input.
     /// 
     /// ``2**log2(x) = x``
@@ -26316,6 +26714,7 @@ type Log2 private (operatorArguments) =
 type Log1p private (operatorArguments) = 
     inherit SymbolOperator("log1p", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Log1p(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Log1p(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise ``log(1 + x)`` value of the input.
     /// 
     /// This function is more accurate than ``log(1 + x)``  for small ``x`` so that
@@ -26352,6 +26751,7 @@ type Log1p private (operatorArguments) =
 type Expm1 private (operatorArguments) = 
     inherit SymbolOperator("expm1", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Expm1(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Expm1(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns ``exp(x) - 1`` computed element-wise on the input.
     /// 
     /// This function provides greater precision than ``exp(x) - 1`` for small values of ``x``.
@@ -26387,6 +26787,7 @@ type Expm1 private (operatorArguments) =
 type Reciprocal private (operatorArguments) = 
     inherit SymbolOperator("reciprocal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Reciprocal(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Reciprocal(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the reciprocal of the argument, element-wise.
     /// 
     /// Calculates 1/x.
@@ -26420,6 +26821,7 @@ type Reciprocal private (operatorArguments) =
 type Square private (operatorArguments) = 
     inherit SymbolOperator("square", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Square(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Square(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise squared value of the input.
     /// 
     /// .. math::
@@ -26460,6 +26862,7 @@ type Square private (operatorArguments) =
 type Sqrt private (operatorArguments) = 
     inherit SymbolOperator("sqrt", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Sqrt(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Sqrt(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise square-root value of the input.
     /// 
     /// .. math::
@@ -26500,6 +26903,7 @@ type Sqrt private (operatorArguments) =
 type Rsqrt private (operatorArguments) = 
     inherit SymbolOperator("rsqrt", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Rsqrt(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Rsqrt(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise inverse square-root value of the input.
     /// 
     /// .. math::
@@ -26536,6 +26940,7 @@ type Rsqrt private (operatorArguments) =
 type Cbrt private (operatorArguments) = 
     inherit SymbolOperator("cbrt", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Cbrt(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Cbrt(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise cube-root value of the input.
     /// 
     /// .. math::
@@ -26576,6 +26981,7 @@ type Cbrt private (operatorArguments) =
 type Rcbrt private (operatorArguments) = 
     inherit SymbolOperator("rcbrt", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Rcbrt(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Rcbrt(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise inverse cube-root value of the input.
     /// 
     /// .. math::
@@ -26610,6 +27016,7 @@ type Rcbrt private (operatorArguments) =
 type Sin private (operatorArguments) = 
     inherit SymbolOperator("sin", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Sin(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Sin(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the element-wise sine of the input array.
     /// 
     /// The input should be in radians (:math:`2\pi` rad equals 360 degrees).
@@ -26648,6 +27055,7 @@ type Sin private (operatorArguments) =
 type Cos private (operatorArguments) = 
     inherit SymbolOperator("cos", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Cos(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Cos(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the element-wise cosine of the input array.
     /// 
     /// The input should be in radians (:math:`2\pi` rad equals 360 degrees).
@@ -26682,6 +27090,7 @@ type Cos private (operatorArguments) =
 type Tan private (operatorArguments) = 
     inherit SymbolOperator("tan", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Tan(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Tan(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the element-wise tangent of the input array.
     /// 
     /// The input should be in radians (:math:`2\pi` rad equals 360 degrees).
@@ -26720,6 +27129,7 @@ type Tan private (operatorArguments) =
 type Arcsin private (operatorArguments) = 
     inherit SymbolOperator("arcsin", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Arcsin(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Arcsin(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise inverse sine of the input array.
     /// 
     /// The input should be in the range `[-1, 1]`.
@@ -26759,6 +27169,7 @@ type Arcsin private (operatorArguments) =
 type Arccos private (operatorArguments) = 
     inherit SymbolOperator("arccos", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Arccos(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Arccos(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise inverse cosine of the input array.
     /// 
     /// The input should be in range `[-1, 1]`.
@@ -26794,6 +27205,7 @@ type Arccos private (operatorArguments) =
 type Arctan private (operatorArguments) = 
     inherit SymbolOperator("arctan", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Arctan(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Arctan(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns element-wise inverse tangent of the input array.
     /// 
     /// The output is in the closed interval :math:`[-\pi/2, \pi/2]`
@@ -26832,6 +27244,7 @@ type Arctan private (operatorArguments) =
 type Degrees private (operatorArguments) = 
     inherit SymbolOperator("degrees", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Degrees(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Degrees(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Converts each element of the input array from radians to degrees.
     /// 
     /// .. math::
@@ -26868,6 +27281,7 @@ type Degrees private (operatorArguments) =
 type Radians private (operatorArguments) = 
     inherit SymbolOperator("radians", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Radians(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Radians(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Converts each element of the input array from degrees to radians.
     /// 
     /// .. math::
@@ -26904,6 +27318,7 @@ type Radians private (operatorArguments) =
 type Sinh private (operatorArguments) = 
     inherit SymbolOperator("sinh", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Sinh(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Sinh(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the hyperbolic sine of the input array, computed element-wise.
     /// 
     /// .. math::
@@ -26940,6 +27355,7 @@ type Sinh private (operatorArguments) =
 type Cosh private (operatorArguments) = 
     inherit SymbolOperator("cosh", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Cosh(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Cosh(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the hyperbolic cosine  of the input array, computed element-wise.
     /// 
     /// .. math::
@@ -26972,6 +27388,7 @@ type Cosh private (operatorArguments) =
 type Tanh private (operatorArguments) = 
     inherit SymbolOperator("tanh", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Tanh(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Tanh(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the hyperbolic tangent of the input array, computed element-wise.
     /// 
     /// .. math::
@@ -27008,6 +27425,7 @@ type Tanh private (operatorArguments) =
 type Arcsinh private (operatorArguments) = 
     inherit SymbolOperator("arcsinh", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Arcsinh(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Arcsinh(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the element-wise inverse hyperbolic sine of the input array, \
     /// computed element-wise.
     /// 
@@ -27042,6 +27460,7 @@ type Arcsinh private (operatorArguments) =
 type Arccosh private (operatorArguments) = 
     inherit SymbolOperator("arccosh", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Arccosh(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Arccosh(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the element-wise inverse hyperbolic cosine of the input array, \
     /// computed element-wise.
     /// 
@@ -27072,6 +27491,7 @@ type Arccosh private (operatorArguments) =
 type Arctanh private (operatorArguments) = 
     inherit SymbolOperator("arctanh", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Arctanh(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Arctanh(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the element-wise inverse hyperbolic tangent of the input array, \
     /// computed element-wise.
     /// 
@@ -27106,6 +27526,7 @@ type Arctanh private (operatorArguments) =
 type Histogram private (operatorArguments) = 
     inherit SymbolOperator("_histogram", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Histogram(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Histogram(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>This operators implements the histogram function.
     /// 
     /// Example::
@@ -27172,6 +27593,7 @@ type Histogram private (operatorArguments) =
 type Embedding private (operatorArguments) = 
     inherit SymbolOperator("Embedding", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Embedding(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Embedding(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Maps integer indices to vector representations (embeddings).
     /// 
     /// This operator maps words to real-valued vectors in a high-dimensional space,
@@ -27371,6 +27793,7 @@ type Embedding private (operatorArguments) =
 type ContribSparseEmbedding private (operatorArguments) = 
     inherit SymbolOperator("_contrib_SparseEmbedding", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribSparseEmbedding(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribSparseEmbedding(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Maps integer indices to vector representations (embeddings).
     /// 
     /// note:: ``contrib.SparseEmbedding`` is deprecated, use ``Embedding`` instead.
@@ -27566,6 +27989,7 @@ type ContribSparseEmbedding private (operatorArguments) =
 type Take private (operatorArguments) = 
     inherit SymbolOperator("take", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Take(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Take(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Takes elements from an input array along the given axis.
     /// 
     /// This function slices the input array along a particular axis with the provided indices.
@@ -27671,6 +28095,7 @@ type Take private (operatorArguments) =
 type BatchTake private (operatorArguments) = 
     inherit SymbolOperator("batch_take", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BatchTake(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BatchTake(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Takes elements from a data batch.
     /// 
     /// .. note::
@@ -27724,6 +28149,7 @@ type BatchTake private (operatorArguments) =
 type OneHot private (operatorArguments) = 
     inherit SymbolOperator("one_hot", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new OneHot(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new OneHot(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns a one-hot array.
     /// 
     /// The locations represented by `indices` take value `on_value`, while all
@@ -27876,6 +28302,7 @@ type OneHot private (operatorArguments) =
 type GatherNd private (operatorArguments) = 
     inherit SymbolOperator("gather_nd", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new GatherNd(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new GatherNd(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Gather elements or slices from `data` and store to a tensor whose
     /// shape is defined by `indices`.
     /// 
@@ -27932,6 +28359,7 @@ type GatherNd private (operatorArguments) =
 type ScatterNd private (operatorArguments) = 
     inherit SymbolOperator("scatter_nd", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ScatterNd(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ScatterNd(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Scatters data into a new tensor according to indices.
     /// 
     /// Given `data` with shape `(Y_0, ..., Y_{K-1}, X_M, ..., X_{N-1})` and indices with shape
@@ -28072,6 +28500,7 @@ type ScatterNd private (operatorArguments) =
 type ScatterSetNd private (operatorArguments) = 
     inherit SymbolOperator("_scatter_set_nd", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ScatterSetNd(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ScatterSetNd(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>This operator has the same functionality as scatter_nd
     /// except that it does not reset the elements not indexed by the input
     /// index `NDArray` in the input data `NDArray`. output should be explicitly
@@ -28168,6 +28597,7 @@ type ScatterSetNd private (operatorArguments) =
 type ZerosWithoutDtype private (operatorArguments) = 
     inherit SymbolOperator("_zeros_without_dtype", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ZerosWithoutDtype(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ZerosWithoutDtype(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>fill target with zeros without default dtype</summary>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
@@ -28204,6 +28634,7 @@ type ZerosWithoutDtype private (operatorArguments) =
 type Zeros private (operatorArguments) = 
     inherit SymbolOperator("_zeros", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Zeros(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Zeros(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>fill target with zeros</summary>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
@@ -28240,6 +28671,7 @@ type Zeros private (operatorArguments) =
 type Eye private (operatorArguments) = 
     inherit SymbolOperator("_eye", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Eye(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Eye(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return a 2-D array with ones on the diagonal and zeros elsewhere.</summary>
     /// <param name="N">Number of rows in the output.</param>
     /// <param name="M">Number of columns in the output. If 0, defaults to N</param>
@@ -28295,6 +28727,7 @@ type Eye private (operatorArguments) =
 type Ones private (operatorArguments) = 
     inherit SymbolOperator("_ones", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Ones(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Ones(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>fill target with ones</summary>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
@@ -28331,6 +28764,7 @@ type Ones private (operatorArguments) =
 type Full private (operatorArguments) = 
     inherit SymbolOperator("_full", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Full(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Full(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>fill target with a scalar value</summary>
     /// <param name="value">Value with which to fill newly created tensor</param>
     /// <param name="shape">The shape of the output</param>
@@ -28375,6 +28809,7 @@ type Full private (operatorArguments) =
 type Arange private (operatorArguments) = 
     inherit SymbolOperator("_arange", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Arange(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Arange(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return evenly spaced values within a given interval. Similar to Numpy</summary>
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
@@ -28452,6 +28887,7 @@ type Arange private (operatorArguments) =
 type ContribArangeLike private (operatorArguments) = 
     inherit SymbolOperator("_contrib_arange_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribArangeLike(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribArangeLike(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return an array with evenly spaced values. If axis is not given, the output will 
     /// have the same shape as the input array. Otherwise, the output will be a 1-D array with size of 
     /// the specified axis in input shape.
@@ -28541,6 +28977,7 @@ type ContribArangeLike private (operatorArguments) =
 type Linspace private (operatorArguments) = 
     inherit SymbolOperator("_linspace", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Linspace(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Linspace(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return evenly spaced numbers over a specified interval. Similar to Numpy</summary>
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
@@ -28618,6 +29055,7 @@ type Linspace private (operatorArguments) =
 type ZerosLike private (operatorArguments) = 
     inherit SymbolOperator("zeros_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ZerosLike(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ZerosLike(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return an array of zeros with the same shape, type and storage type
     /// as the input array.
     /// 
@@ -28658,6 +29096,7 @@ type ZerosLike private (operatorArguments) =
 type OnesLike private (operatorArguments) = 
     inherit SymbolOperator("ones_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new OnesLike(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new OnesLike(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Return an array of ones with the same shape and type
     /// as the input array.
     /// 
@@ -28692,6 +29131,7 @@ type OnesLike private (operatorArguments) =
 type LinalgGemm private (operatorArguments) = 
     inherit SymbolOperator("_linalg_gemm", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgGemm(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgGemm(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Performs general matrix multiplication and accumulation.
     /// Input are tensors *A*, *B*, *C*, each of dimension *n &gt;= 2* and having the same shape
     /// on the leading *n-2* dimensions.
@@ -28837,6 +29277,7 @@ type LinalgGemm private (operatorArguments) =
 type LinalgGemm2 private (operatorArguments) = 
     inherit SymbolOperator("_linalg_gemm2", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgGemm2(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgGemm2(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Performs general matrix multiplication.
     /// Input are tensors *A*, *B*, each of dimension *n &gt;= 2* and having the same shape
     /// on the leading *n-2* dimensions.
@@ -28959,6 +29400,7 @@ type LinalgGemm2 private (operatorArguments) =
 type LinalgPotrf private (operatorArguments) = 
     inherit SymbolOperator("_linalg_potrf", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgPotrf(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgPotrf(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Performs Cholesky factorization of a symmetric positive-definite matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -29008,6 +29450,7 @@ type LinalgPotrf private (operatorArguments) =
 type LinalgPotri private (operatorArguments) = 
     inherit SymbolOperator("_linalg_potri", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgPotri(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgPotri(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Performs matrix inversion from a Cholesky factorization.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -29066,6 +29509,7 @@ type LinalgPotri private (operatorArguments) =
 type LinalgTrmm private (operatorArguments) = 
     inherit SymbolOperator("_linalg_trmm", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgTrmm(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgTrmm(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Performs multiplication with a lower triangular matrix.
     /// Input are tensors *A*, *B*, each of dimension *n &gt;= 2* and having the same shape
     /// on the leading *n-2* dimensions.
@@ -29177,6 +29621,7 @@ type LinalgTrmm private (operatorArguments) =
 type LinalgTrsm private (operatorArguments) = 
     inherit SymbolOperator("_linalg_trsm", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgTrsm(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgTrsm(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Solves matrix equation involving a lower triangular matrix.
     /// Input are tensors *A*, *B*, each of dimension *n &gt;= 2* and having the same shape
     /// on the leading *n-2* dimensions.
@@ -29289,6 +29734,7 @@ type LinalgTrsm private (operatorArguments) =
 type LinalgSumlogdiag private (operatorArguments) = 
     inherit SymbolOperator("_linalg_sumlogdiag", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgSumlogdiag(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgSumlogdiag(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the sum of the logarithms of the diagonal elements of a square matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -29334,6 +29780,7 @@ type LinalgSumlogdiag private (operatorArguments) =
 type LinalgExtractdiag private (operatorArguments) = 
     inherit SymbolOperator("_linalg_extractdiag", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgExtractdiag(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgExtractdiag(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Extracts the diagonal entries of a square matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -29397,6 +29844,7 @@ type LinalgExtractdiag private (operatorArguments) =
 type LinalgMakediag private (operatorArguments) = 
     inherit SymbolOperator("_linalg_makediag", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgMakediag(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgMakediag(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Constructs a square matrix with the input as diagonal.
     /// Input is a tensor *A* of dimension *n &gt;= 1*.
     /// 
@@ -29461,6 +29909,7 @@ type LinalgMakediag private (operatorArguments) =
 type LinalgExtracttrian private (operatorArguments) = 
     inherit SymbolOperator("_linalg_extracttrian", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgExtracttrian(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgExtracttrian(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Extracts a triangular sub-matrix from a square matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -29542,6 +29991,7 @@ type LinalgExtracttrian private (operatorArguments) =
 type LinalgMaketrian private (operatorArguments) = 
     inherit SymbolOperator("_linalg_maketrian", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgMaketrian(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgMaketrian(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Constructs a square matrix with the input representing a specific triangular sub-matrix.
     /// This is basically the inverse of *linalg.extracttrian*. Input is a tensor *A* of dimension *n &gt;= 1*.
     /// 
@@ -29633,6 +30083,7 @@ type LinalgMaketrian private (operatorArguments) =
 type LinalgSyrk private (operatorArguments) = 
     inherit SymbolOperator("_linalg_syrk", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgSyrk(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgSyrk(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Multiplication of matrix with its transpose.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -29713,6 +30164,7 @@ type LinalgSyrk private (operatorArguments) =
 type LinalgGelqf private (operatorArguments) = 
     inherit SymbolOperator("_linalg_gelqf", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgGelqf(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgGelqf(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>LQ factorization for general matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -29782,6 +30234,7 @@ type LinalgGelqf private (operatorArguments) =
 type LinalgSyevd private (operatorArguments) = 
     inherit SymbolOperator("_linalg_syevd", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgSyevd(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgSyevd(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Eigendecomposition for symmetric matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -29850,6 +30303,7 @@ type LinalgSyevd private (operatorArguments) =
 type LinalgInverse private (operatorArguments) = 
     inherit SymbolOperator("_linalg_inverse", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgInverse(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgInverse(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Compute the inverse of a matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -29898,6 +30352,7 @@ type LinalgInverse private (operatorArguments) =
 type LinalgDet private (operatorArguments) = 
     inherit SymbolOperator("_linalg_det", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgDet(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgDet(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Compute the determinant of a matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -29949,6 +30404,7 @@ type LinalgDet private (operatorArguments) =
 type LinalgSlogdet private (operatorArguments) = 
     inherit SymbolOperator("_linalg_slogdet", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new LinalgSlogdet(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new LinalgSlogdet(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Compute the sign and log of the determinant of a matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -30006,6 +30462,7 @@ type LinalgSlogdet private (operatorArguments) =
 type Reshape private (operatorArguments) = 
     inherit SymbolOperator("Reshape", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Reshape(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Reshape(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Reshapes the input array.
     /// 
     /// .. note:: ``Reshape`` is deprecated, use ``reshape``
@@ -30136,6 +30593,7 @@ type Reshape private (operatorArguments) =
 type Transpose private (operatorArguments) = 
     inherit SymbolOperator("transpose", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Transpose(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Transpose(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Permutes the dimensions of an array.
     /// 
     /// Examples::
@@ -30199,6 +30657,7 @@ type Transpose private (operatorArguments) =
 type ExpandDims private (operatorArguments) = 
     inherit SymbolOperator("expand_dims", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ExpandDims(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ExpandDims(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Inserts a new axis of size 1 into the array shape
     /// 
     /// For example, given ``x`` with shape ``(2,3,4)``, then ``expand_dims(x, axis=1)``
@@ -30255,6 +30714,7 @@ type ExpandDims private (operatorArguments) =
 type Slice private (operatorArguments) = 
     inherit SymbolOperator("slice", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Slice(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Slice(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Slices a region of the array.
     /// 
     /// .. note:: ``crop`` is deprecated. Use ``slice`` instead.
@@ -30414,6 +30874,7 @@ type Slice private (operatorArguments) =
 type SliceAssign private (operatorArguments) = 
     inherit SymbolOperator("_slice_assign", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SliceAssign(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SliceAssign(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Assign the rhs to a cropped subset of lhs.
     /// 
     /// Requirements
@@ -30509,6 +30970,7 @@ type SliceAssign private (operatorArguments) =
 type SliceAssignScalar private (operatorArguments) = 
     inherit SymbolOperator("_slice_assign_scalar", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SliceAssignScalar(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SliceAssignScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>(Assign the scalar to a cropped subset of the input.
     /// 
     /// Requirements
@@ -30604,6 +31066,7 @@ type SliceAssignScalar private (operatorArguments) =
 type SliceAxis private (operatorArguments) = 
     inherit SymbolOperator("slice_axis", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SliceAxis(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SliceAxis(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Slices along a given axis.
     /// 
     /// Returns an array slice along a given `axis` starting from the `begin` index
@@ -30717,6 +31180,7 @@ type SliceAxis private (operatorArguments) =
 type SliceLike private (operatorArguments) = 
     inherit SymbolOperator("slice_like", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SliceLike(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SliceLike(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Slices a region of the array like the shape of another array.
     /// 
     /// This function is similar to ``slice``, however, the `begin` are always `0`s
@@ -30812,6 +31276,7 @@ type SliceLike private (operatorArguments) =
 type Clip private (operatorArguments) = 
     inherit SymbolOperator("clip", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Clip(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Clip(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Clips (limits) the values in an array.
     /// 
     /// Given an interval, values outside the interval are clipped to the interval edges.
@@ -30921,6 +31386,7 @@ type Clip private (operatorArguments) =
 type Repeat private (operatorArguments) = 
     inherit SymbolOperator("repeat", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Repeat(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Repeat(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Repeats elements of an array.
     /// 
     /// By default, ``repeat`` flattens the input array into 1-D and then repeats the
@@ -31027,6 +31493,7 @@ type Repeat private (operatorArguments) =
 type Tile private (operatorArguments) = 
     inherit SymbolOperator("tile", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Tile(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Tile(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Repeats the whole array multiple times.
     /// 
     /// If ``reps`` has length *d*, and input array has dimension of *n*. There are
@@ -31141,6 +31608,7 @@ type Tile private (operatorArguments) =
 type Reverse private (operatorArguments) = 
     inherit SymbolOperator("reverse", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Reverse(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Reverse(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Reverses the order of elements along given axis while preserving array shape.
     /// 
     /// Note: reverse and flip are equivalent. We use reverse in the following examples.
@@ -31215,6 +31683,7 @@ type Reverse private (operatorArguments) =
 type Stack private (operatorArguments) = 
     inherit SymbolOperator("stack", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Stack(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Stack(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Join a sequence of arrays along a new axis.
     /// 
     /// The axis parameter specifies the index of the new axis in the dimensions of the
@@ -31264,6 +31733,7 @@ type Stack private (operatorArguments) =
 type Squeeze private (operatorArguments) = 
     inherit SymbolOperator("squeeze", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Squeeze(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Squeeze(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Remove single-dimensional entries from the shape of an array.
     /// Same behavior of defining the output tensor shape as numpy.squeeze for the most of cases.
     /// See the following note for exception.
@@ -31313,6 +31783,7 @@ type Squeeze private (operatorArguments) =
 type DepthToSpace private (operatorArguments) = 
     inherit SymbolOperator("depth_to_space", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new DepthToSpace(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new DepthToSpace(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Rearranges(permutes) data from depth into blocks of spatial data.
     /// Similar to ONNX DepthToSpace operator:
     /// https://github.com/onnx/onnx/blob/master/docs/Operators.md#DepthToSpace.
@@ -31423,6 +31894,7 @@ type DepthToSpace private (operatorArguments) =
 type SpaceToDepth private (operatorArguments) = 
     inherit SymbolOperator("space_to_depth", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SpaceToDepth(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SpaceToDepth(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Rearranges(permutes) blocks of spatial data into depth.
     /// Similar to ONNX SpaceToDepth operator:
     /// https://github.com/onnx/onnx/blob/master/docs/Operators.md#SpaceToDepth 
@@ -31537,6 +32009,7 @@ type SpaceToDepth private (operatorArguments) =
 type SplitV2 private (operatorArguments) = 
     inherit SymbolOperator("_split_v2", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SplitV2(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SplitV2(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Splits an array along a particular axis into multiple sub-arrays.
     /// 
     /// Example::
@@ -31757,6 +32230,7 @@ type SplitV2 private (operatorArguments) =
 type SplitV2Backward private (operatorArguments) = 
     inherit SymbolOperator("_split_v2_backward", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SplitV2Backward(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SplitV2Backward(this.OperatorArguments.AddReplace(args)) :> Symbol
     new() =
         let operatorArguments = 
             [
@@ -31766,6 +32240,7 @@ type SplitV2Backward private (operatorArguments) =
 type Topk private (operatorArguments) = 
     inherit SymbolOperator("topk", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Topk(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Topk(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the top *k* elements in an input array along the given axis.
     ///  The returned elements will be sorted.
     /// 
@@ -31877,6 +32352,7 @@ type Topk private (operatorArguments) =
 type Sort private (operatorArguments) = 
     inherit SymbolOperator("sort", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Sort(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Sort(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns a sorted copy of an input array along the given axis.
     /// 
     /// Examples::
@@ -31946,6 +32422,7 @@ type Sort private (operatorArguments) =
 type Argsort private (operatorArguments) = 
     inherit SymbolOperator("argsort", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Argsort(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Argsort(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Returns the indices that would sort an input array along the given axis.
     /// 
     /// This function performs sorting along the given axis and returns an array of indices having same shape
@@ -32024,6 +32501,7 @@ type Argsort private (operatorArguments) =
 type RavelMultiIndex private (operatorArguments) = 
     inherit SymbolOperator("_ravel_multi_index", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new RavelMultiIndex(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new RavelMultiIndex(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Converts a batch of index arrays into an array of flat indices. The operator follows numpy conventions so a single multi index is given by a column of the input matrix. The leading dimension may be left unspecified by using -1 as placeholder.  
     /// 
     /// Examples::
@@ -32068,6 +32546,7 @@ type RavelMultiIndex private (operatorArguments) =
 type UnravelIndex private (operatorArguments) = 
     inherit SymbolOperator("_unravel_index", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new UnravelIndex(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new UnravelIndex(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Converts an array of flat indices into a batch of index arrays. The operator follows numpy conventions so a single multi index is given by a column of the output matrix. The leading dimension may be left unspecified by using -1 as placeholder.  
     /// 
     /// Examples::
@@ -32112,6 +32591,7 @@ type UnravelIndex private (operatorArguments) =
 type SparseRetain private (operatorArguments) = 
     inherit SymbolOperator("_sparse_retain", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SparseRetain(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SparseRetain(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Pick rows specified by user input index array from a row sparse matrix
     /// and save them in the output sparse matrix.
     /// 
@@ -32165,6 +32645,7 @@ type SparseRetain private (operatorArguments) =
 type SquareSum private (operatorArguments) = 
     inherit SymbolOperator("_square_sum", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SquareSum(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SquareSum(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes the square sum of array elements over a given axis
     /// for row-sparse matrix. This is a temporary solution for fusing ops square and
     /// sum together for row-sparse matrix to save memory for storing gradients.
@@ -32287,6 +32768,7 @@ type SquareSum private (operatorArguments) =
 type BilinearSampler private (operatorArguments) = 
     inherit SymbolOperator("BilinearSampler", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new BilinearSampler(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new BilinearSampler(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Applies bilinear sampling to input feature map.
     /// 
     /// Bilinear Sampling is the key of  [NIPS2015] \&quot;Spatial Transformer Networks\&quot;. The usage of the operator is very similar to remap function in OpenCV,
@@ -32403,6 +32885,7 @@ type BilinearSampler private (operatorArguments) =
 type ContribCountSketch private (operatorArguments) = 
     inherit SymbolOperator("_contrib_count_sketch", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribCountSketch(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribCountSketch(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Apply CountSketch to input: map a d-dimension data to k-dimension data&quot;
     /// 
     /// .. note:: `count_sketch` is only available on GPU.
@@ -32529,6 +33012,7 @@ type ContribCountSketch private (operatorArguments) =
 type ContribDeformableConvolution private (operatorArguments) = 
     inherit SymbolOperator("_contrib_DeformableConvolution", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDeformableConvolution(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribDeformableConvolution(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Compute 2-D deformable convolution on 4-D input.
     /// 
     /// The deformable convolution operation is described in https://arxiv.org/abs/1703.06211
@@ -32823,6 +33307,7 @@ type ContribDeformableConvolution private (operatorArguments) =
 type ContribDeformablePSROIPooling private (operatorArguments) = 
     inherit SymbolOperator("_contrib_DeformablePSROIPooling", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDeformablePSROIPooling(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribDeformablePSROIPooling(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Performs deformable position-sensitive region-of-interest pooling on inputs.
     /// The DeformablePSROIPooling operation is described in https://arxiv.org/abs/1703.06211 .batch_size will change to the number of region bounding boxes after DeformablePSROIPooling</summary>
     /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
@@ -32980,6 +33465,7 @@ type ContribDeformablePSROIPooling private (operatorArguments) =
 type ContribFft private (operatorArguments) = 
     inherit SymbolOperator("_contrib_fft", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribFft(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribFft(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Apply 1D FFT to input&quot;
     /// 
     /// .. note:: `fft` is only available on GPU.
@@ -33028,6 +33514,7 @@ type ContribFft private (operatorArguments) =
 type ContribIfft private (operatorArguments) = 
     inherit SymbolOperator("_contrib_ifft", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribIfft(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribIfft(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Apply 1D ifft to input&quot;
     /// 
     /// .. note:: `ifft` is only available on GPU.
@@ -33077,6 +33564,7 @@ type ContribIfft private (operatorArguments) =
 type ContribMultiProposal private (operatorArguments) = 
     inherit SymbolOperator("_contrib_MultiProposal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribMultiProposal(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribMultiProposal(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Generate region proposals via RPN</summary>
     /// <param name="clsProb">Score of how likely proposal is object.</param>
     /// <param name="bboxPred">BBox Predicted deltas from anchors for proposals</param>
@@ -33217,6 +33705,7 @@ type ContribMultiProposal private (operatorArguments) =
 type ContribProposal private (operatorArguments) = 
     inherit SymbolOperator("_contrib_Proposal", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribProposal(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribProposal(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Generate region proposals via RPN</summary>
     /// <param name="clsProb">Score of how likely proposal is object.</param>
     /// <param name="bboxPred">BBox Predicted deltas from anchors for proposals</param>
@@ -33357,6 +33846,7 @@ type ContribProposal private (operatorArguments) =
 type ContribPSROIPooling private (operatorArguments) = 
     inherit SymbolOperator("_contrib_PSROIPooling", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ContribPSROIPooling(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ContribPSROIPooling(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Performs region-of-interest pooling on inputs. Resize bounding box coordinates by spatial_scale and crop input feature maps accordingly. The cropped feature maps are pooled by max pooling to a fixed size output indicated by pooled_size. batch_size will change to the number of region bounding boxes after PSROIPooling</summary>
     /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
     /// <param name="rois">Bounding box coordinates, a 2D array of [[batch_index, x1, y1, x2, y2]]. (x1, y1) and (x2, y2) are top left and down right corners of designated region of interest. batch_index indicates the index of corresponding image in the input data</param>
@@ -33447,6 +33937,7 @@ type ContribPSROIPooling private (operatorArguments) =
 type ConvolutionV1 private (operatorArguments) = 
     inherit SymbolOperator("Convolution_v1", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new ConvolutionV1(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new ConvolutionV1(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>This operator is DEPRECATED. Apply convolution to input then add a bias.</summary>
     /// <param name="data">Input data to the ConvolutionV1Op.</param>
     /// <param name="weight">Weight matrix.</param>
@@ -33695,6 +34186,7 @@ type ConvolutionV1 private (operatorArguments) =
 type Correlation private (operatorArguments) = 
     inherit SymbolOperator("Correlation", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Correlation(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Correlation(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Applies correlation to inputs.
     /// 
     /// The correlation layer performs multiplicative patch comparisons between two feature maps.
@@ -33826,6 +34318,7 @@ type Correlation private (operatorArguments) =
 type CrossDeviceCopy private (operatorArguments) = 
     inherit SymbolOperator("_CrossDeviceCopy", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new CrossDeviceCopy(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new CrossDeviceCopy(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Special op to copy data cross device</summary>
     new() =
         let operatorArguments = 
@@ -33836,6 +34329,7 @@ type CrossDeviceCopy private (operatorArguments) =
 type GridGenerator private (operatorArguments) = 
     inherit SymbolOperator("GridGenerator", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new GridGenerator(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new GridGenerator(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Generates 2D sampling grid for bilinear sampling.</summary>
     /// <param name="data">Input data to the function.</param>
     /// <param name="transformType">The type of transformation. For `affine`, input data should be an affine matrix of size (batch, 6). For `warp`, input data should be an optical flow of size (batch, 2, h, w).</param>
@@ -33892,6 +34386,7 @@ type GridGenerator private (operatorArguments) =
 type InstanceNorm private (operatorArguments) = 
     inherit SymbolOperator("InstanceNorm", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new InstanceNorm(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new InstanceNorm(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Applies instance normalization to the n-dimensional input array.
     /// 
     /// This operator takes an n-dimensional input array where (n&gt;2) and normalizes
@@ -33985,6 +34480,7 @@ type InstanceNorm private (operatorArguments) =
 type L2Normalization private (operatorArguments) = 
     inherit SymbolOperator("L2Normalization", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new L2Normalization(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new L2Normalization(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Normalize the input array using the L2 norm.
     /// 
     /// For 1-D NDArray, it computes::
@@ -34084,6 +34580,7 @@ type L2Normalization private (operatorArguments) =
 type MakeLoss private (operatorArguments) = 
     inherit SymbolOperator("MakeLoss", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new MakeLoss(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new MakeLoss(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Make your own loss function in network construction.
     /// 
     /// This operator accepts a customized loss function symbol as a terminal loss and
@@ -34163,6 +34660,7 @@ type MakeLoss private (operatorArguments) =
 type SequenceLast private (operatorArguments) = 
     inherit SymbolOperator("SequenceLast", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SequenceLast(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SequenceLast(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Takes the last element of a sequence.
     /// 
     /// This function takes an n-dimensional input array of the form
@@ -34263,6 +34761,7 @@ type SequenceLast private (operatorArguments) =
 type SequenceReverse private (operatorArguments) = 
     inherit SymbolOperator("SequenceReverse", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SequenceReverse(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SequenceReverse(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Reverses the elements of each sequence.
     /// 
     /// This function takes an n-dimensional input array of the form [max_sequence_length, batch_size, other_feature_dims]
@@ -34384,6 +34883,7 @@ type SequenceReverse private (operatorArguments) =
 type SpatialTransformer private (operatorArguments) = 
     inherit SymbolOperator("SpatialTransformer", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SpatialTransformer(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SpatialTransformer(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Applies a spatial transformer to input feature map.</summary>
     /// <param name="data">Input data to the SpatialTransformerOp.</param>
     /// <param name="loc">localisation net, the output dim should be 6 when transform_type is affine. You shold initialize the weight and bias with identity tranform.</param>
@@ -34477,6 +34977,7 @@ type SpatialTransformer private (operatorArguments) =
 type SVMOutput private (operatorArguments) = 
     inherit SymbolOperator("SVMOutput", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SVMOutput(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SVMOutput(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Computes support vector machine based transformation of the input.
     /// 
     /// This tutorial demonstrates using SVM as output layer for classification instead of softmax:
@@ -34547,6 +35048,7 @@ type SVMOutput private (operatorArguments) =
 type SetValue private (operatorArguments) = 
     inherit SymbolOperator("_set_value", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new SetValue(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new SetValue(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <param name="src">Source input to the function.</param>
     new(src : double) =
         let operatorArguments = 
@@ -34568,6 +35070,7 @@ type SetValue private (operatorArguments) =
 type Imdecode private (operatorArguments) = 
     inherit SymbolOperator("_imdecode", operatorArguments)
     static member CreateFromArguments(args : Arguments<Symbol>) = new Imdecode(args)
+    override this.WithArguments(args : Arguments<Symbol>) = new Imdecode(this.OperatorArguments.AddReplace(args)) :> Symbol
     /// <summary>Decode an image, clip to (x0, y0, x1, y1), subtract mean, and write to buffer</summary>
     /// <param name="mean">image mean</param>
     /// <param name="index">buffer position for output</param>

@@ -6,6 +6,7 @@ open MXNetSharp.Interop
 [<AutoOpen>]
 module GeneratedArgumentTypes = 
 
+    [<RequireQualifiedAccess>]
     type ContribBilinearResize2DMode = 
         | Like
         | OddScale
@@ -24,6 +25,7 @@ module GeneratedArgumentTypes =
                 | ToOddDown -> "to_odd_down"
                 | ToOddUp -> "to_odd_up"
     
+    [<RequireQualifiedAccess>]
     type Format = 
         | Center
         | Corner
@@ -32,6 +34,7 @@ module GeneratedArgumentTypes =
                 | Center -> "center"
                 | Corner -> "corner"
     
+    [<RequireQualifiedAccess>]
     type LeakyReLUType = 
         | Elu
         | Gelu
@@ -48,6 +51,7 @@ module GeneratedArgumentTypes =
                 | Rrelu -> "rrelu"
                 | Selu -> "selu"
     
+    [<RequireQualifiedAccess>]
     type ActType = 
         | Relu
         | Sigmoid
@@ -62,6 +66,7 @@ module GeneratedArgumentTypes =
                 | Softsign -> "softsign"
                 | Tanh -> "tanh"
     
+    [<RequireQualifiedAccess>]
     type CudnnTune = 
         | Fastest
         | LimitedWorkspace
@@ -72,6 +77,7 @@ module GeneratedArgumentTypes =
                 | LimitedWorkspace -> "limited_workspace"
                 | Off -> "off"
     
+    [<RequireQualifiedAccess>]
     type ConvolutionLayout = 
         | NCDHW
         | NCHW
@@ -86,6 +92,7 @@ module GeneratedArgumentTypes =
                 | NDHWC -> "NDHWC"
                 | NHWC -> "NHWC"
     
+    [<RequireQualifiedAccess>]
     type BlankLabel = 
         | First
         | Last
@@ -94,6 +101,7 @@ module GeneratedArgumentTypes =
                 | First -> "first"
                 | Last -> "last"
     
+    [<RequireQualifiedAccess>]
     type DeconvolutionLayout = 
         | NCDHW
         | NCHW
@@ -108,6 +116,7 @@ module GeneratedArgumentTypes =
                 | NDHWC -> "NDHWC"
                 | NHWC -> "NHWC"
     
+    [<RequireQualifiedAccess>]
     type DropoutMode = 
         | Always
         | Training
@@ -116,6 +125,7 @@ module GeneratedArgumentTypes =
                 | Always -> "always"
                 | Training -> "training"
     
+    [<RequireQualifiedAccess>]
     type FloatDType = 
         | Float16
         | Float32
@@ -126,6 +136,7 @@ module GeneratedArgumentTypes =
                 | Float32 -> "float32"
                 | Float64 -> "float64"
     
+    [<RequireQualifiedAccess>]
     type PoolType = 
         | Avg
         | Lp
@@ -138,6 +149,7 @@ module GeneratedArgumentTypes =
                 | Max -> "max"
                 | Sum -> "sum"
     
+    [<RequireQualifiedAccess>]
     type PoolingConvention = 
         | Full
         | Same
@@ -148,6 +160,7 @@ module GeneratedArgumentTypes =
                 | Same -> "same"
                 | Valid -> "valid"
     
+    [<RequireQualifiedAccess>]
     type PoolingLayout = 
         | NCDHW
         | NCHW
@@ -164,6 +177,7 @@ module GeneratedArgumentTypes =
                 | NHWC -> "NHWC"
                 | NWC -> "NWC"
     
+    [<RequireQualifiedAccess>]
     type SoftmaxActivationMode = 
         | Channel
         | Instance
@@ -172,6 +186,7 @@ module GeneratedArgumentTypes =
                 | Channel -> "channel"
                 | Instance -> "instance"
     
+    [<RequireQualifiedAccess>]
     type SampleType = 
         | Bilinear
         | Nearest
@@ -180,6 +195,7 @@ module GeneratedArgumentTypes =
                 | Bilinear -> "bilinear"
                 | Nearest -> "nearest"
     
+    [<RequireQualifiedAccess>]
     type MultiInputMode = 
         | Concat
         | Sum
@@ -188,6 +204,7 @@ module GeneratedArgumentTypes =
                 | Concat -> "concat"
                 | Sum -> "sum"
     
+    [<RequireQualifiedAccess>]
     type NpSumDtype = 
         | Float16
         | Float32
@@ -204,6 +221,7 @@ module GeneratedArgumentTypes =
                 | Int64 -> "int64"
                 | Int8 -> "int8"
     
+    [<RequireQualifiedAccess>]
     type NpProdDtype = 
         | Float16
         | Float32
@@ -220,6 +238,7 @@ module GeneratedArgumentTypes =
                 | Int64 -> "int64"
                 | Int8 -> "int8"
     
+    [<RequireQualifiedAccess>]
     type NpiMeanDtype = 
         | Float16
         | Float32
@@ -236,6 +255,7 @@ module GeneratedArgumentTypes =
                 | Int64 -> "int64"
                 | Int8 -> "int8"
     
+    [<RequireQualifiedAccess>]
     type NpiStdDtype = 
         | Float16
         | Float32
@@ -252,6 +272,7 @@ module GeneratedArgumentTypes =
                 | Int64 -> "int64"
                 | Int8 -> "int8"
     
+    [<RequireQualifiedAccess>]
     type NpiVarDtype = 
         | Float16
         | Float32
@@ -268,6 +289,7 @@ module GeneratedArgumentTypes =
                 | Int64 -> "int64"
                 | Int8 -> "int8"
     
+    [<RequireQualifiedAccess>]
     type NpCumsumDtype = 
         | Float16
         | Float32
@@ -284,6 +306,7 @@ module GeneratedArgumentTypes =
                 | Int64 -> "int64"
                 | Int8 -> "int8"
     
+    [<RequireQualifiedAccess>]
     type IntOrFloatDType = 
         | Float16
         | Float32
@@ -302,6 +325,7 @@ module GeneratedArgumentTypes =
                 | Int8 -> "int8"
                 | UInt8 -> "uint8"
     
+    [<RequireQualifiedAccess>]
     type PadMode = 
         | Constant
         | Edge
@@ -312,12 +336,14 @@ module GeneratedArgumentTypes =
                 | Edge -> "edge"
                 | Reflect -> "reflect"
     
+    [<RequireQualifiedAccess>]
     type ContribDequantizeOutType = 
         | Float32
         override x.ToString() =
             match x with
                 | Float32 -> "float32"
     
+    [<RequireQualifiedAccess>]
     type ContribQuantizeOutType = 
         | Int8
         | Uint8
@@ -326,6 +352,7 @@ module GeneratedArgumentTypes =
                 | Int8 -> "int8"
                 | Uint8 -> "uint8"
     
+    [<RequireQualifiedAccess>]
     type ContribQuantizeV2OutType = 
         | Auto
         | Int8
@@ -336,6 +363,7 @@ module GeneratedArgumentTypes =
                 | Int8 -> "int8"
                 | Uint8 -> "uint8"
     
+    [<RequireQualifiedAccess>]
     type ContribQuantizedConvLayout = 
         | NCDHW
         | NCHW
@@ -350,6 +378,7 @@ module GeneratedArgumentTypes =
                 | NDHWC -> "NDHWC"
                 | NHWC -> "NHWC"
     
+    [<RequireQualifiedAccess>]
     type ContribQuantizedPoolingLayout = 
         | NCDHW
         | NCHW
@@ -366,6 +395,7 @@ module GeneratedArgumentTypes =
                 | NHWC -> "NHWC"
                 | NWC -> "NWC"
     
+    [<RequireQualifiedAccess>]
     type ContribRequantizeOutType = 
         | Auto
         | Int8
@@ -376,6 +406,7 @@ module GeneratedArgumentTypes =
                 | Int8 -> "int8"
                 | Uint8 -> "uint8"
     
+    [<RequireQualifiedAccess>]
     type SampleMultinomialDtype = 
         | Float16
         | Float32
@@ -390,6 +421,7 @@ module GeneratedArgumentTypes =
                 | Int32 -> "int32"
                 | Uint8 -> "uint8"
     
+    [<RequireQualifiedAccess>]
     type RandomRandintDtype = 
         | Int32
         | Int64
@@ -398,6 +430,7 @@ module GeneratedArgumentTypes =
                 | Int32 -> "int32"
                 | Int64 -> "int64"
     
+    [<RequireQualifiedAccess>]
     type RNNMode = 
         | Gru
         | Lstm
@@ -410,6 +443,7 @@ module GeneratedArgumentTypes =
                 | RnnRelu -> "rnn_relu"
                 | RnnTanh -> "rnn_tanh"
     
+    [<RequireQualifiedAccess>]
     type Normalization = 
         | Batch
         | Null
@@ -420,6 +454,7 @@ module GeneratedArgumentTypes =
                 | Null -> "null"
                 | Valid -> "valid"
     
+    [<RequireQualifiedAccess>]
     type OutDtype = 
         | Float16
         | Float32
@@ -436,6 +471,7 @@ module GeneratedArgumentTypes =
                 | Int64 -> "int64"
                 | Int8 -> "int8"
     
+    [<RequireQualifiedAccess>]
     type PickMode = 
         | Clip
         | Wrap
@@ -444,6 +480,7 @@ module GeneratedArgumentTypes =
                 | Clip -> "clip"
                 | Wrap -> "wrap"
     
+    [<RequireQualifiedAccess>]
     type Stype = 
         | Csr
         | Default
@@ -454,6 +491,7 @@ module GeneratedArgumentTypes =
                 | Default -> "default"
                 | RowSparse -> "row_sparse"
     
+    [<RequireQualifiedAccess>]
     type ForwardStype = 
         | Csr
         | Default
@@ -464,6 +502,7 @@ module GeneratedArgumentTypes =
                 | Default -> "default"
                 | RowSparse -> "row_sparse"
     
+    [<RequireQualifiedAccess>]
     type TakeMode = 
         | Clip
         | Raise
@@ -474,6 +513,7 @@ module GeneratedArgumentTypes =
                 | Raise -> "raise"
                 | Wrap -> "wrap"
     
+    [<RequireQualifiedAccess>]
     type RetTyp = 
         | Both
         | Indices
@@ -486,6 +526,7 @@ module GeneratedArgumentTypes =
                 | Mask -> "mask"
                 | Value -> "value"
     
+    [<RequireQualifiedAccess>]
     type TopkDtype = 
         | Float16
         | Float32
@@ -502,6 +543,7 @@ module GeneratedArgumentTypes =
                 | Int64 -> "int64"
                 | Uint8 -> "uint8"
     
+    [<RequireQualifiedAccess>]
     type ArgsortDtype = 
         | Float16
         | Float32
@@ -518,6 +560,7 @@ module GeneratedArgumentTypes =
                 | Int64 -> "int64"
                 | Uint8 -> "uint8"
     
+    [<RequireQualifiedAccess>]
     type ContribDeformableConvolutionLayout = 
         | NCDHW
         | NCHW
@@ -528,6 +571,7 @@ module GeneratedArgumentTypes =
                 | NCHW -> "NCHW"
                 | NCW -> "NCW"
     
+    [<RequireQualifiedAccess>]
     type ConvolutionV1Layout = 
         | NCDHW
         | NCHW
@@ -540,6 +584,7 @@ module GeneratedArgumentTypes =
                 | NDHWC -> "NDHWC"
                 | NHWC -> "NHWC"
     
+    [<RequireQualifiedAccess>]
     type GridGeneratorTransformType = 
         | Affine
         | Warp
@@ -548,6 +593,7 @@ module GeneratedArgumentTypes =
                 | Affine -> "affine"
                 | Warp -> "warp"
     
+    [<RequireQualifiedAccess>]
     type L2NormalizationMode = 
         | Channel
         | Instance
@@ -558,12 +604,14 @@ module GeneratedArgumentTypes =
                 | Instance -> "instance"
                 | Spatial -> "spatial"
     
+    [<RequireQualifiedAccess>]
     type SpatialTransformerTransformType = 
         | Affine
         override x.ToString() =
             match x with
                 | Affine -> "affine"
     
+    [<RequireQualifiedAccess>]
     type SamplerType = 
         | Bilinear
         override x.ToString() =
