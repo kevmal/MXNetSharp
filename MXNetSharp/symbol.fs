@@ -83,6 +83,62 @@ type Symbol() =
     static member ( * )(y : float, x : Symbol) = new MulScalar(x,y)
     static member ( * )(x : Symbol, y : Symbol) = new ElemwiseMul(x,y)
     static member ( .* )(x : Symbol, y : Symbol) = new BroadcastMul(x,y)
+    
+    static member ( ** )(x : Symbol, y : float) = new PowerScalar(x,y)
+    static member ( ** )(y : float, x : Symbol) = new RpowerScalar(x,y)
+    static member ( ** )(x : Symbol, y : Symbol) = new Power(x,y)
+    static member ( .** )(x : Symbol, y : Symbol) = new BroadcastPower(x,y)
+
+    static member (~-)(x : Symbol) = -1.0*x
+    
+    static member (%)(x : Symbol, y : float) = new ModScalar(x,y)
+    static member (%)(y : float, x : Symbol) = new ModScalar(x,y)
+    static member (%)(x : Symbol, y : Symbol) = new BroadcastMod(x,y)
+    
+    static member (.=)(x : Symbol, y : float) = new EqualScalar(x,y)
+    static member (.=)(y : float, x : Symbol) = new EqualScalar(x,y)
+    static member (.=)(x : Symbol, y : Symbol) = new BroadcastEqual(x,y)
+    
+    static member (.<>)(x : Symbol, y : float) = new NotEqualScalar(x,y)
+    static member (.<>)(y : float, x : Symbol) = new NotEqualScalar(x,y)
+    static member (.<>)(x : Symbol, y : Symbol) = new BroadcastNotEqual(x,y)
+
+    static member (.>)(x : Symbol, y : float) = new GreaterScalar(x,y)
+    static member (.>)(y : float, x : Symbol) = new LesserScalar(x,y)
+    static member (.>)(x : Symbol, y : Symbol) = new BroadcastGreater(x,y)
+    
+    static member (.<)(x : Symbol, y : float) = new LesserScalar(x,y)
+    static member (.<)(y : float, x : Symbol) = new GreaterScalar(x,y)
+    static member (.<)(x : Symbol, y : Symbol) = new BroadcastLesser(x,y)
+    
+    static member (.>=)(x : Symbol, y : float) = new GreaterEqualScalar(x,y)
+    static member (.>=)(y : float, x : Symbol) = new LesserEqualScalar(x,y)
+    static member (.>=)(x : Symbol, y : Symbol) = new BroadcastGreaterEqual(x,y)
+    
+    static member (.<=)(x : Symbol, y : float) = new LesserEqualScalar(x,y)
+    static member (.<=)(y : float, x : Symbol) = new GreaterEqualScalar(x,y)
+    static member (.<=)(x : Symbol, y : Symbol) = new BroadcastLesserEqual(x,y)
+
+    static member (.&&)(x : Symbol, y : bool) = new LogicalAndScalar(x,if y then 1.0 else 0.0)
+    static member (.&&)(y : bool, x : Symbol) = new LogicalAndScalar(x,if y then 1.0 else 0.0)
+    static member (.&&)(x : Symbol, y : float) = new LogicalAndScalar(x,y)
+    static member (.&&)(y : float, x : Symbol) = new LogicalAndScalar(x,y)
+    static member (.&&)(x : Symbol, y : Symbol) = new LogicalAnd(x,y)
+    static member (..&&)(x : Symbol, y : Symbol) = new BroadcastLogicalAnd(x,y)
+    
+    static member (.||)(x : Symbol, y : bool) = new LogicalOrScalar(x,if y then 1.0 else 0.0)
+    static member (.||)(y : bool, x : Symbol) = new LogicalOrScalar(x,if y then 1.0 else 0.0)
+    static member (.||)(x : Symbol, y : float) = new LogicalOrScalar(x,y)
+    static member (.||)(y : float, x : Symbol) = new LogicalOrScalar(x,y)
+    static member (.||)(x : Symbol, y : Symbol) = new LogicalOr(x,y)
+    static member (..||)(x : Symbol, y : Symbol) = new BroadcastLogicalOr(x,y)
+    
+    static member (.^^)(x : Symbol, y : bool) = new LogicalXorScalar(x,if y then 1.0 else 0.0)
+    static member (.^^)(y : bool, x : Symbol) = new LogicalXorScalar(x,if y then 1.0 else 0.0)
+    static member (.^^)(x : Symbol, y : float) = new LogicalXorScalar(x,y)
+    static member (.^^)(y : float, x : Symbol) = new LogicalXorScalar(x,y)
+    static member (.^^)(x : Symbol, y : Symbol) = new LogicalXor(x,y)
+    static member (..^^)(x : Symbol, y : Symbol) = new BroadcastLogicalXor(x,y)
 
     member x.Exp() = new Exp(x)
     static member Exp(x : Symbol) = new Exp(x) :> Symbol
@@ -194,21 +250,25 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
     //let parametersStr = parameters |> Array.map (fun (k,v) -> k, Util.valueString v)
     new(name, args) = new SymbolOperator(AtomicSymbolCreator.FromName name, args)
     //new(creator,pnames,ps,inames,ins) = new SymbolOperator(creator, Array.zip pnames ps, Array.zip inames ins)
+    member internal x.AtomicSymbolCreator = creator
     member x.OperatorArguments = operatorArguments
     abstract member WithArguments : operatorArguments : Arguments<Symbol> -> Symbol
     default x.WithArguments(args) = new SymbolOperator(creator, args) :> Symbol
-    member x.ComposedWith(symbol : Symbol) = 
+    abstract member ComposedWith : Symbol -> Symbol
+    default x.ComposedWith(symbol : Symbol) = 
         let mutable inserted = false
         let args = 
             operatorArguments
             |> Seq.map 
-                (fun x -> 
-                    match x with 
+                (fun a -> 
+                    match a with 
                     | name, Input(:? ImplicitVariable) when not inserted -> 
                        inserted <- true
+                       printfn "Compising %s in %s with %s" name (x.GetType().Name) (symbol.GetType().Name)
                        name, Input(symbol)
                     | x -> x
                 )
+            |> Seq.toArray
         if inserted then 
             x.WithArguments(Arguments<Symbol>(args))
         else
@@ -277,7 +337,33 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
             with
             | e -> raise(SymbolInitilizationException(x, e))
 
-
+type SymbolComposable<'a when 'a :> SymbolOperator>(argSymbol : Symbol, rootSymbol: 'a) = 
+    inherit SymbolOperator(rootSymbol.AtomicSymbolCreator, rootSymbol.OperatorArguments) 
+    override x.ComposedWith(symbol : Symbol) = 
+        let rec loop (x : SymbolOperator) = 
+            x.OperatorArguments
+            |> Seq.map 
+                (fun a -> 
+                    match a with 
+                    | name, VarArg(num, args) -> 
+                        let args = 
+                            args 
+                            |> Array.map 
+                                (fun a ->
+                                    match a with 
+                                    | s when Object.ReferenceEquals(argSymbol,s) -> symbol
+                                    | :? SymbolOperator as s -> loop s
+                                    | s -> s
+                                )
+                        name, VarArg(num, args)
+                    | name, Input(s) when Object.ReferenceEquals(argSymbol,s) -> name, Input(symbol)
+                    | name, Input(:? SymbolOperator as s) -> name, Input(loop s)
+                    | otherwise -> otherwise
+                )
+            |> (fun args -> x.WithArguments(Arguments<Symbol>(args)))
+        SymbolComposable(argSymbol, loop (rootSymbol :> SymbolOperator) :?> 'a) :> Symbol
+    override x.WithArguments(args : Arguments<Symbol>) = new SymbolComposable<'a>(argSymbol, rootSymbol.WithArguments(args) :?> 'a) :> Symbol
+    
 
 
 type SymbolGroup<'a>(group : 'a, symbols : Symbol []) = 
