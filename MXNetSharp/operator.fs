@@ -32,8 +32,8 @@ type Arguments<'a>(args : IDictionary<string, OpArg<'a>>, ordering : string []) 
     new(args : (string*OpArg<'a>) seq) = Arguments(dict args, args |> Seq.map fst |> Seq.toArray)
     member x.Args = args
     member x.Ordering = ordering
-    member x.AddReplace(args2 : Arguments<'a>) = Arguments(args2.Args |> Dict.addReplace args, x.Ordering)
-    member x.AddIgnore(args2 : Arguments<'a>) = Arguments(args2.Args |> Dict.addIgnore args, x.Ordering)
+    member x.AddReplace(args2 : Arguments<'a>) = Arguments(args |> Dict.addReplace args2.Args, x.Ordering)
+    member x.AddIgnore(args2 : Arguments<'a>) = Arguments(args |> Dict.addIgnore args2.Args, x.Ordering)
     member x.GetInput(name) = 
         match args.[name] with 
         | Input a -> a
