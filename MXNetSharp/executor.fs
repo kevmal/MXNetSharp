@@ -4,6 +4,20 @@ open System.Runtime.InteropServices
 open MXNetSharp.Interop
 open System.Collections.Generic
  
+//[<NoComparison>]
+//type GradArray = 
+//    | NullOp
+//    | WriteTo of NDArray
+//    | WriteInplace of NDArray
+//    | AddTo of NDArray
+
+[<NoComparison; NoEquality>]
+type BindType = 
+    | NoGrad of NDArray
+    | Delayed of (int [] -> BindType)
+    | GradWriteTo of NDArray*NDArray
+    | GradWriteInplace of NDArray*NDArray
+    | GradAddTo of NDArray*NDArray
 
 type SafeExecutorHandle(owner) = 
     inherit SafeHandle(0n, true)
@@ -50,6 +64,28 @@ type Executor(handle : SafeExecutorHandle, ?symbol, ?context, ?contextMap, ?inAr
         new Executor(safeHandle,symbol,context,?contextMap = contextMap,inArgs = inArgs,argGrad = argGrad,gradReqType = gradReqType,auxStates = auxStates)
     new(symbol : Symbol, context, inArgs, argGrad, gradReqType, auxStates) = 
         new Executor(symbol, context, None, inArgs,argGrad,gradReqType,auxStates,None)
+    member x.InputBindings = 
+        let symbol = match symbol with Some s -> s | _ -> failwith  "Executor symbol is null"
+        let names = symbol.ArgumentNames
+        let inArgs = match inArgs with Some s -> s | _ -> failwith  "Executor inArgs is null"
+        let argGrad = match argGrad with Some s -> s | _ -> failwith  "Executor argGrad is null"
+        let gradReqType = match gradReqType with Some s -> s | _ -> failwith  "Executor gradReqType is null"
+        assert(names.Length = inArgs.Length)
+        assert(names.Length = argGrad.Length)
+        assert(names.Length = gradReqType.Length)
+        [|
+            for i = 0 to names.Length - 1 do
+                let name = names.[i]
+                let a = inArgs.[i]
+                let g = argGrad.[i]
+                let t = gradReqType.[i]
+                name, 
+                    match t with 
+                    | NullOp -> NoGrad a
+                    | WriteTo -> GradWriteTo(a,g)
+                    | WriteInplace -> GradWriteInplace(a,g)
+                    | AddTo -> GradAddTo(a,g)
+        |]
     member x.Symbol = symbol
     member internal x.UnsafeHandle = handle.UnsafeHandle
     member x.Forward(isTraining : bool) = 
@@ -74,5 +110,66 @@ type Executor(handle : SafeExecutorHandle, ?symbol, ?context, ?contextMap, ?inAr
     interface IDisposable with  
         member x.Dispose() = x.Dispose()
 
-
-
+[<AutoOpen>]
+module SymbolExtension =
+    type Symbol with 
+        member x.Bindings(f) = 
+            let inputs = x.InputSymbols
+            let bindings = inputs |> Array.map f
+            let shapes = 
+                (inputs,bindings)
+                ||> Array.map2
+                    (fun i x ->
+                        match x with
+                        | NoGrad a
+                        | GradWriteTo(a,_)
+                        | GradWriteInplace(a,_)
+                        | GradAddTo(a,_) -> Some(i.Name, a.Shape)
+                        | Delayed _ -> None
+                    )
+                |> Array.choose id
+            let (k,i,d) = MXSymbol.keyShapeToCsrForm uint32 shapes
+            let inferResult = MXSymbol.inferShape x.UnsafeHandle k i d
+            (inputs, inferResult.InputShapes, bindings)
+            |||> Array.map3
+                (fun i shape b ->
+                    match b with 
+                    | Delayed f -> i.Name, shape |> Array.map int |> f
+                    | x -> i.Name, x
+                )
+        member x.Bind(context, f) = 
+            let inputs = x.InputSymbols
+            let bindings = inputs |> Array.map f
+            let shapes = 
+                (inputs,bindings)
+                ||> Array.map2
+                    (fun i x ->
+                        match x with
+                        | NoGrad a
+                        | GradWriteTo(a,_)
+                        | GradWriteInplace(a,_)
+                        | GradAddTo(a,_) -> Some(i.Name, a.Shape)
+                        | Delayed _ -> None
+                    )
+                |> Array.choose id
+            let (k,i,d) = MXSymbol.keyShapeToCsrForm uint32 shapes
+            let inferResult = MXSymbol.inferShape x.UnsafeHandle k i d
+            let auxStates = 
+                inferResult.AuxShapes
+            let inArgs, grads, opReqType = 
+                (inputs, inferResult.InputShapes, bindings)
+                |||> Array.map3
+                    (fun i shape b ->
+                        let expand x = 
+                            match x with
+                            | NoGrad a -> a, new NDArray(), NullOp
+                            | GradWriteTo(a,g) -> a, g, WriteTo
+                            | GradWriteInplace(a,g) -> a, g, WriteInplace
+                            | GradAddTo(a,g) -> a, g, AddTo
+                            | Delayed _ -> failwith "Unexpected Delayed" //TODO: make ex
+                        match b with 
+                        | Delayed f -> shape |> Array.map int |> f |> expand
+                        | x -> expand x
+                    )
+                |> Array.unzip3
+            new Executor(x,context,inArgs, grads, opReqType, Seq.empty)

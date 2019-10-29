@@ -1,5 +1,6 @@
 namespace rec MXNetSharp
 open System
+open System.Collections.Generic
 open System.Runtime.InteropServices
 open MXNetSharp.Interop
 
@@ -7,11 +8,16 @@ type SymbolInitilizationException(symbol : Symbol, inner : Exception) =
     inherit Exception(
         match inner  with 
         | null -> sprintf "Init failed on symbol %O" symbol
-        | ex -> sprintf "Init failed on symbol %O: %s" symbol ex.Message)
+        | ex -> sprintf "Init failed on symbol %O: %s %A" symbol ex.Message ex.StackTrace)
 
 
 [<AbstractClass>]
 type Symbol() =
+    static let mutable count = 0L
+    static let nameId() = Threading.Interlocked.Increment &count
+    let sid = nameId()
+    member x.Id = sid
+    member x.GeneratedName = sprintf "%s!%d" (x.GetType().Name) x.Id
     //let mutable disposed = false
     member val internal InternalName : string option = None with get,set
     member val internal InternalHandle : SafeSymbolHandle option = None with get,set
@@ -28,20 +34,25 @@ type Symbol() =
     //        MXSymbol.getAttr x.UnsafeHandle "mxnetsharp_symbolid"
     //    else    
     //        None
+    abstract member Copy : unit -> Symbol
     member x.Name 
         with get() = 
             if x.IsInitialized then 
                 match MXSymbol.getName x.UnsafeHandle with 
                 | Some name -> name
                 | None ->
-                    match x.InternalName with Some n -> n | _ -> ""
+                    match x.InternalName with Some n -> n | _ -> x.GeneratedName
             else
-                match x.InternalName with Some n -> n | _ -> ""
+                match x.InternalName with Some n -> n | _ -> x.GeneratedName
         and set v = 
             if x.IsInitialized then
                 failwith "Cannot set name. Symbol has already been created." //TODO: make exception
             x.InternalName <- Some v 
-    member x.WithName(name) = x.Name <- name; x
+    member x.SetName(name) = x.Name <- name; x
+    member x.SetName(symbol : Symbol) =
+        match symbol.InternalName with 
+        | Some(n) -> x.SetName(n)
+        | None -> x
     member x.SymbolHandle : SafeSymbolHandle = 
         match x.InternalHandle with 
         | Some h -> h
@@ -61,7 +72,8 @@ type Symbol() =
                 new SymbolOutput(x,new SafeSymbolHandle(h, true))
             )
     member x.ArgumentNames = MXSymbol.listArguments x.UnsafeHandle
-    member x.InputSymbols = MXSymbol.getInputSymbols x.UnsafeHandle |> Array.map (fun h -> new SymbolInput(x, new SafeSymbolHandle(h,true)))
+    abstract member InputSymbols : Symbol []
+    default x.InputSymbols = MXSymbol.getInputSymbols x.UnsafeHandle |> Array.map (fun h -> new SymbolInput(x, new SafeSymbolHandle(h,true)) :> Symbol)
     abstract member Initialize : unit -> unit
     
     static member (+)(x : Symbol, y : float) = new PlusScalar(x,y)
@@ -205,6 +217,9 @@ type SymbolOutput internal (parent : Symbol) =
             this.InternalHandle <- Some handle
     member x.Parent = parent
     override x.Initialize() = ()
+    default x.Copy() = 
+        let h = MXSymbol.copy x.SymbolHandle.UnsafeHandle
+        SymbolOutput(parent, new SafeSymbolHandle(h, true)) :> Symbol //REVIEW: not sure this makes sense. Copy the output and keep the same parent?
 
 
 type SymbolInput internal (parent : Symbol) = 
@@ -214,6 +229,9 @@ type SymbolInput internal (parent : Symbol) =
             this.InternalHandle <- Some handle
     member x.Parent = parent
     override x.Initialize() = ()
+    default x.Copy() = 
+        let h = MXSymbol.copy x.SymbolHandle.UnsafeHandle
+        SymbolInput(parent, new SafeSymbolHandle(h, true)) :> Symbol //REVIEW: not sure this makes sense. Copy the input and keep the same parent?
 
 type Variable() =
     inherit Symbol()
@@ -231,15 +249,20 @@ type Variable() =
         match x.InternalHandle with 
         | Some _ -> ()
         | None -> 
-            match x.InternalName with 
-            | Some n -> 
-                x.InternalHandle <- Some(new SafeSymbolHandle(MXSymbol.createVariable n,true))
-                //x.CreateId()
-            | None -> failwith "Variable needs a name" //TODO: make exception or auto naming?
+            let n = 
+                match x.InternalName with 
+                | Some n -> n
+                | None -> x.GeneratedName
+            x.InternalHandle <- Some(new SafeSymbolHandle(MXSymbol.createVariable n,true))
+    default x.Copy() = 
+        x.Initialize() 
+        let v = Variable(x.Name) 
+        v :> Symbol
 
 type ImplicitVariable() = 
     inherit Variable() 
-      
+    default x.Copy() = ImplicitVariable() :> Symbol
+
 //TODO: Manually add CustomOp type and skip in codegen
 //TODO: fix histogram
 //TODO: override tostring
@@ -252,6 +275,48 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
     //new(creator,pnames,ps,inames,ins) = new SymbolOperator(creator, Array.zip pnames ps, Array.zip inames ins)
     member internal x.AtomicSymbolCreator = creator
     member x.OperatorArguments = operatorArguments
+    default x.Copy() = 
+        x.OperatorArguments
+        |> Seq.map 
+            (fun a -> 
+                match a with 
+                | name, VarArg(num, args) -> 
+                    let args = args |> Array.map (fun a -> a.Copy().SetName(a.Name))
+                    name, VarArg(num, args)
+                | name, Input(s) -> name, Input(s.Copy().SetName(s.Name))
+                | otherwise -> otherwise
+            )
+        |> (fun args -> x.WithArguments(Arguments<Symbol>(args)).SetName(x.Name))
+    override x.InputSymbols = 
+        let args : string [] = x.ArgumentNames
+        let inputs : Symbol [] = base.InputSymbols
+        let d = Dictionary<string, Symbol>()
+        x.OperatorArguments
+        |> Seq.iter 
+            (fun a -> 
+                match a with 
+                | _, VarArg(num, args) -> 
+                    args 
+                    |> Array.iter 
+                        (fun a ->
+                            a.InputSymbols |> Seq.iter (fun x -> d.[x.Name] <- x)
+                            d.[a.Name] <- a
+                        )
+                | _, Input(s) -> 
+                    s.InputSymbols |> Seq.iter (fun x -> d.[x.Name] <- x)
+                    d.[s.Name] <- s
+                | _ -> ()
+            )
+        args 
+        |> Array.mapi
+            (fun i a ->
+                let scc,v = d.TryGetValue(a)
+                if scc then 
+                    v
+                else
+                    inputs.[i]
+            )
+        
     abstract member WithArguments : operatorArguments : Arguments<Symbol> -> Symbol
     default x.WithArguments(args) = new SymbolOperator(creator, args) :> Symbol
     abstract member ComposedWith : Symbol -> Symbol
@@ -270,7 +335,7 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
                 )
             |> Seq.toArray
         if inserted then 
-            x.WithArguments(Arguments<Symbol>(args))
+            x.WithArguments(Arguments<Symbol>(args)).SetName(x)
         else
             failwithf "Could not compose %O with %O" x  symbol
     override x.Initialize() =   
@@ -283,7 +348,7 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
                 let inputValues = ResizeArray()
                 let pKeys = ResizeArray()
                 let pValues = ResizeArray()
-                let name = defaultArg x.InternalName null
+                let name = defaultArg x.InternalName x.GeneratedName
                 for a in creator.Info.Arguments do  
                     let scc,v = operatorArguments.Args.TryGetValue a.Name
                     if scc then 
@@ -291,7 +356,7 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
                         | Input i -> 
                             inputKeys.Add a.Name
                             match i with 
-                            | :? ImplicitVariable as v -> v.Name <- sprintf "%s_%s" name a.Name
+                            | :? ImplicitVariable as v when not v.IsInitialized -> v.Name <- sprintf "%s_%s" name a.Name
                             | _ -> ()
                             inputValues.Add i
                         | VarArg (count,i) -> 
@@ -360,9 +425,34 @@ type SymbolComposable<'a when 'a :> SymbolOperator>(argSymbol : Symbol, rootSymb
                     | name, Input(:? SymbolOperator as s) -> name, Input(loop s)
                     | otherwise -> otherwise
                 )
-            |> (fun args -> x.WithArguments(Arguments<Symbol>(args)))
+            |> (fun args -> x.WithArguments(Arguments<Symbol>(args)).SetName(x))
         SymbolComposable(argSymbol, loop (rootSymbol :> SymbolOperator) :?> 'a) :> Symbol
     override x.WithArguments(args : Arguments<Symbol>) = new SymbolComposable<'a>(argSymbol, rootSymbol.WithArguments(args) :?> 'a) :> Symbol
+    default x.Copy() = 
+        let rec loop (x : SymbolOperator) = 
+            x.OperatorArguments
+            |> Seq.map 
+                (fun a -> 
+                    match a with 
+                    | name, VarArg(num, args) -> 
+                        let args = 
+                            args 
+                            |> Array.map 
+                                (fun a ->
+                                    match a with 
+                                    | s when Object.ReferenceEquals(argSymbol,s) -> argSymbol
+                                    | :? SymbolOperator as s -> loop s
+                                    | s -> s.Copy().SetName(s.Name)
+                                )
+                        name, VarArg(num, args)
+                    | name, Input(s) when Object.ReferenceEquals(argSymbol,s) -> name, Input(argSymbol)
+                    | name, Input(:? SymbolOperator as s) -> name, Input(loop s)
+                    | name, Input(s) -> name, Input(s.Copy().SetName(s.Name))
+                    | otherwise -> otherwise
+                )
+            |> (fun args -> x.WithArguments(Arguments<Symbol>(args)).SetName(x.Name))
+        SymbolComposable(argSymbol, loop (rootSymbol :> SymbolOperator) :?> 'a) :> Symbol
+    override x.InputSymbols = rootSymbol.InputSymbols
     
 
 
@@ -377,6 +467,12 @@ type SymbolGroup<'a>(group : 'a, symbols : Symbol []) =
             let symbol = symbols |> Array.map (fun x -> x.UnsafeHandle) |> MXSymbol.createGroup 
             x.InternalHandle <- Some(new SafeSymbolHandle(symbol, true))
             //x.CreateId()
+    default x.Copy() = SymbolGroup<'a>(group, symbols |> Array.map (fun x -> x.Copy())) :> Symbol
+    override x.InputSymbols = 
+        let a = symbols |> Array.collect (fun x -> x.InputSymbols)
+        assert ((a |> Array.map (fun x -> x.Name)) = x.ArgumentNames)
+        a
+
 
 // **************************************************************************************************************************************
 // ** GENERATED SYMBOL TYPES SECTION
