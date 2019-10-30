@@ -113,6 +113,29 @@ type DataType =
         | Int64 -> Some(typeof<int64>)
         | Int8 -> Some(typeof<sbyte>)
         | UInt8 -> Some(typeof<byte>)
+    member x.TypeFlag =  
+        match x with 
+        | Float16 -> TypeFlag.Float16
+        | Float32 -> TypeFlag.Float32
+        | Float64 -> TypeFlag.Float64
+        | Int32 -> TypeFlag.Int32
+        | Int64 -> TypeFlag.Int64
+        | Int8 -> TypeFlag.Int8
+        | UInt8 -> TypeFlag.Uint8
+    static member FromTypeFlag(typeflag : TypeFlag) = 
+        match typeflag with 
+        | TypeFlag.None -> None 
+        | TypeFlag.Float16 -> Some Float16
+        | TypeFlag.Float32 -> Some Float32
+        | TypeFlag.Float64 -> Some Float64
+        | TypeFlag.Int32 -> Some Int32
+        | TypeFlag.Int64 -> Some Int64
+        | TypeFlag.Int8 -> Some Int8
+        | TypeFlag.Uint8 -> Some UInt8
+        | _ -> None
+    static member FromInt(typeFlagInt) = DataType.FromTypeFlag(enum typeFlagInt)
+        
+        
 
 
 // From https://github.com/apache/incubator-mxnet/blob/225f71f744ac5e7bd29868b6d3ba0e4fe2527c43/cpp-package/include/mxnet-cpp/base.h#L39

@@ -72,6 +72,8 @@ type Symbol() =
                 new SymbolOutput(x,new SafeSymbolHandle(h, true))
             )
     member x.ArgumentNames = MXSymbol.listArguments x.UnsafeHandle
+    member x.OutputNames = MXSymbol.listOutputs x.UnsafeHandle
+    member x.AuxiliaryStateNames = MXSymbol.listAuxiliaryStates x.UnsafeHandle
     abstract member InputSymbols : Symbol []
     default x.InputSymbols = MXSymbol.getInputSymbols x.UnsafeHandle |> Array.map (fun h -> new SymbolInput(x, new SafeSymbolHandle(h,true)) :> Symbol)
     abstract member Initialize : unit -> unit

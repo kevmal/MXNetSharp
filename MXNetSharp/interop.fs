@@ -190,7 +190,7 @@ type InferShapeResult<'a> =
         OutputShapes : 'a [] []
     }
 
-type InferTypeResult<'a> = 
+type InferTypeResult = 
     {
         Complete : bool
         AuxTypes : int[]
@@ -510,7 +510,8 @@ module MXSymbol =
                 argShapeData.[j] <- shapes.[k]
                 j <- j + 1
         keys,argIndPtr,argShapeData
-        
+
+
     /// <summary>infer shape of unknown input shapes given the known one.
     /// The shapes are packed into a CSR matrix represented by arg_ind_ptr and arg_shape_data
     /// The call will be treated as a kwargs call if key != nullptr or num_args==0, otherwise it is positional.</summary>
@@ -694,8 +695,8 @@ module MXSymbol =
         MXSymbolInferTypePartial(sym, ulength keys, keys, arg_type_data, &in_type_size, &in_type_data, &out_type_size, &out_type_data, &aux_type_size, &aux_type_data, &complete) |> throwOnError "MXSymbolInferTypePartial"
         {
             Complete = complete <> 0
-            AuxTypes = readStructArray aux_type_size aux_type_data
-            InputTypes = readStructArray in_type_size in_type_data
+            AuxTypes = readStructArray aux_type_size aux_type_data 
+            InputTypes = readStructArray in_type_size in_type_data 
             OutputTypes = readStructArray out_type_size out_type_data
         }
 
