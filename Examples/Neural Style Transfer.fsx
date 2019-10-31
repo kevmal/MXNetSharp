@@ -14,7 +14,7 @@ open System
 open System.Net
 open System.IO
 
-let context = CPU(0)
+let context = GPU(0)
 let ctxStr = context.ToString()
 
 let vggParamsUrl = "https://github.com/dmlc/web-data/raw/master/mxnet/neural-style/model/vgg19.params"
@@ -48,7 +48,7 @@ let loadImage (image : Image) =
                     yield float32 p.B - 103.939f
         |]
     let im = new NDArray(dat |> Array.map float32, [image.Height; image.Width; 3], context)
-    let resized = Operators.ImageResize(im,224,224).[0]
+    let resized = Operators.ImageResize(im, [224;224]).[0]
     resized.SwapAxis(0,2).SwapAxis(1,2).Reshape([1;3;224;224])
 
 
@@ -59,13 +59,13 @@ let conv1_1 = new Convolution(data = data, numFilter = 64, pad = [1;1], kernel =
 let relu1_1 = new Relu(conv1_1, Name = "relu1_2")
 let conv1_2 = new Convolution(data = relu1_1, numFilter = 64, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv1_2")
 let relu1_2 = new Relu(conv1_2, Name = "relu1_2")
-let pool1 = new Pooling(relu1_2, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = Avg, Name = "pool1")
+let pool1 = new Pooling(relu1_2, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = PoolType.Avg, Name = "pool1")
 
 let conv2_1 = new Convolution(data = pool1, numFilter = 128, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv2_1")
 let relu2_1 = new Relu(conv2_1, Name = "relu2_1")
 let conv2_2 = new Convolution(data = relu2_1, numFilter = 128, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv2_2")
 let relu2_2 = new Relu(conv2_2, Name = "relu2_2")
-let pool2 = new Pooling(relu2_2, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = Avg, Name = "pool2")
+let pool2 = new Pooling(relu2_2, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = PoolType.Avg, Name = "pool2")
 
 let conv3_1 = new Convolution(data = pool2, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_1")
 let relu3_1 = new Relu(conv3_1, Name = "relu3_1")
@@ -75,7 +75,7 @@ let conv3_3 = new Convolution(data = relu3_2, numFilter = 256, pad = [1;1], kern
 let relu3_3 = new Relu(conv3_3, Name = "relu3_3")
 let conv3_4 = new Convolution(data = relu3_3, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_4")
 let relu3_4 = new Relu(conv3_4, Name = "relu3_4")
-let pool3 = new Pooling(relu3_4, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = Avg, Name = "pool3")
+let pool3 = new Pooling(relu3_4, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = PoolType.Avg, Name = "pool3")
 
 let conv4_1 = new Convolution(data = pool3, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_1")
 let relu4_1 = new Relu(conv4_1, Name = "relu4_1")
@@ -85,7 +85,7 @@ let conv4_3 = new Convolution(data = relu4_2, numFilter = 512, pad = [1;1], kern
 let relu4_3 = new Relu(conv4_3, Name = "relu4_3")
 let conv4_4 = new Convolution(data = relu4_3, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_4")
 let relu4_4 = new Relu(conv4_4, Name = "relu4_4")
-let pool4 = new Pooling(relu4_4, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = Avg, Name = "pool4")
+let pool4 = new Pooling(relu4_4, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = PoolType.Avg, Name = "pool4")
 
 let conv5_1 = new Convolution(data = pool4, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv5_1")
 let relu5_1 = new Relu(conv5_1, Name = "relu5_1")
