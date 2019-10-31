@@ -30,6 +30,7 @@
     <None Include="generate operators.fsx" />
     <None Include="generate data iters.fsx" />
     <Content Include="OpOutCount.txt" />
+    <Content Include="OpOutCountRemainder.txt" />
   </ItemGroup>
 
 </Project>

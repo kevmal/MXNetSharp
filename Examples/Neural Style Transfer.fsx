@@ -48,7 +48,7 @@ let loadImage (image : Image) =
                     yield float32 p.B - 103.939f
         |]
     let im = new NDArray(dat |> Array.map float32, [image.Height; image.Width; 3], context)
-    let resized = Operators.ImageResize(im, [224;224]).[0]
+    let resized = Operators.ImageResize(im, [224;224])
     resized.SwapAxis(0,2).SwapAxis(1,2).Reshape([1;3;224;224])
 
 
@@ -105,7 +105,7 @@ let makeExecutor style content (inputSize : int seq) =
         |> Array.mapi 
             (fun i n -> 
                 let s = inferResult.InputShapes.[i] |> Array.map int
-                let a = Operators.ZerosNDArray(shape = s, ctx = ctxStr) |> Array.head
+                let a = Operators.ZerosNDArray(shape = s, ctx = ctxStr)
                 if n = "data" then 
                     n, a
                 else
@@ -124,7 +124,7 @@ let makeExecutor style content (inputSize : int seq) =
         |> Array.map 
             (fun n ->
                 if n = "data" then  
-                    OpReqType.WriteTo, Operators.ZerosLike(args.[n]).[0]
+                    OpReqType.WriteTo, Operators.ZerosLike(args.[n])
                 else
                     OpReqType.NullOp, new NDArray()
             )
@@ -223,13 +223,13 @@ let gradArray =
                     a.CopyTo(executor.Args.[sprintf "target_gram_%d" i])
                     //TODO: handle ctx parameters in op gen
                     let w = Operators.OnesNDArray(shape = [1], ctx = ctxStr)
-                    Operators.MulScalar(w, w.[0], styleWeight / double gradScale.[i])
-                    w.[0]
+                    Operators.MulScalar([|w|], w, styleWeight / double gradScale.[i])
+                    w
                 )
         let w = 
             let w = Operators.OnesNDArray(shape = [1], ctx = ctxStr)
-            Operators.MulScalar(w, w.[0], contentWeight) |> ignore
-            w.[0]
+            Operators.MulScalar([|w|], w, contentWeight) |> ignore
+            w
         w
     |]
 
@@ -275,13 +275,13 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
 // Train
 
 
-let img = Operators.RandomUniformNDArray(-0.1, 0.1, contentIn.Shape, ctx = ctxStr).[0]
+let img = Operators.RandomUniformNDArray(-0.1, 0.1, contentIn.Shape, ctx = ctxStr)
 let mutable oldImg = img.CopyTo(context)
 let clipNorm = 1.f * (img.Shape |> Array.reduce (*) |> float32)
 let tvGradExe = makeTvGradExecutor img tvWeight
 
 
-let momentum = Operators.ZerosLike(img).[0]
+let momentum = Operators.ZerosLike(img)
 let mutable lr = learningRate
 let opt w g = Operators.NagMomUpdate([w],w,g,momentum, lr, momentum = 0.95, wd = 0.0001 )
 
@@ -311,9 +311,9 @@ let resizeImage (image : Image) w h =
 
 let save (filename : string) (img : NDArray) = 
     printfn "Saving %s" filename
-    let img = Operators.Reshape(img, shape = [3; 224; 224]).[0]
-    let img = Operators.SwapAxis(img,1,2).[0]
-    let img = Operators.SwapAxis(img,0,2).[0]
+    let img = Operators.Reshape(img, shape = [3; 224; 224])
+    let img = Operators.SwapAxis(img,1,2)
+    let img = Operators.SwapAxis(img,0,2)
     let h = 224
     let w = 224
     //let img = Operators.ImageResize(img, contentImage.Height, contentImage.Width).[0]
@@ -345,7 +345,7 @@ let rec trainLoop epoch =
         img.CopyTo(executor.Args.["data"])
         let outs = executor.Executor.Forward(true)
         executor.Executor.Backward(gradArray)
-        let gnorm : float32 = Operators.Norm(executor.ArgGrad.["data"]).[0].ToArray().[0]
+        let gnorm : float32 = Operators.Norm(executor.ArgGrad.["data"]).ToArray().[0]
         if gnorm > clipNorm then 
             Operators.MulScalar([executor.ArgGrad.["data"]], executor.ArgGrad.["data"], double(clipNorm / gnorm))
 
@@ -354,14 +354,14 @@ let rec trainLoop epoch =
             | Some e -> 
                 let outs = e.Executor.Forward(true)
                 //opti
-                let g = Operators.ElemwiseAdd(executor.ArgGrad.["data"], outs.[0]).[0]
+                let g = Operators.ElemwiseAdd(executor.ArgGrad.["data"], outs.[0])
                 opt img g
             | None -> 
                 opt img executor.ArgGrad.["data"]
 
         //let newImg = optResult.[0]
-        let diff = Operators.ElemwiseSub(oldImg, img).[0]
-        let eps : float32 = Operators.ElemwiseDiv(Operators.Norm(diff).[0], Operators.Norm(img).[0]).[0].ToArray().[0]
+        let diff = Operators.ElemwiseSub(oldImg, img)
+        let eps : float32 = Operators.ElemwiseDiv(Operators.Norm(diff), Operators.Norm(img)).ToArray().[0]
         oldImg <- img.CopyTo(context)
         printfn "%5d : %f" epoch eps
         if (epoch + 1) % lrScheduleDelay = 0 then 

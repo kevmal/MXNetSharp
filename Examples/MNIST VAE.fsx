@@ -138,10 +138,10 @@ let ps =
             else
                 let s = s |> Seq.map int
                 TrainParameters(
-                    Operators.RandomUniformNDArray(-0.1, 0.1, s, ctx = context.ToString()).[0], 
-                        Operators.ZerosNDArray(s, ctx = context.ToString()).[0],
-                        Operators.ZerosNDArray(s, ctx = context.ToString()).[0],
-                        Operators.ZerosNDArray(s, ctx = context.ToString()).[0])
+                    Operators.RandomUniformNDArray(-0.1, 0.1, s, ctx = context.ToString()), 
+                        Operators.ZerosNDArray(s, ctx = context.ToString()),
+                        Operators.ZerosNDArray(s, ctx = context.ToString()),
+                        Operators.ZerosNDArray(s, ctx = context.ToString()))
         )
     
 let lr = 0.0005
@@ -168,7 +168,7 @@ let exe, texe =
 
 let xa = ps |> Seq.pick (function NoTrain a -> Some a | _ -> None)
 
-let testZs = Operators.RandomNormalNDArray(shape = [batchSize; 3], ctx = context.ToString()).[0]
+let testZs = Operators.RandomNormalNDArray(shape = [batchSize; 3], ctx = context.ToString())
 
 
 

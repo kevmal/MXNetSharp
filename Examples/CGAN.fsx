@@ -145,7 +145,7 @@ let q =
             match a.Shape with 
             | Some (shape) -> 
                 //Operators.ZerosNDArray(shape, ctx = context.ToString()).[0]
-                Operators.RandomUniformNDArray(low = -0.1, high = 0.1, shape = shape, ctx = context.ToString()).[0]
+                Operators.RandomUniformNDArray(low = -0.1, high = 0.1, shape = shape, ctx = context.ToString())
                 |> a.WithNDArray
             | None -> a
         )
@@ -159,7 +159,7 @@ let q =
         (fun a ->
             match a.OpReqType with 
             | Some NullOp -> {a with Grad = Some(new NDArray())}
-            | _ -> {a with Grad = Some(Operators.ZerosLike(a.NDArray.Value).[0])}
+            | _ -> {a with Grad = Some(Operators.ZerosLike(a.NDArray.Value))}
         )
 
 module BindMap = 
@@ -195,7 +195,7 @@ let optUpdate (e : Executor) =
             if scc then 
                 v
             else
-                let v = Operators.ZerosLike(a).[0],Operators.ZerosLike(a).[0]
+                let v = Operators.ZerosLike(a),Operators.ZerosLike(a)
                 d.[s] <- v
                 v
     fun () -> 
