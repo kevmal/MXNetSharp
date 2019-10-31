@@ -8,9 +8,28 @@ open System.Diagnostics
 #load "cnnvmapi.fs"
 #load "coretypes.fs"
 #load "interop.fs"
+#load "atomicsymbol.fs"
 
+open MXNetSharp
 open MXNetSharp.Interop
 open System
+
+let opOutCount = 
+    System.IO.File.ReadAllLines(IO.Path.Combine(__SOURCE_DIRECTORY__, "OpOutCount.txt"))
+    |> Seq.map (fun x -> let a = x.Split ',' in a.[0], int a.[1])
+    |> dict
+
+let lookupOpCount op = 
+    let scc, v = opOutCount.TryGetValue op
+    if scc then 
+        v
+    else 
+        let c = AtomicSymbolCreator.FromName op
+        let scc,v = opOutCount.TryGetValue c.Name
+        if scc then 
+            v
+        else
+            -2
 
 type Mapper<'a> = 
     | Final of 'a
@@ -655,14 +674,30 @@ let toNDArrayCode suffix (x : ProcessedAtomicSymbol) =
             ) 
         |> arr
     let invoke = 
-        [
-            sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
-            sprintf "let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle"
-            sprintf "                                         %s" inputsStr
-            sprintf "                                         %s" paramNamesStr
-            sprintf "                                         %s" paramValuesStr
-            sprintf "outputs |> Array.map (fun h -> new NDArray(h))"
-        ]
+        match lookupOpCount x.AtomicSymbolInfo.Name with 
+        | c when c > 0 -> 
+            [
+                sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
+                sprintf "let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle"
+                sprintf "                                         %s" inputsStr
+                sprintf "                                         %s" paramNamesStr
+                sprintf "                                         %s" paramValuesStr
+                [
+                    for i = 0 to c - 1 do 
+                        yield sprintf "(new NDArray(outputs.[%d]))" i
+                ] 
+                |> String.concat ", "
+            ]
+        | c when c < 0 ->
+            if c = -2 then printfn "No out count for %s" x.AtomicSymbolInfo.Name 
+            [
+                sprintf "let creator = AtomicSymbolCreator.FromName \"%s\"" x.AtomicSymbolInfo.Name
+                sprintf "let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle"
+                sprintf "                                         %s" inputsStr
+                sprintf "                                         %s" paramNamesStr
+                sprintf "                                         %s" paramValuesStr
+                sprintf "outputs |> Array.map (fun h -> new NDArray(h))"
+            ]
     let defineInto = 
         let name = x.Name
         if args.Length = 0 then 

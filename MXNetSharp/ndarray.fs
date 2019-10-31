@@ -26,7 +26,6 @@ type NDArray(handle : SafeNDArrayHandle) =
         let outcount = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle [|(out.NDArrayHandle : SafeNDArrayHandle).UnsafeHandle|] inputs pkeys pvals
         assert(outcount = 1)
         out
-    static let invoke1 opName inputs parameters = invoke opName inputs parameters |> Array.head
     internal new(h : CApi.NDArrayHandle) = new NDArray(new SafeNDArrayHandle(h, true))
     new() = 
         let h1 = MXNDArray.createNone()
@@ -154,4 +153,4 @@ type NDArray(handle : SafeNDArrayHandle) =
         member x.Dispose() = x.Dispose()
 
 
-    
+

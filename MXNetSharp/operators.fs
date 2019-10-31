@@ -67,7 +67,7 @@ type Operators() =
                                                  [|buf.NDArrayHandle.UnsafeHandle|]
                                                  [|"flag"; "to_rgb"|]
                                                  [|string flag; string toRgb|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Decode image with OpenCV. 
     /// Note: return image in RGB by default, instead of OpenCV&#39;s default BGR.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -97,7 +97,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"filename"; "flag"; "to_rgb"|]
                                                  [|filename; string flag; string toRgb|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Read and decode image with OpenCV. 
     /// Note: return image in RGB by default, instead of OpenCV&#39;s default BGR.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -135,7 +135,7 @@ type Operators() =
                                                  [|src.NDArrayHandle.UnsafeHandle|]
                                                  [|"w"; "h"; "interp"|]
                                                  [|string w; string h; string interp|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Resize image with OpenCV. 
     /// </summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -178,7 +178,7 @@ type Operators() =
                                                  [|src.NDArrayHandle.UnsafeHandle|]
                                                  [|"top"; "bot"; "left"; "right"; "values"; "type"; "value"|]
                                                  [|string top; string bot; string left; string right; string values; string fillingType; string value|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Pad image border with OpenCV. 
     /// </summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -217,7 +217,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">input data</param>
     static member Copyto(outputArray : NDArray seq, data : NDArray) =
@@ -239,7 +239,7 @@ type Operators() =
                                                  Array.empty
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Place holder for variable who cannot perform gradient</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     static member NoGradient(outputArray : NDArray seq) =
@@ -519,7 +519,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mean.NDArrayHandle.UnsafeHandle; var.NDArrayHandle.UnsafeHandle; weight32.NDArrayHandle.UnsafeHandle; rescaleGrad.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "eta"; "beta1"; "beta2"; "epsilon"; "wd"; "clip_gradient"|]
                                                  [|string lr; string eta; string beta1; string beta2; string epsilon; string wd; string clipGradient|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Update function for multi-precision AdamW optimizer.
     /// 
     /// AdamW is seen as a modification of Adam by decoupling the weight decay from the
@@ -720,7 +720,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mean.NDArrayHandle.UnsafeHandle; var.NDArrayHandle.UnsafeHandle; rescaleGrad.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "eta"; "beta1"; "beta2"; "epsilon"; "wd"; "clip_gradient"|]
                                                  [|string lr; string eta; string beta1; string beta2; string epsilon; string wd; string clipGradient|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Update function for AdamW optimizer. AdamW is seen as a modification of
     /// Adam by decoupling the weight decay from the optimization steps taken w.r.t. the loss function.
     /// 
@@ -879,7 +879,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"output_size"|]
                                                  [|(if isNull (outputSize :> obj) then "[]" else (outputSize |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// Applies a 2D adaptive average pooling over a 4D input with the shape of (NCHW).
     /// The pooling kernel and stride sizes are automatically chosen for desired output sizes.
@@ -938,7 +938,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"init_output"|]
                                                  [|string initOutput|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Check if all the float numbers in the array are finite (used for AMP)
     /// 
     /// 
@@ -971,7 +971,7 @@ type Operators() =
                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"num_arrays"; "init_output"|]
                                                  [|string numArrays; string initOutput|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Check if all the float numbers in all the arrays are finite (used for AMP)
     /// 
     /// 
@@ -1032,7 +1032,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; like.NDArrayHandle.UnsafeHandle|]
                                                  [|"height"; "width"; "scale_height"; "scale_width"; "mode"|]
                                                  [|(match height with None -> "1" | Some height -> string height); (match width with None -> "1" | Some width -> string width); (match scaleHeight with None -> "None" | Some scaleHeight -> string scaleHeight); (match scaleWidth with None -> "None" | Some scaleWidth -> string scaleWidth); (match mode with None -> "size" | Some mode -> string mode)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// Perform 2D resizing (upsampling or downsampling) for 4D input using bilinear interpolation.
     /// 
@@ -1119,7 +1119,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; index.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"|]
                                                  [|string axis|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// Given an n-d NDArray data, and a 1-d NDArray index,
     /// the operator produces an un-predeterminable shaped n-d NDArray out,
@@ -1261,7 +1261,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"overlap_thresh"; "valid_thresh"; "topk"; "coord_start"; "score_index"; "id_index"; "background_id"; "force_suppress"; "in_format"; "out_format"|]
                                                  [|string overlapThresh; string validThresh; string topk; string coordStart; string scoreIndex; string idIndex; string backgroundId; string forceSuppress; (if isNull (inFormat :> obj) then "corner" else string inFormat); (if isNull (outFormat :> obj) then "corner" else string outFormat)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>Apply non-maximum suppression to input.
     /// 
     /// The output will be sorted in descending order according to `score`. Boxes with
@@ -1460,7 +1460,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"format"|]
                                                  [|(if isNull (format :> obj) then "corner" else string format)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Bounding box overlap of two arrays.
     ///   The overlap is defined as Intersection-over-Union, aka, IOU.
     ///   - lhs: (a_1, a_2, ..., a_n, 4) array
@@ -1557,7 +1557,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"threshold"; "is_ascend"; "topk"|]
                                                  [|string threshold; string isAscend; string topk|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>Compute bipartite matching.
     ///   The matching is performed on score matrix with shape [B, N, M]
     ///   - B: batch_size
@@ -2206,7 +2206,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; u.NDArrayHandle.UnsafeHandle; v.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>This operator implements the edge_id function for a graph
     /// stored in a CSR matrix (the value of the CSR stores the edge Id of the graph).
     /// output[i] = input[u[i], v[i]] if there is an edge between u[i] and v[i]],
@@ -2300,7 +2300,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>This operator converts a CSR matrix whose values are edge Ids
     /// to an adjacency matrix whose values are ones. The output CSR matrix always has
     /// the data value of float32.
@@ -2579,7 +2579,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>This operator implements the gradient multiplier function.
     /// In forward pass it acts as an identity transform. During backpropagation it
     /// multiplies the gradient from the subsequent level by a scalar factor lambda and passes it to
@@ -2632,7 +2632,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -2957,7 +2957,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axes"|]
                                                  [|(match axes with None -> "None" | Some axes -> (axes |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns an array of indexes of the input array.
     /// 
     /// For an input array with shape  :math:`(d_1, d_2, ..., d_n)`, `index_array` returns a
@@ -3112,7 +3112,7 @@ type Operators() =
                                                  [|oldTensor.NDArrayHandle.UnsafeHandle; indexVector.NDArrayHandle.UnsafeHandle; newTensor.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Copies the elements of a `new_tensor` into the `old_tensor`.
     /// 
     /// This operator copies the elements by selecting the indices in the order given in `index`.
@@ -3200,7 +3200,7 @@ type Operators() =
                                                  Array.empty
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     static member ContribBackwardIndexCopy(outputArray : NDArray seq) =
         let creator = AtomicSymbolCreator.FromName "_contrib_backward_index_copy"
@@ -3258,7 +3258,7 @@ type Operators() =
                                                  (args |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the Khatri-Rao product of the input matrices.
     /// 
     /// Given a collection of :math:`n` input matrices,
@@ -3695,7 +3695,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Number of stored values for a sparse tensor, including explicit zeros.
     /// 
     /// This operator only supports CSR matrix on CPU.
@@ -3768,7 +3768,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; history.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "rescale_grad"; "clip_gradient"; "epsilon"|]
                                                  [|string lr; string rescaleGrad; string clipGradient; string epsilon|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Update function for Group AdaGrad optimizer.
     /// 
     /// Referenced from *Adaptive Subgradient Methods for Online Learning and Stochastic Optimization*,
@@ -4245,7 +4245,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"a"; "b"; "c"|]
                                                  [|string a; string b; string c|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>This operators implements the quadratic function.
     /// 
     /// .. math::
@@ -4317,7 +4317,7 @@ type Operators() =
                                                  Array.empty
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     static member ContribBackwardQuadratic(outputArray : NDArray seq) =
         let creator = AtomicSymbolCreator.FromName "_contrib_backward_quadratic"
@@ -4371,7 +4371,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; rois.NDArrayHandle.UnsafeHandle|]
                                                  [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|]
                                                  [|(pooledSize |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string spatialScale; string sampleRatio; string positionSensitive|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// This operator takes a 4D feature map as an input array and region proposals as `rois`,
     /// then align the feature map over sub-regions of input and produces a fixed-sized output array.
@@ -4513,7 +4513,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; rois.NDArrayHandle.UnsafeHandle|]
                                                  [|"pooled_size"; "spatial_scale"; "sampling_ratio"|]
                                                  [|(pooledSize |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string spatialScale; string samplingRatio|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Performs Rotated ROI Align on the input array.
     /// 
     /// This operator takes a 4D feature map as an input array and region proposals as `rois`,
@@ -4928,7 +4928,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Rescale the input by the square root of the channel dimension.
     /// 
     ///    out = data / sqrt(data.shape[-1])
@@ -5382,7 +5382,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"x"; "y"; "width"; "height"|]
                                                  [|string x; string y; string width; string height|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Crop an image NDArray of shape (H x W x C) or (N x H x W x C) 
     /// to the given size.
     /// Example:
@@ -5570,7 +5570,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Converts an image NDArray of shape (H x W x C) or (N x H x W x C) 
     /// with values in the range [0, 255] to a tensor NDArray of shape (C x H x W) or (N x C x H x W)
     /// with values in the range [0, 1]
@@ -5764,7 +5764,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"mean"; "std"|]
                                                  [|(if isNull (mean :> obj) then "[0,0,0,0]" else string mean); (if isNull (std :> obj) then "[1,1,1,1]" else string std)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Normalize an tensor of shape (C x H x W) or (N x C x H x W) with mean and
     ///     standard deviation.
     /// 
@@ -6433,7 +6433,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"size"; "keep_ratio"; "interp"|]
                                                  [|(if isNull (size :> obj) then "[]" else (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string keepRatio; string interp|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Resize an image NDArray of shape (H x W x C) or (N x H x W x C) 
     /// to the given size
     /// Example:
@@ -6677,7 +6677,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Calculate cross entropy of softmax output and one-hot label.
     /// 
     /// - This operator computes the cross entropy in two steps:
@@ -6781,7 +6781,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"act_type"|]
                                                  [|string actType|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Applies an activation function element-wise to the input.
     /// 
     /// The following activation functions are supported:
@@ -6930,7 +6930,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; movingMean.NDArrayHandle.UnsafeHandle; movingVar.NDArrayHandle.UnsafeHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "axis"; "cudnn_off"; "min_calib_range"; "max_calib_range"|]
                                                  [|(match eps with None -> "0.00100000004749745" | Some eps -> string eps); (match momentum with None -> "0.899999976" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Batch normalization.
     /// 
     /// Normalizes a data batch by mean and variance, and applies a scale ``gamma`` as
@@ -7141,7 +7141,7 @@ type Operators() =
                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"num_args"; "dim"|]
                                                  [|string data.Length; string dim|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Joins input arrays along a given axis.
     /// 
     /// .. note:: `Concat` is deprecated. Use `concat` instead.
@@ -7380,7 +7380,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
                                                  [|(kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Compute *N*-D convolution on *(N+2)*-D input.
     /// 
     /// In the 2-D convolution, given input data with shape *(batch_size,
@@ -7750,7 +7750,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle; dataLengths.NDArrayHandle.UnsafeHandle; labelLengths.NDArrayHandle.UnsafeHandle|]
                                                  [|"use_data_lengths"; "use_label_lengths"; "blank_label"|]
                                                  [|string useDataLengths; string useLabelLengths; (if isNull (blankLabel :> obj) then "first" else string blankLabel)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>Connectionist Temporal Classification Loss.
     /// 
     /// .. note:: The existing alias ``contrib_CTCLoss`` is deprecated.
@@ -8017,7 +8017,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "adj"; "target_shape"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
                                                  [|(kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (adj :> obj) then "[]" else (adj |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes 1D or 2D transposed convolution (aka fractionally strided convolution) of the input tensor. This operation can be seen as the gradient of Convolution operation with respect to its input. Convolution usually reduces the size of the input. Transposed convolution works the other way, going from a smaller input to a larger output while preserving the connectivity pattern.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input tensor to the deconvolution operation.</param>
@@ -8150,7 +8150,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"p"; "mode"; "axes"; "cudnn_off"|]
                                                  [|(match p with None -> "0.5" | Some p -> string p); (match mode with None -> "training" | Some mode -> string mode); (match axes with None -> "[]" | Some axes -> (axes |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>Applies dropout operation to input array.
     /// 
     /// - During training, each element of the input is set to zero with probability p.
@@ -8296,7 +8296,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
                                                  [|"num_hidden"; "no_bias"; "flatten"|]
                                                  [|string numHidden; string noBias; string flatten|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Applies a linear transformation: :math:`Y = XW^T + b`.
     /// 
     /// If ``flatten`` is set to be true, then the shapes are:
@@ -8471,7 +8471,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
                                                  [|"num_groups"; "eps"; "output_mean_var"|]
                                                  [|string numGroups; string eps; string outputMeanVar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>Group normalization.
     /// 
     /// The input channels are separated into ``num_groups`` groups, each containing ``num_channels / num_groups`` channels.
@@ -8581,7 +8581,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "eps"; "output_mean_var"|]
                                                  [|string axis; string eps; string outputMeanVar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>Layer normalization.
     /// 
     /// Normalizes the channels of the input tensor by mean and variance, and applies a scale ``gamma`` as
@@ -8703,7 +8703,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "temperature"; "dtype"; "use_length"|]
                                                  [|(match axis with None -> "-1" | Some axis -> string axis); (match temperature with None -> "None" | Some temperature -> string temperature); (match dtype with None -> "None" | Some dtype -> string dtype); (match useLength with None -> "None" | Some useLength -> string useLength)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the log softmax of the input.
     /// This is equivalent to computing softmax followed by log.
     /// 
@@ -8800,7 +8800,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"nsize"; "alpha"; "beta"; "knorm"|]
                                                  [|string nsize; string alpha; string beta; string knorm|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>Applies local response normalization to the input.
     /// 
     /// The local response normalization layer performs &quot;lateral inhibition&quot; by normalizing
@@ -8924,7 +8924,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axes"; "keepdims"|]
                                                  [|(match axes with None -> "None" | Some axes -> (axes |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>
     /// Calculate the mean and variance of `data`.
     /// 
@@ -9269,7 +9269,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; length.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "temperature"; "dtype"; "use_length"|]
                                                  [|(match axis with None -> "-1" | Some axis -> string axis); (match temperature with None -> "None" | Some temperature -> string temperature); (match dtype with None -> "None" | Some dtype -> string dtype); (match useLength with None -> "None" | Some useLength -> string useLength)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Applies the softmax function.
     /// 
     /// The resulting array contains elements in the range (0,1) and the elements along the given axis sum up to 1.
@@ -9388,7 +9388,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"mode"|]
                                                  [|(if isNull (mode :> obj) then "instance" else string mode)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Applies softmax activation to input. This is intended for internal layers.
     /// 
     /// .. note::
@@ -9502,7 +9502,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "temperature"; "dtype"; "use_length"|]
                                                  [|(match axis with None -> "-1" | Some axis -> string axis); (match temperature with None -> "None" | Some temperature -> string temperature); (match dtype with None -> "None" | Some dtype -> string dtype); (match useLength with None -> "None" | Some useLength -> string useLength)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Applies the softmin function.
     /// 
     /// The resulting array contains elements in the range (0,1) and the elements along the given axis sum
@@ -9866,7 +9866,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\linalg\np_gesvd.cc:L93</summary>
@@ -9900,7 +9900,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
@@ -9940,7 +9940,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "dtype"; "keepdims"; "initial"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "None" | Some dtype -> string dtype); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match initial with None -> "None" | Some initial -> string initial)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L53</summary>
@@ -9991,7 +9991,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "initial"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match initial with None -> "None" | Some initial -> string initial)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L91</summary>
@@ -10035,7 +10035,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "initial"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match initial with None -> "None" | Some initial -> string initial)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L118</summary>
@@ -10081,7 +10081,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "dtype"; "keepdims"; "initial"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "None" | Some dtype -> string dtype); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match initial with None -> "None" | Some initial -> string initial)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
@@ -10128,7 +10128,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "dtype"; "keepdims"; "initial"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "None" | Some dtype -> string dtype); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match initial with None -> "None" | Some initial -> string initial)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
@@ -10175,7 +10175,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "dtype"; "ddof"; "keepdims"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "None" | Some dtype -> string dtype); (match ddof with None -> "0" | Some ddof -> string ddof); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
@@ -10221,7 +10221,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "dtype"; "ddof"; "keepdims"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "None" | Some dtype -> string dtype); (match ddof with None -> "0" | Some ddof -> string ddof); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
@@ -10260,7 +10260,7 @@ type Operators() =
                                                  [|array.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="array">The input</param>
     /// <param name="shape">The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.</param>
@@ -10293,7 +10293,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "dtype"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis); (match dtype with None -> "None" | Some dtype -> string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return the cumulative sum of the elements along a given axis.
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_cumsum.cc:L67</summary>
@@ -10349,7 +10349,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle; b.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Dot product of two arrays. Specifically,
     /// 
     /// - If both a and b are 1-D arrays, it is inner product of vectors.
@@ -10416,7 +10416,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -10444,7 +10444,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -10472,7 +10472,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -10500,7 +10500,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -10528,7 +10528,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -10559,7 +10559,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_broadcast_op.cc:L80</summary>
@@ -10622,7 +10622,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -10654,7 +10654,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -10686,7 +10686,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -10718,7 +10718,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -10750,7 +10750,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -10782,7 +10782,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -10814,7 +10814,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -10846,7 +10846,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -10878,7 +10878,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -10910,7 +10910,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -10944,7 +10944,7 @@ type Operators() =
                                                  [|x1.NDArrayHandle.UnsafeHandle; x2.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x1">The input array</param>
     /// <param name="x2">The input array</param>
@@ -10973,7 +10973,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -11005,7 +11005,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -11039,7 +11039,7 @@ type Operators() =
                                                  [|x1.NDArrayHandle.UnsafeHandle; x2.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x1">The input array</param>
     /// <param name="x2">The input array</param>
@@ -11105,7 +11105,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes rectified linear activation.
     /// .. math::
     ///    max(features, 0)
@@ -11148,7 +11148,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes sigmoid of x element-wise.
     /// .. math::
     ///    y = 1 / (1 + exp(-x))
@@ -11188,7 +11188,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return an array copy of the given object.
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L47</summary>
@@ -11223,7 +11223,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Numerical negative, element-wise.
     /// Example::
     ///     negative([1.,  -1.]) = [-1.,  1.]
@@ -11260,7 +11260,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return the reciprocal of the argument, element-wise.
     /// Example::
     ///     reciprocal([-2, 1, 3, 1.6, 0.2]) = [-0.5, 1.0, 0.33333334, 0.625, 5.0]
@@ -11299,7 +11299,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise absolute value of the input.
     /// Example::
     ///    absolute([-2, 0, 3]) = [2, 0, 3]
@@ -11343,7 +11343,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns an element-wise indication of the sign of a number.
     /// The sign function returns -1 if x &lt; 0, 0 if x==0, 1 if x &gt; 0.
     /// Example::
@@ -11388,7 +11388,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Round elements of the array to the nearest integer.
     /// Example::
     ///    rint([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -0.,  0.,  2.,  2.,  2.]
@@ -11432,7 +11432,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return the ceiling of the input, element-wise.
     /// The ceil of the scalar x is the smallest integer i, such that i &gt;= x.
     /// Example::
@@ -11478,7 +11478,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return the floor of the input, element-wise.
     /// The floor of the scalar x is the largest integer i, such that i &lt;= x.
     /// Example::
@@ -11525,7 +11525,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return the truncated value of the input, element-wise.
     /// The truncated value of the scalar x is the nearest integer i which is closer to
     /// zero than x is. In short, the fractional part of the signed number x is discarded.
@@ -11574,7 +11574,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Round to nearest integer towards zero.
     /// Round an array of floats element-wise to nearest integer towards zero.
     /// The rounded values are returned as floats.
@@ -11621,7 +11621,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return the element-wise square of the input.
     /// Example::
     ///    square([2, 3, 4]) = [4, 9, 16]
@@ -11664,7 +11664,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return the non-negative square-root of an array, element-wise.
     /// Example::
     ///    sqrt([4, 9, 16]) = [2, 3, 4]
@@ -11707,7 +11707,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return the cube-root of an array, element-wise.
     /// Example::
     ///    cbrt([1, 8, -125]) = [1, 2, -5]
@@ -11750,7 +11750,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Calculate the exponential of all elements in the input array.
     /// Example::
     ///    exp([0, 1, 2]) = [1., 2.71828175, 7.38905621]
@@ -11792,7 +11792,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise Natural logarithmic value of the input.
     /// The natural logarithm is logarithm in base *e*, so that ``log(exp(x)) = x``
     /// 
@@ -11832,7 +11832,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise Base-10 logarithmic value of the input.
     /// ``10**log10(x) = x``
     /// 
@@ -11872,7 +11872,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise Base-2 logarithmic value of the input.
     /// ``2**log2(x) = x``
     /// 
@@ -11912,7 +11912,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return the natural logarithm of one plus the input array, element-wise.
     /// Calculates ``log(1 + x)``.
     /// 
@@ -11950,7 +11950,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Calculate ``exp(x) - 1`` for all elements in the array.
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L241</summary>
@@ -11985,7 +11985,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Compute the truth value of NOT x element-wise.
     /// Example::
     ///   logical_not([-2., 0., 1.]) = [0., 1., 0.]
@@ -12024,7 +12024,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Trigonometric sine, element-wise.
     /// .. math::
     ///    sin([0, \pi/4, \pi/2]) = [0, 0.707, 1]
@@ -12067,7 +12067,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the element-wise cosine of the input array.
     /// .. math::
     ///    cos([0, \pi/4, \pi/2]) = [1, 0.707, 0]
@@ -12110,7 +12110,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the element-wise tangent of the input array.
     /// .. math::
     ///    tan([0, \pi/4, \pi/2]) = [0, 1, -inf]
@@ -12153,7 +12153,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise inverse sine of the input array.
     /// .. math::
     ///    arcsin([-1, -.707, 0, .707, 1]) = [-\pi/2, -\pi/4, 0, \pi/4, \pi/2]
@@ -12199,7 +12199,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise inverse cosine of the input array.
     /// The input should be in range `[-1, 1]`.
     /// The output is in the closed interval :math:`[0, \pi]`
@@ -12248,7 +12248,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise inverse tangent of the input array.
     /// .. math::
     ///    arctan([-1, 0, 1]) = [-\pi/4, 0, \pi/4]
@@ -12291,7 +12291,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Converts each element of the input array from radians to degrees.
     /// .. math::
     ///    degrees([0, \pi/2, \pi, 3\pi/2, 2\pi]) = [0, 90, 180, 270, 360]
@@ -12334,7 +12334,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Converts each element of the input array from degrees to radians.
     /// .. math::
     ///    radians([0, 90, 180, 270, 360]) = [0, \pi/2, \pi, 3\pi/2, 2\pi]
@@ -12377,7 +12377,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the hyperbolic sine of the input array, computed element-wise.
     /// .. math::
     ///    sinh(x) = 0.5\times(exp(x) - exp(-x))
@@ -12420,7 +12420,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the hyperbolic cosine  of the input array, computed element-wise.
     /// .. math::
     ///    cosh(x) = 0.5\times(exp(x) + exp(-x))
@@ -12463,7 +12463,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the hyperbolic tangent of the input array, computed element-wise.
     /// .. math::
     ///    tanh(x) = sinh(x) / cosh(x)
@@ -12505,7 +12505,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the element-wise inverse hyperbolic sine of the input array, \
     /// computed element-wise.
     /// 
@@ -12545,7 +12545,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the element-wise inverse hyperbolic cosine of the input array, \
     /// computed element-wise.
     /// 
@@ -12585,7 +12585,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the element-wise inverse hyperbolic tangent of the input array, \
     /// computed element-wise.
     /// 
@@ -12621,7 +12621,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  [|"decimals"|]
                                                  [|string decimals|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">Input ndarray</param>
     /// <param name="decimals">Number of decimal places to round to.</param>
@@ -12650,7 +12650,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"shape"; "ctx"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="shape">The shape of the output</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
@@ -12681,7 +12681,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"shape"; "ctx"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return a new array of given shape, type, and context, filled with ones.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="shape">The shape of the output</param>
@@ -12806,7 +12806,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
                                                  [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
@@ -12852,7 +12852,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"dimensions"; "dtype"; "ctx"|]
                                                  [|(dimensions |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (dtype :> obj) then "int32" else string dtype); ctx|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return an array representing the indices of a grid.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="dimensions">The shape of the grid.</param>
@@ -12883,7 +12883,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  [|"axes"|]
                                                  [|(if isNull (axes :> obj) then null else (axes |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">Source input</param>
     /// <param name="axes">By default, reverse the dimensions, otherwise permute the axes according to the values given.</param>
@@ -12915,7 +12915,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  [|"newshape"; "order"|]
                                                  [|(newshape |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); order|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L167</summary>
@@ -12959,7 +12959,7 @@ type Operators() =
                                                  (a |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"axis"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">data to squeeze</param>
     /// <param name="axis">Selects a subset of the single-dimensional entries in the shape. If an axis is selected with shape entry greater than one, an error is raised.</param>
@@ -12991,7 +12991,7 @@ type Operators() =
                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"num_args"; "dim"|]
                                                  [|string data.Length; string dim|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Join a sequence of arrays along an existing axis.
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L274</summary>
@@ -13044,7 +13044,7 @@ type Operators() =
                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"num_args"; "axis"|]
                                                  [|string data.Length; string axis|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Join a sequence of arrays along a new axis.
     /// 
     /// The axis parameter specifies the index of the new axis in the dimensions of the
@@ -13108,7 +13108,7 @@ type Operators() =
                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"num_args"|]
                                                  [|string data.Length|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L459</summary>
@@ -13143,7 +13143,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"shift"; "axis"|]
                                                  [|(match shift with None -> "None" | Some shift -> (shift |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     /// <param name="shift">The number of places by which elements are shifted. If a tuple,then axis must be a tuple of the same size, and each of the given axes is shiftedby the corresponding number. If an int while axis is a tuple of ints, then the same value is used for all given axes.</param>
@@ -13173,7 +13173,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"|]
                                                  [|(axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data array</param>
     /// <param name="axis">The axis which to flip elements.</param>
@@ -13205,7 +13205,7 @@ type Operators() =
                                                  [|x.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpxNonzero(outputArray : NDArray seq, x : NDArray) =
@@ -13233,7 +13233,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle; b.NDArrayHandle.UnsafeHandle|]
                                                  [|"a_axes_summed"; "b_axes_summed"|]
                                                  [|(aAxesSummed |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (bAxesSummed |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">First input</param>
     /// <param name="b">Second input</param>
@@ -13273,7 +13273,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle; b.NDArrayHandle.UnsafeHandle|]
                                                  [|"axes"|]
                                                  [|string axes|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">First input</param>
     /// <param name="b">Second input</param>
@@ -13331,7 +13331,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"offset"; "axis1"; "axis2"|]
                                                  [|string offset; string axis1; string axis2|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the sum of the diagonal elements of a matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -13452,7 +13452,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// Returns a true division of the inputs, element-wise.
     /// 
@@ -13518,7 +13518,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -13550,7 +13550,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -13630,7 +13630,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"M"; "ctx"; "dtype"|]
                                                  [|string M; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return the Hanning window.The Hanning window is a taper formed by using a weighted cosine.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
@@ -13663,7 +13663,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"M"; "ctx"; "dtype"|]
                                                  [|string M; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return the Hamming window.The Hamming window is a taper formed by using a weighted cosine.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
@@ -13696,7 +13696,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"M"; "ctx"; "dtype"|]
                                                  [|string M; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return the Blackman window.The Blackman window is a taper formed by using a weighted cosine.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
@@ -13739,7 +13739,7 @@ type Operators() =
                                                  [|input1.NDArrayHandle.UnsafeHandle; input2.NDArrayHandle.UnsafeHandle|]
                                                  [|"a"; "size"; "ctx"; "replace"; "weighted"|]
                                                  [|string a; (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); ctx; string replace; string weighted|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>random choice</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="input1">Source input</param>
@@ -13803,7 +13803,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  [|"n"; "pvals"; "size"|]
                                                  [|string n; string pvals; (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw samples from a multinomial distribution. &quot;
     /// &quot;The multinomial distribution is a multivariate generalisation of the binomial distribution. &quot;
     /// &quot;Take an experiment with one of p possible outcomes. &quot;
@@ -13874,7 +13874,7 @@ type Operators() =
                                                  [|input1.NDArrayHandle.UnsafeHandle; input2.NDArrayHandle.UnsafeHandle|]
                                                  [|"loc"; "scale"; "size"; "ctx"; "dtype"|]
                                                  [|(match loc with None -> "None" | Some loc -> string loc); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match ctx with None -> "cpu" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Numpy behavior normal</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="input1">Source input</param>
@@ -13932,7 +13932,7 @@ type Operators() =
                                                  [|input1.NDArrayHandle.UnsafeHandle; input2.NDArrayHandle.UnsafeHandle|]
                                                  [|"low"; "high"; "size"; "ctx"; "dtype"|]
                                                  [|(match low with None -> "None" | Some low -> string low); (match high with None -> "None" | Some high -> string high); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match ctx with None -> "cpu" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>numpy behavior uniform</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="input1">Source input</param>
@@ -14003,7 +14003,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "wd"; "rescale_grad"; "clip_gradient"|]
                                                  [|string lr; string wd; string rescaleGrad; string clipGradient|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Update function for SignSGD optimizer.
     /// 
     /// .. math::
@@ -14135,7 +14135,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mom.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "wd_lh"|]
                                                  [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string wdLh|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>SIGN momentUM (Signum) optimizer.
     /// 
     /// .. math::
@@ -14768,7 +14768,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
                                                  [|string lr; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Update function for Stochastic Gradient Descent (SGD) optimizer.
     /// 
     /// It updates the weights using::
@@ -14911,7 +14911,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mom.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
                                                  [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Momentum update function for Stochastic Gradient Descent (SGD) optimizer.
     /// 
     /// Momentum update has better convergence rates on neural networks. Mathematically it looks
@@ -15074,7 +15074,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; weight32.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
                                                  [|string lr; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Updater function for multi-precision sgd optimizer</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
@@ -15153,7 +15153,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mom.NDArrayHandle.UnsafeHandle; weight32.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
                                                  [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Updater function for multi-precision sgd optimizer</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
@@ -15261,7 +15261,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; d.NDArrayHandle.UnsafeHandle; v.NDArrayHandle.UnsafeHandle; z.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "t"; "beta1"; "beta2"; "epsilon"; "wd"; "rescale_grad"; "clip_grad"|]
                                                  [|string lr; string t; string beta1; string beta2; string epsilon; string wd; string rescaleGrad; string clipGrad|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>The FTML optimizer described in
     /// *FTML - Follow the Moving Leader in Deep Learning*,
     /// available at http://proceedings.mlr.press/v70/zheng17a/zheng17a.pdf.
@@ -15439,7 +15439,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mean.NDArrayHandle.UnsafeHandle; var.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "beta1"; "beta2"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "lazy_update"|]
                                                  [|string lr; string beta1; string beta2; string epsilon; string wd; string rescaleGrad; string clipGradient; string lazyUpdate|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Update function for Adam optimizer. Adam is seen as a generalization
     /// of AdaGrad.
     /// 
@@ -15635,7 +15635,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mom.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"|]
                                                  [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Update function for Nesterov Accelerated Gradient( NAG) optimizer.
     /// It updates the weights using the following formula,
     /// 
@@ -15760,7 +15760,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; mom.NDArrayHandle.UnsafeHandle; weight32.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "momentum"; "wd"; "rescale_grad"; "clip_gradient"|]
                                                  [|string lr; string momentum; string wd; string rescaleGrad; string clipGradient|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Update function for multi-precision Nesterov Accelerated Gradient( NAG) optimizer.
     /// 
     /// 
@@ -15887,7 +15887,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; n.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "gamma1"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "clip_weights"|]
                                                  [|string lr; string gamma1; string epsilon; string wd; string rescaleGrad; string clipGradient; string clipWeights|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Update function for `RMSProp` optimizer.
     /// 
     /// `RMSprop` is a variant of stochastic gradient descent where the gradients are
@@ -16109,7 +16109,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; n.NDArrayHandle.UnsafeHandle; g.NDArrayHandle.UnsafeHandle; delta.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "gamma1"; "gamma2"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"; "clip_weights"|]
                                                  [|string lr; string gamma1; string gamma2; string epsilon; string wd; string rescaleGrad; string clipGradient; string clipWeights|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Update function for RMSPropAlex optimizer.
     /// 
     /// `RMSPropAlex` is non-centered version of `RMSProp`.
@@ -16302,7 +16302,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; z.NDArrayHandle.UnsafeHandle; n.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "lamda1"; "beta"; "wd"; "rescale_grad"; "clip_gradient"|]
                                                  [|string lr; string lamda1; string beta; string wd; string rescaleGrad; string clipGradient|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Update function for Ftrl optimizer.
     /// Referenced from *Ad Click Prediction: a View from the Trenches*, available at
     /// http://dl.acm.org/citation.cfm?id=2488200.
@@ -16466,7 +16466,7 @@ type Operators() =
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; history.NDArrayHandle.UnsafeHandle|]
                                                  [|"lr"; "epsilon"; "wd"; "rescale_grad"; "clip_gradient"|]
                                                  [|string lr; string epsilon; string wd; string rescaleGrad; string clipGradient|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Update function for AdaGrad optimizer.
     /// 
     /// Referenced from *Adaptive Subgradient Methods for Online Learning and Stochastic Optimization*,
@@ -16955,7 +16955,7 @@ type Operators() =
                                                  [|hist.NDArrayHandle.UnsafeHandle; histEdges.NDArrayHandle.UnsafeHandle|]
                                                  [|"num_quantized_bins"|]
                                                  [|string numQuantizedBins|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>Provide calibrated min/max for input histogram.
     /// 
     /// .. Note::
@@ -17017,7 +17017,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; minRange.NDArrayHandle.UnsafeHandle; maxRange.NDArrayHandle.UnsafeHandle|]
                                                  [|"out_type"|]
                                                  [|(if isNull (outType :> obj) then "float32" else string outType)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Dequantize the input tensor into a float tensor.
     /// min_range and max_range are scalar floats that specify the range for
     /// the output data.
@@ -17112,7 +17112,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; minRange.NDArrayHandle.UnsafeHandle; maxRange.NDArrayHandle.UnsafeHandle|]
                                                  [|"out_type"|]
                                                  [|(if isNull (outType :> obj) then "uint8" else string outType)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>Quantize a input tensor from float to `out_type`,
     /// with user-specified `min_range` and `max_range`.
     /// 
@@ -17224,7 +17224,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"out_type"; "min_calib_range"; "max_calib_range"|]
                                                  [|(match outType with None -> "int8" | Some outType -> string outType); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>Quantize a input tensor from float to `out_type`,
     /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
     /// 
@@ -17323,7 +17323,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
                                                  [|"act_type"|]
                                                  [|string actType|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>Activation operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
     /// the float32 data into int8.
@@ -17426,7 +17426,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; movingMean.NDArrayHandle.UnsafeHandle; movingVar.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "axis"; "cudnn_off"; "min_calib_range"; "max_calib_range"|]
                                                  [|(match eps with None -> "0.00100000004749745" | Some eps -> string eps); (match momentum with None -> "0.899999976" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>BatchNorm operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
     /// the float32 data into int8.
@@ -17529,7 +17529,7 @@ type Operators() =
                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"num_args"; "dim"|]
                                                  [|string data.Length; string dim|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>Joins input arrays along a given axis.
     /// 
     /// The dimensions of the input arrays should be the same except the axis along
@@ -17630,7 +17630,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle; minWeight.NDArrayHandle.UnsafeHandle; maxWeight.NDArrayHandle.UnsafeHandle; minBias.NDArrayHandle.UnsafeHandle; maxBias.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
                                                  [|(kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>Convolution operator for input, weight and bias data type of int8,
     /// and accumulates in type int32 for the output. For each argument, two more arguments of type
     /// float32 must be provided representing the thresholds of quantizing argument from data
@@ -17788,7 +17788,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle; lhsMin.NDArrayHandle.UnsafeHandle; lhsMax.NDArrayHandle.UnsafeHandle; rhsMin.NDArrayHandle.UnsafeHandle; rhsMax.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>elemwise_add operator for input dataA and input dataB data type of int8,
     /// and accumulates in type int32 for the output. For each argument, two more arguments of type
     /// float32 must be provided representing the thresholds of quantizing argument from data
@@ -17908,7 +17908,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Flattens the input array into a 2-D array by collapsing the higher dimensions.
     /// 
     /// .. note:: `Flatten` is deprecated. Use `flatten` instead.
@@ -18021,7 +18021,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle; minWeight.NDArrayHandle.UnsafeHandle; maxWeight.NDArrayHandle.UnsafeHandle; minBias.NDArrayHandle.UnsafeHandle; maxBias.NDArrayHandle.UnsafeHandle|]
                                                  [|"num_hidden"; "no_bias"; "flatten"|]
                                                  [|string numHidden; string noBias; string flatten|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>Fully Connected operator for input, weight and bias data type of int8,
     /// and accumulates in type int32 for the output. For each argument, two more arguments of type
     /// float32 must be provided representing the thresholds of quantizing argument from data
@@ -18158,7 +18158,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "p_value"; "count_include_pad"; "layout"|]
                                                  [|(match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match layout with None -> "None" | Some layout -> string layout)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>Pooling operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
     /// the float32 data into int8.
@@ -18260,7 +18260,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; minRange.NDArrayHandle.UnsafeHandle; maxRange.NDArrayHandle.UnsafeHandle|]
                                                  [|"out_type"; "min_calib_range"; "max_calib_range"|]
                                                  [|(match outType with None -> "int8" | Some outType -> string outType); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>Given data that is quantized in int32 and the corresponding thresholds,
     /// requantize the data into int8 using min and max thresholds either calculated at runtime
     /// or from calibration. It&#39;s highly recommended to pre-calucate the min and max thresholds
@@ -20181,7 +20181,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"low"; "high"; "shape"; "ctx"; "dtype"|]
                                                  [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a uniform distribution.
     /// 
     /// .. note:: The existing alias ``uniform`` is deprecated.
@@ -20270,7 +20270,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"loc"; "scale"; "shape"; "ctx"; "dtype"|]
                                                  [|string loc; string scale; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a normal (Gaussian) distribution.
     /// 
     /// .. note:: The existing alias ``normal`` is deprecated.
@@ -20354,7 +20354,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"alpha"; "beta"; "shape"; "ctx"; "dtype"|]
                                                  [|string alpha; string beta; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a gamma distribution.
     /// 
     /// Samples are distributed according to a gamma distribution parametrized by *alpha* (shape) and *beta* (scale).
@@ -20427,7 +20427,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"lam"; "shape"; "ctx"; "dtype"|]
                                                  [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from an exponential distribution.
     /// 
     /// Samples are distributed according to an exponential distribution parametrized by *lambda* (rate).
@@ -20494,7 +20494,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"lam"; "shape"; "ctx"; "dtype"|]
                                                  [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a Poisson distribution.
     /// 
     /// Samples are distributed according to a Poisson distribution parametrized by *lambda* (rate).
@@ -20569,7 +20569,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"k"; "p"; "shape"; "ctx"; "dtype"|]
                                                  [|string k; string p; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a negative binomial distribution.
     /// 
     /// Samples are distributed according to a negative binomial distribution parametrized by
@@ -20654,7 +20654,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"mu"; "alpha"; "shape"; "ctx"; "dtype"|]
                                                  [|string mu; string alpha; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a generalized negative binomial distribution.
     /// 
     /// Samples are distributed according to a generalized negative binomial distribution parametrized by
@@ -20740,7 +20740,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"low"; "high"; "shape"; "ctx"; "dtype"|]
                                                  [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a discrete uniform distribution.
     /// 
     /// Samples are uniformly distributed over the half-open interval *[low, high)*
@@ -20818,7 +20818,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"low"; "high"|]
                                                  [|string low; string high|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a uniform distribution according to the input array shape.
     /// 
     /// Samples are uniformly distributed over the half-open interval *[low, high)*
@@ -20887,7 +20887,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"loc"; "scale"|]
                                                  [|string loc; string scale|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a normal (Gaussian) distribution according to the input array shape.
     /// 
     /// Samples are distributed according to a normal distribution parametrized by *loc* (mean) and *scale*
@@ -20953,7 +20953,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"alpha"; "beta"|]
                                                  [|string alpha; string beta|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a gamma distribution according to the input array shape.
     /// 
     /// Samples are distributed according to a gamma distribution parametrized by *alpha* (shape) and *beta* (scale).
@@ -21016,7 +21016,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"lam"|]
                                                  [|string lam|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from an exponential distribution according to the input array shape.
     /// 
     /// Samples are distributed according to an exponential distribution parametrized by *lambda* (rate).
@@ -21078,7 +21078,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"lam"|]
                                                  [|string lam|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a Poisson distribution according to the input array shape.
     /// 
     /// Samples are distributed according to a Poisson distribution parametrized by *lambda* (rate).
@@ -21144,7 +21144,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"k"; "p"|]
                                                  [|string k; string p|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a negative binomial distribution according to the input array shape.
     /// 
     /// Samples are distributed according to a negative binomial distribution parametrized by
@@ -21216,7 +21216,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"mu"; "alpha"|]
                                                  [|string mu; string alpha|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a generalized negative binomial distribution according to the
     /// input array shape.
     /// 
@@ -21282,7 +21282,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Randomly shuffle the elements.
     /// 
     /// This shuffles the array along the first axis.
@@ -21347,7 +21347,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"range_max"; "shape"|]
                                                  [|string rangeMax; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from an an approximately log-uniform
     /// or Zipfian distribution without replacement.
     /// 
@@ -21448,7 +21448,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
                                                  [|"grad_scale"|]
                                                  [|string gradScale|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes and optimizes for squared loss during backward propagation.
     /// Just outputs ``data`` during forward propagation.
     /// 
@@ -21547,7 +21547,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
                                                  [|"grad_scale"|]
                                                  [|string gradScale|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes mean absolute error of the input.
     /// 
     /// MAE is a risk metric corresponding to the expected value of the absolute error.
@@ -21652,7 +21652,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
                                                  [|"grad_scale"|]
                                                  [|string gradScale|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Applies a logistic function to the input.
     /// 
     /// The logistic function, also known as the sigmoid function, is computed as
@@ -22381,7 +22381,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
                                                  [|"use_sequence_length"; "value"; "axis"|]
                                                  [|string useSequenceLength; string value; string axis|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Sets all elements outside the sequence to a constant value.
     /// 
     /// This function takes an n-dimensional input array of the form
@@ -22621,7 +22621,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"num_outputs"; "axis"; "squeeze_axis"|]
                                                  [|string numOutputs; string axis; string squeezeAxis|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Splits an array along a particular axis into multiple sub-arrays.
     /// 
     /// .. note:: ``SliceChannel`` is deprecated. Use ``split`` instead.
@@ -22937,7 +22937,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
                                                  [|"grad_scale"; "ignore_label"; "multi_output"; "use_ignore"; "preserve_shape"; "normalization"; "out_grad"; "smooth_alpha"|]
                                                  [|string gradScale; string ignoreLabel; string multiOutput; string useIgnore; string preserveShape; (if isNull (normalization :> obj) then "null" else string normalization); string outGrad; string smoothAlpha|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the gradient of cross entropy loss with respect to softmax output.
     /// 
     /// - This operator computes the gradient in two steps.
@@ -23170,7 +23170,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"dim1"; "dim2"|]
                                                  [|string dim1; string dim2|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Interchanges two axes of an array.
     /// 
     /// Examples::
@@ -23389,7 +23389,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match exclude with None -> "false" | Some exclude -> string exclude)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the max of array elements over given axes.
     /// 
     /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L32</summary>
@@ -23472,7 +23472,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match exclude with None -> "false" | Some exclude -> string exclude)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the min of array elements over given axes.
     /// 
     /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L46</summary>
@@ -23579,7 +23579,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"ord"; "axis"; "out_dtype"; "keepdims"|]
                                                  [|(match ord with None -> "2" | Some ord -> string ord); (match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match outDtype with None -> "None" | Some outDtype -> string outDtype); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the norm on an NDArray.
     /// 
     /// This operator computes the norm on an NDArray with the specified axis, depending
@@ -23713,7 +23713,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns indices of the maximum values along an axis.
     /// 
     /// In the case of multiple occurrences of maximum values, the indices corresponding to the first occurrence
@@ -23813,7 +23813,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns indices of the minimum values along an axis.
     /// 
     /// In the case of multiple occurrences of minimum values, the indices corresponding to the first occurrence
@@ -23905,7 +23905,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns argmax indices of each channel from the input array.
     /// 
     /// The result will be an NDArray of shape (num_channel,).
@@ -24016,7 +24016,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; index.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "mode"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match mode with None -> "clip" | Some mode -> string mode)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Picks elements from an input array according to the input indices along the given axis.
     /// 
     /// Given an input array of shape ``(d0, d1)`` and indices of shape ``(i0,)``, the result will be
@@ -24169,7 +24169,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "size"|]
                                                  [|(if isNull (axis :> obj) then "[]" else (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (size :> obj) then "[]" else (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Broadcasts the input array over particular axes.
     /// 
     /// Broadcasting is allowed on axes with size 1, such as from `(2,1,3,1)` to
@@ -24267,7 +24267,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Broadcasts the input array to a new shape.
     /// 
     /// Broadcasting is a mechanism that allows NDArrays to perform arithmetic operations
@@ -24378,7 +24378,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"lhs_axes"; "rhs_axes"|]
                                                  [|(match lhsAxes with None -> "None" | Some lhsAxes -> (lhsAxes |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match rhsAxes with None -> "None" | Some rhsAxes -> (rhsAxes |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Broadcasts lhs to have the same shape as rhs.
     /// 
     /// Broadcasting is a mechanism that allows NDArrays to perform arithmetic operations
@@ -24466,7 +24466,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match exclude with None -> "false" | Some exclude -> string exclude)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the product of array elements over given axes.
     /// 
     /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L31</summary>
@@ -24551,7 +24551,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match exclude with None -> "false" | Some exclude -> string exclude)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the product of array elements over given axes treating Not a Numbers (``NaN``) as one.
     /// 
     /// 
@@ -24672,7 +24672,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match exclude with None -> "false" | Some exclude -> string exclude)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the sum of array elements over given axes.
     /// 
     /// .. Note::
@@ -24823,7 +24823,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match exclude with None -> "false" | Some exclude -> string exclude)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the mean of array elements over given axes.
     /// 
     /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L83</summary>
@@ -24908,7 +24908,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match exclude with None -> "false" | Some exclude -> string exclude)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the sum of array elements over given axes treating Not a Numbers (``NaN``) as zero.
     /// 
     /// 
@@ -25016,7 +25016,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"stype"|]
                                                  [|string stype|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Casts tensor storage type to the new type.
     /// 
     /// When an NDArray with default storage type is cast to csr or row_sparse storage,
@@ -25194,7 +25194,7 @@ type Operators() =
                                                  [|condition.NDArrayHandle.UnsafeHandle; x.NDArrayHandle.UnsafeHandle; y.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return the elements, either from x or y, depending on the condition.
     /// 
     /// Given three ndarrays, condition, x, and y, return an ndarray with the elements from x or y,
@@ -25338,7 +25338,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"k"; "axis1"; "axis2"|]
                                                  [|string k; string axis1; string axis2|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Extracts a diagonal or constructs a diagonal array.
     /// 
     /// ``diag``&#39;s behavior depends on the input array dimensions:
@@ -25535,7 +25535,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"transpose_a"; "transpose_b"; "forward_stype"|]
                                                  [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Dot product of two arrays.
     /// 
     /// ``dot``&#39;s behavior depends on the input array dimensions:
@@ -25690,7 +25690,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"transpose_a"; "transpose_b"; "forward_stype"|]
                                                  [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Batchwise dot product.
     /// 
     /// ``batch_dot`` is used to compute dot product of ``x`` and ``y`` when ``x`` and
@@ -25784,7 +25784,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise sum of the input arrays with broadcasting.
     /// 
     /// `broadcast_plus` is an alias to the function `broadcast_add`.
@@ -25891,7 +25891,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise difference of the input arrays with broadcasting.
     /// 
     /// `broadcast_minus` is an alias to the function `broadcast_sub`.
@@ -25992,7 +25992,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise product of the input arrays with broadcasting.
     /// 
     /// Example::
@@ -26081,7 +26081,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise division of the input arrays with broadcasting.
     /// 
     /// Example::
@@ -26166,7 +26166,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise modulo of the input arrays with broadcasting.
     /// 
     /// Example::
@@ -26243,7 +26243,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns result of first array elements raised to powers from second array, element-wise with broadcasting.
     /// 
     /// Example::
@@ -26322,7 +26322,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise maximum of the input arrays with broadcasting.
     /// 
     /// This function compares two input arrays and returns a new array having the element-wise maxima.
@@ -26405,7 +26405,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise minimum of the input arrays with broadcasting.
     /// 
     /// This function compares two input arrays and returns a new array having the element-wise minima.
@@ -26494,7 +26494,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary> Returns the hypotenuse of a right angled triangle, given its &quot;legs&quot;
     /// with broadcasting.
     /// 
@@ -26587,7 +26587,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the result of element-wise **equal to** (==) comparison operation with broadcasting.
     /// 
     /// Example::
@@ -26663,7 +26663,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the result of element-wise **not equal to** (!=) comparison operation with broadcasting.
     /// 
     /// Example::
@@ -26739,7 +26739,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the result of element-wise **greater than** (&gt;) comparison operation with broadcasting.
     /// 
     /// Example::
@@ -26815,7 +26815,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the result of element-wise **greater than or equal to** (&gt;=) comparison operation with broadcasting.
     /// 
     /// Example::
@@ -26891,7 +26891,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the result of element-wise **lesser than** (&lt;) comparison operation with broadcasting.
     /// 
     /// Example::
@@ -26967,7 +26967,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the result of element-wise **lesser than or equal to** (&lt;=) comparison operation with broadcasting.
     /// 
     /// Example::
@@ -27043,7 +27043,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the result of element-wise **logical and** with broadcasting.
     /// 
     /// Example::
@@ -27119,7 +27119,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the result of element-wise **logical or** with broadcasting.
     /// 
     /// Example::
@@ -27195,7 +27195,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the result of element-wise **logical xor** with broadcasting.
     /// 
     /// Example::
@@ -27268,7 +27268,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Adds arguments element-wise.
     /// 
     /// The storage type of ``elemwise_add`` output depends on storage types of inputs
@@ -27322,7 +27322,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27364,7 +27364,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Subtracts arguments element-wise.
     /// 
     /// The storage type of ``elemwise_sub`` output depends on storage types of inputs
@@ -27431,7 +27431,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Multiplies arguments element-wise.
     /// 
     /// The storage type of ``elemwise_mul`` output depends on storage types of inputs
@@ -27489,7 +27489,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Divides arguments element-wise.
     /// 
     /// The storage type of ``elemwise_div`` output is always dense
@@ -27528,7 +27528,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27557,7 +27557,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27586,7 +27586,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27615,7 +27615,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27649,7 +27649,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Given the &quot;legs&quot; of a right triangle, return its hypotenuse.
     /// 
     /// 
@@ -27688,7 +27688,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27716,7 +27716,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27744,7 +27744,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27772,7 +27772,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27800,7 +27800,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27828,7 +27828,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27856,7 +27856,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27884,7 +27884,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27912,7 +27912,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -27940,7 +27940,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -27972,7 +27972,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28004,7 +28004,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28047,7 +28047,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Multiply an array with a scalar.
     /// 
     /// ``_mul_scalar`` only operates on data array of input if input is sparse.
@@ -28124,7 +28124,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Divide an array with a scalar.
     /// 
     /// ``_div_scalar`` only operates on data array of input if input is sparse.
@@ -28190,7 +28190,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28223,7 +28223,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28256,7 +28256,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28289,7 +28289,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28322,7 +28322,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28355,7 +28355,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28388,7 +28388,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28421,7 +28421,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28474,7 +28474,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Calculate Smooth L1 Loss(lhs, scalar) by summing
     /// 
     /// .. math::
@@ -28567,7 +28567,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28599,7 +28599,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28631,7 +28631,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28663,7 +28663,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28695,7 +28695,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28727,7 +28727,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28759,7 +28759,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28791,7 +28791,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28823,7 +28823,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -28868,7 +28868,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Divides arguments element-wise.  If the left-hand-side input is &#39;row_sparse&#39;, then
     /// only the values which exist in the left-hand sparse array are computed.  The &#39;missing&#39; values
     /// are ignored.
@@ -28934,7 +28934,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Adds a scalar to a tensor element-wise.  If the left-hand-side input is
     /// &#39;row_sparse&#39; or &#39;csr&#39;, then only the values which exist in the left-hand sparse array are computed.
     /// The &#39;missing&#39; values are ignored.
@@ -29014,7 +29014,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Subtracts a scalar to a tensor element-wise.  If the left-hand-side input is
     /// &#39;row_sparse&#39; or &#39;csr&#39;, then only the values which exist in the left-hand sparse array are computed.
     /// The &#39;missing&#39; values are ignored.
@@ -29171,7 +29171,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes rectified linear activation.
     /// 
     /// .. math::
@@ -29235,7 +29235,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes sigmoid of x element-wise.
     /// 
     /// .. math::
@@ -29291,7 +29291,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"alpha"; "beta"|]
                                                  [|string alpha; string beta|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes hard sigmoid of x element-wise.
     /// 
     /// .. math::
@@ -29347,7 +29347,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes softsign of x element-wise.
     /// 
     /// .. math::
@@ -29396,7 +29396,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns a copy of the input.
     /// 
     /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:246</summary>
@@ -29457,7 +29457,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Stops gradient computation.
     /// 
     /// Stops the accumulated gradient of the inputs from flowing through this operator
@@ -29562,7 +29562,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Make your own loss function in network construction.
     /// 
     /// This operator accepts a customized loss function symbol as a terminal loss and
@@ -29807,7 +29807,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns a 1D int64 array containing the shape of data.
     /// 
     /// Example::
@@ -29859,7 +29859,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns a 1D int64 array containing the size of data.
     /// 
     /// Example::
@@ -29996,7 +29996,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Numerical negative of the argument, element-wise.
     /// 
     /// The storage type of ``negative`` output depends upon the input storage type:
@@ -30054,7 +30054,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise absolute value of the input.
     /// 
     /// Example::
@@ -30125,7 +30125,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise sign of the input.
     /// 
     /// Example::
@@ -30196,7 +30196,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise rounded value to the nearest integer of the input.
     /// 
     /// Example::
@@ -30270,7 +30270,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise rounded value to the nearest integer of the input.
     /// 
     /// .. note::
@@ -30350,7 +30350,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise ceiling of the input.
     /// 
     /// The ceil of the scalar x is the smallest integer i, such that i &gt;= x.
@@ -30426,7 +30426,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise floor of the input.
     /// 
     /// The floor of the scalar x is the largest integer i, such that i &lt;= x.
@@ -30503,7 +30503,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return the element-wise truncated value of the input.
     /// 
     /// The truncated value of the scalar x is the nearest integer i which is closer to
@@ -30580,7 +30580,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise rounded value to the nearest \
     /// integer towards zero of the input.
     /// 
@@ -30646,7 +30646,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise gauss error function of the input.
     /// 
     /// Example::
@@ -30699,7 +30699,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise inverse gauss error function of the input.
     /// 
     /// Example::
@@ -30749,7 +30749,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the gamma function (extension of the factorial function \
     /// to the reals), computed element-wise on the input array.
     /// 
@@ -30793,7 +30793,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise log of the absolute value of the gamma function \
     /// of the input.
     /// 
@@ -30837,7 +30837,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the result of logical NOT (!) function
     /// 
     /// Example:
@@ -30888,7 +30888,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise exponential value of the input.
     /// 
     /// .. math::
@@ -30950,7 +30950,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise Natural logarithmic value of the input.
     /// 
     /// The natural logarithm is logarithm in base *e*, so that ``log(exp(x)) = x``
@@ -31002,7 +31002,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise Base-10 logarithmic value of the input.
     /// 
     /// ``10**log10(x) = x``
@@ -31054,7 +31054,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise Base-2 logarithmic value of the input.
     /// 
     /// ``2**log2(x) = x``
@@ -31114,7 +31114,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise ``log(1 + x)`` value of the input.
     /// 
     /// This function is more accurate than ``log(1 + x)``  for small ``x`` so that
@@ -31181,7 +31181,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns ``exp(x) - 1`` computed element-wise on the input.
     /// 
     /// This function provides greater precision than ``exp(x) - 1`` for small values of ``x``.
@@ -31244,7 +31244,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the reciprocal of the argument, element-wise.
     /// 
     /// Calculates 1/x.
@@ -31310,7 +31310,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise squared value of the input.
     /// 
     /// .. math::
@@ -31390,7 +31390,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise square-root value of the input.
     /// 
     /// .. math::
@@ -31466,7 +31466,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise inverse square-root value of the input.
     /// 
     /// .. math::
@@ -31538,7 +31538,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise cube-root value of the input.
     /// 
     /// .. math::
@@ -31612,7 +31612,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise inverse cube-root value of the input.
     /// 
     /// .. math::
@@ -31678,7 +31678,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the element-wise sine of the input array.
     /// 
     /// The input should be in radians (:math:`2\pi` rad equals 360 degrees).
@@ -31748,7 +31748,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the element-wise cosine of the input array.
     /// 
     /// The input should be in radians (:math:`2\pi` rad equals 360 degrees).
@@ -31814,7 +31814,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the element-wise tangent of the input array.
     /// 
     /// The input should be in radians (:math:`2\pi` rad equals 360 degrees).
@@ -31889,7 +31889,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise inverse sine of the input array.
     /// 
     /// The input should be in the range `[-1, 1]`.
@@ -31962,7 +31962,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise inverse cosine of the input array.
     /// 
     /// The input should be in range `[-1, 1]`.
@@ -32030,7 +32030,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns element-wise inverse tangent of the input array.
     /// 
     /// The output is in the closed interval :math:`[-\pi/2, \pi/2]`
@@ -32102,7 +32102,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Converts each element of the input array from radians to degrees.
     /// 
     /// .. math::
@@ -32170,7 +32170,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Converts each element of the input array from degrees to radians.
     /// 
     /// .. math::
@@ -32238,7 +32238,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the hyperbolic sine of the input array, computed element-wise.
     /// 
     /// .. math::
@@ -32302,7 +32302,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the hyperbolic cosine  of the input array, computed element-wise.
     /// 
     /// .. math::
@@ -32362,7 +32362,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the hyperbolic tangent of the input array, computed element-wise.
     /// 
     /// .. math::
@@ -32428,7 +32428,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the element-wise inverse hyperbolic sine of the input array, \
     /// computed element-wise.
     /// 
@@ -32486,7 +32486,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the element-wise inverse hyperbolic cosine of the input array, \
     /// computed element-wise.
     /// 
@@ -32540,7 +32540,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the element-wise inverse hyperbolic tangent of the input array, \
     /// computed element-wise.
     /// 
@@ -32606,7 +32606,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; bins.NDArrayHandle.UnsafeHandle|]
                                                  [|"bin_cnt"; "range"|]
                                                  [|(match binCnt with None -> "None" | Some binCnt -> string binCnt); (match range with None -> "None" | Some range -> string range)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>This operators implements the histogram function.
     /// 
     /// Example::
@@ -32727,7 +32727,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle|]
                                                  [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
                                                  [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Maps integer indices to vector representations (embeddings).
     /// 
     /// This operator maps words to real-valued vectors in a high-dimensional space,
@@ -33000,7 +33000,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle|]
                                                  [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
                                                  [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Maps integer indices to vector representations (embeddings).
     /// 
     /// note:: ``contrib.SparseEmbedding`` is deprecated, use ``Embedding`` instead.
@@ -33262,7 +33262,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "mode"|]
                                                  [|string axis; (if isNull (mode :> obj) then "clip" else string mode)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Takes elements from an input array along the given axis.
     /// 
     /// This function slices the input array along a particular axis with the provided indices.
@@ -33421,7 +33421,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Takes elements from a data batch.
     /// 
     /// .. note::
@@ -33535,7 +33535,7 @@ type Operators() =
                                                  [|indices.NDArrayHandle.UnsafeHandle|]
                                                  [|"depth"; "on_value"; "off_value"; "dtype"|]
                                                  [|string depth; string onValue; string offValue; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns a one-hot array.
     /// 
     /// The locations represented by `indices` take value `on_value`, while all
@@ -33711,7 +33711,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Gather elements or slices from `data` and store to a tensor whose
     /// shape is defined by `indices`.
     /// 
@@ -33834,7 +33834,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
                                                  [|(shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Scatters data into a new tensor according to indices.
     /// 
     /// Given `data` with shape `(Y_0, ..., Y_{K-1}, X_M, ..., X_{N-1})` and indices with shape
@@ -34020,7 +34020,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
                                                  [|(shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>This operator has the same functionality as scatter_nd
     /// except that it does not reset the elements not indexed by the input
     /// index `NDArray` in the input data `NDArray`. output should be explicitly
@@ -34108,7 +34108,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"shape"; "ctx"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; string dtype|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>fill target with zeros without default dtype</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="shape">The shape of the output</param>
@@ -34141,7 +34141,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"shape"; "ctx"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>fill target with zeros</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="shape">The shape of the output</param>
@@ -34180,7 +34180,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"N"; "M"; "k"; "ctx"; "dtype"|]
                                                  [|string N; string M; string k; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return a 2-D array with ones on the diagonal and zeros elsewhere.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="N">Number of rows in the output.</param>
@@ -34222,7 +34222,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"shape"; "ctx"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>fill target with ones</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="shape">The shape of the output</param>
@@ -34301,7 +34301,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
                                                  [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return evenly spaced values within a given interval. Similar to Numpy</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
@@ -34379,7 +34379,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"start"; "step"; "repeat"; "ctx"; "axis"|]
                                                  [|(match start with None -> "0.0" | Some start -> string start); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match ctx with None -> "" | Some ctx -> ctx); (match axis with None -> "None" | Some axis -> string axis)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return an array with evenly spaced values. If axis is not given, the output will 
     /// have the same shape as the input array. Otherwise, the output will be a 1-D array with size of 
     /// the specified axis in input shape.
@@ -34478,7 +34478,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
                                                  [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return evenly spaced numbers over a specified interval. Similar to Numpy</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
@@ -34541,7 +34541,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return an array of zeros with the same shape, type and storage type
     /// as the input array.
     /// 
@@ -34614,7 +34614,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return an array of ones with the same shape and type
     /// as the input array.
     /// 
@@ -34727,7 +34727,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle; C.NDArrayHandle.UnsafeHandle|]
                                                  [|"transpose_a"; "transpose_b"; "alpha"; "beta"; "axis"|]
                                                  [|string transposeA; string transposeB; string alpha; string beta; string axis|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Performs general matrix multiplication and accumulation.
     /// Input are tensors *A*, *B*, *C*, each of dimension *n &gt;= 2* and having the same shape
     /// on the leading *n-2* dimensions.
@@ -34932,7 +34932,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle|]
                                                  [|"transpose_a"; "transpose_b"; "alpha"; "axis"|]
                                                  [|string transposeA; string transposeB; string alpha; string axis|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Performs general matrix multiplication.
     /// Input are tensors *A*, *B*, each of dimension *n &gt;= 2* and having the same shape
     /// on the leading *n-2* dimensions.
@@ -35095,7 +35095,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Performs Cholesky factorization of a symmetric positive-definite matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -35211,7 +35211,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Performs matrix inversion from a Cholesky factorization.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -35355,7 +35355,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle|]
                                                  [|"transpose"; "rightside"; "lower"; "alpha"|]
                                                  [|string transpose; string rightside; string lower; string alpha|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Performs multiplication with a lower triangular matrix.
     /// Input are tensors *A*, *B*, each of dimension *n &gt;= 2* and having the same shape
     /// on the leading *n-2* dimensions.
@@ -35516,7 +35516,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle; B.NDArrayHandle.UnsafeHandle|]
                                                  [|"transpose"; "rightside"; "lower"; "alpha"|]
                                                  [|string transpose; string rightside; string lower; string alpha|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Solves matrix equation involving a lower triangular matrix.
     /// Input are tensors *A*, *B*, each of dimension *n &gt;= 2* and having the same shape
     /// on the leading *n-2* dimensions.
@@ -35655,7 +35655,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the sum of the logarithms of the diagonal elements of a square matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -35758,7 +35758,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  [|"offset"|]
                                                  [|string offset|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Extracts the diagonal entries of a square matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -35878,7 +35878,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  [|"offset"|]
                                                  [|string offset|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Constructs a square matrix with the input as diagonal.
     /// Input is a tensor *A* of dimension *n &gt;= 1*.
     /// 
@@ -36007,7 +36007,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  [|"offset"; "lower"|]
                                                  [|string offset; string lower|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Extracts a triangular sub-matrix from a square matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -36160,7 +36160,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  [|"offset"; "lower"|]
                                                  [|string offset; string lower|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Constructs a square matrix with the input representing a specific triangular sub-matrix.
     /// This is basically the inverse of *linalg.extracttrian*. Input is a tensor *A* of dimension *n &gt;= 1*.
     /// 
@@ -36322,7 +36322,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  [|"transpose"; "alpha"|]
                                                  [|string transpose; string alpha|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Multiplication of matrix with its transpose.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -36471,7 +36471,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>LQ factorization for general matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -36637,7 +36637,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>Eigendecomposition for symmetric matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -36781,7 +36781,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Compute the inverse of a matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -36888,7 +36888,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>Compute the determinant of a matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -37007,7 +37007,7 @@ type Operators() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2])), (new NDArray(outputs.[3]))
     /// <summary>Compute the sign and log of the determinant of a matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -37175,7 +37175,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"; "reverse"; "target_shape"; "keep_highest"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string reverse; (if isNull (targetShape :> obj) then "[]" else (targetShape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string keepHighest|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Reshapes the input array.
     /// 
     /// .. note:: ``Reshape`` is deprecated, use ``reshape``
@@ -37372,7 +37372,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axes"|]
                                                  [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Permutes the dimensions of an array.
     /// 
     /// Examples::
@@ -37468,7 +37468,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"|]
                                                  [|string axis|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Inserts a new axis of size 1 into the array shape
     /// 
     /// For example, given ``x`` with shape ``(2,3,4)``, then ``expand_dims(x, axis=1)``
@@ -37769,7 +37769,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"begin"; "end"; "step"|]
                                                  [|(sliceBegin |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Assign the rhs to a cropped subset of lhs.
     /// 
     /// Requirements
@@ -37857,7 +37857,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"begin"; "end"; "scalar"; "step"|]
                                                  [|(sliceBegin |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string scalar; (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>(Assign the scalar to a cropped subset of the input.
     /// 
     /// Requirements
@@ -37953,7 +37953,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "begin"; "end"|]
                                                  [|string axis; string sliceBegin; (match sliceEnd with None -> "None" | Some sliceEnd -> string sliceEnd)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Slices along a given axis.
     /// 
     /// Returns an array slice along a given `axis` starting from the `begin` index
@@ -38118,7 +38118,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; shapeLike.NDArrayHandle.UnsafeHandle|]
                                                  [|"axes"|]
                                                  [|(if isNull (axes :> obj) then "[]" else (axes |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Slices a region of the array like the shape of another array.
     /// 
     /// This function is similar to ``slice``, however, the `begin` are always `0`s
@@ -38285,7 +38285,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"a_min"; "a_max"|]
                                                  [|string aMin; string aMax|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Clips (limits) the values in an array.
     /// 
     /// Given an interval, values outside the interval are clipped to the interval edges.
@@ -38435,7 +38435,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"repeats"; "axis"|]
                                                  [|string repeats; (match axis with None -> "None" | Some axis -> string axis)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Repeats elements of an array.
     /// 
     /// By default, ``repeat`` flattens the input array into 1-D and then repeats the
@@ -38586,7 +38586,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"reps"|]
                                                  [|(reps |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Repeats the whole array multiple times.
     /// 
     /// If ``reps`` has length *d*, and input array has dimension of *n*. There are
@@ -38747,7 +38747,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"|]
                                                  [|(axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Reverses the order of elements along given axis while preserving array shape.
     /// 
     /// Note: reverse and flip are equivalent. We use reverse in the following examples.
@@ -38848,7 +38848,7 @@ type Operators() =
                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"num_args"; "axis"|]
                                                  [|string data.Length; string axis|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Join a sequence of arrays along a new axis.
     /// 
     /// The axis parameter specifies the index of the new axis in the dimensions of the
@@ -38926,7 +38926,7 @@ type Operators() =
                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"axis"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Remove single-dimensional entries from the shape of an array.
     /// Same behavior of defining the output tensor shape as numpy.squeeze for the most of cases.
     /// See the following note for exception.
@@ -39022,7 +39022,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"block_size"|]
                                                  [|string blockSize|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Rearranges(permutes) data from depth into blocks of spatial data.
     /// Similar to ONNX DepthToSpace operator:
     /// https://github.com/onnx/onnx/blob/master/docs/Operators.md#DepthToSpace.
@@ -39196,7 +39196,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"block_size"|]
                                                  [|string blockSize|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Rearranges(permutes) blocks of spatial data into depth.
     /// Similar to ONNX SpaceToDepth operator:
     /// https://github.com/onnx/onnx/blob/master/docs/Operators.md#SpaceToDepth 
@@ -39666,7 +39666,7 @@ type Operators() =
                                                  Array.empty
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     static member SplitV2Backward(outputArray : NDArray seq) =
         let creator = AtomicSymbolCreator.FromName "_split_v2_backward"
@@ -39861,7 +39861,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "is_ascend"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis); (match isAscend with None -> "true" | Some isAscend -> string isAscend)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>Returns a sorted copy of an input array along the given axis.
     /// 
     /// Examples::
@@ -39966,7 +39966,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "is_ascend"; "dtype"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis); (match isAscend with None -> "true" | Some isAscend -> string isAscend); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns the indices that would sort an input array along the given axis.
     /// 
     /// This function performs sorting along the given axis and returns an array of indices having same shape
@@ -40055,7 +40055,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
                                                  [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Converts a batch of index arrays into an array of flat indices. The operator follows numpy conventions so a single multi index is given by a column of the input matrix. The leading dimension may be left unspecified by using -1 as placeholder.  
     /// 
     /// Examples::
@@ -40116,7 +40116,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"shape"|]
                                                  [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Converts an array of flat indices into a batch of index arrays. The operator follows numpy conventions so a single multi index is given by a column of the output matrix. The leading dimension may be left unspecified by using -1 as placeholder.  
     /// 
     /// Examples::
@@ -40188,7 +40188,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; indices.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Pick rows specified by user input index array from a row sparse matrix
     /// and save them in the output sparse matrix.
     /// 
@@ -40291,7 +40291,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "keepdims"; "exclude"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match exclude with None -> "false" | Some exclude -> string exclude)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the square sum of array elements over a given axis
     /// for row-sparse matrix. This is a temporary solution for fusing ops square and
     /// sum together for row-sparse matrix to save memory for storing gradients.
