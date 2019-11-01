@@ -37,7 +37,7 @@ let styleImage = Image.FromFile(styleFile)
 let contentImage = Image.FromFile(contentFile)
 
 let loadImage (image : Image) = 
-    let bmp = new Bitmap(image)
+    use bmp = new Bitmap(image)
     let dat =
         [|
             for y = 0 to image.Height - 1 do
@@ -54,48 +54,48 @@ let loadImage (image : Image) =
 
 let vggParams = NDArray.Load vggParamsFile    
 
-let data = new Variable("data")
-let conv1_1 = new Convolution(data = data, numFilter = 64, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv1_1")
-let relu1_1 = new Relu(conv1_1, Name = "relu1_2")
-let conv1_2 = new Convolution(data = relu1_1, numFilter = 64, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv1_2")
-let relu1_2 = new Relu(conv1_2, Name = "relu1_2")
-let pool1 = new Pooling(relu1_2, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = PoolType.Avg, Name = "pool1")
+let data = Variable("data")
+let conv1_1 = Convolution(data = data, numFilter = 64, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv1_1")
+let relu1_1 = Relu(conv1_1, Name = "relu1_2")
+let conv1_2 = Convolution(data = relu1_1, numFilter = 64, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv1_2")
+let relu1_2 = Relu(conv1_2, Name = "relu1_2")
+let pool1 = Pooling(relu1_2, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = PoolType.Avg, Name = "pool1")
 
-let conv2_1 = new Convolution(data = pool1, numFilter = 128, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv2_1")
-let relu2_1 = new Relu(conv2_1, Name = "relu2_1")
-let conv2_2 = new Convolution(data = relu2_1, numFilter = 128, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv2_2")
-let relu2_2 = new Relu(conv2_2, Name = "relu2_2")
-let pool2 = new Pooling(relu2_2, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = PoolType.Avg, Name = "pool2")
+let conv2_1 = Convolution(data = pool1, numFilter = 128, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv2_1")
+let relu2_1 = Relu(conv2_1, Name = "relu2_1")
+let conv2_2 = Convolution(data = relu2_1, numFilter = 128, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv2_2")
+let relu2_2 = Relu(conv2_2, Name = "relu2_2")
+let pool2 = Pooling(relu2_2, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = PoolType.Avg, Name = "pool2")
 
-let conv3_1 = new Convolution(data = pool2, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_1")
-let relu3_1 = new Relu(conv3_1, Name = "relu3_1")
-let conv3_2 = new Convolution(data = relu3_1, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_2")
-let relu3_2 = new Relu(conv3_2, Name = "relu3_2")
-let conv3_3 = new Convolution(data = relu3_2, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_3")
-let relu3_3 = new Relu(conv3_3, Name = "relu3_3")
-let conv3_4 = new Convolution(data = relu3_3, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_4")
-let relu3_4 = new Relu(conv3_4, Name = "relu3_4")
-let pool3 = new Pooling(relu3_4, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = PoolType.Avg, Name = "pool3")
+let conv3_1 = Convolution(data = pool2, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_1")
+let relu3_1 = Relu(conv3_1, Name = "relu3_1")
+let conv3_2 = Convolution(data = relu3_1, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_2")
+let relu3_2 = Relu(conv3_2, Name = "relu3_2")
+let conv3_3 = Convolution(data = relu3_2, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_3")
+let relu3_3 = Relu(conv3_3, Name = "relu3_3")
+let conv3_4 = Convolution(data = relu3_3, numFilter = 256, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv3_4")
+let relu3_4 = Relu(conv3_4, Name = "relu3_4")
+let pool3 = Pooling(relu3_4, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = PoolType.Avg, Name = "pool3")
 
-let conv4_1 = new Convolution(data = pool3, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_1")
-let relu4_1 = new Relu(conv4_1, Name = "relu4_1")
-let conv4_2 = new Convolution(data = relu4_1, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_2")
-let relu4_2 = new Relu(conv4_2, Name = "relu4_2")
-let conv4_3 = new Convolution(data = relu4_2, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_3")
-let relu4_3 = new Relu(conv4_3, Name = "relu4_3")
-let conv4_4 = new Convolution(data = relu4_3, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_4")
-let relu4_4 = new Relu(conv4_4, Name = "relu4_4")
-let pool4 = new Pooling(relu4_4, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = PoolType.Avg, Name = "pool4")
+let conv4_1 = Convolution(data = pool3, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_1")
+let relu4_1 = Relu(conv4_1, Name = "relu4_1")
+let conv4_2 = Convolution(data = relu4_1, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_2")
+let relu4_2 = Relu(conv4_2, Name = "relu4_2")
+let conv4_3 = Convolution(data = relu4_2, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_3")
+let relu4_3 = Relu(conv4_3, Name = "relu4_3")
+let conv4_4 = Convolution(data = relu4_3, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv4_4")
+let relu4_4 = Relu(conv4_4, Name = "relu4_4")
+let pool4 = Pooling(relu4_4, pad = [0;0], kernel = [2;2], stride = [2;2], poolType = PoolType.Avg, Name = "pool4")
 
-let conv5_1 = new Convolution(data = pool4, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv5_1")
-let relu5_1 = new Relu(conv5_1, Name = "relu5_1")
+let conv5_1 = Convolution(data = pool4, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv5_1")
+let relu5_1 = Relu(conv5_1, Name = "relu5_1")
 
-let style = new SymbolGroup<unit>((), [|relu1_1; relu2_1; relu3_1; relu4_1; relu5_1|])
-let content = new SymbolGroup<unit>((), [| relu4_2 |])
+let style = SymbolGroup<unit>((), [|relu1_1; relu2_1; relu3_1; relu4_1; relu5_1|])
+let content = SymbolGroup<unit>((), [| relu4_2 |])
 
 let makeExecutor style content (inputSize : int seq) = 
     let inputSize = inputSize |> Seq.toArray
-    let out = new SymbolGroup<unit>((), [| style; content |])
+    let out = SymbolGroup<unit>((), [| style; content |])
     //let inputSize = [|224;224|]
     let dataShape = [1;3;inputSize.[0];inputSize.[1]]
     let (k,i,d) = MXSymbol.keyShapeToCsrForm uint32 [| "data", Array.ofSeq dataShape |]
@@ -140,18 +140,18 @@ let loss (gram: SymbolGroup<'a>) content =
         MXSymbol.listOutputs gram.UnsafeHandle
         |> Array.mapi 
             (fun i oname ->
-                let gvar = new Variable(sprintf "target_gram_%d" i)
-                new Sum(new Square(gvar - gram.SymbolArray.[i]))
+                let gvar = Variable(sprintf "target_gram_%d" i)
+                Sum(Square(gvar - gram.SymbolArray.[i]))
             )
-    let cvar = new Variable("target_content")
-    let contentLoss = new Sum(new Square(cvar - content))
-    new SymbolGroup<unit>((), gramLoss |> Array.map (fun x -> upcast x)), contentLoss
+    let cvar = Variable("target_content")
+    let contentLoss = Sum(Square(cvar - content))
+    SymbolGroup<unit>((), gramLoss |> Array.map (fun x -> upcast x)), contentLoss
 
 
 let tvWeight = Some 1e-2    
 let stopThreshold = 0.0005
 let maxSize = 600
-let contentWeight = 30.0
+let contentWeight = 10.0
 let styleWeight = 1.0
 let learningRate = 0.001
 
@@ -179,34 +179,30 @@ let gramList, gradScale =
         (fun i outName ->
             let shape = styleInferResult.OutputShapes.[i] |> Array.map int
             let target = [shape.[1]; shape.[2 ..] |> Array.reduce (*)] 
-            let x = new Reshape(style.SymbolArray.[i], shape = target) //TODO: deprecate targetShape
-            let gram = new FullyConnected(data = x, weight = x, noBias = true, numHidden = shape.[1])
+            let x = Reshape(style.SymbolArray.[i], shape = target) //TODO: deprecate targetShape
+            let gram = FullyConnected(data = x, weight = x, noBias = true, numHidden = shape.[1])
             gram, (shape.[1..] |> Array.reduce (*)) * shape.[1]
         )
     |> Array.unzip
 
-let gram = new SymbolGroup<unit>((), gramList |> Array.map (fun x -> x :> Symbol))
+let gram = SymbolGroup<unit>((), gramList |> Array.map (fun x -> x :> Symbol))
 
-let modelExe = makeExecutor gram content [|224; 224|]
-
-
-
-styleIn.CopyTo(modelExe.Args.["data"])
-modelExe.Executor.Forward(true) //REVIEW: training true?
-let outputs = modelExe.Executor.Outputs
-
-let styleArray = 
-    outputs.[0 .. outputs.Length - 2] 
-    |> Array.map 
-        (fun x ->
-            x.CopyTo(context)
-        )
-
-
-contentIn.CopyTo(modelExe.Args.["data"])
-modelExe.Executor.Forward(true) //REVIEW: training true?
-
-let contentArray = outputs.[outputs.Length - 1].CopyTo(context)
+let styleArray, contentArray = 
+    let modelExe = makeExecutor gram content [|224; 224|]
+    styleIn.CopyTo(modelExe.Args.["data"])
+    modelExe.Executor.Forward(false)
+    let outputs = modelExe.Executor.Outputs
+    let styleArray = 
+        outputs.[0 .. outputs.Length - 2] 
+        |> Array.map 
+            (fun x ->
+                x.CopyTo(context)
+            )
+    contentIn.CopyTo(modelExe.Args.["data"])
+    modelExe.Executor.Forward(false)
+    let contentArray = outputs.[outputs.Length - 1].CopyTo(context)
+    modelExe.Executor.Dispose()
+    styleArray, contentArray
 
 
 // we could get rid of modelExe here
@@ -241,22 +237,22 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
     match tvWeight with 
     | Some w ->
         let nchannel = img.Shape.[1]
-        let simg = new Variable("img")
-        let skernel = new Variable("kernel")
-        let channels = new SliceChannel(simg, nchannel)
+        let simg = Variable("img")
+        let skernel = Variable("kernel")
+        let channels = SliceChannel(simg, nchannel)
         let convs : Symbol [] = 
             channels.Outputs
             |> Array.map
                 (fun c ->
-                    new Convolution(data = c, weight = skernel, numFilter = 1, kernel = [3;3], pad = [1;1], noBias = true, stride = [1;1]) :> Symbol
+                    Convolution(data = c, weight = skernel, numFilter = 1, kernel = [3;3], pad = [1;1], noBias = true, stride = [1;1]) :> Symbol
                 )
-        let out = new Concat(convs)
+        let out = Concat(convs)
         let kernel = [ 0; -1;  0;
                       -1;  4; -1;
                        0; -1;  0]
                      |> List.map (fun x -> float32 x / 8.f)
                      |> (fun x -> new NDArray(x, [1;1;3;3], context))
-        let out = new MulScalar(out, w)
+        let out = MulScalar(out, w)
         let inArgs,argGrad,grapReqType = 
             out.ArgumentNames
             |> Array.map 
@@ -331,7 +327,7 @@ let save (filename : string) (img : NDArray) =
             i <- i + 1
             let c = Color.FromArgb(1,r,g,b)
             bmp.SetPixel(x,y,c)
-    let resizedImage = resizeImage bmp contentImage.Width contentImage.Height
+    use resizedImage = resizeImage bmp contentImage.Width contentImage.Height
     resizedImage.Save(filename, Imaging.ImageFormat.Jpeg)
 
 save "nstyle_start.jpg" img
@@ -354,7 +350,7 @@ let rec trainLoop epoch =
             match tvGradExe with 
             | Some e -> 
                 e.Executor.Forward(true)
-                let outs = executor.Executor.Outputs
+                let outs = e.Executor.Outputs
                 //opti
                 let g = Operators.ElemwiseAdd(executor.ArgGrad.["data"], outs.[0])
                 opt img g
