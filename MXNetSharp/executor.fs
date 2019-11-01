@@ -216,7 +216,7 @@ module BindMap =
     let mapSymbolArgs (symbol : Symbol) f (bm : BindMap) = 
         let argNames = symbol.ArgumentNames |> Set.ofSeq
         bm
-        |> BindMap.mapArg
+        |> mapArg
             (fun a ->
                 if argNames.Contains a.Name then 
                     f a

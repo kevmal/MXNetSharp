@@ -107,7 +107,7 @@ type Symbol() =
     static member (~-)(x : Symbol) = x.Negate()
 
     static member (%)(x : Symbol, y : float) = new ModScalar(x,y)
-    static member (%)(y : float, x : Symbol) = new ModScalar(x,y)
+    static member (%)(y : float, x : Symbol) = new RmodScalar(x,y)
     static member (%)(x : Symbol, y : Symbol) = new BroadcastMod(x,y)
     
     static member (.=)(x : Symbol, y : float) = new EqualScalar(x,y)
