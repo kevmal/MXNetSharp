@@ -213,6 +213,18 @@ module BindMap =
         |> BindMap
     let ofSeq l = BindMap().WithBindings l
     let inferShapes (s : Symbol) (bm : BindMap) = bm.InferShapes s
+    let mapSymbolArgs (symbol : Symbol) f (bm : BindMap) = 
+        let argNames = symbol.ArgumentNames |> Set.ofSeq
+        bm
+        |> BindMap.mapArg
+            (fun a ->
+                if argNames.Contains a.Name then 
+                    f a
+                else
+                    a
+            )
+    let freezeGraph (symbol : Symbol) (bm : BindMap) = 
+        bm |> mapSymbolArgs symbol (fun a -> {a with OpReqType = Some NullOp} )
 
 
 

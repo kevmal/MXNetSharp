@@ -162,20 +162,6 @@ let q =
             | _ -> {a with Grad = Some(Operators.ZerosLike(a.NDArray.Value))}
         )
 
-module BindMap = 
-    let mapSymbolArgs (symbol : Symbol) f (bm : BindMap) = 
-        let argNames = symbol.ArgumentNames |> Set.ofSeq
-        bm
-        |> BindMap.mapArg
-            (fun a ->
-                if argNames.Contains a.Name then 
-                    f a
-                else
-                    a
-            )
-    let freezeGraph (symbol : Symbol) (bm : BindMap) = 
-        bm |> mapSymbolArgs symbol (fun a -> {a with OpReqType = Some NullOp} )
-
 
 let actualLoss = onActual.Bind(context, q)
 
