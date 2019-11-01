@@ -8,32 +8,32 @@ namespace MXNetSharp
 module InternalPrimitiveOperatorHelpers =     
     type ExpOp = ExpOp with
         static member inline Exp(ExpOp, x : ^T) : ^T = exp x
-        static member inline Exp(ExpOp, x : ^T) : ^Y = (^T: (member Exp : unit -> ^Y) (x))
+        static member inline Exp(ExpOp, x : ^T) : ^Y = (^T: (member ApplyExp : unit -> ^Y) (x))
     let inline internal expHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Exp : ^op * ^t -> ^y)(t,x))
 
     type LogOp = LogOp with
         static member inline Log(LogOp, x : ^T) : ^T = log x
-        static member inline Log(LogOp, x : ^T) : ^Y = (^T: (member Log : unit -> ^Y) (x))
+        static member inline Log(LogOp, x : ^T) : ^Y = (^T: (member ApplyLog : unit -> ^Y) (x))
     let inline internal logHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Log : ^op * ^t -> ^y)(t,x))
         
     type AbsOp = AbsOp with
         static member inline Abs(AbsOp, x : ^T) : ^T = abs x
-        static member inline Abs(AbsOp, x : ^T) : ^Y = (^T: (member Abs : unit -> ^Y) (x))
+        static member inline Abs(AbsOp, x : ^T) : ^Y = (^T: (member ApplyAbs : unit -> ^Y) (x))
     let inline internal absHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Abs : ^op * ^t -> ^y)(t,x))
 
     type AcosOp = AcosOp with
         static member inline Acos(AcosOp, x : ^T) : ^T = acos x
-        static member inline Acos(AcosOp, x : ^T) : ^Y = (^T: (member Acos : unit -> ^Y) (x))
+        static member inline Acos(AcosOp, x : ^T) : ^Y = (^T: (member ApplyAcos : unit -> ^Y) (x))
     let inline internal acosHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Acos : ^op * ^t -> ^y)(t,x))
 
     type AsinOp = AsinOp with
         static member inline Asin(AsinOp, x : ^T) : ^T = asin x
-        static member inline Asin(AsinOp, x : ^T) : ^Y = (^T: (member Asin : unit -> ^Y) (x))
+        static member inline Asin(AsinOp, x : ^T) : ^Y = (^T: (member ApplyAsin : unit -> ^Y) (x))
     let inline internal asinHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Asin : ^op * ^t -> ^y)(t,x))
 
     type AtanOp = AtanOp with
         static member inline Atan(AtanOp, x : ^T) : ^T = atan x
-        static member inline Atan(AtanOp, x : ^T) : ^Y = (^T: (member Atan : unit -> ^Y) (x))
+        static member inline Atan(AtanOp, x : ^T) : ^Y = (^T: (member ApplyAtan : unit -> ^Y) (x))
     let inline internal atanHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Atan : ^op * ^t -> ^y)(t,x))
 
     //TODO: This doesn't work
@@ -44,69 +44,76 @@ module InternalPrimitiveOperatorHelpers =
 
     type CeilingOp = CeilingOp with
         static member inline Ceiling(CeilingOp, x : ^T) : ^T = ceil x
-        static member inline Ceiling(CeilingOp, x : ^T) : ^Y = (^T: (member Ceiling : unit -> ^Y) (x))
+        static member inline Ceiling(CeilingOp, x : ^T) : ^Y = (^T: (member ApplyCeiling : unit -> ^Y) (x))
     let inline internal ceilingHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Ceiling : ^op * ^t -> ^y)(t,x))
 
     type FloorOp = FloorOp with
         static member inline Floor(FloorOp, x : ^T) : ^T = floor x
-        static member inline Floor(FloorOp, x : ^T) : ^Y = (^T: (member Floor : unit -> ^Y) (x))
+        static member inline Floor(FloorOp, x : ^T) : ^Y = (^T: (member ApplyFloor : unit -> ^Y) (x))
     let inline internal floorHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Floor : ^op * ^t -> ^y)(t,x))
 
     type TruncateOp = TruncateOp with
         static member inline Truncate(TruncateOp, x : ^T) : ^T = truncate x
-        static member inline Truncate(TruncateOp, x : ^T) : ^Y = (^T: (member Truncate : unit -> ^Y) (x))
+        static member inline Truncate(TruncateOp, x : ^T) : ^Y = (^T: (member ApplyTruncate : unit -> ^Y) (x))
     let inline internal truncateHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Truncate : ^op * ^t -> ^y)(t,x))
 
     type RoundOp = RoundOp with
         static member inline Round(RoundOp, x : ^T) : ^T = round x
-        static member inline Round(RoundOp, x : ^T) : ^Y = (^T: (member Round : unit -> ^Y) (x))
+        static member inline Round(RoundOp, x : ^T) : ^Y = (^T: (member ApplyRound : unit -> ^Y) (x))
     let inline internal roundHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Round : ^op * ^t -> ^y)(t,x))
 
     type Log10Op = Log10Op with
         static member inline Log10(Log10Op, x : ^T) : ^T = log10 x
-        static member inline Log10(Log10Op, x : ^T) : ^Y = (^T: (member Log10 : unit -> ^Y) (x))
+        static member inline Log10(Log10Op, x : ^T) : ^Y = (^T: (member ApplyLog10 : unit -> ^Y) (x))
     let inline internal log10Helper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Log10 : ^op * ^t -> ^y)(t,x))
 
     type SqrtOp = SqrtOp with
         static member inline Sqrt(SqrtOp, x : ^T) : ^T = sqrt x
-        static member inline Sqrt(SqrtOp, x : ^T) : ^Y = (^T: (member Sqrt : unit -> ^Y) (x))
+        static member inline Sqrt(SqrtOp, x : ^T) : ^Y = (^T: (member ApplySqrt : unit -> ^Y) (x))
     let inline internal sqrtHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Sqrt : ^op * ^t -> ^y)(t,x))
 
     type CosOp = CosOp with
         static member inline Cos(CosOp, x : ^T) : ^T = cos x
-        static member inline Cos(CosOp, x : ^T) : ^Y = (^T: (member Cos : unit -> ^Y) (x))
+        static member inline Cos(CosOp, x : ^T) : ^Y = (^T: (member ApplyCos : unit -> ^Y) (x))
     let inline internal cosHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Cos : ^op * ^t -> ^y)(t,x))
 
     type CoshOp = CoshOp with
         static member inline Cosh(CoshOp, x : ^T) : ^T = cosh x
-        static member inline Cosh(CoshOp, x : ^T) : ^Y = (^T: (member Cosh : unit -> ^Y) (x))
+        static member inline Cosh(CoshOp, x : ^T) : ^Y = (^T: (member ApplyCosh : unit -> ^Y) (x))
     let inline internal coshHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Cosh : ^op * ^t -> ^y)(t,x))
 
     type SinOp = SinOp with
         static member inline Sin(SinOp, x : ^T) : ^T = sin x
-        static member inline Sin(SinOp, x : ^T) : ^Y = (^T: (member Sin : unit -> ^Y) (x))
+        static member inline Sin(SinOp, x : ^T) : ^Y = (^T: (member ApplySin : unit -> ^Y) (x))
     let inline internal sinHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Sin : ^op * ^t -> ^y)(t,x))
 
     type SinhOp = SinhOp with
         static member inline Sinh(SinhOp, x : ^T) : ^T = sinh x
-        static member inline Sinh(SinhOp, x : ^T) : ^Y = (^T: (member Sinh : unit -> ^Y) (x))
+        static member inline Sinh(SinhOp, x : ^T) : ^Y = (^T: (member ApplySinh : unit -> ^Y) (x))
     let inline internal sinhHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Sinh : ^op * ^t -> ^y)(t,x))
 
     type TanOp = TanOp with
         static member inline Tan(TanOp, x : ^T) : ^T = tan x
-        static member inline Tan(TanOp, x : ^T) : ^Y = (^T: (member Tan : unit -> ^Y) (x))
+        static member inline Tan(TanOp, x : ^T) : ^Y = (^T: (member ApplyTan : unit -> ^Y) (x))
     let inline internal tanHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Tan : ^op * ^t -> ^y)(t,x))
 
     type TanhOp = TanhOp with
         static member inline Tanh(TanhOp, x : ^T) : ^T = tanh x
-        static member inline Tanh(TanhOp, x : ^T) : ^Y = (^T: (member Tanh : unit -> ^Y) (x))
+        static member inline Tanh(TanhOp, x : ^T) : ^Y = (^T: (member ApplyTanh : unit -> ^Y) (x))
     let inline internal tanhHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Tanh : ^op * ^t -> ^y)(t,x))
 
     type NegateOp = NegateOp with
         static member inline Negate(NegateOp, x : ^T) : ^T = -x
-        static member inline Negate(NegateOp, x : ^T) : ^Y = (^T: (member Negate : unit -> ^Y) (x))
+        static member inline Negate(NegateOp, x : ^T) : ^Y = (^T: (member ApplyNegate : unit -> ^Y) (x))
     let inline internal negateHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Negate : ^op * ^t -> ^y)(t,x))
 
+    (* TODO: Power op
+    type PowerOp = PowerOp with
+        static member inline Power(PowerOp, x : ^T, y : ^Y) : ^T = x ** y
+        static member inline Power(PowerOp, x : ^T, y : ^Y) : ^S = (^T: (member ApplyPower : ^Y -> ^S) (x, y))
+        static member inline Power(PowerOp, x : ^T, y : ^Y) : ^S2 = (^Y: (member ApplyPowerBaseOf : ^T -> ^S2) (y,x))
+    let inline internal powerHelper (t : ^op) (x : ^t) (y : ^y) : ^s = ((^op or ^t) : (static member Power : ^op * ^t * ^y -> ^s)(t,x,y))
+    *)
 
 open InternalPrimitiveOperatorHelpers
 
