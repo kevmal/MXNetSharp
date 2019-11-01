@@ -151,13 +151,13 @@ let loss (gram: SymbolGroup<'a>) content =
 let tvWeight = Some 1e-2    
 let stopThreshold = 0.0005
 let maxSize = 600
-let contentWeight = 10.0
+let contentWeight = 30.0
 let styleWeight = 1.0
 let learningRate = 0.001
 
 let lrScheduleDelay = 50
 let lrScheduleFactor = 0.6
-let saveEpochs = 5
+let saveEpochs = 50
 let maxNumEpochs = 1000
 
 let removeNoise = 0.02

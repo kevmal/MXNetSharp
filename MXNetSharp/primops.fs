@@ -102,6 +102,12 @@ module InternalPrimitiveOperatorHelpers =
         static member inline Tanh(TanhOp, x : ^T) : ^Y = (^T: (member Tanh : unit -> ^Y) (x))
     let inline internal tanhHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Tanh : ^op * ^t -> ^y)(t,x))
 
+    type NegateOp = NegateOp with
+        static member inline Negate(NegateOp, x : ^T) : ^T = -x
+        static member inline Negate(NegateOp, x : ^T) : ^Y = (^T: (member Negate : unit -> ^Y) (x))
+    let inline internal negateHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Negate : ^op * ^t -> ^y)(t,x))
+
+
 open InternalPrimitiveOperatorHelpers
 
 module PrimitiveOperators = 
@@ -124,5 +130,5 @@ module PrimitiveOperators =
     let inline sinh (x : ^t) : ^y =  sinhHelper SinhOp x
     let inline tan (x : ^t) : ^y =  tanHelper TanOp x
     let inline tanh (x : ^t) : ^y =  tanhHelper TanhOp x
-
+    let inline (~-) (x : ^t) : ^y = negateHelper NegateOp x
         

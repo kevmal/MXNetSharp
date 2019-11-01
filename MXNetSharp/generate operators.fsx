@@ -698,6 +698,7 @@ let toNDArrayCode suffix (x : ProcessedAtomicSymbol) =
                 sprintf "                                         %s" paramValuesStr
                 sprintf "outputs |> Array.map (fun h -> new NDArray(h))"
             ]
+        | _ -> failwithf "Unexpected output count of zero (%d)" c
     let defineInto = 
         let name = x.Name
         if args.Length = 0 then 
@@ -1673,6 +1674,10 @@ module GeneratedArgumentTypes =
 
 let symbolsFile = System.IO.Path.Combine(__SOURCE_DIRECTORY__,"symbol.fs")
 let lines = System.IO.File.ReadAllLines(symbolsFile)
+
+
+// trying a small wait to prevent ocasional errors writing back to symbol.fs
+Async.Sleep 1000 |> Async.RunSynchronously 
 
 let startTag = "(* GERNATED SYMBOL TYPES BEGIN *)//"
 let endTag = "(* GERNATED SYMBOL TYPES END *)//"

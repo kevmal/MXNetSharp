@@ -113,9 +113,9 @@ let scaledImage = inputImage + 0.0 //(inputImage - 127.5) / 127.5
 let sampledLabels = RandomRandint(0L, 10L, [batchSize])
 
 let ep = 0.000001
-let onActual = -1.0*Log(ep + (scaledImage .|> discriminator)) .>> Mean() .>> MakeLoss()
-let onFake = -1.0*Log(ep + 1.0 - ((* freeze *) generator .|> discriminator)) .>> Mean() .>> MakeLoss()
-let gen = -1.0*Log(ep + (generator .|> (* freeze *) discriminator)) .>> Mean() .>> MakeLoss()
+let onActual = -Log(ep + (scaledImage .|> discriminator)) .>> Mean() .>> MakeLoss()
+let onFake = -Log(ep + 1.0 - ((* freeze *) generator .|> discriminator)) .>> Mean() .>> MakeLoss()
+let gen = -Log(ep + (generator .|> (* freeze *) discriminator)) .>> Mean() .>> MakeLoss()
 
 
 let randNormal = RandomNormal(shape = [batchSize; 1; nLatent]) 

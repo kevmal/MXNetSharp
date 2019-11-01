@@ -326,7 +326,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"|]
                                                  [|string eps; string momentum; string fixGamma; string useGlobalStats; string outputMeanVar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Batch normalization.
     /// 
     /// This operator is DEPRECATED. Perform BatchNorm on the input.
@@ -6565,7 +6565,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle|]
                                                  [|"act_type"; "slope"; "lower_bound"; "upper_bound"|]
                                                  [|(if isNull (actType :> obj) then "leaky" else string actType); string slope; string lowerBound; string upperBound|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Applies Leaky rectified linear unit activation element-wise to the input.
     /// 
     /// Leaky ReLUs attempt to fix the &quot;dying ReLU&quot; problem by allowing a small `slope`
@@ -7918,7 +7918,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; movingMean.NDArrayHandle.UnsafeHandle; movingVar.NDArrayHandle.UnsafeHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "axis"; "cudnn_off"; "min_calib_range"; "max_calib_range"|]
                                                  [|(match eps with None -> "0.00100000004749745" | Some eps -> string eps); (match momentum with None -> "0.899999976" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Apply batch normalization to input.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to batch normalization</param>
@@ -9656,7 +9656,7 @@ type Operators() =
                                                  (data |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  [|"scale"; "sample_type"; "num_args"; "num_filter"; "multi_input_mode"; "workspace"|]
                                                  [|string scale; string sampleType; string data.Length; string numFilter; (if isNull (multiInputMode :> obj) then "concat" else string multiInputMode); string workspace|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Upsamples the given input data.
     /// 
     /// Two algorithms (``sample_type``) are available for upsampling:
@@ -10594,7 +10594,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -11068,7 +11068,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -12714,7 +12714,7 @@ type Operators() =
                                                  Array.empty
                                                  [|"shape"; "ctx"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return a new identity array of given shape, type, and context.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="shape">The shape of the output</param>
@@ -12744,7 +12744,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
     static member NpZerosLike(outputArray : NDArray seq, a : NDArray) =
@@ -12769,7 +12769,7 @@ type Operators() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
     static member NpOnesLike(outputArray : NDArray seq, a : NDArray) =
@@ -29098,7 +29098,7 @@ type Operators() =
                                                  (args |> Array.map (fun x -> x.NDArrayHandle.UnsafeHandle))
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Adds all input arguments element-wise.
     /// 
     /// .. math::
@@ -29701,7 +29701,7 @@ type Operators() =
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"lhs_begin"; "lhs_end"; "rhs_begin"; "rhs_end"|]
                                                  [|(match lhsBegin with None -> "None" | Some lhsBegin -> string lhsBegin); (match lhsEnd with None -> "None" | Some lhsEnd -> string lhsEnd); (match rhsBegin with None -> "None" | Some rhsBegin -> string rhsBegin); (match rhsEnd with None -> "None" | Some rhsEnd -> string rhsEnd)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Reshape some or all dimensions of `lhs` to have the same shape as some or all dimensions of `rhs`.
     /// 
     /// Returns a **view** of the `lhs` array with a new shape without altering any data.
@@ -29916,7 +29916,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"dtype"|]
                                                  [|string dtype|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Casts all elements of the input to a new type.
     /// 
     /// .. note:: ``Cast`` is deprecated. Use ``cast`` instead.
@@ -41489,7 +41489,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; weight.NDArrayHandle.UnsafeHandle; bias.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "workspace"; "no_bias"; "cudnn_tune"; "cudnn_off"; "layout"|]
                                                  [|(kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string workspace; string noBias; (if isNull (cudnnTune :> obj) then "None" else string cudnnTune); string cudnnOff; (if isNull (layout :> obj) then "None" else string layout)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>This operator is DEPRECATED. Apply convolution to input then add a bias.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the ConvolutionV1Op.</param>
@@ -41881,7 +41881,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
                                                  [|"eps"|]
                                                  [|string eps|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Applies instance normalization to the n-dimensional input array.
     /// 
     /// This operator takes an n-dimensional input array where (n&gt;2) and normalizes
@@ -42054,7 +42054,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"eps"; "mode"|]
                                                  [|string eps; (if isNull (mode :> obj) then "instance" else string mode)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Normalize the input array using the L2 norm.
     /// 
     /// For 1-D NDArray, it computes::
@@ -42221,7 +42221,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"grad_scale"; "valid_thresh"; "normalization"|]
                                                  [|string gradScale; string validThresh; (if isNull (normalization :> obj) then "null" else string normalization)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Make your own loss function in network construction.
     /// 
     /// This operator accepts a customized loss function symbol as a terminal loss and
@@ -42354,7 +42354,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
                                                  [|"use_sequence_length"; "axis"|]
                                                  [|string useSequenceLength; string axis|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Takes the last element of a sequence.
     /// 
     /// This function takes an n-dimensional input array of the form
@@ -42552,7 +42552,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; sequenceLength.NDArrayHandle.UnsafeHandle|]
                                                  [|"use_sequence_length"; "axis"|]
                                                  [|string useSequenceLength; string axis|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Reverses the elements of each sequence.
     /// 
     /// This function takes an n-dimensional input array of the form [max_sequence_length, batch_size, other_feature_dims]
@@ -42788,7 +42788,7 @@ type Operators() =
                                                  [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle|]
                                                  [|"margin"; "regularization_coefficient"; "use_linear"|]
                                                  [|string margin; string regularizationCoefficient; string useLinear|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes support vector machine based transformation of the input.
     /// 
     /// This tutorial demonstrates using SVM as output layer for classification instead of softmax:
@@ -43208,7 +43208,7 @@ type Operators() =
 //                                                  [|data.NDArrayHandle.UnsafeHandle|]
 //                                                  [|"kernel"; "pool_type"; "global_pool"; "pooling_convention"; "stride"; "pad"|]
 //                                                  [|(if isNull (kernel :> obj) then "[]" else (kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (poolType :> obj) then "max" else string poolType); string globalPool; (if isNull (poolingConvention :> obj) then "valid" else string poolingConvention); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-//         outputs |> Array.map (fun h -> new NDArray(h))
+//         (new NDArray(outputs.[0]))
 //     /// <summary>This operator is DEPRECATED.
 //     /// Perform pooling on the input.
 //     /// 
