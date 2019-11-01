@@ -104,6 +104,7 @@ type Symbol() =
     static member ( .** )(x : Symbol, y : Symbol) = new BroadcastPower(x,y)
 
     member x.Negate() = -1.0*x
+    member x.ApplyNegate() = x.Negate()
     static member (~-)(x : Symbol) = x.Negate()
 
     static member (%)(x : Symbol, y : float) = new ModScalar(x,y)

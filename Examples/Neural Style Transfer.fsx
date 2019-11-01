@@ -192,7 +192,8 @@ let modelExe = makeExecutor gram content [|224; 224|]
 
 
 styleIn.CopyTo(modelExe.Args.["data"])
-let outputs = modelExe.Executor.Forward(true) //REVIEW: training true?
+modelExe.Executor.Forward(true) //REVIEW: training true?
+let outputs = modelExe.Executor.Outputs
 
 let styleArray = 
     outputs.[0 .. outputs.Length - 2] 
@@ -343,7 +344,7 @@ let rec trainLoop epoch =
     else
         //for i = 1 to  maxNumEpochs do 
         img.CopyTo(executor.Args.["data"])
-        let outs = executor.Executor.Forward(true)
+        executor.Executor.Forward(true)
         executor.Executor.Backward(gradArray)
         let gnorm : float32 = Operators.Norm(executor.ArgGrad.["data"]).ToArray().[0]
         if gnorm > clipNorm then 
@@ -352,7 +353,8 @@ let rec trainLoop epoch =
         let optResult = 
             match tvGradExe with 
             | Some e -> 
-                let outs = e.Executor.Forward(true)
+                e.Executor.Forward(true)
+                let outs = executor.Executor.Outputs
                 //opti
                 let g = Operators.ElemwiseAdd(executor.ArgGrad.["data"], outs.[0])
                 opt img g

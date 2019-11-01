@@ -236,8 +236,10 @@ valIter.Next() |> ignore
 
 let update epoch mb = 
     valIter.GetData().CopyTo(xa)
-    let loss : float32 = exe.Forward(false).[0].ToArray().[0]
-    let imgs = texe.Forward(false)
+    exe.Forward(false)
+    let loss : float32 = exe.Outputs.[0].ToArray().[0]
+    texe.Forward(false)
+    let imgs = texe.Outputs
     p.Invoke(Action(fun() ->
         p.Image <- singleBmp (xa.ToArray())
         p2.Image <- singleBmp ( imgs.[0].ToArray())
@@ -264,7 +266,7 @@ let trainTask =
             trainIter.Reset()
             while (trainIter.Next()) do 
                 trainIter.GetData().CopyTo(xa)
-                let eoutput = exe.Forward(true).[0]
+                exe.Forward(true)
                 exe.Backward()
                 ps
                 |> Array.iter 

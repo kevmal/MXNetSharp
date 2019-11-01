@@ -4,6 +4,8 @@
 open MXNetSharp.Interop
 open Xunit
 open MXNetSharp
+//TODO: test mutation operators
+//TODO: add and test unary mutation operators
 
 module BasicBinaryOps =
     let nd (x : float32 seq) = 
