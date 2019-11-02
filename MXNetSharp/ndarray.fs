@@ -23,7 +23,7 @@ type NDArray(handle : SafeNDArrayHandle) =
         let creator = AtomicSymbolCreator.FromName opName
         let inputs = inputs |> Array.map (fun (x : NDArray) -> (x.NDArrayHandle : SafeNDArrayHandle).UnsafeHandle)
         let pkeys,pvals = parameters |> Array.unzip
-        let outcount = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle [|(out.NDArrayHandle : SafeNDArrayHandle).UnsafeHandle|] inputs pkeys pvals
+        let outcount = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle inputs [|(out.NDArrayHandle : SafeNDArrayHandle).UnsafeHandle|] pkeys pvals
         assert(outcount = 1)
         out
     internal new(h : CApi.NDArrayHandle) = new NDArray(new SafeNDArrayHandle(h, true))
@@ -265,6 +265,95 @@ type NDArray(handle : SafeNDArrayHandle) =
     member x.Tanh() = invoke "tanh" [|x|] Array.empty |> Array.head
     static member Tanh(x : NDArray) = x.Tanh()
 
+    member x.Slice(startIndices, endIndices, stepIndices) = 
+        let b = startIndices |> String.concat "," |> sprintf "(%s)"
+        let e = endIndices |> String.concat "," |> sprintf "(%s)"
+        let s = stepIndices |> String.concat "," |> sprintf "(%s)"
+        invoke "slice" [|x|] [|"begin", b; "end", e; "step", s|]|> Array.head
+    member x.GetSlice([<ParamArray>] a : obj []) = 
+        let inline str x = match x with Some v -> v.ValueString() | _ -> "None"
+        if a.Length = 0 then 
+            x // REVIEW: copy?
+        else
+            let b = ResizeArray()
+            let e = ResizeArray()
+            let s = ResizeArray()
+            let mutable i = 0
+            while i < a.Length do 
+                match a.[i] with 
+                | :? int as idx -> 
+                    b.Add(string idx)
+                    e.Add(string (idx + 1))
+                    s.Add "None"
+                | :? (int option) as o -> 
+                    let o2 = a.[i+1] :?> int option |> Option.map (fun x -> x + 1)
+                    b.Add(str o)
+                    e.Add(str o2)
+                    s.Add "None"
+                    i <- i + 1
+                | _ -> failwithf "invalid argument to get slice %A" a.[i]
+                i <- i + 1
+            x.Slice(b,e,s)
+    member x.SetSlice([<ParamArray>] a : obj []) = 
+        let inline str x = match x with Some v -> v.ValueString() | _ -> "None"
+        let b = ResizeArray()
+        let e = ResizeArray()
+        let s = ResizeArray()
+        let mutable i = 0
+        while i < a.Length - 1 do 
+            match a.[i] with 
+            | :? int as idx -> 
+                b.Add(string idx)
+                e.Add(string (idx + 1))
+                s.Add "None"
+            | :? (int option) as o -> 
+                let o2 = a.[i+1] :?> int option |> Option.map (fun x -> x + 1)
+                b.Add(str o)
+                e.Add(str o2)
+                s.Add "None"
+                i <- i + 1
+            | _ -> failwithf "invalid argument to get slice %A" a.[i]
+            i <- i + 1
+        let b = b |> String.concat "," |> sprintf "(%s)" //TODO: Just use a string builder from the start?
+        let e = e |> String.concat "," |> sprintf "(%s)"
+        let s = s |> String.concat "," |> sprintf "(%s)"
+        let inline scalar (v : ^a) = 
+            printfn "%A" (b,e,s)
+            mutInvoke x "_slice_assign_scalar" [|x|] [|"begin", b; "end", e; "step", s; "scalar" <-- v|]       
+            |> ignore
+            
+        match a.[a.Length - 1] with 
+        | :? double as x -> scalar x
+        | :? decimal as x -> scalar x
+        | :? int as x -> scalar x
+        | :? float32 as x -> scalar x
+        | :? int64 as x -> scalar x
+        | :? NDArray as y -> 
+            printfn "%A" (b,e,s)
+            mutInvoke x "_slice_assign" [|x;y|] [|"begin", b; "end", e; "step", s|] |> ignore
+        | q -> failwithf "Unhandled slice assign type %s with value %A" (q.GetType().Name) q
+
+            
+
+(*
+    member x.GetSlice(startIndex0 : int option, endIndex0 : int option) = 
+        let inline str x = match x with Some v -> v.ValueString() | _ -> "None"
+        x.Slice([|str startIndex0|], [|str endIndex0|], Array.empty)
+    member x.GetSlice(startIndex0 : int option, endIndex0 : int option,
+                      startIndex1 : int option, endIndex1 : int option) = 
+        let inline str x = match x with Some v -> v.ValueString() | _ -> "None"
+        let s =
+            [|
+                str startIndex0
+                str startIndex1
+            |]
+        let e = 
+            [|
+                str endIndex0
+                str endIndex1
+            |]
+        x.Slice(s, e, Array.empty)
+*)        
 
     member x.SwapAxis(dim1 : int, dim2 : int) = invoke1 "SwapAxis" [|x|] [|"dim1" <-- dim1; "dim2" <-- dim2|]
     member x.Reshape([<ParamArray>] dims : int []) = invoke1 "Reshape" [|x|] [|"shape" <-- dims|]

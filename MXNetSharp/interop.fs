@@ -1014,7 +1014,7 @@ module MXNDArray =
         assert(length parameterKeys = length parameterValues)
         use outputsptr = fixed outputs
         let mutable ptr = NativeInterop.NativePtr.toNativeInt outputsptr
-        MXImperativeInvoke(creator, length inputs, inputs, &num_outputs, &ptr, length parameterKeys, parameterKeys, parameterValues) |> throwOnError "MXImperativeInvoke"
+        MXImperativeInvoke(creator, length inputs, inputs, &num_outputs, &ptr, length parameterKeys, parameterKeys, parameterValues) |> throwOnError "imperativeInvokeInto"
         assert(ptr = NativeInterop.NativePtr.toNativeInt outputsptr)
         num_outputs
 

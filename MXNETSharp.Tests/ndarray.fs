@@ -145,3 +145,48 @@ module BasicUnaryOps =
     let tan() = uop tan tan
     [<Fact>]
     let tanh() = uop tanh tanh
+
+
+module Slicing =  
+    let nd (x : float32 seq) = 
+        let data = x |> Seq.toArray
+        new NDArray(data, shape = [data.Length], context = CPU(0))
+    [<Fact>]
+    let ``simple 1d``() = 
+        let d1 = [0.0 .. 20.0] |> List.map float32
+        let a = nd d1
+        let expected = d1.[3 .. 5]
+        let actual : float32 [] = (a.[3 .. 6]).ToArray()
+        Assert.Equal(expected.Length, actual.Length)
+        for i = 0 to expected.Length - 1 do    
+            Assert.Equal(double expected.[i], double actual.[i], 6)
+
+    [<Fact>]
+    let ``1d no start``() = 
+        let d1 = [0.0 .. 20.0] |> List.map float32
+        let a = nd d1
+        let expected = d1.[.. 5]
+        let actual : float32 [] = (a.[.. 6]).ToArray()
+        Assert.Equal(expected.Length, actual.Length)
+        for i = 0 to expected.Length - 1 do    
+            Assert.Equal(double expected.[i], double actual.[i], 6)
+
+    [<Fact>]
+    let ``1d no end``() = 
+        let d1 = [0.0 .. 20.0] |> List.map float32
+        let a = nd d1
+        let expected = d1.[2 .. ]
+        let actual : float32 [] = (a.[2 ..]).ToArray()
+        Assert.Equal(expected.Length, actual.Length)
+        for i = 0 to expected.Length - 1 do    
+            Assert.Equal(double expected.[i], double actual.[i], 6)
+
+    //[<Fact>]
+    //let sliceAssign() = 
+    //    let a = new NDArray([1.f .. 100.f], shape = [50; 2], context  = CPU 0)
+    //    let bb : float32 [] = a.ToArray()
+    //    a.[30 .. 40, *] <- 10000.f
+    //    a.[30 .. 40, *] <- a.[0 .. 10, *] 
+    //    Assert.Equal(1,2)
+        
+        
