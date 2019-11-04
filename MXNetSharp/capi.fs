@@ -2000,207 +2000,141 @@ extern int MXKVStoreGetType(KVStoreHandle handle, [<Out>] IntPtr& ``type``)
 //--------------------------------------------
 // Part 6: advanced KVStore for multi-machines
 //--------------------------------------------
-(**
- * \brief return The rank of this node in its group, which is in [0, GroupSize).
- *
- * \param handle handle to the KVStore
- * \param ret the node rank
- * \return 0 when success, -1 when failure happens
- *)
+/// <summary> return The rank of this node in its group, which is in [0, GroupSize).</summary>
+/// <param name="handle"> handle to the KVStore</param>
+/// <param name="ret">the node rank</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXKVStoreGetRank__(KVStoreHandle handle, int[] ret)
 
-(**
- * \brief return The number of nodes in this group, which is
- * - number of workers if if `IsWorkerNode() == true`,
- * - number of servers if if `IsServerNode() == true`,
- * - 1 if `IsSchedulerNode() == true`,
- * \param handle handle to the KVStore
- * \param ret the group size
- * \return 0 when success, -1 when failure happens
- *)
+/// <summary>return The number of nodes in this group, which is 
+/// - number of workers if if `IsWorkerNode() == true`,
+/// - number of servers if if `IsServerNode() == true`,
+/// - 1 if `IsSchedulerNode() == true`, </summary>
+/// <param name="handle"> handle to the KVStore</param>
+/// <param name="ret"> the group size</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXKVStoreGetGroupSize__(KVStoreHandle handle, int[] ret)
 
-(**
- * \brief return whether or not this process is a worker node.
- * \param ret 1 for yes, 0 for no
- * \return 0 when success, -1 when failure happens
- *)
+/// <summary> return whether or not this process is a worker node.</summary>
+/// <param name="ret"> 1 for yes, 0 for no</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXKVStoreIsWorkerNode__(int[] ret)
 
-(**
- * \brief return whether or not this process is a server node.
- * \param ret 1 for yes, 0 for no
- * \return 0 when success, -1 when failure happens
- *)
+
+/// <summar>return whether or not this process is a server node.</summary>
+/// <param name="ret"> 1 for yes, 0 for no</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXKVStoreIsServerNode__(int[] ret)
 
-(**
- * \brief return whether or not this process is a scheduler node.
- * \param ret 1 for yes, 0 for no
- * \return 0 when success, -1 when failure happens
- *)
+/// <summary>return whether or not this process is a scheduler node.</summary>
+/// <param name="ret"> 1 for yes, 0 for no</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXKVStoreIsSchedulerNode__(int[] ret)
 
-(**
- * \brief global barrier among all worker machines
- *
- * \param handle handle to the KVStore
- * \return 0 when success, -1 when failure happens
- *)
+/// <summary>global barrier among all worker machines</summary>
+/// <param name="handle"> handle to the KVStore</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXKVStoreBarrier__(KVStoreHandle handle)
 
-(**
- * \brief whether to do barrier when finalize
- *
- * \param handle handle to the KVStore
- * \param barrier_before_exit whether to do barrier when kvstore finalize
- * \return 0 when success, -1 when failure happens
- *)
+/// <summary>rwhether to do barrier when finalize</summary>
+/// <param name="handle"> handle to the KVStore</param>
+/// <param name="barrier_before_exit"> whether to do barrier when kvstore finalize</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXKVStoreSetBarrierBeforeExit__(KVStoreHandle handle, int barrier_before_exit)
 
-(**
- * \brief the prototype of a server controller
- * \param head the head of the command
- * \param body the body of the command
- * \param controller_handle helper handle for implementing controller
- *)
+/// <summary>rthe prototype of a server controller</summary>
+/// <param name="head"> the head of the command</param>
+/// <param name="body"> the body of the command</param>
+/// <param name="controller_handle"> helper handle for implementing controller</param>
 type MXKVStoreServerController = delegate of int * string * IntPtr -> unit
-(**
- * \brief Run as server (or scheduler)
- * \param handle handle to the KVStore
- * \param controller the user-defined server controller
- * \param controller_handle helper handle for implementing controller
- * \return 0 when success, -1 when failure happens
- *)
+
+/// <summary>rRun as server (or scheduler)</summary>
+/// <param name="handle"> handle to the KVStore</param>
+/// <param name="controller"> the user-defined server controller</param>
+/// <param name="controller_handle"> helper handle for implementing controller</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXKVStoreRunServer__(KVStoreHandle handle, MXKVStoreServerController controller, IntPtr controller_handle)
 
-(**
- * \brief Send a command to all server nodes
- * \param handle handle to the KVStore
- * \param cmd_id the head of the command
- * \param cmd_body the body of the command
- * \return 0 when success, -1 when failure happens
- *)
+/// <summary>rSend a command to all server nodes</summary>
+/// <param name="handle"> handle to the KVStore</param>
+/// <param name="cmd_id"> the head of the command</param>
+/// <param name="cmd_body"> the body of the command</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXKVStoreSendCommmandToServers__(KVStoreHandle handle, int cmd_id, string cmd_body)
 
-(**
- * \brief Get the number of ps dead node(s) specified by {node_id}
- *
- * \param handle handle to the KVStore
- * \param node_id Can be a node group or a single node.
- *                kScheduler = 1, kServerGroup = 2, kWorkerGroup = 4
- * \param number Ouptut number of dead nodes
- * \param timeout_sec A node fails to send heartbeart in {timeout_sec} seconds
- *                    will be presumed as 'dead'
- *)
+/// <summary>rGet the number of ps dead node(s) specified by {node_id}</summary>
+/// <param name="handle"> handle to the KVStore</param>
+/// <param name="node_id"> Can be a node group or a single node.
+///    kScheduler = 1, kServerGroup = 2, kWorkerGroup = 4</param>
+/// <param name="number"> Ouptut number of dead nodes</param>
+/// <param name="timeout_sec"> A node fails to send heartbeart in {timeout_sec} seconds
+/// will be presumed as 'dead'</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXKVStoreGetNumDeadNode__(KVStoreHandle handle, int node_id, int[] number, int timeout_sec (*=60*))
 
-(**
- * \brief Create a RecordIO writer object
- * \param uri path to file
- * \param out handle pointer to the created object
- * \return 0 when success, -1 when failure happens
-*)
+/// <summary>rCreate a RecordIO writer object</summary>
+/// <param name="uri"> path to file</param>
+/// <param name="out"> handle pointer to the created object</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRecordIOWriterCreate__(string uri, RecordIOHandle[] out)
 
-(**
- * \brief Delete a RecordIO writer object
- * \param handle handle to RecordIO object
- * \return 0 when success, -1 when failure happens
-*)
+/// <summary>rDelete a RecordIO writer object</summary>
+/// <param name="handle"> handle to RecordIO object</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRecordIOWriterFree__(RecordIOHandle handle)
 
-(**
- * \brief Write a record to a RecordIO object
- * \param handle handle to RecordIO object
- * \param buf buffer to write
- * \param size size of buffer
- * \return 0 when success, -1 when failure happens
-*)
+/// <summary>rWrite a record to a RecordIO object</summary>
+/// <param name="handle"> handle to RecordIO object</param>
+/// <param name="buf"> buffer to write</param>
+/// <param name="size"> size of buffer</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRecordIOWriterWriteRecord__(RecordIOHandle handle, string buf, size_t size)
 
-(**
- * \brief Get the current writer pointer position
- * \param handle handle to RecordIO object
- * \param pos handle to output position
- * \return 0 when success, -1 when failure happens
-*)
+/// <summary>rGet the current writer pointer position</summary>
+/// <param name="handle"> handle to RecordIO object</param>
+/// <param name="pos"> handle to output position</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRecordIOWriterTell__(RecordIOHandle handle, size_t[] pos)
 
-(**
- * \brief Create a RecordIO reader object
- * \param uri path to file
- * \param out handle pointer to the created object
- * \return 0 when success, -1 when failure happens
-*)
+/// <summary>rCreate a RecordIO reader object</summary>
+/// <param name="uri"> path to file</param>
+/// <param name="out"> handle pointer to the created object</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRecordIOReaderCreate__(string uri, RecordIOHandle[] out)
 
-(**
- * \brief Delete a RecordIO reader object
- * \param handle handle to RecordIO object
- * \return 0 when success, -1 when failure happens
-*)
+/// <summary>rDelete a RecordIO reader object</summary>
+/// <param name="handle"> handle to RecordIO object</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRecordIOReaderFree__(RecordIOHandle handle)
 
-(**
- * \brief Write a record to a RecordIO object
- * \param handle handle to RecordIO object
- * \param buf pointer to return buffer
- * \param size point to size of buffer
- * \return 0 when success, -1 when failure happens
-*)
+/// <summary>rWrite a record to a RecordIO object</summary>
+/// <param name="handle"> handle to RecordIO object</param>
+/// <param name="buf"> pointer to return buffer</param>
+/// <param name="size"> point to size of buffer</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRecordIOReaderReadRecord__(RecordIOHandle handle, string[] buf, size_t[] size)
 
-(**
- * \brief Set the current reader pointer position
- * \param handle handle to RecordIO object
- * \param pos target position
- * \return 0 when success, -1 when failure happens
-*)
+/// <summary>rSet the current reader pointer position</summary>
+/// <param name="handle"> handle to RecordIO object</param>
+/// <param name="pos"> target position</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRecordIOReaderSeek__(RecordIOHandle handle, size_t pos)
 
-(**
- * \brief Get the current writer pointer position
- * \param handle handle to RecordIO object
- * \param pos handle to output position
- * \return 0 when success, -1 when failure happens
-*)
+/// <summary>rGet the current writer pointer position</summary>
+/// <param name="handle"> handle to RecordIO object</param>
+/// <param name="pos"> handle to output position</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRecordIOReaderTell__(RecordIOHandle handle, size_t[] pos)
 
-(**
- * \brief Create a MXRtc object
-*)
+/// <summary>rCreate a MXRtc object</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRtcCreate__(string name, uint32 num_input, uint32 num_output, string[] input_names, string[] output_names, NDArrayHandle[] inputs, [<Out>] NDArrayHandle& outputs, string kernel, RtcHandle[] out)
 
-(**
- * \brief Run cuda kernel
-*)
+/// <summary>rRun cuda kernel</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRtcPush__(RtcHandle handle, uint32 num_input, uint32 num_output, NDArrayHandle[] inputs, [<Out>] NDArrayHandle& outputs, uint32 gridDimX, uint32 gridDimY, uint32 gridDimZ, uint32 blockDimX, uint32 blockDimY, uint32 blockDimZ)
 
-(**
- * \brief Delete a MXRtc object
-*)
+/// Delete a MXRtc object
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRtcFree__(RtcHandle handle)
 
@@ -2210,69 +2144,57 @@ extern int MXRtcFree__(RtcHandle handle)
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXCustomOpRegister(string op_type, CustomOpPropCreator creator)
 
-(*
- * \brief record custom function for backward later.
- * \param num_inputs number of input NDArrays.
- * \param inputs handle to input NDArrays.
- * \param num_outputs number of output NDArrays.
- * \param outputs handle to output NDArrays.
- * \param callbacks callbacks for backward function.
- *)
+/// <summary>rrecord custom function for backward later.</summary>
+/// <param name="num_inputs"> number of input NDArrays.</param>
+/// <param name="inputs"> handle to input NDArrays.</param>
+/// <param name="num_outputs"> number of output NDArrays.</param>
+/// <param name="outputs"> handle to output NDArrays.</param>
+/// <param name="callbacks"> callbacks for backward function.</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXCustomFunctionRecord__(int num_inputs, NDArrayHandle[] inputs, int num_outputs, [<Out>] NDArrayHandle& outputs,  MXCallbackList[] callbacks)
 
-(*
- * \brief create cuda rtc module
- * \param source cuda source code
- * \param num_options number of compiler flags
- * \param options compiler flags
- * \param num_exports number of exported function names
- * \param exported function names
- * \param out handle to created module
- *)
+/// <summary>rcreate cuda rtc module</summary>
+/// <param name="source"> cuda source code</param>
+/// <param name="num_options"> number of compiler flags</param>
+/// <param name="options"> compiler flags</param>
+/// <param name="num_exports"> number of exported function names</param>
+/// <param name="exported"> function names</param>
+/// <param name="out"> handle to created module</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRtcCudaModuleCreate__(string source, int num_options, string[] options, int num_exports, string[] exports, CudaModuleHandle[] out)
 
-(*
- * \brief delete cuda rtc module
- * \param handle handle to cuda module
- *)
+/// <summary>rdelete cuda rtc module</summary>
+/// <param name="handle"> handle to cuda module</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRtcCudaModuleFree__(CudaModuleHandle handle)
 
-(*
- * \brief get kernel from module
- * \param handle handle to cuda module
- * \param name name of kernel function
- * \param num_args number of arguments
- * \param is_ndarray whether argument is ndarray
- * \param is_const whether argument is constant
- * \param arg_types data type of arguments
- * \param out created kernel
- *)
+/// <summary>rget kernel from module</summary>
+/// <param name="handle"> handle to cuda module</param>
+/// <param name="name"> name of kernel function</param>
+/// <param name="num_args"> number of arguments</param>
+/// <param name="is_ndarray"> whether argument is ndarray</param>
+/// <param name="is_const"> whether argument is constant</param>
+/// <param name="arg_types"> data type of arguments</param>
+/// <param name="out"> created kernel</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRtcCudaKernelCreate__(CudaModuleHandle handle, string name, int num_args, int[] is_ndarray, int[] is_const, int[] arg_types, CudaKernelHandle[] out)
 
-(*
- * \brief delete kernel
- * \param handle handle to previously created kernel
- *)
+/// <summary>rdelete kernel</summary>
+/// <param name="handle"> handle to previously created kernel</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRtcCudaKernelFree__(CudaKernelHandle handle)
 
-(*
- * \brief launch cuda kernel
- * \param handle handle to kernel
- * \param dev_id (GPU) device id
- * \param args pointer to arguments
- * \param grid_dim_x grid dimension x
- * \param grid_dim_y grid dimension y
- * \param grid_dim_z grid dimension z
- * \param block_dim_x block dimension x
- * \param block_dim_y block dimension y
- * \param block_dim_z block dimension z
- * \param shared_mem size of dynamically allocated shared memory
- *)
+/// <summary>rlaunch cuda kernel</summary>
+/// <param name="handle"> handle to kernel</param>
+/// <param name="dev_id"> (GPU) device id</param>
+/// <param name="args"> pointer to arguments</param>
+/// <param name="grid_dim_x"> grid dimension x</param>
+/// <param name="grid_dim_y"> grid dimension y</param>
+/// <param name="grid_dim_z"> grid dimension z</param>
+/// <param name="block_dim_x"> block dimension x</param>
+/// <param name="block_dim_y"> block dimension y</param>
+/// <param name="block_dim_z"> block dimension z</param>
+/// <param name="shared_mem"> size of dynamically allocated shared memory</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXRtcCudaKernelCall__(CudaKernelHandle handle, int dev_id, IntPtr args, uint32 grid_dim_x, uint32 grid_dim_y, uint32 grid_dim_z, uint32 block_dim_x, uint32 block_dim_y, uint32 block_dim_z, uint32 shared_mem)
 
