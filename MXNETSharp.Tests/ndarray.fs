@@ -61,6 +61,7 @@ module BasicBinaryOps =
 
 
  
+    open MXNetSharp.PrimitiveOperators
 
     [<Fact>]
     let ``add``() = testBinaryOp1 (+) (+) (+) (+) (.+) true
@@ -70,8 +71,8 @@ module BasicBinaryOps =
     let ``div``() = testBinaryOp1 (/) (/) (/) (/) (./) true
     [<Fact>]
     let ``mul``() = testBinaryOp1 ( * ) ( * ) ( * ) ( * ) (.*) true
-    //[<Fact>] // TODO: power op
-    //let ``pow``() = testBinaryOp1 ( ** ) ( ** ) ( ** ) ( ** ) (.**)
+    [<Fact>] 
+    let ``pow``() = testBinaryOp1 ( ** ) ( ** ) ( ** ) ( ** ) (.**)
     [<Fact>]
     let ``mod``() = testBinaryOp1 (%) (%) (%) (%) (%) false
     let boolValue (==) x y = if x == y then 1.f else 0.f

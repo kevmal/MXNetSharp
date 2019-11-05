@@ -3,6 +3,9 @@
 // also be ^T which generally makes no sense. Each exp call would need an upcast, `exp (input :> Symbol)` which
 // gets ugly. The following module can be opened for "elegant" expressions such as `(exp 5.0) * (exp symbol)`
 namespace MXNetSharp
+
+open System
+
 #nowarn "77"
 
 module InternalPrimitiveOperatorHelpers =     
@@ -107,13 +110,11 @@ module InternalPrimitiveOperatorHelpers =
         static member inline Negate(NegateOp, x : ^T) : ^Y = (^T: (member ApplyNegate : unit -> ^Y) (x))
     let inline internal negateHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Negate : ^op * ^t -> ^y)(t,x))
 
-    (* TODO: Power op
     type PowerOp = PowerOp with
-        static member inline Power(PowerOp, x : ^T, y : ^Y) : ^T = x ** y
-        static member inline Power(PowerOp, x : ^T, y : ^Y) : ^S = (^T: (member ApplyPower : ^Y -> ^S) (x, y))
-        static member inline Power(PowerOp, x : ^T, y : ^Y) : ^S2 = (^Y: (member ApplyPowerBaseOf : ^T -> ^S2) (y,x))
-    let inline internal powerHelper (t : ^op) (x : ^t) (y : ^y) : ^s = ((^op or ^t) : (static member Power : ^op * ^t * ^y -> ^s)(t,x,y))
-    *)
+        static member inline Power(PowerOp, x : float, y : float) = System.Math.Pow(x,y)
+        static member inline Power(PowerOp, x : float32, y : float32) = System.Math.Pow(double x,double y) |> float32
+        static member inline Power(PowerOp, x : ^T, y : ^Y) : ^S = (^S : (static member Pow : ^T * ^Y -> ^S) (x, y))
+    let inline internal powerHelper (t : ^op) (x : ^t) (y : ^y) : ^s = ((^op or ^t or ^y) : (static member Power : ^op * ^t * ^y -> ^s)(t,x,y))
 
 open InternalPrimitiveOperatorHelpers
 
@@ -138,4 +139,4 @@ module PrimitiveOperators =
     let inline tan (x : ^t) : ^y =  tanHelper TanOp x
     let inline tanh (x : ^t) : ^y =  tanhHelper TanhOp x
     let inline (~-) (x : ^t) : ^y = negateHelper NegateOp x
-        
+    let inline ( ** ) (x : ^t1) (y : ^t2) = powerHelper PowerOp x y    
