@@ -186,6 +186,8 @@ type SafeNDArrayHandle(owner) =
 [<Extension>]
 type ValueStringExtensions = ValueStringExtensions with
     [<Extension>] 
+    static member ValueString(x : int option seq) = x |> Seq.map (function Some x -> string x | _ -> "None") |> String.concat "," |> sprintf "[%s]"
+    [<Extension>] 
     static member ValueString(x : int seq) = x |> Seq.map string |> String.concat "," |> sprintf "[%s]"
     [<Extension>] 
     static member ValueString(x : int64 seq) = x |> Seq.map string |> String.concat "," |> sprintf "[%s]"
@@ -201,6 +203,7 @@ type ValueStringExtensions = ValueStringExtensions with
         | :? bool as x -> x.ValueString()
         | :? string as x -> x
         | :? seq<int> as x -> x.ValueString()
+        | :? seq<int option> as x -> x.ValueString()
         | :? seq<double> as x -> x.ValueString()
         | :? seq<int64> as x -> x.ValueString()
         | _ -> string x

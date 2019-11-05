@@ -77,7 +77,29 @@ type Symbol() =
     abstract member InputSymbols : Symbol []
     default x.InputSymbols = MXSymbol.getInputSymbols x.UnsafeHandle |> Array.map (fun h -> new SymbolInput(x, new SafeSymbolHandle(h,true)) :> Symbol)
     abstract member Initialize : unit -> unit
-    
+   
+    member x.Slice(startIndices, endIndices, stepIndices) = Slice(x, startIndices, endIndices, stepIndices)
+    member x.GetSlice([<ParamArray>] a : obj []) = 
+        let b = ResizeArray()
+        let e = ResizeArray()
+        let s = ResizeArray<int option>()
+        let mutable i = 0
+        while i < a.Length do 
+            match a.[i] with 
+            | :? int as idx -> 
+                b.Add(Some idx)
+                e.Add(Some(idx + 1))
+                s.Add None
+            | :? (int option) as o -> 
+                let o2 = a.[i+1] :?> int option |> Option.map (fun x -> x + 1)
+                b.Add(o)
+                e.Add(o2)
+                s.Add None
+                i <- i + 1
+            | _ -> failwithf "invalid argument to get slice %A" a.[i]
+            i <- i + 1
+        x.Slice(b,e,s) 
+             
     static member (+)(x : Symbol, y : float) = new PlusScalar(x,y)
     static member (+)(y : float, x : Symbol) = new PlusScalar(x,y)
     static member (+)(x : Symbol, y : Symbol) = new ElemwiseAdd(x,y)
@@ -351,8 +373,13 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
                     match a with 
                     | name, Input(:? ImplicitVariable) when not inserted -> 
                        inserted <- true
-                       printfn "Compising %s in %s with %s" name (x.GetType().Name) (symbol.GetType().Name)
+                       printfn "Composing %s in %s with %s" name (x.GetType().Name) (symbol.GetType().Name)
                        name, Input(symbol)
+                    | name, VarArg(countName,a) -> 
+                       inserted <- true
+                       printfn "Composing %s in %s with %s" name (x.GetType().Name) (symbol.GetType().Name)
+                       name, VarArg(countName, [|yield! a; yield symbol|])
+                        
                     | x -> x
                 )
             |> Seq.toArray
@@ -30971,9 +30998,9 @@ type Slice private (operatorArguments) =
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
     new(data : Symbol,
-        sliceBegin : int seq,
-        sliceEnd : int seq,
-        [<Optional>] ?step : int seq) = 
+        sliceBegin : int option seq,
+        sliceEnd : int option seq,
+        [<Optional>] ?step : int option seq) = 
         let operatorArguments = 
             [
                 "data", Input data
@@ -31033,10 +31060,10 @@ type Slice private (operatorArguments) =
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
     /// <param name="data">Source input</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
-    new(sliceBegin : int seq,
-        sliceEnd : int seq,
+    new(sliceBegin : int option seq,
+        sliceEnd : int option seq,
         [<Optional>] ?data : Symbol,
-        [<Optional>] ?step : int seq) = 
+        [<Optional>] ?step : int option seq) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
             [
@@ -31052,9 +31079,9 @@ type Slice private (operatorArguments) =
     /// Source input
     member __.Data = operatorArguments.GetInput "data"
     /// starting indices for the slice operation, supports negative indices.
-    member __.SliceBegin : int seq = match operatorArguments.GetParameter "begin" with Some(v) -> unbox v | None -> failwithf "Required parameter begin is missing"
+    member __.SliceBegin : int option seq = match operatorArguments.GetParameter "begin" with Some(v) -> unbox v | None -> failwithf "Required parameter begin is missing"
     /// ending indices for the slice operation, supports negative indices.
-    member __.SliceEnd : int seq = match operatorArguments.GetParameter "end" with Some(v) -> unbox v | None -> failwithf "Required parameter end is missing"
+    member __.SliceEnd : int option seq = match operatorArguments.GetParameter "end" with Some(v) -> unbox v | None -> failwithf "Required parameter end is missing"
     /// step for the slice operation, supports negative values.
     member __.Step = operatorArguments.GetParameter("step", Slice.StepDefault)
     /// <summary>Copy Slice instance with updated inputs/parameters.</summary>
@@ -31063,9 +31090,9 @@ type Slice private (operatorArguments) =
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
     member this.With([<Optional>] ?data : Symbol,
-        [<Optional>] ?sliceBegin : int seq,
-        [<Optional>] ?sliceEnd : int seq,
-        [<Optional>] ?step : int seq) = 
+        [<Optional>] ?sliceBegin : int option seq,
+        [<Optional>] ?sliceEnd : int option seq,
+        [<Optional>] ?step : int option seq) = 
         let operatorArguments = 
             [
                 data |> Option.map (fun x -> "data", Input x)
@@ -31095,9 +31122,9 @@ type SliceAssign private (operatorArguments) =
     /// <param name="step">step for the slice operation, supports negative values.</param>
     new(lhs : Symbol,
         rhs : Symbol,
-        sliceBegin : int seq,
-        sliceEnd : int seq,
-        [<Optional>] ?step : int seq) = 
+        sliceBegin : int option seq,
+        sliceEnd : int option seq,
+        [<Optional>] ?step : int option seq) = 
         let operatorArguments = 
             [
                 "lhs", Input lhs
@@ -31121,11 +31148,11 @@ type SliceAssign private (operatorArguments) =
     /// <param name="lhs">Source input</param>
     /// <param name="rhs">value to assign</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
-    new(sliceBegin : int seq,
-        sliceEnd : int seq,
+    new(sliceBegin : int option seq,
+        sliceEnd : int option seq,
         [<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol,
-        [<Optional>] ?step : int seq) = 
+        [<Optional>] ?step : int option seq) = 
         let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
         let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
@@ -31145,9 +31172,9 @@ type SliceAssign private (operatorArguments) =
     /// value to assign
     member __.Rhs = operatorArguments.GetInput "rhs"
     /// starting indices for the slice operation, supports negative indices.
-    member __.SliceBegin : int seq = match operatorArguments.GetParameter "begin" with Some(v) -> unbox v | None -> failwithf "Required parameter begin is missing"
+    member __.SliceBegin : int option seq = match operatorArguments.GetParameter "begin" with Some(v) -> unbox v | None -> failwithf "Required parameter begin is missing"
     /// ending indices for the slice operation, supports negative indices.
-    member __.SliceEnd : int seq = match operatorArguments.GetParameter "end" with Some(v) -> unbox v | None -> failwithf "Required parameter end is missing"
+    member __.SliceEnd : int option seq = match operatorArguments.GetParameter "end" with Some(v) -> unbox v | None -> failwithf "Required parameter end is missing"
     /// step for the slice operation, supports negative values.
     member __.Step = operatorArguments.GetParameter("step", SliceAssign.StepDefault)
     /// <summary>Copy SliceAssign instance with updated inputs/parameters.</summary>
@@ -31158,9 +31185,9 @@ type SliceAssign private (operatorArguments) =
     /// <param name="step">step for the slice operation, supports negative values.</param>
     member this.With([<Optional>] ?lhs : Symbol,
         [<Optional>] ?rhs : Symbol,
-        [<Optional>] ?sliceBegin : int seq,
-        [<Optional>] ?sliceEnd : int seq,
-        [<Optional>] ?step : int seq) = 
+        [<Optional>] ?sliceBegin : int option seq,
+        [<Optional>] ?sliceEnd : int option seq,
+        [<Optional>] ?step : int option seq) = 
         let operatorArguments = 
             [
                 lhs |> Option.map (fun x -> "lhs", Input x)
@@ -31189,10 +31216,10 @@ type SliceAssignScalar private (operatorArguments) =
     /// <param name="scalar">The scalar value for assignment.</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
     new(data : Symbol,
-        sliceBegin : int seq,
-        sliceEnd : int seq,
+        sliceBegin : int option seq,
+        sliceEnd : int option seq,
         [<Optional>] ?scalar : double,
-        [<Optional>] ?step : int seq) = 
+        [<Optional>] ?step : int option seq) = 
         let operatorArguments = 
             [
                 "data", Input data
@@ -31215,11 +31242,11 @@ type SliceAssignScalar private (operatorArguments) =
     /// <param name="data">Source input</param>
     /// <param name="scalar">The scalar value for assignment.</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
-    new(sliceBegin : int seq,
-        sliceEnd : int seq,
+    new(sliceBegin : int option seq,
+        sliceEnd : int option seq,
         [<Optional>] ?data : Symbol,
         [<Optional>] ?scalar : double,
-        [<Optional>] ?step : int seq) = 
+        [<Optional>] ?step : int option seq) = 
         let data = defaultArg data (new ImplicitVariable() :> Symbol)
         let operatorArguments = 
             [
@@ -31239,9 +31266,9 @@ type SliceAssignScalar private (operatorArguments) =
     /// Source input
     member __.Data = operatorArguments.GetInput "data"
     /// starting indices for the slice operation, supports negative indices.
-    member __.SliceBegin : int seq = match operatorArguments.GetParameter "begin" with Some(v) -> unbox v | None -> failwithf "Required parameter begin is missing"
+    member __.SliceBegin : int option seq = match operatorArguments.GetParameter "begin" with Some(v) -> unbox v | None -> failwithf "Required parameter begin is missing"
     /// ending indices for the slice operation, supports negative indices.
-    member __.SliceEnd : int seq = match operatorArguments.GetParameter "end" with Some(v) -> unbox v | None -> failwithf "Required parameter end is missing"
+    member __.SliceEnd : int option seq = match operatorArguments.GetParameter "end" with Some(v) -> unbox v | None -> failwithf "Required parameter end is missing"
     /// The scalar value for assignment.
     member __.Scalar = operatorArguments.GetParameter("scalar", SliceAssignScalar.ScalarDefault)
     /// step for the slice operation, supports negative values.
@@ -31253,10 +31280,10 @@ type SliceAssignScalar private (operatorArguments) =
     /// <param name="scalar">The scalar value for assignment.</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
     member this.With([<Optional>] ?data : Symbol,
-        [<Optional>] ?sliceBegin : int seq,
-        [<Optional>] ?sliceEnd : int seq,
+        [<Optional>] ?sliceBegin : int option seq,
+        [<Optional>] ?sliceEnd : int option seq,
         [<Optional>] ?scalar : double,
-        [<Optional>] ?step : int seq) = 
+        [<Optional>] ?step : int option seq) = 
         let operatorArguments = 
             [
                 data |> Option.map (fun x -> "data", Input x)

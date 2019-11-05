@@ -698,7 +698,7 @@ let toNDArrayCode suffix (x : ProcessedAtomicSymbol) =
                 sprintf "                                         %s" paramValuesStr
                 sprintf "outputs |> Array.map (fun h -> new NDArray(h))"
             ]
-        | _ -> failwithf "Unexpected output count of zero (%d)" c
+        | c -> failwithf "Unexpected output count of zero (%d)" c
     let defineInto = 
         let name = x.Name
         if args.Length = 0 then 
@@ -1274,6 +1274,19 @@ Mappings.Modify(fun (x : ProcessedArg) ->
         match x.Arg.ArgumentInfo.Name with 
         | "begin" -> {x with Name = "sliceBegin"} |> argDoc
         | "end" -> {x with Name = "sliceEnd"} |> argDoc
+        | _ -> x
+    | _ -> x
+    )
+
+Mappings.Modify(fun (x : ProcessedArg) -> 
+    match x.Arg.AtomicSymbolInfo.Name with 
+    | "slice"
+    | "_slice_assign"
+    | "_slice_assign_scalar" ->
+        match x.Arg.ArgumentInfo.Name with 
+        | "begin" -> {x with TypeString = "int option seq"} |> argDoc
+        | "end" -> {x with TypeString = "int option seq"} |> argDoc
+        | "step" -> {x with TypeString = "int option seq"} |> argDoc
         | _ -> x
     | _ -> x
     )

@@ -37567,12 +37567,12 @@ type Operators() =
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
-    static member Slice(data : NDArray, sliceBegin : int seq, sliceEnd : int seq, [<Optional>] step : int seq) =
+    static member Slice(data : NDArray, sliceBegin : int option seq, sliceEnd : int option seq, [<Optional>] step : int option seq) =
         let creator = AtomicSymbolCreator.FromName "slice"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"begin"; "end"; "step"|]
-                                                 [|(sliceBegin |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+                                                 [|string sliceBegin; string sliceEnd; (if isNull (step :> obj) then "[]" else string step)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Slices a region of the array.
     /// 
@@ -37626,10 +37626,10 @@ type Operators() =
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
-    static member Slice(outputArray : NDArray seq, data : NDArray, sliceBegin : int seq, sliceEnd : int seq, [<Optional>] step : int seq) =
+    static member Slice(outputArray : NDArray seq, data : NDArray, sliceBegin : int option seq, sliceEnd : int option seq, [<Optional>] step : int option seq) =
         let creator = AtomicSymbolCreator.FromName "slice"
         let names = [|"begin"; "end"; "step"|]
-        let vals = [|(sliceBegin |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        let vals = [|string sliceBegin; string sliceEnd; (if isNull (step :> obj) then "[]" else string step)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -37688,7 +37688,7 @@ type Operators() =
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
-    static member Slice(data : Symbol, sliceBegin : int seq, sliceEnd : int seq, [<Optional>] ?step : int seq) =
+    static member Slice(data : Symbol, sliceBegin : int option seq, sliceEnd : int option seq, [<Optional>] ?step : int option seq) =
         Slice(data, sliceBegin, sliceEnd, ?step = step)
     /// <summary>Slices a region of the array.
     /// 
@@ -37741,7 +37741,7 @@ type Operators() =
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
     /// <param name="data">Source input</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
-    static member Slice(sliceBegin : int seq, sliceEnd : int seq, [<Optional>] ?data : Symbol, [<Optional>] ?step : int seq) =
+    static member Slice(sliceBegin : int option seq, sliceEnd : int option seq, [<Optional>] ?data : Symbol, [<Optional>] ?step : int option seq) =
         Slice(sliceBegin, sliceEnd, ?data = data, ?step = step)
 
 
@@ -37761,14 +37761,14 @@ type Operators() =
     /// <param name="step">step for the slice operation, supports negative values.</param>
     static member SliceAssign(lhs : NDArray, 
                               rhs : NDArray, 
-                              sliceBegin : int seq, 
-                              sliceEnd : int seq, 
-                              [<Optional>] step : int seq) =
+                              sliceBegin : int option seq, 
+                              sliceEnd : int option seq, 
+                              [<Optional>] step : int option seq) =
         let creator = AtomicSymbolCreator.FromName "_slice_assign"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
                                                  [|"begin"; "end"; "step"|]
-                                                 [|(sliceBegin |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+                                                 [|string sliceBegin; string sliceEnd; (if isNull (step :> obj) then "[]" else string step)|]
         (new NDArray(outputs.[0]))
     /// <summary>Assign the rhs to a cropped subset of lhs.
     /// 
@@ -37788,12 +37788,12 @@ type Operators() =
     static member SliceAssign(outputArray : NDArray seq, 
                               lhs : NDArray, 
                               rhs : NDArray, 
-                              sliceBegin : int seq, 
-                              sliceEnd : int seq, 
-                              [<Optional>] step : int seq) =
+                              sliceBegin : int option seq, 
+                              sliceEnd : int option seq, 
+                              [<Optional>] step : int option seq) =
         let creator = AtomicSymbolCreator.FromName "_slice_assign"
         let names = [|"begin"; "end"; "step"|]
-        let vals = [|(sliceBegin |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        let vals = [|string sliceBegin; string sliceEnd; (if isNull (step :> obj) then "[]" else string step)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
@@ -37815,7 +37815,7 @@ type Operators() =
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
-    static member SliceAssign(lhs : Symbol, rhs : Symbol, sliceBegin : int seq, sliceEnd : int seq, [<Optional>] ?step : int seq) =
+    static member SliceAssign(lhs : Symbol, rhs : Symbol, sliceBegin : int option seq, sliceEnd : int option seq, [<Optional>] ?step : int option seq) =
         SliceAssign(lhs, rhs, sliceBegin, sliceEnd, ?step = step)
     /// <summary>Assign the rhs to a cropped subset of lhs.
     /// 
@@ -37831,7 +37831,7 @@ type Operators() =
     /// <param name="lhs">Source input</param>
     /// <param name="rhs">value to assign</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
-    static member SliceAssign(sliceBegin : int seq, sliceEnd : int seq, [<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol, [<Optional>] ?step : int seq) =
+    static member SliceAssign(sliceBegin : int option seq, sliceEnd : int option seq, [<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol, [<Optional>] ?step : int option seq) =
         SliceAssign(sliceBegin, sliceEnd, ?lhs = lhs, ?rhs = rhs, ?step = step)
 
     /// <summary>(Assign the scalar to a cropped subset of the input.
@@ -37848,15 +37848,15 @@ type Operators() =
     /// <param name="scalar">The scalar value for assignment.</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
     static member SliceAssignScalar(data : NDArray, 
-                                    sliceBegin : int seq, 
-                                    sliceEnd : int seq, 
+                                    sliceBegin : int option seq, 
+                                    sliceEnd : int option seq, 
                                     [<Optional; DefaultParameterValue(0.0)>] scalar : double, 
-                                    [<Optional>] step : int seq) =
+                                    [<Optional>] step : int option seq) =
         let creator = AtomicSymbolCreator.FromName "_slice_assign_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"begin"; "end"; "scalar"; "step"|]
-                                                 [|(sliceBegin |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string scalar; (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+                                                 [|string sliceBegin; string sliceEnd; string scalar; (if isNull (step :> obj) then "[]" else string step)|]
         (new NDArray(outputs.[0]))
     /// <summary>(Assign the scalar to a cropped subset of the input.
     /// 
@@ -37874,13 +37874,13 @@ type Operators() =
     /// <param name="step">step for the slice operation, supports negative values.</param>
     static member SliceAssignScalar(outputArray : NDArray seq, 
                                     data : NDArray, 
-                                    sliceBegin : int seq, 
-                                    sliceEnd : int seq, 
+                                    sliceBegin : int option seq, 
+                                    sliceEnd : int option seq, 
                                     [<Optional; DefaultParameterValue(0.0)>] scalar : double, 
-                                    [<Optional>] step : int seq) =
+                                    [<Optional>] step : int option seq) =
         let creator = AtomicSymbolCreator.FromName "_slice_assign_scalar"
         let names = [|"begin"; "end"; "scalar"; "step"|]
-        let vals = [|(sliceBegin |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (sliceEnd |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string scalar; (if isNull (step :> obj) then "[]" else (step |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        let vals = [|string sliceBegin; string sliceEnd; string scalar; (if isNull (step :> obj) then "[]" else string step)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -37901,7 +37901,7 @@ type Operators() =
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
     /// <param name="scalar">The scalar value for assignment.</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
-    static member SliceAssignScalar(data : Symbol, sliceBegin : int seq, sliceEnd : int seq, [<Optional>] ?scalar : double, [<Optional>] ?step : int seq) =
+    static member SliceAssignScalar(data : Symbol, sliceBegin : int option seq, sliceEnd : int option seq, [<Optional>] ?scalar : double, [<Optional>] ?step : int option seq) =
         SliceAssignScalar(data, sliceBegin, sliceEnd, ?scalar = scalar, ?step = step)
     /// <summary>(Assign the scalar to a cropped subset of the input.
     /// 
@@ -37916,7 +37916,7 @@ type Operators() =
     /// <param name="data">Source input</param>
     /// <param name="scalar">The scalar value for assignment.</param>
     /// <param name="step">step for the slice operation, supports negative values.</param>
-    static member SliceAssignScalar(sliceBegin : int seq, sliceEnd : int seq, [<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?step : int seq) =
+    static member SliceAssignScalar(sliceBegin : int option seq, sliceEnd : int option seq, [<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?step : int option seq) =
         SliceAssignScalar(sliceBegin, sliceEnd, ?data = data, ?scalar = scalar, ?step = step)
 
     /// <summary>Slices along a given axis.
