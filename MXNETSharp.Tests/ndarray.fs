@@ -157,7 +157,7 @@ module Slicing =
         let d1 = [0.0 .. 20.0] |> List.map float32
         let a = nd d1
         let expected = d1.[3 .. 5]
-        let actual : float32 [] = (a.[3 .. 6]).ToArray()
+        let actual : float32 [] = (a.[3 .. 5]).ToArray()
         Assert.Equal(expected.Length, actual.Length)
         for i = 0 to expected.Length - 1 do    
             Assert.Equal(double expected.[i], double actual.[i], 6)
@@ -167,7 +167,7 @@ module Slicing =
         let d1 = [0.0 .. 20.0] |> List.map float32
         let a = nd d1
         let expected = d1.[.. 5]
-        let actual : float32 [] = (a.[.. 6]).ToArray()
+        let actual : float32 [] = (a.[.. 5]).ToArray()
         Assert.Equal(expected.Length, actual.Length)
         for i = 0 to expected.Length - 1 do    
             Assert.Equal(double expected.[i], double actual.[i], 6)
