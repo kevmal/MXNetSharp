@@ -933,53 +933,53 @@ extern int MXImperativeInvokeEx__(AtomicSymbolCreatorHandle creator, int num_inp
 /// <param name="prev">returns the previous status before this set.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXAutogradSetIsRecording__(int is_recording, int[] prev)
+extern int MXAutogradSetIsRecording(int is_recording, [<Out>] int& prev)
 
 /// <summary>set whether to record operator for autograd</summary>
 /// <param name="is_training">1 when training, 0 when testing</param>
 /// <param name="prev">returns the previous status before this set.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXAutogradSetIsTraining__(int is_training, int[] prev)
+extern int MXAutogradSetIsTraining(int is_training, [<Out>] int& prev)
 
 /// <summary>get whether autograd recording is on</summary>
 /// <param name="curr">returns the current status.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXAutogradIsRecording__(bool* curr)
+extern int MXAutogradIsRecording([<Out>] bool& curr)
 
 /// <summary>get whether training mode is on</summary>
 /// <param name="curr">returns the current status.</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXAutogradIsTraining__(bool* curr)
+extern int MXAutogradIsTraining([<Out>] bool& curr)
 
 /// <summary>get whether numpy compatibility is on</summary>
 /// <param name="curr">returns the current status</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXIsNumpyShape__(bool* curr)
+extern int MXIsNumpyShape([<Out>] bool& curr)
 
 /// <summary>set numpy compatibility switch</summary>
 /// <param name="is_np_shape">1 when numpy shape semantics is on, 0 when off</param>
 /// <param name="prev">returns the previous status before this set</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXSetIsNumpyShape__(int is_np_shape, int[] prev)
+extern int MXSetIsNumpyShape(int is_np_shape, [<Out>] int& prev)
 
 /// <summary>mark NDArrays as variables to compute gradient for autograd</summary>
 /// <param name="num_var">number of variable NDArrays</param>
 /// <param name="var_handles">variable NDArrays</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXAutogradMarkVariables__(uint32 num_var, NDArrayHandle[] var_handles, uint32[] reqs_array, NDArrayHandle[] grad_handles)
+extern int MXAutogradMarkVariables(uint32 num_var, NDArrayHandle[] var_handles, uint32[] reqs_array, NDArrayHandle[] grad_handles)
 
 /// <summary>compute the gradient of outputs w.r.t variabels</summary>
 /// <param name="num_output">number of output NDArray</param>
 /// <param name="output_handles">output NDArrays</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXAutogradComputeGradient__(uint32 num_output, [<Out>] NDArrayHandle& output_handles)
+extern int MXAutogradComputeGradient(uint32 num_output, NDArrayHandle[] output_handles)
 
 /// <summary>compute the gradient of outputs w.r.t variabels</summary>
 /// <param name="num_output">number of output NDArray</param>
@@ -988,7 +988,7 @@ extern int MXAutogradComputeGradient__(uint32 num_output, [<Out>] NDArrayHandle&
 /// <param name="retain_graph">whether to keep the graph after backward</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXAutogradBackward__(uint32 num_output, [<Out>] NDArrayHandle& output_handles, NDArrayHandle[] ograd_handles, int retain_graph)
+extern int MXAutogradBackward(uint32 num_output, NDArrayHandle[] output_handles, NDArrayHandle[] ograd_handles, int retain_graph)
 
 /// <summary>compute the gradient of outputs w.r.t variabels</summary>
 /// <param name="num_output">number of output NDArray</param>
@@ -999,15 +999,13 @@ extern int MXAutogradBackward__(uint32 num_output, [<Out>] NDArrayHandle& output
 /// <param name="is_train">whether to do backward for training or inference</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXAutogradBackwardEx__(uint32 num_output, [<Out>] NDArrayHandle& output_handles, NDArrayHandle[] ograd_handles, uint32 num_variables, NDArrayHandle[] var_handles, int retain_graph, int create_graph, int is_train, NDArrayHandle[]& grad_handles, int[]& grad_stypes)
+extern int MXAutogradBackwardEx(uint32 num_output, NDArrayHandle[] output_handles, NDArrayHandle[] ograd_handles, uint32 num_variables, NDArrayHandle[] var_handles, int retain_graph, int create_graph, int is_train, NDArrayHandle[]& grad_handles, int[]& grad_stypes)
 
-(*
- * \brief get the graph constructed by autograd.
- * \param handle ndarray handle
- * \param out output symbol handle
- *)
+/// <summary>get the graph constructed by autograd.</summary>
+/// <param name="handle">ndarray handle</param>
+/// <param name="out">output symbol handle</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXAutogradGetSymbol__(NDArrayHandle handle, SymbolHandle[] out)
+extern int MXAutogradGetSymbol(NDArrayHandle handle, [<Out>] SymbolHandle& out)
 
 /// <summary>create cached operator</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]

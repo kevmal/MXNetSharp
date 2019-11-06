@@ -181,6 +181,20 @@ module MXLib =
     let customOpRegister opType creator = 
         MXCustomOpRegister(opType, creator) |> throwOnError "MXCustomOpRegister"
 
+    /// <summary>get whether numpy compatibility is on</summary>
+    /// <returns>the current status.</returns>
+    let isNumpyShape() = 
+        let mutable curr = un
+        MXIsNumpyShape(&curr) |> throwOnError "MXIsNumpyShape"
+        curr
+
+    /// <summary>set numpy compatibility switch</summary>
+    /// <param name="is_np_shape">true when numpy shape semantics is on, false when off</param>
+    /// <returns>the previous status before this set</returns>
+    let setIsNumpyShape is_np_shape = 
+        let mutable prev = un
+        MXSetIsNumpyShape((if is_np_shape then 1 else 0), &prev) |> throwOnError "MXSetIsNumpyShape"
+        prev <> 0
 
 type InferShapeResult<'a> = 
     {
@@ -2259,3 +2273,80 @@ module MXKVStore =
         let mutable tp = un
         MXKVStoreGetType(handle, &tp) |> throwOnError "MXKVStoreGetType"
         str tp
+
+
+module MXAutograd = 
+    /// <summary>set whether to record operator for autograd</summary>
+    /// <param name="is_recording">true when recording, false when not recording.</param>
+    /// <returns>the previous status before this set.</returns>
+    let setIsRecording is_recording = 
+        let mutable prev = un
+        MXAutogradSetIsRecording((if is_recording then 1 else 0), &prev) |> throwOnError "MXAutogradSetIsRecording"
+        prev <> 0
+    
+    /// <summary>set whether to record operator for autograd</summary>
+    /// <param name="is_training">true when training, false when testing</param>
+    /// <returns>the previous status before this set.</returns>
+    let setIsTraining is_training = 
+        let mutable prev = un
+        MXAutogradSetIsTraining((if is_training then 1 else 0), &prev) |> throwOnError "MXAutogradSetIsTraining"
+        prev <> 0
+    
+    /// <summary>get whether autograd recording is on</summary>
+    /// <returns>the current status.</returns>
+    let isRecording()= 
+        let mutable curr = un
+        MXAutogradIsRecording(&curr) |> throwOnError "MXAutogradIsRecording"
+        curr
+    
+    /// <summary>get whether training mode is on</summary>
+    /// <returns>the current status.</returns>
+    let isTraining() = 
+        let mutable curr = un
+        MXAutogradIsTraining(&curr) |> throwOnError "MXAutogradIsTraining"
+        curr
+
+    /// <summary>mark NDArrays as variables to compute gradient for autograd</summary>
+    /// <param name="var_handles">variable NDArrays</param>
+    /// <param name="reqs_array">variable op req types</param>
+    /// <param name="grad_handles">variable gards</param>
+    let markVariables var_handles reqs_array grad_handles = 
+        assert (ulength var_handles = ulength reqs_array)
+        assert (ulength var_handles = ulength grad_handles)
+        MXAutogradMarkVariables(ulength var_handles, var_handles, reqs_array, grad_handles) |> throwOnError "MXAutogradMarkVariables"
+    
+    /// <summary>compute the gradient of outputs w.r.t variabels</summary>
+    /// <param name="output_handles">output NDArrays</param>
+    let computeGradient output_handles = 
+        MXAutogradComputeGradient(ulength output_handles, output_handles) |> throwOnError "MXAutogradComputeGradient"
+    
+    /// <summary>compute the gradient of outputs w.r.t variabels</summary>
+    /// <param name="num_output">number of output NDArray</param>
+    /// <param name="output_handles">output NDArrays</param>
+    /// <param name="ograd_handles">head gradient for NDArrays</param>
+    /// <param name="retain_graph">whether to keep the graph after backward</param>
+    let backward output_handles ograd_handles retain_graph = 
+        assert(ulength output_handles = ulength ograd_handles)
+        MXAutogradBackward(ulength output_handles, output_handles, ograd_handles, (if retain_graph then 1 else 0)) |> throwOnError "MXAutogradBackward"
+    
+
+    //TODO: backwardEx
+    /// <summary>compute the gradient of outputs w.r.t variabels</summary>
+    /// <param name="num_output">number of output NDArray</param>
+    /// <param name="output_handles">output NDArrays</param>
+    /// <param name="ograd_handles">head gradient for NDArrays</param>
+    /// <param name="num_variables">number of variables</param>
+    /// <param name="retain_graph">whether to keep the graph after backward</param>
+    /// <param name="is_train">whether to do backward for training or inference</param>
+    /// <returns>0 when success, -1 when failure happens</returns>
+    //let backwardEx num_output ograd_handles num_variables var_handles retain_graph create_graph is_train grad_handles grad_stypes = 
+    //    let mutable output_handles = un
+    //    MXAutogradBackwardEx(num_output, &output_handles, ograd_handles, num_variables, var_handles, retain_graph, create_graph, is_train, grad_handles, grad_stypes) |> throwOnError "MXAutogradBackwardEx"
+    
+    /// <summary>get the graph constructed by autograd.</summary>
+    /// <param name="handle">ndarray handle</param>
+    /// <param name="out">output symbol handle</param>
+    let getSymbol handle = 
+        let mutable out = un
+        MXAutogradGetSymbol(handle, &out) |> throwOnError "MXAutogradGetSymbol"
+        out
