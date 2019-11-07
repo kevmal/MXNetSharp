@@ -66,9 +66,78 @@ type NDArray(handle : SafeNDArrayHandle) =
     member x.NDArrayHandle = handle
     member x.UnsafeHandle = x.NDArrayHandle.UnsafeHandle
 
+    member x.GetAuxType(index : int64) = MXNDArray.getAuxType64 handle.UnsafeHandle index |> DataType.FromTypeFlag
+    member x.GetAuxType(index : int) = x.GetAuxType(int64 index)
+
+    /// Get a deep copy of the ith aux data blob
+    /// in the form of an NDArray of default storage type.
+    /// This function blocks. Do not use it in performance critical code.
+    member x.GetAuxCopy(index : int64) = 
+        let handle = MXNDArray.getAuxNDArray64 handle.UnsafeHandle index
+        new NDArray(new SafeNDArrayHandle(handle, true))
+    member x.GetAuxCopy(index : int) = x.GetAuxCopy(int64 index)
+
+    /// Attach a gradient buffer to this NDArray, so that `backward`
+    /// can compute gradient with respect to it.
+    /// The gradient is initialized to zeros.
+    member x.AttachGradient([<Optional>] ?gradReq, [<Optional>] ?storageType) = 
+        let gradReq = defaultArg gradReq OpReqType.WriteTo
+        let grad = 
+            match storageType with 
+            | Some (StorageType.Default | StorageType.Undefined) -> 
+                match x.DataType with 
+                | Some dtype -> 
+                    invoke1 "_zeros" Array.empty [|"shape" <-- x.Shape; "ctx" <-- x.Context; "dtype" <-- dtype |]
+                | None ->
+                    invoke1 "_zeros" Array.empty [|"shape" <-- x.Shape; "ctx" <-- x.Context |]
+            | Some stype ->  //TODO: pull this out into general ctor for sparse ndarray
+                let types,shapes = 
+                    match stype with 
+                    | CSR -> [|int TypeFlag.Int64; int TypeFlag.Int64|], [|[|0u|] ; [|0u|]|]
+                    | RowSparse -> [|int TypeFlag.Int64|], [|[|0u|]|]
+                    | StorageType.Default 
+                    | StorageType.Undefined -> failwith "Unreachable. Default/Undefined case matched"
+                let dtype : TypeFlag = x.DataTypeFlag
+                let ctx : Context = x.Context
+                let handle = 
+                    MXNDArray.createSparseEx
+                        (int stype)
+                        (x.Shape |> Array.map uint32)
+                        (int ctx.DeviceType)
+                        ctx.DeviceId
+                        1 //delay alloc REVIEW: 
+                        (int dtype)
+                        types 
+                        shapes
+                let a = new NDArray(new SafeNDArrayHandle(handle, true))
+                mutInvoke a "_zeros" [|a|] Array.empty
+            | None -> invoke1 "zeros_like" [|x|] Array.empty
+        MXAutograd.markVariables [|x.UnsafeHandle|] [|uint32 gradReq|] [|grad.UnsafeHandle|]
+    member x.Backward(?outGrad, ?retainGraph, ?train, ?createGraph) = 
+        let retainGraph = defaultArg retainGraph false
+        let train = defaultArg train true
+        let createGraph = defaultArg createGraph false
+        let ograd = 
+            match outGrad with
+            | Some (a : NDArray) -> [| a.UnsafeHandle |]
+            | None -> [| 0n |]
+        let h,st = MXAutograd.backwardEx [|x.UnsafeHandle|] ograd Array.empty retainGraph createGraph train
+        ()
+
+    member x.Grad = 
+        let handle = MXNDArray.getGrad handle.UnsafeHandle 
+        if handle > 0n then 
+            Some(new NDArray(new SafeNDArrayHandle(handle, true)))
+        else 
+            None
+    member x.DataType = MXNDArray.getDType handle.UnsafeHandle |> DataType.FromTypeFlag
+    member x.DataTypeFlag = MXNDArray.getDType handle.UnsafeHandle
+    member x.StorageType = MXNDArray.getStorageType handle.UnsafeHandle |> StorageType.FromInt
     member x.Shape = MXNDArray.getShape handle.UnsafeHandle
     member x.Size = x.Shape |> Array.reduce (*)
-    member x.Context = MXNDArray.getContext handle.UnsafeHandle
+    member x.Context = 
+        let struct(dt, id) = MXNDArray.getContext handle.UnsafeHandle
+        Context.FromDeviceTypeAndId(dt,id)
 
     member x.CopyTo(destination : NDArray) = 
         MXNDArray.syncCopyFromNDArray destination.NDArrayHandle.UnsafeHandle x.NDArrayHandle.UnsafeHandle -1
@@ -272,7 +341,7 @@ type NDArray(handle : SafeNDArrayHandle) =
         let e = endIndices |> String.concat "," |> sprintf "(%s)"
         let s = stepIndices |> String.concat "," |> sprintf "(%s)"
         invoke "slice" [|x|] [|"begin", b; "end", e; "step", s|]|> Array.head
-    member x.GetSlice([<ParamArray>] a : obj []) = 
+    member x.GetSlice([<ParamArray>] a : obj []) =  //TODO: support all indexing types
         let inline str x = match x with Some v -> v.ValueString() | _ -> "None"
         if a.Length = 0 then 
             x // REVIEW: copy?

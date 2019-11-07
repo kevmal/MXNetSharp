@@ -21,6 +21,7 @@
     <Compile Include="genargtypes.fs" />
     <Compile Include="symbol.fs" />
     <Compile Include="ndarray.fs" />
+    <Compile Include="autograd.fs" />
     <Compile Include="customop.fs" />
     <Compile Include="dataiter.fs" />
     <Compile Include="executor.fs" />

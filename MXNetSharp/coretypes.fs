@@ -6,12 +6,28 @@ open MXNetSharp.Interop
 open System.Runtime.CompilerServices
 open System
 
+type NewAxis = NewAxis
+
 //https://github.com/apache/incubator-mxnet/blob/62b063802634048fe9da0a736dd6ee429e410f27/python/mxnet/ndarray/ndarray.py#L57-L60
 type StorageType = 
-    | Undefined = -1
-    | Default = 0
-    | RowSparse = 1
-    | CSR = 2
+    | Undefined
+    | Default
+    | RowSparse
+    | CSR
+    static member FromInt(n) = 
+        match n with 
+        | -1 -> Undefined
+        | 0 -> Default
+        | 1 -> RowSparse
+        | 2 -> CSR
+        | _ -> invalidArg "n" (sprintf "Storage type %d is not surported" n)
+    member x.ToInt() = 
+        match x with 
+        | Undefined -> -1
+        | Default -> 0
+        | RowSparse -> 1
+        | CSR -> 2
+    static member op_Explicit(st : StorageType) = st.ToInt()
 
 
 // defined in mshadow/base.h
@@ -38,7 +54,7 @@ type DeviceType =
     | CPU 
     | GPU
     | CPUPinned 
-    member x.FromInt(n) = 
+    static member FromInt(n) = 
         match n with
         | 1 -> CPU
         | 2 -> GPU
@@ -50,6 +66,7 @@ type DeviceType =
         | GPU -> DeviceTypeEnum.GPU
         | CPUPinned -> DeviceTypeEnum.CPUPinned
     member x.ToInt() = x.ToEnum() |> int
+    static member op_Explicit(st : DeviceType) = st.ToInt()
 
 
 type Context = 
@@ -71,6 +88,12 @@ type Context =
         | CPU n 
         | GPU n 
         | CPUPinned n -> n
+    static member FromDeviceTypeAndId(deviceType : DeviceTypeEnum, id : int) = 
+        match deviceType with 
+        | DeviceTypeEnum.CPU -> CPU(id)
+        | DeviceTypeEnum.GPU -> GPU(id)
+        | DeviceTypeEnum.CPUPinned -> CPUPinned(id)
+        | _ -> invalidArg "deviceType" (sprintf "Device type %d not suported" (int deviceType))
     static member TryParse(str : String) = 
         let str2 = str.Trim().ToLower()
         let tryPrefix (prefix : string) f = 
@@ -157,6 +180,8 @@ type OpReqType =
         | 2 -> WriteInplace
         | 3 -> AddTo
         | _ -> invalidArg "i" (sprintf "OpReqType must be in {0,1,2,3}. Received %d" i)
+    static member op_Explicit(st : OpReqType) = st.OpReqTypeInt
+    static member op_Explicit(st : OpReqType) = uint32 st.OpReqTypeInt
 
 type SafeSymbolHandle(owner) = 
     inherit SafeHandle(0n, true)

@@ -293,7 +293,7 @@ module CustomOp =
                     true
                 )    
             let inferBackwardStorageType = CustomOpBackwardInferStorageTypeFunc(fun numTensor tensorTypesPtr tags state -> 
-                let tensorTypes : StorageType [] = Helper.readStructArray numTensor tensorTypesPtr |> Array.map enum
+                let tensorTypes : StorageType [] = Helper.readStructArray numTensor tensorTypesPtr |> Array.map StorageType.FromInt
                 let tags : int [] =  Helper.readStructArray numTensor tags
                 let tensors = Array.init 5 (fun _ -> ResizeArray())
                 for i = 0 to int numTensor - 1 do 
@@ -317,7 +317,7 @@ module CustomOp =
                         yield! tensors.InputGrad
                         yield! tensors.Auxiliary
                     |]
-                    |> Array.map int
+                    |> Array.map (fun x -> x.ToInt())
                 Marshal.Copy(retStorageTypes, 0, tensorTypesPtr, retStorageTypes.Length) |> ignore
                 true
             )
@@ -326,7 +326,7 @@ module CustomOp =
                 let inCount = opProp.ListArguments().Length
                 let outCount = opProp.ListOutputs().Length
                 let auxCount = opProp.ListAuxiliaryStates().Length
-                let tensorTypes : StorageType [] = Helper.readStructArray inCount stypesPtr |> Array.map enum
+                let tensorTypes : StorageType [] = Helper.readStructArray inCount stypesPtr |> Array.map StorageType.FromInt
                 let inStore, outStore, auxStore = opProp.InferStorageType tensorTypes
                 assert(inStore.Length = inCount)
                 assert(outStore.Length = outCount)
@@ -337,7 +337,7 @@ module CustomOp =
                         yield! outStore
                         yield! auxStore
                     |]
-                    |> Array.map int
+                    |> Array.map (fun x -> x.ToInt())
                 Marshal.Copy(retStorageTypes, 0, stypesPtr, retStorageTypes.Length) |> ignore
                 true
             )

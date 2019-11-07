@@ -2330,19 +2330,25 @@ module MXAutograd =
         MXAutogradBackward(ulength output_handles, output_handles, ograd_handles, (if retain_graph then 1 else 0)) |> throwOnError "MXAutogradBackward"
     
 
-    //TODO: backwardEx
     /// <summary>compute the gradient of outputs w.r.t variabels</summary>
-    /// <param name="num_output">number of output NDArray</param>
     /// <param name="output_handles">output NDArrays</param>
     /// <param name="ograd_handles">head gradient for NDArrays</param>
-    /// <param name="num_variables">number of variables</param>
     /// <param name="retain_graph">whether to keep the graph after backward</param>
+    /// <param name="create_graph">whether to record gradient graph for computing higher order</param>
     /// <param name="is_train">whether to do backward for training or inference</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    //let backwardEx num_output ograd_handles num_variables var_handles retain_graph create_graph is_train grad_handles grad_stypes = 
-    //    let mutable output_handles = un
-    //    MXAutogradBackwardEx(num_output, &output_handles, ograd_handles, num_variables, var_handles, retain_graph, create_graph, is_train, grad_handles, grad_stypes) |> throwOnError "MXAutogradBackwardEx"
-    
+    let backwardEx output_handles ograd_handles var_handles retain_graph create_graph is_train = 
+        let mutable grad_handles = un
+        let mutable grad_stypes = un
+        let retain_graph = if retain_graph then 1 else 0
+        let create_graph = if create_graph then 1 else 0
+        let is_train = if is_train then 1 else 0
+        MXAutogradBackwardEx(ulength output_handles, output_handles, ograd_handles, ulength var_handles, var_handles, retain_graph, create_graph, is_train, &grad_handles, &grad_stypes) |> throwOnError "MXAutogradBackwardEx"
+        let g : NDArrayHandle [] = readStructArray output_handles.Length grad_handles
+        let st : int [] = readStructArray output_handles.Length grad_stypes
+        g,st |> Array.map (StorageType.FromInt)
+
+
     /// <summary>get the graph constructed by autograd.</summary>
     /// <param name="handle">ndarray handle</param>
     /// <param name="out">output symbol handle</param>

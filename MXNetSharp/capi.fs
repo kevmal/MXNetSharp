@@ -999,7 +999,7 @@ extern int MXAutogradBackward(uint32 num_output, NDArrayHandle[] output_handles,
 /// <param name="is_train">whether to do backward for training or inference</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXAutogradBackwardEx(uint32 num_output, NDArrayHandle[] output_handles, NDArrayHandle[] ograd_handles, uint32 num_variables, NDArrayHandle[] var_handles, int retain_graph, int create_graph, int is_train, NDArrayHandle[]& grad_handles, int[]& grad_stypes)
+extern int MXAutogradBackwardEx(uint32 num_output, NDArrayHandle[] output_handles, NDArrayHandle[] ograd_handles, uint32 num_variables, NDArrayHandle[] var_handles, int retain_graph, int create_graph, int is_train, [<Out>] IntPtr& grad_handles, [<Out>] IntPtr& grad_stypes)
 
 /// <summary>get the graph constructed by autograd.</summary>
 /// <param name="handle">ndarray handle</param>
