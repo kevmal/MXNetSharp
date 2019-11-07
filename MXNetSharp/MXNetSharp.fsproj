@@ -2,6 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>0.0.1-alpha</Version>
+    <Description>F# bindings for MXNet</Description>
+    <PackageTags>MXNet F# FSharp deep learning</PackageTags>
+    <PackageProjectUrl>https://github.com/kevmal/MXNetSharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/kevmal/MXNetSharp</RepositoryUrl>
+    <Copyright>Copyright 2019</Copyright>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <NeutralLanguage></NeutralLanguage>
+    <Authors>Kevin Malenfant</Authors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

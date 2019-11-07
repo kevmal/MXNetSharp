@@ -1,18 +1,21 @@
-﻿open System.Drawing
-open System.Drawing.Drawing2D
-open System.Drawing.Imaging
+﻿// Neural Style Transfer
+// Ported from https://github.com/apache/incubator-mxnet/tree/225f71f744ac5e7bd29868b6d3ba0e4fe2527c43/example/neural-style
 
-(*
-# Neural Style Transfer
-Ported from https://github.com/apache/incubator-mxnet/tree/225f71f744ac5e7bd29868b6d3ba0e4fe2527c43/example/neural-style
-*)
 
 #load "load.fsx"
 open MXNetSharp
 open MXNetSharp.Interop
 open System
 open System.Net
-open System.IO
+open System.Drawing
+open System.Drawing.Drawing2D
+open System.Drawing.Imaging
+
+
+// Images will be saved here
+let outputDirectory = IO.Path.Combine(__SOURCE_DIRECTORY__, "Output")
+IO.Directory.CreateDirectory outputDirectory
+IO.Directory.SetCurrentDirectory outputDirectory
 
 let context = GPU(0)
 let ctxStr = context.ToString()
@@ -160,11 +163,6 @@ let lrScheduleFactor = 0.6
 let saveEpochs = 50
 let maxNumEpochs = 1000
 
-let removeNoise = 0.02
-
-let contentNoise = 0.02
-
-
 let contentIn = loadImage contentImage
 let styleIn = loadImage styleImage
 
@@ -204,8 +202,6 @@ let styleArray, contentArray =
     modelExe.Executor.Dispose()
     styleArray, contentArray
 
-
-// we could get rid of modelExe here
 
 let styleLoss, contentLoss = loss gram content
 
@@ -382,23 +378,5 @@ let rec trainLoop epoch =
 trainLoop 0
 
 
-//TODO: don't just save to default directory
-//TODO: show images
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
 
 

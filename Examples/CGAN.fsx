@@ -1,14 +1,15 @@
 ﻿
+// Conditional Generative Adversarial Nets (https://arxiv.org/abs/1411.1784) Mehdi Mirza, Simon Osindero
+// Adapted from https://github.com/eriklindernoren/Keras-GAN/tree/master/cgan
 
-open System.Collections.Generic
 
 #load "load.fsx"
 open MXNetSharp
-open MXNetSharp.Interop
 open MXNetSharp.IO
 open System
 open System.Net
 open System.IO
+open System.Collections.Generic
 open System.IO.Compression
 
 open MXNetSharp.PrimitiveOperators
@@ -161,7 +162,6 @@ let q =
             | Some NullOp -> {a with Grad = Some(new NDArray())}
             | _ -> {a with Grad = Some(Operators.ZerosLike(a.NDArray.Value))}
         )
-
 
 let actualLoss = onActual.Bind(context, q)
 

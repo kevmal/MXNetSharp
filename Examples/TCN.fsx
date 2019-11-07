@@ -1,4 +1,8 @@
-﻿open System.Collections.Generic
+﻿// ********************** Incomplete "Example" *****************************
+
+// Adapted from https://github.com/locuslab/TCN
+
+open System.Collections.Generic
 open System.Runtime.InteropServices
 
 #load "load.fsx"
@@ -33,7 +37,7 @@ let temporalBlock name inCount outputCount kernelSize stride dilation padding dr
                                 pad = [padding],  
                                 noBias = false,
                                 Name = name + "_conv1")
-    let conv1Sliced = new Slice(conv1, [0; 0; 0], [0; 0; -padding], [0;0;1])
+    let conv1Sliced = new Slice(conv1, [None; None; None], [None; None; Some -padding])
     let relu1 = new Relu(conv1Sliced, Name = name + "_relu1")
     let dropout1 = new Dropout(relu1, dropout, DropoutMode.Training)
     let conv2 = new Convolution(dropout1,
@@ -46,7 +50,7 @@ let temporalBlock name inCount outputCount kernelSize stride dilation padding dr
                                 pad = [padding],  
                                 noBias = false,
                                 Name = name + "_conv2")
-    let conv2Sliced = new Slice(conv2, [0; 0; 0], [0; 0; -padding], [0;0;1])
+    let conv2Sliced = new Slice(conv2, [None; None; None], [None; None; Some -padding])
     let relu2 = new Relu(conv2Sliced, Name = name + "_relu2")
     let dropout2 = new Dropout(relu2, dropout, DropoutMode.Training)
     let final = 
@@ -75,12 +79,6 @@ let tcn = make 1 10 (Array.create 8 30) 7 0.00
 
 let batchSize = 32
 let seqLength = 400
-
-
-tcn.ArgumentNames
-
-
-
 
 
 
