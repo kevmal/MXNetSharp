@@ -148,6 +148,7 @@ type NDArray(handle : SafeNDArrayHandle) =
         destination
 
     member x.SyncCopyFromCPU(data : float32 []) = MXNDArray.syncCopyFromCPU handle.UnsafeHandle data
+    member x.SyncCopyFromCPU(data : int []) = MXNDArray.syncCopyFromCPU handle.UnsafeHandle data
 
     member x.Set(value : float32) =
         let setValue = AtomicSymbolCreator.FromName "_set_value"

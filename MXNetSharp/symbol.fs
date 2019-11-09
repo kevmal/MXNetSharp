@@ -10,6 +10,8 @@ type SymbolInitilizationException(symbol : Symbol, inner : Exception) =
         | null -> sprintf "Init failed on symbol %O" symbol
         | ex -> sprintf "Init failed on symbol %O: %s %A" symbol ex.Message ex.StackTrace)
 
+type ISymbolComposable = 
+    abstract member ComposedWith : Symbol -> Symbol
 
 [<AbstractClass>]
 type Symbol() =
@@ -450,6 +452,8 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
                 //x.CreateId()
             with
             | e -> raise(SymbolInitilizationException(x, e))
+    interface ISymbolComposable with 
+        member x.ComposedWith(y) = x.ComposedWith(y)
 
 type SymbolComposable<'a when 'a :> SymbolOperator>(argSymbol : Symbol, rootSymbol: 'a) = 
     inherit SymbolOperator(rootSymbol.AtomicSymbolCreator, rootSymbol.OperatorArguments) 
@@ -505,10 +509,11 @@ type SymbolComposable<'a when 'a :> SymbolOperator>(argSymbol : Symbol, rootSymb
     
 
 
-type SymbolGroup<'a>(group : 'a, symbols : Symbol []) = 
+type SymbolGroup(symbols : Symbol []) = 
     inherit Symbol()
-    member x.Symbol = group
-    member x.SymbolArray = symbols |> Array.copy
+    new (symbols : Symbol seq) = SymbolGroup(symbols |> Seq.toArray)
+    member x.Item with get(i : int) = symbols.[i]
+    member x.Count = symbols.Length
     override x.Initialize() =   
         match x.InternalHandle with 
         | Some _ -> ()
@@ -516,7 +521,7 @@ type SymbolGroup<'a>(group : 'a, symbols : Symbol []) =
             let symbol = symbols |> Array.map (fun x -> x.UnsafeHandle) |> MXSymbol.createGroup 
             x.InternalHandle <- Some(new SafeSymbolHandle(symbol, true))
             //x.CreateId()
-    default x.Copy() = SymbolGroup<'a>(group, symbols |> Array.map (fun x -> x.Copy())) :> Symbol
+    default x.Copy() = SymbolGroup(symbols |> Array.map (fun x -> x.Copy())) :> Symbol
     override x.InputSymbols = 
         let a = symbols |> Array.collect (fun x -> x.InputSymbols)
         assert ((a |> Array.map (fun x -> x.Name)) = x.ArgumentNames)

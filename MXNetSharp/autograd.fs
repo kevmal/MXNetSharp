@@ -35,4 +35,3 @@ module Autograd =
         let g = g |> Array.map (fun (g : NDArray) -> g.UnsafeHandle)
         MXAutograd.markVariables a req g
 
-    MXAutograd.backwardEx
