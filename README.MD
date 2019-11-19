@@ -43,6 +43,12 @@ let v : float32 [] = b.ToArray() //Copy back to CPU in managed array
 //  [|4.5825758f; 4.69041586f; 4.79583168f; 4.89897966f; 5.0f; 5.09901953f;
 //    5.19615221f; 5.29150248f; 5.38516474f; 5.47722578f|]
 
+// NDArray Operators exist in MXNEtSharp.Operators
+
+(Operators.Mean(b).ToArray().[0] : float32)
+
+// val it : float32 = 5.04168653f
+
 ```
 
 Simple examples adapted from various sources:
