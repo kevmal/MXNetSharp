@@ -1,3 +1,3 @@
-﻿#r @"bin/Debug/MXNetSharp.dll"
+﻿#r @"..\MXNetSharp\bin\Debug\netstandard2.0\MXNetSharp.dll"
 
 

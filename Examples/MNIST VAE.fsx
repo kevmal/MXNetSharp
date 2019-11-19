@@ -1,4 +1,7 @@
-﻿#load "load.fsx"
+﻿
+#load "loadui.fsx"
+open Loadui
+
 open MXNetSharp
 open MXNetSharp.Interop
 open MXNetSharp.IO
@@ -6,12 +9,15 @@ open System
 open System.Net
 open System.IO
 open System.IO.Compression
+open Avalonia.Media.Imaging
+open Avalonia
+open Microsoft.FSharp.NativeInterop
 
 open MXNetSharp.PrimitiveOperators
 
 let batchSize = 64
 
-let context = GPU(0)
+let context = GPU 0
 
 let ensure (url : string) (file : string) = 
     if not(File.Exists file) then
@@ -59,12 +65,6 @@ let conv name kernelSize strides outFeatureMapCount x =
 let convTranspose name kernelSize (strides : int) outFeatureMapCount x = 
     let y = new Deconvolution(data = x, numFilter = outFeatureMapCount, kernel = [kernelSize; kernelSize], stride = [strides; strides], Name = name + "_dconv")
     new Relu(y,Name = name + "_relu")
-    //let numInputChannels = x.Shape.[2]
-    //let convParams = C.Parameter([kernelSize; kernelSize; outFeatureMapCount; numInputChannels], CNTKLib.GlorotUniformInitializer())
-    //printfn "%A" (x.Shape.Dimensions,strides)
-    //let rr = CNTKLib.ReLU(CNTKLib.ConvolutionTranspose(convParams, x, [strides;strides;numInputChannels]))//, BoolVector.Repeat(false,3), BoolVector.Repeat(true,3), [x.Shape.[0]*strides;x.Shape.[1]*strides;outFeatureMapCount]))
-    //printfn "rr %A" (rr.Shape.Dimensions)
-    //rr
     
 let encoder x dropProb = 
     let layer name s x = 
@@ -168,15 +168,11 @@ let exe, texe =
 
 let xa = ps |> Seq.pick (function NoTrain a -> Some a | _ -> None)
 
-let testZs = Operators.RandomNormalNDArray(shape = [batchSize; 3], ctx = context.ToString())
-
-
-
-
-let singleBmp pixs = 
-    let bitmap = System.Drawing.Bitmap(28*8,28*8)
+let singleBmp (pixs : float32 []) (bitmap : WriteableBitmap) = 
     let mutable col = 0
     let mutable row = 0
+    use fb = bitmap.Lock()
+    let ptr =  fb.Address |> NativePtr.ofNativeInt<uint32>
     pixs 
     |> Seq.chunkBySize (28*28)
     |> Seq.iter 
@@ -188,8 +184,13 @@ let singleBmp pixs =
                     xs 
                     |> Seq.iteri 
                         (fun j x ->
-                            let xx = (1.f - x)*255.f |> min 255.f |> max 0.f |> round |> int
-                            bitmap.SetPixel(col*27 + j,row*27 + i,Drawing.Color.FromArgb(xx, xx, xx))
+                            let xx = (1.f - x)*255.f |> min 255.f |> max 0.f |> round |> uint32
+                            //bitmap.SetPixel(col*27 + j,row*27 + i,Drawing.Color.FromArgb(xx, xx, xx))
+                            let c = col*27 + j
+                            let r = (row*27 + i)*(fb.RowBytes / 4)
+                            let ix = r + c
+                            let pixel = (xx <<< 16) ||| (xx <<< 8) ||| xx  ||| (0xFFu <<< 24)
+                            NativePtr.set ptr ix pixel
                         )
                 )
             row <- row + 1
@@ -197,39 +198,52 @@ let singleBmp pixs =
                 row <- 0 
                 col <- col + 1
     )
-    bitmap
 
+open Avalonia.Controls
+let bmp1 = new WriteableBitmap(PixelSize(28*8,28*8),Vector(90.,90.), Nullable(Platform.PixelFormat.Bgra8888))
+let bmp2 = new WriteableBitmap(PixelSize(28*8,28*8),Vector(90.,90.), Nullable(Platform.PixelFormat.Bgra8888))
 
-let bmps pixs = 
-    pixs 
-    |> Seq.chunkBySize (28*28)
-    |> Seq.map 
-        (fun s ->
-            let bitmap = System.Drawing.Bitmap(28,28)
-            s 
-            |> Seq.chunkBySize 28
-            |> Seq.iteri
-                (fun i xs ->
-                    xs 
-                    |> Seq.iteri 
-                        (fun j x ->
-                            let xx = (1.f - x)*255.f |> min 255.f |> max 0.f |> round |> int
-                            bitmap.SetPixel(i,j,Drawing.Color.FromArgb(xx, xx, xx))
-                        )
-                )
-            bitmap
+let wnd = 
+    UI.ui (fun () ->
+        let f = Window()
+        let p = Image()
+        let p2 = Image()
+        p.Source <- bmp1
+        p2.Source <- bmp2
+        let split = Grid()
+        split.ColumnDefinitions.Add(ColumnDefinition(GridLength.Parse "*"))
+        split.ColumnDefinitions.Add(ColumnDefinition(GridLength.Parse "5"))
+        split.ColumnDefinitions.Add(ColumnDefinition(GridLength.Parse "*"))
+        //split.RowDefinitions.Add(RowDefinition())
+        //p.SetValue(Grid.RowProperty, 0)
+        p.SetValue(Grid.ColumnProperty, 0)
+        //p2.SetValue(Grid.RowProperty, 0)
+        p2.SetValue(Grid.ColumnProperty, 2)
+        split.Children.Add(p)
+        let ss = GridSplitter()
+        ss.SetValue(Grid.ColumnProperty, 1)
+        ss.SetValue(Grid.WidthProperty, 5)
+        //ss.SetValue(Grid.HorizontalAlignmentProperty, "Stretch")
+        split.Children.Add(ss)
+        split.Children.Add(p2)
+        f.Content <- split
+        f.Show()
+        f.KeyUp
+        |> Observable.add
+            (fun k ->
+                if k.Key = Input.Key.Space then 
+                    printfn  "Next test batch"
+                    if not(valIter.Next()) then 
+                        valIter.Reset() 
+                        valIter.Next() |> ignore
+            )
+        {|
+            Window = f
+            Image1 = p
+            Image2 = p2
+        |}
     )
-    |> Seq.toArray
 
-let f = Windows.Forms.Form(Visible = true)
-let p = Windows.Forms.PictureBox(Dock = Windows.Forms.DockStyle.Fill)
-let p2 = Windows.Forms.PictureBox(Dock = Windows.Forms.DockStyle.Fill)
-let split = Windows.Forms.SplitContainer(Dock = Windows.Forms.DockStyle.Fill)
-split.Panel1.Controls.Add p
-split.Panel2.Controls.Add p2
-f.Controls.Add split
-p.SizeMode <- Windows.Forms.PictureBoxSizeMode.Zoom
-p2.SizeMode <- Windows.Forms.PictureBoxSizeMode.Zoom
 
 valIter.Reset()
 valIter.Next() |> ignore
@@ -240,23 +254,16 @@ let update epoch mb =
     let loss : float32 = exe.Outputs.[0].ToArray().[0]
     texe.Forward(false)
     let imgs = texe.Outputs
-    p.Invoke(Action(fun() ->
-        p.Image <- singleBmp (xa.ToArray())
-        p2.Image <- singleBmp ( imgs.[0].ToArray())
-        f.Text <- sprintf "Epoch % 4d  Mb % 7d  Loss: %f" epoch mb loss
-    )) |> ignore
-
-update 0
-
-split.KeyUp
-|> Observable.add
-    (fun k ->
-        if k.KeyCode = Windows.Forms.Keys.Space then 
-            printfn  "Next test batch"
-            if not(valIter.Next()) then 
-                valIter.Reset() 
-                valIter.Next() |> ignore
+    singleBmp (xa.ToArray()) bmp1
+    singleBmp (imgs.[0].ToArray()) bmp2
+    UI.uido (fun() ->
+        wnd.Window.Title <- sprintf "Epoch % 4d  Mb % 7d  Loss: %f" epoch mb loss
+        wnd.Image1.InvalidateVisual()
+        wnd.Image2.InvalidateVisual()
     )
+
+
+
 
 let trainTask = 
     async {
