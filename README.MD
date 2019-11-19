@@ -57,7 +57,7 @@ Simple examples adapted from various sources:
 Currently each MXNet operation is represented as a type inheriting from `SymbolOperator` in the `MXNetSharp` namespace (these will soon find a new home in their own namespace). 
 
 
-Actual creation of the `Symbol` (at the MXNet level) are delayed until symbol handles are needed. This is to allow for delayed naming and late input binding.
+Actual creation of the `Symbol` (at the MXNet level) is delayed until the symbol handle is needed. This is to allow for delayed naming and late input binding.
 ```fsharp
 open MXNetSharp
 
