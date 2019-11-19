@@ -9,8 +9,6 @@ open System
 open System.Net
 open System.IO
 open System.IO.Compression
-open Avalonia.Media.Imaging
-open Avalonia
 open Microsoft.FSharp.NativeInterop
 
 open MXNetSharp.PrimitiveOperators
@@ -168,6 +166,12 @@ let exe, texe =
 
 let xa = ps |> Seq.pick (function NoTrain a -> Some a | _ -> None)
 
+
+
+open Avalonia
+open Avalonia.Controls
+open Avalonia.Media.Imaging
+
 let singleBmp (pixs : float32 []) (bitmap : WriteableBitmap) = 
     let mutable col = 0
     let mutable row = 0
@@ -199,7 +203,6 @@ let singleBmp (pixs : float32 []) (bitmap : WriteableBitmap) =
                 col <- col + 1
     )
 
-open Avalonia.Controls
 let bmp1 = new WriteableBitmap(PixelSize(28*8,28*8),Vector(90.,90.), Nullable(Platform.PixelFormat.Bgra8888))
 let bmp2 = new WriteableBitmap(PixelSize(28*8,28*8),Vector(90.,90.), Nullable(Platform.PixelFormat.Bgra8888))
 

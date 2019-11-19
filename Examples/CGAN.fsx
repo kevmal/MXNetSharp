@@ -1,9 +1,10 @@
-﻿
-// Conditional Generative Adversarial Nets (https://arxiv.org/abs/1411.1784) Mehdi Mirza, Simon Osindero
+﻿// Conditional Generative Adversarial Nets (https://arxiv.org/abs/1411.1784) Mehdi Mirza, Simon Osindero
 // Adapted from https://github.com/eriklindernoren/Keras-GAN/tree/master/cgan
 
 
-#load "load.fsx"
+#load "loadui.fsx"
+open Loadui
+
 open MXNetSharp
 open MXNetSharp.IO
 open System
@@ -11,6 +12,7 @@ open System.Net
 open System.IO
 open System.Collections.Generic
 open System.IO.Compression
+open Microsoft.FSharp.NativeInterop
 
 open MXNetSharp.PrimitiveOperators
 
@@ -18,7 +20,7 @@ let batchSize = 128
 let nLatent = 100
 let nClasses = 10
     
-let context = GPU(0)
+let context = CPU(0)
 
 let ensure (url : string) (file : string) = 
     if not(File.Exists file) then
@@ -217,10 +219,15 @@ generated.Outputs.[0].Shape
 
 
 
-let singleBmp pixs = 
-    let bitmap = System.Drawing.Bitmap(28*16,28*8)
+open Avalonia
+open Avalonia.Controls
+open Avalonia.Media.Imaging
+
+let singleBmp (pixs : float32 []) (bitmap : WriteableBitmap) = 
     let mutable col = 0
     let mutable row = 0
+    use fb = bitmap.Lock()
+    let ptr =  fb.Address |> NativePtr.ofNativeInt<uint32>
     pixs 
     |> Seq.chunkBySize (28*28)
     |> Seq.iter 
@@ -232,8 +239,13 @@ let singleBmp pixs =
                     xs 
                     |> Seq.iteri 
                         (fun j x ->
-                            let xx = (1.f - x)*255.f |> min 255.f |> max 0.f |> round |> int |> max 0 |> min 255
-                            bitmap.SetPixel(col*27 + j,row*27 + i,Drawing.Color.FromArgb(xx, xx, xx))
+                            let xx = (1.f - x)*255.f |> min 255.f |> max 0.f |> round |> uint32
+                            //bitmap.SetPixel(col*27 + j,row*27 + i,Drawing.Color.FromArgb(xx, xx, xx))
+                            let c = col*27 + j
+                            let r = (row*27 + i)*(fb.RowBytes / 4)
+                            let ix = r + c
+                            let pixel = (xx <<< 16) ||| (xx <<< 8) ||| xx  ||| (0xFFu <<< 24)
+                            NativePtr.set ptr ix pixel
                         )
                 )
             row <- row + 1
@@ -241,13 +253,22 @@ let singleBmp pixs =
                 row <- 0 
                 col <- col + 1
     )
-    bitmap
 
+let bmp1 = new WriteableBitmap(PixelSize(28*16,28*8),Vector(90.,90.), Nullable(Platform.PixelFormat.Bgra8888))
 
-let f = Windows.Forms.Form(Visible = true)
-let p = Windows.Forms.PictureBox(Dock = Windows.Forms.DockStyle.Fill)
-f.Controls.Add p
-p.SizeMode <- Windows.Forms.PictureBoxSizeMode.Zoom
+let wnd = 
+    UI.ui (fun () ->
+        let f = Window()
+        let p = Image()
+        p.Source <- bmp1
+        f.Content <- p
+        f.Show()
+        {|
+            Window = f
+            Image = p
+        |}
+    )
+
 
 valIter.Reset()
 valIter.Next() |> ignore
@@ -258,10 +279,11 @@ let update epoch mb =
     let loss3 : float32 = genLoss.Outputs.[0].ToArray().[0]
     generated.Forward(false)
     let out : float32 [] = generated.Outputs.[0].ToArray()
-    p.Invoke(Action(fun() ->
-        p.Image <- singleBmp out
-        f.Text <- sprintf "Epoch % 4d  Mb % 7d  Loss: %A" epoch mb (loss1,loss2,loss3) 
-    )) |> ignore
+    singleBmp out bmp1
+    UI.uido(fun() ->
+        wnd.Image.InvalidateVisual()
+        wnd.Window.Title <- sprintf "Epoch % 4d  Mb % 7d  Loss: %A" epoch mb (loss1,loss2,loss3) 
+    )
 
 
 
