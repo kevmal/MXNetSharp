@@ -93,12 +93,12 @@ let pool4 = Pooling(relu4_4, pad = [0;0], kernel = [2;2], stride = [2;2], poolTy
 let conv5_1 = Convolution(data = pool4, numFilter = 512, pad = [1;1], kernel = [3;3], stride = [1;1], noBias = false, workspace = 1024L, Name = "conv5_1")
 let relu5_1 = Relu(conv5_1, Name = "relu5_1")
 
-let style = SymbolGroup<unit>((), [|relu1_1; relu2_1; relu3_1; relu4_1; relu5_1|])
-let content = SymbolGroup<unit>((), [| relu4_2 |])
+let style = SymbolGroup([|relu1_1 :> Symbol; upcast relu2_1; upcast relu3_1; upcast relu4_1; upcast relu5_1|])
+let content = SymbolGroup([| relu4_2 :> Symbol |])
 
 let makeExecutor style content (inputSize : int seq) = 
     let inputSize = inputSize |> Seq.toArray
-    let out = SymbolGroup<unit>((), [| style; content |])
+    let out = SymbolGroup([| style; content |])
     //let inputSize = [|224;224|]
     let dataShape = [1;3;inputSize.[0];inputSize.[1]]
     let (k,i,d) = MXSymbol.keyShapeToCsrForm uint32 [| "data", Array.ofSeq dataShape |]
@@ -138,17 +138,17 @@ let makeExecutor style content (inputSize : int seq) =
         Executor = new Executor(out, context, inArgs, argGrad, gradReqType, Array.empty)
     |}
 
-let loss (gram: SymbolGroup<'a>) content = 
+let loss (gram: SymbolGroup) content = 
     let gramLoss = 
         MXSymbol.listOutputs gram.UnsafeHandle
         |> Array.mapi 
             (fun i oname ->
                 let gvar = Variable(sprintf "target_gram_%d" i)
-                Sum(Square(gvar - gram.SymbolArray.[i]))
+                Sum(Square(gvar - gram.[i]))
             )
     let cvar = Variable("target_content")
     let contentLoss = Sum(Square(cvar - content))
-    SymbolGroup<unit>((), gramLoss |> Array.map (fun x -> upcast x)), contentLoss
+    SymbolGroup(gramLoss |> Array.map (fun x -> x :> Symbol)), contentLoss
 
 
 let tvWeight = Some 1e-2    
@@ -177,13 +177,13 @@ let gramList, gradScale =
         (fun i outName ->
             let shape = styleInferResult.OutputShapes.[i] |> Array.map int
             let target = [shape.[1]; shape.[2 ..] |> Array.reduce (*)] 
-            let x = Reshape(style.SymbolArray.[i], shape = target) //TODO: deprecate targetShape
+            let x = Reshape(style.[i], shape = target) //TODO: deprecate targetShape
             let gram = FullyConnected(data = x, weight = x, noBias = true, numHidden = shape.[1])
             gram, (shape.[1..] |> Array.reduce (*)) * shape.[1]
         )
     |> Array.unzip
 
-let gram = SymbolGroup<unit>((), gramList |> Array.map (fun x -> x :> Symbol))
+let gram = SymbolGroup(gramList |> Array.map (fun x -> x :> Symbol))
 
 let styleArray, contentArray = 
     let modelExe = makeExecutor gram content [|224; 224|]
