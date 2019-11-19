@@ -1,7 +1,19 @@
-﻿
-//#I @"bin\Debug\netcoreapp3.0"
-#I @"bin\Debug\net48"
+﻿// .NET core
+(*
+#I @"bin\Debug\netcoreapp3.0"
 //#I @"bin\Debug\netstandard2.0"
+open System
+open System.IO
+let path = Environment.GetEnvironmentVariable("PATH")
+let libsearch = 
+    Directory.EnumerateDirectories(Path.Combine(__SOURCE_DIRECTORY__, "bin", "Debug", "netcoreapp3.0", "runtimes"))
+    |> Seq.map (fun d -> Path.Combine(d,"native"))
+    |> String.concat (string Path.PathSeparator)
+Environment.SetEnvironmentVariable("PATH", libsearch + string Path.PathSeparator + path)
+*)
+// .NET Framework
+#I @"bin\Debug\net48"
+
 #r "System.Reactive.dll" 
 #r "Avalonia.Animation.dll" 
 #r "Avalonia.Base.dll"
