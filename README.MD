@@ -58,7 +58,7 @@ Currently each MXNet operation is represented as a type inheriting from `SymbolO
 
 
 Actual creation of the `Symbol` (at the MXNet level) are delayed until symbol handles are needed. This is to allow for delayed naming and late input binding.
-```
+```fsharp
 open MXNetSharp
 
 let inline (.>>) (x : Symbol) (y : 'a) : 'a = 
