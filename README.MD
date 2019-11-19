@@ -46,8 +46,8 @@ let v : float32 [] = b.ToArray() //Copy back to CPU in managed array
 ```
 
 Simple examples adapted from various sources:
-- [Neural style transfer](Examples/Neural\ Style\ Transfer.fsx)
-- [Variational Autoencoder](Examples/MNIST\ VAE.fsx)
+- [Neural style transfer](Examples/Neural%20Style%20Transfer.fsx)
+- [Variational Autoencoder](Examples/MNIST%20VAE.fsx)
 - [CGAN](Examples/CGAN.fsx)
 
 
