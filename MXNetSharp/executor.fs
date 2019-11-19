@@ -65,6 +65,11 @@ type Binding =
         match x with 
         | AuxBinding(a) -> AuxBinding{a with NDArray = Some ndarray}
         | ArgBinding(a) -> ArgBinding{a with NDArray = Some ndarray}
+    member x.NDArray = 
+        match x with 
+        | AuxBinding(a) -> a.NDArray
+        | ArgBinding(a) -> a.NDArray
+    member x.HasNDArray = x.NDArray.IsSome
     static member Arg(name, ?ndarray : NDArray, ?grad : NDArray, ?opReqType : OpReqType, ?shape : int seq, ?dataType : DataType, ?storageType : StorageType) = 
         ArgBinding 
             {ArgBinding.Named name with 
@@ -301,6 +306,7 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                     | _ -> failwithf "No binding for %s" name
                 )
         new Executor(symbol, context, inArgs, argGrad, gradReqType, aux)
+    member x.Print() = MXExecutor.print handle.UnsafeHandle
     member x.BindMap =  
         let args = Array.zip3 inArgs argGrad gradReqType
         seq {
@@ -316,9 +322,9 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                                 Grad = Some g
                                 OpReqType = Some t
                                 //StorageType = Some a.StorageType //TODO: ndarray storage type
-                                //DataType = a.DataType //TODO: 
+                                DataType = a.DataType 
                                 StorageType = None 
-                                DataType = None
+                                //DataType = None
                             }
                     )
             yield!
@@ -331,9 +337,8 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                                 Shape = Some a.Shape
                                 NDArray = Some a
                                 //StorageType = Some a.StorageType //TODO: ndarray storage type
-                                //DataType = a.DataType //TODO: 
+                                DataType = a.DataType
                                 StorageType = None 
-                                DataType = None
                             }
                     )
             yield!
@@ -348,9 +353,8 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                                 Grad = None
                                 OpReqType = None
                                 //StorageType = Some a.StorageType //TODO: ndarray storage type
-                                //DataType = a.DataType //TODO: 
+                                DataType = a.DataType 
                                 StorageType = None 
-                                DataType = None
                             }
                     )
         }
