@@ -22,20 +22,22 @@ let z2 = x .* y // x and y shapes can differ according to the rules of MXNet bro
 let z3 = 4.0*x
 
 // broadcast operators for +, -, /, and such are analogous to above
-// comparison operators at the moment are by default prefixed with a `.` and `..`  is used for broadcasting
+// comparison operators at the moment are by default prefixed with a `.` and have no broadcast equivalents
 let z4 = x .= y // elementwise
-let z5 = x ..= y // broadcast
+
+// logical operators do have broadcast equivalents
+let z5 = x .&& y // elementwise
+let z6 = x ..&& y // broadcast
 
 // For operators sqrt, exp, pow and such we need to open MXNetSharp.PrimitiveOperators
 open MXNetSharp.PrimitiveOperators
-let z4 = exp x
+let z7 = exp x
 
 // NDArray's do not need the MXNetSharp.PrimitiveOperators namespace
 
 let a = new NDArray([|1.f .. 10.f|], shape = [5;2], context = GPU 0)
 
 let b = sqrt(a + 20.0)
-
 
 let v : float32 [] = b.ToArray() //Copy back to CPU in managed array
 
@@ -48,6 +50,23 @@ let v : float32 [] = b.ToArray() //Copy back to CPU in managed array
 (Operators.Mean(b).ToArray().[0] : float32)
 
 // val it : float32 = 5.04168653f
+
+// Slicing
+
+// following are equivalent
+(b.[2..4,*].ToArray() : float32[]) 
+(b.[2..4].ToArray() : float32[]) 
+//val it : float32 [] =
+// [|5.0f; 5.09901953f; 5.19615221f; 5.29150248f; 5.38516474f; 5.47722578f|]
+
+// Note that the range is startIndex..endIndex (F# style) as oppose to MXnet slcing where slice stops just up to the end
+(b.[2..2,*].ToArray() : float32[]) 
+//val it : float32 [] = [|5.0f; 5.09901953f|]
+
+// With negative slicing then 'end' value behaves the same as MXNet. startIndex .. -dropCount
+(b.[3..-2,1].ToArray() : float32[]) 
+// val it : float32 [] = [|5.29150248f|]
+
 
 ```
 
