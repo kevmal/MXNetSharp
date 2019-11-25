@@ -10,6 +10,10 @@ type SymbolInitilizationException(symbol : Symbol, inner : Exception) =
         | null -> sprintf "Init failed on symbol %O" symbol
         | ex -> sprintf "Init failed on symbol %O: %s %A" symbol ex.Message ex.StackTrace)
 
+
+type ISymbolArguments = 
+    abstract member Arguments : Symbol seq
+
 type ISymbolComposable = 
     abstract member ComposedWith : Symbol -> Symbol
 
@@ -17,8 +21,8 @@ type ISymbolComposable =
 type Symbol() =
     static let mutable count = 0L
     static let nameId() = Threading.Interlocked.Increment &count
-    let sid = nameId()
-    member x.Id = sid
+    let sid = lazy(nameId())
+    member x.Id = sid.Value
     member x.GeneratedName = sprintf "%s!%d" (x.GetType().Name) x.Id
     //let mutable disposed = false
     member val internal InternalName : string option = None with get,set

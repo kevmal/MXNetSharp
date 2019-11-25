@@ -6,7 +6,7 @@ open System.Collections.Generic
  
 
 [<NoComparison>]
-type AuxBinding = 
+type AuxBind = 
     {
         Name : string
         NDArray : NDArray option
@@ -24,7 +24,7 @@ type AuxBinding =
         }
 
 [<NoComparison>]
-type ArgBinding = 
+type ArgBind = 
     {
         Name : string
         NDArray : NDArray option
@@ -46,9 +46,9 @@ type ArgBinding =
         }
 
 [<NoComparison>]
-type Binding = 
-    | AuxBinding of AuxBinding
-    | ArgBinding of ArgBinding
+type Bind = 
+    | AuxBinding of AuxBind
+    | ArgBinding of ArgBind
     member x.Name = 
         match x with 
         | AuxBinding r -> r.Name
@@ -72,7 +72,7 @@ type Binding =
     member x.HasNDArray = x.NDArray.IsSome
     static member Arg(name, ?ndarray : NDArray, ?grad : NDArray, ?opReqType : OpReqType, ?shape : int seq, ?dataType : DataType, ?storageType : StorageType) = 
         ArgBinding 
-            {ArgBinding.Named name with 
+            {ArgBind.Named name with 
                 Name = name
                 NDArray = ndarray
                 Grad = grad 
@@ -83,7 +83,7 @@ type Binding =
             }
     static member Aux(name, ?ndarray : NDArray, ?shape : int [], ?dataType : DataType, ?storageType : StorageType) = 
         AuxBinding 
-            {AuxBinding.Named name with 
+            {AuxBind.Named name with 
                 Name = name
                 NDArray = ndarray
                 Shape = shape |> Option.map Seq.toArray
@@ -91,17 +91,56 @@ type Binding =
                 StorageType = storageType
             }
 
-type BindMap(bindings : IDictionary<string, Binding>) = 
-    new() = BindMap(Map.empty)
-    member x.TryGetValue(name : string, [<Out>] value : Binding byref) = 
+type IInitializer = 
+    abstract member Initialize : Bind -> unit
+
+
+type Parameter(?name, ?shape, ?opReqType, ?grad, ?ndarray, ?dataType, ?storageType, ?init : IInitializer) = 
+    inherit Variable()
+    let shape = shape |> Option.map (Seq.toArray)
+    do 
+        match name with 
+        | Some n -> base.Name <- n
+        | None -> ()
+    member x.Shape = shape
+    member x.Grad = grad
+    member x.OpReqType = opReqType
+    member x.NDArray = ndarray
+    member x.DataType = dataType 
+    member x.StorageType = storageType
+    member x.Initializer = init
+    member x.Binding = 
+       {
+           Name = x.Name 
+           NDArray = x.NDArray 
+           Grad = x.Grad
+           OpReqType = x.OpReqType
+           Shape = x.Shape
+           DataType = x.DataType 
+           StorageType = x.StorageType
+       }
+
+type Input(?name, ?shape, ?ndarray, ?dataType, ?storageType) = 
+    inherit Parameter(?name = name, 
+                      ?shape = shape, 
+                      opReqType = OpReqType.NullOp, 
+                      grad = new NDArray(), 
+                      ?ndarray = ndarray, 
+                      ?dataType = dataType, 
+                      ?storageType = storageType)
+
+
+type Bindings(bindings : IDictionary<string, Bind>) = 
+    new() = Bindings(Map.empty)
+    member x.TryGetValue(name : string, [<Out>] value : Bind byref) = 
         let scc,v = bindings.TryGetValue(name)
         value <- v
         scc
 
-    member x.WithBindings(newBindings : Binding seq) = 
+    member x.WithBindings(newBindings : Bind seq) = 
         let d = Dictionary(bindings)
         newBindings |> Seq.iter (fun b -> d.[b.Name] <- b)
-        BindMap d
+        Bindings d
     member x.InferShapes(symbol : Symbol) =    
         let argNames = symbol.ArgumentNames
         let result = 
@@ -121,7 +160,7 @@ type BindMap(bindings : IDictionary<string, Binding>) =
                     match bindings.TryGetValue(name) with
                     | true, AuxBinding(b) -> AuxBinding { b with Shape = Some shape}
                     //| true, _ ->  TODO: Log?
-                    | _ -> AuxBinding {AuxBinding.Named name with Shape = Some shape}
+                    | _ -> AuxBinding {AuxBind.Named name with Shape = Some shape}
                 )
         let outBindings = 
             (symbol.OutputNames, result.OutputShapes)
@@ -131,7 +170,7 @@ type BindMap(bindings : IDictionary<string, Binding>) =
                     match bindings.TryGetValue(name) with
                     | true, ArgBinding(a)-> ArgBinding {a with Shape = Some shape }
                     //| true, _ ->  TODO: Log?
-                    | _ -> ArgBinding {ArgBinding.Named name with Shape = Some shape}
+                    | _ -> ArgBinding {ArgBind.Named name with Shape = Some shape}
                 )
         let inBindings = 
             (argNames, result.InputShapes)
@@ -141,7 +180,7 @@ type BindMap(bindings : IDictionary<string, Binding>) =
                     match bindings.TryGetValue(name) with
                     | true, ArgBinding(a)-> ArgBinding {a with Shape = Some shape }
                     //| true, _ ->  TODO: Log?
-                    | _ -> ArgBinding {ArgBinding.Named name with Shape = Some shape}
+                    | _ -> ArgBinding {ArgBind.Named name with Shape = Some shape}
                 )
         x.WithBindings(seq {yield! inBindings; yield! outBindings; yield! auxBindings})
     member x.InferTypes(symbol : Symbol) =    
@@ -162,7 +201,7 @@ type BindMap(bindings : IDictionary<string, Binding>) =
                     match bindings.TryGetValue(name) with
                     | true, AuxBinding a -> AuxBinding { a with DataType = DataType.FromInt t}
                     //| true, _ ->  TODO: Log?
-                    | _ ->  AuxBinding { AuxBinding.Named name with DataType = DataType.FromInt t} 
+                    | _ ->  AuxBinding { AuxBind.Named name with DataType = DataType.FromInt t} 
                 )
         let outBindings = 
             (symbol.OutputNames, result.OutputTypes)
@@ -171,7 +210,7 @@ type BindMap(bindings : IDictionary<string, Binding>) =
                     match bindings.TryGetValue(name) with
                     | true, ArgBinding a -> ArgBinding {a with DataType = DataType.FromInt t}
                     //| true, _ ->  TODO: Log?
-                    | _ -> ArgBinding { ArgBinding.Named name with DataType = DataType.FromInt t} 
+                    | _ -> ArgBinding { ArgBind.Named name with DataType = DataType.FromInt t} 
                 )
         let inBindings = 
             (argNames, result.InputTypes)
@@ -180,45 +219,45 @@ type BindMap(bindings : IDictionary<string, Binding>) =
                     match bindings.TryGetValue(name) with
                     | true, ArgBinding a -> ArgBinding {a with DataType = DataType.FromInt t}
                     //| true, _ ->  TODO: Log?
-                    | _ -> ArgBinding { ArgBinding.Named name with DataType = DataType.FromInt t} 
+                    | _ -> ArgBinding { ArgBind.Named name with DataType = DataType.FromInt t} 
                 )
         x.WithBindings(seq {yield! inBindings; yield! outBindings; yield! auxBindings})
     member x.Bindings = bindings
-    interface IEnumerable<Binding> with 
+    interface IEnumerable<Bind> with 
         member x.GetEnumerator() = bindings.Values.GetEnumerator()
         member x.GetEnumerator() = bindings.Values.GetEnumerator() :> System.Collections.IEnumerator
 
 
-module BindMap = 
-    let mapAux f (bm : BindMap) = 
+module Bindings = 
+    let mapAux f (bm : Bindings) = 
         bm
         |> Seq.map 
             (function 
              | AuxBinding a -> f a |> AuxBinding
              | x -> x
             )
-        |> Seq.map (fun (x : Binding) -> x.Name, x)
+        |> Seq.map (fun (x : Bind) -> x.Name, x)
         |> dict 
-        |> BindMap
-    let mapArg f (bm : BindMap) = 
+        |> Bindings
+    let mapArg f (bm : Bindings) = 
         bm
         |> Seq.map 
             (function 
              | ArgBinding a -> f a |> ArgBinding
              | x -> x
             )
-        |> Seq.map (fun (x : Binding) -> x.Name, x)
+        |> Seq.map (fun (x : Bind) -> x.Name, x)
         |> dict 
-        |> BindMap
-    let map f (bm : BindMap) = 
+        |> Bindings
+    let map f (bm : Bindings) = 
         bm
         |> Seq.map f
-        |> Seq.map (fun (x : Binding) -> x.Name, x)
+        |> Seq.map (fun (x : Bind) -> x.Name, x)
         |> dict 
-        |> BindMap
-    let ofSeq l = BindMap().WithBindings l
-    let inferShapes (s : Symbol) (bm : BindMap) = bm.InferShapes s
-    let mapSymbolArgs (symbol : Symbol) f (bm : BindMap) = 
+        |> Bindings
+    let ofSeq l = Bindings().WithBindings l
+    let inferShapes (s : Symbol) (bm : Bindings) = bm.InferShapes s
+    let mapSymbolArgs (symbol : Symbol) f (bm : Bindings) = 
         let argNames = symbol.ArgumentNames |> Set.ofSeq
         bm
         |> mapArg
@@ -228,7 +267,7 @@ module BindMap =
                 else
                     a
             )
-    let freezeGraph (symbol : Symbol) (bm : BindMap) = 
+    let freezeGraph (symbol : Symbol) (bm : Bindings) = 
         bm |> mapSymbolArgs symbol (fun a -> {a with OpReqType = Some NullOp} )
 
 
@@ -246,9 +285,9 @@ type SafeExecutorHandle(owner) =
             ObjectDisposedException("SafeExecutorHandle", "Executor handle has been closed") |> raise
 
  
-type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, argGrad, gradReqType, auxStates, sharedExecutor, outputs) =   
+type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, argGrad, gradReqType, auxStates, sharedExecutor, outputs, bindMap) =   
     let mutable disposed = false
-    new(symbol : Symbol, context : Context, contextMap : IDictionary<string,Context>, inArgs, argGrad, gradReqType, auxStates, sharedExecutor : Executor option) = 
+    new(symbol : Symbol, context : Context, contextMap : IDictionary<string,Context>, inArgs, argGrad, gradReqType, auxStates, sharedExecutor : Executor option, bindMap : Bindings option) = 
         let inArgs = inArgs |> Seq.toArray
         let argGrad = argGrad |> Seq.toArray
         let gradReqType = gradReqType |> Seq.toArray
@@ -277,10 +316,14 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
         let safeHandle = new SafeExecutorHandle(h, true)
         let outputs = MXExecutor.outputs h |> Array.map (fun h -> new NDArray(new SafeNDArrayHandle(h, true)))
         // NOTE: We need to make sure all references get stored to prevent handles from being freed.
-        new Executor(safeHandle,symbol,context,contextMap,inArgs,argGrad,gradReqType,auxStates,sharedExecutor,outputs)
+        new Executor(safeHandle,symbol,context,contextMap,inArgs,argGrad,gradReqType,auxStates,sharedExecutor,outputs, bindMap)
+    new(symbol : Symbol, context : Context, contextMap : IDictionary<string,Context>, inArgs, argGrad, gradReqType, auxStates, sharedExecutor : Executor option) = 
+        new Executor(symbol, context, contextMap, inArgs, argGrad, gradReqType, auxStates, sharedExecutor, None)
+    new(symbol : Symbol, context, inArgs, argGrad, gradReqType, auxStates, bindMap) = 
+        new Executor(symbol, context, Map.empty, inArgs,argGrad,gradReqType,auxStates,None,bindMap)
     new(symbol : Symbol, context, inArgs, argGrad, gradReqType, auxStates) = 
-        new Executor(symbol, context, Map.empty, inArgs,argGrad,gradReqType,auxStates,None)
-    new(symbol : Symbol, context, bindings : BindMap) = 
+        new Executor(symbol, context, Map.empty, inArgs,argGrad,gradReqType,auxStates,None,None)
+    new(symbol : Symbol, context, bindings : Bindings) = 
         let args = symbol.ArgumentNames
         let inArgs, argGrad, gradReqType = 
             args 
@@ -305,60 +348,62 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                         a
                     | _ -> failwithf "No binding for %s" name
                 )
-        new Executor(symbol, context, inArgs, argGrad, gradReqType, aux)
+        new Executor(symbol, context, inArgs, argGrad, gradReqType, aux, Some bindings)
     member x.Print() = MXExecutor.print handle.UnsafeHandle
     member x.BindMap =  
-        let args = Array.zip3 inArgs argGrad gradReqType
-        seq {
-            yield!
-                (symbol.ArgumentNames, args)
-                ||> Seq.map2
-                    (fun name (a,g,t) ->
-                        ArgBinding 
-                            { 
-                                Name = name
-                                Shape = Some a.Shape
-                                NDArray = Some a
-                                Grad = Some g
-                                OpReqType = Some t
-                                //StorageType = Some a.StorageType //TODO: ndarray storage type
-                                DataType = a.DataType 
-                                StorageType = None 
-                                //DataType = None
-                            }
-                    )
-            yield!
-                (symbol.AuxiliaryStateNames, auxStates)
-                ||> Seq.map2
-                    (fun name a ->
-                        AuxBinding 
-                            { 
-                                Name = name
-                                Shape = Some a.Shape
-                                NDArray = Some a
-                                //StorageType = Some a.StorageType //TODO: ndarray storage type
-                                DataType = a.DataType
-                                StorageType = None 
-                            }
-                    )
-            yield!
-                (symbol.OutputNames, outputs)
-                ||> Seq.map2
-                    (fun name a ->
-                        ArgBinding 
-                            { 
-                                Name = name
-                                Shape = Some a.Shape
-                                NDArray = Some a
-                                Grad = None
-                                OpReqType = None
-                                //StorageType = Some a.StorageType //TODO: ndarray storage type
-                                DataType = a.DataType 
-                                StorageType = None 
-                            }
-                    )
-        }
-        |> BindMap.ofSeq
+        match bindMap with 
+        | Some bm -> bm
+        | None ->
+            let args = Array.zip3 inArgs argGrad gradReqType
+            seq {
+                yield!
+                    (symbol.ArgumentNames, args)
+                    ||> Seq.map2
+                        (fun name (a,g,t) ->
+                            ArgBinding 
+                                { 
+                                    Name = name
+                                    Shape = Some a.Shape
+                                    NDArray = Some a
+                                    Grad = Some g
+                                    OpReqType = Some t
+                                    //StorageType = Some a.StorageType //TODO: ndarray storage type
+                                    DataType = a.DataType 
+                                    StorageType = None 
+                                }
+                        )
+                yield!
+                    (symbol.AuxiliaryStateNames, auxStates)
+                    ||> Seq.map2
+                        (fun name a ->
+                            AuxBinding 
+                                { 
+                                    Name = name
+                                    Shape = Some a.Shape
+                                    NDArray = Some a
+                                    //StorageType = Some a.StorageType //TODO: ndarray storage type
+                                    DataType = a.DataType
+                                    StorageType = None 
+                                }
+                        )
+                yield!
+                    (symbol.OutputNames, outputs)
+                    ||> Seq.map2
+                        (fun name a ->
+                            ArgBinding 
+                                { 
+                                    Name = name
+                                    Shape = Some a.Shape
+                                    NDArray = Some a
+                                    Grad = None
+                                    OpReqType = None
+                                    //StorageType = Some a.StorageType //TODO: ndarray storage type
+                                    DataType = a.DataType 
+                                    StorageType = None 
+                                }
+                        )
+            }
+            |> Bindings.ofSeq
     member x.Symbol = symbol
     member internal x.UnsafeHandle = handle.UnsafeHandle
     member x.Forward(isTraining : bool) = 
@@ -387,3 +432,4 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
 module SymbolExtension =
     type Symbol with 
         member x.Bind(context, bindmap) = new Executor(x,context,bindmap)
+        member x.Bind(context) = new Executor(x,context,Bindings())
