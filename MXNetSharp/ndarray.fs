@@ -342,30 +342,139 @@ type NDArray(handle : SafeNDArrayHandle) =
         let e = endIndices |> String.concat "," |> sprintf "(%s)"
         let s = stepIndices |> String.concat "," |> sprintf "(%s)"
         invoke "slice" [|x|] [|"begin", b; "end", e; "step", s|]|> Array.head
+    member x.At(index : int) = new NDArray(MXNDArray.at x.UnsafeHandle index)
+    member x.Item 
+        with get([<ParamArray>] a : int [])  = (x, a) ||> Array.fold (fun x i -> x.At(i))
+            
+            
+        
     member x.GetSlice([<ParamArray>] a : obj []) =  //TODO: support all indexing types
-        let inline str x = match x with Some v -> v.ValueString() | _ -> "None"
+        let inline str x = match x with ValueSome v -> v.ValueString() | _ -> "None"
         if a.Length = 0 then 
-            x // REVIEW: copy?
+            x 
         else
-            let b = ResizeArray()
-            let e = ResizeArray()
-            let s = ResizeArray()
+            let shape = x.Shape
+            let ndim = shape.Length
+            let b = ResizeArray<int64 voption>()
+            let e = ResizeArray<int64 voption>()
+            let s = ResizeArray<int64 voption>()
+            let sliceAxis = ResizeArray()
+            let newAxis = ResizeArray()
             let mutable i = 0
+            let mutable sliceAx = 0
             while i < a.Length do 
                 match a.[i] with 
                 | :? int as idx -> 
-                    b.Add(string idx)
-                    e.Add(string (idx + 1))
-                    s.Add "None"
+                    b.Add(ValueSome(int64 idx))
+                    e.Add(ValueSome(if idx >= 0 then int64 idx + 1L else int64 idx))
+                    s.Add(ValueNone)
+                    if sliceAx < ndim && (not (-shape.[sliceAx] <= idx) || not (shape.[sliceAx] >= idx)) then 
+                        failwithf "Index %d is out of bounds for axis %d with size %d" idx sliceAx shape.[sliceAx]
+                    sliceAxis.Add sliceAx
+                    sliceAx <- sliceAx + 1
                 | :? (int option) as o -> 
-                    let o2 = a.[i+1] :?> int option |> Option.map (fun x -> x + 1)
-                    b.Add(str o)
-                    e.Add(str o2)
-                    s.Add "None"
+                    let o2 = a.[i+1] :?> int option |> Option.map (fun x -> if x > 0 then x + 1 else x)
+                    b.Add(match o with | Some o -> ValueSome (int64 o) | _ -> ValueNone)
+                    e.Add(match o2 with | Some o -> ValueSome (int64 o) | _ -> ValueNone)
+                    s.Add(ValueNone)
+                    sliceAxis.Add sliceAx
+                    sliceAx <- sliceAx + 1
                     i <- i + 1
-                | _ -> failwithf "invalid argument to get slice %A" a.[i]
+                | :? NewAxis -> newAxis.Add sliceAx
+                | _ -> failwithf "invalid argument to get slice %A" a.[i] //TODO create ex
                 i <- i + 1
-            x.Slice(b,e,s)
+            // check continuous
+            // https://github.com/apache/incubator-mxnet/blob/6bff547465c83ed343a5ef8241d22f56738534bd/python/mxnet/ndarray/ndarray.py#L846
+            let indices k = 
+                let start = match b.[k] with ValueNone -> 0L | ValueSome v -> v
+                let stop = match e.[k] with ValueNone -> int64(shape.[sliceAxis.[k]]) | ValueSome v -> v
+                let step = match s.[k] with ValueNone -> 1L | ValueSome v -> v
+                let starti = if start >= 0L then start else int64 shape.[sliceAxis.[k]] + start
+                let stopi = if stop >= 0L then stop else int64 shape.[sliceAxis.[k]] + stop
+                starti, stopi, step
+            let continuous = 
+                let mutable subset = false
+                let mutable k = b.Count - 1
+                let mutable continuous = true
+                while continuous && k >= 0 do
+                    let start,stop,step = indices k
+                    let num = 
+                        if step > 0L then 
+                            double (max (stop - start) 0L) / double step |> int
+                        else 
+                            double (min (stop - start) 0L) / double step |> int
+                    if num <> 1 && (subset || step <> 1L) then 
+                        continuous <- false
+                    elif num <> shape.[k] then
+                        subset <- true
+                    k <- k - 1
+                continuous
+            let sliced = 
+                if continuous then 
+                    let mutable flatBegin = 0L
+                    let mutable flatEnd = 0L
+                    for k = 0 to shape.Length - 1 do 
+                        flatBegin <- flatBegin*int64 shape.[k]
+                        flatEnd <- flatEnd*int64 shape.[k]
+                        if k < b.Count then 
+                            let b,e,s = indices k
+                            if s < 0L then 
+                                flatBegin <- flatBegin + e - 1L
+                                flatEnd <- flatEnd + b
+                            else 
+                                flatBegin <- flatBegin + b
+                                flatEnd <- flatEnd + e - 1L
+                        else
+                            flatEnd <- flatEnd + int64 shape.[k] - 1L
+                    flatEnd <- flatEnd + 1L
+                    let flat : NDArray = x.Reshape(-1)
+                    let slicedFlat = new NDArray(MXNDArray.slice64 flat.UnsafeHandle flatBegin flatEnd)
+                    let slicedShape = 
+                        let s = Array.zeroCreate shape.Length
+                        let mutable k = shape.Length - 1
+                        while k >= 0 do
+                            let start,stop,step = 
+                                if k >= b.Count then 
+                                    (0L,int64 shape.[k],1L)
+                                else 
+                                    indices k
+                            let num = 
+                                if step > 0L then 
+                                    double (max (stop - start) 0L) / double step |> int
+                                else 
+                                    double (min (stop - start) 0L) / double step |> int
+                            s.[k] <- num
+                            k <- k - 1
+                        s
+                    slicedFlat.Reshape(slicedShape)
+                else
+                    x.Slice(b |> Seq.map str, e |> Seq.map str, s |> Seq.map str)
+            if newAxis.Count = 0 then 
+                sliced
+            else
+                let newShape = 
+                    let s = ResizeArray()
+                    let mutable j = 0
+                    for k = 0 to shape.Length - 1 do
+                        while j < newAxis.Count && newAxis.[j] = k do 
+                            s.Add(1)
+                            j <- j + 1
+                        let start,stop,step = 
+                            if k >= b.Count then 
+                                (0L,int64 shape.[k],1L)
+                            else 
+                                indices k
+                        let num = 
+                            if step > 0L then 
+                                double (max (stop - start) 0L) / double step |> int
+                            else 
+                                double (min (stop - start) 0L) / double step |> int
+                        s.Add num
+                    while j < newAxis.Count && newAxis.[j] = shape.Length do 
+                        s.Add(1)
+                        j <- j + 1
+                    s.ToArray()
+                sliced.Reshape newShape
     member x.SetSlice([<ParamArray>] a : obj []) = 
         let inline str x = match x with Some v -> v.ValueString() | _ -> "None"
         let b = ResizeArray()

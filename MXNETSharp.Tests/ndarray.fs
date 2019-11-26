@@ -182,6 +182,64 @@ module Slicing =
         for i = 0 to expected.Length - 1 do    
             Assert.Equal(double expected.[i], double actual.[i], 6)
 
+    [<Fact>]
+    let ``getItem``() = 
+        let d1 = [|0.0 .. 9.0|] |> Array.map float32
+        let a = (nd d1).Reshape([2; 5])
+        do 
+            let actual : float32[] = a.[0].ToArray()
+            let expected = d1.[0 .. 4]
+            Assert.Equal(expected.Length, actual.Length)
+            for i = 0 to expected.Length - 1 do    
+                Assert.Equal(double expected.[i], double actual.[i], 6)
+        do 
+            let actual : float32[] = a.[1].ToArray()
+            let expected = d1.[5 .. ]
+            Assert.Equal(expected.Length, actual.Length)
+            for i = 0 to expected.Length - 1 do    
+                Assert.Equal(double expected.[i], double actual.[i], 6)
+        do 
+            let actual : float32[] = a.[0, 0].ToArray()
+            let expected = [|d1.[0]|]
+            Assert.Equal(expected.Length, actual.Length)
+            for i = 0 to expected.Length - 1 do    
+                Assert.Equal(double expected.[i], double actual.[i], 6)
+        do 
+            let actual : float32[] = a.[1, 1].ToArray()
+            let expected = [|d1.[6]|]
+            Assert.Equal(expected.Length, actual.Length)
+            for i = 0 to expected.Length - 1 do    
+                Assert.Equal(double expected.[i], double actual.[i], 6)
+
+
+    [<Fact>]
+    let ``python doc examples``() = 
+        let d1 = [|0.0 .. 5.0|] |> Array.map float32
+        let a = (nd d1).Reshape([2; 3])
+        let check expected (a : NDArray) = 
+            let expected = Seq.toArray expected
+            let actual : float32[] = a.ToArray()
+            Assert.Equal(expected.Length, actual.Length)
+            for i = 0 to expected.Length - 1 do    
+                Assert.Equal(double expected.[i], double actual.[i], 6)
+        check [0.0 .. 2.0] a.[0]
+        check [0.0 .. 2.0] a.[0,*]
+        check [0.0 .. 1.0] a.[0,..1]
+        check [0.0 ;1.0 ;3.0; 4.0] a.[*, .. -1]
+
+        check [3.0 .. 5.0] a.[1..]
+        check [|0.0 .. 5.0|] a.[NewAxis,*,*]
+        Assert.Equal(3,a.[NewAxis,*,*].Shape.Length)
+        Assert.Equal(5,a.[NewAxis,NewAxis,*,*,NewAxis].Shape.Length)
+
+        let d2 = [|0.0 .. 15.0|] |> Array.map float32
+        let a2 = (nd d2).Reshape([2; 2; 2; 2])
+        // check [1.0; 3.0; 5.0; 7.0] a2.[0, ..., 1] //TODO: Omit range?
+        check [1.0; 3.0; 5.0; 7.0] a2.[0, *, *, 1]
+
+
+
+
     //[<Fact>]
     //let sliceAssign() = 
     //    let a = new NDArray([1.f .. 100.f], shape = [50; 2], context  = CPU 0)
