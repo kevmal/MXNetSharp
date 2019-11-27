@@ -58,7 +58,7 @@ module Helper =
         | _ -> a.Length
     let ulength (a : 'a []) = a |> length |> uint32
     let boolToInt b = if b then 1 else 0
-    let intPtrSz = Marshal.SizeOf<IntPtr>()
+    let intPtrSz = Marshal.SizeOf(typeof<IntPtr>)
     let un<'a> = Unchecked.defaultof<'a>
     let str x = 
         if x = IntPtr.Zero then 
@@ -73,7 +73,7 @@ module Helper =
         b
     let inline readStringArray size ptr = Array.init (int size) (fun i -> readString i ptr)
     let inline readPtrArray size ptr = Array.init (int size) (fun i -> readIntPtr i ptr)
-    let inline readStructArray size ptr : ^a[] = Array.init (int size) (fun i -> Marshal.PtrToStructure(ptr + IntPtr(i*sizeof< ^a>)))
+    let inline readStructArray size ptr : ^a[] = Array.init (int size) (fun i -> Marshal.PtrToStructure(ptr + IntPtr(i*sizeof< ^a>), typeof< ^a>) :?> ^a)
     let throwOnError call (returnCode : int) = 
         if returnCode <> 0 then 
             let ptr = MXGetLastError()
@@ -104,7 +104,7 @@ module MXLib =
         let mutable a = un
         let mutable sz = un
         MXLibInfoFeatures(&a, &sz) |> throwOnError "MXLibInfoFeatures"
-        Array.init sz (fun i -> Marshal.PtrToStructure( a + IntPtr(i*sizeof<LibFeature>)))
+        Array.init sz (fun i -> Marshal.PtrToStructure( a + IntPtr(i*sizeof<LibFeature>), typeof<LibFeature>) :?> _)
         
     /// <summary>Seed all global random number generators in mxnet.</summary>
     /// <param name="seed">the random number seed.</param>

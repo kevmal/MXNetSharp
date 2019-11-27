@@ -239,6 +239,19 @@ module Slicing =
 
 
 
+    [<Fact>]
+    let ``simple stepping``() = 
+        let d1 = [|0.0 .. 10.0|] |> Array.map float32
+        let a = nd d1
+        let check expected (a : NDArray) = 
+            let expected = Seq.toArray expected
+            let actual : float32[] = a.ToArray()
+            Assert.Equal(expected.Length, actual.Length)
+            for i = 0 to expected.Length - 1 do    
+                Assert.Equal(double expected.[i], double actual.[i], 6)
+
+        check ({0 .. 2 .. 10} |> Seq.map (fun i -> d1.[i])) a.[SliceRange(0L,10L,2L)]
+
 
     //[<Fact>]
     //let sliceAssign() = 

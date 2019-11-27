@@ -6,7 +6,14 @@ open MXNetSharp.Interop
 open System.Runtime.CompilerServices
 open System
 
+/// Add new axis within indexer
 type NewAxis = NewAxis
+
+type SliceRange(?start : int64, ?stop : int64, ?step : int64) = 
+    member x.Start = start
+    member x.Stop = stop
+    member x.Step = step
+
 
 //https://github.com/apache/incubator-mxnet/blob/62b063802634048fe9da0a736dd6ee429e410f27/python/mxnet/ndarray/ndarray.py#L57-L60
 type StorageType = 

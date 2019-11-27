@@ -373,13 +373,25 @@ type NDArray(handle : SafeNDArrayHandle) =
                     sliceAxis.Add sliceAx
                     sliceAx <- sliceAx + 1
                 | :? (int option) as o -> 
-                    let o2 = a.[i+1] :?> int option |> Option.map (fun x -> if x > 0 then x + 1 else x)
+                    let o2 = a.[i+1] :?> int option |> Option.map (fun x -> if x >= 0 then x + 1 else x)
                     b.Add(match o with | Some o -> ValueSome (int64 o) | _ -> ValueNone)
                     e.Add(match o2 with | Some o -> ValueSome (int64 o) | _ -> ValueNone)
                     s.Add(ValueNone)
                     sliceAxis.Add sliceAx
                     sliceAx <- sliceAx + 1
                     i <- i + 1
+                | :? SliceRange as r -> 
+                    match r.Start with 
+                    | Some v -> b.Add(ValueSome(v))
+                    | None -> b.Add(ValueNone)
+                    match r.Stop with 
+                    | Some v -> e.Add(ValueSome(if v >= 0L then v + 1L else v))
+                    | None -> e.Add(ValueNone)
+                    match r.Step with 
+                    | Some v -> s.Add(ValueSome(v))
+                    | None -> s.Add(ValueNone)
+                    sliceAxis.Add sliceAx
+                    sliceAx <- sliceAx + 1
                 | :? NewAxis -> newAxis.Add sliceAx
                 | _ -> failwithf "invalid argument to get slice %A" a.[i] //TODO create ex
                 i <- i + 1
@@ -475,6 +487,8 @@ type NDArray(handle : SafeNDArrayHandle) =
                         j <- j + 1
                     s.ToArray()
                 sliced.Reshape newShape
+    member x.Item 
+        with get([<ParamArray>] a : obj []) = x.GetSlice(a = a)
     member x.SetSlice([<ParamArray>] a : obj []) = 
         let inline str x = match x with Some v -> v.ValueString() | _ -> "None"
         let b = ResizeArray()
