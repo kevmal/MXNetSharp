@@ -137,10 +137,10 @@ let ps =
             else
                 let s = s |> Seq.map int
                 TrainParameters(
-                    MX.RandomUniformNDArray(-0.1, 0.1, s, ctx = context.ToString()), 
-                        MX.ZerosNDArray(s, ctx = context.ToString()),
-                        MX.ZerosNDArray(s, ctx = context.ToString()),
-                        MX.ZerosNDArray(s, ctx = context.ToString()))
+                    MX.RandomUniformNDArray(context, -0.1, 0.1, s), 
+                        MX.ZerosNDArray(context, s),
+                        MX.ZerosNDArray(context, s),
+                        MX.ZerosNDArray(context, s))
         )
     
 let lr = 0.0005

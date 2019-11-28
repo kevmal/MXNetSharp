@@ -1186,6 +1186,19 @@ let definedTypeToCode (a : ProcessedArg) =
         ]
         
             
+// **************************** Context string -> Context type*******************************
+
+Mappings.Modify
+    (fun (x : ProcessedArg) -> 
+        if x.Name = "ctx" then 
+            {x with 
+                TypeString = "Context"
+                DefaultMode  = None    
+            }
+        else 
+            x
+    )
+
 // **************************** remove underscores from param names *******************************
 
 Mappings.Modify(fun (x : ProcessedArg) -> {x with Name = toParamName x.Name} |> argDoc)

@@ -1,5 +1,6 @@
 namespace rec MXNetSharp
-open SymbolOperators
+open MXNetSharp.SymbolOperators
+open MXNetSharp.SymbolArgument
 open System
 open System.Collections.Generic
 open System.Runtime.InteropServices

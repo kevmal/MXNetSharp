@@ -19,7 +19,6 @@ IO.Directory.CreateDirectory outputDirectory
 IO.Directory.SetCurrentDirectory outputDirectory
 
 let context = GPU(0)
-let ctxStr = context.ToString()
 
 let vggParamsUrl = "https://github.com/dmlc/web-data/raw/master/mxnet/neural-style/model/vgg19.params"
 let vggParamsFile = "vgg19.params"
@@ -109,7 +108,7 @@ let makeExecutor style content (inputSize : int seq) =
         |> Array.mapi 
             (fun i n -> 
                 let s = inferResult.InputShapes.[i] |> Array.map int
-                let a = MX.ZerosNDArray(shape = s, ctx = ctxStr)
+                let a = MX.ZerosNDArray(context, shape = s)
                 if n = "data" then 
                     n, a
                 else
@@ -216,12 +215,12 @@ let gradArray =
                 (fun i a ->
                     a.CopyTo(executor.Args.[sprintf "target_gram_%d" i])
                     //TODO: handle ctx parameters in op gen
-                    let w = MX.OnesNDArray(shape = [1], ctx = ctxStr)
+                    let w = MX.OnesNDArray(context, shape = [1])
                     MX.MulScalar([|w|], w, styleWeight / double gradScale.[i])
                     w
                 )
         let w = 
-            let w = MX.OnesNDArray(shape = [1], ctx = ctxStr)
+            let w = MX.OnesNDArray(context, shape = [1])
             MX.MulScalar([|w|], w, contentWeight) |> ignore
             w
         w
@@ -269,7 +268,7 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
 // Train
 
 
-let img = MX.RandomUniformNDArray(-0.1, 0.1, contentIn.Shape, ctx = ctxStr)
+let img = MX.RandomUniformNDArray(context, -0.1, 0.1, contentIn.Shape)
 let mutable oldImg = img.CopyTo(context)
 let clipNorm = 1.f * (img.Shape |> Array.reduce (*) |> float32)
 let tvGradExe = makeTvGradExecutor img tvWeight

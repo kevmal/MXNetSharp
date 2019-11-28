@@ -1,4 +1,4 @@
-﻿namespace MXNetSharp
+﻿namespace MXNetSharp.SymbolArgument
 open System
 open System.Collections.Generic
 

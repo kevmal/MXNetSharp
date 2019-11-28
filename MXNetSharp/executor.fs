@@ -57,6 +57,10 @@ type Bind =
         match x with 
         | AuxBinding {Shape = s}
         | ArgBinding {Shape = s} -> s
+    member x.WithShape(s) = 
+        match x with 
+        | AuxBinding b -> {b with Shape = Some (Array.ofSeq s)} |> AuxBinding
+        | ArgBinding b -> {b with Shape = Some (Array.ofSeq s)} |> ArgBinding
     member x.DataType = 
         match x with 
         | AuxBinding {DataType = s}
@@ -223,9 +227,45 @@ type Bindings(bindings : IDictionary<string, Bind>) =
                 )
         x.WithBindings(seq {yield! inBindings; yield! outBindings; yield! auxBindings})
     member x.Bindings = bindings
+    member x.Item 
+        with get(v : Variable) = 
+            let scc, b = x.TryGetValue(v.Name)
+            if not scc then 
+                raise (KeyNotFoundException(sprintf "No binding for %s" b.Name))
+            b
+    member x.NDArray(v : Variable) = 
+        match x.Item(v).NDArray with 
+        | Some x -> x
+        | None -> 
+            raise (NullReferenceException(sprintf "NDArray not set for binding %s" v.Name))
     interface IEnumerable<Bind> with 
         member x.GetEnumerator() = bindings.Values.GetEnumerator()
         member x.GetEnumerator() = bindings.Values.GetEnumerator() :> System.Collections.IEnumerator
+
+module Bind = 
+    let fromVariable (v : Variable) = 
+        match v with 
+        | :? Parameter as p -> p.Binding |> ArgBinding
+        | _ -> ArgBind.Named v.Name |> ArgBinding
+    let shape (shape) (b : Bind) = b.WithShape shape
+    let noGrad (b : Bind) = 
+        match b with 
+        | AuxBinding _ -> b
+        | ArgBinding b -> ArgBinding {b with OpReqType = Some OpReqType.NullOp}
+    let gradWriteTo (b : Bind) = 
+        match b with 
+        | AuxBinding _ -> b
+        | ArgBinding b -> ArgBinding {b with OpReqType = Some OpReqType.WriteTo}
+    let gradWriteInPlace (b : Bind) = 
+        match b with 
+        | AuxBinding _ -> b
+        | ArgBinding b -> ArgBinding {b with OpReqType = Some OpReqType.WriteInplace}
+    let gradAddTo (b : Bind) = 
+        match b with 
+        | AuxBinding _ -> b
+        | ArgBinding b -> ArgBinding {b with OpReqType = Some OpReqType.AddTo}
+
+
 
 
 module Bindings = 
@@ -269,6 +309,48 @@ module Bindings =
             )
     let freezeGraph (symbol : Symbol) (bm : Bindings) = 
         bm |> mapSymbolArgs symbol (fun a -> {a with OpReqType = Some NullOp} )
+    let inputs (variables : Variable seq) = 
+        variables 
+        |> Seq.map Bind.fromVariable
+        |> ofSeq
+    let batchSize batchSize (bm : Bindings) = 
+        bm
+        |> Seq.map 
+            (fun x -> 
+                match x.Shape with 
+                | Some a when a.Length > 0 && a.[0] = 0 -> 
+                    x.WithShape [yield batchSize; yield! a.[1..]]
+                | _ -> x
+            )
+        |> ofSeq
+    let defaultOpReqType opReqType (bm : Bindings) = 
+        bm
+        |> mapArg 
+            (fun a ->
+                match a.OpReqType with 
+                | None -> {a with OpReqType = Some opReqType}
+                | _ -> a
+            )
+    let mapNDArray f (bm : Bindings) = 
+        bm
+        |> map 
+            (fun a ->
+                match a.NDArray with 
+                | None -> f a |> a.WithNDArray
+                | _ -> a
+            )
+    let init f bm = 
+        bm 
+        |> defaultOpReqType OpReqType.WriteTo
+        |> mapNDArray (fun x -> f x x.Shape.Value) //TODO: check and throw
+        |> map 
+            (fun a ->
+                match a with
+                | ArgBinding b when b.Grad.IsNone -> 
+                    ArgBinding {b with Grad = Some(MX.ZerosLike(a.NDArray.Value))}
+                | _ -> a
+            )
+        
 
 
 
