@@ -2,10 +2,11 @@ namespace MXNetSharp
 open System
 open System.Runtime.InteropServices
 open MXNetSharp.Interop
+open MXNetSharp.SymbolOperators
 
 
 
-type Operators() =  
+type MX() =  
 
     static member CustomFunctionNDArray() =
         let creator = AtomicSymbolCreator.FromName "_CustomFunction"

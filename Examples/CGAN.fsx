@@ -15,6 +15,7 @@ open System.IO.Compression
 open Microsoft.FSharp.NativeInterop
 
 open MXNetSharp.PrimitiveOperators
+open MXNetSharp.SymbolOperators
 
 let batchSize = 128
 let nLatent = 100
@@ -123,14 +124,14 @@ let gen = -Log(ep + (generator .|> (* freeze *) discriminator)) .>> Mean() .>> M
 
 let randNormal = RandomNormal(shape = [batchSize; 1; nLatent]) 
 let genNoise = 
-    randNormal.Bind(context, BindMap())
+    randNormal.Bind(context, Bindings())
 
 
 let inputs = 
     [
-        Binding.Arg(inputImage.Name, shape = [batchSize; 1; 28; 28], opReqType = OpReqType.NullOp, dataType = DataType.Float32)
-        Binding.Arg(label.Name, shape = [batchSize; 1], opReqType = OpReqType.NullOp, dataType = DataType.Float32)
-        Binding.Arg(noise.Name, shape = [batchSize; 1; nLatent] , opReqType = OpReqType.NullOp, dataType = DataType.Float32, ndarray = genNoise.Outputs.[0])
+        Bind.Arg(inputImage.Name, shape = [batchSize; 1; 28; 28], opReqType = OpReqType.NullOp, dataType = DataType.Float32)
+        Bind.Arg(label.Name, shape = [batchSize; 1], opReqType = OpReqType.NullOp, dataType = DataType.Float32)
+        Bind.Arg(noise.Name, shape = [batchSize; 1; nLatent] , opReqType = OpReqType.NullOp, dataType = DataType.Float32, ndarray = genNoise.Outputs.[0])
     ]
 
 
@@ -139,38 +140,38 @@ let inputs =
 
 let q = 
     inputs
-    |> BindMap.ofSeq
-    |> BindMap.inferShapes onActual
-    |> BindMap.inferShapes onFake
-    |> BindMap.inferShapes gen
-    |> BindMap.map   
+    |> Bindings.ofSeq
+    |> Bindings.inferShapes onActual
+    |> Bindings.inferShapes onFake
+    |> Bindings.inferShapes gen
+    |> Bindings.map   
         (fun a ->
             match a.Shape with 
             | Some (shape) -> 
                 //Operators.ZerosNDArray(shape, ctx = context.ToString()).[0]
-                Operators.RandomUniformNDArray(low = -0.1, high = 0.1, shape = shape, ctx = context.ToString())
+                MX.RandomUniformNDArray(low = -0.1, high = 0.1, shape = shape, ctx = context.ToString())
                 |> a.WithNDArray
             | None -> a
         )
-    |> BindMap.mapArg 
+    |> Bindings.mapArg 
         (fun a ->
             match a.OpReqType with 
             | None -> {a with OpReqType = Some OpReqType.WriteTo}
             | _ -> a
         )
-    |> BindMap.mapArg 
+    |> Bindings.mapArg 
         (fun a ->
             match a.OpReqType with 
             | Some NullOp -> {a with Grad = Some(new NDArray())}
-            | _ -> {a with Grad = Some(Operators.ZerosLike(a.NDArray.Value))}
+            | _ -> {a with Grad = Some(MX.ZerosLike(a.NDArray.Value))}
         )
 
 let actualLoss = onActual.Bind(context, q)
 
-let bindOnFake = q |> BindMap.freezeGraph randNormal |> BindMap.freezeGraph generator  
+let bindOnFake = q |> Bindings.freezeGraph randNormal |> Bindings.freezeGraph generator  
 let fakeLoss = onFake.Bind(context, bindOnFake)
 
-let bindGenLoss = q |> BindMap.freezeGraph discriminator
+let bindGenLoss = q |> Bindings.freezeGraph discriminator
 let genLoss = gen.Bind(context, bindGenLoss)
 
 
@@ -183,7 +184,7 @@ let optUpdate (e : Executor) =
             if scc then 
                 v
             else
-                let v = Operators.ZerosLike(a),Operators.ZerosLike(a)
+                let v = MX.ZerosLike(a),MX.ZerosLike(a)
                 d.[s] <- v
                 v
     fun () -> 
@@ -193,7 +194,7 @@ let optUpdate (e : Executor) =
                 match a with 
                 | ArgBinding ({Name = name; OpReqType = Some WriteTo; Grad = Some grad; NDArray = Some weight}) -> 
                     let m,v = lu name grad
-                    Operators.AdamUpdate([weight], weight, grad, m, v, 0.0002, 0.5)
+                    MX.AdamUpdate([weight], weight, grad, m, v, 0.0002, 0.5)
                 | _ -> ()
             )
 
