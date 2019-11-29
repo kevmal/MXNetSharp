@@ -10,7 +10,7 @@ open MXNetSharp
 module BasicBinaryOps =
     let nd (x : float32 seq) = 
         let data = x |> Seq.toArray
-        new NDArray(data, shape = [data.Length], context = CPU(0))
+        NDArray.CopyFrom(data,[data.Length],CPU(0))
 
     let testBinaryOp1 ((+) : float32 -> float32 -> float32) 
                              ((++) : _ -> _ -> NDArray) 
@@ -101,7 +101,7 @@ module BasicUnaryOps =
     open MXNetSharp.PrimitiveOperators
     let nd (x : float32 seq) = 
         let data = x |> Seq.toArray
-        new NDArray(data, shape = [data.Length], context = CPU(0))
+        NDArray.CopyFrom(data, [data.Length], CPU(0))
     let uop f (f2 : _ -> NDArray) = 
         let d1 = [155.01; 1.0] |> List.map float32
         let a = nd d1
@@ -151,7 +151,7 @@ module BasicUnaryOps =
 module Slicing =  
     let nd (x : float32 seq) = 
         let data = x |> Seq.toArray
-        new NDArray(data, shape = [data.Length], context = CPU(0))
+        NDArray.CopyFrom(data, [data.Length], CPU(0))
     [<Fact>]
     let ``simple 1d``() = 
         let d1 = [0.0 .. 20.0] |> List.map float32

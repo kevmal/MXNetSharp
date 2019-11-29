@@ -2,8 +2,34 @@
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 
+    
 [<Extension>]
 type ContextExtensions private () = 
+    [<Extension>]
+    static member CopyFrom(ctx : Context, data : float32 [], shape : int seq) = NDArray.CopyFrom(data,shape,ctx)
+    [<Extension>]
+    static member CopyFrom(ctx : Context, data : double [], shape : int seq) = NDArray.CopyFrom(data,shape,ctx)
+    [<Extension>]
+    static member CopyFrom(ctx : Context, data : int [], shape : int seq) = NDArray.CopyFrom(data,shape,ctx)
+    [<Extension>]
+    static member CopyFrom(ctx : Context, data : int64 [], shape : int seq) = NDArray.CopyFrom(data,shape,ctx)
+    [<Extension>]
+    static member CopyFrom(ctx : Context, data : int8 [], shape : int seq) = NDArray.CopyFrom(data,shape,ctx)
+    [<Extension>]
+    static member CopyFrom(ctx : Context, data : uint8 [], shape : int seq) = NDArray.CopyFrom(data,shape,ctx)
+    [<Extension>]
+    static member CopyFrom(ctx : Context, data : float32 seq, shape : int seq) = NDArray.CopyFrom(Seq.toArray data,shape,ctx)
+    [<Extension>]
+    static member CopyFrom(ctx : Context, data : double seq, shape : int seq) = NDArray.CopyFrom(Seq.toArray data,shape,ctx)
+    [<Extension>]
+    static member CopyFrom(ctx : Context, data : int seq, shape : int seq) = NDArray.CopyFrom(Seq.toArray data,shape,ctx)
+    [<Extension>]
+    static member CopyFrom(ctx : Context, data : int64 seq, shape : int seq) = NDArray.CopyFrom(Seq.toArray data,shape,ctx)
+    [<Extension>]
+    static member CopyFrom(ctx : Context, data : int8 seq, shape : int seq) = NDArray.CopyFrom(Seq.toArray data,shape,ctx)
+    [<Extension>]
+    static member CopyFrom(ctx : Context, data : uint8 seq, shape : int seq) = NDArray.CopyFrom(Seq.toArray data,shape,ctx)
+        
 (*
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>

@@ -7,7 +7,7 @@ open MXNetSharp.Interop
 
 module internal Helper = 
     let inline (<--) x y = x, Util.valueString y
-
+        
 open Helper
 
 type NDArray(handle : SafeNDArrayHandle) = 
@@ -31,37 +31,37 @@ type NDArray(handle : SafeNDArrayHandle) =
         let h1 = MXNDArray.createNone()
         new NDArray(h1)
     new(shape : int seq, context : Context, ?dtype, ?delayAlloc) = 
-        let dtype = defaultArg dtype TypeFlag.Float32
+        let dtype = defaultArg dtype Float32
         let delayAlloc = defaultArg delayAlloc true
         let shape = shape |> Seq.toArray
-        new NDArray(MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype)
-    new(data : float[], shape, context : Context) = 
-        let dtype = TypeFlag.Float64
-        let delayAlloc = false
-        let shape = shape |> Seq.toArray
-        let handle = MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype
-        MXNDArray.syncCopyFromCPU handle data
-        new NDArray(handle)
-    new(data : float seq, shape, context : Context) = new NDArray(data |> Seq.toArray, shape, context)
-    new(data : float32[], shape, context : Context) = 
-        let dtype = TypeFlag.Float32
-        let delayAlloc = false
-        let shape = shape |> Seq.toArray
-        let handle = MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype
-        MXNDArray.syncCopyFromCPU handle data
-        new NDArray(handle)
-    new(data : float32 seq, shape, context) = new NDArray(data |> Seq.toArray, shape, context)
-    new(data : float[]) =
-        let h1 = MXNDArray.createNone()
-        MXNDArray.syncCopyFromCPU h1 data
-        new NDArray(h1)
-    new(data : byte[], shape, context : Context) = 
-        let dtype = TypeFlag.Uint8
-        let delayAlloc = false
-        let shape = shape |> Seq.toArray
-        let handle = MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype
-        MXNDArray.syncCopyFromCPU handle data
-        new NDArray(handle)
+        new NDArray(MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype.TypeFlag)
+    static member ConvertCopyFrom(data : 'aa[], shape : int seq, ctx : Context, ?dtype : DataType) =
+        let shape = 
+            let shape = shape |> Seq.toArray
+            let mutable idx = -1
+            let mutable sz = 1
+            for i = 0 to shape.Length - 1 do 
+                if shape.[i] = -1 then 
+                    if idx >= 0 then 
+                        invalidArg "shape" (sprintf "Invalid shape %A. At most one dimension of shape can be -1" shape)
+                    idx <- i
+                else    
+                    sz <- sz * shape.[i]
+            if idx >= 0 then 
+                let n, r = Math.DivRem(data.Length, sz)
+                if r <> 0 then 
+                    invalidArg "shape" (sprintf "Invalid shape %A. Could not infer -1 dimension." shape)
+                shape.[idx] <- n
+                shape
+            elif sz <> data.Length then 
+                invalidArg "shape" (sprintf "shape %A with length %d does not match array length %d" shape sz data.Length)
+            else
+                shape
+        let dtype = defaultArg dtype DataType.Float32
+        let a = new NDArray(shape, ctx, dtype, false)
+        a.CopyFrom(data)
+        a
+
         
     member x.NDArrayHandle = handle
     member x.UnsafeHandle = x.NDArrayHandle.UnsafeHandle
@@ -169,7 +169,13 @@ type NDArray(handle : SafeNDArrayHandle) =
             | Int8 -> ArrayConverter.Int8(a) |> x.SyncCopyFromCPUUnchecked
             | UInt8 -> ArrayConverter.UInt8(a) |> x.SyncCopyFromCPUUnchecked
 
-
+    static member CopyFrom(data : float32[], shape : int seq, ctx : Context) = NDArray.ConvertCopyFrom(data,shape,ctx,DataType.Float32)
+    static member CopyFrom(data : float[], shape : int seq, ctx : Context) = NDArray.ConvertCopyFrom(data,shape,ctx,DataType.Float64)
+    static member CopyFrom(data : int[], shape : int seq, ctx : Context) = NDArray.ConvertCopyFrom(data,shape,ctx,DataType.Int32)
+    static member CopyFrom(data : int64[], shape : int seq, ctx : Context) = NDArray.ConvertCopyFrom(data,shape,ctx,DataType.Int64)
+    static member CopyFrom(data : int8[], shape : int seq, ctx : Context) = NDArray.ConvertCopyFrom(data,shape,ctx,DataType.Int8)
+    static member CopyFrom(data : uint8[], shape : int seq, ctx : Context) = NDArray.ConvertCopyFrom(data,shape,ctx,DataType.UInt8)
+    
     member x.SyncCopyFromCPU(data : int []) = MXNDArray.syncCopyFromCPU handle.UnsafeHandle data
 
     member x.Set(value : float32) =

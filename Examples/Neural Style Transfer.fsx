@@ -50,7 +50,7 @@ let loadImage (image : Image) =
                     yield float32 p.G - 116.779f
                     yield float32 p.B - 103.939f
         |]
-    let im = new NDArray(dat |> Array.map float32, [image.Height; image.Width; 3], context)
+    let im = context.CopyFrom(dat, [image.Height; image.Width; 3])
     let resized = MX.ImageResize(im, [224;224])
     resized.SwapAxis(0,2).SwapAxis(1,2).Reshape([1;3;224;224])
 
@@ -247,7 +247,7 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
                       -1;  4; -1;
                        0; -1;  0]
                      |> List.map (fun x -> float32 x / 8.f)
-                     |> (fun x -> new NDArray(x, [1;1;3;3], context))
+                     |> (fun x -> context.CopyFrom(x, [1;1;3;3]))
         let out = MulScalar(out, w)
         let inArgs,argGrad,grapReqType = 
             out.ArgumentNames
