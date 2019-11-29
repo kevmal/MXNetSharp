@@ -79,23 +79,43 @@ type Symbol() =
    
     member x.Slice(startIndices, endIndices, stepIndices) = Slice(x, startIndices, endIndices, stepIndices)
     member x.GetSlice([<ParamArray>] a : obj []) = 
-        let b = ResizeArray()
-        let e = ResizeArray()
+        let b = ResizeArray<int option>()
+        let e = ResizeArray<int option>()
         let s = ResizeArray<int option>()
+        let sliceAxis = ResizeArray()
+        let newAxis = ResizeArray()
         let mutable i = 0
+        let mutable sliceAx = 0
         while i < a.Length do 
             match a.[i] with 
             | :? int as idx -> 
-                b.Add(Some idx)
-                e.Add(Some(idx + 1))
-                s.Add None
+                b.Add(Some(int idx))
+                e.Add(Some(if idx >= 0 then int idx + 1 else int idx))
+                s.Add(None)
+                sliceAxis.Add sliceAx
+                sliceAx <- sliceAx + 1
             | :? (int option) as o -> 
-                let o2 = a.[i+1] :?> int option |> Option.map (fun x -> x + 1)
-                b.Add(o)
-                e.Add(o2)
-                s.Add None
+                let o2 = a.[i+1] :?> int option |> Option.map (fun x -> if x >= 0 then x + 1 else x)
+                b.Add(match o with | Some o -> Some (int o) | _ -> None)
+                e.Add(match o2 with | Some o -> Some (int o) | _ -> None)
+                s.Add(None)
+                sliceAxis.Add sliceAx
+                sliceAx <- sliceAx + 1
                 i <- i + 1
-            | _ -> failwithf "invalid argument to get slice %A" a.[i]
+            | :? SliceRange as r -> 
+                match r.Start with 
+                | Some v -> b.Add(Some(int v))
+                | None -> b.Add(None)
+                match r.Stop with 
+                | Some v -> e.Add(Some(if v >= 0L then int v + 1 else int v))
+                | None -> e.Add(None)
+                match r.Step with 
+                | Some v -> s.Add(Some(int v))
+                | None -> s.Add(None)
+                sliceAxis.Add sliceAx
+                sliceAx <- sliceAx + 1
+            | :? NewAxis -> newAxis.Add sliceAx
+            | _ -> failwithf "invalid argument to get slice %A" a.[i] //TODO create ex
             i <- i + 1
         x.Slice(b,e,s) 
              
