@@ -6,15 +6,13 @@ open System.Collections.Generic
 open System.Runtime.InteropServices
 open MXNetSharp.Interop
 
+
+
 type SymbolInitilizationException(symbol : Symbol, inner : Exception) =
     inherit Exception(
         match inner  with 
         | null -> sprintf "Init failed on symbol %O" symbol
         | ex -> sprintf "Init failed on symbol %O: %s %A" symbol ex.Message ex.StackTrace)
-
-
-type ISymbolArguments = 
-    abstract member Arguments : Symbol seq
 
 type ISymbolComposable = 
     abstract member ComposedWith : Symbol -> Symbol
@@ -30,18 +28,11 @@ type Symbol() =
     member val internal InternalName : string option = None with get,set
     member val internal InternalHandle : SafeSymbolHandle option = None with get,set
     member x.IsInitialized = x.InternalHandle.IsSome
-    //member internal x.CreateId() = 
-    //    assert(x.IsInitialized)
-    //    match x.Id with 
-    //    | None ->
-    //        let sid = Guid.NewGuid()
-    //        MXSymbol.setAttr x.UnsafeHandle "mxnetsharp_symbolid" (string sid)
-    //    | _ -> ()
-    //member x.Id = 
-    //    if x.IsInitialized then 
-    //        MXSymbol.getAttr x.UnsafeHandle "mxnetsharp_symbolid"
-    //    else    
-    //        None
+    member x.FreezeName() = 
+        if not x.IsInitialized then 
+            match x.InternalName with 
+            | Some _ -> ()
+            | None -> x.InternalName <- Some x.GeneratedName
     abstract member Copy : unit -> Symbol
     member x.Name 
         with get() = 
@@ -247,20 +238,22 @@ type Symbol() =
     member x.ApplyTanh() = new Tanh(x)
     static member Tanh(x : Symbol) = new Tanh(x) :> Symbol
 
-(*
-    member x.Dispose(disposing) = 
-        if not disposed then 
-            if disposing then 
-                match x.InternalHandle with 
-                | Some h -> h.Dispose()
-                | None -> ()
-        disposed <- true
-    member x.Dispose() = 
-        x.Dispose(true)
-        GC.SuppressFinalize(x)
-    interface IDisposable with  
-        member x.Dispose() = x.Dispose()
-*)
+    
+    static member inline (.>>)(x : Symbol, y : 'a) : 'a = 
+        match SymUtil.tryFindType<Hole> y |> Option.bind (fun h -> SymUtil.tryReplaceSymbol h x y) with 
+        | Some h -> h |> box |> unbox
+        | None -> 
+        match y :> Symbol with 
+        | :? SymbolOperator as s -> s.ComposedWith(x) :?> 'a
+        | _ -> y
+    
+    
+    static member inline (.|>)(x : ^a, f : ^b) = 
+        let _f() = f :> SymbolOperator
+        f.Initialize()
+        let fcopy = f.Copy() :?> SymbolOperator
+        x .>> fcopy
+    
 
 type SymbolOutput internal (parent : Symbol) = 
     inherit Symbol()
@@ -290,13 +283,6 @@ type Variable() =
     new (name : string) as this = 
         new Variable() then 
             this.InternalName <- Some name
-    //member internal x.CreateId() = 
-    //    assert(x.IsInitialized)
-    //    match x.Id with 
-    //    | None ->
-    //        let sid = Guid.NewGuid()
-    //        MXSymbol.setAttr x.UnsafeHandle "mxnetsharp_symbolid" (string sid)
-    //    | _ -> ()
     override x.Initialize() =   
         match x.InternalHandle with 
         | Some _ -> ()
@@ -318,7 +304,6 @@ type ImplicitVariable() =
 //TODO: Manually add CustomOp type and skip in codegen
 //TODO: fix histogram
 //TODO: override tostring
-//TODO: ctx = '' for NDArray ops is invalid even though it's often the default
 //TODO: We should add valiation to the specific symbol types
 type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments<Symbol>) = 
     inherit Symbol()
@@ -381,11 +366,9 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
                     match a with 
                     | name, Input(:? ImplicitVariable) when not inserted -> 
                        inserted <- true
-                       printfn "Composing %s in %s with %s" name (x.GetType().Name) (symbol.GetType().Name)
                        name, Input(symbol)
                     | name, VarArg(countName,a) -> 
                        inserted <- true
-                       printfn "Composing %s in %s with %s" name (x.GetType().Name) (symbol.GetType().Name)
                        name, VarArg(countName, [|yield! a; yield symbol|])
                         
                     | x -> x
@@ -455,11 +438,99 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
                     |> Array.unzip
                     ||> MXSymbol.compose symbol name
                 x.InternalHandle <- Some(new SafeSymbolHandle(symbol, true))
-                //x.CreateId()
             with
             | e -> raise(SymbolInitilizationException(x, e))
     interface ISymbolComposable with 
         member x.ComposedWith(y) = x.ComposedWith(y)
+
+type Hole() = 
+    inherit Variable()
+    default x.Copy() = Hole() :> Symbol
+
+module SymUtil = 
+    let tryReplaceSymbol (search : Symbol) (replacement : Symbol) (target : Symbol) = 
+        match target with 
+        | :? SymbolOperator as s -> 
+            let mutable count = 0 //TODO: cleanup
+            let rec loop (x : SymbolOperator) = 
+                x.OperatorArguments
+                |> Seq.map 
+                    (fun a -> 
+                        match a with 
+                        | name, VarArg(num, args) -> 
+                            let args = 
+                                args 
+                                |> Array.map 
+                                    (fun a ->
+                                        match a with 
+                                        | s when Object.ReferenceEquals(search,s) -> 
+                                            count <- count + 1
+                                            replacement
+                                        | :? SymbolOperator as s -> loop s
+                                        | s -> s
+                                    )
+                            name, VarArg(num, args)
+                        | name, Input(s) when Object.ReferenceEquals(search,s) -> 
+                            count <- count + 1
+                            name, Input(replacement)
+                        | name, Input(:? SymbolOperator as s) -> name, Input(loop s)
+                        | otherwise -> otherwise
+                    )
+                |> (fun args -> x.WithArguments(Arguments<Symbol>(args)).SetName(x))
+            let result = loop s
+            if count > 0 then 
+                Some result
+            else 
+                None
+        | _ -> None
+    let tryFindType<'a when 'a :> Symbol> (symbol : Symbol) : 'a option = 
+        match symbol with 
+        | :? SymbolOperator as s -> 
+            let rec loop (x : SymbolOperator) = 
+                x.OperatorArguments
+                |> Seq.tryPick 
+                    (fun a -> 
+                        match a with 
+                        | name, VarArg(num, args) -> 
+                            args 
+                            |> Array.tryPick 
+                                (fun a ->
+                                    match a with 
+                                    | :? 'a as h -> 
+                                        Some h
+                                    | :? SymbolOperator as s -> 
+                                        loop s
+                                    | s -> None
+                                )
+                        | name, Input(:? 'a as s) -> 
+                            Some s
+                        | name, Input(:? SymbolOperator as s) -> loop s
+                        | otherwise -> None
+                    )
+            loop s
+        | _ -> None
+    let rec symbolArgs (s : Symbol) = 
+        let rec loop (x : SymbolOperator) = 
+            x.OperatorArguments
+            |> Seq.collect
+                (fun a -> 
+                    match a with 
+                    | name, VarArg(num, args) -> 
+                        args |> Seq.collect symbolArgs
+                    | name, Input(s) -> symbolArgs s
+                    | otherwise -> Seq.empty
+                )
+        seq {
+            match s with 
+            | :? SymbolOperator as o -> 
+                yield! loop o
+            | s -> s
+        }
+    let initNames (symbol : Symbol) = 
+        symbol
+        |> symbolArgs 
+        |> Seq.iter (fun s -> s.FreezeName())
+
 
 type SymbolComposable<'a when 'a :> SymbolOperator>(argSymbol : Symbol, rootSymbol: 'a) = 
     inherit SymbolOperator(rootSymbol.AtomicSymbolCreator, rootSymbol.OperatorArguments) 
@@ -526,7 +597,6 @@ type SymbolGroup(symbols : Symbol []) =
         | None -> 
             let symbol = symbols |> Array.map (fun x -> x.UnsafeHandle) |> MXSymbol.createGroup 
             x.InternalHandle <- Some(new SafeSymbolHandle(symbol, true))
-            //x.CreateId()
     default x.Copy() = SymbolGroup(symbols |> Array.map (fun x -> x.Copy())) :> Symbol
     override x.InputSymbols = 
         let a = symbols |> Array.collect (fun x -> x.InputSymbols)

@@ -53,62 +53,43 @@ let valIter   = new MNISTIter(@"t10k-images-idx3-ubyte",
                               batchSize = batchSize,
                               flat = false)
 
-let inline (.>>) (x : Symbol) (y : 'a) : 'a = 
-    let _f() = y :> SymbolOperator
-    y.ComposedWith(x) |> box |> unbox
 
-let inline (.|>) (x : ^a) (f : ^b) = 
-    let _f() = f :> SymbolOperator
-    f.Initialize()
-    let fcopy = f.Copy() :?> SymbolOperator
-    fcopy.ComposedWith(x)
 
 let withName (name) (x : #Symbol) = x.Name <- name; x
 
-let composable f = 
-    let v = Variable()
-    SymbolComposable(v,f v)
-
 let noise = Input("noise", [0; 1])
 let label = Input("label", [0; 1])
-let generator = composable (fun noise -> 
-        let labelEmbedding = Embedding(data = label, inputDim = nClasses, outputDim = nLatent)
-        let layer n = 
-            composable(fun x -> 
-                x
-                .>> FullyConnected(numHidden = n) 
-                .>> LeakyReLU(actType = LeakyReLUType.Leaky, slope = 0.2)
-                .>> BatchNorm(momentum = 0.8)
-            )
-        (noise*labelEmbedding)
-        .>> layer 256
-        .>> layer 512
-        .>> layer 1024
-        .>> FullyConnected(numHidden = 28*28)
-        .>> Activation(ActType.Tanh)
-    )
+let generator = 
+    let labelEmbedding = Embedding(data = label, inputDim = nClasses, outputDim = nLatent)
+    let layer n = 
+        Hole()
+        .>> FullyConnected(numHidden = n) 
+        .>> LeakyReLU(actType = LeakyReLUType.Leaky, slope = 0.2)
+        .>> BatchNorm(momentum = 0.8)
+    (Hole()*labelEmbedding)
+    .>> layer 256
+    .>> layer 512
+    .>> layer 1024
+    .>> FullyConnected(numHidden = 28*28)
+    .>> Activation(ActType.Tanh)
 
-let discriminator = composable (fun image -> 
-        let labelEmbedding = Embedding(data = label, inputDim = nClasses, outputDim = 28*28)
-        let dense n = 
-            composable(fun x -> 
-                x
-                .>> FullyConnected(numHidden = n) 
-                .>> LeakyReLU(actType = LeakyReLUType.Leaky, slope = 0.2)
-            )
-        (Reshape(image, [0; 1; 28*28])*labelEmbedding)
-        .>> dense 512
-        .>> dense 512
-        .>> Dropout(p = 0.4, mode = DropoutMode.Training)
-        .>> dense 512
-        .>> Dropout(p = 0.4, mode = DropoutMode.Training)
-        .>> FullyConnected(1) 
-        .>> Activation(ActType.Sigmoid)
-    )
+let discriminator = 
+    let labelEmbedding = Embedding(data = label, inputDim = nClasses, outputDim = 28*28)
+    let dense n = 
+        Hole()
+        .>> FullyConnected(numHidden = n) 
+        .>> LeakyReLU(actType = LeakyReLUType.Leaky, slope = 0.2)
+    (Reshape(Hole(), [0; 1; 28*28])*labelEmbedding)
+    .>> dense 512
+    .>> dense 512
+    .>> Dropout(p = 0.4, mode = DropoutMode.Training)
+    .>> dense 512
+    .>> Dropout(p = 0.4, mode = DropoutMode.Training)
+    .>> FullyConnected(1) 
+    .>> Activation(ActType.Sigmoid)
 
 
 let inputImage = Input("inputImage", [0; 1; 28; 28])
-
 
 let ep = 0.000001
 let onActual = -Log(ep + (inputImage .|> discriminator)) .>> Mean() .>> MakeLoss()
