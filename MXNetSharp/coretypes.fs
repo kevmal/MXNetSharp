@@ -35,6 +35,12 @@ type StorageType =
         | RowSparse -> 1
         | CSR -> 2
     static member op_Explicit(st : StorageType) = st.ToInt()
+    override x.ToString() =
+        match x with
+            | CSR -> "csr"
+            | Default -> "default"
+            | RowSparse -> "row_sparse"
+            | Undefined -> ""
 
 
 // defined in mshadow/base.h

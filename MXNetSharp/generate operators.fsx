@@ -158,6 +158,7 @@ type UnionType =
         TypeString : string
         Name : string
         Cases : (string*string) []
+        Generate : bool
     }
 
 
@@ -280,6 +281,7 @@ type TranslatedType =
                             cases 
                             |> Array.filter (fun x -> x <> "None" && x <> "'None'") 
                             |> Array.map (fun x -> toCaseName x, x.Trim ''')
+                        Generate = true
                     }
                 match ro with 
                 | None
@@ -292,12 +294,12 @@ type TranslatedType =
                         TypeString = t
                         Name = arg.Name |> toCaseName
                         Cases = cases |> Array.map (fun x -> toCaseName x, x.Trim ''')
+                        Generate = true
                     }
                 StringChoices(ut, ro |> Option.map trimQuotes)
         | p -> 
             failwithf "Unhandled type %A" t
            
-
 
 
 type DefaultMode = 
@@ -423,6 +425,7 @@ Mappings.Modify
                                 cases 
                                 |> Array.filter (fun x -> x <> "None" && x <> "'None'") 
                                 |> Array.map (fun x -> toCaseName x, x.Trim ''')
+                            Generate = true
                         })}
             else
                 {x with 
@@ -431,6 +434,7 @@ Mappings.Modify
                             TypeString = x.TypeString
                             Name = x.Name |> toCaseName
                             Cases = cases |> Array.map (fun x -> toCaseName x, x.Trim ''')
+                            Generate = true
                         })}
         else 
             x
@@ -1446,7 +1450,8 @@ Mappings.Modify(fun (l : ProcessedAtomicSymbol list) ->
 
 
 let processDefinedType (t : UnionType) (arg : ProcessedArg) =
-    let (|Name|_|) name (t : UnionType,_) = if t.Name = name then Some() else None
+    let (|Name|_|) name (t : UnionType,_) = if t.Name.Trim() = name then Some() else None
+    let (|FName|_|) name (t : UnionType,_) = if arg.ProcessedAtomicSymbol.Value.Name + t.Name = name then Some() else None
     let (|Cases|_|) cases (t : UnionType,_) = 
         let cases = cases |> Seq.toArray |> Array.sort
         let tcases = t.Cases |> Seq.map fst |> Seq.toArray
@@ -1462,10 +1467,43 @@ let processDefinedType (t : UnionType) (arg : ProcessedArg) =
                         "Corner", "corner"
                     |]
                 TypeString = ""
+                Generate = true
             } 
+        | FName "Stype"
+        | FName "ForwardStype" -> 
+            {
+                Name = "StorageType"
+                Cases = [||]
+                TypeString = ""
+                Generate = false
+            } 
+        | Cases ["Float16"; "Float32"; "Float64"] -> 
+            {
+                Name = "FloatDType"
+                Cases = 
+                    [|
+                        "Float16", "float16"
+                        "Float32", "float32"
+                        "Float64", "float64"
+                    |]
+                TypeString = ""
+                Generate = true
+            } 
+        | FName "NpSumDtype"
+        | FName "NpProdDtype"
+        | FName "NpiMeanDtype"
+        | FName "NpiStdDtype"
+        | FName "NpiVarDtype"
+        | FName "TopkDtype"
+        | FName "NpCumsumDtype"
+        | FName "OutDtype"
+        | FName "ArgsortDtype"
+        | Name "OutDtype"
+        | FName "NpiVarDtype"
+        | FName "NpiVarDtype"
         | Cases ["Float16"; "Float32"; "Float64"; "Int32"; "Int64"; "Int8"; "Uint8"] ->  
             {
-                Name = "IntOrFloatDType"
+                Name = "DataType"
                 Cases = 
                     [|
                         "Float16", "float16"
@@ -1477,19 +1515,9 @@ let processDefinedType (t : UnionType) (arg : ProcessedArg) =
                         "UInt8", "uint8"
                     |]
                 TypeString = ""
+                Generate = false
             } 
             
-        | Cases ["Float16"; "Float32"; "Float64"] -> 
-            {
-                Name = "FloatDType"
-                Cases = 
-                    [|
-                        "Float16", "float16"
-                        "Float32", "float32"
-                        "Float64", "float64"
-                    |]
-                TypeString = ""
-            } 
         | Name "ActType" & (_,a) when a.Arg.AtomicSymbolInfo.Name = "LeakyReLU" -> 
             {t with Name = "LeakyReLUType"}
         | (Name "Mode" | Name "OutType" | Name "Dtype" | Name "Layout" | Name "TransformType") & (_,{ProcessedAtomicSymbol = Some pas}) -> 
@@ -1578,6 +1606,7 @@ let processed =
                     y
                     |> Seq.collect (fun x -> x.Args |> Seq.choose (fun x -> x.DefinedType |> Option.map (fun d -> x, d)))
                     |> Seq.distinctBy snd
+                    |> Seq.filter (fun (a,t) -> t.Generate)
                     |> Seq.map 
                         (fun (a,t) ->
                             a, definedTypeToCode a
@@ -1606,6 +1635,7 @@ let skipped =
 
 
 let definedTypes = HashSet()
+//definedTypes.Add "DataType"
 let types = ResizeArray()
 let members = ResizeArray()
 let symboltypes = ResizeArray()

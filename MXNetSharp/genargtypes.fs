@@ -206,127 +206,6 @@ module GeneratedArgumentTypes =
                 | Sum -> "sum"
     
     [<RequireQualifiedAccess>]
-    type NpSumDtype = 
-        | Float16
-        | Float32
-        | Float64
-        | Int32
-        | Int64
-        | Int8
-        override x.ToString() =
-            match x with
-                | Float16 -> "float16"
-                | Float32 -> "float32"
-                | Float64 -> "float64"
-                | Int32 -> "int32"
-                | Int64 -> "int64"
-                | Int8 -> "int8"
-    
-    [<RequireQualifiedAccess>]
-    type NpProdDtype = 
-        | Float16
-        | Float32
-        | Float64
-        | Int32
-        | Int64
-        | Int8
-        override x.ToString() =
-            match x with
-                | Float16 -> "float16"
-                | Float32 -> "float32"
-                | Float64 -> "float64"
-                | Int32 -> "int32"
-                | Int64 -> "int64"
-                | Int8 -> "int8"
-    
-    [<RequireQualifiedAccess>]
-    type NpiMeanDtype = 
-        | Float16
-        | Float32
-        | Float64
-        | Int32
-        | Int64
-        | Int8
-        override x.ToString() =
-            match x with
-                | Float16 -> "float16"
-                | Float32 -> "float32"
-                | Float64 -> "float64"
-                | Int32 -> "int32"
-                | Int64 -> "int64"
-                | Int8 -> "int8"
-    
-    [<RequireQualifiedAccess>]
-    type NpiStdDtype = 
-        | Float16
-        | Float32
-        | Float64
-        | Int32
-        | Int64
-        | Int8
-        override x.ToString() =
-            match x with
-                | Float16 -> "float16"
-                | Float32 -> "float32"
-                | Float64 -> "float64"
-                | Int32 -> "int32"
-                | Int64 -> "int64"
-                | Int8 -> "int8"
-    
-    [<RequireQualifiedAccess>]
-    type NpiVarDtype = 
-        | Float16
-        | Float32
-        | Float64
-        | Int32
-        | Int64
-        | Int8
-        override x.ToString() =
-            match x with
-                | Float16 -> "float16"
-                | Float32 -> "float32"
-                | Float64 -> "float64"
-                | Int32 -> "int32"
-                | Int64 -> "int64"
-                | Int8 -> "int8"
-    
-    [<RequireQualifiedAccess>]
-    type NpCumsumDtype = 
-        | Float16
-        | Float32
-        | Float64
-        | Int32
-        | Int64
-        | Int8
-        override x.ToString() =
-            match x with
-                | Float16 -> "float16"
-                | Float32 -> "float32"
-                | Float64 -> "float64"
-                | Int32 -> "int32"
-                | Int64 -> "int64"
-                | Int8 -> "int8"
-    
-    [<RequireQualifiedAccess>]
-    type IntOrFloatDType = 
-        | Float16
-        | Float32
-        | Float64
-        | Int32
-        | Int64
-        | Int8
-        | UInt8
-        override x.ToString() =
-            match x with
-                | Float16 -> "float16"
-                | Float32 -> "float32"
-                | Float64 -> "float64"
-                | Int32 -> "int32"
-                | Int64 -> "int64"
-                | Int8 -> "int8"
-                | UInt8 -> "uint8"
-    
-    [<RequireQualifiedAccess>]
     type PadMode = 
         | Constant
         | Edge
@@ -456,23 +335,6 @@ module GeneratedArgumentTypes =
                 | Valid -> "valid"
     
     [<RequireQualifiedAccess>]
-    type OutDtype = 
-        | Float16
-        | Float32
-        | Float64
-        | Int32
-        | Int64
-        | Int8
-        override x.ToString() =
-            match x with
-                | Float16 -> "float16"
-                | Float32 -> "float32"
-                | Float64 -> "float64"
-                | Int32 -> "int32"
-                | Int64 -> "int64"
-                | Int8 -> "int8"
-    
-    [<RequireQualifiedAccess>]
     type PickMode = 
         | Clip
         | Wrap
@@ -526,40 +388,6 @@ module GeneratedArgumentTypes =
                 | Indices -> "indices"
                 | Mask -> "mask"
                 | Value -> "value"
-    
-    [<RequireQualifiedAccess>]
-    type TopkDtype = 
-        | Float16
-        | Float32
-        | Float64
-        | Int32
-        | Int64
-        | Uint8
-        override x.ToString() =
-            match x with
-                | Float16 -> "float16"
-                | Float32 -> "float32"
-                | Float64 -> "float64"
-                | Int32 -> "int32"
-                | Int64 -> "int64"
-                | Uint8 -> "uint8"
-    
-    [<RequireQualifiedAccess>]
-    type ArgsortDtype = 
-        | Float16
-        | Float32
-        | Float64
-        | Int32
-        | Int64
-        | Uint8
-        override x.ToString() =
-            match x with
-                | Float16 -> "float16"
-                | Float32 -> "float32"
-                | Float64 -> "float64"
-                | Int32 -> "int32"
-                | Int64 -> "int64"
-                | Uint8 -> "uint8"
     
     [<RequireQualifiedAccess>]
     type ContribDeformableConvolutionLayout = 

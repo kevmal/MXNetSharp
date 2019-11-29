@@ -9933,7 +9933,7 @@ type MX() =
     /// <param name="initial">Starting value for the sum.</param>
     static member NpSum(a : NDArray, 
                         [<Optional>] ?axis : int seq, 
-                        [<Optional>] ?dtype : NpSumDtype, 
+                        [<Optional>] ?dtype : DataType, 
                         [<Optional>] ?keepdims : bool, 
                         [<Optional>] ?initial : float) =
         let creator = AtomicSymbolCreator.FromName "_np_sum"
@@ -9954,7 +9954,7 @@ type MX() =
     static member NpSum(outputArray : NDArray seq, 
                         a : NDArray, 
                         [<Optional>] ?axis : int seq, 
-                        [<Optional>] ?dtype : NpSumDtype, 
+                        [<Optional>] ?dtype : DataType, 
                         [<Optional>] ?keepdims : bool, 
                         [<Optional>] ?initial : float) =
         let creator = AtomicSymbolCreator.FromName "_np_sum"
@@ -9975,7 +9975,7 @@ type MX() =
     /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
     /// <param name="initial">Starting value for the sum.</param>
-    static member NpSum([<Optional>] ?a : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?dtype : NpSumDtype, [<Optional>] ?keepdims : bool, [<Optional>] ?initial : float) =
+    static member NpSum([<Optional>] ?a : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?dtype : DataType, [<Optional>] ?keepdims : bool, [<Optional>] ?initial : float) =
         NpSum(?a = a, ?axis = axis, ?dtype = dtype, ?keepdims = keepdims, ?initial = initial)
 
 
@@ -10074,7 +10074,7 @@ type MX() =
     /// <param name="initial">Starting value for the sum.</param>
     static member NpProd(a : NDArray, 
                          [<Optional>] ?axis : int seq, 
-                         [<Optional>] ?dtype : NpProdDtype, 
+                         [<Optional>] ?dtype : DataType, 
                          [<Optional>] ?keepdims : bool, 
                          [<Optional>] ?initial : float) =
         let creator = AtomicSymbolCreator.FromName "_np_prod"
@@ -10092,7 +10092,7 @@ type MX() =
     static member NpProd(outputArray : NDArray seq, 
                          a : NDArray, 
                          [<Optional>] ?axis : int seq, 
-                         [<Optional>] ?dtype : NpProdDtype, 
+                         [<Optional>] ?dtype : DataType, 
                          [<Optional>] ?keepdims : bool, 
                          [<Optional>] ?initial : float) =
         let creator = AtomicSymbolCreator.FromName "_np_prod"
@@ -10110,7 +10110,7 @@ type MX() =
     /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
     /// <param name="initial">Starting value for the sum.</param>
-    static member NpProd([<Optional>] ?a : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?dtype : NpProdDtype, [<Optional>] ?keepdims : bool, [<Optional>] ?initial : float) =
+    static member NpProd([<Optional>] ?a : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?dtype : DataType, [<Optional>] ?keepdims : bool, [<Optional>] ?initial : float) =
         NpProd(?a = a, ?axis = axis, ?dtype = dtype, ?keepdims = keepdims, ?initial = initial)
 
 
@@ -10121,7 +10121,7 @@ type MX() =
     /// <param name="initial">Starting value for the sum.</param>
     static member NpiMean(a : NDArray, 
                           [<Optional>] ?axis : int seq, 
-                          [<Optional>] ?dtype : NpiMeanDtype, 
+                          [<Optional>] ?dtype : DataType, 
                           [<Optional>] ?keepdims : bool, 
                           [<Optional>] ?initial : float) =
         let creator = AtomicSymbolCreator.FromName "_npi_mean"
@@ -10139,7 +10139,7 @@ type MX() =
     static member NpiMean(outputArray : NDArray seq, 
                           a : NDArray, 
                           [<Optional>] ?axis : int seq, 
-                          [<Optional>] ?dtype : NpiMeanDtype, 
+                          [<Optional>] ?dtype : DataType, 
                           [<Optional>] ?keepdims : bool, 
                           [<Optional>] ?initial : float) =
         let creator = AtomicSymbolCreator.FromName "_npi_mean"
@@ -10157,7 +10157,7 @@ type MX() =
     /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
     /// <param name="initial">Starting value for the sum.</param>
-    static member NpiMean([<Optional>] ?a : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?dtype : NpiMeanDtype, [<Optional>] ?keepdims : bool, [<Optional>] ?initial : float) =
+    static member NpiMean([<Optional>] ?a : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?dtype : DataType, [<Optional>] ?keepdims : bool, [<Optional>] ?initial : float) =
         NpiMean(?a = a, ?axis = axis, ?dtype = dtype, ?keepdims = keepdims, ?initial = initial)
 
 
@@ -10168,7 +10168,7 @@ type MX() =
     /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
     static member NpiStd(a : NDArray, 
                          [<Optional>] ?axis : int seq, 
-                         [<Optional>] ?dtype : NpiStdDtype, 
+                         [<Optional>] ?dtype : DataType, 
                          [<Optional>] ?ddof : int, 
                          [<Optional>] ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_std"
@@ -10186,7 +10186,7 @@ type MX() =
     static member NpiStd(outputArray : NDArray seq, 
                          a : NDArray, 
                          [<Optional>] ?axis : int seq, 
-                         [<Optional>] ?dtype : NpiStdDtype, 
+                         [<Optional>] ?dtype : DataType, 
                          [<Optional>] ?ddof : int, 
                          [<Optional>] ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_std"
@@ -10204,7 +10204,7 @@ type MX() =
     /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
     /// <param name="ddof">Starting value for the sum.</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
-    static member NpiStd([<Optional>] ?a : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?dtype : NpiStdDtype, [<Optional>] ?ddof : int, [<Optional>] ?keepdims : bool) =
+    static member NpiStd([<Optional>] ?a : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?dtype : DataType, [<Optional>] ?ddof : int, [<Optional>] ?keepdims : bool) =
         NpiStd(?a = a, ?axis = axis, ?dtype = dtype, ?ddof = ddof, ?keepdims = keepdims)
 
     /// <param name="a">The input</param>
@@ -10214,7 +10214,7 @@ type MX() =
     /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
     static member NpiVar(a : NDArray, 
                          [<Optional>] ?axis : int seq, 
-                         [<Optional>] ?dtype : NpiVarDtype, 
+                         [<Optional>] ?dtype : DataType, 
                          [<Optional>] ?ddof : int, 
                          [<Optional>] ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_var"
@@ -10232,7 +10232,7 @@ type MX() =
     static member NpiVar(outputArray : NDArray seq, 
                          a : NDArray, 
                          [<Optional>] ?axis : int seq, 
-                         [<Optional>] ?dtype : NpiVarDtype, 
+                         [<Optional>] ?dtype : DataType, 
                          [<Optional>] ?ddof : int, 
                          [<Optional>] ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_var"
@@ -10250,7 +10250,7 @@ type MX() =
     /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
     /// <param name="ddof">Starting value for the sum.</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
-    static member NpiVar([<Optional>] ?a : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?dtype : NpiVarDtype, [<Optional>] ?ddof : int, [<Optional>] ?keepdims : bool) =
+    static member NpiVar([<Optional>] ?a : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?dtype : DataType, [<Optional>] ?ddof : int, [<Optional>] ?keepdims : bool) =
         NpiVar(?a = a, ?axis = axis, ?dtype = dtype, ?ddof = ddof, ?keepdims = keepdims)
 
     /// <param name="array">The input</param>
@@ -10288,7 +10288,7 @@ type MX() =
     /// <param name="a">Input ndarray</param>
     /// <param name="axis">Axis along which the cumulative sum is computed. The default (None) is to compute the cumsum over the flattened array.</param>
     /// <param name="dtype">Type of the returned array and of the accumulator in which the elements are summed. If dtype is not specified, it defaults to the dtype of a, unless a has an integer dtype with a precision less than that of the default platform integer. In that case, the default platform integer is used.</param>
-    static member NpCumsum(a : NDArray, [<Optional>] ?axis : int, [<Optional>] ?dtype : NpCumsumDtype) =
+    static member NpCumsum(a : NDArray, [<Optional>] ?axis : int, [<Optional>] ?dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_np_cumsum"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|a.NDArrayHandle.UnsafeHandle|]
@@ -10302,7 +10302,7 @@ type MX() =
     /// <param name="a">Input ndarray</param>
     /// <param name="axis">Axis along which the cumulative sum is computed. The default (None) is to compute the cumsum over the flattened array.</param>
     /// <param name="dtype">Type of the returned array and of the accumulator in which the elements are summed. If dtype is not specified, it defaults to the dtype of a, unless a has an integer dtype with a precision less than that of the default platform integer. In that case, the default platform integer is used.</param>
-    static member NpCumsum(outputArray : NDArray seq, a : NDArray, [<Optional>] ?axis : int, [<Optional>] ?dtype : NpCumsumDtype) =
+    static member NpCumsum(outputArray : NDArray seq, a : NDArray, [<Optional>] ?axis : int, [<Optional>] ?dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_np_cumsum"
         let names = [|"axis"; "dtype"|]
         let vals = [|(match axis with None -> "None" | Some axis -> string axis); (match dtype with None -> "None" | Some dtype -> string dtype)|]
@@ -10319,7 +10319,7 @@ type MX() =
     /// <param name="a">Input ndarray</param>
     /// <param name="axis">Axis along which the cumulative sum is computed. The default (None) is to compute the cumsum over the flattened array.</param>
     /// <param name="dtype">Type of the returned array and of the accumulator in which the elements are summed. If dtype is not specified, it defaults to the dtype of a, unless a has an integer dtype with a precision less than that of the default platform integer. In that case, the default platform integer is used.</param>
-    static member NpCumsum([<Optional>] ?a : Symbol, [<Optional>] ?axis : int, [<Optional>] ?dtype : NpCumsumDtype) =
+    static member NpCumsum([<Optional>] ?a : Symbol, [<Optional>] ?axis : int, [<Optional>] ?dtype : DataType) =
         NpCumsum(?a = a, ?axis = axis, ?dtype = dtype)
 
 
@@ -12645,7 +12645,7 @@ type MX() =
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiZerosNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiZerosNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_zeros"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -12656,7 +12656,7 @@ type MX() =
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiZeros(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiZeros(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_zeros"
         let names = [|"ctx"; "shape"; "dtype"|]
         let vals = [|string ctx; (if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -12669,14 +12669,14 @@ type MX() =
         ()
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiZeros([<Optional>] ?shape : int seq, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member NpiZeros([<Optional>] ?shape : int seq, [<Optional>] ?dtype : DataType) =
         NpiZeros(?shape = shape, ?dtype = dtype)
 
     /// <summary>Return a new array of given shape, type, and context, filled with ones.</summary>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiOnesNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiOnesNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_ones"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -12688,7 +12688,7 @@ type MX() =
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiOnes(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiOnes(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_ones"
         let names = [|"ctx"; "shape"; "dtype"|]
         let vals = [|string ctx; (if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -12702,14 +12702,14 @@ type MX() =
     /// <summary>Return a new array of given shape, type, and context, filled with ones.</summary>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiOnes([<Optional>] ?shape : int seq, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member NpiOnes([<Optional>] ?shape : int seq, [<Optional>] ?dtype : DataType) =
         NpiOnes(?shape = shape, ?dtype = dtype)
 
     /// <summary>Return a new identity array of given shape, type, and context.</summary>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiIdentityNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiIdentityNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_identity"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -12721,7 +12721,7 @@ type MX() =
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiIdentity(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiIdentity(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_identity"
         let names = [|"ctx"; "shape"; "dtype"|]
         let vals = [|string ctx; (if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -12735,7 +12735,7 @@ type MX() =
     /// <summary>Return a new identity array of given shape, type, and context.</summary>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiIdentity([<Optional>] ?shape : int seq, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member NpiIdentity([<Optional>] ?shape : int seq, [<Optional>] ?dtype : DataType) =
         NpiIdentity(?shape = shape, ?dtype = dtype)
 
     /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
@@ -12801,7 +12801,7 @@ type MX() =
                                    [<Optional>] ?step : double, 
                                    [<Optional>] ?repeat : int, 
                                    [<Optional>] ?inferRange : bool, 
-                                   [<Optional>] ?dtype : IntOrFloatDType) =
+                                   [<Optional>] ?dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_arange"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -12823,7 +12823,7 @@ type MX() =
                             [<Optional>] ?step : double, 
                             [<Optional>] ?repeat : int, 
                             [<Optional>] ?inferRange : bool, 
-                            [<Optional>] ?dtype : IntOrFloatDType) =
+                            [<Optional>] ?dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_arange"
         let names = [|"start"; "ctx"; "stop"; "step"; "repeat"; "infer_range"; "dtype"|]
         let vals = [|string start; string ctx; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
@@ -12840,14 +12840,14 @@ type MX() =
     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiArange(start : double, [<Optional>] ?stop : float, [<Optional>] ?step : double, [<Optional>] ?repeat : int, [<Optional>] ?inferRange : bool, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member NpiArange(start : double, [<Optional>] ?stop : float, [<Optional>] ?step : double, [<Optional>] ?repeat : int, [<Optional>] ?inferRange : bool, [<Optional>] ?dtype : DataType) =
         NpiArange(start, ?stop = stop, ?step = step, ?repeat = repeat, ?inferRange = inferRange, ?dtype = dtype)
 
     /// <summary>Return an array representing the indices of a grid.</summary>
     /// <param name="dimensions">The shape of the grid.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiIndicesNDArray(dimensions : int seq, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiIndicesNDArray(dimensions : int seq, ctx : Context, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_indices"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -12859,7 +12859,7 @@ type MX() =
     /// <param name="dimensions">The shape of the grid.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiIndices(outputArray : NDArray seq, dimensions : int seq, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiIndices(outputArray : NDArray seq, dimensions : int seq, ctx : Context, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_indices"
         let names = [|"dimensions"; "ctx"; "dtype"|]
         let vals = [|(dimensions |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string ctx; (if isNull (dtype :> obj) then "int32" else string dtype)|]
@@ -12873,7 +12873,7 @@ type MX() =
     /// <summary>Return an array representing the indices of a grid.</summary>
     /// <param name="dimensions">The shape of the grid.</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiIndices(dimensions : int seq, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member NpiIndices(dimensions : int seq, [<Optional>] ?dtype : DataType) =
         NpiIndices(dimensions, ?dtype = dtype)
 
     /// <param name="a">Source input</param>
@@ -13625,7 +13625,7 @@ type MX() =
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHanningNDArray(M : int, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiHanningNDArray(M : int, ctx : Context, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_hanning"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -13637,7 +13637,7 @@ type MX() =
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHanning(outputArray : NDArray seq, M : int, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiHanning(outputArray : NDArray seq, M : int, ctx : Context, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_hanning"
         let names = [|"M"; "ctx"; "dtype"|]
         let vals = [|string M; string ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -13651,14 +13651,14 @@ type MX() =
     /// <summary>Return the Hanning window.The Hanning window is a taper formed by using a weighted cosine.</summary>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHanning(M : int, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member NpiHanning(M : int, [<Optional>] ?dtype : DataType) =
         NpiHanning(M, ?dtype = dtype)
 
     /// <summary>Return the Hamming window.The Hamming window is a taper formed by using a weighted cosine.</summary>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHammingNDArray(M : int, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiHammingNDArray(M : int, ctx : Context, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_hamming"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -13670,7 +13670,7 @@ type MX() =
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHamming(outputArray : NDArray seq, M : int, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiHamming(outputArray : NDArray seq, M : int, ctx : Context, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_hamming"
         let names = [|"M"; "ctx"; "dtype"|]
         let vals = [|string M; string ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -13684,14 +13684,14 @@ type MX() =
     /// <summary>Return the Hamming window.The Hamming window is a taper formed by using a weighted cosine.</summary>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHamming(M : int, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member NpiHamming(M : int, [<Optional>] ?dtype : DataType) =
         NpiHamming(M, ?dtype = dtype)
 
     /// <summary>Return the Blackman window.The Blackman window is a taper formed by using a weighted cosine.</summary>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiBlackmanNDArray(M : int, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiBlackmanNDArray(M : int, ctx : Context, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_blackman"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -13703,7 +13703,7 @@ type MX() =
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiBlackman(outputArray : NDArray seq, M : int, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiBlackman(outputArray : NDArray seq, M : int, ctx : Context, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_npi_blackman"
         let names = [|"M"; "ctx"; "dtype"|]
         let vals = [|string M; string ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -13717,7 +13717,7 @@ type MX() =
     /// <summary>Return the Blackman window.The Blackman window is a taper formed by using a weighted cosine.</summary>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiBlackman(M : int, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member NpiBlackman(M : int, [<Optional>] ?dtype : DataType) =
         NpiBlackman(M, ?dtype = dtype)
 
     /// <summary>random choice</summary>
@@ -23243,7 +23243,7 @@ type MX() =
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
-    static member AmpCast(data : NDArray, dtype : IntOrFloatDType) =
+    static member AmpCast(data : NDArray, dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "amp_cast"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -23259,7 +23259,7 @@ type MX() =
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
-    static member AmpCast(outputArray : NDArray seq, data : NDArray, dtype : IntOrFloatDType) =
+    static member AmpCast(outputArray : NDArray seq, data : NDArray, dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "amp_cast"
         let names = [|"dtype"|]
         let vals = [|string dtype|]
@@ -23278,7 +23278,7 @@ type MX() =
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
-    static member AmpCast(data : Symbol, dtype : IntOrFloatDType) =
+    static member AmpCast(data : Symbol, dtype : DataType) =
         AmpCast(data, dtype)
     /// <summary>Cast function between low precision float/FP32 used by AMP.
     /// 
@@ -23288,7 +23288,7 @@ type MX() =
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
     /// <param name="dtype">Output data type.</param>
     /// <param name="data">The input.</param>
-    static member AmpCast(dtype : IntOrFloatDType, [<Optional>] ?data : Symbol) =
+    static member AmpCast(dtype : DataType, [<Optional>] ?data : Symbol) =
         AmpCast(dtype, ?data = data)
 
 
@@ -23573,7 +23573,7 @@ type MX() =
     static member Norm(data : NDArray, 
                        [<Optional>] ?ord : int, 
                        [<Optional>] ?axis : int seq, 
-                       [<Optional>] ?outDtype : OutDtype, 
+                       [<Optional>] ?outDtype : DataType, 
                        [<Optional>] ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "norm"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
@@ -23626,7 +23626,7 @@ type MX() =
                        data : NDArray, 
                        [<Optional>] ?ord : int, 
                        [<Optional>] ?axis : int seq, 
-                       [<Optional>] ?outDtype : OutDtype, 
+                       [<Optional>] ?outDtype : DataType, 
                        [<Optional>] ?keepdims : bool) =
         let creator = AtomicSymbolCreator.FromName "norm"
         let names = [|"ord"; "axis"; "out_dtype"; "keepdims"|]
@@ -23678,7 +23678,7 @@ type MX() =
     ///       and the matrix norms of these matrices are computed.</param>
     /// <param name="outDtype">The data type of the output.</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
-    static member Norm([<Optional>] ?data : Symbol, [<Optional>] ?ord : int, [<Optional>] ?axis : int seq, [<Optional>] ?outDtype : OutDtype, [<Optional>] ?keepdims : bool) =
+    static member Norm([<Optional>] ?data : Symbol, [<Optional>] ?ord : int, [<Optional>] ?axis : int seq, [<Optional>] ?outDtype : DataType, [<Optional>] ?keepdims : bool) =
         Norm(?data = data, ?ord = ord, ?axis = axis, ?outDtype = outDtype, ?keepdims = keepdims)
 
 
@@ -29911,7 +29911,7 @@ type MX() =
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L664</summary>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
-    static member Cast(data : NDArray, dtype : IntOrFloatDType) =
+    static member Cast(data : NDArray, dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "Cast"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -29934,7 +29934,7 @@ type MX() =
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
-    static member Cast(outputArray : NDArray seq, data : NDArray, dtype : IntOrFloatDType) =
+    static member Cast(outputArray : NDArray seq, data : NDArray, dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "Cast"
         let names = [|"dtype"|]
         let vals = [|string dtype|]
@@ -29960,7 +29960,7 @@ type MX() =
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L664</summary>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
-    static member Cast(data : Symbol, dtype : IntOrFloatDType) =
+    static member Cast(data : Symbol, dtype : DataType) =
         Cast(data, dtype)
     /// <summary>Casts all elements of the input to a new type.
     /// 
@@ -29977,7 +29977,7 @@ type MX() =
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L664</summary>
     /// <param name="dtype">Output data type.</param>
     /// <param name="data">The input.</param>
-    static member Cast(dtype : IntOrFloatDType, [<Optional>] ?data : Symbol) =
+    static member Cast(dtype : DataType, [<Optional>] ?data : Symbol) =
         Cast(dtype, ?data = data)
 
 
@@ -32721,7 +32721,7 @@ type MX() =
                             weight : NDArray, 
                             inputDim : int, 
                             outputDim : int, 
-                            [<Optional>] dtype : IntOrFloatDType, 
+                            [<Optional>] dtype : DataType, 
                             [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
         let creator = AtomicSymbolCreator.FromName "Embedding"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
@@ -32795,7 +32795,7 @@ type MX() =
                             weight : NDArray, 
                             inputDim : int, 
                             outputDim : int, 
-                            [<Optional>] dtype : IntOrFloatDType, 
+                            [<Optional>] dtype : DataType, 
                             [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
         let creator = AtomicSymbolCreator.FromName "Embedding"
         let names = [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
@@ -32867,7 +32867,7 @@ type MX() =
     /// <param name="outputDim">Dimension of the embedding vectors.</param>
     /// <param name="dtype">Data type of weight.</param>
     /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
-    static member Embedding(data : Symbol, weight : Symbol, inputDim : int, outputDim : int, [<Optional>] ?dtype : IntOrFloatDType, [<Optional>] ?sparseGrad : bool) =
+    static member Embedding(data : Symbol, weight : Symbol, inputDim : int, outputDim : int, [<Optional>] ?dtype : DataType, [<Optional>] ?sparseGrad : bool) =
         Embedding(data, weight, inputDim, outputDim, ?dtype = dtype, ?sparseGrad = sparseGrad)
     /// <summary>Maps integer indices to vector representations (embeddings).
     /// 
@@ -32929,7 +32929,7 @@ type MX() =
     /// <param name="weight">The embedding weight matrix.</param>
     /// <param name="dtype">Data type of weight.</param>
     /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
-    static member Embedding(inputDim : int, outputDim : int, [<Optional>] ?data : Symbol, [<Optional>] ?weight : Symbol, [<Optional>] ?dtype : IntOrFloatDType, [<Optional>] ?sparseGrad : bool) =
+    static member Embedding(inputDim : int, outputDim : int, [<Optional>] ?data : Symbol, [<Optional>] ?weight : Symbol, [<Optional>] ?dtype : DataType, [<Optional>] ?sparseGrad : bool) =
         Embedding(inputDim, outputDim, ?data = data, ?weight = weight, ?dtype = dtype, ?sparseGrad = sparseGrad)
 
     /// <summary>Maps integer indices to vector representations (embeddings).
@@ -32994,7 +32994,7 @@ type MX() =
                                          weight : NDArray, 
                                          inputDim : int, 
                                          outputDim : int, 
-                                         [<Optional>] dtype : IntOrFloatDType, 
+                                         [<Optional>] dtype : DataType, 
                                          [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_SparseEmbedding"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
@@ -33066,7 +33066,7 @@ type MX() =
                                          weight : NDArray, 
                                          inputDim : int, 
                                          outputDim : int, 
-                                         [<Optional>] dtype : IntOrFloatDType, 
+                                         [<Optional>] dtype : DataType, 
                                          [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_SparseEmbedding"
         let names = [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
@@ -33136,7 +33136,7 @@ type MX() =
     /// <param name="outputDim">Dimension of the embedding vectors.</param>
     /// <param name="dtype">Data type of weight.</param>
     /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
-    static member ContribSparseEmbedding(data : Symbol, weight : Symbol, inputDim : int, outputDim : int, [<Optional>] ?dtype : IntOrFloatDType, [<Optional>] ?sparseGrad : bool) =
+    static member ContribSparseEmbedding(data : Symbol, weight : Symbol, inputDim : int, outputDim : int, [<Optional>] ?dtype : DataType, [<Optional>] ?sparseGrad : bool) =
         ContribSparseEmbedding(data, weight, inputDim, outputDim, ?dtype = dtype, ?sparseGrad = sparseGrad)
     /// <summary>Maps integer indices to vector representations (embeddings).
     /// 
@@ -33196,7 +33196,7 @@ type MX() =
     /// <param name="weight">The embedding weight matrix.</param>
     /// <param name="dtype">Data type of weight.</param>
     /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
-    static member ContribSparseEmbedding(inputDim : int, outputDim : int, [<Optional>] ?data : Symbol, [<Optional>] ?weight : Symbol, [<Optional>] ?dtype : IntOrFloatDType, [<Optional>] ?sparseGrad : bool) =
+    static member ContribSparseEmbedding(inputDim : int, outputDim : int, [<Optional>] ?data : Symbol, [<Optional>] ?weight : Symbol, [<Optional>] ?dtype : DataType, [<Optional>] ?sparseGrad : bool) =
         ContribSparseEmbedding(inputDim, outputDim, ?data = data, ?weight = weight, ?dtype = dtype, ?sparseGrad = sparseGrad)
 
 
@@ -33530,7 +33530,7 @@ type MX() =
                          depth : int, 
                          [<Optional; DefaultParameterValue(1.0)>] onValue : double, 
                          [<Optional; DefaultParameterValue(0.0)>] offValue : double, 
-                         [<Optional>] dtype : IntOrFloatDType) =
+                         [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "one_hot"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|indices.NDArrayHandle.UnsafeHandle|]
@@ -33583,7 +33583,7 @@ type MX() =
                          depth : int, 
                          [<Optional; DefaultParameterValue(1.0)>] onValue : double, 
                          [<Optional; DefaultParameterValue(0.0)>] offValue : double, 
-                         [<Optional>] dtype : IntOrFloatDType) =
+                         [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "one_hot"
         let names = [|"depth"; "on_value"; "off_value"; "dtype"|]
         let vals = [|string depth; string onValue; string offValue; (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -33634,7 +33634,7 @@ type MX() =
     /// <param name="onValue">The value assigned to the locations represented by indices.</param>
     /// <param name="offValue">The value assigned to the locations not represented by indices.</param>
     /// <param name="dtype">DType of the output</param>
-    static member OneHot(indices : Symbol, depth : int, [<Optional>] ?onValue : double, [<Optional>] ?offValue : double, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member OneHot(indices : Symbol, depth : int, [<Optional>] ?onValue : double, [<Optional>] ?offValue : double, [<Optional>] ?dtype : DataType) =
         OneHot(indices, depth, ?onValue = onValue, ?offValue = offValue, ?dtype = dtype)
     /// <summary>Returns a one-hot array.
     /// 
@@ -33676,7 +33676,7 @@ type MX() =
     /// <param name="onValue">The value assigned to the locations represented by indices.</param>
     /// <param name="offValue">The value assigned to the locations not represented by indices.</param>
     /// <param name="dtype">DType of the output</param>
-    static member OneHot(depth : int, [<Optional>] ?indices : Symbol, [<Optional>] ?onValue : double, [<Optional>] ?offValue : double, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member OneHot(depth : int, [<Optional>] ?indices : Symbol, [<Optional>] ?onValue : double, [<Optional>] ?offValue : double, [<Optional>] ?dtype : DataType) =
         OneHot(depth, ?indices = indices, ?onValue = onValue, ?offValue = offValue, ?dtype = dtype)
 
     /// <summary>Gather elements or slices from `data` and store to a tensor whose
@@ -34136,7 +34136,7 @@ type MX() =
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member ZerosNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
+    static member ZerosNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_zeros"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -34148,7 +34148,7 @@ type MX() =
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member Zeros(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
+    static member Zeros(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_zeros"
         let names = [|"ctx"; "shape"; "dtype"|]
         let vals = [|string ctx; (if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -34162,7 +34162,7 @@ type MX() =
     /// <summary>fill target with zeros</summary>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member Zeros([<Optional>] ?shape : int seq, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member Zeros([<Optional>] ?shape : int seq, [<Optional>] ?dtype : DataType) =
         Zeros(?shape = shape, ?dtype = dtype)
 
     /// <summary>Return a 2-D array with ones on the diagonal and zeros elsewhere.</summary>
@@ -34175,7 +34175,7 @@ type MX() =
                              ctx : Context, 
                              [<Optional; DefaultParameterValue(0L)>] M : int64, 
                              [<Optional; DefaultParameterValue(0L)>] k : int64, 
-                             [<Optional>] dtype : IntOrFloatDType) =
+                             [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_eye"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -34194,7 +34194,7 @@ type MX() =
                       ctx : Context, 
                       [<Optional; DefaultParameterValue(0L)>] M : int64, 
                       [<Optional; DefaultParameterValue(0L)>] k : int64, 
-                      [<Optional>] dtype : IntOrFloatDType) =
+                      [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_eye"
         let names = [|"N"; "ctx"; "M"; "k"; "dtype"|]
         let vals = [|string N; string ctx; string M; string k; (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -34210,14 +34210,14 @@ type MX() =
     /// <param name="M">Number of columns in the output. If 0, defaults to N</param>
     /// <param name="k">Index of the diagonal. 0 (the default) refers to the main diagonal.A positive value refers to an upper diagonal.A negative value to a lower diagonal.</param>
     /// <param name="dtype">Target data type.</param>
-    static member Eye(N : int64, [<Optional>] ?M : int64, [<Optional>] ?k : int64, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member Eye(N : int64, [<Optional>] ?M : int64, [<Optional>] ?k : int64, [<Optional>] ?dtype : DataType) =
         Eye(N, ?M = M, ?k = k, ?dtype = dtype)
 
     /// <summary>fill target with ones</summary>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member OnesNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
+    static member OnesNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_ones"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -34229,7 +34229,7 @@ type MX() =
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member Ones(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
+    static member Ones(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_ones"
         let names = [|"ctx"; "shape"; "dtype"|]
         let vals = [|string ctx; (if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -34243,7 +34243,7 @@ type MX() =
     /// <summary>fill target with ones</summary>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member Ones([<Optional>] ?shape : int seq, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member Ones([<Optional>] ?shape : int seq, [<Optional>] ?dtype : DataType) =
         Ones(?shape = shape, ?dtype = dtype)
 
     /// <summary>fill target with a scalar value</summary>
@@ -34251,7 +34251,7 @@ type MX() =
     /// <param name="value">Value with which to fill newly created tensor</param>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member FullNDArray(ctx : Context, value : double, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
+    static member FullNDArray(ctx : Context, value : double, [<Optional>] shape : int seq, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_full"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -34264,7 +34264,7 @@ type MX() =
     /// <param name="value">Value with which to fill newly created tensor</param>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member Full(outputArray : NDArray seq, ctx : Context, value : double, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
+    static member Full(outputArray : NDArray seq, ctx : Context, value : double, [<Optional>] shape : int seq, [<Optional>] dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_full"
         let names = [|"ctx"; "value"; "shape"; "dtype"|]
         let vals = [|string ctx; string value; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -34279,7 +34279,7 @@ type MX() =
     /// <param name="value">Value with which to fill newly created tensor</param>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member Full(value : double, [<Optional>] ?shape : int seq, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member Full(value : double, [<Optional>] ?shape : int seq, [<Optional>] ?dtype : DataType) =
         Full(value, ?shape = shape, ?dtype = dtype)
 
     /// <summary>Return evenly spaced values within a given interval. Similar to Numpy</summary>
@@ -34296,7 +34296,7 @@ type MX() =
                                 [<Optional>] ?step : double, 
                                 [<Optional>] ?repeat : int, 
                                 [<Optional>] ?inferRange : bool, 
-                                [<Optional>] ?dtype : IntOrFloatDType) =
+                                [<Optional>] ?dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_arange"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -34319,7 +34319,7 @@ type MX() =
                          [<Optional>] ?step : double, 
                          [<Optional>] ?repeat : int, 
                          [<Optional>] ?inferRange : bool, 
-                         [<Optional>] ?dtype : IntOrFloatDType) =
+                         [<Optional>] ?dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_arange"
         let names = [|"start"; "ctx"; "stop"; "step"; "repeat"; "infer_range"; "dtype"|]
         let vals = [|string start; string ctx; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
@@ -34337,7 +34337,7 @@ type MX() =
     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
     /// <param name="dtype">Target data type.</param>
-    static member Arange(start : double, [<Optional>] ?stop : float, [<Optional>] ?step : double, [<Optional>] ?repeat : int, [<Optional>] ?inferRange : bool, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member Arange(start : double, [<Optional>] ?stop : float, [<Optional>] ?step : double, [<Optional>] ?repeat : int, [<Optional>] ?inferRange : bool, [<Optional>] ?dtype : DataType) =
         Arange(start, ?stop = stop, ?step = step, ?repeat = repeat, ?inferRange = inferRange, ?dtype = dtype)
 
     /// <summary>Return an array with evenly spaced values. If axis is not given, the output will 
@@ -34473,7 +34473,7 @@ type MX() =
                                   [<Optional>] ?step : double, 
                                   [<Optional>] ?repeat : int, 
                                   [<Optional>] ?inferRange : bool, 
-                                  [<Optional>] ?dtype : IntOrFloatDType) =
+                                  [<Optional>] ?dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_linspace"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -34496,7 +34496,7 @@ type MX() =
                            [<Optional>] ?step : double, 
                            [<Optional>] ?repeat : int, 
                            [<Optional>] ?inferRange : bool, 
-                           [<Optional>] ?dtype : IntOrFloatDType) =
+                           [<Optional>] ?dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "_linspace"
         let names = [|"start"; "ctx"; "stop"; "step"; "repeat"; "infer_range"; "dtype"|]
         let vals = [|string start; string ctx; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
@@ -34514,7 +34514,7 @@ type MX() =
     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
     /// <param name="dtype">Target data type.</param>
-    static member Linspace(start : double, [<Optional>] ?stop : float, [<Optional>] ?step : double, [<Optional>] ?repeat : int, [<Optional>] ?inferRange : bool, [<Optional>] ?dtype : IntOrFloatDType) =
+    static member Linspace(start : double, [<Optional>] ?stop : float, [<Optional>] ?step : double, [<Optional>] ?repeat : int, [<Optional>] ?inferRange : bool, [<Optional>] ?dtype : DataType) =
         Linspace(start, ?stop = stop, ?step = step, ?repeat = repeat, ?inferRange = inferRange, ?dtype = dtype)
 
     /// <summary>Return an array of zeros with the same shape, type and storage type
@@ -39725,7 +39725,7 @@ type MX() =
                        [<Optional>] ?k : int, 
                        [<Optional>] ?retTyp : RetTyp, 
                        [<Optional>] ?isAscend : bool, 
-                       [<Optional>] ?dtype : TopkDtype) =
+                       [<Optional>] ?dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "topk"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -39776,7 +39776,7 @@ type MX() =
                        [<Optional>] ?k : int, 
                        [<Optional>] ?retTyp : RetTyp, 
                        [<Optional>] ?isAscend : bool, 
-                       [<Optional>] ?dtype : TopkDtype) =
+                       [<Optional>] ?dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "topk"
         let names = [|"axis"; "k"; "ret_typ"; "is_ascend"; "dtype"|]
         let vals = [|(match axis with None -> "None" | Some axis -> string axis); (match k with None -> "1" | Some k -> string k); (match retTyp with None -> "indices" | Some retTyp -> string retTyp); (match isAscend with None -> "false" | Some isAscend -> string isAscend); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
@@ -39824,7 +39824,7 @@ type MX() =
     ///  &quot;value&quot; means to return the top k values, &quot;indices&quot; means to return the indices of the top k values, &quot;mask&quot; means to return a mask array containing 0 and 1. 1 means the top k values. &quot;both&quot; means to return a list of both values and indices of top k elements.</param>
     /// <param name="isAscend">Whether to choose k largest or k smallest elements. Top K largest elements will be chosen if set to false.</param>
     /// <param name="dtype">DType of the output indices when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
-    static member Topk([<Optional>] ?data : Symbol, [<Optional>] ?axis : int, [<Optional>] ?k : int, [<Optional>] ?retTyp : RetTyp, [<Optional>] ?isAscend : bool, [<Optional>] ?dtype : TopkDtype) =
+    static member Topk([<Optional>] ?data : Symbol, [<Optional>] ?axis : int, [<Optional>] ?k : int, [<Optional>] ?retTyp : RetTyp, [<Optional>] ?isAscend : bool, [<Optional>] ?dtype : DataType) =
         Topk(?data = data, ?axis = axis, ?k = k, ?retTyp = retTyp, ?isAscend = isAscend, ?dtype = dtype)
 
 
@@ -39961,7 +39961,7 @@ type MX() =
     /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
     /// <param name="dtype">DType of the output indices. It is only valid when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
-    static member Argsort(data : NDArray, [<Optional>] ?axis : int, [<Optional>] ?isAscend : bool, [<Optional>] ?dtype : ArgsortDtype) =
+    static member Argsort(data : NDArray, [<Optional>] ?axis : int, [<Optional>] ?isAscend : bool, [<Optional>] ?dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "argsort"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -39996,7 +39996,7 @@ type MX() =
     /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
     /// <param name="dtype">DType of the output indices. It is only valid when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
-    static member Argsort(outputArray : NDArray seq, data : NDArray, [<Optional>] ?axis : int, [<Optional>] ?isAscend : bool, [<Optional>] ?dtype : ArgsortDtype) =
+    static member Argsort(outputArray : NDArray seq, data : NDArray, [<Optional>] ?axis : int, [<Optional>] ?isAscend : bool, [<Optional>] ?dtype : DataType) =
         let creator = AtomicSymbolCreator.FromName "argsort"
         let names = [|"axis"; "is_ascend"; "dtype"|]
         let vals = [|(match axis with None -> "None" | Some axis -> string axis); (match isAscend with None -> "true" | Some isAscend -> string isAscend); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
@@ -40034,7 +40034,7 @@ type MX() =
     /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
     /// <param name="dtype">DType of the output indices. It is only valid when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.</param>
-    static member Argsort([<Optional>] ?data : Symbol, [<Optional>] ?axis : int, [<Optional>] ?isAscend : bool, [<Optional>] ?dtype : ArgsortDtype) =
+    static member Argsort([<Optional>] ?data : Symbol, [<Optional>] ?axis : int, [<Optional>] ?isAscend : bool, [<Optional>] ?dtype : DataType) =
         Argsort(?data = data, ?axis = axis, ?isAscend = isAscend, ?dtype = dtype)
 
     /// <summary>Converts a batch of index arrays into an array of flat indices. The operator follows numpy conventions so a single multi index is given by a column of the input matrix. The leading dimension may be left unspecified by using -1 as placeholder.  

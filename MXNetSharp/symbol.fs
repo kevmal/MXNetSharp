@@ -8896,7 +8896,7 @@ module SymbolOperators =
         /// <param name="initial">Starting value for the sum.</param>
         new([<Optional>] ?a : Symbol,
             [<Optional>] ?axis : int seq,
-            [<Optional>] ?dtype : NpSumDtype,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?keepdims : bool,
             [<Optional>] ?initial : float) = 
             let a = defaultArg a (new ImplicitVariable() :> Symbol)
@@ -8914,7 +8914,7 @@ module SymbolOperators =
         static member AxisDefault : int [] option = None
         /// Default value for Dtype
         /// The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.
-        static member DtypeDefault : NpSumDtype option = None
+        static member DtypeDefault : DataType option = None
         /// Default value for Keepdims
         /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
         static member KeepdimsDefault : bool = false
@@ -8939,7 +8939,7 @@ module SymbolOperators =
         /// <param name="initial">Starting value for the sum.</param>
         member this.With([<Optional>] ?a : Symbol,
             [<Optional>] ?axis : int seq,
-            [<Optional>] ?dtype : NpSumDtype,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?keepdims : bool,
             [<Optional>] ?initial : float) = 
             let operatorArguments = 
@@ -9081,7 +9081,7 @@ module SymbolOperators =
         /// <param name="initial">Starting value for the sum.</param>
         new([<Optional>] ?a : Symbol,
             [<Optional>] ?axis : int seq,
-            [<Optional>] ?dtype : NpProdDtype,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?keepdims : bool,
             [<Optional>] ?initial : float) = 
             let a = defaultArg a (new ImplicitVariable() :> Symbol)
@@ -9099,7 +9099,7 @@ module SymbolOperators =
         static member AxisDefault : int [] option = None
         /// Default value for Dtype
         /// The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.
-        static member DtypeDefault : NpProdDtype option = None
+        static member DtypeDefault : DataType option = None
         /// Default value for Keepdims
         /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
         static member KeepdimsDefault : bool = false
@@ -9124,7 +9124,7 @@ module SymbolOperators =
         /// <param name="initial">Starting value for the sum.</param>
         member this.With([<Optional>] ?a : Symbol,
             [<Optional>] ?axis : int seq,
-            [<Optional>] ?dtype : NpProdDtype,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?keepdims : bool,
             [<Optional>] ?initial : float) = 
             let operatorArguments = 
@@ -9148,7 +9148,7 @@ module SymbolOperators =
         /// <param name="initial">Starting value for the sum.</param>
         new([<Optional>] ?a : Symbol,
             [<Optional>] ?axis : int seq,
-            [<Optional>] ?dtype : NpiMeanDtype,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?keepdims : bool,
             [<Optional>] ?initial : float) = 
             let a = defaultArg a (new ImplicitVariable() :> Symbol)
@@ -9166,7 +9166,7 @@ module SymbolOperators =
         static member AxisDefault : int [] option = None
         /// Default value for Dtype
         /// The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.
-        static member DtypeDefault : NpiMeanDtype option = None
+        static member DtypeDefault : DataType option = None
         /// Default value for Keepdims
         /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
         static member KeepdimsDefault : bool = false
@@ -9191,7 +9191,7 @@ module SymbolOperators =
         /// <param name="initial">Starting value for the sum.</param>
         member this.With([<Optional>] ?a : Symbol,
             [<Optional>] ?axis : int seq,
-            [<Optional>] ?dtype : NpiMeanDtype,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?keepdims : bool,
             [<Optional>] ?initial : float) = 
             let operatorArguments = 
@@ -9215,7 +9215,7 @@ module SymbolOperators =
         /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
         new([<Optional>] ?a : Symbol,
             [<Optional>] ?axis : int seq,
-            [<Optional>] ?dtype : NpiStdDtype,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?ddof : int,
             [<Optional>] ?keepdims : bool) = 
             let a = defaultArg a (new ImplicitVariable() :> Symbol)
@@ -9233,7 +9233,7 @@ module SymbolOperators =
         static member AxisDefault : int [] option = None
         /// Default value for Dtype
         /// The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.
-        static member DtypeDefault : NpiStdDtype option = None
+        static member DtypeDefault : DataType option = None
         /// Default value for Ddof
         /// Starting value for the sum.
         static member DdofDefault : int = 0
@@ -9258,7 +9258,7 @@ module SymbolOperators =
         /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
         member this.With([<Optional>] ?a : Symbol,
             [<Optional>] ?axis : int seq,
-            [<Optional>] ?dtype : NpiStdDtype,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?ddof : int,
             [<Optional>] ?keepdims : bool) = 
             let operatorArguments = 
@@ -9282,7 +9282,7 @@ module SymbolOperators =
         /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
         new([<Optional>] ?a : Symbol,
             [<Optional>] ?axis : int seq,
-            [<Optional>] ?dtype : NpiVarDtype,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?ddof : int,
             [<Optional>] ?keepdims : bool) = 
             let a = defaultArg a (new ImplicitVariable() :> Symbol)
@@ -9300,7 +9300,7 @@ module SymbolOperators =
         static member AxisDefault : int [] option = None
         /// Default value for Dtype
         /// The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.
-        static member DtypeDefault : NpiVarDtype option = None
+        static member DtypeDefault : DataType option = None
         /// Default value for Ddof
         /// Starting value for the sum.
         static member DdofDefault : int = 0
@@ -9325,7 +9325,7 @@ module SymbolOperators =
         /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
         member this.With([<Optional>] ?a : Symbol,
             [<Optional>] ?axis : int seq,
-            [<Optional>] ?dtype : NpiVarDtype,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?ddof : int,
             [<Optional>] ?keepdims : bool) = 
             let operatorArguments = 
@@ -9384,7 +9384,7 @@ module SymbolOperators =
         /// <param name="dtype">Type of the returned array and of the accumulator in which the elements are summed. If dtype is not specified, it defaults to the dtype of a, unless a has an integer dtype with a precision less than that of the default platform integer. In that case, the default platform integer is used.</param>
         new([<Optional>] ?a : Symbol,
             [<Optional>] ?axis : int,
-            [<Optional>] ?dtype : NpCumsumDtype) = 
+            [<Optional>] ?dtype : DataType) = 
             let a = defaultArg a (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
@@ -9398,7 +9398,7 @@ module SymbolOperators =
         static member AxisDefault : int option = None
         /// Default value for Dtype
         /// Type of the returned array and of the accumulator in which the elements are summed. If dtype is not specified, it defaults to the dtype of a, unless a has an integer dtype with a precision less than that of the default platform integer. In that case, the default platform integer is used.
-        static member DtypeDefault : NpCumsumDtype option = None
+        static member DtypeDefault : DataType option = None
         /// Input ndarray
         member __.A = operatorArguments.GetInput "a"
         /// Axis along which the cumulative sum is computed. The default (None) is to compute the cumsum over the flattened array.
@@ -9411,7 +9411,7 @@ module SymbolOperators =
         /// <param name="dtype">Type of the returned array and of the accumulator in which the elements are summed. If dtype is not specified, it defaults to the dtype of a, unless a has an integer dtype with a precision less than that of the default platform integer. In that case, the default platform integer is used.</param>
         member this.With([<Optional>] ?a : Symbol,
             [<Optional>] ?axis : int,
-            [<Optional>] ?dtype : NpCumsumDtype) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     a |> Option.map (fun x -> "a", Input x)
@@ -11371,7 +11371,7 @@ module SymbolOperators =
         /// <param name="shape">The shape of the output</param>
         /// <param name="dtype">Target data type.</param>
         new([<Optional>] ?shape : int seq,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     "shape", shape |> Option.map box |> Parameter
@@ -11383,7 +11383,7 @@ module SymbolOperators =
         static member ShapeDefault : int [] = [||]
         /// Default value for Dtype
         /// Target data type.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// The shape of the output
         member __.Shape = operatorArguments.GetParameter("shape", NpiZeros.ShapeDefault)
         /// Target data type.
@@ -11392,7 +11392,7 @@ module SymbolOperators =
         /// <param name="shape">The shape of the output</param>
         /// <param name="dtype">Target data type.</param>
         member this.With([<Optional>] ?shape : int seq,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
@@ -11408,7 +11408,7 @@ module SymbolOperators =
         /// <param name="shape">The shape of the output</param>
         /// <param name="dtype">Target data type.</param>
         new([<Optional>] ?shape : int seq,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     "shape", shape |> Option.map box |> Parameter
@@ -11420,7 +11420,7 @@ module SymbolOperators =
         static member ShapeDefault : int [] = [||]
         /// Default value for Dtype
         /// Target data type.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// The shape of the output
         member __.Shape = operatorArguments.GetParameter("shape", NpiOnes.ShapeDefault)
         /// Target data type.
@@ -11429,7 +11429,7 @@ module SymbolOperators =
         /// <param name="shape">The shape of the output</param>
         /// <param name="dtype">Target data type.</param>
         member this.With([<Optional>] ?shape : int seq,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
@@ -11445,7 +11445,7 @@ module SymbolOperators =
         /// <param name="shape">The shape of the output</param>
         /// <param name="dtype">Target data type.</param>
         new([<Optional>] ?shape : int seq,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     "shape", shape |> Option.map box |> Parameter
@@ -11457,7 +11457,7 @@ module SymbolOperators =
         static member ShapeDefault : int [] = [||]
         /// Default value for Dtype
         /// Target data type.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// The shape of the output
         member __.Shape = operatorArguments.GetParameter("shape", NpiIdentity.ShapeDefault)
         /// Target data type.
@@ -11466,7 +11466,7 @@ module SymbolOperators =
         /// <param name="shape">The shape of the output</param>
         /// <param name="dtype">Target data type.</param>
         member this.With([<Optional>] ?shape : int seq,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
@@ -11535,7 +11535,7 @@ module SymbolOperators =
             [<Optional>] ?step : double,
             [<Optional>] ?repeat : int,
             [<Optional>] ?inferRange : bool,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     "start", Parameter(Some(box start))
@@ -11560,7 +11560,7 @@ module SymbolOperators =
         static member InferRangeDefault : bool = false
         /// Default value for Dtype
         /// Target data type.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// Start of interval. The interval includes this value. The default start value is 0.
         member __.Start : double = match operatorArguments.GetParameter "start" with Some(v) -> unbox v | None -> failwithf "Required parameter start is missing"
         /// End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.
@@ -11585,7 +11585,7 @@ module SymbolOperators =
             [<Optional>] ?step : double,
             [<Optional>] ?repeat : int,
             [<Optional>] ?inferRange : bool,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     start |> Option.map (fun x -> "start", Parameter(Some (box x)))
@@ -11605,7 +11605,7 @@ module SymbolOperators =
         /// <param name="dimensions">The shape of the grid.</param>
         /// <param name="dtype">Target data type.</param>
         new(dimensions : int seq,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     "dimensions", Parameter(Some(box dimensions))
@@ -11614,7 +11614,7 @@ module SymbolOperators =
             new NpiIndices(Arguments<Symbol>(operatorArguments))
         /// Default value for Dtype
         /// Target data type.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Int32
+        static member DtypeDefault : DataType = DataType.Int32
         /// The shape of the grid.
         member __.Dimensions : int seq = match operatorArguments.GetParameter "dimensions" with Some(v) -> unbox v | None -> failwithf "Required parameter dimensions is missing"
         /// Target data type.
@@ -11623,7 +11623,7 @@ module SymbolOperators =
         /// <param name="dimensions">The shape of the grid.</param>
         /// <param name="dtype">Target data type.</param>
         member this.With([<Optional>] ?dimensions : int seq,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     dimensions |> Option.map (fun x -> "dimensions", Parameter(Some (box x)))
@@ -12416,7 +12416,7 @@ module SymbolOperators =
         /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
         /// <param name="dtype">Data-type of the returned array.</param>
         new(M : int,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     "M", Parameter(Some(box M))
@@ -12425,7 +12425,7 @@ module SymbolOperators =
             new NpiHanning(Arguments<Symbol>(operatorArguments))
         /// Default value for Dtype
         /// Data-type of the returned array.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// Number of points in the output window. If zero or less, an empty array is returned.
         member __.M : int = match operatorArguments.GetParameter "M" with Some(v) -> unbox v | None -> failwithf "Required parameter M is missing"
         /// Data-type of the returned array.
@@ -12434,7 +12434,7 @@ module SymbolOperators =
         /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
         /// <param name="dtype">Data-type of the returned array.</param>
         member this.With([<Optional>] ?M : int,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     M |> Option.map (fun x -> "M", Parameter(Some (box x)))
@@ -12450,7 +12450,7 @@ module SymbolOperators =
         /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
         /// <param name="dtype">Data-type of the returned array.</param>
         new(M : int,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     "M", Parameter(Some(box M))
@@ -12459,7 +12459,7 @@ module SymbolOperators =
             new NpiHamming(Arguments<Symbol>(operatorArguments))
         /// Default value for Dtype
         /// Data-type of the returned array.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// Number of points in the output window. If zero or less, an empty array is returned.
         member __.M : int = match operatorArguments.GetParameter "M" with Some(v) -> unbox v | None -> failwithf "Required parameter M is missing"
         /// Data-type of the returned array.
@@ -12468,7 +12468,7 @@ module SymbolOperators =
         /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
         /// <param name="dtype">Data-type of the returned array.</param>
         member this.With([<Optional>] ?M : int,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     M |> Option.map (fun x -> "M", Parameter(Some (box x)))
@@ -12484,7 +12484,7 @@ module SymbolOperators =
         /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
         /// <param name="dtype">Data-type of the returned array.</param>
         new(M : int,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     "M", Parameter(Some(box M))
@@ -12493,7 +12493,7 @@ module SymbolOperators =
             new NpiBlackman(Arguments<Symbol>(operatorArguments))
         /// Default value for Dtype
         /// Data-type of the returned array.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// Number of points in the output window. If zero or less, an empty array is returned.
         member __.M : int = match operatorArguments.GetParameter "M" with Some(v) -> unbox v | None -> failwithf "Required parameter M is missing"
         /// Data-type of the returned array.
@@ -12502,7 +12502,7 @@ module SymbolOperators =
         /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
         /// <param name="dtype">Data-type of the returned array.</param>
         member this.With([<Optional>] ?M : int,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     M |> Option.map (fun x -> "M", Parameter(Some (box x)))
@@ -21086,7 +21086,7 @@ module SymbolOperators =
         /// <param name="data">The input.</param>
         /// <param name="dtype">Output data type.</param>
         new(data : Symbol,
-            dtype : IntOrFloatDType) = 
+            dtype : DataType) = 
             let operatorArguments = 
                 [
                     "data", Input data
@@ -21101,7 +21101,7 @@ module SymbolOperators =
         /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
         /// <param name="dtype">Output data type.</param>
         /// <param name="data">The input.</param>
-        new(dtype : IntOrFloatDType,
+        new(dtype : DataType,
             [<Optional>] ?data : Symbol) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
@@ -21113,12 +21113,12 @@ module SymbolOperators =
         /// The input.
         member __.Data = operatorArguments.GetInput "data"
         /// Output data type.
-        member __.Dtype : IntOrFloatDType = match operatorArguments.GetParameter "dtype" with Some(v) -> unbox v | None -> failwithf "Required parameter dtype is missing"
+        member __.Dtype : DataType = match operatorArguments.GetParameter "dtype" with Some(v) -> unbox v | None -> failwithf "Required parameter dtype is missing"
         /// <summary>Copy AmpCast instance with updated inputs/parameters.</summary>
         /// <param name="data">The input.</param>
         /// <param name="dtype">Output data type.</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
@@ -21467,7 +21467,7 @@ module SymbolOperators =
         new([<Optional>] ?data : Symbol,
             [<Optional>] ?ord : int,
             [<Optional>] ?axis : int seq,
-            [<Optional>] ?outDtype : OutDtype,
+            [<Optional>] ?outDtype : DataType,
             [<Optional>] ?keepdims : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
@@ -21492,7 +21492,7 @@ module SymbolOperators =
         static member AxisDefault : int [] option = None
         /// Default value for OutDtype
         /// The data type of the output.
-        static member OutDtypeDefault : OutDtype option = None
+        static member OutDtypeDefault : DataType option = None
         /// Default value for Keepdims
         /// If this is set to `True`, the reduced axis is left in the result as dimension with size one.
         static member KeepdimsDefault : bool = false
@@ -21525,7 +21525,7 @@ module SymbolOperators =
         member this.With([<Optional>] ?data : Symbol,
             [<Optional>] ?ord : int,
             [<Optional>] ?axis : int seq,
-            [<Optional>] ?outDtype : OutDtype,
+            [<Optional>] ?outDtype : DataType,
             [<Optional>] ?keepdims : bool) = 
             let operatorArguments = 
                 [
@@ -26365,7 +26365,7 @@ module SymbolOperators =
         /// <param name="data">The input.</param>
         /// <param name="dtype">Output data type.</param>
         new(data : Symbol,
-            dtype : IntOrFloatDType) = 
+            dtype : DataType) = 
             let operatorArguments = 
                 [
                     "data", Input data
@@ -26387,7 +26387,7 @@ module SymbolOperators =
         /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L664</summary>
         /// <param name="dtype">Output data type.</param>
         /// <param name="data">The input.</param>
-        new(dtype : IntOrFloatDType,
+        new(dtype : DataType,
             [<Optional>] ?data : Symbol) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
@@ -26399,12 +26399,12 @@ module SymbolOperators =
         /// The input.
         member __.Data = operatorArguments.GetInput "data"
         /// Output data type.
-        member __.Dtype : IntOrFloatDType = match operatorArguments.GetParameter "dtype" with Some(v) -> unbox v | None -> failwithf "Required parameter dtype is missing"
+        member __.Dtype : DataType = match operatorArguments.GetParameter "dtype" with Some(v) -> unbox v | None -> failwithf "Required parameter dtype is missing"
         /// <summary>Copy Cast instance with updated inputs/parameters.</summary>
         /// <param name="data">The input.</param>
         /// <param name="dtype">Output data type.</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
@@ -27991,7 +27991,7 @@ module SymbolOperators =
             weight : Symbol,
             inputDim : int,
             outputDim : int,
-            [<Optional>] ?dtype : IntOrFloatDType,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?sparseGrad : bool) = 
             let operatorArguments = 
                 [
@@ -28067,7 +28067,7 @@ module SymbolOperators =
             outputDim : int,
             [<Optional>] ?data : Symbol,
             [<Optional>] ?weight : Symbol,
-            [<Optional>] ?dtype : IntOrFloatDType,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?sparseGrad : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let weight = defaultArg weight (new ImplicitVariable() :> Symbol)
@@ -28083,7 +28083,7 @@ module SymbolOperators =
             new Embedding(Arguments<Symbol>(operatorArguments))
         /// Default value for Dtype
         /// Data type of weight.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// Default value for SparseGrad
         /// Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.
         static member SparseGradDefault : bool = false
@@ -28110,7 +28110,7 @@ module SymbolOperators =
             [<Optional>] ?weight : Symbol,
             [<Optional>] ?inputDim : int,
             [<Optional>] ?outputDim : int,
-            [<Optional>] ?dtype : IntOrFloatDType,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?sparseGrad : bool) = 
             let operatorArguments = 
                 [
@@ -28189,7 +28189,7 @@ module SymbolOperators =
             weight : Symbol,
             inputDim : int,
             outputDim : int,
-            [<Optional>] ?dtype : IntOrFloatDType,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?sparseGrad : bool) = 
             let operatorArguments = 
                 [
@@ -28263,7 +28263,7 @@ module SymbolOperators =
             outputDim : int,
             [<Optional>] ?data : Symbol,
             [<Optional>] ?weight : Symbol,
-            [<Optional>] ?dtype : IntOrFloatDType,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?sparseGrad : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let weight = defaultArg weight (new ImplicitVariable() :> Symbol)
@@ -28279,7 +28279,7 @@ module SymbolOperators =
             new ContribSparseEmbedding(Arguments<Symbol>(operatorArguments))
         /// Default value for Dtype
         /// Data type of weight.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// Default value for SparseGrad
         /// Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.
         static member SparseGradDefault : bool = false
@@ -28306,7 +28306,7 @@ module SymbolOperators =
             [<Optional>] ?weight : Symbol,
             [<Optional>] ?inputDim : int,
             [<Optional>] ?outputDim : int,
-            [<Optional>] ?dtype : IntOrFloatDType,
+            [<Optional>] ?dtype : DataType,
             [<Optional>] ?sparseGrad : bool) = 
             let operatorArguments = 
                 [
@@ -28527,7 +28527,7 @@ module SymbolOperators =
             depth : int,
             [<Optional>] ?onValue : double,
             [<Optional>] ?offValue : double,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     "indices", Input indices
@@ -28581,7 +28581,7 @@ module SymbolOperators =
             [<Optional>] ?indices : Symbol,
             [<Optional>] ?onValue : double,
             [<Optional>] ?offValue : double,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let indices = defaultArg indices (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
@@ -28600,7 +28600,7 @@ module SymbolOperators =
         static member OffValueDefault : double = 0.0
         /// Default value for Dtype
         /// DType of the output
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// array of locations where to set on_value
         member __.Indices = operatorArguments.GetInput "indices"
         /// Depth of the one hot dimension.
@@ -28621,7 +28621,7 @@ module SymbolOperators =
             [<Optional>] ?depth : int,
             [<Optional>] ?onValue : double,
             [<Optional>] ?offValue : double,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     indices |> Option.map (fun x -> "indices", Input x)
@@ -28972,7 +28972,7 @@ module SymbolOperators =
         /// <param name="shape">The shape of the output</param>
         /// <param name="dtype">Target data type.</param>
         new([<Optional>] ?shape : int seq,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     "shape", shape |> Option.map box |> Parameter
@@ -28984,7 +28984,7 @@ module SymbolOperators =
         static member ShapeDefault : int [] = [||]
         /// Default value for Dtype
         /// Target data type.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// The shape of the output
         member __.Shape = operatorArguments.GetParameter("shape", Zeros.ShapeDefault)
         /// Target data type.
@@ -28993,7 +28993,7 @@ module SymbolOperators =
         /// <param name="shape">The shape of the output</param>
         /// <param name="dtype">Target data type.</param>
         member this.With([<Optional>] ?shape : int seq,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
@@ -29013,7 +29013,7 @@ module SymbolOperators =
         new(N : int64,
             [<Optional>] ?M : int64,
             [<Optional>] ?k : int64,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     "N", Parameter(Some(box N))
@@ -29030,7 +29030,7 @@ module SymbolOperators =
         static member KDefault : int64 = 0L
         /// Default value for Dtype
         /// Target data type.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// Number of rows in the output.
         member __.N : int64 = match operatorArguments.GetParameter "N" with Some(v) -> unbox v | None -> failwithf "Required parameter N is missing"
         /// Number of columns in the output. If 0, defaults to N
@@ -29047,7 +29047,7 @@ module SymbolOperators =
         member this.With([<Optional>] ?N : int64,
             [<Optional>] ?M : int64,
             [<Optional>] ?k : int64,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     N |> Option.map (fun x -> "N", Parameter(Some (box x)))
@@ -29065,7 +29065,7 @@ module SymbolOperators =
         /// <param name="shape">The shape of the output</param>
         /// <param name="dtype">Target data type.</param>
         new([<Optional>] ?shape : int seq,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     "shape", shape |> Option.map box |> Parameter
@@ -29077,7 +29077,7 @@ module SymbolOperators =
         static member ShapeDefault : int [] = [||]
         /// Default value for Dtype
         /// Target data type.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// The shape of the output
         member __.Shape = operatorArguments.GetParameter("shape", Ones.ShapeDefault)
         /// Target data type.
@@ -29086,7 +29086,7 @@ module SymbolOperators =
         /// <param name="shape">The shape of the output</param>
         /// <param name="dtype">Target data type.</param>
         member this.With([<Optional>] ?shape : int seq,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
@@ -29104,7 +29104,7 @@ module SymbolOperators =
         /// <param name="dtype">Target data type.</param>
         new(value : double,
             [<Optional>] ?shape : int seq,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     "value", Parameter(Some(box value))
@@ -29117,7 +29117,7 @@ module SymbolOperators =
         static member ShapeDefault : int [] option = None
         /// Default value for Dtype
         /// Target data type.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// Value with which to fill newly created tensor
         member __.Value : double = match operatorArguments.GetParameter "value" with Some(v) -> unbox v | None -> failwithf "Required parameter value is missing"
         /// The shape of the output
@@ -29130,7 +29130,7 @@ module SymbolOperators =
         /// <param name="dtype">Target data type.</param>
         member this.With([<Optional>] ?value : double,
             [<Optional>] ?shape : int seq,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     value |> Option.map (fun x -> "value", Parameter(Some (box x)))
@@ -29155,7 +29155,7 @@ module SymbolOperators =
             [<Optional>] ?step : double,
             [<Optional>] ?repeat : int,
             [<Optional>] ?inferRange : bool,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     "start", Parameter(Some(box start))
@@ -29180,7 +29180,7 @@ module SymbolOperators =
         static member InferRangeDefault : bool = false
         /// Default value for Dtype
         /// Target data type.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// Start of interval. The interval includes this value. The default start value is 0.
         member __.Start : double = match operatorArguments.GetParameter "start" with Some(v) -> unbox v | None -> failwithf "Required parameter start is missing"
         /// End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.
@@ -29205,7 +29205,7 @@ module SymbolOperators =
             [<Optional>] ?step : double,
             [<Optional>] ?repeat : int,
             [<Optional>] ?inferRange : bool,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     start |> Option.map (fun x -> "start", Parameter(Some (box x)))
@@ -29323,7 +29323,7 @@ module SymbolOperators =
             [<Optional>] ?step : double,
             [<Optional>] ?repeat : int,
             [<Optional>] ?inferRange : bool,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     "start", Parameter(Some(box start))
@@ -29348,7 +29348,7 @@ module SymbolOperators =
         static member InferRangeDefault : bool = false
         /// Default value for Dtype
         /// Target data type.
-        static member DtypeDefault : IntOrFloatDType = IntOrFloatDType.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// Start of interval. The interval includes this value. The default start value is 0.
         member __.Start : double = match operatorArguments.GetParameter "start" with Some(v) -> unbox v | None -> failwithf "Required parameter start is missing"
         /// End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.
@@ -29373,7 +29373,7 @@ module SymbolOperators =
             [<Optional>] ?step : double,
             [<Optional>] ?repeat : int,
             [<Optional>] ?inferRange : bool,
-            [<Optional>] ?dtype : IntOrFloatDType) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     start |> Option.map (fun x -> "start", Parameter(Some (box x)))
@@ -32616,7 +32616,7 @@ module SymbolOperators =
             [<Optional>] ?k : int,
             [<Optional>] ?retTyp : RetTyp,
             [<Optional>] ?isAscend : bool,
-            [<Optional>] ?dtype : TopkDtype) = 
+            [<Optional>] ?dtype : DataType) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
@@ -32643,7 +32643,7 @@ module SymbolOperators =
         static member IsAscendDefault : bool = false
         /// Default value for Dtype
         /// DType of the output indices when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.
-        static member DtypeDefault : TopkDtype = TopkDtype.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// The input array
         member __.Data = operatorArguments.GetInput "data"
         /// Axis along which to choose the top k indices. If not given, the flattened array is used. Default is -1.
@@ -32670,7 +32670,7 @@ module SymbolOperators =
             [<Optional>] ?k : int,
             [<Optional>] ?retTyp : RetTyp,
             [<Optional>] ?isAscend : bool,
-            [<Optional>] ?dtype : TopkDtype) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
@@ -32786,7 +32786,7 @@ module SymbolOperators =
         new([<Optional>] ?data : Symbol,
             [<Optional>] ?axis : int,
             [<Optional>] ?isAscend : bool,
-            [<Optional>] ?dtype : ArgsortDtype) = 
+            [<Optional>] ?dtype : DataType) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
@@ -32804,7 +32804,7 @@ module SymbolOperators =
         static member IsAscendDefault : bool = true
         /// Default value for Dtype
         /// DType of the output indices. It is only valid when ret_typ is &quot;indices&quot; or &quot;both&quot;. An error will be raised if the selected data type cannot precisely represent the indices.
-        static member DtypeDefault : ArgsortDtype = ArgsortDtype.Float32
+        static member DtypeDefault : DataType = DataType.Float32
         /// The input array
         member __.Data = operatorArguments.GetInput "data"
         /// Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.
@@ -32821,7 +32821,7 @@ module SymbolOperators =
         member this.With([<Optional>] ?data : Symbol,
             [<Optional>] ?axis : int,
             [<Optional>] ?isAscend : bool,
-            [<Optional>] ?dtype : ArgsortDtype) = 
+            [<Optional>] ?dtype : DataType) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
