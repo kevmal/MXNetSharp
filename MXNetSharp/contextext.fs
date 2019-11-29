@@ -265,10 +265,9 @@ type ContextExtensions private () =
      
     /// <summary>fill target with zeros without default dtype</summary>
     /// <param name="shape">The shape of the output</param>
-    /// <param name="dtype">Target data type.</param>
     [<Extension>]
-    static member ZerosWithoutDtype(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : int) =
-        MX.ZerosWithoutDtypeNDArray(ctx, shape = shape, dtype = dtype)
+    static member ZerosWithoutDtype(ctx : Context, [<Optional>] shape : int seq) =
+        MX.ZerosWithoutDtypeNDArray(ctx, shape = shape)
     
     /// <summary>fill target with zeros</summary>
     /// <param name="shape">The shape of the output</param>
@@ -309,8 +308,8 @@ type ContextExtensions private () =
     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
     /// <param name="dtype">Target data type.</param>
     [<Extension>]
-    static member Arange(ctx : Context, start : double, [<Optional>] stop : float, [<Optional>] step : double, [<Optional>] repeat : int, [<Optional>] inferRange : bool, [<Optional>] dtype : DataType) =
-        MX.ArangeNDArray(start, ctx, stop = stop, step = step, repeat = repeat, inferRange = inferRange, dtype = dtype)
+    static member Arange(ctx : Context, start : double, [<Optional>] ?stop : float, [<Optional>] ?step : double, [<Optional>] ?repeat : int, [<Optional>] ?inferRange : bool, [<Optional>] ?dtype : DataType) =
+        MX.ArangeNDArray(start, ctx, ?stop = stop, ?step = step, ?repeat = repeat, ?inferRange = inferRange, ?dtype = dtype)
     
     /// <summary>Return an array with evenly spaced values. If axis is not given, the output will 
     /// have the same shape as the input array. Otherwise, the output will be a 1-D array with size of 

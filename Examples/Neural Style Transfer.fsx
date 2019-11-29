@@ -18,8 +18,6 @@ let outputDirectory = IO.Path.Combine(__SOURCE_DIRECTORY__, "Output")
 IO.Directory.CreateDirectory outputDirectory
 IO.Directory.SetCurrentDirectory outputDirectory
 
-let context = GPU(0)
-
 let vggParamsUrl = "https://github.com/dmlc/web-data/raw/master/mxnet/neural-style/model/vgg19.params"
 let vggParamsFile = "vgg19.params"
 
