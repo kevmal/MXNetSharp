@@ -4,6 +4,7 @@
 
 #load "load.fsx"
 open MXNetSharp
+open MXNetSharp.SymbolOperators
 open MXNetSharp.Interop
 open System
 open System.Net
@@ -18,7 +19,6 @@ IO.Directory.CreateDirectory outputDirectory
 IO.Directory.SetCurrentDirectory outputDirectory
 
 let context = GPU(0)
-let ctxStr = context.ToString()
 
 let vggParamsUrl = "https://github.com/dmlc/web-data/raw/master/mxnet/neural-style/model/vgg19.params"
 let vggParamsFile = "vgg19.params"
@@ -51,7 +51,7 @@ let loadImage (image : Image) =
                     yield float32 p.B - 103.939f
         |]
     let im = new NDArray(dat |> Array.map float32, [image.Height; image.Width; 3], context)
-    let resized = Operators.ImageResize(im, [224;224])
+    let resized = MX.ImageResize(im, [224;224])
     resized.SwapAxis(0,2).SwapAxis(1,2).Reshape([1;3;224;224])
 
 
@@ -108,7 +108,7 @@ let makeExecutor style content (inputSize : int seq) =
         |> Array.mapi 
             (fun i n -> 
                 let s = inferResult.InputShapes.[i] |> Array.map int
-                let a = Operators.ZerosNDArray(shape = s, ctx = ctxStr)
+                let a = MX.ZerosNDArray(context, shape = s)
                 if n = "data" then 
                     n, a
                 else
@@ -127,7 +127,7 @@ let makeExecutor style content (inputSize : int seq) =
         |> Array.map 
             (fun n ->
                 if n = "data" then  
-                    OpReqType.WriteTo, Operators.ZerosLike(args.[n])
+                    OpReqType.WriteTo, MX.ZerosLike(args.[n])
                 else
                     OpReqType.NullOp, new NDArray()
             )
@@ -215,13 +215,13 @@ let gradArray =
                 (fun i a ->
                     a.CopyTo(executor.Args.[sprintf "target_gram_%d" i])
                     //TODO: handle ctx parameters in op gen
-                    let w = Operators.OnesNDArray(shape = [1], ctx = ctxStr)
-                    Operators.MulScalar([|w|], w, styleWeight / double gradScale.[i])
+                    let w = MX.OnesNDArray(context, shape = [1])
+                    MX.MulScalar([|w|], w, styleWeight / double gradScale.[i])
                     w
                 )
         let w = 
-            let w = Operators.OnesNDArray(shape = [1], ctx = ctxStr)
-            Operators.MulScalar([|w|], w, contentWeight) |> ignore
+            let w = MX.OnesNDArray(context, shape = [1])
+            MX.MulScalar([|w|], w, contentWeight) |> ignore
             w
         w
     |]
@@ -268,15 +268,15 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
 // Train
 
 
-let img = Operators.RandomUniformNDArray(-0.1, 0.1, contentIn.Shape, ctx = ctxStr)
+let img = MX.RandomUniformNDArray(context, -0.1, 0.1, contentIn.Shape)
 let mutable oldImg = img.CopyTo(context)
 let clipNorm = 1.f * (img.Shape |> Array.reduce (*) |> float32)
 let tvGradExe = makeTvGradExecutor img tvWeight
 
 
-let momentum = Operators.ZerosLike(img)
+let momentum = MX.ZerosLike(img)
 let mutable lr = learningRate
-let opt w g = Operators.NagMomUpdate([w],w,g,momentum, lr, momentum = 0.95, wd = 0.0001 )
+let opt w g = MX.NagMomUpdate([w],w,g,momentum, lr, momentum = 0.95, wd = 0.0001 )
 
 // https://stackoverflow.com/questions/1922040/how-to-resize-an-image-c-sharp
 let resizeImage (image : Image) w h = 
@@ -304,9 +304,9 @@ let resizeImage (image : Image) w h =
 
 let save (filename : string) (img : NDArray) = 
     printfn "Saving %s" filename
-    let img = Operators.Reshape(img, shape = [3; 224; 224])
-    let img = Operators.SwapAxis(img,1,2)
-    let img = Operators.SwapAxis(img,0,2)
+    let img = MX.Reshape(img, shape = [3; 224; 224])
+    let img = MX.SwapAxis(img,1,2)
+    let img = MX.SwapAxis(img,0,2)
     let h = 224
     let w = 224
     //let img = Operators.ImageResize(img, contentImage.Height, contentImage.Width).[0]
@@ -338,9 +338,9 @@ let rec trainLoop epoch =
         img.CopyTo(executor.Args.["data"])
         executor.Executor.Forward(true)
         executor.Executor.Backward(gradArray)
-        let gnorm : float32 = Operators.Norm(executor.ArgGrad.["data"]).ToArray().[0]
+        let gnorm : float32 = MX.Norm(executor.ArgGrad.["data"]).ToArray().[0]
         if gnorm > clipNorm then 
-            Operators.MulScalar([executor.ArgGrad.["data"]], executor.ArgGrad.["data"], double(clipNorm / gnorm))
+            MX.MulScalar([executor.ArgGrad.["data"]], executor.ArgGrad.["data"], double(clipNorm / gnorm))
 
         let optResult = 
             match tvGradExe with 
@@ -348,14 +348,14 @@ let rec trainLoop epoch =
                 e.Executor.Forward(true)
                 let outs = e.Executor.Outputs
                 //opti
-                let g = Operators.ElemwiseAdd(executor.ArgGrad.["data"], outs.[0])
+                let g = MX.ElemwiseAdd(executor.ArgGrad.["data"], outs.[0])
                 opt img g
             | None -> 
                 opt img executor.ArgGrad.["data"]
 
         //let newImg = optResult.[0]
-        let diff = Operators.ElemwiseSub(oldImg, img)
-        let eps : float32 = Operators.ElemwiseDiv(Operators.Norm(diff), Operators.Norm(img)).ToArray().[0]
+        let diff = MX.ElemwiseSub(oldImg, img)
+        let eps : float32 = MX.ElemwiseDiv(MX.Norm(diff), MX.Norm(img)).ToArray().[0]
         oldImg <- img.CopyTo(context)
         printfn "%5d : %f" epoch eps
         if (epoch + 1) % lrScheduleDelay = 0 then 

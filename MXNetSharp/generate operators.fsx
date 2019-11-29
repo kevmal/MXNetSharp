@@ -1186,6 +1186,19 @@ let definedTypeToCode (a : ProcessedArg) =
         ]
         
             
+// **************************** Context string -> Context type*******************************
+
+Mappings.Modify
+    (fun (x : ProcessedArg) -> 
+        if x.Name = "ctx" then 
+            {x with 
+                TypeString = "Context"
+                DefaultMode  = None    
+            }
+        else 
+            x
+    )
+
 // **************************** remove underscores from param names *******************************
 
 Mappings.Modify(fun (x : ProcessedArg) -> {x with Name = toParamName x.Name} |> argDoc)
@@ -1657,12 +1670,13 @@ System.IO.File.WriteAllLines(System.IO.Path.Combine(__SOURCE_DIRECTORY__,"operat
 open System
 open System.Runtime.InteropServices
 open MXNetSharp.Interop
+open MXNetSharp.SymbolOperators
 """
         //yield! types |> breakBlocks
         ""
         //yield! symboltypes |> Seq.filter (List.isEmpty >> not) |> breakBlocks
         """
-type Operators() =  
+type MX() =  
 """  
         yield! members |> breakBlocks
         yield! skip |> breakBlocks
@@ -1677,6 +1691,7 @@ System.IO.File.WriteAllLines(System.IO.Path.Combine(__SOURCE_DIRECTORY__,"genarg
 open System
 open System.Runtime.InteropServices
 open MXNetSharp.Interop
+
 
 [<AutoOpen>]
 module GeneratedArgumentTypes = 
@@ -1702,7 +1717,7 @@ System.IO.File.WriteAllLines(symbolsFile,
             i <- i + 1
         yield lines.[i]
         i <- i + 1
-        yield! symboltypes |> Seq.filter (List.isEmpty >> not) |> breakBlocks
+        yield! symboltypes |> Seq.filter (List.isEmpty >> not) |> breakBlocks |> indent 1
         while i < lines.Length && not (lines.[i].StartsWith(endTag)) do 
             i <- i + 1
         yield lines.[i]

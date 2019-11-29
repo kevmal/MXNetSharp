@@ -15,6 +15,7 @@ open System.IO.Compression
 open Microsoft.FSharp.NativeInterop
 
 open MXNetSharp.PrimitiveOperators
+open MXNetSharp.SymbolOperators
 
 let batchSize = 128
 let nLatent = 100
@@ -52,125 +53,73 @@ let valIter   = new MNISTIter(@"t10k-images-idx3-ubyte",
                               batchSize = batchSize,
                               flat = false)
 
-let inline (.>>) (x : Symbol) (y : 'a) : 'a = 
-    let _f() = y :> SymbolOperator
-    y.ComposedWith(x) |> box |> unbox
 
-let inline (.|>) (x : ^a) (f : ^b) = 
-    let _f() = f :> SymbolOperator
-    f.Initialize()
-    let fcopy = f.Copy() :?> SymbolOperator
-    fcopy.ComposedWith(x)
 
 let withName (name) (x : #Symbol) = x.Name <- name; x
 
-let composable f = 
-    let v = Variable()
-    SymbolComposable(v,f v)
+let noise = Input("noise", [0; 1])
+let label = Input("label", [0; 1])
+let generator = 
+    let labelEmbedding = Embedding(data = label, inputDim = nClasses, outputDim = nLatent)
+    let layer n = 
+        Hole()
+        .>> FullyConnected(numHidden = n) 
+        .>> LeakyReLU(actType = LeakyReLUType.Leaky, slope = 0.2)
+        .>> BatchNorm(momentum = 0.8)
+    (Hole()*labelEmbedding)
+    .>> layer 256
+    .>> layer 512
+    .>> layer 1024
+    .>> FullyConnected(numHidden = 28*28)
+    .>> Activation(ActType.Tanh)
 
-let noise = Variable "noise"
-let label = Variable "label"
-let generator = composable (fun noise -> 
-        let labelEmbedding = Embedding(data = label, inputDim = nClasses, outputDim = nLatent)
-        let layer n = 
-            composable(fun x -> 
-                x
-                .>> FullyConnected(numHidden = n) 
-                .>> LeakyReLU(actType = LeakyReLUType.Leaky, slope = 0.2)
-                .>> BatchNorm(momentum = 0.8)
-            )
-        (noise*labelEmbedding)
-        .>> layer 256
-        .>> layer 512
-        .>> layer 1024
-        .>> FullyConnected(numHidden = 28*28)
-        .>> Activation(ActType.Tanh)
-    )
-
-let discriminator = composable (fun image -> 
-        let labelEmbedding = Embedding(data = label, inputDim = nClasses, outputDim = 28*28)
-        let dense n = 
-            composable(fun x -> 
-                x
-                .>> FullyConnected(numHidden = n) 
-                .>> LeakyReLU(actType = LeakyReLUType.Leaky, slope = 0.2)
-            )
-        (Reshape(image, [batchSize; 1; 28*28])*labelEmbedding)
-        .>> dense 512
-        .>> dense 512
-        .>> Dropout(p = 0.4, mode = DropoutMode.Training)
-        .>> dense 512
-        .>> Dropout(p = 0.4, mode = DropoutMode.Training)
-        .>> FullyConnected(1) 
-        .>> Activation(ActType.Sigmoid)
-    )
+let discriminator = 
+    let labelEmbedding = Embedding(data = label, inputDim = nClasses, outputDim = 28*28)
+    let dense n = 
+        Hole()
+        .>> FullyConnected(numHidden = n) 
+        .>> LeakyReLU(actType = LeakyReLUType.Leaky, slope = 0.2)
+    (Reshape(Hole(), [0; 1; 28*28])*labelEmbedding)
+    .>> dense 512
+    .>> dense 512
+    .>> Dropout(p = 0.4, mode = DropoutMode.Training)
+    .>> dense 512
+    .>> Dropout(p = 0.4, mode = DropoutMode.Training)
+    .>> FullyConnected(1) 
+    .>> Activation(ActType.Sigmoid)
 
 
-let inputImage = Variable "inputImage"
-let scaledImage = inputImage + 0.0 //(inputImage - 127.5) / 127.5
-
-//let valid = Ones(shape = [batchSize])    
-//let fake = Zeros(shape = [batchSize])    
-
-
-let sampledLabels = RandomRandint(0L, 10L, [batchSize])
+let inputImage = Input("inputImage", [0; 1; 28; 28])
 
 let ep = 0.000001
-let onActual = -Log(ep + (scaledImage .|> discriminator)) .>> Mean() .>> MakeLoss()
+let onActual = -Log(ep + (inputImage .|> discriminator)) .>> Mean() .>> MakeLoss()
 let onFake = -Log(ep + 1.0 - ((* freeze *) generator .|> discriminator)) .>> Mean() .>> MakeLoss()
 let gen = -Log(ep + (generator .|> (* freeze *) discriminator)) .>> Mean() .>> MakeLoss()
+let inputs = Bindings.inputs [ inputImage; label; noise ]
 
 
-let randNormal = RandomNormal(shape = [batchSize; 1; nLatent]) 
-let genNoise = 
-    randNormal.Bind(context, BindMap())
-
-
-let inputs = 
-    [
-        Binding.Arg(inputImage.Name, shape = [batchSize; 1; 28; 28], opReqType = OpReqType.NullOp, dataType = DataType.Float32)
-        Binding.Arg(label.Name, shape = [batchSize; 1], opReqType = OpReqType.NullOp, dataType = DataType.Float32)
-        Binding.Arg(noise.Name, shape = [batchSize; 1; nLatent] , opReqType = OpReqType.NullOp, dataType = DataType.Float32, ndarray = genNoise.Outputs.[0])
-    ]
-
-
-
-
-
-let q = 
+let bindings = 
     inputs
-    |> BindMap.ofSeq
-    |> BindMap.inferShapes onActual
-    |> BindMap.inferShapes onFake
-    |> BindMap.inferShapes gen
-    |> BindMap.map   
-        (fun a ->
-            match a.Shape with 
-            | Some (shape) -> 
-                //Operators.ZerosNDArray(shape, ctx = context.ToString()).[0]
-                Operators.RandomUniformNDArray(low = -0.1, high = 0.1, shape = shape, ctx = context.ToString())
-                |> a.WithNDArray
-            | None -> a
-        )
-    |> BindMap.mapArg 
-        (fun a ->
-            match a.OpReqType with 
-            | None -> {a with OpReqType = Some OpReqType.WriteTo}
-            | _ -> a
-        )
-    |> BindMap.mapArg 
-        (fun a ->
-            match a.OpReqType with 
-            | Some NullOp -> {a with Grad = Some(new NDArray())}
-            | _ -> {a with Grad = Some(Operators.ZerosLike(a.NDArray.Value))}
-        )
+    |> Bindings.ofSeq
+    |> Bindings.inferShapes onActual
+    |> Bindings.inferShapes onFake
+    |> Bindings.inferShapes gen
 
-let actualLoss = onActual.Bind(context, q)
 
-let bindOnFake = q |> BindMap.freezeGraph randNormal |> BindMap.freezeGraph generator  
+let randNormal = RandomNormal(shape = [128; 1; nLatent]) 
+let genNoise = randNormal.Bind(context)
+let trainBindings = 
+    bindings 
+    |> Bindings.batchSize 128
+    |> Bindings.init (fun a shape ->  MX.RandomUniformNDArray(context, -0.1, 0.1, shape))
+
+
+let actualLoss = onActual.Bind(context, trainBindings)
+
+let bindOnFake = trainBindings |> Bindings.freezeGraph randNormal |> Bindings.freezeGraph generator  
 let fakeLoss = onFake.Bind(context, bindOnFake)
 
-let bindGenLoss = q |> BindMap.freezeGraph discriminator
+let bindGenLoss = trainBindings |> Bindings.freezeGraph discriminator
 let genLoss = gen.Bind(context, bindGenLoss)
 
 
@@ -183,7 +132,7 @@ let optUpdate (e : Executor) =
             if scc then 
                 v
             else
-                let v = Operators.ZerosLike(a),Operators.ZerosLike(a)
+                let v = MX.ZerosLike(a),MX.ZerosLike(a)
                 d.[s] <- v
                 v
     fun () -> 
@@ -193,7 +142,7 @@ let optUpdate (e : Executor) =
                 match a with 
                 | ArgBinding ({Name = name; OpReqType = Some WriteTo; Grad = Some grad; NDArray = Some weight}) -> 
                     let m,v = lu name grad
-                    Operators.AdamUpdate([weight], weight, grad, m, v, 0.0002, 0.5)
+                    MX.AdamUpdate([weight], weight, grad, m, v, 0.0002, 0.5)
                 | _ -> ()
             )
 
@@ -201,22 +150,10 @@ let optAct = optUpdate actualLoss
 let optFake = optUpdate fakeLoss
 let optGen = optUpdate genLoss
 
-let xa = 
-    match q.TryGetValue(inputImage.Name) with 
-    | _,ArgBinding({NDArray = Some a}) -> a
-    | _ -> failwith ""
-let la = 
-    match q.TryGetValue(label.Name) with 
-    | _,ArgBinding({NDArray = Some a}) -> a
-    | _ -> failwith ""
+let xa = trainBindings.NDArray(inputImage)
+let la = trainBindings.NDArray(label) 
 
-genLoss.BindMap
-genLoss.BindMap
-|> Seq.iter (fun x -> printfn "%s" x.Name)
-
-let generated = generator.Bind(context, q)
-generated.Outputs.[0].Shape
-
+let generated = generator.Bind(context, trainBindings)
 
 
 open Avalonia

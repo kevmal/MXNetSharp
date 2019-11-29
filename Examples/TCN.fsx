@@ -7,7 +7,7 @@ open System.Runtime.InteropServices
 
 #load "load.fsx"
 open MXNetSharp
-open MXNetSharp.Interop
+open MXNetSharp.SymbolOperators
 open MXNetSharp.IO
 open System
 open System.Net
@@ -15,7 +15,6 @@ open System.IO
 open System.IO.Compression
 
 open MXNetSharp.PrimitiveOperators
-open MXNetSharp.Interop.CApi
     
 
 let withName name (symbol : #Symbol) = symbol.Name <- name; symbol

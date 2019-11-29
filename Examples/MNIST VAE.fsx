@@ -4,6 +4,7 @@ open Loadui
 
 open MXNetSharp
 open MXNetSharp.Interop
+open MXNetSharp.SymbolOperators
 open MXNetSharp.IO
 open System
 open System.Net
@@ -136,10 +137,10 @@ let ps =
             else
                 let s = s |> Seq.map int
                 TrainParameters(
-                    Operators.RandomUniformNDArray(-0.1, 0.1, s, ctx = context.ToString()), 
-                        Operators.ZerosNDArray(s, ctx = context.ToString()),
-                        Operators.ZerosNDArray(s, ctx = context.ToString()),
-                        Operators.ZerosNDArray(s, ctx = context.ToString()))
+                    MX.RandomUniformNDArray(context, -0.1, 0.1, s), 
+                        MX.ZerosNDArray(context, s),
+                        MX.ZerosNDArray(context, s),
+                        MX.ZerosNDArray(context, s))
         )
     
 let lr = 0.0005
@@ -282,7 +283,7 @@ let trainTask =
                 |> Array.iter 
                     (function 
                      | NoTrain _ -> ()
-                     | TrainParameters(w,g,mu,sd) -> Operators.AdamUpdate([w],w,g,mu,sd,lr)
+                     | TrainParameters(w,g,mu,sd) -> MX.AdamUpdate([w],w,g,mu,sd,lr)
                      )
                 mb <- mb + 1
                 if mb % 10 = 0 then 

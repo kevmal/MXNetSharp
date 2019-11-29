@@ -2,10 +2,11 @@ namespace MXNetSharp
 open System
 open System.Runtime.InteropServices
 open MXNetSharp.Interop
+open MXNetSharp.SymbolOperators
 
 
 
-type Operators() =  
+type MX() =  
 
     static member CustomFunctionNDArray() =
         let creator = AtomicSymbolCreator.FromName "_CustomFunction"
@@ -12641,24 +12642,24 @@ type Operators() =
     static member NpiAround([<Optional>] ?x : Symbol, [<Optional>] ?decimals : int) =
         NpiAround(?x = x, ?decimals = decimals)
 
-    /// <param name="shape">The shape of the output</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
+    /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiZerosNDArray([<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiZerosNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_zeros"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"shape"; "ctx"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+                                                 [|"ctx"; "shape"; "dtype"|]
+                                                 [|string ctx; (if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="shape">The shape of the output</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
+    /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiZeros(outputArray : NDArray seq, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiZeros(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_zeros"
-        let names = [|"shape"; "ctx"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+        let names = [|"ctx"; "shape"; "dtype"|]
+        let vals = [|string ctx; (if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -12672,25 +12673,25 @@ type Operators() =
         NpiZeros(?shape = shape, ?dtype = dtype)
 
     /// <summary>Return a new array of given shape, type, and context, filled with ones.</summary>
-    /// <param name="shape">The shape of the output</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
+    /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiOnesNDArray([<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiOnesNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_ones"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"shape"; "ctx"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+                                                 [|"ctx"; "shape"; "dtype"|]
+                                                 [|string ctx; (if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Return a new array of given shape, type, and context, filled with ones.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="shape">The shape of the output</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
+    /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiOnes(outputArray : NDArray seq, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiOnes(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_ones"
-        let names = [|"shape"; "ctx"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+        let names = [|"ctx"; "shape"; "dtype"|]
+        let vals = [|string ctx; (if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -12705,25 +12706,25 @@ type Operators() =
         NpiOnes(?shape = shape, ?dtype = dtype)
 
     /// <summary>Return a new identity array of given shape, type, and context.</summary>
-    /// <param name="shape">The shape of the output</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
+    /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiIdentityNDArray([<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiIdentityNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_identity"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"shape"; "ctx"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+                                                 [|"ctx"; "shape"; "dtype"|]
+                                                 [|string ctx; (if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Return a new identity array of given shape, type, and context.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="shape">The shape of the output</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
+    /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiIdentity(outputArray : NDArray seq, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiIdentity(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_identity"
-        let names = [|"shape"; "ctx"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+        let names = [|"ctx"; "shape"; "dtype"|]
+        let vals = [|string ctx; (if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -12788,44 +12789,44 @@ type Operators() =
         NpOnesLike(?a = a)
 
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
     /// <param name="step">Spacing between values.</param>
     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Target data type.</param>
     static member NpiArangeNDArray(start : double, 
+                                   ctx : Context, 
                                    [<Optional>] ?stop : float, 
                                    [<Optional>] ?step : double, 
                                    [<Optional>] ?repeat : int, 
                                    [<Optional>] ?inferRange : bool, 
-                                   [<Optional>] ?ctx : string, 
                                    [<Optional>] ?dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_arange"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
-                                                 [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+                                                 [|"start"; "ctx"; "stop"; "step"; "repeat"; "infer_range"; "dtype"|]
+                                                 [|string start; string ctx; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
     /// <param name="step">Spacing between values.</param>
     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Target data type.</param>
     static member NpiArange(outputArray : NDArray seq, 
                             start : double, 
+                            ctx : Context, 
                             [<Optional>] ?stop : float, 
                             [<Optional>] ?step : double, 
                             [<Optional>] ?repeat : int, 
                             [<Optional>] ?inferRange : bool, 
-                            [<Optional>] ?ctx : string, 
                             [<Optional>] ?dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_arange"
-        let names = [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
-        let vals = [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+        let names = [|"start"; "ctx"; "stop"; "step"; "repeat"; "infer_range"; "dtype"|]
+        let vals = [|string start; string ctx; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -12844,24 +12845,24 @@ type Operators() =
 
     /// <summary>Return an array representing the indices of a grid.</summary>
     /// <param name="dimensions">The shape of the grid.</param>
-    /// <param name="dtype">Target data type.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
-    static member NpiIndicesNDArray(dimensions : int seq, [<Optional>] dtype : IntOrFloatDType, [<Optional; DefaultParameterValue("")>] ctx : string) =
+    /// <param name="dtype">Target data type.</param>
+    static member NpiIndicesNDArray(dimensions : int seq, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_indices"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"dimensions"; "dtype"; "ctx"|]
-                                                 [|(dimensions |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (dtype :> obj) then "int32" else string dtype); ctx|]
+                                                 [|"dimensions"; "ctx"; "dtype"|]
+                                                 [|(dimensions |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string ctx; (if isNull (dtype :> obj) then "int32" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Return an array representing the indices of a grid.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="dimensions">The shape of the grid.</param>
-    /// <param name="dtype">Target data type.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
-    static member NpiIndices(outputArray : NDArray seq, dimensions : int seq, [<Optional>] dtype : IntOrFloatDType, [<Optional; DefaultParameterValue("")>] ctx : string) =
+    /// <param name="dtype">Target data type.</param>
+    static member NpiIndices(outputArray : NDArray seq, dimensions : int seq, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_indices"
-        let names = [|"dimensions"; "dtype"; "ctx"|]
-        let vals = [|(dimensions |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (dtype :> obj) then "int32" else string dtype); ctx|]
+        let names = [|"dimensions"; "ctx"; "dtype"|]
+        let vals = [|(dimensions |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string ctx; (if isNull (dtype :> obj) then "int32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -13624,22 +13625,22 @@ type Operators() =
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHanningNDArray(M : int, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiHanningNDArray(M : int, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_hanning"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"M"; "ctx"; "dtype"|]
-                                                 [|string M; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+                                                 [|string M; string ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Return the Hanning window.The Hanning window is a taper formed by using a weighted cosine.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHanning(outputArray : NDArray seq, M : int, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiHanning(outputArray : NDArray seq, M : int, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_hanning"
         let names = [|"M"; "ctx"; "dtype"|]
-        let vals = [|string M; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+        let vals = [|string M; string ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -13657,22 +13658,22 @@ type Operators() =
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHammingNDArray(M : int, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiHammingNDArray(M : int, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_hamming"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"M"; "ctx"; "dtype"|]
-                                                 [|string M; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+                                                 [|string M; string ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Return the Hamming window.The Hamming window is a taper formed by using a weighted cosine.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHamming(outputArray : NDArray seq, M : int, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiHamming(outputArray : NDArray seq, M : int, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_hamming"
         let names = [|"M"; "ctx"; "dtype"|]
-        let vals = [|string M; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+        let vals = [|string M; string ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -13690,22 +13691,22 @@ type Operators() =
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiBlackmanNDArray(M : int, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiBlackmanNDArray(M : int, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_blackman"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
                                                  [|"M"; "ctx"; "dtype"|]
-                                                 [|string M; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+                                                 [|string M; string ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Return the Blackman window.The Blackman window is a taper formed by using a weighted cosine.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiBlackman(outputArray : NDArray seq, M : int, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member NpiBlackman(outputArray : NDArray seq, M : int, ctx : Context, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_blackman"
         let names = [|"M"; "ctx"; "dtype"|]
-        let vals = [|string M; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+        let vals = [|string M; string ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -13731,14 +13732,14 @@ type Operators() =
                             input2 : NDArray, 
                             a : int64, 
                             size : int seq, 
-                            [<Optional; DefaultParameterValue("cpu")>] ctx : string, 
+                            ctx : Context, 
                             [<Optional; DefaultParameterValue(true)>] replace : bool, 
                             [<Optional; DefaultParameterValue(false)>] weighted : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_choice"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|input1.NDArrayHandle.UnsafeHandle; input2.NDArrayHandle.UnsafeHandle|]
                                                  [|"a"; "size"; "ctx"; "replace"; "weighted"|]
-                                                 [|string a; (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); ctx; string replace; string weighted|]
+                                                 [|string a; (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string ctx; string replace; string weighted|]
         (new NDArray(outputs.[0]))
     /// <summary>random choice</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -13754,12 +13755,12 @@ type Operators() =
                             input2 : NDArray, 
                             a : int64, 
                             size : int seq, 
-                            [<Optional; DefaultParameterValue("cpu")>] ctx : string, 
+                            ctx : Context, 
                             [<Optional; DefaultParameterValue(true)>] replace : bool, 
                             [<Optional; DefaultParameterValue(false)>] weighted : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_choice"
         let names = [|"a"; "size"; "ctx"; "replace"; "weighted"|]
-        let vals = [|string a; (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); ctx; string replace; string weighted|]
+        let vals = [|string a; (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string ctx; string replace; string weighted|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|input1.NDArrayHandle.UnsafeHandle; input2.NDArrayHandle.UnsafeHandle|]
@@ -13857,44 +13858,44 @@ type Operators() =
     /// <summary>Numpy behavior normal</summary>
     /// <param name="input1">Source input</param>
     /// <param name="input2">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="loc"></param>
     /// <param name="scale"></param>
     /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member NpiNormal(input1 : NDArray, 
                             input2 : NDArray, 
+                            ctx : Context, 
                             [<Optional>] ?loc : float, 
                             [<Optional>] ?scale : float, 
                             [<Optional>] ?size : int seq, 
-                            [<Optional>] ?ctx : string, 
                             [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_normal"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|input1.NDArrayHandle.UnsafeHandle; input2.NDArrayHandle.UnsafeHandle|]
-                                                 [|"loc"; "scale"; "size"; "ctx"; "dtype"|]
-                                                 [|(match loc with None -> "None" | Some loc -> string loc); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match ctx with None -> "cpu" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+                                                 [|"ctx"; "loc"; "scale"; "size"; "dtype"|]
+                                                 [|string ctx; (match loc with None -> "None" | Some loc -> string loc); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Numpy behavior normal</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="input1">Source input</param>
     /// <param name="input2">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="loc"></param>
     /// <param name="scale"></param>
     /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member NpiNormal(outputArray : NDArray seq, 
                             input1 : NDArray, 
                             input2 : NDArray, 
+                            ctx : Context, 
                             [<Optional>] ?loc : float, 
                             [<Optional>] ?scale : float, 
                             [<Optional>] ?size : int seq, 
-                            [<Optional>] ?ctx : string, 
                             [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_normal"
-        let names = [|"loc"; "scale"; "size"; "ctx"; "dtype"|]
-        let vals = [|(match loc with None -> "None" | Some loc -> string loc); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match ctx with None -> "cpu" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+        let names = [|"ctx"; "loc"; "scale"; "size"; "dtype"|]
+        let vals = [|string ctx; (match loc with None -> "None" | Some loc -> string loc); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|input1.NDArrayHandle.UnsafeHandle; input2.NDArrayHandle.UnsafeHandle|]
@@ -13915,44 +13916,44 @@ type Operators() =
     /// <summary>numpy behavior uniform</summary>
     /// <param name="input1">Source input</param>
     /// <param name="input2">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="low"></param>
     /// <param name="high"></param>
     /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member NpiUniform(input1 : NDArray, 
                              input2 : NDArray, 
+                             ctx : Context, 
                              [<Optional>] ?low : float, 
                              [<Optional>] ?high : float, 
                              [<Optional>] ?size : int seq, 
-                             [<Optional>] ?ctx : string, 
                              [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_uniform"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|input1.NDArrayHandle.UnsafeHandle; input2.NDArrayHandle.UnsafeHandle|]
-                                                 [|"low"; "high"; "size"; "ctx"; "dtype"|]
-                                                 [|(match low with None -> "None" | Some low -> string low); (match high with None -> "None" | Some high -> string high); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match ctx with None -> "cpu" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+                                                 [|"ctx"; "low"; "high"; "size"; "dtype"|]
+                                                 [|string ctx; (match low with None -> "None" | Some low -> string low); (match high with None -> "None" | Some high -> string high); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>numpy behavior uniform</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="input1">Source input</param>
     /// <param name="input2">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="low"></param>
     /// <param name="high"></param>
     /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member NpiUniform(outputArray : NDArray seq, 
                              input1 : NDArray, 
                              input2 : NDArray, 
+                             ctx : Context, 
                              [<Optional>] ?low : float, 
                              [<Optional>] ?high : float, 
                              [<Optional>] ?size : int seq, 
-                             [<Optional>] ?ctx : string, 
                              [<Optional>] ?dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_npi_uniform"
-        let names = [|"low"; "high"; "size"; "ctx"; "dtype"|]
-        let vals = [|(match low with None -> "None" | Some low -> string low); (match high with None -> "None" | Some high -> string high); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match ctx with None -> "cpu" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+        let names = [|"ctx"; "low"; "high"; "size"; "dtype"|]
+        let vals = [|string ctx; (match low with None -> "None" | Some low -> string low); (match high with None -> "None" | Some high -> string high); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|input1.NDArrayHandle.UnsafeHandle; input2.NDArrayHandle.UnsafeHandle|]
@@ -20166,21 +20167,21 @@ type Operators() =
     /// 
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L97</summary>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="low">Lower bound of the distribution.</param>
     /// <param name="high">Upper bound of the distribution.</param>
     /// <param name="shape">Shape of the output.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member RandomUniformNDArray([<Optional; DefaultParameterValue(0.0)>] low : float, 
+    static member RandomUniformNDArray(ctx : Context, 
+                                       [<Optional; DefaultParameterValue(0.0)>] low : float, 
                                        [<Optional; DefaultParameterValue(1.0)>] high : float, 
                                        [<Optional>] shape : int seq, 
-                                       [<Optional; DefaultParameterValue("")>] ctx : string, 
                                        [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_uniform"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"low"; "high"; "shape"; "ctx"; "dtype"|]
-                                                 [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|"ctx"; "low"; "high"; "shape"; "dtype"|]
+                                                 [|string ctx; string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a uniform distribution.
     /// 
@@ -20198,20 +20199,20 @@ type Operators() =
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L97</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="low">Lower bound of the distribution.</param>
     /// <param name="high">Upper bound of the distribution.</param>
     /// <param name="shape">Shape of the output.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member RandomUniform(outputArray : NDArray seq, 
+                                ctx : Context, 
                                 [<Optional; DefaultParameterValue(0.0)>] low : float, 
                                 [<Optional; DefaultParameterValue(1.0)>] high : float, 
                                 [<Optional>] shape : int seq, 
-                                [<Optional; DefaultParameterValue("")>] ctx : string, 
                                 [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_uniform"
-        let names = [|"low"; "high"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let names = [|"ctx"; "low"; "high"; "shape"; "dtype"|]
+        let vals = [|string ctx; string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -20255,21 +20256,21 @@ type Operators() =
     /// 
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L115</summary>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="loc">Mean of the distribution.</param>
     /// <param name="scale">Standard deviation of the distribution.</param>
     /// <param name="shape">Shape of the output.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member RandomNormalNDArray([<Optional; DefaultParameterValue(0.0)>] loc : float, 
+    static member RandomNormalNDArray(ctx : Context, 
+                                      [<Optional; DefaultParameterValue(0.0)>] loc : float, 
                                       [<Optional; DefaultParameterValue(1.0)>] scale : float, 
                                       [<Optional>] shape : int seq, 
-                                      [<Optional; DefaultParameterValue("")>] ctx : string, 
                                       [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_normal"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"loc"; "scale"; "shape"; "ctx"; "dtype"|]
-                                                 [|string loc; string scale; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|"ctx"; "loc"; "scale"; "shape"; "dtype"|]
+                                                 [|string ctx; string loc; string scale; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a normal (Gaussian) distribution.
     /// 
@@ -20286,20 +20287,20 @@ type Operators() =
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L115</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="loc">Mean of the distribution.</param>
     /// <param name="scale">Standard deviation of the distribution.</param>
     /// <param name="shape">Shape of the output.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member RandomNormal(outputArray : NDArray seq, 
+                               ctx : Context, 
                                [<Optional; DefaultParameterValue(0.0)>] loc : float, 
                                [<Optional; DefaultParameterValue(1.0)>] scale : float, 
                                [<Optional>] shape : int seq, 
-                               [<Optional; DefaultParameterValue("")>] ctx : string, 
                                [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_normal"
-        let names = [|"loc"; "scale"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string loc; string scale; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let names = [|"ctx"; "loc"; "scale"; "shape"; "dtype"|]
+        let vals = [|string ctx; string loc; string scale; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -20339,21 +20340,21 @@ type Operators() =
     /// 
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L127</summary>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="alpha">Alpha parameter (shape) of the gamma distribution.</param>
     /// <param name="beta">Beta parameter (scale) of the gamma distribution.</param>
     /// <param name="shape">Shape of the output.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member RandomGammaNDArray([<Optional; DefaultParameterValue(1.0)>] alpha : float, 
+    static member RandomGammaNDArray(ctx : Context, 
+                                     [<Optional; DefaultParameterValue(1.0)>] alpha : float, 
                                      [<Optional; DefaultParameterValue(1.0)>] beta : float, 
                                      [<Optional>] shape : int seq, 
-                                     [<Optional; DefaultParameterValue("")>] ctx : string, 
                                      [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_gamma"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"alpha"; "beta"; "shape"; "ctx"; "dtype"|]
-                                                 [|string alpha; string beta; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|"ctx"; "alpha"; "beta"; "shape"; "dtype"|]
+                                                 [|string ctx; string alpha; string beta; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a gamma distribution.
     /// 
@@ -20367,20 +20368,20 @@ type Operators() =
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L127</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="alpha">Alpha parameter (shape) of the gamma distribution.</param>
     /// <param name="beta">Beta parameter (scale) of the gamma distribution.</param>
     /// <param name="shape">Shape of the output.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member RandomGamma(outputArray : NDArray seq, 
+                              ctx : Context, 
                               [<Optional; DefaultParameterValue(1.0)>] alpha : float, 
                               [<Optional; DefaultParameterValue(1.0)>] beta : float, 
                               [<Optional>] shape : int seq, 
-                              [<Optional; DefaultParameterValue("")>] ctx : string, 
                               [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_gamma"
-        let names = [|"alpha"; "beta"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string alpha; string beta; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let names = [|"ctx"; "alpha"; "beta"; "shape"; "dtype"|]
+        let vals = [|string ctx; string alpha; string beta; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -20417,16 +20418,16 @@ type Operators() =
     /// 
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L139</summary>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
     /// <param name="shape">Shape of the output.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member RandomExponentialNDArray([<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : FloatDType) =
+    static member RandomExponentialNDArray(ctx : Context, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_exponential"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"lam"; "shape"; "ctx"; "dtype"|]
-                                                 [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|"ctx"; "lam"; "shape"; "dtype"|]
+                                                 [|string ctx; string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from an exponential distribution.
     /// 
@@ -20440,14 +20441,14 @@ type Operators() =
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L139</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
     /// <param name="shape">Shape of the output.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member RandomExponential(outputArray : NDArray seq, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : FloatDType) =
+    static member RandomExponential(outputArray : NDArray seq, ctx : Context, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_exponential"
-        let names = [|"lam"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let names = [|"ctx"; "lam"; "shape"; "dtype"|]
+        let vals = [|string ctx; string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -20484,16 +20485,16 @@ type Operators() =
     /// 
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L152</summary>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
     /// <param name="shape">Shape of the output.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member RandomPoissonNDArray([<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : FloatDType) =
+    static member RandomPoissonNDArray(ctx : Context, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_poisson"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"lam"; "shape"; "ctx"; "dtype"|]
-                                                 [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|"ctx"; "lam"; "shape"; "dtype"|]
+                                                 [|string ctx; string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a Poisson distribution.
     /// 
@@ -20508,14 +20509,14 @@ type Operators() =
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L152</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
     /// <param name="shape">Shape of the output.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member RandomPoisson(outputArray : NDArray seq, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : FloatDType) =
+    static member RandomPoisson(outputArray : NDArray seq, ctx : Context, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_poisson"
-        let names = [|"lam"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let names = [|"ctx"; "lam"; "shape"; "dtype"|]
+        let vals = [|string ctx; string lam; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -20554,21 +20555,21 @@ type Operators() =
     /// 
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L166</summary>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="k">Limit of unsuccessful experiments.</param>
     /// <param name="p">Failure probability in each experiment.</param>
     /// <param name="shape">Shape of the output.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member RandomNegativeBinomialNDArray([<Optional; DefaultParameterValue(1)>] k : int, 
+    static member RandomNegativeBinomialNDArray(ctx : Context, 
+                                                [<Optional; DefaultParameterValue(1)>] k : int, 
                                                 [<Optional; DefaultParameterValue(1.0)>] p : float, 
                                                 [<Optional>] shape : int seq, 
-                                                [<Optional; DefaultParameterValue("")>] ctx : string, 
                                                 [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_negative_binomial"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"k"; "p"; "shape"; "ctx"; "dtype"|]
-                                                 [|string k; string p; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|"ctx"; "k"; "p"; "shape"; "dtype"|]
+                                                 [|string ctx; string k; string p; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a negative binomial distribution.
     /// 
@@ -20584,20 +20585,20 @@ type Operators() =
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L166</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="k">Limit of unsuccessful experiments.</param>
     /// <param name="p">Failure probability in each experiment.</param>
     /// <param name="shape">Shape of the output.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member RandomNegativeBinomial(outputArray : NDArray seq, 
+                                         ctx : Context, 
                                          [<Optional; DefaultParameterValue(1)>] k : int, 
                                          [<Optional; DefaultParameterValue(1.0)>] p : float, 
                                          [<Optional>] shape : int seq, 
-                                         [<Optional; DefaultParameterValue("")>] ctx : string, 
                                          [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_negative_binomial"
-        let names = [|"k"; "p"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string k; string p; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let names = [|"ctx"; "k"; "p"; "shape"; "dtype"|]
+        let vals = [|string ctx; string k; string p; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -20639,21 +20640,21 @@ type Operators() =
     /// 
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L181</summary>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="mu">Mean of the negative binomial distribution.</param>
     /// <param name="alpha">Alpha (dispersion) parameter of the negative binomial distribution.</param>
     /// <param name="shape">Shape of the output.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member RandomGeneralizedNegativeBinomialNDArray([<Optional; DefaultParameterValue(1.0)>] mu : float, 
+    static member RandomGeneralizedNegativeBinomialNDArray(ctx : Context, 
+                                                           [<Optional; DefaultParameterValue(1.0)>] mu : float, 
                                                            [<Optional; DefaultParameterValue(1.0)>] alpha : float, 
                                                            [<Optional>] shape : int seq, 
-                                                           [<Optional; DefaultParameterValue("")>] ctx : string, 
                                                            [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_generalized_negative_binomial"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"mu"; "alpha"; "shape"; "ctx"; "dtype"|]
-                                                 [|string mu; string alpha; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|"ctx"; "mu"; "alpha"; "shape"; "dtype"|]
+                                                 [|string ctx; string mu; string alpha; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a generalized negative binomial distribution.
     /// 
@@ -20670,20 +20671,20 @@ type Operators() =
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L181</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="mu">Mean of the negative binomial distribution.</param>
     /// <param name="alpha">Alpha (dispersion) parameter of the negative binomial distribution.</param>
     /// <param name="shape">Shape of the output.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member RandomGeneralizedNegativeBinomial(outputArray : NDArray seq, 
+                                                    ctx : Context, 
                                                     [<Optional; DefaultParameterValue(1.0)>] mu : float, 
                                                     [<Optional; DefaultParameterValue(1.0)>] alpha : float, 
                                                     [<Optional>] shape : int seq, 
-                                                    [<Optional; DefaultParameterValue("")>] ctx : string, 
                                                     [<Optional>] dtype : FloatDType) =
         let creator = AtomicSymbolCreator.FromName "_random_generalized_negative_binomial"
-        let names = [|"mu"; "alpha"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string mu; string alpha; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let names = [|"ctx"; "mu"; "alpha"; "shape"; "dtype"|]
+        let vals = [|string ctx; string mu; string alpha; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -20727,19 +20728,19 @@ type Operators() =
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L196</summary>
     /// <param name="low">Lower bound of the distribution.</param>
     /// <param name="high">Upper bound of the distribution.</param>
-    /// <param name="shape">Shape of the output.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="shape">Shape of the output.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to int32 if not defined (dtype=None).</param>
     static member RandomRandintNDArray(low : int64, 
                                        high : int64, 
+                                       ctx : Context, 
                                        [<Optional>] shape : int seq, 
-                                       [<Optional; DefaultParameterValue("")>] ctx : string, 
                                        [<Optional>] dtype : RandomRandintDtype) =
         let creator = AtomicSymbolCreator.FromName "_random_randint"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"low"; "high"; "shape"; "ctx"; "dtype"|]
-                                                 [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+                                                 [|"low"; "high"; "ctx"; "shape"; "dtype"|]
+                                                 [|string low; string high; string ctx; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Draw random samples from a discrete uniform distribution.
     /// 
@@ -20757,18 +20758,18 @@ type Operators() =
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="low">Lower bound of the distribution.</param>
     /// <param name="high">Upper bound of the distribution.</param>
-    /// <param name="shape">Shape of the output.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="shape">Shape of the output.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to int32 if not defined (dtype=None).</param>
     static member RandomRandint(outputArray : NDArray seq, 
                                 low : int64, 
                                 high : int64, 
+                                ctx : Context, 
                                 [<Optional>] shape : int seq, 
-                                [<Optional; DefaultParameterValue("")>] ctx : string, 
                                 [<Optional>] dtype : RandomRandintDtype) =
         let creator = AtomicSymbolCreator.FromName "_random_randint"
-        let names = [|"low"; "high"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string low; string high; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        let names = [|"low"; "high"; "ctx"; "shape"; "dtype"|]
+        let vals = [|string low; string high; string ctx; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -34099,25 +34100,25 @@ type Operators() =
         ScatterSetNd(shape, ?lhs = lhs, ?rhs = rhs, ?indices = indices)
 
     /// <summary>fill target with zeros without default dtype</summary>
-    /// <param name="shape">The shape of the output</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
+    /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member ZerosWithoutDtypeNDArray([<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional; DefaultParameterValue(-1)>] dtype : int) =
+    static member ZerosWithoutDtypeNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue(-1)>] dtype : int) =
         let creator = AtomicSymbolCreator.FromName "_zeros_without_dtype"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"shape"; "ctx"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; string dtype|]
+                                                 [|"ctx"; "shape"; "dtype"|]
+                                                 [|string ctx; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string dtype|]
         (new NDArray(outputs.[0]))
     /// <summary>fill target with zeros without default dtype</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="shape">The shape of the output</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
+    /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member ZerosWithoutDtype(outputArray : NDArray seq, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional; DefaultParameterValue(-1)>] dtype : int) =
+    static member ZerosWithoutDtype(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue(-1)>] dtype : int) =
         let creator = AtomicSymbolCreator.FromName "_zeros_without_dtype"
-        let names = [|"shape"; "ctx"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; string dtype|]
+        let names = [|"ctx"; "shape"; "dtype"|]
+        let vals = [|string ctx; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string dtype|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -34132,25 +34133,25 @@ type Operators() =
         ZerosWithoutDtype(?shape = shape, ?dtype = dtype)
 
     /// <summary>fill target with zeros</summary>
-    /// <param name="shape">The shape of the output</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
+    /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member ZerosNDArray([<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member ZerosNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_zeros"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"shape"; "ctx"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+                                                 [|"ctx"; "shape"; "dtype"|]
+                                                 [|string ctx; (if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>fill target with zeros</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="shape">The shape of the output</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
+    /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member Zeros(outputArray : NDArray seq, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member Zeros(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_zeros"
-        let names = [|"shape"; "ctx"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+        let names = [|"ctx"; "shape"; "dtype"|]
+        let vals = [|string ctx; (if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -34166,37 +34167,37 @@ type Operators() =
 
     /// <summary>Return a 2-D array with ones on the diagonal and zeros elsewhere.</summary>
     /// <param name="N">Number of rows in the output.</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="M">Number of columns in the output. If 0, defaults to N</param>
     /// <param name="k">Index of the diagonal. 0 (the default) refers to the main diagonal.A positive value refers to an upper diagonal.A negative value to a lower diagonal.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Target data type.</param>
     static member EyeNDArray(N : int64, 
+                             ctx : Context, 
                              [<Optional; DefaultParameterValue(0L)>] M : int64, 
                              [<Optional; DefaultParameterValue(0L)>] k : int64, 
-                             [<Optional; DefaultParameterValue("")>] ctx : string, 
                              [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_eye"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"N"; "M"; "k"; "ctx"; "dtype"|]
-                                                 [|string N; string M; string k; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+                                                 [|"N"; "ctx"; "M"; "k"; "dtype"|]
+                                                 [|string N; string ctx; string M; string k; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Return a 2-D array with ones on the diagonal and zeros elsewhere.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="N">Number of rows in the output.</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="M">Number of columns in the output. If 0, defaults to N</param>
     /// <param name="k">Index of the diagonal. 0 (the default) refers to the main diagonal.A positive value refers to an upper diagonal.A negative value to a lower diagonal.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Target data type.</param>
     static member Eye(outputArray : NDArray seq, 
                       N : int64, 
+                      ctx : Context, 
                       [<Optional; DefaultParameterValue(0L)>] M : int64, 
                       [<Optional; DefaultParameterValue(0L)>] k : int64, 
-                      [<Optional; DefaultParameterValue("")>] ctx : string, 
                       [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_eye"
-        let names = [|"N"; "M"; "k"; "ctx"; "dtype"|]
-        let vals = [|string N; string M; string k; ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+        let names = [|"N"; "ctx"; "M"; "k"; "dtype"|]
+        let vals = [|string N; string ctx; string M; string k; (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -34213,25 +34214,25 @@ type Operators() =
         Eye(N, ?M = M, ?k = k, ?dtype = dtype)
 
     /// <summary>fill target with ones</summary>
-    /// <param name="shape">The shape of the output</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
+    /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member OnesNDArray([<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member OnesNDArray(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_ones"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"shape"; "ctx"; "dtype"|]
-                                                 [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+                                                 [|"ctx"; "shape"; "dtype"|]
+                                                 [|string ctx; (if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>fill target with ones</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="shape">The shape of the output</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
+    /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
-    static member Ones(outputArray : NDArray seq, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member Ones(outputArray : NDArray seq, ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_ones"
-        let names = [|"shape"; "ctx"; "dtype"|]
-        let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+        let names = [|"ctx"; "shape"; "dtype"|]
+        let vals = [|string ctx; (if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -34246,27 +34247,27 @@ type Operators() =
         Ones(?shape = shape, ?dtype = dtype)
 
     /// <summary>fill target with a scalar value</summary>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="value">Value with which to fill newly created tensor</param>
     /// <param name="shape">The shape of the output</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Target data type.</param>
-    static member FullNDArray(value : double, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member FullNDArray(ctx : Context, value : double, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_full"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"value"; "shape"; "ctx"; "dtype"|]
-                                                 [|string value; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+                                                 [|"ctx"; "value"; "shape"; "dtype"|]
+                                                 [|string ctx; string value; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>fill target with a scalar value</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="value">Value with which to fill newly created tensor</param>
     /// <param name="shape">The shape of the output</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Target data type.</param>
-    static member Full(outputArray : NDArray seq, value : double, [<Optional>] shape : int seq, [<Optional; DefaultParameterValue("")>] ctx : string, [<Optional>] dtype : IntOrFloatDType) =
+    static member Full(outputArray : NDArray seq, ctx : Context, value : double, [<Optional>] shape : int seq, [<Optional>] dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_full"
-        let names = [|"value"; "shape"; "ctx"; "dtype"|]
-        let vals = [|string value; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
+        let names = [|"ctx"; "value"; "shape"; "dtype"|]
+        let vals = [|string ctx; string value; (if isNull (shape :> obj) then null else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "float32" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -34283,45 +34284,45 @@ type Operators() =
 
     /// <summary>Return evenly spaced values within a given interval. Similar to Numpy</summary>
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
     /// <param name="step">Spacing between values.</param>
     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Target data type.</param>
     static member ArangeNDArray(start : double, 
+                                ctx : Context, 
                                 [<Optional>] ?stop : float, 
                                 [<Optional>] ?step : double, 
                                 [<Optional>] ?repeat : int, 
                                 [<Optional>] ?inferRange : bool, 
-                                [<Optional>] ?ctx : string, 
                                 [<Optional>] ?dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_arange"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
-                                                 [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+                                                 [|"start"; "ctx"; "stop"; "step"; "repeat"; "infer_range"; "dtype"|]
+                                                 [|string start; string ctx; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Return evenly spaced values within a given interval. Similar to Numpy</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
     /// <param name="step">Spacing between values.</param>
     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Target data type.</param>
     static member Arange(outputArray : NDArray seq, 
                          start : double, 
+                         ctx : Context, 
                          [<Optional>] ?stop : float, 
                          [<Optional>] ?step : double, 
                          [<Optional>] ?repeat : int, 
                          [<Optional>] ?inferRange : bool, 
-                         [<Optional>] ?ctx : string, 
                          [<Optional>] ?dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_arange"
-        let names = [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
-        let vals = [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+        let names = [|"start"; "ctx"; "stop"; "step"; "repeat"; "infer_range"; "dtype"|]
+        let vals = [|string start; string ctx; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
@@ -34363,22 +34364,22 @@ type Operators() =
     ///     &lt;NDArray 4 @cpu(0)&gt;
     /// </summary>
     /// <param name="data">The input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
     /// <param name="step">Spacing between values.</param>
     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="axis">Arange elements according to the size of a certain axis of input array. The negative numbers are interpreted counting from the backward. If not provided, will arange elements according to the input shape.</param>
     static member ContribArangeLike(data : NDArray, 
+                                    ctx : Context, 
                                     [<Optional>] ?start : double, 
                                     [<Optional>] ?step : double, 
                                     [<Optional>] ?repeat : int, 
-                                    [<Optional>] ?ctx : string, 
                                     [<Optional>] ?axis : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_arange_like"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
-                                                 [|"start"; "step"; "repeat"; "ctx"; "axis"|]
-                                                 [|(match start with None -> "0.0" | Some start -> string start); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match ctx with None -> "" | Some ctx -> ctx); (match axis with None -> "None" | Some axis -> string axis)|]
+                                                 [|"ctx"; "start"; "step"; "repeat"; "axis"|]
+                                                 [|string ctx; (match start with None -> "0.0" | Some start -> string start); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match axis with None -> "None" | Some axis -> string axis)|]
         (new NDArray(outputs.[0]))
     /// <summary>Return an array with evenly spaced values. If axis is not given, the output will 
     /// have the same shape as the input array. Otherwise, the output will be a 1-D array with size of 
@@ -34405,21 +34406,21 @@ type Operators() =
     /// </summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
     /// <param name="step">Spacing between values.</param>
     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="axis">Arange elements according to the size of a certain axis of input array. The negative numbers are interpreted counting from the backward. If not provided, will arange elements according to the input shape.</param>
     static member ContribArangeLike(outputArray : NDArray seq, 
                                     data : NDArray, 
+                                    ctx : Context, 
                                     [<Optional>] ?start : double, 
                                     [<Optional>] ?step : double, 
                                     [<Optional>] ?repeat : int, 
-                                    [<Optional>] ?ctx : string, 
                                     [<Optional>] ?axis : int) =
         let creator = AtomicSymbolCreator.FromName "_contrib_arange_like"
-        let names = [|"start"; "step"; "repeat"; "ctx"; "axis"|]
-        let vals = [|(match start with None -> "0.0" | Some start -> string start); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match ctx with None -> "" | Some ctx -> ctx); (match axis with None -> "None" | Some axis -> string axis)|]
+        let names = [|"ctx"; "start"; "step"; "repeat"; "axis"|]
+        let vals = [|string ctx; (match start with None -> "0.0" | Some start -> string start); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match axis with None -> "None" | Some axis -> string axis)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle|]
@@ -34460,45 +34461,45 @@ type Operators() =
 
     /// <summary>Return evenly spaced numbers over a specified interval. Similar to Numpy</summary>
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
     /// <param name="step">Spacing between values.</param>
     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Target data type.</param>
     static member LinspaceNDArray(start : double, 
+                                  ctx : Context, 
                                   [<Optional>] ?stop : float, 
                                   [<Optional>] ?step : double, 
                                   [<Optional>] ?repeat : int, 
                                   [<Optional>] ?inferRange : bool, 
-                                  [<Optional>] ?ctx : string, 
                                   [<Optional>] ?dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_linspace"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
-                                                 [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
-                                                 [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+                                                 [|"start"; "ctx"; "stop"; "step"; "repeat"; "infer_range"; "dtype"|]
+                                                 [|string start; string ctx; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
         (new NDArray(outputs.[0]))
     /// <summary>Return evenly spaced numbers over a specified interval. Similar to Numpy</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="stop">End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.</param>
     /// <param name="step">Spacing between values.</param>
     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Target data type.</param>
     static member Linspace(outputArray : NDArray seq, 
                            start : double, 
+                           ctx : Context, 
                            [<Optional>] ?stop : float, 
                            [<Optional>] ?step : double, 
                            [<Optional>] ?repeat : int, 
                            [<Optional>] ?inferRange : bool, 
-                           [<Optional>] ?ctx : string, 
                            [<Optional>] ?dtype : IntOrFloatDType) =
         let creator = AtomicSymbolCreator.FromName "_linspace"
-        let names = [|"start"; "stop"; "step"; "repeat"; "infer_range"; "ctx"; "dtype"|]
-        let vals = [|string start; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match ctx with None -> "" | Some ctx -> ctx); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+        let names = [|"start"; "ctx"; "stop"; "step"; "repeat"; "infer_range"; "dtype"|]
+        let vals = [|string start; string ctx; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      Array.empty
