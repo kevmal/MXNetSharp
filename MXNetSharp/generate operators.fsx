@@ -1757,6 +1757,83 @@ System.IO.File.WriteAllLines(symbolsFile,
             i <- i + 1
     ]
 ) 
+(*
+
+let ctxExtensions = 
+    processed
+    |> Array.choose 
+        (function 
+         | Ok(x) -> Some x
+         | _ -> None
+        )
+    |> Array.filter (fun x -> x.AtomicSymbolInfo.Arguments |> Seq.exists (fun x -> x.Name = "ctx"))
+    |> Array.map 
+        (fun x ->
+            let trim (x : string) = x.TrimStart('?')
+            let (m,_) = x.MemberDefinitions |> Seq.head
+            let h = m
+            [
+                yield!
+                    m.Args
+                    |> Array.filter (fun x -> x.Name <> "ctx")
+                    |> Array.collect (fun x -> x.Doc)
+                let args = 
+                    let args = 
+                        [|
+                            m.Args |> Array.find (fun x -> x.Name = "ctx")
+                            yield! m.Args |> Array.filter (fun x -> x.Name <> "ctx")
+                        |]
+                    [
+                        for a in args do 
+                            let tp = 
+                                match a.SymbolOrNDArray with 
+                                | Some ManySymbolOrNDArray -> "Symbol seq"
+                                | Some SymbolOrNDArray
+                                | Some Symbol -> "Symbol"
+                                | _ -> a.TypeString 
+                            if a.Arg.ArgumentInfo.Name <> h.AtomicSymbolInfo.KeyVarNumArgs then 
+                                if a.DefaultMode.IsSome then 
+                                    sprintf "[<Optional>] ?%s : %s" a.Name tp
+                                else
+                                    sprintf "%s : %s" a.Name tp
+                    ]
+                "[<Extension>]"
+                if args.Length = 0 then 
+                    sprintf "static member %s() =" h.Name
+                else
+                    sprintf "static member %s(%s) =" h.Name (args |> String.concat ", ")
+                yield! indent 1 
+                    [
+                        let toparam (x : string) =     
+                            let p = x.Replace("[<Optional>] ", "").Split(':').[0].Trim()
+                            if not(x.Contains "?") then
+                                p
+                            else
+                                sprintf "%s = %s" p (trim p)
+                        sprintf "%s(%s)" h.Name (args |> Seq.map toparam |> String.concat ", ")
+                    ]
+                
+
+            ]
+        )
+
+ctxExtensions
+|> Seq.concat
+|> Seq.iter (printfn "%s")
 
 
+ctxExtensions |> Array.iter (fun x -> printfn "%s" x.AtomicSymbolInfo.Name)
 
+System.IO.File.WriteAllLines(System.IO.Path.Combine(__SOURCE_DIRECTORY__,"ctxext.fs"),     
+    [
+        """namespace MXNetSharp
+open System.Runtime.CompilerServices
+
+[<Extension>]
+type ContextExtensions private () = 
+"""
+        yield! types |> Seq.filter (fun x -> Seq.isEmpty x |> not) |> Seq.map (fun x -> ["[<RequireQualifiedAccess>]"; yield! x]) |> breakBlocks |> indent 1
+        ""
+    ])
+
+*)
