@@ -147,7 +147,29 @@ type NDArray(handle : SafeNDArrayHandle) =
         x.CopyTo(destination)
         destination
 
-    member x.SyncCopyFromCPU(data : float32 []) = MXNDArray.syncCopyFromCPU handle.UnsafeHandle data
+    member x.SyncCopyFromCPUUnchecked(data : 'a []) = MXNDArray.syncCopyFromCPU handle.UnsafeHandle data
+    member x.SyncCopyFromCPU(data : 'a []) = 
+        if x.DataType = DataType.TryFromNetType<'a>() then 
+            MXNDArray.syncCopyFromCPU handle.UnsafeHandle data
+        else
+            raise (InvalidOperationException(sprintf "Source type of %s does not match NDArray type of %O" typeof<'a>.FullName x.DataTypeFlag))
+
+    member x.CopyFrom(data : 'aa []) = 
+        match x.DataType with 
+        | None -> // REVIEW: what to do here
+            failwith "NDArray has no data type"
+        | Some t -> 
+            let a = data
+            match t with 
+            | Float16 -> failwith "float16 not supported yet" //TODO: float16
+            | Float32 -> ArrayConverter.Float32(a) |> x.SyncCopyFromCPUUnchecked
+            | Float64 -> ArrayConverter.Float64(a) |> x.SyncCopyFromCPUUnchecked
+            | Int32 -> ArrayConverter.Int32(a) |> x.SyncCopyFromCPUUnchecked
+            | Int64 -> ArrayConverter.Int64(a) |> x.SyncCopyFromCPUUnchecked
+            | Int8 -> ArrayConverter.Int8(a) |> x.SyncCopyFromCPUUnchecked
+            | UInt8 -> ArrayConverter.UInt8(a) |> x.SyncCopyFromCPUUnchecked
+
+
     member x.SyncCopyFromCPU(data : int []) = MXNDArray.syncCopyFromCPU handle.UnsafeHandle data
 
     member x.Set(value : float32) =
@@ -489,70 +511,139 @@ type NDArray(handle : SafeNDArrayHandle) =
                 sliced.Reshape newShape
     member x.Item 
         with get([<ParamArray>] a : obj []) = x.GetSlice(a = a)
-    member x.SetSlice([<ParamArray>] a : obj []) = 
-        let inline str x = match x with Some v -> v.ValueString() | _ -> "None"
-        let b = ResizeArray()
-        let e = ResizeArray()
-        let s = ResizeArray()
-        let mutable i = 0
-        while i < a.Length - 1 do 
-            match a.[i] with 
-            | :? int as idx -> 
-                b.Add(string idx)
-                e.Add(string (idx + 1))
-                s.Add "None"
-            | :? (int option) as o -> 
-                let o2 = a.[i+1] :?> int option |> Option.map (fun x -> x + 1)
-                b.Add(str o)
-                e.Add(str o2)
-                s.Add "None"
+    member x.SetSlice([<ParamArray>] a : obj []) : unit = 
+        let inline str x = match x with ValueSome v -> v.ValueString() | _ -> "None"
+        if a.Length = 0 then 
+            ()
+        else
+            let shape = x.Shape
+            let ndim = shape.Length
+            let b = ResizeArray<int64 voption>()
+            let e = ResizeArray<int64 voption>()
+            let s = ResizeArray<int64 voption>()
+            let sliceAxis = ResizeArray()
+            let newAxis = ResizeArray()
+            let mutable i = 0
+            let mutable sliceAx = 0
+            while i < a.Length - 1 do 
+                match a.[i] with 
+                | :? int as idx -> 
+                    b.Add(ValueSome(int64 idx))
+                    e.Add(ValueSome(if idx >= 0 then int64 idx + 1L else int64 idx))
+                    s.Add(ValueNone)
+                    if sliceAx < ndim && (not (-shape.[sliceAx] <= idx) || not (shape.[sliceAx] >= idx)) then 
+                        failwithf "Index %d is out of bounds for axis %d with size %d" idx sliceAx shape.[sliceAx]
+                    sliceAxis.Add sliceAx
+                    sliceAx <- sliceAx + 1
+                | :? (int option) as o -> 
+                    let o2 = a.[i+1] :?> int option |> Option.map (fun x -> if x >= 0 then x + 1 else x)
+                    b.Add(match o with | Some o -> ValueSome (int64 o) | _ -> ValueNone)
+                    e.Add(match o2 with | Some o -> ValueSome (int64 o) | _ -> ValueNone)
+                    s.Add(ValueNone)
+                    sliceAxis.Add sliceAx
+                    sliceAx <- sliceAx + 1
+                    i <- i + 1
+                | :? SliceRange as r -> 
+                    match r.Start with 
+                    | Some v -> b.Add(ValueSome(v))
+                    | None -> b.Add(ValueNone)
+                    match r.Stop with 
+                    | Some v -> e.Add(ValueSome(if v >= 0L then v + 1L else v))
+                    | None -> e.Add(ValueNone)
+                    match r.Step with 
+                    | Some v -> s.Add(ValueSome(v))
+                    | None -> s.Add(ValueNone)
+                    sliceAxis.Add sliceAx
+                    sliceAx <- sliceAx + 1
+                | :? NewAxis -> newAxis.Add sliceAx //TODO: handle NewAxis for SetSlice
+                | _ -> failwithf "invalid argument to get slice %A" a.[i] //TODO create ex
                 i <- i + 1
-            | _ -> failwithf "invalid argument to get slice %A" a.[i]
-            i <- i + 1
-        let b = b |> String.concat "," |> sprintf "(%s)" //TODO: Just use a string builder from the start?
-        let e = e |> String.concat "," |> sprintf "(%s)"
-        let s = s |> String.concat "," |> sprintf "(%s)"
-        let inline scalar (v : ^a) = 
-            printfn "%A" (b,e,s)
-            mutInvoke x "_slice_assign_scalar" [|x|] [|"begin", b; "end", e; "step", s; "scalar" <-- v|]       
-            |> ignore
-            
-        match a.[a.Length - 1] with 
-        | :? double as x -> scalar x
-        | :? decimal as x -> scalar x
-        | :? int as x -> scalar x
-        | :? float32 as x -> scalar x
-        | :? int64 as x -> scalar x
-        | :? NDArray as y -> 
-            printfn "%A" (b,e,s)
-            mutInvoke x "_slice_assign" [|x;y|] [|"begin", b; "end", e; "step", s|] |> ignore
-        | q -> failwithf "Unhandled slice assign type %s with value %A" (q.GetType().Name) q
+            let indices k = 
+                let start = match b.[k] with ValueNone -> 0L | ValueSome v -> v
+                let stop = match e.[k] with ValueNone -> int64(shape.[sliceAxis.[k]]) | ValueSome v -> v
+                let step = match s.[k] with ValueNone -> 1L | ValueSome v -> v
+                let starti = if start >= 0L then start else int64 shape.[sliceAxis.[k]] + start
+                let stopi = if stop >= 0L then stop else int64 shape.[sliceAxis.[k]] + stop
+                starti, stopi, step
+            let indexedShape : int [] = 
+                [|
+                    for i = 0 to s.Count - 1 do 
+                        let b,e,s = indices i
+                        assert(s <> 0L)
+                        if b = e then 
+                            0
+                        elif s > 0L then 
+                            assert(b < e)
+                            (e - b - 1L) / s + 1L |> int
+                        else
+                            (b - e - 1L) / -s + 1L |> int
+                |]
+            if indexedShape = x.Shape && (s |> Seq.exists (fun step -> match step with ValueSome step -> step <= 0L | _ -> false) |> not) then 
+                //Overwrite entire array
+                let length = x.Shape |> Array.reduce (*)
+                match a.[a.Length - 1] with 
+                | :? NDArray as v -> 
+                    if v.NDArrayHandle <> x.NDArrayHandle then 
+                        let v2 : NDArray = v.BroadcastTo(x.Shape)
+                        v2.CopyTo(x) |> ignore
+                | :? double as v -> x.MutFull(v) |> ignore
+                | :? decimal as v -> x.MutFull(v) |> ignore
+                | :? int as v -> x.MutFull(v) |> ignore
+                | :? float32 as v -> x.MutFull(v) |> ignore
+                | :? int64 as v -> x.MutFull(v) |> ignore    
+                | :? int8 as v -> x.MutFull(v) |> ignore    
+                | :? uint8 as v -> x.MutFull(v) |> ignore    
+                | :? (double []) as v -> x.CopyFrom(v)
+                | :? (decimal []) as v -> x.CopyFrom(v)
+                | :? (int []) as v -> x.CopyFrom(v)
+                | :? (float32 []) as v -> x.CopyFrom(v)
+                | :? (int64 []) as v -> x.CopyFrom(v)
+                | :? (uint8 []) as v -> x.CopyFrom(v)
+                | :? (int8 []) as v -> x.CopyFrom(v)
+                | :? (double seq) as v -> x.CopyFrom(v |> Seq.take length |> Seq.toArray)
+                | :? (decimal seq) as v -> x.CopyFrom(v |> Seq.take length |> Seq.toArray)
+                | :? (int seq) as v -> x.CopyFrom(v |> Seq.take length |> Seq.toArray)
+                | :? (float32 seq) as v -> x.CopyFrom(v |> Seq.take length |> Seq.toArray)
+                | :? (int64 seq) as v -> x.CopyFrom(v |> Seq.take length |> Seq.toArray)
+                | :? (uint8 seq) as v -> x.CopyFrom(v |> Seq.take length |> Seq.toArray)
+                | :? (int8 seq) as v -> x.CopyFrom(v |> Seq.take length |> Seq.toArray)
+                | _ -> failwithf "Cannot assign slice from type %s" (a.[a.Length - 1].GetType().FullName)
 
-            
-
-(*
-    member x.GetSlice(startIndex0 : int option, endIndex0 : int option) = 
-        let inline str x = match x with Some v -> v.ValueString() | _ -> "None"
-        x.Slice([|str startIndex0|], [|str endIndex0|], Array.empty)
-    member x.GetSlice(startIndex0 : int option, endIndex0 : int option,
-                      startIndex1 : int option, endIndex1 : int option) = 
-        let inline str x = match x with Some v -> v.ValueString() | _ -> "None"
-        let s =
-            [|
-                str startIndex0
-                str startIndex1
-            |]
-        let e = 
-            [|
-                str endIndex0
-                str endIndex1
-            |]
-        x.Slice(s, e, Array.empty)
-*)        
-
+            else
+                let b = b |> Seq.map str |> String.concat "," |> sprintf "(%s)"
+                let e = e |> Seq.map str |> String.concat "," |> sprintf "(%s)"
+                let s = s |> Seq.map str |> String.concat "," |> sprintf "(%s)"
+                let inline scalar (v : ^a) = 
+                    mutInvoke x "_slice_assign_scalar" [|x|] [|"begin", b; "end", e; "step", s; "scalar" <-- v|]       
+                    |> ignore
+                match a.[a.Length - 1] with 
+                | :? double as x -> scalar x
+                | :? decimal as x -> scalar x
+                | :? int as x -> scalar x
+                | :? float32 as x -> scalar x
+                | :? int64 as x -> scalar x
+                | :? NDArray as y ->
+                    mutInvoke x "_slice_assign" [|x;y|] [|"begin", b; "end", e; "step", s|] |> ignore
+                | q -> failwithf "Unhandled slice assign type %s with value %A" (q.GetType().Name) q
+    
     member x.SwapAxis(dim1 : int, dim2 : int) = invoke1 "SwapAxis" [|x|] [|"dim1" <-- dim1; "dim2" <-- dim2|]
     member x.Reshape([<ParamArray>] dims : int []) = invoke1 "Reshape" [|x|] [|"shape" <-- dims|]
     member x.Reshape(dims : int seq) = invoke1 "Reshape" [|x|] [|"shape" <-- dims|]
+    member x.BroadcastTo(shape : int seq) = invoke1 "broadcast_to" [|x|] [|"shape" <-- shape|]
+    member x.MutFull(value : double) = 
+        mutInvoke x "_full" [|x|] [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType; "ctx" <-- x.Context|]
+    member x.MutFull(value : float32) = 
+        mutInvoke x "_full" [|x|] [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType; "ctx" <-- x.Context|]
+    member x.MutFull(value : decimal) = 
+        mutInvoke x "_full" [|x|] [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType; "ctx" <-- x.Context|]
+    member x.MutFull(value : int32) = 
+        mutInvoke x "_full" [|x|] [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType; "ctx" <-- x.Context|]
+    member x.MutFull(value : int64) = 
+        mutInvoke x "_full" [|x|] [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType; "ctx" <-- x.Context|]
+    member x.MutFull(value : int8) = 
+        mutInvoke x "_full" [|x|] [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType; "ctx" <-- x.Context|]
+    member x.MutFull(value : uint8) = 
+        mutInvoke x "_full" [|x|] [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType; "ctx" <-- x.Context|]
     
     member x.ToArray() : 'a [] = 
         let a = Array.zeroCreate x.Size

@@ -164,8 +164,36 @@ type DataType =
         | TypeFlag.Uint8 -> Some UInt8
         | _ -> None
     static member FromInt(typeFlagInt) = DataType.FromTypeFlag(enum typeFlagInt)
-        
-        
+    static member FromNetType<'a>() = 
+        if typeof<'a> = typeof<float32> then 
+            Float32
+        elif typeof<'a> = typeof<double> then 
+            Float64
+        elif typeof<'a> = typeof<int> then 
+            Int32
+        elif typeof<'a> = typeof<int64> then 
+            Int64
+        elif typeof<'a> = typeof<sbyte> then 
+            Int8
+        elif typeof<'a> = typeof<byte> then 
+            UInt8
+        else
+            failwithf "No corresponding MXNet type for type %s" (typeof<'a>.Name)
+    static member TryFromNetType<'a>() = 
+        if typeof<'a> = typeof<float32> then 
+            Some Float32
+        elif typeof<'a> = typeof<double> then 
+            Some Float64
+        elif typeof<'a> = typeof<int> then 
+            Some Int32
+        elif typeof<'a> = typeof<int64> then 
+            Some Int64
+        elif typeof<'a> = typeof<sbyte> then 
+            Some Int8
+        elif typeof<'a> = typeof<byte> then 
+            Some UInt8
+        else
+            None
 
 
 // From https://github.com/apache/incubator-mxnet/blob/225f71f744ac5e7bd29868b6d3ba0e4fe2527c43/cpp-package/include/mxnet-cpp/base.h#L39
@@ -240,6 +268,153 @@ type ValueStringExtensions = ValueStringExtensions with
         | :? seq<int64> as x -> x.ValueString()
         | _ -> string x
         
+type ArrayConverter private () = 
+    static member inline Float32(a : float32 []) = a
+    static member inline Float32(a : double []) = a |> Array.map float32
+    static member inline Float32(a : int32 []) = a |> Array.map float32
+    static member inline Float32(a : int64 []) = a |> Array.map float32
+    static member inline Float32(a : decimal []) = a |> Array.map float32
+    static member inline Float32(a : int8 []) = a |> Array.map float32
+    static member inline Float32(a : uint8 []) = a |> Array.map float32
+    static member inline Float32(a : 'a []) = 
+        if typeof<'a> = typeof<float32> then 
+            ArrayConverter.Float32(unbox(box a) : float32 [])
+        elif typeof<'a> = typeof<double> then 
+            ArrayConverter.Float32(unbox(box a) : double [])
+        elif typeof<'a> = typeof<int32> then 
+            ArrayConverter.Float32(unbox(box a) : int32 [])
+        elif typeof<'a> = typeof<int64> then 
+            ArrayConverter.Float32(unbox(box a) : int64 [])
+        elif typeof<'a> = typeof<decimal> then 
+            ArrayConverter.Float32(unbox(box a) : decimal [])
+        elif typeof<'a> = typeof<int8> then 
+            ArrayConverter.Float32(unbox(box a) : int8 [])
+        elif typeof<'a> = typeof<uint8> then 
+            ArrayConverter.Float32(unbox(box a) : uint8 [])
+        else
+            a |> Array.map (fun x -> Convert.ChangeType(x, typeof<float32>) :?> float32)
+    static member inline Float64(a : float32 []) = a |> Array.map double
+    static member inline Float64(a : double []) = a 
+    static member inline Float64(a : int32 []) = a |> Array.map double
+    static member inline Float64(a : int64 []) = a |> Array.map double
+    static member inline Float64(a : decimal []) = a |> Array.map double
+    static member inline Float64(a : int8 []) = a |> Array.map double
+    static member inline Float64(a : uint8 []) = a |> Array.map double
+    static member inline Float64(a : 'a []) = 
+        if typeof<'a> = typeof<float32> then 
+            ArrayConverter.Float64(unbox(box a) : float32 [])
+        elif typeof<'a> = typeof<double> then 
+            ArrayConverter.Float64(unbox(box a) : double [])
+        elif typeof<'a> = typeof<int32> then 
+            ArrayConverter.Float64(unbox(box a) : int32 [])
+        elif typeof<'a> = typeof<int64> then 
+            ArrayConverter.Float64(unbox(box a) : int64 [])
+        elif typeof<'a> = typeof<decimal> then 
+            ArrayConverter.Float64(unbox(box a) : decimal [])
+        elif typeof<'a> = typeof<int8> then 
+            ArrayConverter.Float64(unbox(box a) : int8 [])
+        elif typeof<'a> = typeof<uint8> then 
+            ArrayConverter.Float64(unbox(box a) : uint8 [])
+        else
+            a |> Array.map (fun x -> Convert.ChangeType(x, typeof<double>) :?> double)
+    static member inline Int32(a : float32 []) = a |> Array.map int
+    static member inline Int32(a : double []) = a |> Array.map int
+    static member inline Int32(a : int32 []) = a 
+    static member inline Int32(a : int64 []) = a |> Array.map int
+    static member inline Int32(a : decimal []) = a |> Array.map int
+    static member inline Int32(a : int8 []) = a |> Array.map int
+    static member inline Int32(a : uint8 []) = a |> Array.map int
+    static member inline Int32(a : 'a []) = 
+        if typeof<'a> = typeof<float32> then 
+            ArrayConverter.Int32(unbox(box a) : float32 [])
+        elif typeof<'a> = typeof<double> then 
+            ArrayConverter.Int32(unbox(box a) : double [])
+        elif typeof<'a> = typeof<int32> then 
+            ArrayConverter.Int32(unbox(box a) : int32 [])
+        elif typeof<'a> = typeof<int64> then 
+            ArrayConverter.Int32(unbox(box a) : int64 [])
+        elif typeof<'a> = typeof<decimal> then 
+            ArrayConverter.Int32(unbox(box a) : decimal [])
+        elif typeof<'a> = typeof<int8> then 
+            ArrayConverter.Int32(unbox(box a) : int8 [])
+        elif typeof<'a> = typeof<uint8> then 
+            ArrayConverter.Int32(unbox(box a) : uint8 [])
+        else
+            a |> Array.map (fun x -> Convert.ChangeType(x, typeof<int>) :?> int)
+    static member inline Int64(a : float32 []) = a |> Array.map int64
+    static member inline Int64(a : double []) = a |> Array.map int64
+    static member inline Int64(a : int32 []) = a |> Array.map int64
+    static member inline Int64(a : int64 []) = a
+    static member inline Int64(a : decimal []) = a |> Array.map int64
+    static member inline Int64(a : int8 []) = a |> Array.map int64
+    static member inline Int64(a : uint8 []) = a |> Array.map int64
+    static member inline Int64(a : 'a []) = 
+        if typeof<'a> = typeof<float32> then 
+            ArrayConverter.Int64(unbox(box a) : float32 [])
+        elif typeof<'a> = typeof<double> then 
+            ArrayConverter.Int64(unbox(box a) : double [])
+        elif typeof<'a> = typeof<int32> then 
+            ArrayConverter.Int64(unbox(box a) : int32 [])
+        elif typeof<'a> = typeof<int64> then 
+            ArrayConverter.Int64(unbox(box a) : int64 [])
+        elif typeof<'a> = typeof<decimal> then 
+            ArrayConverter.Int64(unbox(box a) : decimal [])
+        elif typeof<'a> = typeof<int8> then 
+            ArrayConverter.Int64(unbox(box a) : int8 [])
+        elif typeof<'a> = typeof<uint8> then 
+            ArrayConverter.Int64(unbox(box a) : uint8 [])
+        else
+            a |> Array.map (fun x -> Convert.ChangeType(x, typeof<int64>) :?> int64)
+    static member inline Int8(a : float32 []) = a |> Array.map int8
+    static member inline Int8(a : double []) = a |> Array.map int8
+    static member inline Int8(a : int32 []) = a |> Array.map int8
+    static member inline Int8(a : int64 []) = a |> Array.map int8
+    static member inline Int8(a : decimal []) = a |> Array.map int8
+    static member inline Int8(a : int8 []) = a
+    static member inline Int8(a : uint8 []) = a |> Array.map int8
+    static member inline Int8(a : 'a []) = 
+        if typeof<'a> = typeof<float32> then 
+            ArrayConverter.Int8(unbox(box a) : float32 [])
+        elif typeof<'a> = typeof<double> then 
+            ArrayConverter.Int8(unbox(box a) : double [])
+        elif typeof<'a> = typeof<int32> then 
+            ArrayConverter.Int8(unbox(box a) : int32 [])
+        elif typeof<'a> = typeof<int64> then 
+            ArrayConverter.Int8(unbox(box a) : int64 [])
+        elif typeof<'a> = typeof<decimal> then 
+            ArrayConverter.Int8(unbox(box a) : decimal [])
+        elif typeof<'a> = typeof<int8> then 
+            ArrayConverter.Int8(unbox(box a) : int8 [])
+        elif typeof<'a> = typeof<uint8> then 
+            ArrayConverter.Int8(unbox(box a) : uint8 [])
+        else
+            a |> Array.map (fun x -> Convert.ChangeType(x, typeof<int8>) :?> int8)
+    static member inline UInt8(a : float32 []) = a |> Array.map uint8
+    static member inline UInt8(a : double []) = a |> Array.map uint8
+    static member inline UInt8(a : int32 []) = a |> Array.map uint8
+    static member inline UInt8(a : int64 []) = a |> Array.map uint8
+    static member inline UInt8(a : decimal []) = a |> Array.map uint8
+    static member inline UInt8(a : int8 []) = a |> Array.map uint8
+    static member inline UInt8(a : uint8 []) = a
+    static member inline UInt8(a : 'a []) = 
+        if typeof<'a> = typeof<float32> then 
+            ArrayConverter.UInt8(unbox(box a) : float32 [])
+        elif typeof<'a> = typeof<double> then 
+            ArrayConverter.UInt8(unbox(box a) : double [])
+        elif typeof<'a> = typeof<int32> then 
+            ArrayConverter.UInt8(unbox(box a) : int32 [])
+        elif typeof<'a> = typeof<int64> then 
+            ArrayConverter.UInt8(unbox(box a) : int64 [])
+        elif typeof<'a> = typeof<decimal> then 
+            ArrayConverter.UInt8(unbox(box a) : decimal [])
+        elif typeof<'a> = typeof<int8> then 
+            ArrayConverter.UInt8(unbox(box a) : int8 [])
+        elif typeof<'a> = typeof<uint8> then 
+            ArrayConverter.UInt8(unbox(box a) : uint8 [])
+        else
+            a |> Array.map (fun x -> Convert.ChangeType(x, typeof<uint8>) :?> uint8)
+
+
 
 
 
@@ -247,3 +422,13 @@ module Util =
     let inline internal valueStringHelper (_ : ^a) (x : ^b) = 
         ((^a or ^b) : (static member ValueString : ^b -> string) (x))
     let inline valueString (x : ^t) = valueStringHelper ValueStringExtensions x
+
+    let inline convertArray (a : ^a []) (dtype : DataType) = 
+        match dtype with 
+        | Float16 -> failwith "float16 not supported yet" //TODO: float16
+        | Float32 -> ArrayConverter.Float32(a) :> Array
+        | Float64 -> ArrayConverter.Float64(a) :> Array
+        | Int32 -> ArrayConverter.Int32(a) :> Array
+        | Int64 -> ArrayConverter.Int64(a) :> Array
+        | Int8 -> ArrayConverter.Int8(a) :> Array
+        | UInt8 -> ArrayConverter.UInt8(a) :> Array

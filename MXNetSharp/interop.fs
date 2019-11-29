@@ -973,9 +973,9 @@ module MXNDArray =
 
     /// <summary>get the shape of the array</summary>
     /// <param name="handle">the handle to the narray</param>
-    let inline syncCopyFromCPU handle (data : ^a[]) = 
+    let syncCopyFromCPU handle (data : 'a []) = 
         use ptr = fixed data
-        let iptr = NativeInterop.NativePtr.toNativeInt ptr
+        let iptr = System.Runtime.InteropServices.Marshal.UnsafeAddrOfPinnedArrayElement(data,0)
         let sz = int64 data.Length
         MXNDArraySyncCopyFromCPU(handle, iptr, sz) |> throwOnError "MXNDArraySyncCopyFromCPU"
         
