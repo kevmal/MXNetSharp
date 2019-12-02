@@ -9,8 +9,9 @@ module Autograd =
     let setIsTraining training = MXAutograd.setIsTraining training
     let record f = 
         MXAutograd.setIsRecording true |> ignore
-        f()
+        let result = f()
         MXAutograd.setIsRecording false |> ignore
+        result
     let symbol (ndarray : NDArray) = 
         let rec makeSymbol handle = 
             let s = 

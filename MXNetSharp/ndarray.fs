@@ -689,6 +689,7 @@ type NDArray(handle : SafeNDArrayHandle) =
         let a = x.ToArray()
         assert(a.Length = 1)
         a.[0]
+    member x.ToFloat32Scalar() : float32 = x.ToScalar()
     member x.ToDoubleScalar() : double = x.ToScalar()
     member x.ToIntScalar() : int = x.ToScalar()
     member x.ToInt64Scalar() : int64 = x.ToScalar()

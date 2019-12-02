@@ -16,7 +16,7 @@ open MXNetSharp.PrimitiveOperators
 
 let batchSize = 64
 
-let context = GPU 0
+let context = if MXLib.getGpuCount() > 0 then GPU 0 else CPU 0
 
 let ensure (url : string) (file : string) = 
     if not(File.Exists file) then

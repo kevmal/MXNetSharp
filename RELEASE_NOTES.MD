@@ -1,3 +1,17 @@
+#### 0.0.1 (TBD)
+* Move generated operators to MX and generated Symbol types to SymbolOperators
+* Type conversion on NDArray.ToArray as well as specific ToArray methods (ie ToFloat32Array)
+* NDArray.ToScalar (NDArray.ToFloat32Scalar) methods
+* Basic indexing for NDArray and Symbol
+* Cleaned up generated Argument types. DType arguments were consolidated where only one/two options were missing. For exmaple, if all dtypes but uint8 are valid then it just uses DataType regardless.
+* (.>>) and (.|>) operators for Symbol composition
+* Context extension methods for creating NDArrays on a context (zeros, ones, linspace, ...)
+* Fix ctx arg type on gernerated NDArray ops (was previously a string)
+* Context is not optional for NDArray operators that have it as an arg
+* NDArray initializing constructors were removed in favor of NDArray.CopyFrom static methods
+* BindMap now Bindings and ArgBinding is now Bind. Additional functions added to the corresponding modules.
+
+
 #### 0.0.1-alpha (2019-11-07)
 * Generated types for MXNet symbol api in MXNetSharp namespace
 * Generated static methods for both NDArray and Symbol operators in MXNetSharp.Operators namespace

@@ -33,41 +33,57 @@ let z6 = x ..&& y // broadcast
 open MXNetSharp.PrimitiveOperators
 let z7 = exp x
 
+
+// Create an NDArray from a .NET array
+
+let a = NDArray.CopyFrom([|1.f .. 10.f|], [5;2], GPU 0)
+
+// This is the same as above
+let a2 = GPU(0).CopyFrom([|1.f .. 10.f|], [5;2])
+
+
 // NDArray's do not need the MXNetSharp.PrimitiveOperators namespace
-
-let a = new NDArray([|1.f .. 10.f|], shape = [5;2], context = GPU 0)
-
 let b = sqrt(a + 20.0)
 
 let v : float32 [] = b.ToArray() //Copy back to CPU in managed array
+let v2 = b.ToFloat32Array() //Same as above
+let v3 = b.ToDoubleArray() // Float32 -> Double conversion happens implicitly
 
 // val v : float32 [] =
 //  [|4.5825758f; 4.69041586f; 4.79583168f; 4.89897966f; 5.0f; 5.09901953f;
 //    5.19615221f; 5.29150248f; 5.38516474f; 5.47722578f|]
 
-// NDArray Operators exist in MXNEtSharp.Operators
+// NDArray Operators exist in MXNEtSharp.MX
 
-(Operators.Mean(b).ToArray().[0] : float32)
+MX.Mean(b).ToFloat32Scalar()
 
 // val it : float32 = 5.04168653f
 
 // Slicing
 
 // following are equivalent
-(b.[2..4,*].ToArray() : float32[]) 
-(b.[2..4].ToArray() : float32[]) 
+b.[2..4,*].ToFloat32Array()
+b.[2..4].ToFloat32Array()
 //val it : float32 [] =
 // [|5.0f; 5.09901953f; 5.19615221f; 5.29150248f; 5.38516474f; 5.47722578f|]
 
 // Note that the range is startIndex..endIndex (F# style) as oppose to MXnet slcing where slice stops just up to the end
-(b.[2..2,*].ToArray() : float32[]) 
+b.[2..2,*].ToFloat32Array()
 //val it : float32 [] = [|5.0f; 5.09901953f|]
 
 // With negative slicing then 'end' value behaves the same as MXNet. startIndex .. -dropCount
-(b.[3..-2,1].ToArray() : float32[]) 
+b.[2..-2,1].ToFloat32Array()
 // val it : float32 [] = [|5.29150248f|]
 
+// Steping syntax is more verbose (the following are all equivalent)
 
+b.[SliceRange(0L, 4L, 2L), *].ToFloat32Array()
+b.[SliceRange(stop = 4L, step = 2L), *].ToFloat32Array()
+b.[SliceRange(start = 0L, step = 2L), *].ToFloat32Array()
+b.[SliceRange(step = 2L), *].ToFloat32Array()
+
+// val it : float32 [] =
+// [|4.5825758f; 4.69041586f; 5.0f; 5.09901953f; 5.38516474f; 5.47722578f|]
 ```
 
 Simple examples adapted from various sources:
@@ -79,26 +95,23 @@ Simple examples adapted from various sources:
 
 ## Symbol API
 
-Currently each MXNet operation is represented as a type inheriting from `SymbolOperator` in the `MXNetSharp` namespace (these will soon find a new home in their own namespace). 
+Currently each MXNet operation is represented as a type inheriting from `SymbolOperator` and are generated in the `MXNetSharp.SymbolOperators` namespace.
 
 
 Actual creation of the `Symbol` (at the MXNet level) is delayed until the symbol handle is needed. This is to allow for delayed naming and late input binding.
 ```fsharp
 open MXNetSharp
-
-let inline (.>>) (x : Symbol) (y : 'a) : 'a = 
-    let _f() = y :> SymbolOperator
-    y.ComposedWith(x) |> box |> unbox
+open MXNetSharp.SymbolOperators
 
 let x = Variable "x"
 let y = Variable "y"
 
 let z = 
-	x
-	.>> FullyConnected(1024)
-	.>> FullyConnected(1024)
-	.>> FullyConnected(32)
-	.>> FullyConnected(1)
+    x
+    .>> FullyConnected(1024)
+    .>> FullyConnected(1024)
+    .>> FullyConnected(32)
+    .>> FullyConnected(1)
 
 let loss = MakeLoss(Sum(Square(x-y))) 
 
@@ -112,6 +125,7 @@ the `Symbol` type such as `tanh`, `exp`, `pow`.
 ```fsharp
 
 open MXNetSharp
+open MXNetSharp.SymbolOperators
 open MXNetSharp.PrimitiveOperators
 
 let x = Variable "x"

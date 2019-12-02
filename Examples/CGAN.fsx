@@ -6,6 +6,7 @@
 open Loadui
 
 open MXNetSharp
+open MXNetSharp.Interop
 open MXNetSharp.IO
 open System
 open System.Net
@@ -21,7 +22,7 @@ let batchSize = 128
 let nLatent = 100
 let nClasses = 10
     
-let context = CPU(0)
+let context = if MXLib.getGpuCount() > 0 then GPU 0 else CPU 0
 
 let ensure (url : string) (file : string) = 
     if not(File.Exists file) then
