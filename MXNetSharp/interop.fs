@@ -17,8 +17,10 @@ exception MXNetException of string*string with
 
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type LibFeature =
-    val name : string
-    val enabled : bool    
+    val private name : string
+    val private enabled : byte    
+    member x.Name = x.name
+    member x.Enabled = x.enabled <> 0uy
 
 type ArgumentInfo = 
     {
