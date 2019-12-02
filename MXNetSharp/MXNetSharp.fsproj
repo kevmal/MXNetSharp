@@ -25,6 +25,7 @@
     <Compile Include="coretypes.fs" />
     <Compile Include="primops.fs" />
     <Compile Include="interop.fs" />
+    <Compile Include="mxlib.fs" />
     <Compile Include="atomicsymbol.fs" />
     <Compile Include="operator.fs" />
     <Compile Include="genargtypes.fs" />

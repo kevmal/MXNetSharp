@@ -468,7 +468,11 @@ type NDArray(handle : SafeNDArrayHandle) =
                             flatEnd <- flatEnd + int64 shape.[k] - 1L
                     flatEnd <- flatEnd + 1L
                     let flat : NDArray = x.Reshape(-1)
-                    let slicedFlat = new NDArray(MXNDArray.slice64 flat.UnsafeHandle flatBegin flatEnd)
+                    let slicedFlat =    
+                        if LibFeature.INT64_TENSOR_SIZE then 
+                            new NDArray(MXNDArray.slice64 flat.UnsafeHandle flatBegin flatEnd)
+                        else
+                            new NDArray(MXNDArray.slice flat.UnsafeHandle flatBegin flatEnd)
                     let slicedShape = 
                         let s = Array.zeroCreate shape.Length
                         let mutable k = shape.Length - 1
