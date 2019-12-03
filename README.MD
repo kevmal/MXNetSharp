@@ -4,6 +4,13 @@
 
 Bindings are generated for MXNet 1.5.1 and so "libmxnet" version 1.5.1 needs to be on library search path. For GPU support, relevant CUDA libraries also need to be accessible. 
 
+## Examples
+- [CGAN](Examples/CGAN.fsx)
+- [Variational Autoencoder](Examples/MNIST%20VAE.fsx)
+- [Neural style transfer](Examples/Neural%20Style%20Transfer.fsx)
+
+Note: Samples which use UI (CGAN, VAE) need to specifically reference either net46 or netcore assemblies. By default they're loading net46, to use netcore uncomment the ".NET core" section in loadui.fsx in the Examples directory and comment the Net46 section.
+
 ## Quick start 
 ```fsharp
 open MXNetSharp
@@ -134,14 +141,17 @@ let y = exp(2.0*x + 33.0) // y is of type `Exp`
 let y2 = Exp(2.0*x + 33.0) // same as above but explicitly creates the `Exp` symbol type
 
 ```
-## Executor 
-TODO
+## Executor (TODO)
+MXNetSharp.Executor class. Please see samples.
 
-## NDArray
-TODO
-### Autodiff
-TODO
+## NDArray (TODO)
+MXNetSharp.NDArray class. Please see samples and quickstart section.
 
+### Autodiff (TODO)
+MXNetSharp.Autodiff module.
+
+## Data loaders (TODO)
+MXNetSharp.IO.CSVIter and MXNetSharp.IO.MNISTIter. MNISTIter is used in the VAE and CGAN examples.
 
 
 
