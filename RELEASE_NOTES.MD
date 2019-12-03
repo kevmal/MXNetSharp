@@ -1,4 +1,4 @@
-#### 0.0.1 (TBD)
+#### 0.0.1 (2019-12-03)
 * Move generated operators to MX and generated Symbol types to SymbolOperators
 * Type conversion on NDArray.ToArray as well as specific ToArray methods (ie ToFloat32Array)
 * NDArray.ToScalar (NDArray.ToFloat32Scalar) methods

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-    <Version>0.0.1-alpha</Version>
+    <Version>0.0.1</Version>
     <Description>F# bindings for MXNet</Description>
     <PackageTags>MXNet F# FSharp deep learning</PackageTags>
     <PackageProjectUrl>https://github.com/kevmal/MXNetSharp</PackageProjectUrl>
