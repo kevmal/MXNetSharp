@@ -10,6 +10,7 @@
 * Context is not optional for NDArray operators that have it as an arg
 * NDArray initializing constructors were removed in favor of NDArray.CopyFrom static methods
 * BindMap now Bindings and ArgBinding is now Bind. Additional functions added to the corresponding modules.
+* Feature struct fix (incorrectly reporting "enabled" flag on MXLib features) with LibFeature module
 
 
 #### 0.0.1-alpha (2019-11-07)
