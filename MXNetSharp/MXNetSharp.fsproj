@@ -41,8 +41,8 @@
     <None Include="explore operators.fsx" />
     <None Include="generate operators.fsx" />
     <None Include="generate data iters.fsx" />
-    <Content Include="OpOutCount.txt" />
-    <Content Include="OpOutCountRemainder.txt" />
+    <None Include="OpOutCount.txt" />
+    <None Include="OpOutCountRemainder.txt" />
   </ItemGroup>
 
 </Project>

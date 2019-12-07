@@ -261,4 +261,7 @@ module Slicing =
     //    a.[30 .. 40, *] <- a.[0 .. 10, *] 
     //    Assert.Equal(1,2)
         
-        
+module Main = 
+    [<EntryPoint>]
+    let main argv = 
+        0 

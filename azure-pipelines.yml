@@ -1,23 +1,90 @@
-# ASP.NET Core
-# Build and test ASP.NET Core projects targeting .NET Core.
-# Add steps that run tests, create a NuGet package, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
-
 trigger:
 - master
 
-pool:
-  vmImage: 'ubuntu-latest'
+stages:
+  - stage: build
+    displayName: Build
+    jobs:
+      - job: Linux
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+        - task: UsePythonVersion@0
+        - checkout: self
+          clean: true
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'build'
+            projects: 'MXNetSharp'
+            arguments: '-f netstandard2.0'
+            configuration: "Debug"
+            requestedMajorVersion: 3
+          displayName: 'dotnet build Debug'
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'build'
+            projects: 'MXNetSharp'
+            arguments: '-f netstandard2.0'
+            configuration: "Release"
+            requestedMajorVersion: 3
+          displayName: 'dotnet build Release'
+        - script: pip install --target=$(Agent.TempDirectory) mxnet
+          displayName: 'Install MXNet $(mxver)'
+        - task: DotNetCoreCLI@2
+          env: 
+            LD_LIBRARY_PATH: '$(Agent.TempDirectory)/mxnet:$(LD_LIBRARY_PATH)'
+          inputs:
+            command: 'test'
+            projects: 'MXNETSharp.Tests'
+            configuration: "Debug"
+          displayName: 'dotnet test Debug'
+        - task: DotNetCoreCLI@2
+          env: 
+            LD_LIBRARY_PATH: '$(Agent.TempDirectory)/mxnet:$(LD_LIBRARY_PATH)'
+          inputs:
+            command: 'test'
+            projects: 'MXNETSharp.Tests'
+            configuration: "Release"
+            requestedMajorVersion: 3
+          displayName: 'dotnet test Release'
 
-variables:
-  buildConfiguration: 'Release'
+      - job: Windows
+        pool:
+          vmImage: 'windows-2019'
+        steps:
+        - task: UsePythonVersion@0
+        - checkout: self
+          clean: true
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'build'
+            configuration: "Debug"
+            requestedMajorVersion: 3
+          displayName: 'dotnet build Debug'
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'build'
+            configuration: "Release"
+            requestedMajorVersion: 3
+          displayName: 'dotnet build Release'
+        - script: pip install --target=$(Agent.TempDirectory) mxnet
+          displayName: 'Install MXNet $(mxver)'
+        - task: DotNetCoreCLI@2
+          env: 
+            PATH: '$(Agent.TempDirectory)\mxnet\;$(PATH)'
+          inputs:
+            command: 'test'
+            configuration: "Debug"
+            requestedMajorVersion: 3
+          displayName: 'dotnet test Debug'
+        - task: DotNetCoreCLI@2
+          env: 
+            PATH: '$(Agent.TempDirectory)\mxnet\;$(PATH)'
+          inputs:
+            command: 'test'
+            configuration: "Release"
+            requestedMajorVersion: 3
+          displayName: 'dotnet test Release'
+        
 
-steps:
-- script: dotnet build --configuration Debug
-  displayName: 'dotnet build Debug'
-- script: dotnet test --configuration Debug
-  displayName: 'dotnet test Debug'
-- script: dotnet build --configuration Release
-  displayName: 'dotnet build Release'
-- script: dotnet test --configuration Release
-  displayName: 'dotnet test Release'
+     

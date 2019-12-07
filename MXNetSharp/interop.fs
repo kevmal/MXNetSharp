@@ -313,7 +313,7 @@ module MXSymbol =
     /// <summary>Get the input symbols of the graph.</summary>
     /// <param name="sym">The graph.</param>
     /// <returns>The input symbols of the graph.</returns>
-    let getInputSymbols sym  : SymbolHandle [] = 
+    let getInputSymbols sym : SymbolHandle [] = 
         let mutable input_size = un
         let mutable inputs = 0n
         MXSymbolGetInputSymbols(sym, &inputs, &input_size) |> throwOnError "MXSymbolGetInputSymbols"
@@ -325,7 +325,7 @@ module MXSymbol =
     ///connect to the subgraph will be returned.</summary>
     /// <param name="sym">The graph.</param>
     /// <returns>The nodes that connect to the subgraph.</returns>
-    let cutSubgraph sym = 
+    let cutSubgraph sym : SymbolHandle [] = 
         let mutable input_size = un
         let mutable inputs = 0n
         MXSymbolCutSubgraph(sym, &inputs, &input_size) |> throwOnError "MXSymbolCutSubgraph"

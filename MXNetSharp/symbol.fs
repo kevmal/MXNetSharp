@@ -25,8 +25,8 @@ type Symbol() =
     member x.Id = sid.Value
     member x.GeneratedName = sprintf "%s!%d" (x.GetType().Name) x.Id
     //let mutable disposed = false
-    member val internal InternalName : string option = None with get,set
-    member val internal InternalHandle : SafeSymbolHandle option = None with get,set
+    member val InternalName : string option = None with get,set
+    member val InternalHandle : SafeSymbolHandle option = None with get,set
     member x.IsInitialized = x.InternalHandle.IsSome
     member x.FreezeName() = 
         if not x.IsInitialized then 
@@ -422,7 +422,7 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
                         | VarArg (count,i) -> 
                             inputValues.AddRange i
                             pKeys.Add count
-                            pValues.Add(i.Length.ValueString())
+                            pValues.Add(inputValues.Count.ValueString())
                         | Parameter (Some o) -> 
                             pKeys.Add a.Name
                             pValues.Add(o.ValueString())
