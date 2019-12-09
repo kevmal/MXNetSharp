@@ -857,7 +857,7 @@ extern int MXGetFunction__(string name, FunctionHandle[] out)
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXFuncGetInfo(
     FunctionHandle ``fun``, 
-    [<Out>] string& name, 
+    [<Out>] IntPtr& name, 
     [<Out>] IntPtr& description, 
     [<Out>] uint32& num_args,
     [<Out>] IntPtr& arg_names, 

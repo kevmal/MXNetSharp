@@ -158,7 +158,7 @@ module MXLib =
         let mutable return_type = un
         MXFuncGetInfo(functionHandle,&name,&description,&numArgs,&argNames,&arg_type_infos,&arg_descriptions,&return_type) |> throwOnError "MXFuncGetInfo"
         {
-            Name = name
+            Name = str name
             Description = str description
             Arguments = 
                 [|

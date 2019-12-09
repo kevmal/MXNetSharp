@@ -8,7 +8,6 @@ open Xunit
 open MXNetSharp
 
 module MXLib =
-    System.AppDomain.CurrentDomain.ProcessExit.AddHandler(fun _ _ -> MXLib.notifyShutdown())
 
     [<Fact>]
     let ``basic MXLib calls``() =
