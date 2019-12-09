@@ -31,7 +31,7 @@ stages:
             configuration: "Release"
             requestedMajorVersion: 3
           displayName: 'dotnet build Release'
-        - script: pip install --target=$(Agent.TempDirectory) mxnet
+        - script: pip install --target=$(Agent.TempDirectory) mxnet==$(mxver)
           displayName: 'Install MXNet $(mxver)'
         - task: DotNetCoreCLI@2
           env: 
@@ -118,7 +118,7 @@ stages:
             configuration: "Release"
             requestedMajorVersion: 3
           displayName: 'dotnet build Release'
-        - script: pip install --target=$(Agent.TempDirectory) mxnet
+        - script: pip install --target=$(Agent.TempDirectory) mxnet==$(mxver)
           displayName: 'Install MXNet $(mxver)'
         - task: DotNetCoreCLI@2
           env: 
