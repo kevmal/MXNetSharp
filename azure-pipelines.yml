@@ -11,7 +11,7 @@ stages:
         steps:
         - task: DotNetCoreInstaller@1
           inputs:
-            version: 3.1.0
+            version: $(dotnet_version)
         - task: UsePythonVersion@0
         - checkout: self
           clean: true
@@ -57,7 +57,7 @@ stages:
         steps:
         - task: DotNetCoreInstaller@1
           inputs:
-            version: 3.1.0
+            version: $(dotnet_version)
         - task: UsePythonVersion@0
         - checkout: self
           clean: true
@@ -98,7 +98,7 @@ stages:
         steps:
         - task: DotNetCoreInstaller@1
           inputs:
-            version: 3.1.0
+            version: $(dotnet_version)
         - task: UsePythonVersion@0
         - checkout: self
           clean: true
