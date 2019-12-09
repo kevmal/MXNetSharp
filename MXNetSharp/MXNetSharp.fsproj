@@ -13,11 +13,6 @@
     <Authors>Kevin Malenfant</Authors>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>.\MXNetSharp.XML</DocumentationFile>
-    <WarningLevel>5</WarningLevel>
-  </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="capi.fs" />
     <Compile Include="cpredictapi.fs" />

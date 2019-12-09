@@ -9,6 +9,9 @@ stages:
         pool:
           vmImage: 'ubuntu-latest'
         steps:
+        - task: DotNetCoreInstaller@1
+          inputs:
+            version: $(dotnet_version)
         - task: UsePythonVersion@0
         - checkout: self
           clean: true
@@ -28,7 +31,7 @@ stages:
             configuration: "Release"
             requestedMajorVersion: 3
           displayName: 'dotnet build Release'
-        - script: pip install --target=$(Agent.TempDirectory) mxnet
+        - script: pip install --target=$(Agent.TempDirectory) mxnet==$(mxver)
           displayName: 'Install MXNet $(mxver)'
         - task: DotNetCoreCLI@2
           env: 
@@ -52,6 +55,9 @@ stages:
         pool:
           vmImage: 'windows-2019'
         steps:
+        - task: DotNetCoreInstaller@1
+          inputs:
+            version: $(dotnet_version)
         - task: UsePythonVersion@0
         - checkout: self
           clean: true
@@ -82,6 +88,52 @@ stages:
             PATH: '$(Agent.TempDirectory)\mxnet\;$(PATH)'
           inputs:
             command: 'test'
+            configuration: "Release"
+            requestedMajorVersion: 3
+          displayName: 'dotnet test Release'
+
+      - job: MacOS
+        pool:
+          vmImage: 'macos-latest'
+        steps:
+        - task: DotNetCoreInstaller@1
+          inputs:
+            version: $(dotnet_version)
+        - task: UsePythonVersion@0
+        - checkout: self
+          clean: true
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'build'
+            projects: 'MXNetSharp'
+            arguments: '-f netstandard2.0'
+            configuration: "Debug"
+            requestedMajorVersion: 3
+          displayName: 'dotnet build Debug'
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'build'
+            projects: 'MXNetSharp'
+            arguments: '-f netstandard2.0'
+            configuration: "Release"
+            requestedMajorVersion: 3
+          displayName: 'dotnet build Release'
+        - script: pip install --target=$(Agent.TempDirectory) mxnet==$(mxver)
+          displayName: 'Install MXNet $(mxver)'
+        - task: DotNetCoreCLI@2
+          env: 
+            LD_LIBRARY_PATH: '$(Agent.TempDirectory)/mxnet:$(LD_LIBRARY_PATH)'
+          inputs:
+            command: 'test'
+            projects: 'MXNETSharp.Tests'
+            configuration: "Debug"
+          displayName: 'dotnet test Debug'
+        - task: DotNetCoreCLI@2
+          env: 
+            LD_LIBRARY_PATH: '$(Agent.TempDirectory)/mxnet:$(LD_LIBRARY_PATH)'
+          inputs:
+            command: 'test'
+            projects: 'MXNETSharp.Tests'
             configuration: "Release"
             requestedMajorVersion: 3
           displayName: 'dotnet test Release'
