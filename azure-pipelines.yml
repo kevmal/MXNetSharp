@@ -9,9 +9,9 @@ stages:
         pool:
           vmImage: 'ubuntu-latest'
         steps:
-        - task: DotNetCoreInstaller@0
+        - task: DotNetCoreInstaller@1
           inputs:
-            version: 3.0.100
+            version: 3.1.0
         - task: UsePythonVersion@0
         - checkout: self
           clean: true
@@ -55,9 +55,9 @@ stages:
         pool:
           vmImage: 'windows-2019'
         steps:
-        - task: DotNetCoreInstaller@0
+        - task: DotNetCoreInstaller@1
           inputs:
-            version: 3.0.100
+            version: 3.1.0
         - task: UsePythonVersion@0
         - checkout: self
           clean: true
@@ -96,9 +96,9 @@ stages:
         pool:
           vmImage: 'macos-latest'
         steps:
-        - task: DotNetCoreInstaller@0
+        - task: DotNetCoreInstaller@1
           inputs:
-            version: 3.0.100
+            version: 3.1.0
         - task: UsePythonVersion@0
         - checkout: self
           clean: true
