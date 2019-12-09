@@ -92,7 +92,6 @@ stages:
             requestedMajorVersion: 3
           displayName: 'dotnet test Release'
 
-    jobs:
       - job: MacOS
         pool:
           vmImage: 'macos-latest'
