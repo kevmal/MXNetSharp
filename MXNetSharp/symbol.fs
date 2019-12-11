@@ -330,6 +330,19 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
     //let parametersStr = parameters |> Array.map (fun (k,v) -> k, Util.valueString v)
     new(name, args) = new SymbolOperator(AtomicSymbolCreator.FromName name, args)
     //new(creator,pnames,ps,inames,ins) = new SymbolOperator(creator, Array.zip pnames ps, Array.zip inames ins)
+    override x.ToString() = 
+        sprintf "%s(%s)" (x.GetType().Name)
+            (operatorArguments 
+             |> Seq.choose
+                (fun a ->
+                    match a with 
+                    | name, Input(:? ImplicitVariable) -> None
+                    | name, Input(a) -> sprintf "%s = %s" name (a.GetType().Name) |> Some
+                    | name, VarArg(_, xs) -> sprintf "%s = [|%s|]" name (xs |> Seq.map (fun x -> x.GetType().Name) |> String.concat "; ") |> Some
+                    | name, Parameter(Some p) -> sprintf "%s = %O" name p |> Some
+                    | _ -> None
+                )
+             |> String.concat ", " )
     member internal x.AtomicSymbolCreator = creator
     member x.OperatorArguments = operatorArguments
     default x.Copy() = 
