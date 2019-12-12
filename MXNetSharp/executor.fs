@@ -69,6 +69,10 @@ type Bind =
         match x with 
         | AuxBinding(a) -> AuxBinding{a with NDArray = Some ndarray}
         | ArgBinding(a) -> ArgBinding{a with NDArray = Some ndarray}
+    member x.Grad = 
+        match x with 
+        | AuxBinding(a) -> None
+        | ArgBinding(a) -> a.Grad
     member x.NDArray = 
         match x with 
         | AuxBinding(a) -> a.NDArray
@@ -255,6 +259,11 @@ type Bindings(bindings : IDictionary<string, Bind>) =
         | Some x -> x
         | None -> 
             raise (NullReferenceException(sprintf "NDArray not set for binding %s" v.Name))
+    member x.Grad(v : Variable) = 
+        match x.Item(v).Grad with 
+        | Some x -> x
+        | None -> 
+            raise (NullReferenceException(sprintf "Grad not set for binding %s" v.Name))
     interface IEnumerable<Bind> with 
         member x.GetEnumerator() = bindings.Values.GetEnumerator()
         member x.GetEnumerator() = bindings.Values.GetEnumerator() :> System.Collections.IEnumerator
