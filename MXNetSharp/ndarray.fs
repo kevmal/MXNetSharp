@@ -700,6 +700,18 @@ type NDArray(handle : SafeNDArrayHandle) =
     member x.ToInt8Scalar() : int8 = x.ToScalar()
     member x.ToUInt8Scalar() : uint8 = x.ToScalar()
 
+    /// Returns a copy of the array after casting to a specified type
+    member x.AsType(dtype : DataType, copy : bool) = 
+        match x.DataType with 
+        | Some d when d = dtype && not copy -> x
+        | _ -> 
+            let target = new NDArray(x.Shape, x.Context, dtype = dtype)
+            x.CopyTo target
+            target
+        
+    /// Returns a copy of the array after casting to a specified type
+    member x.AsType(dtype) = x.AsType(dtype, true)
+
     override x.ToString() = sprintf "NDArray[%s] @%O" (x.Shape |> Array.map string |> String.concat ",") (x.Context)
     member x.Dispose(disposing) = 
         if not disposed then 
