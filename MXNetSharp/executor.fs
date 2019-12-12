@@ -98,10 +98,27 @@ type Bind =
 type IInitializer = 
     abstract member Initialize : Bind -> unit
 
-
 type Parameter(?name, ?shape, ?opReqType, ?grad, ?ndarray, ?dataType, ?storageType, ?init : IInitializer) = 
     inherit Variable()
-    let shape = shape |> Option.map (Seq.toArray)
+    let shape = 
+        match ndarray, shape with 
+        | Some (ndarray : NDArray), None -> ndarray.Shape |> Some
+        | Some (ndarray), Some s ->     
+            let s = s |> Seq.toArray
+            if ndarray.Shape.Length <> s.Length then 
+                invalidArg "shape" (sprintf "NDArray shape %A is not compatable with given parameter shape %A" ndarray.Shape s)
+            else
+                (ndarray.Shape, s)
+                ||> Array.iter2
+                    (fun s1 s2 ->
+                        if s1 = s2 || s2 = 0 || s2 = -1 then 
+                            ()
+                        else 
+                            invalidArg "shape" (sprintf "NDArray shape %A is not compatable with given parameter shape %A" ndarray.Shape s)
+                    )
+                ndarray.Shape |> Some
+        | None, Some s -> s |> Seq.toArray |> Some
+        | None, None -> None
     do 
         match name with 
         | Some n -> base.Name <- n
