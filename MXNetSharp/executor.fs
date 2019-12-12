@@ -458,7 +458,7 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                 )
         new Executor(symbol, context, inArgs, argGrad, gradReqType, aux, Some bindings)
     member x.Print() = MXExecutor.print handle.UnsafeHandle
-    member x.BindMap =  
+    member x.Bindings =  
         match bindMap with 
         | Some bm -> bm
         | None ->
@@ -475,9 +475,8 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                                     NDArray = Some a
                                     Grad = Some g
                                     OpReqType = Some t
-                                    //StorageType = Some a.StorageType //TODO: ndarray storage type
+                                    StorageType = Some a.StorageType
                                     DataType = a.DataType 
-                                    StorageType = None 
                                 }
                         )
                 yield!
@@ -489,9 +488,8 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                                     Name = name
                                     Shape = Some a.Shape
                                     NDArray = Some a
-                                    //StorageType = Some a.StorageType //TODO: ndarray storage type
+                                    StorageType = Some a.StorageType
                                     DataType = a.DataType
-                                    StorageType = None 
                                 }
                         )
                 yield!
@@ -505,9 +503,8 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                                     NDArray = Some a
                                     Grad = None
                                     OpReqType = None
-                                    //StorageType = Some a.StorageType //TODO: ndarray storage type
+                                    StorageType = Some a.StorageType
                                     DataType = a.DataType 
-                                    StorageType = None 
                                 }
                         )
             }
