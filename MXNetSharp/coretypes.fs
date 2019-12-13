@@ -170,6 +170,36 @@ type DataType =
         | TypeFlag.Uint8 -> Some UInt8
         | _ -> None
     static member FromInt(typeFlagInt) = DataType.FromTypeFlag(enum typeFlagInt)
+    static member FromNetType(t : Type) = 
+        if t = typeof<float32> then 
+            Float32
+        elif t = typeof<double> then 
+            Float64
+        elif t = typeof<int> then 
+            Int32
+        elif t = typeof<int64> then 
+            Int64
+        elif t = typeof<sbyte> then 
+            Int8
+        elif t = typeof<byte> then 
+            UInt8
+        else
+            failwithf "No corresponding MXNet type for type %s" (t.Name)
+    static member TryFromNetType(t : Type) = 
+        if t = typeof<float32> then 
+            Some Float32
+        elif t = typeof<double> then 
+            Some Float64
+        elif t = typeof<int> then 
+            Some Int32
+        elif t = typeof<int64> then 
+            Some Int64
+        elif t = typeof<sbyte> then 
+            Some Int8
+        elif t = typeof<byte> then 
+            Some UInt8
+        else
+            None
     static member FromNetType<'a>() = 
         if typeof<'a> = typeof<float32> then 
             Float32

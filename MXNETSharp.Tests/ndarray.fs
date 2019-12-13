@@ -260,7 +260,35 @@ module Slicing =
     //    a.[30 .. 40, *] <- 10000.f
     //    a.[30 .. 40, *] <- a.[0 .. 10, *] 
     //    Assert.Equal(1,2)
-        
+
+module Basic = 
+    [<Fact>]
+    let ``AsType int -> double``() = 
+        let nd = NDArray.CopyFrom([|0 .. 10|], CPU(0))
+        let nd2 = nd.AsType(DataType.Float64)
+        Assert.Equal(Some(DataType.Float64), nd2.DataType)
+        Assert.Equal(Some(DataType.Int32), nd.DataType)
+        Assert.True(nd2.ToArray() = [|0.0 .. 10.0|])
+    [<Fact>]
+    let ``CopyFrom Array``() = 
+        let a1 = System.Array.CreateInstance(typeof<float32>, 2, 2)
+        a1.SetValue(23.f, 1, 1)
+        a1.SetValue(50.f, 1, 0)
+        let b1 = NDArray.CopyFrom(a1, CPU 1)
+        Assert.True(b1.Shape = [|2;2|])
+        Assert.Equal(23.f, b1.[1,1].ToFloat32Scalar())
+        Assert.Equal(50.f, b1.[1,0].ToFloat32Scalar())
+        let a2 = System.Array.CreateInstance(typeof<float32>, 2, 2, 4, 2, 5)
+        a2.SetValue(23.f, 1, 1, 2, 1, 4)
+        a2.SetValue(50.f, 0, 1, 0, 0, 3)
+        a2.SetValue(110.f, 0, 1, 3, 0, 2)
+        let b2 = NDArray.CopyFrom(a2, CPU 1)
+        Assert.True(b2.Shape = [|2;2;4;2;5|])
+        Assert.Equal(23.f, b2.[1, 1, 2, 1, 4].ToFloat32Scalar())
+        Assert.Equal(50.f, b2.[0, 1, 0, 0, 3].ToFloat32Scalar())
+        Assert.Equal(110.f, b2.[0, 1, 3, 0, 2].ToFloat32Scalar())
+
+
 module Main = 
     [<EntryPoint>]
     let main argv = 

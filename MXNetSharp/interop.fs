@@ -973,8 +973,27 @@ module MXNDArray =
             Array.empty
         
 
-    /// <summary>get the shape of the array</summary>
+    /// <summary>Perform a synchronize copy from a continugous CPU memory region.
+    /// This function will call WaitToWrite before the copy is performed.
+    /// This is useful to copy data from existing memory region that are
+    /// not wrapped by NDArray(thus dependency not being tracked).</summary>
     /// <param name="handle">the handle to the narray</param>
+    /// <param name="data">data the data source to copy from</param>
+    let syncCopyFromCPUArray handle (data : Array) = 
+        let h = GCHandle.Alloc(data)
+        try
+            let iptr = System.Runtime.InteropServices.Marshal.UnsafeAddrOfPinnedArrayElement(data,0)
+            let sz = int64 data.Length
+            MXNDArraySyncCopyFromCPU(handle, iptr, sz) |> throwOnError "MXNDArraySyncCopyFromCPU"
+        finally
+            h.Free()
+        
+    /// <summary>Perform a synchronize copy from a continugous CPU memory region.
+    /// This function will call WaitToWrite before the copy is performed.
+    /// This is useful to copy data from existing memory region that are
+    /// not wrapped by NDArray(thus dependency not being tracked).</summary>
+    /// <param name="handle">the handle to the narray</param>
+    /// <param name="data">data the data source to copy from</param>
     let syncCopyFromCPU handle (data : 'a []) = 
         use ptr = fixed data
         let iptr = System.Runtime.InteropServices.Marshal.UnsafeAddrOfPinnedArrayElement(data,0)
