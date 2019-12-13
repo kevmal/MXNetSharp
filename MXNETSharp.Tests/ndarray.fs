@@ -287,6 +287,17 @@ module Basic =
         Assert.Equal(23.f, b2.[1, 1, 2, 1, 4].ToFloat32Scalar())
         Assert.Equal(50.f, b2.[0, 1, 0, 0, 3].ToFloat32Scalar())
         Assert.Equal(110.f, b2.[0, 1, 3, 0, 2].ToFloat32Scalar())
+    [<Fact>]
+    let ``Float16``() = 
+        let a1 = System.Array.CreateInstance(typeof<float32>, 2, 2)
+        a1.SetValue(23.f, 1, 1)
+        a1.SetValue(50.f, 1, 0)
+        let b1 = new NDArray([2;2], CPU 0, DataType.Float16)
+        b1.CopyFrom(a1)
+        Assert.Equal(Some(DataType.Float16), b1.DataType)
+        Assert.Equal(23.f, b1.[1,1].ToFloat32Scalar())
+        Assert.Equal(50.f, b1.[1,0].ToFloat32Scalar())
+
 
 
 module Main = 

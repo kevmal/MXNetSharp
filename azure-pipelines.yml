@@ -91,6 +91,3 @@ stages:
             configuration: "Release"
             requestedMajorVersion: 3
           displayName: 'dotnet test Release'
-        
-
-     
