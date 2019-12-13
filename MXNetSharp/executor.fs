@@ -395,6 +395,7 @@ type SafeExecutorHandle(owner) =
  
 type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, argGrad, gradReqType, auxStates, sharedExecutor, outputs, bindMap) =   
     let mutable disposed = false
+    let mutable outputs = outputs
     new(symbol : Symbol, context : Context, contextMap : IDictionary<string,Context>, inArgs, argGrad, gradReqType, auxStates, sharedExecutor : Executor option, bindMap : Bindings option) = 
         let inArgs = inArgs |> Seq.toArray
         let argGrad = argGrad |> Seq.toArray
@@ -457,6 +458,19 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                     | _ -> failwithf "No binding for %s" name
                 )
         new Executor(symbol, context, inArgs, argGrad, gradReqType, aux, Some bindings)
+    /// Refresh executor outputs. Returns false if nothing is updated.
+    member x.RefreshOutputs() = 
+        let mutable updated = false
+        let handles = MXExecutor.outputs handle.UnsafeHandle
+        if handles.Length = outputs.Length then 
+            for i = 0 to outputs.Length - 1 do 
+                if outputs.[i].UnsafeHandle <> handles.[i] then 
+                    outputs.[i] <- new NDArray(new SafeNDArrayHandle(handles.[i], true))
+                    updated <- true
+            updated
+        else
+            outputs <- handles |> Array.map (fun h -> new NDArray(new SafeNDArrayHandle(h, true)))
+            true
     member x.Print() = MXExecutor.print handle.UnsafeHandle
     member x.Bindings =  
         match bindMap with 
@@ -514,6 +528,7 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
     member x.Forward(isTraining : bool) = 
         let isTrain = if isTraining then 1 else 0
         MXExecutor.forward handle.UnsafeHandle isTrain
+        x.RefreshOutputs() |> ignore
     member x.Backward() = 
         MXExecutor.backward handle.UnsafeHandle null
     member x.Backward(grads) = 
