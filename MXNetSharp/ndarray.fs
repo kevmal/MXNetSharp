@@ -141,11 +141,19 @@ type NDArray(handle : SafeNDArrayHandle) =
 
     member x.CopyTo(destination : NDArray) = 
         MXNDArray.syncCopyFromNDArray destination.NDArrayHandle.UnsafeHandle x.NDArrayHandle.UnsafeHandle -1
+        mutInvoke destination "_copyto" [|x|] Array.empty |> ignore
 
     member x.CopyTo(deviceContext : Context) = 
         let destination = new NDArray(x.Shape, deviceContext, delayAlloc = true)
         x.CopyTo(destination)
         destination
+
+    member x.SyncCopyFromCPUUnchecked(data : Array) = MXNDArray.syncCopyFromCPUArray handle.UnsafeHandle data
+    member x.SyncCopyFromCPU(data : Array) = 
+        if x.DataType = DataType.TryFromNetType(data.GetType().GetElementType()) then 
+            MXNDArray.syncCopyFromCPUArray handle.UnsafeHandle data
+        else
+            raise (InvalidOperationException(sprintf "Source type of %s does not match NDArray type of %O" typeof<'a>.FullName x.DataTypeFlag))
 
     member x.SyncCopyFromCPUUnchecked(data : 'a []) = MXNDArray.syncCopyFromCPU handle.UnsafeHandle data
     member x.SyncCopyFromCPU(data : 'a []) = 
@@ -154,6 +162,16 @@ type NDArray(handle : SafeNDArrayHandle) =
         else
             raise (InvalidOperationException(sprintf "Source type of %s does not match NDArray type of %O" typeof<'a>.FullName x.DataTypeFlag))
 
+    member x.CopyFrom(data : Array) = 
+        let etype = data.GetType().GetElementType()
+        let dtype = DataType.FromNetType(etype)
+        match x.DataType with 
+        | None -> failwith "NDArray has no data type"
+        | Some t when t = dtype -> x.SyncCopyFromCPUUnchecked(data)
+        | Some _ -> 
+            use nd : NDArray = NDArray.CopyFrom(data, x.Context)
+            nd.CopyTo(x) |> ignore
+            
     member x.CopyFrom(data : 'aa []) = 
         match x.DataType with 
         | None -> // REVIEW: what to do here
@@ -169,6 +187,20 @@ type NDArray(handle : SafeNDArrayHandle) =
             | Int8 -> ArrayConverter.Int8(a) |> x.SyncCopyFromCPUUnchecked
             | UInt8 -> ArrayConverter.UInt8(a) |> x.SyncCopyFromCPUUnchecked
 
+    static member CopyFrom(data : Array, ctx : Context) = 
+        let etype = data.GetType().GetElementType()
+        let dtype = DataType.FromNetType(etype)
+        let shape = 
+            Array.init data.Rank 
+                (fun d -> 
+                    let l = data.GetLowerBound(d)
+                    let u = data.GetUpperBound(d)
+                    u - l + 1
+                )
+        let a = new NDArray(shape, ctx, dtype, false)
+        a.CopyFrom(data)
+        a
+        
     static member CopyFrom(data : float32[], shape : int seq, ctx : Context) = NDArray.ConvertCopyFrom(data,shape,ctx,DataType.Float32)
     static member CopyFrom(data : float[], shape : int seq, ctx : Context) = NDArray.ConvertCopyFrom(data,shape,ctx,DataType.Float64)
     static member CopyFrom(data : int[], shape : int seq, ctx : Context) = NDArray.ConvertCopyFrom(data,shape,ctx,DataType.Int32)
