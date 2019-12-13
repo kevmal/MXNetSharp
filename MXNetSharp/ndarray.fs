@@ -179,7 +179,9 @@ type NDArray(handle : SafeNDArrayHandle) =
         | Some t -> 
             let a = data
             match t with 
-            | Float16 -> failwith "float16 not supported yet" //TODO: float16
+            | Float16 -> 
+                use nd : NDArray = NDArray.CopyFrom(data, x.Context)
+                nd.CopyTo(x) |> ignore
             | Float32 -> ArrayConverter.Float32(a) |> x.SyncCopyFromCPUUnchecked
             | Float64 -> ArrayConverter.Float64(a) |> x.SyncCopyFromCPUUnchecked
             | Int32 -> ArrayConverter.Int32(a) |> x.SyncCopyFromCPUUnchecked
