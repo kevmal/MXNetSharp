@@ -3,15 +3,27 @@
 open MXNetSharp.Interop
 
 module Autograd = 
+    let internal lck = obj()
     let isRecording() = MXAutograd.isRecording()
     let isTraining() = MXAutograd.isTraining()
     let setIsRecording recording = MXAutograd.setIsRecording recording
     let setIsTraining training = MXAutograd.setIsTraining training
+    let pause f = 
+        lock lck
+            (fun _ ->
+                MXAutograd.setIsRecording false |> ignore
+                let result = f()
+                MXAutograd.setIsRecording true |> ignore
+                result
+            )
     let record f = 
-        MXAutograd.setIsRecording true |> ignore
-        let result = f()
-        MXAutograd.setIsRecording false |> ignore
-        result
+        lock lck
+            (fun _ ->
+                MXAutograd.setIsRecording true |> ignore
+                let result = f()
+                MXAutograd.setIsRecording false |> ignore
+                result
+            )
     let symbol (ndarray : NDArray) = 
         let rec makeSymbol handle = 
             let s = 

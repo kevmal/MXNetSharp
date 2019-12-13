@@ -4,6 +4,10 @@
 * Fix MXSymbol.cutSubgraph return type
 * Issue #8: fix MXFuncGetInfo parameter types causing mem error
 * Issue #5: Add ToString override for SymbolOperator
+* Autograd.pause and thread lock on Autograd.record
+* NDArray.AsType instance method
+* Use provided NDArray shape for parameter default shape
+* Executor.BindMap renamed to Executor.Bindings
 
 #### 0.0.1 (2019-12-03)
 * Move generated operators to MX and generated Symbol types to SymbolOperators

@@ -69,6 +69,10 @@ type Bind =
         match x with 
         | AuxBinding(a) -> AuxBinding{a with NDArray = Some ndarray}
         | ArgBinding(a) -> ArgBinding{a with NDArray = Some ndarray}
+    member x.Grad = 
+        match x with 
+        | AuxBinding(a) -> None
+        | ArgBinding(a) -> a.Grad
     member x.NDArray = 
         match x with 
         | AuxBinding(a) -> a.NDArray
@@ -98,10 +102,27 @@ type Bind =
 type IInitializer = 
     abstract member Initialize : Bind -> unit
 
-
 type Parameter(?name, ?shape, ?opReqType, ?grad, ?ndarray, ?dataType, ?storageType, ?init : IInitializer) = 
     inherit Variable()
-    let shape = shape |> Option.map (Seq.toArray)
+    let shape = 
+        match ndarray, shape with 
+        | Some (ndarray : NDArray), None -> ndarray.Shape |> Some
+        | Some (ndarray), Some s ->     
+            let s = s |> Seq.toArray
+            if ndarray.Shape.Length <> s.Length then 
+                invalidArg "shape" (sprintf "NDArray shape %A is not compatable with given parameter shape %A" ndarray.Shape s)
+            else
+                (ndarray.Shape, s)
+                ||> Array.iter2
+                    (fun s1 s2 ->
+                        if s1 = s2 || s2 = 0 || s2 = -1 then 
+                            ()
+                        else 
+                            invalidArg "shape" (sprintf "NDArray shape %A is not compatable with given parameter shape %A" ndarray.Shape s)
+                    )
+                ndarray.Shape |> Some
+        | None, Some s -> s |> Seq.toArray |> Some
+        | None, None -> None
     do 
         match name with 
         | Some n -> base.Name <- n
@@ -238,6 +259,11 @@ type Bindings(bindings : IDictionary<string, Bind>) =
         | Some x -> x
         | None -> 
             raise (NullReferenceException(sprintf "NDArray not set for binding %s" v.Name))
+    member x.Grad(v : Variable) = 
+        match x.Item(v).Grad with 
+        | Some x -> x
+        | None -> 
+            raise (NullReferenceException(sprintf "Grad not set for binding %s" v.Name))
     interface IEnumerable<Bind> with 
         member x.GetEnumerator() = bindings.Values.GetEnumerator()
         member x.GetEnumerator() = bindings.Values.GetEnumerator() :> System.Collections.IEnumerator
@@ -360,7 +386,7 @@ type SafeExecutorHandle(owner) =
     new(ptr,owner) as this = new SafeExecutorHandle(owner) then this.SetHandle(ptr)
     override x.IsInvalid = x.handle <= 0n
     override x.ReleaseHandle() = CApi.MXExecutorFree x.handle = 0
-    member internal x.UnsafeHandle = 
+    member x.UnsafeHandle = 
         if not x.IsClosed then
             x.handle
         else
@@ -432,7 +458,7 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                 )
         new Executor(symbol, context, inArgs, argGrad, gradReqType, aux, Some bindings)
     member x.Print() = MXExecutor.print handle.UnsafeHandle
-    member x.BindMap =  
+    member x.Bindings =  
         match bindMap with 
         | Some bm -> bm
         | None ->
@@ -449,9 +475,8 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                                     NDArray = Some a
                                     Grad = Some g
                                     OpReqType = Some t
-                                    //StorageType = Some a.StorageType //TODO: ndarray storage type
+                                    StorageType = Some a.StorageType
                                     DataType = a.DataType 
-                                    StorageType = None 
                                 }
                         )
                 yield!
@@ -463,9 +488,8 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                                     Name = name
                                     Shape = Some a.Shape
                                     NDArray = Some a
-                                    //StorageType = Some a.StorageType //TODO: ndarray storage type
+                                    StorageType = Some a.StorageType
                                     DataType = a.DataType
-                                    StorageType = None 
                                 }
                         )
                 yield!
@@ -479,9 +503,8 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                                     NDArray = Some a
                                     Grad = None
                                     OpReqType = None
-                                    //StorageType = Some a.StorageType //TODO: ndarray storage type
+                                    StorageType = Some a.StorageType
                                     DataType = a.DataType 
-                                    StorageType = None 
                                 }
                         )
             }
@@ -507,6 +530,7 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
     member x.Dispose() = 
         x.Dispose(true)
         GC.SuppressFinalize(x)
+    member x.ExecutorHandle = handle
     interface IDisposable with  
         member x.Dispose() = x.Dispose()
 
