@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <Description>F# bindings for MXNet</Description>
     <PackageTags>MXNet F# FSharp deep learning</PackageTags>
     <PackageProjectUrl>https://github.com/kevmal/MXNetSharp</PackageProjectUrl>
@@ -11,6 +11,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <NeutralLanguage></NeutralLanguage>
     <Authors>Kevin Malenfant</Authors>
+    <AssemblyVersion>0.0.2.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,4 +1,4 @@
-#### MASTER
+#### 0.0.2 (2019-12-13)
 * OpOutCount.txt and OpOutCountRemainder.txt are no longer packaged
 * Fix num_var_arg to include count of all Symbol arguments (not just the vararg param) in SymbolOperator
 * Fix MXSymbol.cutSubgraph return type
@@ -8,6 +8,9 @@
 * NDArray.AsType instance method
 * Use provided NDArray shape for parameter default shape
 * Executor.BindMap renamed to Executor.Bindings
+* Issue #12: Executor outputs need to be updated
+* Issue #5: Float16 support
+* NDArray.CopyFrom supports multidimensional .net Array type
 
 #### 0.0.1 (2019-12-03)
 * Move generated operators to MX and generated Symbol types to SymbolOperators

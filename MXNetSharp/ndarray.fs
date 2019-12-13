@@ -153,7 +153,7 @@ type NDArray(handle : SafeNDArrayHandle) =
         if x.DataType = DataType.TryFromNetType(data.GetType().GetElementType()) then 
             MXNDArray.syncCopyFromCPUArray handle.UnsafeHandle data
         else
-            raise (InvalidOperationException(sprintf "Source type of %s does not match NDArray type of %O" typeof<'a>.FullName x.DataTypeFlag))
+            raise (InvalidOperationException(sprintf "Source type of %s does not match NDArray type of %O" (data.GetType().FullName) x.DataTypeFlag))
 
     member x.SyncCopyFromCPUUnchecked(data : 'a []) = MXNDArray.syncCopyFromCPU handle.UnsafeHandle data
     member x.SyncCopyFromCPU(data : 'a []) = 

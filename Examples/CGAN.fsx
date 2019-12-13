@@ -137,7 +137,7 @@ let optUpdate (e : Executor) =
                 d.[s] <- v
                 v
     fun () -> 
-        e.BindMap
+        e.Bindings
         |> Seq.iter
             (fun a ->
                 match a with 
