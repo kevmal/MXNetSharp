@@ -386,7 +386,7 @@ type SafeExecutorHandle(owner) =
     new(ptr,owner) as this = new SafeExecutorHandle(owner) then this.SetHandle(ptr)
     override x.IsInvalid = x.handle <= 0n
     override x.ReleaseHandle() = CApi.MXExecutorFree x.handle = 0
-    member internal x.UnsafeHandle = 
+    member x.UnsafeHandle = 
         if not x.IsClosed then
             x.handle
         else
@@ -530,6 +530,7 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
     member x.Dispose() = 
         x.Dispose(true)
         GC.SuppressFinalize(x)
+    member x.ExecutorHandle = handle
     interface IDisposable with  
         member x.Dispose() = x.Dispose()
 
