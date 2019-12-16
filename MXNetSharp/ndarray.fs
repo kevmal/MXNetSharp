@@ -139,9 +139,7 @@ type NDArray(handle : SafeNDArrayHandle) =
         let struct(dt, id) = MXNDArray.getContext handle.UnsafeHandle
         Context.FromDeviceTypeAndId(dt,id)
 
-    member x.CopyTo(destination : NDArray) = 
-        MXNDArray.syncCopyFromNDArray destination.NDArrayHandle.UnsafeHandle x.NDArrayHandle.UnsafeHandle -1
-        mutInvoke destination "_copyto" [|x|] Array.empty |> ignore
+    member x.CopyTo(destination : NDArray) = mutInvoke destination "_copyto" [|x|] Array.empty |> ignore
 
     member x.CopyTo(deviceContext : Context) = 
         let destination = new NDArray(x.Shape, deviceContext, delayAlloc = true)
