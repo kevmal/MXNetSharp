@@ -200,6 +200,10 @@ type NDArray(handle : SafeNDArrayHandle) =
         let a = new NDArray(shape, ctx, dtype, false)
         a.CopyFrom(data)
         a
+
+    static member CopyFrom(data : NDArray, ctx : Context) = data.CopyTo(ctx)        
+    static member CopyFrom(data : NDArray) = NDArray.CopyFrom(data, data.Context)        
+    
         
     static member CopyFrom(data : float32[], shape : int seq, ctx : Context) = NDArray.ConvertCopyFrom(data,shape,ctx,DataType.Float32)
     static member CopyFrom(data : float[], shape : int seq, ctx : Context) = NDArray.ConvertCopyFrom(data,shape,ctx,DataType.Float64)
