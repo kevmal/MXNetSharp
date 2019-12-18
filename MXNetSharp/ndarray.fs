@@ -744,7 +744,13 @@ type NDArray(handle : SafeNDArrayHandle) =
     /// Returns a copy of the array after casting to a specified type
     member x.AsType(dtype) = x.AsType(dtype, true)
 
-    override x.ToString() = sprintf "NDArray[%s] @%O" (x.Shape |> Array.map string |> String.concat ",") (x.Context)
+    override x.ToString() = 
+        let struct(dt, id) = MXNDArray.getContext handle.UnsafeHandle
+        if int dt = 0 then 
+            //Empty NDArray
+            sprintf "NDArray[EMPTY]"
+        else
+            sprintf "NDArray[%s] @%O" (x.Shape |> Array.map string |> String.concat ",") (x.Context)
     member x.Dispose(disposing) = 
         if not disposed then 
             if disposing then 
