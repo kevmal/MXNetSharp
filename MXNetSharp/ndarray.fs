@@ -407,10 +407,20 @@ type NDArray(handle : SafeNDArrayHandle) =
         let s = stepIndices |> String.concat "," |> sprintf "(%s)"
         invoke "slice" [|x|] [|"begin", b; "end", e; "step", s|]|> Array.head
     member x.At(index : int) = new NDArray(MXNDArray.at x.UnsafeHandle index)
+    member internal x.SetItemAtIntex(a : int [], v : obj) = 
+        let b = Array.zeroCreate (a.Length + 1)
+        for i = 0 to a.Length - 1 do b.[i] <- a.[i] :> obj
+        b.[b.Length - 1] <- v
+        x.SetSlice(a = b)
     member x.Item 
         with get([<ParamArray>] a : int [])  = (x, a) ||> Array.fold (fun x i -> x.At(i))
-            
-            
+        and set ([<ParamArray>] a : int []) (v : double) = x.SetItemAtIntex(a,v)
+    member x.Item 
+        with set ([<ParamArray>] a : int []) (v : decimal) = x.SetItemAtIntex(a,v)
+    member x.Item 
+        with set ([<ParamArray>] a : int []) (v : float32) = x.SetItemAtIntex(a,v)
+    member x.Item 
+        with set ([<ParamArray>] a : int []) (v : int) = x.SetItemAtIntex(a,v)
         
     member x.GetSlice([<ParamArray>] a : obj []) =  //TODO: support all indexing types
         let inline str x = match x with ValueSome v -> v.ValueString() | _ -> "None"
