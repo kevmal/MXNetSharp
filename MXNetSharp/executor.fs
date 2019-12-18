@@ -102,7 +102,7 @@ type Bind =
 type IInitializer = 
     abstract member Initialize : Bind -> unit
 
-type Parameter(?name, ?shape, ?opReqType, ?grad, ?ndarray, ?dataType, ?storageType, ?init : IInitializer) = 
+type Parameter(?name, ?shape : int seq, ?opReqType, ?grad, ?ndarray, ?dataType, ?storageType, ?init : IInitializer) = 
     inherit Variable()
     let shape = 
         match ndarray, shape with 
@@ -154,6 +154,14 @@ type Input(?name, ?shape, ?ndarray, ?dataType, ?storageType) =
                       ?dataType = dataType, 
                       ?storageType = storageType)
 
+type Constant(ndarray : NDArray, ?name) = 
+    inherit Parameter(?name = name, 
+                      shape = ndarray.Shape, 
+                      opReqType = OpReqType.NullOp, 
+                      grad = new NDArray(), 
+                      ndarray = ndarray, 
+                      ?dataType = ndarray.DataType, 
+                      storageType = ndarray.StorageType)
 
 type Bindings(bindings : IDictionary<string, Bind>) = 
     new() = Bindings(Map.empty)
