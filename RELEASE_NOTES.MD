@@ -1,3 +1,6 @@
+#### MASTER
+* Added Constant:>Variable type
+
 #### 0.0.2 (2019-12-13)
 * OpOutCount.txt and OpOutCountRemainder.txt are no longer packaged
 * Fix num_var_arg to include count of all Symbol arguments (not just the vararg param) in SymbolOperator

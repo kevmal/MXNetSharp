@@ -154,6 +154,14 @@ type Input(?name, ?shape, ?ndarray, ?dataType, ?storageType) =
                       ?dataType = dataType, 
                       ?storageType = storageType)
 
+type Constant(ndarray : NDArray, ?name) = 
+    inherit Parameter(?name = name, 
+                      shape = ndarray.Shape, 
+                      opReqType = OpReqType.NullOp, 
+                      grad = new NDArray(), 
+                      ndarray = ndarray, 
+                      ?dataType = ndarray.DataType, 
+                      storageType = ndarray.StorageType)
 
 type Bindings(bindings : IDictionary<string, Bind>) = 
     new() = Bindings(Map.empty)
