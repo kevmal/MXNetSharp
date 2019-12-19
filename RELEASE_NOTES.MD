@@ -4,6 +4,7 @@
 * Issue #18: Add NDArray.CopyFrom(_:NDArray) method
 * Issue #17: Add NDArray index setter
 * Additional Context.CopyFrom convenience methods
+* Issue #22: NDArray.MutFull method fixed
 
 #### 0.0.2 (2019-12-13)
 * OpOutCount.txt and OpOutCountRemainder.txt are no longer packaged

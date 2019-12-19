@@ -687,19 +687,19 @@ type NDArray(handle : SafeNDArrayHandle) =
     member x.Reshape(dims : int seq) = invoke1 "Reshape" [|x|] [|"shape" <-- dims|]
     member x.BroadcastTo(shape : int seq) = invoke1 "broadcast_to" [|x|] [|"shape" <-- shape|]
     member x.MutFull(value : double) = 
-        mutInvoke x "_full" [|x|] [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType; "ctx" <-- x.Context|]
+        mutInvoke x "_full" Array.empty [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType.Value; "ctx" <-- x.Context|]
     member x.MutFull(value : float32) = 
-        mutInvoke x "_full" [|x|] [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType; "ctx" <-- x.Context|]
+        mutInvoke x "_full" Array.empty [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType.Value; "ctx" <-- x.Context|]
     member x.MutFull(value : decimal) = 
-        mutInvoke x "_full" [|x|] [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType; "ctx" <-- x.Context|]
+        mutInvoke x "_full" Array.empty [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType.Value; "ctx" <-- x.Context|]
     member x.MutFull(value : int32) = 
-        mutInvoke x "_full" [|x|] [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType; "ctx" <-- x.Context|]
+        mutInvoke x "_full" Array.empty [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType.Value; "ctx" <-- x.Context|]
     member x.MutFull(value : int64) = 
-        mutInvoke x "_full" [|x|] [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType; "ctx" <-- x.Context|]
+        mutInvoke x "_full" Array.empty [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType.Value; "ctx" <-- x.Context|]
     member x.MutFull(value : int8) = 
-        mutInvoke x "_full" [|x|] [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType; "ctx" <-- x.Context|]
+        mutInvoke x "_full" Array.empty [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType.Value; "ctx" <-- x.Context|]
     member x.MutFull(value : uint8) = 
-        mutInvoke x "_full" [|x|] [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType; "ctx" <-- x.Context|]
+        mutInvoke x "_full" Array.empty [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType.Value; "ctx" <-- x.Context|]
     
     member x.ToArray() : 'a[] = 
         if typeof<'a> = typeof<obj> then //REVIEW: since 'a : unmanaged this will never hit
