@@ -262,6 +262,15 @@ module Slicing =
     //    Assert.Equal(1,2)
 
 module Basic = 
+
+    // issue #19 - empty ndarray tostring causes exception
+    [<Fact>]
+    let ``NDArray.ToString``() = 
+        let nd = NDArray.CopyFrom([|0 .. 10|], CPU(0))
+        Assert.Equal("NDArray[11] @cpu(0)", nd.ToString())
+        let nd2 = new NDArray()
+        Assert.Equal("NDArray[EMPTY]", nd2.ToString())
+
     [<Fact>]
     let ``AsType int -> double``() = 
         let nd = NDArray.CopyFrom([|0 .. 10|], CPU(0))

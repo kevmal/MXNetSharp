@@ -200,6 +200,10 @@ type NDArray(handle : SafeNDArrayHandle) =
         let a = new NDArray(shape, ctx, dtype, false)
         a.CopyFrom(data)
         a
+
+    static member CopyFrom(data : NDArray, ctx : Context) = data.CopyTo(ctx)        
+    static member CopyFrom(data : NDArray) = NDArray.CopyFrom(data, data.Context)        
+    
         
     static member CopyFrom(data : float32[], shape : int seq, ctx : Context) = NDArray.ConvertCopyFrom(data,shape,ctx,DataType.Float32)
     static member CopyFrom(data : float[], shape : int seq, ctx : Context) = NDArray.ConvertCopyFrom(data,shape,ctx,DataType.Float64)
@@ -403,10 +407,20 @@ type NDArray(handle : SafeNDArrayHandle) =
         let s = stepIndices |> String.concat "," |> sprintf "(%s)"
         invoke "slice" [|x|] [|"begin", b; "end", e; "step", s|]|> Array.head
     member x.At(index : int) = new NDArray(MXNDArray.at x.UnsafeHandle index)
+    member internal x.SetItemAtIntex(a : int [], v : obj) = 
+        let b = Array.zeroCreate (a.Length + 1)
+        for i = 0 to a.Length - 1 do b.[i] <- a.[i] :> obj
+        b.[b.Length - 1] <- v
+        x.SetSlice(a = b)
     member x.Item 
         with get([<ParamArray>] a : int [])  = (x, a) ||> Array.fold (fun x i -> x.At(i))
-            
-            
+        and set ([<ParamArray>] a : int []) (v : double) = x.SetItemAtIntex(a,v)
+    member x.Item 
+        with set ([<ParamArray>] a : int []) (v : decimal) = x.SetItemAtIntex(a,v)
+    member x.Item 
+        with set ([<ParamArray>] a : int []) (v : float32) = x.SetItemAtIntex(a,v)
+    member x.Item 
+        with set ([<ParamArray>] a : int []) (v : int) = x.SetItemAtIntex(a,v)
         
     member x.GetSlice([<ParamArray>] a : obj []) =  //TODO: support all indexing types
         let inline str x = match x with ValueSome v -> v.ValueString() | _ -> "None"
@@ -744,7 +758,13 @@ type NDArray(handle : SafeNDArrayHandle) =
     /// Returns a copy of the array after casting to a specified type
     member x.AsType(dtype) = x.AsType(dtype, true)
 
-    override x.ToString() = sprintf "NDArray[%s] @%O" (x.Shape |> Array.map string |> String.concat ",") (x.Context)
+    override x.ToString() = 
+        let struct(dt, id) = MXNDArray.getContext handle.UnsafeHandle
+        if int dt = 0 then 
+            //Empty NDArray
+            sprintf "NDArray[EMPTY]"
+        else
+            sprintf "NDArray[%s] @%O" (x.Shape |> Array.map string |> String.concat ",") (x.Context)
     member x.Dispose(disposing) = 
         if not disposed then 
             if disposing then 

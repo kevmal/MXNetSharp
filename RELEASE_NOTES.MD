@@ -1,3 +1,10 @@
+#### MASTER
+* Issue #20: Added Constant:>Variable type
+* Issue #19: Empty NDArray error on ToString
+* Issue #18: Add NDArray.CopyFrom(_:NDArray) method
+* Issue #17: Add NDArray index setter
+* Additional Context.CopyFrom convenience methods
+
 #### 0.0.2 (2019-12-13)
 * OpOutCount.txt and OpOutCountRemainder.txt are no longer packaged
 * Fix num_var_arg to include count of all Symbol arguments (not just the vararg param) in SymbolOperator

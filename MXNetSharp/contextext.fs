@@ -29,6 +29,10 @@ type ContextExtensions private () =
     static member CopyFrom(ctx : Context, data : int8 seq, shape : int seq) = NDArray.CopyFrom(Seq.toArray data,shape,ctx)
     [<Extension>]
     static member CopyFrom(ctx : Context, data : uint8 seq, shape : int seq) = NDArray.CopyFrom(Seq.toArray data,shape,ctx)
+    [<Extension>]
+    static member CopyFrom(ctx : Context, data : System.Array) = NDArray.CopyFrom(data,ctx)
+    [<Extension>]
+    static member CopyFrom(ctx : Context, data : NDArray) = NDArray.CopyFrom(data,ctx)
         
 (*
     /// <param name="shape">The shape of the output</param>
