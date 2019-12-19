@@ -297,8 +297,15 @@ module Basic =
         Assert.Equal(Some(DataType.Float16), b1.DataType)
         Assert.Equal(23.f, b1.[1,1].ToFloat32Scalar())
         Assert.Equal(50.f, b1.[1,0].ToFloat32Scalar())
-
-
+    [<Fact>]
+    let ``MutFull tests``() = 
+        let a = NDArray.CopyFrom([|0.0 .. 9.0|], [-1], CPU 0)
+        a.MutFull(0.0) |> ignore
+        Assert.True(a.ToDoubleArray() = Array.zeroCreate 10)
+        a.MutFull(0.f) |> ignore
+        Assert.True(a.ToDoubleArray() = Array.zeroCreate 10)
+        a.MutFull(0) |> ignore
+        Assert.True(a.ToDoubleArray() = Array.zeroCreate 10)
 
 module Main = 
     [<EntryPoint>]
