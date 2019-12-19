@@ -63,15 +63,16 @@ type Symbol() =
                 // We should never really get to this point. Handle should be set or another excepion already thrown.
                 raise (SymbolInitilizationException(x, null))
     member x.UnsafeHandle = x.SymbolHandle.UnsafeHandle //REVIEW: mark as internal?
+    member x.OutputCount = MXSymbol.getNumOutputs x.UnsafeHandle |> int
     member x.Outputs = 
-        let n = MXSymbol.getNumOutputs x.UnsafeHandle |> int
+        let n = x.OutputCount
         Array.init n 
             (fun i ->
                 let h = MXSymbol.getOutput x.UnsafeHandle i
-                new SymbolOutput(x,new SafeSymbolHandle(h, true))
+                new SymbolOutput(x, i,new SafeSymbolHandle(h, true))
             )
-    member x.ArgumentNames = MXSymbol.listArguments x.UnsafeHandle
     member x.OutputNames = MXSymbol.listOutputs x.UnsafeHandle
+    member x.ArgumentNames = MXSymbol.listArguments x.UnsafeHandle
     member x.AuxiliaryStateNames = MXSymbol.listAuxiliaryStates x.UnsafeHandle
     abstract member InputSymbols : Symbol []
     default x.InputSymbols = MXSymbol.getInputSymbols x.UnsafeHandle |> Array.map (fun h -> new SymbolInput(x, new SafeSymbolHandle(h,true)) :> Symbol)
@@ -275,16 +276,17 @@ type Symbol() =
         x .>> fcopy
     
 
-type SymbolOutput internal (parent : Symbol) = 
+type SymbolOutput internal (parent : Symbol, position : int) = 
     inherit Symbol()
-    new(parent, handle) as this = 
-        new SymbolOutput(parent) then 
+    new(parent, position, handle) as this = 
+        new SymbolOutput(parent, position) then 
             this.InternalHandle <- Some handle
     member x.Parent = parent
+    member x.Position = position
     override x.Initialize() = ()
     default x.Copy() = 
         let h = MXSymbol.copy x.SymbolHandle.UnsafeHandle
-        SymbolOutput(parent, new SafeSymbolHandle(h, true)) :> Symbol //REVIEW: not sure this makes sense. Copy the output and keep the same parent?
+        SymbolOutput(parent, position, new SafeSymbolHandle(h, true)) :> Symbol //REVIEW: not sure this makes sense. Copy the output and keep the same parent?
 
 
 type SymbolInput internal (parent : Symbol) = 
@@ -481,7 +483,7 @@ type Hole() =
     default x.Copy() = Hole() :> Symbol
 
 module SymUtil = 
-    let tryReplaceSymbol (search : Symbol) (replacement : Symbol) (target : Symbol) = 
+    let rec tryReplaceSymbol (search : Symbol) (replacement : Symbol) (target : Symbol) = 
         match target with 
         | :? SymbolOperator as s -> 
             let mutable count = 0 //TODO: cleanup
@@ -507,6 +509,15 @@ module SymUtil =
                             count <- count + 1
                             name, Input(replacement)
                         | name, Input(:? SymbolOperator as s) -> name, Input(loop s)
+                        | name, Input(:? SymbolOutput as s) -> 
+                            if Object.ReferenceEquals(search,s.Parent) then
+                                count <- count + 1
+                                name, Input(replacement.Outputs.[s.Position] :> _)
+                            elif s.Parent :? SymbolOperator then 
+                                count <- count + 1
+                                name, Input((loop (s.Parent :?> SymbolOperator)).Outputs.[s.Position] :> _)
+                            else
+                                name, Input(s :> Symbol)
                         | otherwise -> otherwise
                     )
                 |> (fun args -> x.WithArguments(Arguments<Symbol>(args)).SetName(x))
@@ -515,9 +526,14 @@ module SymUtil =
                 Some result
             else 
                 None
+        | :? SymbolOutput as s ->   
+            match tryReplaceSymbol search replacement s.Parent with 
+            | Some o -> o.Outputs.[s.Position] :> Symbol |> Some
+            | None -> None
         | _ -> None
-    let tryFindType<'a when 'a :> Symbol> (symbol : Symbol) : 'a option = 
+    let rec tryFindType<'a when 'a :> Symbol> (symbol : Symbol) : 'a option = 
         match symbol with 
+        | :? SymbolOutput as s -> tryFindType s.Parent
         | :? SymbolOperator as s -> 
             let rec loop (x : SymbolOperator) = 
                 x.OperatorArguments
@@ -533,11 +549,14 @@ module SymUtil =
                                         Some h
                                     | :? SymbolOperator as s -> 
                                         loop s
+                                    | :? SymbolOutput as s -> 
+                                        tryFindType s.Parent
                                     | s -> None
                                 )
                         | name, Input(:? 'a as s) -> 
                             Some s
                         | name, Input(:? SymbolOperator as s) -> loop s
+                        | name, Input(:? SymbolOutput as s) -> tryFindType s.Parent
                         | otherwise -> None
                     )
             loop s
@@ -586,6 +605,13 @@ type SymbolComposable<'a when 'a :> SymbolOperator>(argSymbol : Symbol, rootSymb
                         name, VarArg(num, args)
                     | name, Input(s) when Object.ReferenceEquals(argSymbol,s) -> name, Input(symbol)
                     | name, Input(:? SymbolOperator as s) -> name, Input(loop s)
+                    | name, Input(:? SymbolOutput as s) ->
+                        if Object.ReferenceEquals(argSymbol,s.Parent) then 
+                            name, Input(symbol.Outputs.[s.Position] :> Symbol)
+                        elif s.Parent :? SymbolOperator then 
+                            name, Input((loop (s.Parent :?> SymbolOperator) ).Outputs.[s.Position] :> Symbol)
+                        else
+                            name, Input(s :> Symbol)
                     | otherwise -> otherwise
                 )
             |> (fun args -> x.WithArguments(Arguments<Symbol>(args)).SetName(x))

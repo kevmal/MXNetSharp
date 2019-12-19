@@ -5,6 +5,8 @@
 * Issue #17: Add NDArray index setter
 * Additional Context.CopyFrom convenience methods
 * Issue #22: NDArray.MutFull method fixed
+* Symbol.OutputCount property
+* Compose op .>> now flows through Symbol.Outputs.[index]
 
 #### 0.0.2 (2019-12-13)
 * OpOutCount.txt and OpOutCountRemainder.txt are no longer packaged

@@ -7,6 +7,7 @@
   <ItemGroup>
     <Compile Include="interop.fs" />
     <Compile Include="executor.fs" />
+    <Compile Include="symbol.fs" />
     <Compile Include="ndarray.fs" />
   </ItemGroup>
 
