@@ -315,6 +315,8 @@ module Basic =
         Assert.True(a.ToDoubleArray() = Array.zeroCreate 10)
         a.MutFull(0) |> ignore
         Assert.True(a.ToDoubleArray() = Array.zeroCreate 10)
+        a.MutFull(123.0) |> ignore
+        Assert.True(a.ToDoubleArray() = Array.create 10 123.0)
 
 module Main = 
     [<EntryPoint>]
