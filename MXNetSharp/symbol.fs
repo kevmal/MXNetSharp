@@ -140,9 +140,12 @@ type Symbol() =
     static member ( * )(x : Symbol, y : Symbol) = new ElemwiseMul(x,y)
     static member ( .* )(x : Symbol, y : Symbol) = new BroadcastMul(x,y)
     
-    static member ( ** )(x : Symbol, y : float) = new PowerScalar(x,y)
-    static member ( ** )(y : float, x : Symbol) = new RpowerScalar(x,y)
-    static member ( ** )(x : Symbol, y : Symbol) = new Power(x,y)
+    static member ApplyPow(x : Symbol, y : float) = new PowerScalar(x,y)
+    static member ApplyPow(y : float, x : Symbol) = new RpowerScalar(x,y)
+    static member ApplyPow(x : Symbol, y : Symbol) = new Power(x,y)
+    static member Pow(x : Symbol, y : float) = new PowerScalar(x,y)
+    static member Pow(y : float, x : Symbol) = new RpowerScalar(x,y)
+    static member Pow(x : Symbol, y : Symbol) = new Power(x,y)
     static member ( .** )(x : Symbol, y : Symbol) = new BroadcastPower(x,y)
 
     member x.Negate() = -1.0*x
