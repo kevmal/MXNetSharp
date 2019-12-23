@@ -125,7 +125,10 @@ let genLoss = gen.Bind(context, bindGenLoss)
 
 
 let optUpdate (e : Executor) = 
-
+    let lr = 0.0002
+    let beta1 = 0.5
+    let beta2 = 0.999
+    let mutable updateCount = 0
     let lu = 
         let d = Dictionary<string, NDArray*NDArray>()
         fun (s : String) (a : NDArray) ->
@@ -137,13 +140,16 @@ let optUpdate (e : Executor) =
                 d.[s] <- v
                 v
     fun () -> 
+        updateCount <- updateCount + 1
+        let t = double updateCount
+        let lr = lr*sqrt(1.0 - Math.Pow(beta2,t)) / (1.0 - Math.Pow(beta1,t))
         e.Bindings
         |> Seq.iter
             (fun a ->
                 match a with 
                 | ArgBinding ({Name = name; OpReqType = Some WriteTo; Grad = Some grad; NDArray = Some weight}) -> 
                     let m,v = lu name grad
-                    MX.AdamUpdate([weight], weight, grad, m, v, 0.0002, 0.5)
+                    MX.AdamUpdate([weight], weight, grad, m, v, lr, beta1, beta2)
                 | _ -> ()
             )
 
@@ -233,7 +239,7 @@ let trainTask =
             trainIter.Reset()
             while (trainIter.Next()) do 
                 trainIter.GetData().CopyTo(xa)
-                trainIter.GetLabel().CopyTo(la)
+                trainIter.GetLabel().Reshape(la.Shape).CopyTo(la)
                 actualLoss.Forward(true)
                 actualLoss.Backward()
                 optAct()

@@ -384,7 +384,6 @@ module Bindings =
                     ArgBinding {b with Grad = Some(MX.ZerosLike(a.NDArray.Value))}
                 | _ -> a
             )
-        
 
 
 
@@ -432,7 +431,6 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
         let h = MXExecutor.bindEX symbol.UnsafeHandle (int context.DeviceType) context.DeviceId mapKeys mapDevTypes mapDevIds inArgsHandles argGradHandles gradReqTypeHandles auxStatesHandles sharedExecutorHandle
         let safeHandle = new SafeExecutorHandle(h, true)
         let outputs = MXExecutor.outputs h |> Array.map (fun h -> new NDArray(new SafeNDArrayHandle(h, true)))
-        // NOTE: We need to make sure all references get stored to prevent handles from being freed.
         new Executor(safeHandle,symbol,context,contextMap,inArgs,argGrad,gradReqType,auxStates,sharedExecutor,outputs, bindMap)
     new(symbol : Symbol, context : Context, contextMap : IDictionary<string,Context>, inArgs, argGrad, gradReqType, auxStates, sharedExecutor : Executor option) = 
         new Executor(symbol, context, contextMap, inArgs, argGrad, gradReqType, auxStates, sharedExecutor, None)
@@ -559,6 +557,56 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
 
 [<AutoOpen>]
 module SymbolExtension =
+    open MXNetSharp.SymbolArgument
     type Symbol with 
-        member x.Bind(context, bindmap) = new Executor(x,context,bindmap)
-        member x.Bind(context) = new Executor(x,context,Bindings())
+        member x.Bindings = 
+            let rec loop (symbol : Symbol) : Parameter seq = 
+                match symbol with 
+                | :? Parameter as p -> Seq.singleton p
+                | :? SymbolOutput as s -> loop s.Parent
+                | :? SymbolOperator as s -> 
+                    s.OperatorArguments
+                    |> Seq.collect
+                        (fun a -> 
+                            match a with 
+                            | name, VarArg(num, args) -> 
+                                args 
+                                |> Seq.collect 
+                                    (fun a ->
+                                        match a with 
+                                        | :? SymbolOperator as s -> 
+                                            loop s
+                                        | :? SymbolOutput as s -> 
+                                            loop s.Parent
+                                        | :? Parameter as p -> 
+                                            Seq.singleton p
+                                        | s -> Seq.empty
+                                    )
+                            | name, Input(:? SymbolOperator as s) -> loop s
+                            | name, Input(:? SymbolOutput as s) -> loop s.Parent
+                            | name, Input(:? Parameter as s) -> Seq.singleton s
+                            | otherwise -> Seq.empty
+                        )
+                | _ -> Seq.empty
+            loop x 
+            |> Seq.cast
+            |> Bindings.inputs
+        member x.Bind(context, batchSize, bindings) = 
+            let bindmap = x.Bindings.WithBindings(bindings) |> Bindings.batchSize batchSize |> Bindings.inferShapes x
+            new Executor(x,context,bindmap)
+        member x.Bind(context, bindings) = 
+            let bindmap = x.Bindings.WithBindings(bindings) |> Bindings.inferShapes x
+            new Executor(x,context,bindmap)
+        member x.Bind(context, batchSize) = 
+            let bindmap = x.Bindings |> Bindings.batchSize batchSize |> Bindings.inferShapes x
+            new Executor(x,context,bindmap)
+        member x.Bind(context) = new Executor(x,context,x.Bindings)
+        member x.Eval(context) = 
+            let exe = x.Bind(context)
+            exe.Forward(false)
+            exe
+        member x.Eval(context, bindings : Bindings) = 
+            let exe = x.Bind(context,bindings)
+            exe.Forward(false)
+            exe
+

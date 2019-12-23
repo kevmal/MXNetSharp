@@ -273,17 +273,23 @@ let trainTask =
     async {
         let mutable epoch = 0
         let mutable mb = 0
+        let beta1 = 0.9
+        let beta2 = 0.999
+        let mutable updateCount = 0
         while true do
             trainIter.Reset()
             while (trainIter.Next()) do 
                 trainIter.GetData().CopyTo(xa)
                 exe.Forward(true)
                 exe.Backward()
+                updateCount <- updateCount + 1
+                let t = double updateCount
+                let lr = lr*sqrt(1.0 - Math.Pow(beta2,t)) / (1.0 - Math.Pow(beta1,t))
                 ps
                 |> Array.iter 
                     (function 
                      | NoTrain _ -> ()
-                     | TrainParameters(w,g,mu,sd) -> MX.AdamUpdate([w],w,g,mu,sd,lr)
+                     | TrainParameters(w,g,mu,sd) -> MX.AdamUpdate([w],w,g,mu,sd,lr, beta1, beta2)
                      )
                 mb <- mb + 1
                 if mb % 10 = 0 then 
