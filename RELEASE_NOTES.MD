@@ -8,6 +8,7 @@
 * Symbol.OutputCount property
 * Compose op .>> now flows through Symbol.Outputs.[index]
 * Symbol.Bind now finds Parameter types and uses them as default bindings
+* Issue #25: opening PrimitiveOperators breaks ** operator
 
 #### 0.0.2 (2019-12-13)
 * OpOutCount.txt and OpOutCountRemainder.txt are no longer packaged

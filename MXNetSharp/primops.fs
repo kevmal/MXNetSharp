@@ -9,6 +9,10 @@ open System
 #nowarn "77"
 
 module InternalPrimitiveOperatorHelpers =     
+    type Dummy1 = Dummy1 with static member Instance = Dummy1
+    type Dummy2 = Dummy2 with static member Instance = Dummy2
+    let inline chooseType< ^a when ^a : (static member Instance : ^a) > = (^a : (static member Instance : ^a) ())
+
     type ExpOp = ExpOp with
         static member inline Exp(ExpOp, x : ^T) : ^T = exp x
         static member inline Exp(ExpOp, x : ^T) : ^Y = (^T: (member ApplyExp : unit -> ^Y) (x))
@@ -111,10 +115,9 @@ module InternalPrimitiveOperatorHelpers =
     let inline internal negateHelper (t : ^op) (x : ^t) : ^y = ((^op or ^t) : (static member Negate : ^op * ^t -> ^y)(t,x))
 
     type PowerOp = PowerOp with
-        static member inline Power(PowerOp, x : float, y : float) = System.Math.Pow(x,y)
-        static member inline Power(PowerOp, x : float32, y : float32) = System.Math.Pow(double x,double y) |> float32
-        static member inline Power(PowerOp, x : ^T, y : ^Y) : ^S = (^S : (static member Pow : ^T * ^Y -> ^S) (x, y))
-    let inline internal powerHelper (t : ^op) (x : ^t) (y : ^y) : ^s = ((^op or ^t or ^y) : (static member Power : ^op * ^t * ^y -> ^s)(t,x,y))
+        static member inline (?<-)(PowerOp,Dummy1,a) = fun b -> a ** b
+        static member inline (?<-)(PowerOp,Dummy2,a) = fun b ->((^t or ^y) : (static member ApplyPow : ^t * ^y -> ^s)(a, b)) 
+    let inline powerHelper t a b = (?<-) t chooseType a b
 
 open InternalPrimitiveOperatorHelpers
 
@@ -139,4 +142,4 @@ module PrimitiveOperators =
     let inline tan (x : ^t) : ^y =  tanHelper TanOp x
     let inline tanh (x : ^t) : ^y =  tanhHelper TanhOp x
     let inline (~-) (x : ^t) : ^y = negateHelper NegateOp x
-    let inline ( ** ) (x : ^t1) (y : ^t2) = powerHelper PowerOp x y    
+    let inline ( ** ) (x : ^t1) (y : ^t2) = powerHelper PowerOp x y
