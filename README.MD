@@ -141,11 +141,12 @@ let y = exp(2.0*x + 33.0) // y is of type `Exp`
 let y2 = Exp(2.0*x + 33.0) // same as above but explicitly creates the `Exp` symbol type
 
 ```
-## Executor (TODO)
-MXNetSharp.Executor class. Please see samples.
 
 ## NDArray (TODO)
 MXNetSharp.NDArray class. Please see samples and quickstart section.
+
+## Executor (TODO)
+MXNetSharp.Executor class. Please see samples.
 
 ### Autodiff (TODO)
 MXNetSharp.Autodiff module.

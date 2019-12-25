@@ -552,6 +552,8 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
         x.Dispose(true)
         GC.SuppressFinalize(x)
     member x.ExecutorHandle = handle
+    member x.Item 
+        with get(v : Variable) = x.Bindings.NDArray(v)
     interface IDisposable with  
         member x.Dispose() = x.Dispose()
 

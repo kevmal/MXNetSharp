@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="QNN\play1000.gif" />
+    <None Include="QNN\README.MD" />
+    <None Include="QNN\QNN.fsx" />
+    <None Include="QNN.fsx" />
     <Compile Include="Library.fs" />
     <None Include="load.fsx" />
     <None Include="loadui.fsx" />
