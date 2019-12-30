@@ -5,7 +5,6 @@ F# deep reinforcement learning example. Simple QNN trained on a toy game using e
 QNN after training 1000 episodes:
 ![](play1000.gif)
 
-
 # Running
 
 - "libmxnet" and CUDA libraries must be available for loading
@@ -246,5 +245,9 @@ Epsilon   0.010028 Steps 174700, Episode: 1000, Average reward for episode 963.0
 ```
 
 
+
+
+Another model trained on a 16x16 board:
+![](play1616.gif)
 
 
