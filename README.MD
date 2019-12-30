@@ -5,6 +5,7 @@
 Bindings are generated for MXNet 1.5.1 and so "libmxnet" version 1.5.1 needs to be on library search path. For GPU support, relevant CUDA libraries also need to be accessible. 
 
 ## Examples
+- [QNN](Examples/QNN)
 - [CGAN](Examples/CGAN.fsx)
 - [Variational Autoencoder](Examples/MNIST%20VAE.fsx)
 - [Neural style transfer](Examples/Neural%20Style%20Transfer.fsx)
@@ -141,11 +142,12 @@ let y = exp(2.0*x + 33.0) // y is of type `Exp`
 let y2 = Exp(2.0*x + 33.0) // same as above but explicitly creates the `Exp` symbol type
 
 ```
-## Executor (TODO)
-MXNetSharp.Executor class. Please see samples.
 
 ## NDArray (TODO)
 MXNetSharp.NDArray class. Please see samples and quickstart section.
+
+## Executor (TODO)
+MXNetSharp.Executor class. Please see samples.
 
 ### Autodiff (TODO)
 MXNetSharp.Autodiff module.
