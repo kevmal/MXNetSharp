@@ -200,6 +200,51 @@ let run onStep (ts : TrainState)  =
 
 ```
 
+### Output 
+
+```
+Epsilon   0.839253 Steps 2953, Episode: 25, Average reward for episode 57.000000, Count 2953.000000, LossSum 28.019345, Loss 0.009488, LR: 0.001000
+Epsilon   0.722375 Steps 5485, Episode: 50, Average reward for episode 79.000000, Count 2532.000000, LossSum 18.755739, Loss 0.007407, LR: 0.001000
+Epsilon   0.614998 Steps 8208, Episode: 75, Average reward for episode 89.000000, Count 2723.000000, LossSum 19.206608, Loss 0.007053, LR: 0.001000
+Epsilon   0.539517 Steps 10429, Episode: 100, Average reward for episode 77.000000, Count 2221.000000, LossSum 16.179795, Loss 0.007285, LR: 0.001000
+Epsilon   0.461784 Steps 13075, Episode: 125, Average reward for episode 107.000000, Count 2646.000000, LossSum 19.993038, Loss 0.007556, LR: 0.001000
+Epsilon   0.391803 Steps 15880, Episode: 150, Average reward for episode 128.000000, Count 2805.000000, LossSum 21.602951, Loss 0.007702, LR: 0.001000
+Epsilon   0.335892 Steps 18519, Episode: 175, Average reward for episode 140.000000, Count 2639.000000, LossSum 20.869931, Loss 0.007908, LR: 0.001000
+Epsilon   0.279057 Steps 21713, Episode: 200, Average reward for episode 216.000000, Count 3194.000000, LossSum 27.370556, Loss 0.008569, LR: 0.001000
+Epsilon   0.236849 Steps 24557, Episode: 225, Average reward for episode 227.000000, Count 2844.000000, LossSum 28.080246, Loss 0.009874, LR: 0.001000
+Epsilon   0.195053 Steps 27951, Episode: 250, Average reward for episode 268.000000, Count 3394.000000, LossSum 38.820503, Loss 0.011438, LR: 0.001000
+Epsilon   0.159033 Steps 31559, Episode: 275, Average reward for episode 317.000000, Count 3608.000000, LossSum 44.924326, Loss 0.012451, LR: 0.001000
+Epsilon   0.130796 Steps 35060, Episode: 300, Average reward for episode 340.000000, Count 3501.000000, LossSum 46.270952, Loss 0.013216, LR: 0.001000
+Epsilon   0.107248 Steps 38674, Episode: 325, Average reward for episode 373.000000, Count 3614.000000, LossSum 50.403512, Loss 0.013947, LR: 0.001000
+Epsilon   0.087659 Steps 42423, Episode: 350, Average reward for episode 413.000000, Count 3749.000000, LossSum 56.182322, Loss 0.014986, LR: 0.001000
+Epsilon   0.071453 Steps 46324, Episode: 375, Average reward for episode 423.000000, Count 3901.000000, LossSum 62.217738, Loss 0.015949, LR: 0.001000
+Epsilon   0.056723 Steps 50891, Episode: 400, Average reward for episode 561.000000, Count 4567.000000, LossSum 73.896589, Loss 0.016181, LR: 0.001000
+Epsilon   0.045503 Steps 55468, Episode: 425, Average reward for episode 581.000000, Count 4577.000000, LossSum 80.852974, Loss 0.017665, LR: 0.001000
+Epsilon   0.038123 Steps 59352, Episode: 450, Average reward for episode 499.000000, Count 3884.000000, LossSum 73.538884, Loss 0.018934, LR: 0.001000
+Epsilon   0.031506 Steps 63823, Episode: 475, Average reward for episode 603.000000, Count 4471.000000, LossSum 87.744444, Loss 0.019625, LR: 0.001000
+Epsilon   0.026403 Steps 68337, Episode: 500, Average reward for episode 627.000000, Count 4514.000000, LossSum 89.207025, Loss 0.019762, LR: 0.001000
+Epsilon   0.022722 Steps 72573, Episode: 525, Average reward for episode 552.000000, Count 4236.000000, LossSum 88.052853, Loss 0.020787, LR: 0.001000
+Epsilon   0.019898 Steps 76756, Episode: 550, Average reward for episode 564.000000, Count 4183.000000, LossSum 85.427326, Loss 0.020423, LR: 0.001000
+Epsilon   0.017418 Steps 81563, Episode: 575, Average reward for episode 678.000000, Count 4807.000000, LossSum 98.908486, Loss 0.020576, LR: 0.001000
+Epsilon   0.015394 Steps 86873, Episode: 600, Average reward for episode 731.000000, Count 5310.000000, LossSum 106.897506, Loss 0.020131, LR: 0.001000
+Epsilon   0.014012 Steps 91805, Episode: 625, Average reward for episode 691.000000, Count 4932.000000, LossSum 100.438259, Loss 0.020365, LR: 0.001000
+Epsilon   0.013056 Steps 96344, Episode: 650, Average reward for episode 654.000000, Count 4539.000000, LossSum 98.475399, Loss 0.021695, LR: 0.001000
+Epsilon   0.012247 Steps 101465, Episode: 675, Average reward for episode 750.000000, Count 5121.000000, LossSum 110.899554, Loss 0.021656, LR: 0.001000
+Epsilon   0.011636 Steps 106756, Episode: 700, Average reward for episode 781.000000, Count 5291.000000, LossSum 126.065292, Loss 0.023826, LR: 0.001000
+Epsilon   0.011213 Steps 111737, Episode: 725, Average reward for episode 706.000000, Count 4981.000000, LossSum 114.303913, Loss 0.022948, LR: 0.001000
+Epsilon   0.010896 Steps 116796, Episode: 750, Average reward for episode 724.000000, Count 5059.000000, LossSum 114.417569, Loss 0.022617, LR: 0.001000
+Epsilon   0.010660 Steps 121882, Episode: 775, Average reward for episode 728.000000, Count 5086.000000, LossSum 116.830421, Loss 0.022971, LR: 0.001000
+Epsilon   0.010492 Steps 126775, Episode: 800, Average reward for episode 711.000000, Count 4893.000000, LossSum 115.339400, Loss 0.023572, LR: 0.001000
+Epsilon   0.010353 Steps 132326, Episode: 825, Average reward for episode 828.000000, Count 5551.000000, LossSum 129.576478, Loss 0.023343, LR: 0.001000
+Epsilon   0.010243 Steps 138519, Episode: 850, Average reward for episode 901.000000, Count 6193.000000, LossSum 131.729647, Loss 0.021271, LR: 0.001000
+Epsilon   0.010172 Steps 144318, Episode: 875, Average reward for episode 839.000000, Count 5799.000000, LossSum 120.418099, Loss 0.020765, LR: 0.001000
+Epsilon   0.010121 Steps 150223, Episode: 900, Average reward for episode 870.000000, Count 5905.000000, LossSum 130.611125, Loss 0.022119, LR: 0.001000
+Epsilon   0.010083 Steps 156371, Episode: 925, Average reward for episode 906.000000, Count 6148.000000, LossSum 136.082563, Loss 0.022134, LR: 0.001000
+Epsilon   0.010059 Steps 162042, Episode: 950, Average reward for episode 871.000000, Count 5671.000000, LossSum 131.959497, Loss 0.023269, LR: 0.001000
+Epsilon   0.010041 Steps 168283, Episode: 975, Average reward for episode 928.000000, Count 6241.000000, LossSum 146.372114, Loss 0.023453, LR: 0.001000
+Epsilon   0.010028 Steps 174700, Episode: 1000, Average reward for episode 963.000000, Count 6417.000000, LossSum 152.498118, Loss 0.023765, LR: 0.001000
+```
+
 
 
 

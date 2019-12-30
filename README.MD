@@ -5,6 +5,7 @@
 Bindings are generated for MXNet 1.5.1 and so "libmxnet" version 1.5.1 needs to be on library search path. For GPU support, relevant CUDA libraries also need to be accessible. 
 
 ## Examples
+- [QNN](Examples/QNN/QNN.fsx)
 - [CGAN](Examples/CGAN.fsx)
 - [Variational Autoencoder](Examples/MNIST%20VAE.fsx)
 - [Neural style transfer](Examples/Neural%20Style%20Transfer.fsx)
