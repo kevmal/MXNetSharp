@@ -1,15 +1,15 @@
 ﻿# Description 
 
-F# deep reinforcement learning example. Simple QNN trained on a toy game using epsilon-greedy based decisions with memory replay. The task is simple, player (blue) can move left/right to collect rewards (green) and avoid obstacles (red). Once 10 (default setting) green rewards are missed the game resets.
+F# deep reinforcement learning example. Simple DQN trained on a toy game using epsilon-greedy based decisions with memory replay. The task is simple, player (blue) can move left/right to collect rewards (green) and avoid obstacles (red). Once 10 (default setting) green rewards are missed the game resets.
 
-QNN after training 1000 episodes:
+DQN after training 1000 episodes:
 ![](play1000.gif)
 
 # Running
 
 - "libmxnet" and CUDA libraries must be available for loading
 - configure [loadui.fsx](../loadui.fsx) to desired framework (needs editing for dotnet core)
-- execute [QNN.fsx](QNN.fsx) in F# interactive.
+- execute [DQN.fsx](DQN.fsx) in F# interactive.
 
 # Details 
 Player is blue, rewards are green and obstacles (not on by default) are red. The gameboard is set to 9x9 pixels with it's representation simply a [3;w;h] array where rgb values are 0.f or 1.f.
