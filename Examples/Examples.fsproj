@@ -10,7 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="TCN\TCN.fsx" />
+    <None Include="TCN\README.MD" />
+    <None Include="TCN\adding.fsx" />
     <Content Include="DQN\play1616.gif" />
     <Content Include="DQN\play1000.gif" />
     <None Include="DQN\README.MD" />
