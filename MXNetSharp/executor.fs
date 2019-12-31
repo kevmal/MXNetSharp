@@ -562,34 +562,43 @@ module SymbolExtension =
     open MXNetSharp.SymbolArgument
     type Symbol with 
         member x.Bindings = 
+            let visited = HashSet<Symbol>({new IEqualityComparer<Symbol> with
+                                               member this.Equals(x: Symbol, y: Symbol): bool = 
+                                                   Object.ReferenceEquals(x,y)
+                                               member this.GetHashCode(obj: Symbol): int = 
+                                                   System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj)})
             let rec loop (symbol : Symbol) : Parameter seq = 
-                match symbol with 
-                | :? Parameter as p -> Seq.singleton p
-                | :? SymbolOutput as s -> loop s.Parent
-                | :? SymbolOperator as s -> 
-                    s.OperatorArguments
-                    |> Seq.collect
-                        (fun a -> 
-                            match a with 
-                            | name, VarArg(num, args) -> 
-                                args 
-                                |> Seq.collect 
-                                    (fun a ->
-                                        match a with 
-                                        | :? SymbolOperator as s -> 
-                                            loop s
-                                        | :? SymbolOutput as s -> 
-                                            loop s.Parent
-                                        | :? Parameter as p -> 
-                                            Seq.singleton p
-                                        | s -> Seq.empty
-                                    )
-                            | name, Input(:? SymbolOperator as s) -> loop s
-                            | name, Input(:? SymbolOutput as s) -> loop s.Parent
-                            | name, Input(:? Parameter as s) -> Seq.singleton s
-                            | otherwise -> Seq.empty
-                        )
-                | _ -> Seq.empty
+                if not(visited.Add symbol) then 
+                    Seq.empty 
+                else
+                    match symbol with 
+                    | :? Parameter as p -> Seq.singleton p
+                    | :? SymbolOutput as s -> loop s.Parent
+                    | :? SymbolOperator as s -> 
+                        s.OperatorArguments
+                        |> Seq.collect
+                            (fun a -> 
+                                match a with 
+                                | name, VarArg(num, args) -> 
+                                    args 
+                                    |> Seq.collect 
+                                        (fun a ->
+                                            match a with 
+                                            | :? SymbolOperator as s -> 
+                                                loop s
+                                            | :? SymbolOutput as s -> 
+                                                loop s.Parent
+                                            | :? Parameter as p -> 
+                                                Seq.singleton p
+                                            | s -> 
+                                                Seq.empty
+                                        )
+                                | name, Input(:? SymbolOperator as s) -> loop s
+                                | name, Input(:? SymbolOutput as s) -> loop s.Parent
+                                | name, Input(:? Parameter as s) -> Seq.singleton s
+                                | otherwise -> Seq.empty
+                            )
+                    | _ -> Seq.empty
             loop x 
             |> Seq.cast
             |> Bindings.inputs
