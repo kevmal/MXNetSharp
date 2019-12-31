@@ -55,7 +55,7 @@ let weightNormalization name =
     w :> Symbol    
 ```
 
-Layers are stacked with dilation of `2^i - 1` for layer i in {1..layerCount} and finally mapped (for each time `t`) to "output count" by
+Layers are stacked with dilation of `2^i - 1` for layer i in {0..layerCount-1} and finally mapped (for each time `t`) to "output count" by
 
 ```fsharp
 let make numInputs outCount numChannels kernelSize dropout x = 
@@ -74,7 +74,7 @@ let make numInputs outCount numChannels kernelSize dropout x =
 
 ```
 
-## Adding Problem [adding.fsx](adding.fsx)
+## Adding Problem [(adding.fsx)](adding.fsx)
 ### Problem 
 Let v_t be a sequence sampled uniformly from (0.0, 1.0) for each t in {0 .. seqLength - 1} and let I_t be a sequence such that all I_t are 0 except for I_i and I_k (i <> k with i and k uniform random) which are 1.
 Output sum(v_t*I_t) over t. For example with sequence length 3, `v = [0.5; 0.2; 0.1]` and `I = [1; 0; 1]` the output should be `0.5 + 0.1 = 0.6`.
@@ -111,3 +111,41 @@ Using the same parameters as the defaults in the PyTorch implementation the resu
 ```
 
 
+## Sequntial MNIST [(MNIST.fsx)](MNIST.fsx)
+### Problem
+Identify MNIST digits by treating each pixel as a single item in a sequence.
+
+### Model
+
+The last output of the sequence is used to classify the digit (using Argmax). Loss is negative log-liklihood and `correct` is calculated to display testset accuracy.
+
+```fsharp
+let x = Input("xIn", shape = [0; 1; seqLength])
+let tcn = make 1 nclasses (Array.create levels nhidden) ksize dropout x
+let label = Input("y", shape = [0; 1])
+
+let z = 
+    let tcn = SwapAxis(tcn,0,2)
+    let tcn = SwapAxis(tcn,1,2)
+    SequenceLast(tcn)
+
+let correct = Argmax(z, axis = 1) .= Reshape(label, [-1]) .>> Sum()
+let loss = -Mean(Pick(LogSoftmax(z, axis=1), Reshape(label, [-1]))) .>> MakeLoss()
+let outp = SymbolGroup([loss :> Symbol; correct :> Symbol])
+
+```
+
+### Output
+
+```
+1          train:0.333846        test loss:0.113528        test acc:0.967548        elapsed:00:00:59.9895152
+2          train:0.134682        test loss:0.082103        test acc:0.974359        elapsed:00:00:59.7280397
+3          train:0.102840        test loss:0.070891        test acc:0.977965        elapsed:00:01:00.0386445
+4          train:0.087685        test loss:0.060512        test acc:0.980669        elapsed:00:01:00.1369914
+5          train:0.074136        test loss:0.061168        test acc:0.981270        elapsed:00:01:00.3091698
+6          train:0.068078        test loss:0.056768        test acc:0.981771        elapsed:00:01:00.2082732
+7          train:0.061308        test loss:0.052581        test acc:0.982973        elapsed:00:01:00.0804604
+8          train:0.055402        test loss:0.053301        test acc:0.983373        elapsed:00:01:00.0303374
+9          train:0.052518        test loss:0.048700        test acc:0.984575        elapsed:00:00:59.8584486
+10         train:0.047068        test loss:0.045140        test acc:0.985577        elapsed:00:00:59.9931980
+```
