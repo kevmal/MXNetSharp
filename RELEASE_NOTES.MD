@@ -10,6 +10,7 @@
 * Symbol.Bind now finds Parameter types and uses them as default bindings
 * Issue #25: opening PrimitiveOperators breaks ** operator
 * Executor indexer on Variable for NDArray
+* Issue #28: Symbol.Bindings speed up on complex symbols
 
 #### 0.0.2 (2019-12-13)
 * OpOutCount.txt and OpOutCountRemainder.txt are no longer packaged

@@ -31,7 +31,7 @@ module Basic =
 
     // See issue #28
     [<Fact>]
-    let ``Symbol.Bind timing``() = 
+    let ``Symbol Bind timing``() = 
         let alpha = Variable("alpha")
         let z = Variable("z")
         let d = 3.0
