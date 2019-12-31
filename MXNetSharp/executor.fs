@@ -562,94 +562,46 @@ module SymbolExtension =
     open MXNetSharp.SymbolArgument
     type Symbol with 
         member x.Bindings = 
-            let mutable count = 0
-            let mutable count1 = 0
-            let mutable count2 = 0
-            let mutable count3 = 0
-            let mutable count4 = 0
-            let mutable count5 = 0
-            let mutable count6 = 0
-            let mutable count7 = 0
-            let mutable count8 = 0
-            let mutable count9 = 0
-            let mutable count10 = 0
-            let mutable count11 = 0
-            let mutable count12 = 0
-            let mutable count13 = 0
-            let mutable count14 = 0
-            let counts = Dictionary()
-            let c name = 
-                let scc,v = counts.TryGetValue(name)
-                if scc then 
-                    counts.[name] <- v + 1
-                else
-                    counts.[name] <- 1
             let visited = HashSet<Symbol>({new IEqualityComparer<Symbol> with
                                                member this.Equals(x: Symbol, y: Symbol): bool = 
                                                    Object.ReferenceEquals(x,y)
                                                member this.GetHashCode(obj: Symbol): int = 
                                                    System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj)})
-
-
             let rec loop (symbol : Symbol) : Parameter seq = 
-                if not(visited.Add symbol) then Seq.empty else
-                count <- count + 1
-                match symbol with 
-                | :? Parameter as p -> 
-                    count1 <- count1 + 1
-                    Seq.singleton p
-                | :? SymbolOutput as s -> 
-                    count2 <- count2 + 1
-                    loop s.Parent
-                | :? SymbolOperator as s -> 
-                    count3 <- count3 + 1
-                    s.OperatorArguments
-                    |> Seq.collect
-                        (fun a -> 
-                            match a with 
-                            | name, VarArg(num, args) -> 
-                                count4 <- count4 + 1
-                                args 
-                                |> Seq.collect 
-                                    (fun a ->
-                                        count5 <- count5 + 1
-                                        match a with 
-                                        | :? SymbolOperator as s -> 
-                                            count6 <- count6 + 1
-                                            loop s
-                                        | :? SymbolOutput as s -> 
-                                            count7 <- count7 + 1
-                                            loop s.Parent
-                                        | :? Parameter as p -> 
-                                            count8 <- count8 + 1
-                                            Seq.singleton p
-                                        | s -> 
-                                            count9 <- count9 + 1
-                                            Seq.empty
-                                    )
-                            | name, Input(:? SymbolOperator as s) -> 
-                                c (s.Name)
-                                count10 <- count10 + 1
-                                loop s
-                            | name, Input(:? SymbolOutput as s) -> 
-                                count11 <- count11 + 1
-                                loop s.Parent
-                            | name, Input(:? Parameter as s) -> 
-                                count12 <- count12 + 1
-                                Seq.singleton s
-                            | otherwise -> 
-                                count13 <- count13 + 1
-                                Seq.empty
-                        )
-                | _ ->
-                    count14 <- count14 + 1
-                    Seq.empty
-            let r = 
-                loop x 
-                |> Seq.cast
-                |> Bindings.inputs
-            printfn "%A  --> %A" x count
-            r
+                if not(visited.Add symbol) then 
+                    Seq.empty 
+                else
+                    match symbol with 
+                    | :? Parameter as p -> Seq.singleton p
+                    | :? SymbolOutput as s -> loop s.Parent
+                    | :? SymbolOperator as s -> 
+                        s.OperatorArguments
+                        |> Seq.collect
+                            (fun a -> 
+                                match a with 
+                                | name, VarArg(num, args) -> 
+                                    args 
+                                    |> Seq.collect 
+                                        (fun a ->
+                                            match a with 
+                                            | :? SymbolOperator as s -> 
+                                                loop s
+                                            | :? SymbolOutput as s -> 
+                                                loop s.Parent
+                                            | :? Parameter as p -> 
+                                                Seq.singleton p
+                                            | s -> 
+                                                Seq.empty
+                                        )
+                                | name, Input(:? SymbolOperator as s) -> loop s
+                                | name, Input(:? SymbolOutput as s) -> loop s.Parent
+                                | name, Input(:? Parameter as s) -> Seq.singleton s
+                                | otherwise -> Seq.empty
+                            )
+                    | _ -> Seq.empty
+            loop x 
+            |> Seq.cast
+            |> Bindings.inputs
         member x.Bind(context, batchSize, bindings) = 
             let bindmap = x.Bindings.WithBindings(bindings) |> Bindings.batchSize batchSize |> Bindings.inferShapes x
             new Executor(x,context,bindmap)
