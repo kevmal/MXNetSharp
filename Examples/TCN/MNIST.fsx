@@ -132,7 +132,7 @@ type AdamOptimizer(e : Executor, lr, ?beta1, ?beta2) =
             d.[s] <- v
             v
     member x.Update() =
-        let t = count //self._index_update_count[index]
+        let t = count 
         let coef1 = 1.0 - Math.Pow(beta1, double t)
         let coef2 = 1.0 - Math.Pow(beta2, double t)
         let lr = lr*(sqrt(coef2)/coef1)
