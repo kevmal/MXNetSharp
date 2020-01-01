@@ -648,7 +648,7 @@ type SymbolComposable<'a when 'a :> SymbolOperator>(argSymbol : Symbol, rootSymb
     
 
 
-type SymbolGroup(symbols : Symbol []) = 
+type SymbolGroup([<ParamArray>] symbols : Symbol []) = 
     inherit Symbol()
     new (symbols : Symbol seq) = SymbolGroup(symbols |> Seq.toArray)
     member x.Item with get(i : int) = symbols.[i]
