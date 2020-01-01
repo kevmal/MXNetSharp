@@ -381,14 +381,33 @@ module Bindings =
         |> map 
             (fun a ->
                 match a.NDArray with 
-                | None -> f a |> a.WithNDArray
+                | None -> 
+                    let nd : NDArray = f a 
+                    match a.Shape with 
+                    | None -> a.WithNDArray(nd).WithShape(nd.Shape)
+                    | Some s when s = nd.Shape -> nd |> a.WithNDArray
+                    | Some s -> 
+                        let nds = nd.Shape
+                        if s.Length = 0 then 
+                            a.WithNDArray(nd).WithShape(nds)
+                        elif s.Length <> nds.Length then 
+                            raise (RankException(sprintf "Given NDArray shape %A does not match binding %s shape %A" nds a.Name s))
+                        else
+                            for i = 0 to s.Length - 1 do 
+                                if s.[i] > 0 && s.[i] <> nds.[i] then 
+                                    raise (RankException(sprintf "Given NDArray shape %A does not match binding %s shape %A" nds a.Name s))
+                            a.WithNDArray(nd).WithShape(nds)
                 | _ -> a
             )
-    /// Default tp OpReqType.WriteTo, zero grads and seq missing Arg NDArray's using `f : b : Bind -> shape : int seq -> NDArray`
+    /// Default to OpReqType.WriteTo, zero grads and fill missing NDArray's using `f : b : Bind -> shape : int seq -> NDArray`
     let init f bm = 
         bm 
         |> defaultOpReqType OpReqType.WriteTo
-        |> fillNDArray (fun x -> f x x.Shape.Value) //TODO: check and throw
+        |> fillNDArray 
+            (fun x -> 
+                let shape = match x.Shape with | Some s -> s | _ -> Array.empty
+                f x shape
+            ) 
         |> map 
             (fun a ->
                 match a with
@@ -396,7 +415,6 @@ module Bindings =
                     ArgBinding {b with Grad = Some(MX.ZerosLike(a.NDArray.Value))}
                 | _ -> a
             )
-
 
 
 type SafeExecutorHandle(owner) = 
@@ -653,4 +671,4 @@ module SymbolExtension =
             let exe = x.Bind(context,bindings)
             exe.Forward(false)
             exe
-
+    
