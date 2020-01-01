@@ -19,8 +19,8 @@ module Basic =
         let input = Input("x", ndarray = X)
         let label = Input("y", ndarray = observedY)
         let g = ctx.Zeros(shape = [1])
-        let m = Parameter("m",ndarray = ctx.RandomUniform(-1.0, 1.0, shape = [1]), grad = g, opReqType = OpReqType.WriteTo)
-        let b = Parameter("b",ndarray = ctx.RandomUniform(-1.0, 1.0, shape = [1]), grad = ctx.Zeros(shape = [1]), opReqType = OpReqType.WriteTo)
+        let m = Parameter("m",ndarray = ctx.RandomUniform([1], -1.0, 1.0), grad = g, opReqType = OpReqType.WriteTo)
+        let b = Parameter("b",ndarray = ctx.RandomUniform([1], -1.0, 1.0), grad = ctx.Zeros(shape = [1]), opReqType = OpReqType.WriteTo)
         let model = m.*input .+ b
         let loss = MakeLoss(Mean(Square(model - label)))
         let execOutput = SymbolGroup([loss :> Symbol; model :> Symbol])
