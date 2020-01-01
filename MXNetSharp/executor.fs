@@ -303,6 +303,7 @@ module Bind =
 
 
 module Bindings = 
+    /// Apply map f : Bind -> Bind on all aux bindings
     let mapAux f (bm : Bindings) = 
         bm
         |> Seq.map 
@@ -313,6 +314,7 @@ module Bindings =
         |> Seq.map (fun (x : Bind) -> x.Name, x)
         |> dict 
         |> Bindings
+    /// Apply map f : Bind -> Bind on all arg bindings
     let mapArg f (bm : Bindings) = 
         bm
         |> Seq.map 
@@ -323,14 +325,18 @@ module Bindings =
         |> Seq.map (fun (x : Bind) -> x.Name, x)
         |> dict 
         |> Bindings
+    /// Apply map f : Bind -> Bind on all bindings
     let map f (bm : Bindings) = 
         bm
         |> Seq.map f
         |> Seq.map (fun (x : Bind) -> x.Name, x)
         |> dict 
         |> Bindings
+    /// Bindings from sequence of Bind
     let ofSeq l = Bindings().WithBindings l
+    /// Infer the shape of symbol and it's arguments given bindings
     let inferShapes (s : Symbol) (bm : Bindings) = bm.InferShapes s
+    /// Apply mapping f to all bindings which are arguments to symbol
     let mapSymbolArgs (symbol : Symbol) f (bm : Bindings) = 
         let argNames = symbol.ArgumentNames |> Set.ofSeq
         bm
@@ -341,12 +347,15 @@ module Bindings =
                 else
                     a
             )
+    /// All OpReqType's set to NullOp (no gradient calc)
     let freezeGraph (symbol : Symbol) (bm : Bindings) = 
         bm |> mapSymbolArgs symbol (fun a -> {a with OpReqType = Some NullOp} )
+    /// Initilize Bindings with given Variables
     let inputs (variables : Variable seq) = 
         variables 
         |> Seq.map Bind.fromVariable
         |> ofSeq
+    /// If shape[0] = 0 then set to given batchSize
     let batchSize batchSize (bm : Bindings) = 
         bm
         |> Seq.map 
@@ -357,6 +366,7 @@ module Bindings =
                 | _ -> x
             )
         |> ofSeq
+    /// Fill missing OpReqType
     let defaultOpReqType opReqType (bm : Bindings) = 
         bm
         |> mapArg 
@@ -365,7 +375,8 @@ module Bindings =
                 | None -> {a with OpReqType = Some opReqType}
                 | _ -> a
             )
-    let mapNDArray f (bm : Bindings) = 
+    /// Fill missing NDArray's with f : Bind -> NDArray
+    let fillNDArray f (bm : Bindings) = 
         bm
         |> map 
             (fun a ->
@@ -373,10 +384,11 @@ module Bindings =
                 | None -> f a |> a.WithNDArray
                 | _ -> a
             )
+    /// Default tp OpReqType.WriteTo, zero grads and seq missing Arg NDArray's using `f : b : Bind -> shape : int seq -> NDArray`
     let init f bm = 
         bm 
         |> defaultOpReqType OpReqType.WriteTo
-        |> mapNDArray (fun x -> f x x.Shape.Value) //TODO: check and throw
+        |> fillNDArray (fun x -> f x x.Shape.Value) //TODO: check and throw
         |> map 
             (fun a ->
                 match a with
