@@ -648,7 +648,7 @@ type SymbolComposable<'a when 'a :> SymbolOperator>(argSymbol : Symbol, rootSymb
     
 
 
-type SymbolGroup(symbols : Symbol []) = 
+type SymbolGroup([<ParamArray>] symbols : Symbol []) = 
     inherit Symbol()
     new (symbols : Symbol seq) = SymbolGroup(symbols |> Seq.toArray)
     member x.Item with get(i : int) = symbols.[i]
@@ -935,7 +935,7 @@ module SymbolOperators =
         /// the update is skipped.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L77</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L58</summary>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
         /// <param name="mean">Moving mean</param>
@@ -1004,7 +1004,7 @@ module SymbolOperators =
         /// the update is skipped.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L77</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L58</summary>
         /// <param name="lr">Learning rate</param>
         /// <param name="eta">Learning rate schedule multiplier</param>
         /// <param name="weight">Weight</param>
@@ -1167,7 +1167,7 @@ module SymbolOperators =
         /// the update is skipped.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L120</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L101</summary>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
         /// <param name="mean">Moving mean</param>
@@ -1231,7 +1231,7 @@ module SymbolOperators =
         /// the update is skipped.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L120</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L101</summary>
         /// <param name="lr">Learning rate</param>
         /// <param name="eta">Learning rate schedule multiplier</param>
         /// <param name="weight">Weight</param>
@@ -1358,6 +1358,376 @@ module SymbolOperators =
                 ] |> List.choose id
             new AdamwUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type MultiAdamwUpdate private (operatorArguments) = 
+        inherit SymbolOperator("_multi_adamw_update", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new MultiAdamwUpdate(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new MultiAdamwUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Update function for AdamW optimizer.
+        /// 
+        /// AdamW is seen as a modification of Adam by decoupling the weight decay from the
+        /// optimization steps taken w.r.t. the loss function.
+        /// 
+        /// Adam update consists of the following steps, where g represents gradient and m, v
+        /// are 1st and 2nd order moment estimates (mean and variance).
+        /// 
+        /// .. math::
+        /// 
+        ///  g_t = \nabla J(W_{t-1})\\
+        ///  m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t\\
+        ///  v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^2\\
+        ///  W_t = W_{t-1} - \eta_t (\alpha \frac{ m_t }{ \sqrt{ v_t } + \epsilon } + wd W_{t-1})
+        /// 
+        /// It updates the weights using::
+        /// 
+        ///  m = beta1*m + (1-beta1)*grad
+        ///  v = beta2*v + (1-beta2)*(grad**2)
+        ///  w -= eta * (learning_rate * m / (sqrt(v) + epsilon) + w * wd)
+        /// 
+        /// Note that gradient is rescaled to grad = rescale_grad * grad. If rescale_grad is NaN, Inf, or 0,
+        /// the update is skipped.
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L167</summary>
+        /// <param name="data">data</param>
+        /// <param name="lrs">Learning rates</param>
+        /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+        /// <param name="etas">Learning rates schedule multiplier</param>
+        /// <param name="beta1">The decay rate for the 1st moment estimates.</param>
+        /// <param name="beta2">The decay rate for the 2nd moment estimates.</param>
+        /// <param name="epsilon">A small constant for numerical stability.</param>
+        /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+        /// <param name="numWeights">Number of updated weights.</param>
+        new(data : Symbol seq,
+            lrs : double seq,
+            wds : double seq,
+            etas : double seq,
+            [<Optional>] ?beta1 : float,
+            [<Optional>] ?beta2 : float,
+            [<Optional>] ?epsilon : float,
+            [<Optional>] ?clipGradient : float,
+            [<Optional>] ?numWeights : int) = 
+            let operatorArguments = 
+                [
+                    "data", VarArg("", data |> Seq.toArray)
+                    "lrs", Parameter(Some(box lrs))
+                    "wds", Parameter(Some(box wds))
+                    "etas", Parameter(Some(box etas))
+                    "beta1", beta1 |> Option.map box |> Parameter
+                    "beta2", beta2 |> Option.map box |> Parameter
+                    "epsilon", epsilon |> Option.map box |> Parameter
+                    "clip_gradient", clipGradient |> Option.map box |> Parameter
+                    "num_weights", numWeights |> Option.map box |> Parameter
+                ]
+            new MultiAdamwUpdate(Arguments<Symbol>(operatorArguments))
+        /// <summary>Update function for AdamW optimizer.
+        /// 
+        /// AdamW is seen as a modification of Adam by decoupling the weight decay from the
+        /// optimization steps taken w.r.t. the loss function.
+        /// 
+        /// Adam update consists of the following steps, where g represents gradient and m, v
+        /// are 1st and 2nd order moment estimates (mean and variance).
+        /// 
+        /// .. math::
+        /// 
+        ///  g_t = \nabla J(W_{t-1})\\
+        ///  m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t\\
+        ///  v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^2\\
+        ///  W_t = W_{t-1} - \eta_t (\alpha \frac{ m_t }{ \sqrt{ v_t } + \epsilon } + wd W_{t-1})
+        /// 
+        /// It updates the weights using::
+        /// 
+        ///  m = beta1*m + (1-beta1)*grad
+        ///  v = beta2*v + (1-beta2)*(grad**2)
+        ///  w -= eta * (learning_rate * m / (sqrt(v) + epsilon) + w * wd)
+        /// 
+        /// Note that gradient is rescaled to grad = rescale_grad * grad. If rescale_grad is NaN, Inf, or 0,
+        /// the update is skipped.
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L167</summary>
+        /// <param name="lrs">Learning rates</param>
+        /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+        /// <param name="etas">Learning rates schedule multiplier</param>
+        /// <param name="data">data</param>
+        /// <param name="beta1">The decay rate for the 1st moment estimates.</param>
+        /// <param name="beta2">The decay rate for the 2nd moment estimates.</param>
+        /// <param name="epsilon">A small constant for numerical stability.</param>
+        /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+        /// <param name="numWeights">Number of updated weights.</param>
+        new(lrs : double seq,
+            wds : double seq,
+            etas : double seq,
+            [<Optional>] ?data : Symbol seq,
+            [<Optional>] ?beta1 : float,
+            [<Optional>] ?beta2 : float,
+            [<Optional>] ?epsilon : float,
+            [<Optional>] ?clipGradient : float,
+            [<Optional>] ?numWeights : int) = 
+            let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
+            let operatorArguments = 
+                [
+                    "data", VarArg("", data)
+                    "lrs", Parameter(Some(box lrs))
+                    "wds", Parameter(Some(box wds))
+                    "etas", Parameter(Some(box etas))
+                    "beta1", beta1 |> Option.map box |> Parameter
+                    "beta2", beta2 |> Option.map box |> Parameter
+                    "epsilon", epsilon |> Option.map box |> Parameter
+                    "clip_gradient", clipGradient |> Option.map box |> Parameter
+                    "num_weights", numWeights |> Option.map box |> Parameter
+                ]
+            new MultiAdamwUpdate(Arguments<Symbol>(operatorArguments))
+        /// Default value for Beta1
+        /// The decay rate for the 1st moment estimates.
+        static member Beta1Default : double = 0.899999976
+        /// Default value for Beta2
+        /// The decay rate for the 2nd moment estimates.
+        static member Beta2Default : double = 0.999000013
+        /// Default value for Epsilon
+        /// A small constant for numerical stability.
+        static member EpsilonDefault : double = 0.0000000099999999
+        /// Default value for ClipGradient
+        /// Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).
+        static member ClipGradientDefault : double = -1.0
+        /// Default value for NumWeights
+        /// Number of updated weights.
+        static member NumWeightsDefault : int = 1
+        /// data
+        member __.Data = operatorArguments.GetVarArg "data"
+        /// Learning rates
+        member __.Lrs : double seq = match operatorArguments.GetParameter "lrs" with Some(v) -> unbox v | None -> failwithf "Required parameter lrs is missing"
+        /// Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.
+        member __.Wds : double seq = match operatorArguments.GetParameter "wds" with Some(v) -> unbox v | None -> failwithf "Required parameter wds is missing"
+        /// Learning rates schedule multiplier
+        member __.Etas : double seq = match operatorArguments.GetParameter "etas" with Some(v) -> unbox v | None -> failwithf "Required parameter etas is missing"
+        /// The decay rate for the 1st moment estimates.
+        member __.Beta1 = operatorArguments.GetParameter("beta1", MultiAdamwUpdate.Beta1Default)
+        /// The decay rate for the 2nd moment estimates.
+        member __.Beta2 = operatorArguments.GetParameter("beta2", MultiAdamwUpdate.Beta2Default)
+        /// A small constant for numerical stability.
+        member __.Epsilon = operatorArguments.GetParameter("epsilon", MultiAdamwUpdate.EpsilonDefault)
+        /// Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).
+        member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", MultiAdamwUpdate.ClipGradientDefault)
+        /// Number of updated weights.
+        member __.NumWeights = operatorArguments.GetParameter("num_weights", MultiAdamwUpdate.NumWeightsDefault)
+        /// <summary>Copy MultiAdamwUpdate instance with updated inputs/parameters.</summary>
+        /// <param name="data">data</param>
+        /// <param name="lrs">Learning rates</param>
+        /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+        /// <param name="etas">Learning rates schedule multiplier</param>
+        /// <param name="beta1">The decay rate for the 1st moment estimates.</param>
+        /// <param name="beta2">The decay rate for the 2nd moment estimates.</param>
+        /// <param name="epsilon">A small constant for numerical stability.</param>
+        /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+        /// <param name="numWeights">Number of updated weights.</param>
+        member this.With([<Optional>] ?data : Symbol seq,
+            [<Optional>] ?lrs : double seq,
+            [<Optional>] ?wds : double seq,
+            [<Optional>] ?etas : double seq,
+            [<Optional>] ?beta1 : float,
+            [<Optional>] ?beta2 : float,
+            [<Optional>] ?epsilon : float,
+            [<Optional>] ?clipGradient : float,
+            [<Optional>] ?numWeights : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                    lrs |> Option.map (fun x -> "lrs", Parameter(Some (box x)))
+                    wds |> Option.map (fun x -> "wds", Parameter(Some (box x)))
+                    etas |> Option.map (fun x -> "etas", Parameter(Some (box x)))
+                    beta1 |> Option.map (fun x -> "beta1", Parameter(Some (box x)))
+                    beta2 |> Option.map (fun x -> "beta2", Parameter(Some (box x)))
+                    epsilon |> Option.map (fun x -> "epsilon", Parameter(Some (box x)))
+                    clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                    numWeights |> Option.map (fun x -> "num_weights", Parameter(Some (box x)))
+                ] |> List.choose id
+            new MultiAdamwUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type MultiMpAdamwUpdate private (operatorArguments) = 
+        inherit SymbolOperator("_multi_mp_adamw_update", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new MultiMpAdamwUpdate(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new MultiMpAdamwUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Update function for multi-precision AdamW optimizer.
+        /// 
+        /// AdamW is seen as a modification of Adam by decoupling the weight decay from the
+        /// optimization steps taken w.r.t. the loss function.
+        /// 
+        /// Adam update consists of the following steps, where g represents gradient and m, v
+        /// are 1st and 2nd order moment estimates (mean and variance).
+        /// 
+        /// .. math::
+        /// 
+        ///  g_t = \nabla J(W_{t-1})\\
+        ///  m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t\\
+        ///  v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^2\\
+        ///  W_t = W_{t-1} - \eta_t (\alpha \frac{ m_t }{ \sqrt{ v_t } + \epsilon } + wd W_{t-1})
+        /// 
+        /// It updates the weights using::
+        /// 
+        ///  m = beta1*m + (1-beta1)*grad
+        ///  v = beta2*v + (1-beta2)*(grad**2)
+        ///  w -= eta * (learning_rate * m / (sqrt(v) + epsilon) + w * wd)
+        /// 
+        /// Note that gradient is rescaled to grad = rescale_grad * grad. If rescale_grad is NaN, Inf, or 0,
+        /// the update is skipped.
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L223</summary>
+        /// <param name="data">data</param>
+        /// <param name="lrs">Learning rates</param>
+        /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+        /// <param name="etas">Learning rates schedule multiplier</param>
+        /// <param name="beta1">The decay rate for the 1st moment estimates.</param>
+        /// <param name="beta2">The decay rate for the 2nd moment estimates.</param>
+        /// <param name="epsilon">A small constant for numerical stability.</param>
+        /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+        /// <param name="numWeights">Number of updated weights.</param>
+        new(data : Symbol seq,
+            lrs : double seq,
+            wds : double seq,
+            etas : double seq,
+            [<Optional>] ?beta1 : float,
+            [<Optional>] ?beta2 : float,
+            [<Optional>] ?epsilon : float,
+            [<Optional>] ?clipGradient : float,
+            [<Optional>] ?numWeights : int) = 
+            let operatorArguments = 
+                [
+                    "data", VarArg("", data |> Seq.toArray)
+                    "lrs", Parameter(Some(box lrs))
+                    "wds", Parameter(Some(box wds))
+                    "etas", Parameter(Some(box etas))
+                    "beta1", beta1 |> Option.map box |> Parameter
+                    "beta2", beta2 |> Option.map box |> Parameter
+                    "epsilon", epsilon |> Option.map box |> Parameter
+                    "clip_gradient", clipGradient |> Option.map box |> Parameter
+                    "num_weights", numWeights |> Option.map box |> Parameter
+                ]
+            new MultiMpAdamwUpdate(Arguments<Symbol>(operatorArguments))
+        /// <summary>Update function for multi-precision AdamW optimizer.
+        /// 
+        /// AdamW is seen as a modification of Adam by decoupling the weight decay from the
+        /// optimization steps taken w.r.t. the loss function.
+        /// 
+        /// Adam update consists of the following steps, where g represents gradient and m, v
+        /// are 1st and 2nd order moment estimates (mean and variance).
+        /// 
+        /// .. math::
+        /// 
+        ///  g_t = \nabla J(W_{t-1})\\
+        ///  m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t\\
+        ///  v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^2\\
+        ///  W_t = W_{t-1} - \eta_t (\alpha \frac{ m_t }{ \sqrt{ v_t } + \epsilon } + wd W_{t-1})
+        /// 
+        /// It updates the weights using::
+        /// 
+        ///  m = beta1*m + (1-beta1)*grad
+        ///  v = beta2*v + (1-beta2)*(grad**2)
+        ///  w -= eta * (learning_rate * m / (sqrt(v) + epsilon) + w * wd)
+        /// 
+        /// Note that gradient is rescaled to grad = rescale_grad * grad. If rescale_grad is NaN, Inf, or 0,
+        /// the update is skipped.
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L223</summary>
+        /// <param name="lrs">Learning rates</param>
+        /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+        /// <param name="etas">Learning rates schedule multiplier</param>
+        /// <param name="data">data</param>
+        /// <param name="beta1">The decay rate for the 1st moment estimates.</param>
+        /// <param name="beta2">The decay rate for the 2nd moment estimates.</param>
+        /// <param name="epsilon">A small constant for numerical stability.</param>
+        /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+        /// <param name="numWeights">Number of updated weights.</param>
+        new(lrs : double seq,
+            wds : double seq,
+            etas : double seq,
+            [<Optional>] ?data : Symbol seq,
+            [<Optional>] ?beta1 : float,
+            [<Optional>] ?beta2 : float,
+            [<Optional>] ?epsilon : float,
+            [<Optional>] ?clipGradient : float,
+            [<Optional>] ?numWeights : int) = 
+            let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
+            let operatorArguments = 
+                [
+                    "data", VarArg("", data)
+                    "lrs", Parameter(Some(box lrs))
+                    "wds", Parameter(Some(box wds))
+                    "etas", Parameter(Some(box etas))
+                    "beta1", beta1 |> Option.map box |> Parameter
+                    "beta2", beta2 |> Option.map box |> Parameter
+                    "epsilon", epsilon |> Option.map box |> Parameter
+                    "clip_gradient", clipGradient |> Option.map box |> Parameter
+                    "num_weights", numWeights |> Option.map box |> Parameter
+                ]
+            new MultiMpAdamwUpdate(Arguments<Symbol>(operatorArguments))
+        /// Default value for Beta1
+        /// The decay rate for the 1st moment estimates.
+        static member Beta1Default : double = 0.899999976
+        /// Default value for Beta2
+        /// The decay rate for the 2nd moment estimates.
+        static member Beta2Default : double = 0.999000013
+        /// Default value for Epsilon
+        /// A small constant for numerical stability.
+        static member EpsilonDefault : double = 0.0000000099999999
+        /// Default value for ClipGradient
+        /// Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).
+        static member ClipGradientDefault : double = -1.0
+        /// Default value for NumWeights
+        /// Number of updated weights.
+        static member NumWeightsDefault : int = 1
+        /// data
+        member __.Data = operatorArguments.GetVarArg "data"
+        /// Learning rates
+        member __.Lrs : double seq = match operatorArguments.GetParameter "lrs" with Some(v) -> unbox v | None -> failwithf "Required parameter lrs is missing"
+        /// Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.
+        member __.Wds : double seq = match operatorArguments.GetParameter "wds" with Some(v) -> unbox v | None -> failwithf "Required parameter wds is missing"
+        /// Learning rates schedule multiplier
+        member __.Etas : double seq = match operatorArguments.GetParameter "etas" with Some(v) -> unbox v | None -> failwithf "Required parameter etas is missing"
+        /// The decay rate for the 1st moment estimates.
+        member __.Beta1 = operatorArguments.GetParameter("beta1", MultiMpAdamwUpdate.Beta1Default)
+        /// The decay rate for the 2nd moment estimates.
+        member __.Beta2 = operatorArguments.GetParameter("beta2", MultiMpAdamwUpdate.Beta2Default)
+        /// A small constant for numerical stability.
+        member __.Epsilon = operatorArguments.GetParameter("epsilon", MultiMpAdamwUpdate.EpsilonDefault)
+        /// Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).
+        member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", MultiMpAdamwUpdate.ClipGradientDefault)
+        /// Number of updated weights.
+        member __.NumWeights = operatorArguments.GetParameter("num_weights", MultiMpAdamwUpdate.NumWeightsDefault)
+        /// <summary>Copy MultiMpAdamwUpdate instance with updated inputs/parameters.</summary>
+        /// <param name="data">data</param>
+        /// <param name="lrs">Learning rates</param>
+        /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+        /// <param name="etas">Learning rates schedule multiplier</param>
+        /// <param name="beta1">The decay rate for the 1st moment estimates.</param>
+        /// <param name="beta2">The decay rate for the 2nd moment estimates.</param>
+        /// <param name="epsilon">A small constant for numerical stability.</param>
+        /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+        /// <param name="numWeights">Number of updated weights.</param>
+        member this.With([<Optional>] ?data : Symbol seq,
+            [<Optional>] ?lrs : double seq,
+            [<Optional>] ?wds : double seq,
+            [<Optional>] ?etas : double seq,
+            [<Optional>] ?beta1 : float,
+            [<Optional>] ?beta2 : float,
+            [<Optional>] ?epsilon : float,
+            [<Optional>] ?clipGradient : float,
+            [<Optional>] ?numWeights : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                    lrs |> Option.map (fun x -> "lrs", Parameter(Some (box x)))
+                    wds |> Option.map (fun x -> "wds", Parameter(Some (box x)))
+                    etas |> Option.map (fun x -> "etas", Parameter(Some (box x)))
+                    beta1 |> Option.map (fun x -> "beta1", Parameter(Some (box x)))
+                    beta2 |> Option.map (fun x -> "beta2", Parameter(Some (box x)))
+                    epsilon |> Option.map (fun x -> "epsilon", Parameter(Some (box x)))
+                    clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                    numWeights |> Option.map (fun x -> "num_weights", Parameter(Some (box x)))
+                ] |> List.choose id
+            new MultiMpAdamwUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type ContribAdaptiveAvgPooling2D private (operatorArguments) = 
         inherit SymbolOperator("_contrib_AdaptiveAvgPooling2D", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new ContribAdaptiveAvgPooling2D(args)
@@ -1454,6 +1824,96 @@ module SymbolOperators =
                 ] |> List.choose id
             new MultiAllFinite(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type ContribAllclose private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_allclose", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribAllclose(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribAllclose(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>This operators implements the numpy.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
+        /// 
+        /// .. math::
+        /// 
+        ///     f(x) = |a&#226;ˆ’b|&#226;‰&#164;atol+rtol|b|
+        /// 
+        /// where
+        /// :math:`a, b` are the input tensors of equal types an shapes
+        /// :math:`atol, rtol` the values of absolute and relative tolerance (by default, rtol=1e-05, atol=1e-08)
+        /// 
+        /// Examples::
+        /// 
+        ///   a = [1e10, 1e-7],
+        ///   b = [1.00001e10, 1e-8]
+        ///   y = allclose(a, b)
+        ///   y = False
+        /// 
+        ///   a = [1e10, 1e-8],
+        ///   b = [1.00001e10, 1e-9]
+        ///   y = allclose(a, b)
+        ///   y = True
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\allclose_op.cc:L55</summary>
+        /// <param name="a">Input array a</param>
+        /// <param name="b">Input array b</param>
+        /// <param name="rtol">Relative tolerance.</param>
+        /// <param name="atol">Absolute tolerance.</param>
+        /// <param name="equalNan">Whether to compare NaN&#39;s as equal. If True, NaN&#39;s in A will be considered equal to NaN&#39;s in B in the output array.</param>
+        new([<Optional>] ?a : Symbol,
+            [<Optional>] ?b : Symbol,
+            [<Optional>] ?rtol : float,
+            [<Optional>] ?atol : float,
+            [<Optional>] ?equalNan : bool) = 
+            let a = defaultArg a (new ImplicitVariable() :> Symbol)
+            let b = defaultArg b (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "a", Input a
+                    "b", Input b
+                    "rtol", rtol |> Option.map box |> Parameter
+                    "atol", atol |> Option.map box |> Parameter
+                    "equal_nan", equalNan |> Option.map box |> Parameter
+                ]
+            new ContribAllclose(Arguments<Symbol>(operatorArguments))
+        /// Default value for Rtol
+        /// Relative tolerance.
+        static member RtolDefault : double = 0.00000999999975
+        /// Default value for Atol
+        /// Absolute tolerance.
+        static member AtolDefault : double = 0.0000000099999999
+        /// Default value for EqualNan
+        /// Whether to compare NaN&#39;s as equal. If True, NaN&#39;s in A will be considered equal to NaN&#39;s in B in the output array.
+        static member EqualNanDefault : bool = true
+        /// Input array a
+        member __.A = operatorArguments.GetInput "a"
+        /// Input array b
+        member __.B = operatorArguments.GetInput "b"
+        /// Relative tolerance.
+        member __.Rtol = operatorArguments.GetParameter("rtol", ContribAllclose.RtolDefault)
+        /// Absolute tolerance.
+        member __.Atol = operatorArguments.GetParameter("atol", ContribAllclose.AtolDefault)
+        /// Whether to compare NaN&#39;s as equal. If True, NaN&#39;s in A will be considered equal to NaN&#39;s in B in the output array.
+        member __.EqualNan = operatorArguments.GetParameter("equal_nan", ContribAllclose.EqualNanDefault)
+        /// <summary>Copy ContribAllclose instance with updated inputs/parameters.</summary>
+        /// <param name="a">Input array a</param>
+        /// <param name="b">Input array b</param>
+        /// <param name="rtol">Relative tolerance.</param>
+        /// <param name="atol">Absolute tolerance.</param>
+        /// <param name="equalNan">Whether to compare NaN&#39;s as equal. If True, NaN&#39;s in A will be considered equal to NaN&#39;s in B in the output array.</param>
+        member this.With([<Optional>] ?a : Symbol,
+            [<Optional>] ?b : Symbol,
+            [<Optional>] ?rtol : float,
+            [<Optional>] ?atol : float,
+            [<Optional>] ?equalNan : bool) = 
+            let operatorArguments = 
+                [
+                    a |> Option.map (fun x -> "a", Input x)
+                    b |> Option.map (fun x -> "b", Input x)
+                    rtol |> Option.map (fun x -> "rtol", Parameter(Some (box x)))
+                    atol |> Option.map (fun x -> "atol", Parameter(Some (box x)))
+                    equalNan |> Option.map (fun x -> "equal_nan", Parameter(Some (box x)))
+                ] |> List.choose id
+            new ContribAllclose(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type ContribBilinearResize2D private (operatorArguments) = 
         inherit SymbolOperator("_contrib_BilinearResize2D", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBilinearResize2D(args)
@@ -1469,7 +1929,7 @@ module SymbolOperators =
         /// for more details.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bilinear_resize.cc:L215</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bilinear_resize.cc:L220</summary>
         /// <param name="data">Input data</param>
         /// <param name="like">Resize data to it&#39;s shape</param>
         /// <param name="height">output height (required, but ignored if scale_height is defined or mode is not &quot;size&quot;)</param>
@@ -1477,13 +1937,15 @@ module SymbolOperators =
         /// <param name="scaleHeight">sampling scale of the height (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
         /// <param name="scaleWidth">sampling scale of the width (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
         /// <param name="mode">resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);</param>
+        /// <param name="alignCorners">With align_corners = True, the interpolating doesn&#39;t proportionally align theoutput and input pixels, and thus the output values can depend on the input size.</param>
         new([<Optional>] ?data : Symbol,
             [<Optional>] ?like : Symbol,
             [<Optional>] ?height : int,
             [<Optional>] ?width : int,
             [<Optional>] ?scaleHeight : float,
             [<Optional>] ?scaleWidth : float,
-            [<Optional>] ?mode : ContribBilinearResize2DMode) = 
+            [<Optional>] ?mode : ContribBilinearResize2DMode,
+            [<Optional>] ?alignCorners : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let like = defaultArg like (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
@@ -1495,6 +1957,7 @@ module SymbolOperators =
                     "scale_height", scaleHeight |> Option.map box |> Parameter
                     "scale_width", scaleWidth |> Option.map box |> Parameter
                     "mode", mode |> Option.map box |> Parameter
+                    "align_corners", alignCorners |> Option.map box |> Parameter
                 ]
             new ContribBilinearResize2D(Arguments<Symbol>(operatorArguments))
         /// Default value for Height
@@ -1512,6 +1975,9 @@ module SymbolOperators =
         /// Default value for Mode
         /// resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);
         static member ModeDefault : ContribBilinearResize2DMode = ContribBilinearResize2DMode.Size
+        /// Default value for AlignCorners
+        /// With align_corners = True, the interpolating doesn&#39;t proportionally align theoutput and input pixels, and thus the output values can depend on the input size.
+        static member AlignCornersDefault : bool = true
         /// Input data
         member __.Data = operatorArguments.GetInput "data"
         /// Resize data to it&#39;s shape
@@ -1526,6 +1992,8 @@ module SymbolOperators =
         member __.ScaleWidth = operatorArguments.GetParameter("scale_width", ContribBilinearResize2D.ScaleWidthDefault)
         /// resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);
         member __.Mode = operatorArguments.GetParameter("mode", ContribBilinearResize2D.ModeDefault)
+        /// With align_corners = True, the interpolating doesn&#39;t proportionally align theoutput and input pixels, and thus the output values can depend on the input size.
+        member __.AlignCorners = operatorArguments.GetParameter("align_corners", ContribBilinearResize2D.AlignCornersDefault)
         /// <summary>Copy ContribBilinearResize2D instance with updated inputs/parameters.</summary>
         /// <param name="data">Input data</param>
         /// <param name="like">Resize data to it&#39;s shape</param>
@@ -1534,13 +2002,15 @@ module SymbolOperators =
         /// <param name="scaleHeight">sampling scale of the height (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
         /// <param name="scaleWidth">sampling scale of the width (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
         /// <param name="mode">resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);</param>
+        /// <param name="alignCorners">With align_corners = True, the interpolating doesn&#39;t proportionally align theoutput and input pixels, and thus the output values can depend on the input size.</param>
         member this.With([<Optional>] ?data : Symbol,
             [<Optional>] ?like : Symbol,
             [<Optional>] ?height : int,
             [<Optional>] ?width : int,
             [<Optional>] ?scaleHeight : float,
             [<Optional>] ?scaleWidth : float,
-            [<Optional>] ?mode : ContribBilinearResize2DMode) = 
+            [<Optional>] ?mode : ContribBilinearResize2DMode,
+            [<Optional>] ?alignCorners : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
@@ -1550,6 +2020,7 @@ module SymbolOperators =
                     scaleHeight |> Option.map (fun x -> "scale_height", Parameter(Some (box x)))
                     scaleWidth |> Option.map (fun x -> "scale_width", Parameter(Some (box x)))
                     mode |> Option.map (fun x -> "mode", Parameter(Some (box x)))
+                    alignCorners |> Option.map (fun x -> "align_corners", Parameter(Some (box x)))
                 ] |> List.choose id
             new ContribBilinearResize2D(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -1572,7 +2043,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\boolean_mask.cc:L195</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\boolean_mask.cc:L196</summary>
         /// <param name="data">Data</param>
         /// <param name="index">Mask</param>
         /// <param name="axis">An integer that represents the axis in NDArray to mask from.</param>
@@ -1673,7 +2144,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L93</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L95</summary>
         /// <param name="data">The input</param>
         /// <param name="overlapThresh">Overlapping(IoU) threshold to suppress object with smaller score.</param>
         /// <param name="validThresh">Filter input boxes to those whose scores greater than valid_thresh.</param>
@@ -1833,7 +2304,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L134</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L137</summary>
         /// <param name="lhs">The first input</param>
         /// <param name="rhs">The second input</param>
         /// <param name="format">The box encoding type. 
@@ -1904,7 +2375,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L180</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L183</summary>
         /// <param name="data">The input</param>
         /// <param name="threshold">Ignore matching when score &lt; thresh, if is_ascend=false, or ignore score &gt; thresh, if is_ascend=true.</param>
         /// <param name="isAscend">Use ascend order for scores instead of descending. Please set threshold accordingly.</param>
@@ -1944,7 +2415,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L180</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L183</summary>
         /// <param name="threshold">Ignore matching when score &lt; thresh, if is_ascend=false, or ignore score &gt; thresh, if is_ascend=true.</param>
         /// <param name="data">The input</param>
         /// <param name="isAscend">Use ascend order for scores instead of descending. Please set threshold accordingly.</param>
@@ -1993,6 +2464,187 @@ module SymbolOperators =
                     topk |> Option.map (fun x -> "topk", Parameter(Some (box x)))
                 ] |> List.choose id
             new ContribBipartiteMatching(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type ContribBoxEncode private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_box_encode", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBoxEncode(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribBoxEncode(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Encode bounding boxes training target with normalized center offsets.
+        ///     Input bounding boxes are using corner type: `x_{min}, y_{min}, x_{max}, y_{max}`.) array
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L211</summary>
+        /// <param name="samples">(B, N) value +1 (positive), -1 (negative), 0 (ignore)</param>
+        /// <param name="matches">(B, N) value range [0, M)</param>
+        /// <param name="anchors">(B, N, 4) encoded in corner</param>
+        /// <param name="refs">(B, M, 4) encoded in corner</param>
+        /// <param name="means">(4,) Mean value to be subtracted from encoded values</param>
+        /// <param name="stds">(4,) Std value to be divided from encoded values</param>
+        new([<Optional>] ?samples : Symbol,
+            [<Optional>] ?matches : Symbol,
+            [<Optional>] ?anchors : Symbol,
+            [<Optional>] ?refs : Symbol,
+            [<Optional>] ?means : Symbol,
+            [<Optional>] ?stds : Symbol) = 
+            let samples = defaultArg samples (new ImplicitVariable() :> Symbol)
+            let matches = defaultArg matches (new ImplicitVariable() :> Symbol)
+            let anchors = defaultArg anchors (new ImplicitVariable() :> Symbol)
+            let refs = defaultArg refs (new ImplicitVariable() :> Symbol)
+            let means = defaultArg means (new ImplicitVariable() :> Symbol)
+            let stds = defaultArg stds (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "samples", Input samples
+                    "matches", Input matches
+                    "anchors", Input anchors
+                    "refs", Input refs
+                    "means", Input means
+                    "stds", Input stds
+                ]
+            new ContribBoxEncode(Arguments<Symbol>(operatorArguments))
+        /// (B, N) value +1 (positive), -1 (negative), 0 (ignore)
+        member __.Samples = operatorArguments.GetInput "samples"
+        /// (B, N) value range [0, M)
+        member __.Matches = operatorArguments.GetInput "matches"
+        /// (B, N, 4) encoded in corner
+        member __.Anchors = operatorArguments.GetInput "anchors"
+        /// (B, M, 4) encoded in corner
+        member __.Refs = operatorArguments.GetInput "refs"
+        /// (4,) Mean value to be subtracted from encoded values
+        member __.Means = operatorArguments.GetInput "means"
+        /// (4,) Std value to be divided from encoded values
+        member __.Stds = operatorArguments.GetInput "stds"
+        /// <summary>Copy ContribBoxEncode instance with updated inputs/parameters.</summary>
+        /// <param name="samples">(B, N) value +1 (positive), -1 (negative), 0 (ignore)</param>
+        /// <param name="matches">(B, N) value range [0, M)</param>
+        /// <param name="anchors">(B, N, 4) encoded in corner</param>
+        /// <param name="refs">(B, M, 4) encoded in corner</param>
+        /// <param name="means">(4,) Mean value to be subtracted from encoded values</param>
+        /// <param name="stds">(4,) Std value to be divided from encoded values</param>
+        member this.With([<Optional>] ?samples : Symbol,
+            [<Optional>] ?matches : Symbol,
+            [<Optional>] ?anchors : Symbol,
+            [<Optional>] ?refs : Symbol,
+            [<Optional>] ?means : Symbol,
+            [<Optional>] ?stds : Symbol) = 
+            let operatorArguments = 
+                [
+                    samples |> Option.map (fun x -> "samples", Input x)
+                    matches |> Option.map (fun x -> "matches", Input x)
+                    anchors |> Option.map (fun x -> "anchors", Input x)
+                    refs |> Option.map (fun x -> "refs", Input x)
+                    means |> Option.map (fun x -> "means", Input x)
+                    stds |> Option.map (fun x -> "stds", Input x)
+                ] |> List.choose id
+            new ContribBoxEncode(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type ContribBoxDecode private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_box_decode", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBoxDecode(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribBoxDecode(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Decode bounding boxes training target with normalized center offsets.
+        ///     Input bounding boxes are using corner type: `x_{min}, y_{min}, x_{max}, y_{max}`
+        ///     or center type: `x, y, width, height.) array
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L234</summary>
+        /// <param name="data">(B, N, 4) predicted bbox offset</param>
+        /// <param name="anchors">(1, N, 4) encoded in corner or center</param>
+        /// <param name="std0">value to be divided from the 1st encoded values</param>
+        /// <param name="std1">value to be divided from the 2nd encoded values</param>
+        /// <param name="std2">value to be divided from the 3rd encoded values</param>
+        /// <param name="std3">value to be divided from the 4th encoded values</param>
+        /// <param name="clip">If larger than 0, bounding box target will be clipped to this value.</param>
+        /// <param name="format">The box encoding type. 
+        ///  &quot;corner&quot; means boxes are encoded as [xmin, ymin, xmax, ymax], &quot;center&quot; means boxes are encodes as [x, y, width, height].</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?anchors : Symbol,
+            [<Optional>] ?std0 : float,
+            [<Optional>] ?std1 : float,
+            [<Optional>] ?std2 : float,
+            [<Optional>] ?std3 : float,
+            [<Optional>] ?clip : float,
+            [<Optional>] ?format : Format) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let anchors = defaultArg anchors (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "anchors", Input anchors
+                    "std0", std0 |> Option.map box |> Parameter
+                    "std1", std1 |> Option.map box |> Parameter
+                    "std2", std2 |> Option.map box |> Parameter
+                    "std3", std3 |> Option.map box |> Parameter
+                    "clip", clip |> Option.map box |> Parameter
+                    "format", format |> Option.map box |> Parameter
+                ]
+            new ContribBoxDecode(Arguments<Symbol>(operatorArguments))
+        /// Default value for Std0
+        /// value to be divided from the 1st encoded values
+        static member Std0Default : double = 1.0
+        /// Default value for Std1
+        /// value to be divided from the 2nd encoded values
+        static member Std1Default : double = 1.0
+        /// Default value for Std2
+        /// value to be divided from the 3rd encoded values
+        static member Std2Default : double = 1.0
+        /// Default value for Std3
+        /// value to be divided from the 4th encoded values
+        static member Std3Default : double = 1.0
+        /// Default value for Clip
+        /// If larger than 0, bounding box target will be clipped to this value.
+        static member ClipDefault : double = -1.0
+        /// Default value for Format
+        /// The box encoding type. 
+        ///  &quot;corner&quot; means boxes are encoded as [xmin, ymin, xmax, ymax], &quot;center&quot; means boxes are encodes as [x, y, width, height].
+        static member FormatDefault : Format = Format.Center
+        /// (B, N, 4) predicted bbox offset
+        member __.Data = operatorArguments.GetInput "data"
+        /// (1, N, 4) encoded in corner or center
+        member __.Anchors = operatorArguments.GetInput "anchors"
+        /// value to be divided from the 1st encoded values
+        member __.Std0 = operatorArguments.GetParameter("std0", ContribBoxDecode.Std0Default)
+        /// value to be divided from the 2nd encoded values
+        member __.Std1 = operatorArguments.GetParameter("std1", ContribBoxDecode.Std1Default)
+        /// value to be divided from the 3rd encoded values
+        member __.Std2 = operatorArguments.GetParameter("std2", ContribBoxDecode.Std2Default)
+        /// value to be divided from the 4th encoded values
+        member __.Std3 = operatorArguments.GetParameter("std3", ContribBoxDecode.Std3Default)
+        /// If larger than 0, bounding box target will be clipped to this value.
+        member __.Clip = operatorArguments.GetParameter("clip", ContribBoxDecode.ClipDefault)
+        /// The box encoding type. 
+        ///  &quot;corner&quot; means boxes are encoded as [xmin, ymin, xmax, ymax], &quot;center&quot; means boxes are encodes as [x, y, width, height].
+        member __.Format = operatorArguments.GetParameter("format", ContribBoxDecode.FormatDefault)
+        /// <summary>Copy ContribBoxDecode instance with updated inputs/parameters.</summary>
+        /// <param name="data">(B, N, 4) predicted bbox offset</param>
+        /// <param name="anchors">(1, N, 4) encoded in corner or center</param>
+        /// <param name="std0">value to be divided from the 1st encoded values</param>
+        /// <param name="std1">value to be divided from the 2nd encoded values</param>
+        /// <param name="std2">value to be divided from the 3rd encoded values</param>
+        /// <param name="std3">value to be divided from the 4th encoded values</param>
+        /// <param name="clip">If larger than 0, bounding box target will be clipped to this value.</param>
+        /// <param name="format">The box encoding type. 
+        ///  &quot;corner&quot; means boxes are encoded as [xmin, ymin, xmax, ymax], &quot;center&quot; means boxes are encodes as [x, y, width, height].</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?anchors : Symbol,
+            [<Optional>] ?std0 : float,
+            [<Optional>] ?std1 : float,
+            [<Optional>] ?std2 : float,
+            [<Optional>] ?std3 : float,
+            [<Optional>] ?clip : float,
+            [<Optional>] ?format : Format) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    anchors |> Option.map (fun x -> "anchors", Input x)
+                    std0 |> Option.map (fun x -> "std0", Parameter(Some (box x)))
+                    std1 |> Option.map (fun x -> "std1", Parameter(Some (box x)))
+                    std2 |> Option.map (fun x -> "std2", Parameter(Some (box x)))
+                    std3 |> Option.map (fun x -> "std3", Parameter(Some (box x)))
+                    clip |> Option.map (fun x -> "clip", Parameter(Some (box x)))
+                    format |> Option.map (fun x -> "format", Parameter(Some (box x)))
+                ] |> List.choose id
+            new ContribBoxDecode(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type ContribDglCsrNeighborUniformSample private (operatorArguments) = 
         inherit SymbolOperator("_contrib_dgl_csr_neighbor_uniform_sample", operatorArguments)
@@ -4125,6 +4777,69 @@ module SymbolOperators =
                 ]
             new ContribBackwardQuadratic(Arguments<Symbol>(operatorArguments))
     
+    type ResetArrays private (operatorArguments) = 
+        inherit SymbolOperator("reset_arrays", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ResetArrays(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ResetArrays(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Set to zero multiple arrays
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\reset_arrays.cc:L36</summary>
+        /// <param name="data">Arrays</param>
+        /// <param name="numArrays">number of input arrays.</param>
+        new(data : Symbol seq,
+            numArrays : int) = 
+            let operatorArguments = 
+                [
+                    "data", VarArg("", data |> Seq.toArray)
+                    "num_arrays", Parameter(Some(box numArrays))
+                ]
+            new ResetArrays(Arguments<Symbol>(operatorArguments))
+        /// <summary>Set to zero multiple arrays
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\reset_arrays.cc:L36</summary>
+        /// <param name="numArrays">number of input arrays.</param>
+        /// <param name="data">Arrays</param>
+        new(numArrays : int,
+            [<Optional>] ?data : Symbol seq) = 
+            let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
+            let operatorArguments = 
+                [
+                    "data", VarArg("", data)
+                    "num_arrays", Parameter(Some(box numArrays))
+                ]
+            new ResetArrays(Arguments<Symbol>(operatorArguments))
+        /// <summary>Set to zero multiple arrays
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\reset_arrays.cc:L36</summary>
+        /// <param name="numArrays">number of input arrays.</param>
+        /// <param name="data">Arrays</param>
+        new(numArrays : int,
+            [<ParamArray>] data : Symbol[]) = 
+            let operatorArguments = 
+                [
+                    "data", VarArg("", data)
+                    "num_arrays", Parameter(Some(box numArrays))
+                ]
+            new ResetArrays(Arguments<Symbol>(operatorArguments))
+        /// Arrays
+        member __.Data = operatorArguments.GetVarArg "data"
+        /// number of input arrays.
+        member __.NumArrays : int = match operatorArguments.GetParameter "num_arrays" with Some(v) -> unbox v | None -> failwithf "Required parameter num_arrays is missing"
+        /// <summary>Copy ResetArrays instance with updated inputs/parameters.</summary>
+        /// <param name="data">Arrays</param>
+        /// <param name="numArrays">number of input arrays.</param>
+        member this.With([<Optional>] ?data : Symbol seq,
+            [<Optional>] ?numArrays : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                    numArrays |> Option.map (fun x -> "num_arrays", Parameter(Some (box x)))
+                ] |> List.choose id
+            new ResetArrays(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type ContribROIAlign private (operatorArguments) = 
         inherit SymbolOperator("_contrib_ROIAlign", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new ContribROIAlign(args)
@@ -4132,7 +4847,8 @@ module SymbolOperators =
         /// <summary>
         /// This operator takes a 4D feature map as an input array and region proposals as `rois`,
         /// then align the feature map over sub-regions of input and produces a fixed-sized output array.
-        /// This operator is typically used in Faster R-CNN &amp; Mask R-CNN networks.
+        /// This operator is typically used in Faster R-CNN &amp; Mask R-CNN networks. If roi batchid is less 
+        /// than 0, it will be ignored, and the corresponding output will be set to 0.
         /// 
         /// Different from ROI pooling, ROI Align removes the harsh quantization, properly aligning
         /// the extracted features with the input. RoIAlign computes the value of each sampling point
@@ -4149,9 +4865,9 @@ module SymbolOperators =
         /// He, Kaiming, et al. &quot;Mask R-CNN.&quot; ICCV, 2017
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\roi_align.cc:L538</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
         /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
-        /// <param name="rois">Bounding box coordinates, a 2D array</param>
+        /// <param name="rois">Bounding box coordinates, a 2D array, if batchid is less than 0, it will be ignored.</param>
         /// <param name="pooledSize">ROI Align output roi feature map height and width: (h, w)</param>
         /// <param name="spatialScale">Ratio of input feature map height (or w) to raw image height (or w). Equals the reciprocal of total stride in convolutional layers</param>
         /// <param name="sampleRatio">Optional sampling ratio of ROI align, using adaptive size by default.</param>
@@ -4175,7 +4891,8 @@ module SymbolOperators =
         /// <summary>
         /// This operator takes a 4D feature map as an input array and region proposals as `rois`,
         /// then align the feature map over sub-regions of input and produces a fixed-sized output array.
-        /// This operator is typically used in Faster R-CNN &amp; Mask R-CNN networks.
+        /// This operator is typically used in Faster R-CNN &amp; Mask R-CNN networks. If roi batchid is less 
+        /// than 0, it will be ignored, and the corresponding output will be set to 0.
         /// 
         /// Different from ROI pooling, ROI Align removes the harsh quantization, properly aligning
         /// the extracted features with the input. RoIAlign computes the value of each sampling point
@@ -4192,11 +4909,11 @@ module SymbolOperators =
         /// He, Kaiming, et al. &quot;Mask R-CNN.&quot; ICCV, 2017
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\roi_align.cc:L538</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
         /// <param name="pooledSize">ROI Align output roi feature map height and width: (h, w)</param>
         /// <param name="spatialScale">Ratio of input feature map height (or w) to raw image height (or w). Equals the reciprocal of total stride in convolutional layers</param>
         /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
-        /// <param name="rois">Bounding box coordinates, a 2D array</param>
+        /// <param name="rois">Bounding box coordinates, a 2D array, if batchid is less than 0, it will be ignored.</param>
         /// <param name="sampleRatio">Optional sampling ratio of ROI align, using adaptive size by default.</param>
         /// <param name="positionSensitive">Whether to perform position-sensitive RoI pooling. PSRoIPooling is first proposaled by R-FCN and it can reduce the input channels by ph*pw times, where (ph, pw) is the pooled_size</param>
         new(pooledSize : int seq,
@@ -4225,7 +4942,7 @@ module SymbolOperators =
         static member PositionSensitiveDefault : bool = false
         /// Input data to the pooling operator, a 4D Feature maps
         member __.Data = operatorArguments.GetInput "data"
-        /// Bounding box coordinates, a 2D array
+        /// Bounding box coordinates, a 2D array, if batchid is less than 0, it will be ignored.
         member __.Rois = operatorArguments.GetInput "rois"
         /// ROI Align output roi feature map height and width: (h, w)
         member __.PooledSize : int seq = match operatorArguments.GetParameter "pooled_size" with Some(v) -> unbox v | None -> failwithf "Required parameter pooled_size is missing"
@@ -4237,7 +4954,7 @@ module SymbolOperators =
         member __.PositionSensitive = operatorArguments.GetParameter("position_sensitive", ContribROIAlign.PositionSensitiveDefault)
         /// <summary>Copy ContribROIAlign instance with updated inputs/parameters.</summary>
         /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
-        /// <param name="rois">Bounding box coordinates, a 2D array</param>
+        /// <param name="rois">Bounding box coordinates, a 2D array, if batchid is less than 0, it will be ignored.</param>
         /// <param name="pooledSize">ROI Align output roi feature map height and width: (h, w)</param>
         /// <param name="spatialScale">Ratio of input feature map height (or w) to raw image height (or w). Equals the reciprocal of total stride in convolutional layers</param>
         /// <param name="sampleRatio">Optional sampling ratio of ROI align, using adaptive size by default.</param>
@@ -4378,6 +5095,98 @@ module SymbolOperators =
                     samplingRatio |> Option.map (fun x -> "sampling_ratio", Parameter(Some (box x)))
                 ] |> List.choose id
             new ContribRROIAlign(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type ContribRoundSte private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_round_ste", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribRoundSte(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribRoundSte(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Straight-through-estimator of `round()`.
+        /// 
+        /// In forward pass, returns element-wise rounded value to the nearest integer of the input (same as `round()`).
+        /// 
+        /// In backward pass, returns gradients of ``1`` everywhere (instead of ``0`` everywhere as in `round()`):
+        /// :math:`\frac{d}{dx}{round\_ste(x)} = 1` vs. :math:`\frac{d}{dx}{round(x)} = 0`.
+        /// This is useful for quantized training.
+        /// 
+        /// Reference: Estimating or Propagating Gradients Through Stochastic Neurons for Conditional Computation.
+        /// 
+        /// Example::
+        ///   x = round_ste([-1.5, 1.5, -1.9, 1.9, 2.7])
+        ///   x.backward()
+        ///   x = [-2.,  2., -2.,  2.,  3.]
+        ///   x.grad() = [1.,  1., 1.,  1.,  1.]
+        /// 
+        /// The storage type of ``round_ste`` output depends upon the input storage type:
+        ///   - round_ste(default) = default
+        ///   - round_ste(row_sparse) = row_sparse
+        ///   - round_ste(csr) = csr
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\stes_op.cc:L55</summary>
+        /// <param name="data">The input array.</param>
+        new([<Optional>] ?data : Symbol) =
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                ]
+            new ContribRoundSte(Arguments<Symbol>(operatorArguments))
+        /// The input array.
+        member __.Data = operatorArguments.GetInput "data"
+        /// <summary>Copy ContribRoundSte instance with updated inputs/parameters.</summary>
+        /// <param name="data">The input array.</param>
+        member this.With([<Optional>] ?data : Symbol) =
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                ] |> List.choose id
+            new ContribRoundSte(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type ContribSignSte private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_sign_ste", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribSignSte(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribSignSte(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Straight-through-estimator of `sign()`.
+        /// 
+        /// In forward pass, returns element-wise sign of the input (same as `sign()`).
+        /// 
+        /// In backward pass, returns gradients of ``1`` everywhere (instead of ``0`` everywhere as in ``sign()``):
+        /// :math:`\frac{d}{dx}{sign\_ste(x)} = 1` vs. :math:`\frac{d}{dx}{sign(x)} = 0`.
+        /// This is useful for quantized training.
+        /// 
+        /// Reference: Estimating or Propagating Gradients Through Stochastic Neurons for Conditional Computation.
+        /// 
+        /// Example::
+        ///   x = sign_ste([-2, 0, 3])
+        ///   x.backward()
+        ///   x = [-1.,  0., 1.]
+        ///   x.grad() = [1.,  1., 1.]
+        /// 
+        /// The storage type of ``sign_ste`` output depends upon the input storage type:
+        ///   - round_ste(default) = default
+        ///   - round_ste(row_sparse) = row_sparse
+        ///   - round_ste(csr) = csr
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\stes_op.cc:L80</summary>
+        /// <param name="data">The input array.</param>
+        new([<Optional>] ?data : Symbol) =
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                ]
+            new ContribSignSte(Arguments<Symbol>(operatorArguments))
+        /// The input array.
+        member __.Data = operatorArguments.GetInput "data"
+        /// <summary>Copy ContribSignSte instance with updated inputs/parameters.</summary>
+        /// <param name="data">The input array.</param>
+        member this.With([<Optional>] ?data : Symbol) =
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                ] |> List.choose id
+            new ContribSignSte(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type ContribSyncBatchNorm private (operatorArguments) = 
         inherit SymbolOperator("_contrib_SyncBatchNorm", operatorArguments)
@@ -4654,6 +5463,384 @@ module SymbolOperators =
                 ] |> List.choose id
             new ContribSyncBatchNorm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type ContribInterleavedMatmulSelfattQk private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_interleaved_matmul_selfatt_qk", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribInterleavedMatmulSelfattQk(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribInterleavedMatmulSelfattQk(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Compute the matrix multiplication between the projections of
+        /// queries and keys in multihead attention use as self attention.
+        /// 
+        /// the input must be a single tensor of interleaved projections
+        /// of queries, keys and values following the layout:
+        /// (seq_length, batch_size, num_heads * head_dim * 3)
+        /// 
+        /// the equivalent code would be:
+        /// tmp = mx.nd.reshape(queries_keys_values, shape=(0, 0, num_heads, 3, -1))
+        /// q_proj = mx.nd.transpose(tmp[:,:,:,0,:], axes=(1, 2, 0, 3))
+        /// q_proj = mx.nd.reshape(q_proj, shape=(-1, 0, 0), reverse=True)
+        /// q_proj = mx.nd.contrib.div_sqrt_dim(q_proj)
+        /// k_proj = mx.nd.transpose(tmp[:,:,:,1,:], axes=(1, 2, 0, 3))
+        /// k_proj = mx.nd.reshap(k_proj, shape=(-1, 0, 0), reverse=True)
+        /// output = mx.nd.batch_dot(q_proj, k_proj, transpose_b=True)
+        /// 
+        /// This Op is GPU only
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L143</summary>
+        /// <param name="queriesKeysValues">Interleaved queries, keys and values</param>
+        /// <param name="heads">Set number of heads</param>
+        new(queriesKeysValues : Symbol,
+            heads : int) = 
+            let operatorArguments = 
+                [
+                    "queries_keys_values", Input queriesKeysValues
+                    "heads", Parameter(Some(box heads))
+                ]
+            new ContribInterleavedMatmulSelfattQk(Arguments<Symbol>(operatorArguments))
+        /// <summary>Compute the matrix multiplication between the projections of
+        /// queries and keys in multihead attention use as self attention.
+        /// 
+        /// the input must be a single tensor of interleaved projections
+        /// of queries, keys and values following the layout:
+        /// (seq_length, batch_size, num_heads * head_dim * 3)
+        /// 
+        /// the equivalent code would be:
+        /// tmp = mx.nd.reshape(queries_keys_values, shape=(0, 0, num_heads, 3, -1))
+        /// q_proj = mx.nd.transpose(tmp[:,:,:,0,:], axes=(1, 2, 0, 3))
+        /// q_proj = mx.nd.reshape(q_proj, shape=(-1, 0, 0), reverse=True)
+        /// q_proj = mx.nd.contrib.div_sqrt_dim(q_proj)
+        /// k_proj = mx.nd.transpose(tmp[:,:,:,1,:], axes=(1, 2, 0, 3))
+        /// k_proj = mx.nd.reshap(k_proj, shape=(-1, 0, 0), reverse=True)
+        /// output = mx.nd.batch_dot(q_proj, k_proj, transpose_b=True)
+        /// 
+        /// This Op is GPU only
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L143</summary>
+        /// <param name="heads">Set number of heads</param>
+        /// <param name="queriesKeysValues">Interleaved queries, keys and values</param>
+        new(heads : int,
+            [<Optional>] ?queriesKeysValues : Symbol) = 
+            let queriesKeysValues = defaultArg queriesKeysValues (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "queries_keys_values", Input queriesKeysValues
+                    "heads", Parameter(Some(box heads))
+                ]
+            new ContribInterleavedMatmulSelfattQk(Arguments<Symbol>(operatorArguments))
+        /// Interleaved queries, keys and values
+        member __.QueriesKeysValues = operatorArguments.GetInput "queries_keys_values"
+        /// Set number of heads
+        member __.Heads : int = match operatorArguments.GetParameter "heads" with Some(v) -> unbox v | None -> failwithf "Required parameter heads is missing"
+        /// <summary>Copy ContribInterleavedMatmulSelfattQk instance with updated inputs/parameters.</summary>
+        /// <param name="queriesKeysValues">Interleaved queries, keys and values</param>
+        /// <param name="heads">Set number of heads</param>
+        member this.With([<Optional>] ?queriesKeysValues : Symbol,
+            [<Optional>] ?heads : int) = 
+            let operatorArguments = 
+                [
+                    queriesKeysValues |> Option.map (fun x -> "queries_keys_values", Input x)
+                    heads |> Option.map (fun x -> "heads", Parameter(Some (box x)))
+                ] |> List.choose id
+            new ContribInterleavedMatmulSelfattQk(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type ContribInterleavedMatmulSelfattValatt private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_interleaved_matmul_selfatt_valatt", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribInterleavedMatmulSelfattValatt(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribInterleavedMatmulSelfattValatt(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Compute the matrix multiplication between the projections of
+        /// values and the attention weights in multihead attention use as self attention.
+        /// 
+        /// the inputs must be a tensor of interleaved projections
+        /// of queries, keys and values following the layout:
+        /// (seq_length, batch_size, num_heads * head_dim * 3)
+        /// 
+        /// and the attention weights following the layout:
+        /// (batch_size, seq_length, seq_length)
+        /// 
+        /// the equivalent code would be:
+        /// tmp = mx.nd.reshape(queries_keys_values, shape=(0, 0, num_heads, 3, -1))
+        /// v_proj = mx.nd.transpose(tmp[:,:,:,2,:], axes=(1, 2, 0, 3))
+        /// v_proj = mx.nd.reshape(v_proj, shape=(-1, 0, 0), reverse=True)
+        /// output = mx.nd.batch_dot(attention, v_proj, transpose_b=True)
+        /// output = mx.nd.reshape(output, shape=(-1, num_heads, 0, 0), reverse=True)
+        /// output = mx.nd.transpose(output, axes=(0, 2, 1, 3))
+        /// output = mx.nd.reshape(output, shape=(0, 0, -1))
+        /// 
+        /// This Op is GPU only
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L187</summary>
+        /// <param name="queriesKeysValues">Queries, keys and values interleaved</param>
+        /// <param name="attention">Attention maps</param>
+        /// <param name="heads">Set number of heads</param>
+        new(queriesKeysValues : Symbol,
+            attention : Symbol,
+            heads : int) = 
+            let operatorArguments = 
+                [
+                    "queries_keys_values", Input queriesKeysValues
+                    "attention", Input attention
+                    "heads", Parameter(Some(box heads))
+                ]
+            new ContribInterleavedMatmulSelfattValatt(Arguments<Symbol>(operatorArguments))
+        /// <summary>Compute the matrix multiplication between the projections of
+        /// values and the attention weights in multihead attention use as self attention.
+        /// 
+        /// the inputs must be a tensor of interleaved projections
+        /// of queries, keys and values following the layout:
+        /// (seq_length, batch_size, num_heads * head_dim * 3)
+        /// 
+        /// and the attention weights following the layout:
+        /// (batch_size, seq_length, seq_length)
+        /// 
+        /// the equivalent code would be:
+        /// tmp = mx.nd.reshape(queries_keys_values, shape=(0, 0, num_heads, 3, -1))
+        /// v_proj = mx.nd.transpose(tmp[:,:,:,2,:], axes=(1, 2, 0, 3))
+        /// v_proj = mx.nd.reshape(v_proj, shape=(-1, 0, 0), reverse=True)
+        /// output = mx.nd.batch_dot(attention, v_proj, transpose_b=True)
+        /// output = mx.nd.reshape(output, shape=(-1, num_heads, 0, 0), reverse=True)
+        /// output = mx.nd.transpose(output, axes=(0, 2, 1, 3))
+        /// output = mx.nd.reshape(output, shape=(0, 0, -1))
+        /// 
+        /// This Op is GPU only
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L187</summary>
+        /// <param name="heads">Set number of heads</param>
+        /// <param name="queriesKeysValues">Queries, keys and values interleaved</param>
+        /// <param name="attention">Attention maps</param>
+        new(heads : int,
+            [<Optional>] ?queriesKeysValues : Symbol,
+            [<Optional>] ?attention : Symbol) = 
+            let queriesKeysValues = defaultArg queriesKeysValues (new ImplicitVariable() :> Symbol)
+            let attention = defaultArg attention (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "queries_keys_values", Input queriesKeysValues
+                    "attention", Input attention
+                    "heads", Parameter(Some(box heads))
+                ]
+            new ContribInterleavedMatmulSelfattValatt(Arguments<Symbol>(operatorArguments))
+        /// Queries, keys and values interleaved
+        member __.QueriesKeysValues = operatorArguments.GetInput "queries_keys_values"
+        /// Attention maps
+        member __.Attention = operatorArguments.GetInput "attention"
+        /// Set number of heads
+        member __.Heads : int = match operatorArguments.GetParameter "heads" with Some(v) -> unbox v | None -> failwithf "Required parameter heads is missing"
+        /// <summary>Copy ContribInterleavedMatmulSelfattValatt instance with updated inputs/parameters.</summary>
+        /// <param name="queriesKeysValues">Queries, keys and values interleaved</param>
+        /// <param name="attention">Attention maps</param>
+        /// <param name="heads">Set number of heads</param>
+        member this.With([<Optional>] ?queriesKeysValues : Symbol,
+            [<Optional>] ?attention : Symbol,
+            [<Optional>] ?heads : int) = 
+            let operatorArguments = 
+                [
+                    queriesKeysValues |> Option.map (fun x -> "queries_keys_values", Input x)
+                    attention |> Option.map (fun x -> "attention", Input x)
+                    heads |> Option.map (fun x -> "heads", Parameter(Some (box x)))
+                ] |> List.choose id
+            new ContribInterleavedMatmulSelfattValatt(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type ContribInterleavedMatmulEncdecQk private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_interleaved_matmul_encdec_qk", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribInterleavedMatmulEncdecQk(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribInterleavedMatmulEncdecQk(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Compute the matrix multiplication between the projections of
+        /// queries and keys in multihead attention use as encoder-decoder.
+        /// 
+        /// the inputs must be a tensor of projections of queries following the layout:
+        /// (seq_length, batch_size, num_heads * head_dim)
+        /// 
+        /// and a tensor of interleaved projections of values and keys following the layout:
+        /// (seq_length, batch_size, num_heads * head_dim * 2)
+        /// 
+        /// the equivalent code would be:
+        /// q_proj = mx.nd.transpose(queries, axes=(1, 2, 0, 3))
+        /// q_proj = mx.nd.reshape(q_proj, shape=(-1, 0, 0), reverse=True)
+        /// q_proj = mx.nd.contrib.div_sqrt_dim(q_proj)
+        /// tmp = mx.nd.reshape(keys_values, shape=(0, 0, num_heads, 2, -1))
+        /// k_proj = mx.nd.transpose(tmp[:,:,:,0,:], axes=(1, 2, 0, 3))
+        /// k_proj = mx.nd.reshap(k_proj, shape=(-1, 0, 0), reverse=True)
+        /// output = mx.nd.batch_dot(q_proj, k_proj, transpose_b=True)
+        /// 
+        /// This Op is GPU only
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L231</summary>
+        /// <param name="queries">Queries</param>
+        /// <param name="keysValues">Keys and values interleaved</param>
+        /// <param name="heads">Set number of heads</param>
+        new(queries : Symbol,
+            keysValues : Symbol,
+            heads : int) = 
+            let operatorArguments = 
+                [
+                    "queries", Input queries
+                    "keys_values", Input keysValues
+                    "heads", Parameter(Some(box heads))
+                ]
+            new ContribInterleavedMatmulEncdecQk(Arguments<Symbol>(operatorArguments))
+        /// <summary>Compute the matrix multiplication between the projections of
+        /// queries and keys in multihead attention use as encoder-decoder.
+        /// 
+        /// the inputs must be a tensor of projections of queries following the layout:
+        /// (seq_length, batch_size, num_heads * head_dim)
+        /// 
+        /// and a tensor of interleaved projections of values and keys following the layout:
+        /// (seq_length, batch_size, num_heads * head_dim * 2)
+        /// 
+        /// the equivalent code would be:
+        /// q_proj = mx.nd.transpose(queries, axes=(1, 2, 0, 3))
+        /// q_proj = mx.nd.reshape(q_proj, shape=(-1, 0, 0), reverse=True)
+        /// q_proj = mx.nd.contrib.div_sqrt_dim(q_proj)
+        /// tmp = mx.nd.reshape(keys_values, shape=(0, 0, num_heads, 2, -1))
+        /// k_proj = mx.nd.transpose(tmp[:,:,:,0,:], axes=(1, 2, 0, 3))
+        /// k_proj = mx.nd.reshap(k_proj, shape=(-1, 0, 0), reverse=True)
+        /// output = mx.nd.batch_dot(q_proj, k_proj, transpose_b=True)
+        /// 
+        /// This Op is GPU only
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L231</summary>
+        /// <param name="heads">Set number of heads</param>
+        /// <param name="queries">Queries</param>
+        /// <param name="keysValues">Keys and values interleaved</param>
+        new(heads : int,
+            [<Optional>] ?queries : Symbol,
+            [<Optional>] ?keysValues : Symbol) = 
+            let queries = defaultArg queries (new ImplicitVariable() :> Symbol)
+            let keysValues = defaultArg keysValues (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "queries", Input queries
+                    "keys_values", Input keysValues
+                    "heads", Parameter(Some(box heads))
+                ]
+            new ContribInterleavedMatmulEncdecQk(Arguments<Symbol>(operatorArguments))
+        /// Queries
+        member __.Queries = operatorArguments.GetInput "queries"
+        /// Keys and values interleaved
+        member __.KeysValues = operatorArguments.GetInput "keys_values"
+        /// Set number of heads
+        member __.Heads : int = match operatorArguments.GetParameter "heads" with Some(v) -> unbox v | None -> failwithf "Required parameter heads is missing"
+        /// <summary>Copy ContribInterleavedMatmulEncdecQk instance with updated inputs/parameters.</summary>
+        /// <param name="queries">Queries</param>
+        /// <param name="keysValues">Keys and values interleaved</param>
+        /// <param name="heads">Set number of heads</param>
+        member this.With([<Optional>] ?queries : Symbol,
+            [<Optional>] ?keysValues : Symbol,
+            [<Optional>] ?heads : int) = 
+            let operatorArguments = 
+                [
+                    queries |> Option.map (fun x -> "queries", Input x)
+                    keysValues |> Option.map (fun x -> "keys_values", Input x)
+                    heads |> Option.map (fun x -> "heads", Parameter(Some (box x)))
+                ] |> List.choose id
+            new ContribInterleavedMatmulEncdecQk(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type ContribInterleavedMatmulEncdecValatt private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_interleaved_matmul_encdec_valatt", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribInterleavedMatmulEncdecValatt(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribInterleavedMatmulEncdecValatt(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Compute the matrix multiplication between the projections of
+        /// values and the attention weights in multihead attention use as encoder-decoder.
+        /// 
+        /// the inputs must be a tensor of interleaved projections of
+        /// keys and values following the layout:
+        /// (seq_length, batch_size, num_heads * head_dim * 2)
+        /// 
+        /// and the attention weights following the layout:
+        /// (batch_size, seq_length, seq_length)
+        /// 
+        /// the equivalent code would be:
+        /// 
+        /// tmp = mx.nd.reshape(queries_keys_values, shape=(0, 0, num_heads, 3, -1))
+        /// v_proj = mx.nd.transpose(tmp[:,:,:,1,:], axes=(1, 2, 0, 3))
+        /// v_proj = mx.nd.reshape(v_proj, shape=(-1, 0, 0), reverse=True)
+        /// output = mx.nd.batch_dot(attention, v_proj, transpose_b=True)
+        /// output = mx.nd.reshape(output, shape=(-1, num_heads, 0, 0), reverse=True)
+        /// output = mx.nd.transpose(output, axes=(0, 2, 1, 3))
+        /// output = mx.nd.reshape(output, shape=(0, 0, -1))
+        /// 
+        /// This Op is GPU only
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L277</summary>
+        /// <param name="keysValues">Keys and values interleaved</param>
+        /// <param name="attention">Attention maps</param>
+        /// <param name="heads">Set number of heads</param>
+        new(keysValues : Symbol,
+            attention : Symbol,
+            heads : int) = 
+            let operatorArguments = 
+                [
+                    "keys_values", Input keysValues
+                    "attention", Input attention
+                    "heads", Parameter(Some(box heads))
+                ]
+            new ContribInterleavedMatmulEncdecValatt(Arguments<Symbol>(operatorArguments))
+        /// <summary>Compute the matrix multiplication between the projections of
+        /// values and the attention weights in multihead attention use as encoder-decoder.
+        /// 
+        /// the inputs must be a tensor of interleaved projections of
+        /// keys and values following the layout:
+        /// (seq_length, batch_size, num_heads * head_dim * 2)
+        /// 
+        /// and the attention weights following the layout:
+        /// (batch_size, seq_length, seq_length)
+        /// 
+        /// the equivalent code would be:
+        /// 
+        /// tmp = mx.nd.reshape(queries_keys_values, shape=(0, 0, num_heads, 3, -1))
+        /// v_proj = mx.nd.transpose(tmp[:,:,:,1,:], axes=(1, 2, 0, 3))
+        /// v_proj = mx.nd.reshape(v_proj, shape=(-1, 0, 0), reverse=True)
+        /// output = mx.nd.batch_dot(attention, v_proj, transpose_b=True)
+        /// output = mx.nd.reshape(output, shape=(-1, num_heads, 0, 0), reverse=True)
+        /// output = mx.nd.transpose(output, axes=(0, 2, 1, 3))
+        /// output = mx.nd.reshape(output, shape=(0, 0, -1))
+        /// 
+        /// This Op is GPU only
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L277</summary>
+        /// <param name="heads">Set number of heads</param>
+        /// <param name="keysValues">Keys and values interleaved</param>
+        /// <param name="attention">Attention maps</param>
+        new(heads : int,
+            [<Optional>] ?keysValues : Symbol,
+            [<Optional>] ?attention : Symbol) = 
+            let keysValues = defaultArg keysValues (new ImplicitVariable() :> Symbol)
+            let attention = defaultArg attention (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "keys_values", Input keysValues
+                    "attention", Input attention
+                    "heads", Parameter(Some(box heads))
+                ]
+            new ContribInterleavedMatmulEncdecValatt(Arguments<Symbol>(operatorArguments))
+        /// Keys and values interleaved
+        member __.KeysValues = operatorArguments.GetInput "keys_values"
+        /// Attention maps
+        member __.Attention = operatorArguments.GetInput "attention"
+        /// Set number of heads
+        member __.Heads : int = match operatorArguments.GetParameter "heads" with Some(v) -> unbox v | None -> failwithf "Required parameter heads is missing"
+        /// <summary>Copy ContribInterleavedMatmulEncdecValatt instance with updated inputs/parameters.</summary>
+        /// <param name="keysValues">Keys and values interleaved</param>
+        /// <param name="attention">Attention maps</param>
+        /// <param name="heads">Set number of heads</param>
+        member this.With([<Optional>] ?keysValues : Symbol,
+            [<Optional>] ?attention : Symbol,
+            [<Optional>] ?heads : int) = 
+            let operatorArguments = 
+                [
+                    keysValues |> Option.map (fun x -> "keys_values", Input x)
+                    attention |> Option.map (fun x -> "attention", Input x)
+                    heads |> Option.map (fun x -> "heads", Parameter(Some (box x)))
+                ] |> List.choose id
+            new ContribInterleavedMatmulEncdecValatt(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type ContribDivSqrtDim private (operatorArguments) = 
         inherit SymbolOperator("_contrib_div_sqrt_dim", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new ContribDivSqrtDim(args)
@@ -4664,7 +5851,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L38</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L308</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -5041,7 +6228,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L546</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
         /// <param name="data">Input data for the custom operator.</param>
         /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
         new(data : Symbol seq,
@@ -5060,7 +6247,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L546</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
         /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
         /// <param name="data">Input data for the custom operator.</param>
         new(opType : string,
@@ -5080,7 +6267,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L546</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
         /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
         /// <param name="data">Input data for the custom operator.</param>
         new(opType : string,
@@ -5106,6 +6293,48 @@ module SymbolOperators =
                     opType |> Option.map (fun x -> "op_type", Parameter(Some (box x)))
                 ] |> List.choose id
             new Custom(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type FusedOp private (operatorArguments) = 
+        inherit SymbolOperator("_FusedOp", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new FusedOp(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new FusedOp(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">Data</param>
+        new([<ParamArray>] data : Symbol[]) =
+            let operatorArguments = 
+                [
+                    "data", VarArg("", data)
+                ]
+            new FusedOp(Arguments<Symbol>(operatorArguments))
+        /// Data
+        member __.Data = operatorArguments.GetVarArg "data"
+        /// <summary>Copy FusedOp instance with updated inputs/parameters.</summary>
+        /// <param name="data">Data</param>
+        member this.With([<Optional>] ?data : Symbol seq) =
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                ] |> List.choose id
+            new FusedOp(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type FusedOpHelper private (operatorArguments) = 
+        inherit SymbolOperator("_FusedOpHelper", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new FusedOpHelper(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new FusedOpHelper(this.OperatorArguments.AddReplace(args)) :> Symbol
+        new() =
+            let operatorArguments = 
+                [
+                ]
+            new FusedOpHelper(Arguments<Symbol>(operatorArguments))
+    
+    type FusedOpOutHelper private (operatorArguments) = 
+        inherit SymbolOperator("_FusedOpOutHelper", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new FusedOpOutHelper(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new FusedOpOutHelper(this.OperatorArguments.AddReplace(args)) :> Symbol
+        new() =
+            let operatorArguments = 
+                [
+                ]
+            new FusedOpOutHelper(Arguments<Symbol>(operatorArguments))
     
     type IdentityAttachKLSparseReg private (operatorArguments) = 
         inherit SymbolOperator("IdentityAttachKLSparseReg", operatorArguments)
@@ -6024,7 +7253,7 @@ module SymbolOperators =
         /// <param name="data">The input.</param>
         /// <param name="size">Size of new image. Could be (width, height) or (size)</param>
         /// <param name="keepRatio">Whether to resize the short edge or both edges to `size`, if size is give as an integer.</param>
-        /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu</param>
+        /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1)</param>
         new([<Optional>] ?data : Symbol,
             [<Optional>] ?size : int seq,
             [<Optional>] ?keepRatio : bool,
@@ -6045,7 +7274,7 @@ module SymbolOperators =
         /// Whether to resize the short edge or both edges to `size`, if size is give as an integer.
         static member KeepRatioDefault : bool = false
         /// Default value for Interp
-        /// Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu
+        /// Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1)
         static member InterpDefault : int = 1
         /// The input.
         member __.Data = operatorArguments.GetInput "data"
@@ -6053,13 +7282,13 @@ module SymbolOperators =
         member __.Size = operatorArguments.GetParameter("size", ImageResize.SizeDefault)
         /// Whether to resize the short edge or both edges to `size`, if size is give as an integer.
         member __.KeepRatio = operatorArguments.GetParameter("keep_ratio", ImageResize.KeepRatioDefault)
-        /// Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu
+        /// Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1)
         member __.Interp = operatorArguments.GetParameter("interp", ImageResize.InterpDefault)
         /// <summary>Copy ImageResize instance with updated inputs/parameters.</summary>
         /// <param name="data">The input.</param>
         /// <param name="size">Size of new image. Could be (width, height) or (size)</param>
         /// <param name="keepRatio">Whether to resize the short edge or both edges to `size`, if size is give as an integer.</param>
-        /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu</param>
+        /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1)</param>
         member this.With([<Optional>] ?data : Symbol,
             [<Optional>] ?size : int seq,
             [<Optional>] ?keepRatio : bool,
@@ -7629,7 +8858,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\fully_connected.cc:L288</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
         /// <param name="data">Input data.</param>
         /// <param name="weight">Weight matrix.</param>
         /// <param name="bias">Bias parameter.</param>
@@ -7684,7 +8913,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\fully_connected.cc:L288</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
         /// <param name="numHidden">Number of hidden nodes of the output.</param>
         /// <param name="data">Input data.</param>
         /// <param name="weight">Weight matrix.</param>
@@ -8853,10 +10082,10 @@ module SymbolOperators =
                 ] |> List.choose id
             new UpSampling(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
-    type NpLinalgSvd private (operatorArguments) = 
-        inherit SymbolOperator("_np__linalg_svd", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new NpLinalgSvd(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new NpLinalgSvd(this.OperatorArguments.AddReplace(args)) :> Symbol
+    type NpiSvd private (operatorArguments) = 
+        inherit SymbolOperator("_npi_svd", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSvd(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiSvd(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>
         /// 
         /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\linalg\np_gesvd.cc:L93</summary>
@@ -8867,17 +10096,146 @@ module SymbolOperators =
                 [
                     "A", Input A
                 ]
-            new NpLinalgSvd(Arguments<Symbol>(operatorArguments))
+            new NpiSvd(Arguments<Symbol>(operatorArguments))
         /// Input matrices to be factorized
         member __.A = operatorArguments.GetInput "A"
-        /// <summary>Copy NpLinalgSvd instance with updated inputs/parameters.</summary>
+        /// <summary>Copy NpiSvd instance with updated inputs/parameters.</summary>
         /// <param name="A">Input matrices to be factorized</param>
         member this.With([<Optional>] ?A : Symbol) =
             let operatorArguments = 
                 [
                     A |> Option.map (fun x -> "A", Input x)
                 ] |> List.choose id
-            new NpLinalgSvd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+            new NpiSvd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiCholesky private (operatorArguments) = 
+        inherit SymbolOperator("_npi_cholesky", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCholesky(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiCholesky(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\linalg\np_potrf.cc:L47</summary>
+        /// <param name="A">Tensor of input matrices to be decomposed</param>
+        new([<Optional>] ?A : Symbol) =
+            let A = defaultArg A (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "A", Input A
+                ]
+            new NpiCholesky(Arguments<Symbol>(operatorArguments))
+        /// Tensor of input matrices to be decomposed
+        member __.A = operatorArguments.GetInput "A"
+        /// <summary>Copy NpiCholesky instance with updated inputs/parameters.</summary>
+        /// <param name="A">Tensor of input matrices to be decomposed</param>
+        member this.With([<Optional>] ?A : Symbol) =
+            let operatorArguments = 
+                [
+                    A |> Option.map (fun x -> "A", Input x)
+                ] |> List.choose id
+            new NpiCholesky(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBooleanMaskAssignScalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_boolean_mask_assign_scalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBooleanMaskAssignScalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBooleanMaskAssignScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Scalar version of boolean assign
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
+        /// <param name="data">input</param>
+        /// <param name="mask">mask</param>
+        /// <param name="value">value to be assigned to masked positions</param>
+        new(data : Symbol,
+            mask : Symbol,
+            value : float) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "mask", Input mask
+                    "value", Parameter(Some(box value))
+                ]
+            new NpiBooleanMaskAssignScalar(Arguments<Symbol>(operatorArguments))
+        /// <summary>Scalar version of boolean assign
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
+        /// <param name="value">value to be assigned to masked positions</param>
+        /// <param name="data">input</param>
+        /// <param name="mask">mask</param>
+        new(value : float,
+            [<Optional>] ?data : Symbol,
+            [<Optional>] ?mask : Symbol) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let mask = defaultArg mask (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "mask", Input mask
+                    "value", Parameter(Some(box value))
+                ]
+            new NpiBooleanMaskAssignScalar(Arguments<Symbol>(operatorArguments))
+        /// input
+        member __.Data = operatorArguments.GetInput "data"
+        /// mask
+        member __.Mask = operatorArguments.GetInput "mask"
+        /// value to be assigned to masked positions
+        member __.Value : float = match operatorArguments.GetParameter "value" with Some(v) -> unbox v | None -> failwithf "Required parameter value is missing"
+        /// <summary>Copy NpiBooleanMaskAssignScalar instance with updated inputs/parameters.</summary>
+        /// <param name="data">input</param>
+        /// <param name="mask">mask</param>
+        /// <param name="value">value to be assigned to masked positions</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?mask : Symbol,
+            [<Optional>] ?value : float) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    mask |> Option.map (fun x -> "mask", Input x)
+                    value |> Option.map (fun x -> "value", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiBooleanMaskAssignScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBooleanMaskAssignTensor private (operatorArguments) = 
+        inherit SymbolOperator("_npi_boolean_mask_assign_tensor", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBooleanMaskAssignTensor(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBooleanMaskAssignTensor(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Tensor version of boolean assign
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L246</summary>
+        /// <param name="data">input</param>
+        /// <param name="mask">mask</param>
+        /// <param name="value">assignment</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?mask : Symbol,
+            [<Optional>] ?value : Symbol) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let mask = defaultArg mask (new ImplicitVariable() :> Symbol)
+            let value = defaultArg value (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "mask", Input mask
+                    "value", Input value
+                ]
+            new NpiBooleanMaskAssignTensor(Arguments<Symbol>(operatorArguments))
+        /// input
+        member __.Data = operatorArguments.GetInput "data"
+        /// mask
+        member __.Mask = operatorArguments.GetInput "mask"
+        /// assignment
+        member __.Value = operatorArguments.GetInput "value"
+        /// <summary>Copy NpiBooleanMaskAssignTensor instance with updated inputs/parameters.</summary>
+        /// <param name="data">input</param>
+        /// <param name="mask">mask</param>
+        /// <param name="value">assignment</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?mask : Symbol,
+            [<Optional>] ?value : Symbol) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    mask |> Option.map (fun x -> "mask", Input x)
+                    value |> Option.map (fun x -> "value", Input x)
+                ] |> List.choose id
+            new NpiBooleanMaskAssignTensor(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpiArgmax private (operatorArguments) = 
         inherit SymbolOperator("_npi_argmax", operatorArguments)
@@ -8924,13 +10282,58 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiArgmax(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiArgmin private (operatorArguments) = 
+        inherit SymbolOperator("_npi_argmin", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArgmin(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiArgmin(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">The input</param>
+        /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
+        /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?axis : int,
+            [<Optional>] ?keepdims : bool) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "axis", axis |> Option.map box |> Parameter
+                    "keepdims", keepdims |> Option.map box |> Parameter
+                ]
+            new NpiArgmin(Arguments<Symbol>(operatorArguments))
+        /// Default value for Axis
+        /// The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``
+        static member AxisDefault : int option = None
+        /// Default value for Keepdims
+        /// If this is set to `True`, the reduced axis is left in the result as dimension with size one.
+        static member KeepdimsDefault : bool = false
+        /// The input
+        member __.Data = operatorArguments.GetInput "data"
+        /// The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``
+        member __.Axis = operatorArguments.GetParameter("axis", NpiArgmin.AxisDefault)
+        /// If this is set to `True`, the reduced axis is left in the result as dimension with size one.
+        member __.Keepdims = operatorArguments.GetParameter("keepdims", NpiArgmin.KeepdimsDefault)
+        /// <summary>Copy NpiArgmin instance with updated inputs/parameters.</summary>
+        /// <param name="data">The input</param>
+        /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
+        /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?axis : int,
+            [<Optional>] ?keepdims : bool) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                    keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiArgmin(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpSum private (operatorArguments) = 
         inherit SymbolOperator("_np_sum", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpSum(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpSum(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L53</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L124</summary>
         /// <param name="a">The input</param>
         /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
         /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
@@ -9000,7 +10403,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpMax(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L91</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L163</summary>
         /// <param name="a">The input</param>
         /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
         /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
@@ -9059,7 +10462,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpMin(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L118</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L191</summary>
         /// <param name="a">The input</param>
         /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
         /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
@@ -9420,7 +10823,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpCumsum(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Return the cumulative sum of the elements along a given axis.
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_cumsum.cc:L67</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_cumsum.cc:L70</summary>
         /// <param name="a">Input ndarray</param>
         /// <param name="axis">Axis along which the cumulative sum is computed. The default (None) is to compute the cumsum over the flattened array.</param>
         /// <param name="dtype">Type of the returned array and of the accumulator in which the elements are summed. If dtype is not specified, it defaults to the dtype of a, unless a has an integer dtype with a precision less than that of the default platform integer. In that case, the default platform integer is used.</param>
@@ -9461,6 +10864,51 @@ module SymbolOperators =
                     dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpCumsum(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiDiff private (operatorArguments) = 
+        inherit SymbolOperator("_npi_diff", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiDiff(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiDiff(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="a">Input ndarray</param>
+        /// <param name="n">The number of times values are differenced. If zero, the input is returned as-is.</param>
+        /// <param name="axis">Axis along which the cumulative sum is computed. The default (None) is to compute the diff over the flattened array.</param>
+        new([<Optional>] ?a : Symbol,
+            [<Optional>] ?n : int,
+            [<Optional>] ?axis : int) = 
+            let a = defaultArg a (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "a", Input a
+                    "n", n |> Option.map box |> Parameter
+                    "axis", axis |> Option.map box |> Parameter
+                ]
+            new NpiDiff(Arguments<Symbol>(operatorArguments))
+        /// Default value for N
+        /// The number of times values are differenced. If zero, the input is returned as-is.
+        static member NDefault : int = 1
+        /// Default value for Axis
+        /// Axis along which the cumulative sum is computed. The default (None) is to compute the diff over the flattened array.
+        static member AxisDefault : int = -1
+        /// Input ndarray
+        member __.A = operatorArguments.GetInput "a"
+        /// The number of times values are differenced. If zero, the input is returned as-is.
+        member __.N = operatorArguments.GetParameter("n", NpiDiff.NDefault)
+        /// Axis along which the cumulative sum is computed. The default (None) is to compute the diff over the flattened array.
+        member __.Axis = operatorArguments.GetParameter("axis", NpiDiff.AxisDefault)
+        /// <summary>Copy NpiDiff instance with updated inputs/parameters.</summary>
+        /// <param name="a">Input ndarray</param>
+        /// <param name="n">The number of times values are differenced. If zero, the input is returned as-is.</param>
+        /// <param name="axis">Axis along which the cumulative sum is computed. The default (None) is to compute the diff over the flattened array.</param>
+        member this.With([<Optional>] ?a : Symbol,
+            [<Optional>] ?n : int,
+            [<Optional>] ?axis : int) = 
+            let operatorArguments = 
+                [
+                    a |> Option.map (fun x -> "a", Input x)
+                    n |> Option.map (fun x -> "n", Parameter(Some (box x)))
+                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiDiff(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpDot private (operatorArguments) = 
         inherit SymbolOperator("_np_dot", operatorArguments)
@@ -9512,6 +10960,492 @@ module SymbolOperators =
                     b |> Option.map (fun x -> "b", Input x)
                 ] |> List.choose id
             new NpDot(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiEinsum private (operatorArguments) = 
+        inherit SymbolOperator("_npi_einsum", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiEinsum(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiEinsum(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_einsum_op.cc:L333</summary>
+        /// <param name="data">List of eimsum operands</param>
+        /// <param name="subscripts">Specifies the subscripts for summation as comma separated list of subscript labels. An implicit (classical Einstein summation) calculation is performed unless the explicit indicator &#39;-&gt;&#39; is included as well as subscript labels of the precise output form.</param>
+        /// <param name="optimize"></param>
+        new([<Optional>] ?data : Symbol seq,
+            [<Optional>] ?subscripts : string,
+            [<Optional>] ?optimize : int) = 
+            let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
+            let operatorArguments = 
+                [
+                    "data", VarArg("num_args", data)
+                    "subscripts", subscripts |> Option.map box |> Parameter
+                    "optimize", optimize |> Option.map box |> Parameter
+                ]
+            new NpiEinsum(Arguments<Symbol>(operatorArguments))
+        /// Default value for Subscripts
+        /// Specifies the subscripts for summation as comma separated list of subscript labels. An implicit (classical Einstein summation) calculation is performed unless the explicit indicator &#39;-&gt;&#39; is included as well as subscript labels of the precise output form.
+        static member SubscriptsDefault : string = ""
+        /// Default value for Optimize
+        /// 
+        static member OptimizeDefault : int = 0
+        /// List of eimsum operands
+        member __.Data = operatorArguments.GetVarArg "data"
+        /// Specifies the subscripts for summation as comma separated list of subscript labels. An implicit (classical Einstein summation) calculation is performed unless the explicit indicator &#39;-&gt;&#39; is included as well as subscript labels of the precise output form.
+        member __.Subscripts = operatorArguments.GetParameter("subscripts", NpiEinsum.SubscriptsDefault)
+        /// 
+        member __.Optimize = operatorArguments.GetParameter("optimize", NpiEinsum.OptimizeDefault)
+        /// <summary>Copy NpiEinsum instance with updated inputs/parameters.</summary>
+        /// <param name="data">List of eimsum operands</param>
+        /// <param name="subscripts">Specifies the subscripts for summation as comma separated list of subscript labels. An implicit (classical Einstein summation) calculation is performed unless the explicit indicator &#39;-&gt;&#39; is included as well as subscript labels of the precise output form.</param>
+        /// <param name="optimize"></param>
+        member this.With([<Optional>] ?data : Symbol seq,
+            [<Optional>] ?subscripts : string,
+            [<Optional>] ?optimize : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+                    subscripts |> Option.map (fun x -> "subscripts", Parameter(Some (box x)))
+                    optimize |> Option.map (fun x -> "optimize", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiEinsum(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiEqual private (operatorArguments) = 
+        inherit SymbolOperator("_npi_equal", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiEqual(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiEqual(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                ]
+            new NpiEqual(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// Second input to the function
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// <summary>Copy NpiEqual instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                ] |> List.choose id
+            new NpiEqual(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiNotEqual private (operatorArguments) = 
+        inherit SymbolOperator("_npi_not_equal", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiNotEqual(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiNotEqual(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                ]
+            new NpiNotEqual(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// Second input to the function
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// <summary>Copy NpiNotEqual instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                ] |> List.choose id
+            new NpiNotEqual(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiGreater private (operatorArguments) = 
+        inherit SymbolOperator("_npi_greater", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiGreater(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiGreater(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                ]
+            new NpiGreater(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// Second input to the function
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// <summary>Copy NpiGreater instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                ] |> List.choose id
+            new NpiGreater(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiLess private (operatorArguments) = 
+        inherit SymbolOperator("_npi_less", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLess(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiLess(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                ]
+            new NpiLess(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// Second input to the function
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// <summary>Copy NpiLess instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                ] |> List.choose id
+            new NpiLess(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiGreaterEqual private (operatorArguments) = 
+        inherit SymbolOperator("_npi_greater_equal", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiGreaterEqual(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiGreaterEqual(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                ]
+            new NpiGreaterEqual(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// Second input to the function
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// <summary>Copy NpiGreaterEqual instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                ] |> List.choose id
+            new NpiGreaterEqual(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiLessEqual private (operatorArguments) = 
+        inherit SymbolOperator("_npi_less_equal", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLessEqual(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiLessEqual(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                ]
+            new NpiLessEqual(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// Second input to the function
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// <summary>Copy NpiLessEqual instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                ] |> List.choose id
+            new NpiLessEqual(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiEqualScalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_equal_scalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiEqualScalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiEqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">First input to the function</param>
+        /// <param name="scalar">scalar input</param>
+        new(data : Symbol,
+            scalar : float) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiEqualScalar(Arguments<Symbol>(operatorArguments))
+        /// <param name="scalar">scalar input</param>
+        /// <param name="data">First input to the function</param>
+        new(scalar : float,
+            [<Optional>] ?data : Symbol) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiEqualScalar(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Data = operatorArguments.GetInput "data"
+        /// scalar input
+        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// <summary>Copy NpiEqualScalar instance with updated inputs/parameters.</summary>
+        /// <param name="data">First input to the function</param>
+        /// <param name="scalar">scalar input</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : float) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiEqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiNotEqualScalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_not_equal_scalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiNotEqualScalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiNotEqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">First input to the function</param>
+        /// <param name="scalar">scalar input</param>
+        new(data : Symbol,
+            scalar : float) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiNotEqualScalar(Arguments<Symbol>(operatorArguments))
+        /// <param name="scalar">scalar input</param>
+        /// <param name="data">First input to the function</param>
+        new(scalar : float,
+            [<Optional>] ?data : Symbol) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiNotEqualScalar(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Data = operatorArguments.GetInput "data"
+        /// scalar input
+        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// <summary>Copy NpiNotEqualScalar instance with updated inputs/parameters.</summary>
+        /// <param name="data">First input to the function</param>
+        /// <param name="scalar">scalar input</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : float) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiNotEqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiGreaterScalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_greater_scalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiGreaterScalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiGreaterScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">First input to the function</param>
+        /// <param name="scalar">scalar input</param>
+        new(data : Symbol,
+            scalar : float) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiGreaterScalar(Arguments<Symbol>(operatorArguments))
+        /// <param name="scalar">scalar input</param>
+        /// <param name="data">First input to the function</param>
+        new(scalar : float,
+            [<Optional>] ?data : Symbol) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiGreaterScalar(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Data = operatorArguments.GetInput "data"
+        /// scalar input
+        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// <summary>Copy NpiGreaterScalar instance with updated inputs/parameters.</summary>
+        /// <param name="data">First input to the function</param>
+        /// <param name="scalar">scalar input</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : float) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiGreaterScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiLessScalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_less_scalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLessScalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiLessScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">First input to the function</param>
+        /// <param name="scalar">scalar input</param>
+        new(data : Symbol,
+            scalar : float) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiLessScalar(Arguments<Symbol>(operatorArguments))
+        /// <param name="scalar">scalar input</param>
+        /// <param name="data">First input to the function</param>
+        new(scalar : float,
+            [<Optional>] ?data : Symbol) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiLessScalar(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Data = operatorArguments.GetInput "data"
+        /// scalar input
+        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// <summary>Copy NpiLessScalar instance with updated inputs/parameters.</summary>
+        /// <param name="data">First input to the function</param>
+        /// <param name="scalar">scalar input</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : float) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiLessScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiGreaterEqualScalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_greater_equal_scalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiGreaterEqualScalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiGreaterEqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">First input to the function</param>
+        /// <param name="scalar">scalar input</param>
+        new(data : Symbol,
+            scalar : float) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiGreaterEqualScalar(Arguments<Symbol>(operatorArguments))
+        /// <param name="scalar">scalar input</param>
+        /// <param name="data">First input to the function</param>
+        new(scalar : float,
+            [<Optional>] ?data : Symbol) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiGreaterEqualScalar(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Data = operatorArguments.GetInput "data"
+        /// scalar input
+        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// <summary>Copy NpiGreaterEqualScalar instance with updated inputs/parameters.</summary>
+        /// <param name="data">First input to the function</param>
+        /// <param name="scalar">scalar input</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : float) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiGreaterEqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiLessEqualScalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_less_equal_scalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLessEqualScalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiLessEqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">First input to the function</param>
+        /// <param name="scalar">scalar input</param>
+        new(data : Symbol,
+            scalar : float) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiLessEqualScalar(Arguments<Symbol>(operatorArguments))
+        /// <param name="scalar">scalar input</param>
+        /// <param name="data">First input to the function</param>
+        new(scalar : float,
+            [<Optional>] ?data : Symbol) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiLessEqualScalar(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Data = operatorArguments.GetInput "data"
+        /// scalar input
+        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// <summary>Copy NpiLessEqualScalar instance with updated inputs/parameters.</summary>
+        /// <param name="data">First input to the function</param>
+        /// <param name="scalar">scalar input</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : float) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiLessEqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpiAdd private (operatorArguments) = 
         inherit SymbolOperator("_npi_add", operatorArguments)
@@ -9672,73 +11606,6 @@ module SymbolOperators =
                     rhs |> Option.map (fun x -> "rhs", Input x)
                 ] |> List.choose id
             new NpiPower(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
-    
-    type NpiCopysign private (operatorArguments) = 
-        inherit SymbolOperator("_npi_copysign", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCopysign(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new NpiCopysign(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <summary>
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_broadcast_op.cc:L80</summary>
-        /// <param name="lhs">First input to the function</param>
-        /// <param name="rhs">Second input to the function</param>
-        new([<Optional>] ?lhs : Symbol,
-            [<Optional>] ?rhs : Symbol) = 
-            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
-            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
-            let operatorArguments = 
-                [
-                    "lhs", Input lhs
-                    "rhs", Input rhs
-                ]
-            new NpiCopysign(Arguments<Symbol>(operatorArguments))
-        /// First input to the function
-        member __.Lhs = operatorArguments.GetInput "lhs"
-        /// Second input to the function
-        member __.Rhs = operatorArguments.GetInput "rhs"
-        /// <summary>Copy NpiCopysign instance with updated inputs/parameters.</summary>
-        /// <param name="lhs">First input to the function</param>
-        /// <param name="rhs">Second input to the function</param>
-        member this.With([<Optional>] ?lhs : Symbol,
-            [<Optional>] ?rhs : Symbol) = 
-            let operatorArguments = 
-                [
-                    lhs |> Option.map (fun x -> "lhs", Input x)
-                    rhs |> Option.map (fun x -> "rhs", Input x)
-                ] |> List.choose id
-            new NpiCopysign(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
-    
-    type NpiLcm private (operatorArguments) = 
-        inherit SymbolOperator("_npi_lcm", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLcm(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new NpiLcm(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <param name="lhs">First input to the function</param>
-        /// <param name="rhs">Second input to the function</param>
-        new([<Optional>] ?lhs : Symbol,
-            [<Optional>] ?rhs : Symbol) = 
-            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
-            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
-            let operatorArguments = 
-                [
-                    "lhs", Input lhs
-                    "rhs", Input rhs
-                ]
-            new NpiLcm(Arguments<Symbol>(operatorArguments))
-        /// First input to the function
-        member __.Lhs = operatorArguments.GetInput "lhs"
-        /// Second input to the function
-        member __.Rhs = operatorArguments.GetInput "rhs"
-        /// <summary>Copy NpiLcm instance with updated inputs/parameters.</summary>
-        /// <param name="lhs">First input to the function</param>
-        /// <param name="rhs">Second input to the function</param>
-        member this.With([<Optional>] ?lhs : Symbol,
-            [<Optional>] ?rhs : Symbol) = 
-            let operatorArguments = 
-                [
-                    lhs |> Option.map (fun x -> "lhs", Input x)
-                    rhs |> Option.map (fun x -> "rhs", Input x)
-                ] |> List.choose id
-            new NpiLcm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpiAddScalar private (operatorArguments) = 
         inherit SymbolOperator("_npi_add_scalar", operatorArguments)
@@ -10068,6 +11935,260 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiRpowerScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiCopysign private (operatorArguments) = 
+        inherit SymbolOperator("_npi_copysign", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCopysign(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiCopysign(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_broadcast_op_extended.cc:L49</summary>
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                ]
+            new NpiCopysign(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// Second input to the function
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// <summary>Copy NpiCopysign instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                ] |> List.choose id
+            new NpiCopysign(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiLcm private (operatorArguments) = 
+        inherit SymbolOperator("_npi_lcm", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLcm(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiLcm(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                ]
+            new NpiLcm(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// Second input to the function
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// <summary>Copy NpiLcm instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                ] |> List.choose id
+            new NpiLcm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiLcmScalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_lcm_scalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLcmScalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiLcmScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">source input</param>
+        /// <param name="scalar">scalar input</param>
+        new(data : Symbol,
+            scalar : int) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiLcmScalar(Arguments<Symbol>(operatorArguments))
+        /// <param name="scalar">scalar input</param>
+        /// <param name="data">source input</param>
+        new(scalar : int,
+            [<Optional>] ?data : Symbol) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiLcmScalar(Arguments<Symbol>(operatorArguments))
+        /// source input
+        member __.Data = operatorArguments.GetInput "data"
+        /// scalar input
+        member __.Scalar : int = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// <summary>Copy NpiLcmScalar instance with updated inputs/parameters.</summary>
+        /// <param name="data">source input</param>
+        /// <param name="scalar">scalar input</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiLcmScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBitwiseXor private (operatorArguments) = 
+        inherit SymbolOperator("_npi_bitwise_xor", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBitwiseXor(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBitwiseXor(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                ]
+            new NpiBitwiseXor(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// Second input to the function
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// <summary>Copy NpiBitwiseXor instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                ] |> List.choose id
+            new NpiBitwiseXor(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBitwiseOr private (operatorArguments) = 
+        inherit SymbolOperator("_npi_bitwise_or", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBitwiseOr(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBitwiseOr(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                ]
+            new NpiBitwiseOr(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// Second input to the function
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// <summary>Copy NpiBitwiseOr instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                ] |> List.choose id
+            new NpiBitwiseOr(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBitwiseXorScalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_bitwise_xor_scalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBitwiseXorScalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBitwiseXorScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">source input</param>
+        /// <param name="scalar">scalar input</param>
+        new(data : Symbol,
+            scalar : int) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiBitwiseXorScalar(Arguments<Symbol>(operatorArguments))
+        /// <param name="scalar">scalar input</param>
+        /// <param name="data">source input</param>
+        new(scalar : int,
+            [<Optional>] ?data : Symbol) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiBitwiseXorScalar(Arguments<Symbol>(operatorArguments))
+        /// source input
+        member __.Data = operatorArguments.GetInput "data"
+        /// scalar input
+        member __.Scalar : int = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// <summary>Copy NpiBitwiseXorScalar instance with updated inputs/parameters.</summary>
+        /// <param name="data">source input</param>
+        /// <param name="scalar">scalar input</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiBitwiseXorScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBitwiseOrScalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_bitwise_or_scalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBitwiseOrScalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBitwiseOrScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">source input</param>
+        /// <param name="scalar">scalar input</param>
+        new(data : Symbol,
+            scalar : int) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiBitwiseOrScalar(Arguments<Symbol>(operatorArguments))
+        /// <param name="scalar">scalar input</param>
+        /// <param name="data">source input</param>
+        new(scalar : int,
+            [<Optional>] ?data : Symbol) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiBitwiseOrScalar(Arguments<Symbol>(operatorArguments))
+        /// source input
+        member __.Data = operatorArguments.GetInput "data"
+        /// scalar input
+        member __.Scalar : int = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// <summary>Copy NpiBitwiseOrScalar instance with updated inputs/parameters.</summary>
+        /// <param name="data">source input</param>
+        /// <param name="scalar">scalar input</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiBitwiseOrScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpiCopysignScalar private (operatorArguments) = 
         inherit SymbolOperator("_npi_copysign_scalar", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCopysignScalar(args)
@@ -10296,23 +12417,55 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiHypot(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
-    type NpiLcmScalar private (operatorArguments) = 
-        inherit SymbolOperator("_npi_lcm_scalar", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLcmScalar(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new NpiLcmScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+    type NpiLdexp private (operatorArguments) = 
+        inherit SymbolOperator("_npi_ldexp", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLdexp(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiLdexp(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                ]
+            new NpiLdexp(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// Second input to the function
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// <summary>Copy NpiLdexp instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                ] |> List.choose id
+            new NpiLdexp(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiLdexpScalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_ldexp_scalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLdexpScalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiLdexpScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
         /// <param name="scalar">scalar input</param>
         new(data : Symbol,
-            scalar : int) = 
+            scalar : float) = 
             let operatorArguments = 
                 [
                     "data", Input data
                     "scalar", Parameter(Some(box scalar))
                 ]
-            new NpiLcmScalar(Arguments<Symbol>(operatorArguments))
+            new NpiLdexpScalar(Arguments<Symbol>(operatorArguments))
         /// <param name="scalar">scalar input</param>
         /// <param name="data">source input</param>
-        new(scalar : int,
+        new(scalar : float,
             [<Optional>] ?data : Symbol) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
@@ -10320,22 +12473,63 @@ module SymbolOperators =
                     "data", Input data
                     "scalar", Parameter(Some(box scalar))
                 ]
-            new NpiLcmScalar(Arguments<Symbol>(operatorArguments))
+            new NpiLdexpScalar(Arguments<Symbol>(operatorArguments))
         /// source input
         member __.Data = operatorArguments.GetInput "data"
         /// scalar input
-        member __.Scalar : int = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
-        /// <summary>Copy NpiLcmScalar instance with updated inputs/parameters.</summary>
+        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// <summary>Copy NpiLdexpScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
         /// <param name="scalar">scalar input</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : int) = 
+            [<Optional>] ?scalar : float) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
                 ] |> List.choose id
-            new NpiLcmScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+            new NpiLdexpScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiRldexpScalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_rldexp_scalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRldexpScalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiRldexpScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">source input</param>
+        /// <param name="scalar">scalar input</param>
+        new(data : Symbol,
+            scalar : float) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiRldexpScalar(Arguments<Symbol>(operatorArguments))
+        /// <param name="scalar">scalar input</param>
+        /// <param name="data">source input</param>
+        new(scalar : float,
+            [<Optional>] ?data : Symbol) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", Parameter(Some(box scalar))
+                ]
+            new NpiRldexpScalar(Arguments<Symbol>(operatorArguments))
+        /// source input
+        member __.Data = operatorArguments.GetInput "data"
+        /// scalar input
+        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// <summary>Copy NpiRldexpScalar instance with updated inputs/parameters.</summary>
+        /// <param name="data">source input</param>
+        /// <param name="scalar">scalar input</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : float) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiRldexpScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpxRelu private (operatorArguments) = 
         inherit SymbolOperator("_npx_relu", operatorArguments)
@@ -10484,7 +12678,7 @@ module SymbolOperators =
         ///    absolute([-2, 0, 3]) = [2, 0, 3]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L107</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L134</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10514,7 +12708,7 @@ module SymbolOperators =
         ///    sign([-2, 0, 3]) = [-1, 0, 1]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L116</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L143</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10543,7 +12737,7 @@ module SymbolOperators =
         ///    rint([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -0.,  0.,  2.,  2.,  2.]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L124</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L151</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10573,7 +12767,7 @@ module SymbolOperators =
         ///    ceil([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  1.,  2.,  2.,  2.]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L133</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L160</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10603,7 +12797,7 @@ module SymbolOperators =
         ///    floor([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -1.,  0.,  1.,  1.,  2.]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L142</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L169</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10634,7 +12828,7 @@ module SymbolOperators =
         ///    trunc([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  0.,  1.,  1.,  2.]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L152</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L179</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10665,7 +12859,7 @@ module SymbolOperators =
         ///    fix([-2.1, -1.9, 1.9, 2.1]) = [-2., -1.,  1., 2.]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L162</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L189</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10694,7 +12888,7 @@ module SymbolOperators =
         ///    square([2, 3, 4]) = [4, 9, 16]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L170</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L197</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10723,7 +12917,7 @@ module SymbolOperators =
         ///    sqrt([4, 9, 16]) = [2, 3, 4]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L178</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L205</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10752,7 +12946,7 @@ module SymbolOperators =
         ///    cbrt([1, 8, -125]) = [1, 2, -5]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L186</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L213</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10781,7 +12975,7 @@ module SymbolOperators =
         ///    exp([0, 1, 2]) = [1., 2.71828175, 7.38905621]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L194</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L221</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10809,7 +13003,7 @@ module SymbolOperators =
         /// The natural logarithm is logarithm in base *e*, so that ``log(exp(x)) = x``
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L201</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L228</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10837,7 +13031,7 @@ module SymbolOperators =
         /// ``10**log10(x) = x``
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L222</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L249</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10865,7 +13059,7 @@ module SymbolOperators =
         /// ``2**log2(x) = x``
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L229</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L256</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10893,7 +13087,7 @@ module SymbolOperators =
         /// Calculates ``log(1 + x)``.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L236</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L263</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10919,7 +13113,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpiExpm1(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Calculate ``exp(x) - 1`` for all elements in the array.
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L241</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L268</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10943,10 +13137,6 @@ module SymbolOperators =
         inherit SymbolOperator("_npi_logical_not", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLogicalNot(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiLogicalNot(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <summary>Compute the truth value of NOT x element-wise.
-        /// Example::
-        ///   logical_not([-2., 0., 1.]) = [0., 1., 0.]
-        /// </summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -10975,7 +13165,7 @@ module SymbolOperators =
         ///    sin([0, \pi/4, \pi/2]) = [0, 0.707, 1]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L258</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L281</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -11004,7 +13194,7 @@ module SymbolOperators =
         ///    cos([0, \pi/4, \pi/2]) = [1, 0.707, 0]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L266</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L289</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -11033,7 +13223,7 @@ module SymbolOperators =
         ///    tan([0, \pi/4, \pi/2]) = [0, 1, -inf]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L274</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L297</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -11062,7 +13252,7 @@ module SymbolOperators =
         ///    arcsin([-1, -.707, 0, .707, 1]) = [-\pi/2, -\pi/4, 0, \pi/4, \pi/2]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L282</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L305</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -11094,7 +13284,7 @@ module SymbolOperators =
         /// The storage type of ``arccos`` output is always dense
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L293</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L316</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -11123,7 +13313,7 @@ module SymbolOperators =
         ///    arctan([-1, 0, 1]) = [-\pi/4, 0, \pi/4]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L301</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L324</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -11152,7 +13342,7 @@ module SymbolOperators =
         ///    degrees([0, \pi/2, \pi, 3\pi/2, 2\pi]) = [0, 90, 180, 270, 360]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L309</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L332</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -11181,7 +13371,7 @@ module SymbolOperators =
         ///    radians([0, 90, 180, 270, 360]) = [0, \pi/2, \pi, 3\pi/2, 2\pi]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L317</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L340</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -11210,7 +13400,7 @@ module SymbolOperators =
         ///    sinh(x) = 0.5\times(exp(x) - exp(-x))
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L325</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L348</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -11239,7 +13429,7 @@ module SymbolOperators =
         ///    cosh(x) = 0.5\times(exp(x) + exp(-x))
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L333</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L356</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -11268,7 +13458,7 @@ module SymbolOperators =
         ///    tanh(x) = sinh(x) / cosh(x)
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L341</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L364</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -11296,7 +13486,7 @@ module SymbolOperators =
         /// computed element-wise.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L348</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L371</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -11324,7 +13514,7 @@ module SymbolOperators =
         /// computed element-wise.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L355</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L378</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -11352,7 +13542,7 @@ module SymbolOperators =
         /// computed element-wise.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L362</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L385</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -11405,6 +13595,86 @@ module SymbolOperators =
                     decimals |> Option.map (fun x -> "decimals", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiAround(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiNanToNum private (operatorArguments) = 
+        inherit SymbolOperator("_npi_nan_to_num", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiNanToNum(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiNanToNum(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L425</summary>
+        /// <param name="data">Input ndarray</param>
+        /// <param name="copy">Whether to create a copy of `x` (True) or to replace valuesin-place (False). The in-place operation only occurs ifcasting to an array does not require a copy.Default is True.</param>
+        /// <param name="nan">Value to be used to fill NaN values. If no value is passedthen NaN values will be replaced with 0.0.</param>
+        /// <param name="posinf">Value to be used to fill positive infinity values.If no value is passed then positive infinity values will bereplaced with a very large number.</param>
+        /// <param name="neginf">Value to be used to fill negative infinity values.If no value is passed then negative infinity valueswill be replaced with a very small (or negative) number.</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?copy : bool,
+            [<Optional>] ?nan : double,
+            [<Optional>] ?posinf : float,
+            [<Optional>] ?neginf : float) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "copy", copy |> Option.map box |> Parameter
+                    "nan", nan |> Option.map box |> Parameter
+                    "posinf", posinf |> Option.map box |> Parameter
+                    "neginf", neginf |> Option.map box |> Parameter
+                ]
+            new NpiNanToNum(Arguments<Symbol>(operatorArguments))
+        /// Default value for Copy
+        /// Whether to create a copy of `x` (True) or to replace valuesin-place (False). The in-place operation only occurs ifcasting to an array does not require a copy.Default is True.
+        static member CopyDefault : bool = true
+        /// Default value for Nan
+        /// Value to be used to fill NaN values. If no value is passedthen NaN values will be replaced with 0.0.
+        static member NanDefault : double = 0.0
+        /// Default value for Posinf
+        /// Value to be used to fill positive infinity values.If no value is passed then positive infinity values will bereplaced with a very large number.
+        static member PosinfDefault : double option = None
+        /// Default value for Neginf
+        /// Value to be used to fill negative infinity values.If no value is passed then negative infinity valueswill be replaced with a very small (or negative) number.
+        static member NeginfDefault : double option = None
+        /// Input ndarray
+        member __.Data = operatorArguments.GetInput "data"
+        /// Whether to create a copy of `x` (True) or to replace valuesin-place (False). The in-place operation only occurs ifcasting to an array does not require a copy.Default is True.
+        member __.Copy = operatorArguments.GetParameter("copy", NpiNanToNum.CopyDefault)
+        /// Value to be used to fill NaN values. If no value is passedthen NaN values will be replaced with 0.0.
+        member __.Nan = operatorArguments.GetParameter("nan", NpiNanToNum.NanDefault)
+        /// Value to be used to fill positive infinity values.If no value is passed then positive infinity values will bereplaced with a very large number.
+        member __.Posinf = operatorArguments.GetParameter("posinf", NpiNanToNum.PosinfDefault)
+        /// Value to be used to fill negative infinity values.If no value is passed then negative infinity valueswill be replaced with a very small (or negative) number.
+        member __.Neginf = operatorArguments.GetParameter("neginf", NpiNanToNum.NeginfDefault)
+        /// <summary>Copy NpiNanToNum instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input ndarray</param>
+        /// <param name="copy">Whether to create a copy of `x` (True) or to replace valuesin-place (False). The in-place operation only occurs ifcasting to an array does not require a copy.Default is True.</param>
+        /// <param name="nan">Value to be used to fill NaN values. If no value is passedthen NaN values will be replaced with 0.0.</param>
+        /// <param name="posinf">Value to be used to fill positive infinity values.If no value is passed then positive infinity values will bereplaced with a very large number.</param>
+        /// <param name="neginf">Value to be used to fill negative infinity values.If no value is passed then negative infinity valueswill be replaced with a very small (or negative) number.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?copy : bool,
+            [<Optional>] ?nan : double,
+            [<Optional>] ?posinf : float,
+            [<Optional>] ?neginf : float) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    copy |> Option.map (fun x -> "copy", Parameter(Some (box x)))
+                    nan |> Option.map (fun x -> "nan", Parameter(Some (box x)))
+                    posinf |> Option.map (fun x -> "posinf", Parameter(Some (box x)))
+                    neginf |> Option.map (fun x -> "neginf", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiNanToNum(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBackwardNanToNum private (operatorArguments) = 
+        inherit SymbolOperator("_npi_backward_nan_to_num", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBackwardNanToNum(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBackwardNanToNum(this.OperatorArguments.AddReplace(args)) :> Symbol
+        new() =
+            let operatorArguments = 
+                [
+                ]
+            new NpiBackwardNanToNum(Arguments<Symbol>(operatorArguments))
     
     type NpiZeros private (operatorArguments) = 
         inherit SymbolOperator("_npi_zeros", operatorArguments)
@@ -11639,6 +13909,59 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiArange(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiEye private (operatorArguments) = 
+        inherit SymbolOperator("_npi_eye", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiEye(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiEye(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Return a 2-D array with ones on the diagonal and zeros elsewhere.</summary>
+        /// <param name="N">Number of rows in the output.</param>
+        /// <param name="M">Number of columns in the output. If None, defaults to N.</param>
+        /// <param name="k">Index of the diagonal. 0 (the default) refers to the main diagonal,a positive value refers to an upper diagonal.and a negative value to a lower diagonal.</param>
+        /// <param name="dtype">Data-type of the returned array.</param>
+        new(N : int64,
+            M : int64,
+            [<Optional>] ?k : int64,
+            [<Optional>] ?dtype : DataType) = 
+            let operatorArguments = 
+                [
+                    "N", Parameter(Some(box N))
+                    "M", Parameter(Some(box M))
+                    "k", k |> Option.map box |> Parameter
+                    "dtype", dtype |> Option.map box |> Parameter
+                ]
+            new NpiEye(Arguments<Symbol>(operatorArguments))
+        /// Default value for K
+        /// Index of the diagonal. 0 (the default) refers to the main diagonal,a positive value refers to an upper diagonal.and a negative value to a lower diagonal.
+        static member KDefault : int64 = 0L
+        /// Default value for Dtype
+        /// Data-type of the returned array.
+        static member DtypeDefault : DataType = DataType.Float32
+        /// Number of rows in the output.
+        member __.N : int64 = match operatorArguments.GetParameter "N" with Some(v) -> unbox v | None -> failwithf "Required parameter N is missing"
+        /// Number of columns in the output. If None, defaults to N.
+        member __.M : int64 = match operatorArguments.GetParameter "M" with Some(v) -> unbox v | None -> failwithf "Required parameter M is missing"
+        /// Index of the diagonal. 0 (the default) refers to the main diagonal,a positive value refers to an upper diagonal.and a negative value to a lower diagonal.
+        member __.K = operatorArguments.GetParameter("k", NpiEye.KDefault)
+        /// Data-type of the returned array.
+        member __.Dtype = operatorArguments.GetParameter("dtype", NpiEye.DtypeDefault)
+        /// <summary>Copy NpiEye instance with updated inputs/parameters.</summary>
+        /// <param name="N">Number of rows in the output.</param>
+        /// <param name="M">Number of columns in the output. If None, defaults to N.</param>
+        /// <param name="k">Index of the diagonal. 0 (the default) refers to the main diagonal,a positive value refers to an upper diagonal.and a negative value to a lower diagonal.</param>
+        /// <param name="dtype">Data-type of the returned array.</param>
+        member this.With([<Optional>] ?N : int64,
+            [<Optional>] ?M : int64,
+            [<Optional>] ?k : int64,
+            [<Optional>] ?dtype : DataType) = 
+            let operatorArguments = 
+                [
+                    N |> Option.map (fun x -> "N", Parameter(Some (box x)))
+                    M |> Option.map (fun x -> "M", Parameter(Some (box x)))
+                    k |> Option.map (fun x -> "k", Parameter(Some (box x)))
+                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiEye(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpiIndices private (operatorArguments) = 
         inherit SymbolOperator("_npi_indices", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiIndices(args)
@@ -11672,6 +13995,78 @@ module SymbolOperators =
                     dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiIndices(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiLogspace private (operatorArguments) = 
+        inherit SymbolOperator("_npi_logspace", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLogspace(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiLogspace(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Return numbers spaced evenly on a log scale.</summary>
+        /// <param name="start">The starting value of the sequence.</param>
+        /// <param name="stop">The ending value of the sequence</param>
+        /// <param name="num">Number of samples to generate. Must be non-negative.</param>
+        /// <param name="endpoint">If True, stop is the last sample. Otherwise, it is not included.</param>
+        /// <param name="lbase">The base of the log space. The step size between the elements in ln(samples) / ln(base) (or log_base(samples)) is uniform.</param>
+        /// <param name="dtype">Target data type.</param>
+        new(start : double,
+            stop : double,
+            num : int,
+            [<Optional>] ?endpoint : bool,
+            [<Optional>] ?lbase : double,
+            [<Optional>] ?dtype : DataType) = 
+            let operatorArguments = 
+                [
+                    "start", Parameter(Some(box start))
+                    "stop", Parameter(Some(box stop))
+                    "num", Parameter(Some(box num))
+                    "endpoint", endpoint |> Option.map box |> Parameter
+                    "base", lbase |> Option.map box |> Parameter
+                    "dtype", dtype |> Option.map box |> Parameter
+                ]
+            new NpiLogspace(Arguments<Symbol>(operatorArguments))
+        /// Default value for Endpoint
+        /// If True, stop is the last sample. Otherwise, it is not included.
+        static member EndpointDefault : bool = true
+        /// Default value for Lbase
+        /// The base of the log space. The step size between the elements in ln(samples) / ln(base) (or log_base(samples)) is uniform.
+        static member LbaseDefault : double = 10.0
+        /// Default value for Dtype
+        /// Target data type.
+        static member DtypeDefault : DataType = DataType.Float32
+        /// The starting value of the sequence.
+        member __.Start : double = match operatorArguments.GetParameter "start" with Some(v) -> unbox v | None -> failwithf "Required parameter start is missing"
+        /// The ending value of the sequence
+        member __.Stop : double = match operatorArguments.GetParameter "stop" with Some(v) -> unbox v | None -> failwithf "Required parameter stop is missing"
+        /// Number of samples to generate. Must be non-negative.
+        member __.Num : int = match operatorArguments.GetParameter "num" with Some(v) -> unbox v | None -> failwithf "Required parameter num is missing"
+        /// If True, stop is the last sample. Otherwise, it is not included.
+        member __.Endpoint = operatorArguments.GetParameter("endpoint", NpiLogspace.EndpointDefault)
+        /// The base of the log space. The step size between the elements in ln(samples) / ln(base) (or log_base(samples)) is uniform.
+        member __.Lbase = operatorArguments.GetParameter("base", NpiLogspace.LbaseDefault)
+        /// Target data type.
+        member __.Dtype = operatorArguments.GetParameter("dtype", NpiLogspace.DtypeDefault)
+        /// <summary>Copy NpiLogspace instance with updated inputs/parameters.</summary>
+        /// <param name="start">The starting value of the sequence.</param>
+        /// <param name="stop">The ending value of the sequence</param>
+        /// <param name="num">Number of samples to generate. Must be non-negative.</param>
+        /// <param name="endpoint">If True, stop is the last sample. Otherwise, it is not included.</param>
+        /// <param name="lbase">The base of the log space. The step size between the elements in ln(samples) / ln(base) (or log_base(samples)) is uniform.</param>
+        /// <param name="dtype">Target data type.</param>
+        member this.With([<Optional>] ?start : double,
+            [<Optional>] ?stop : double,
+            [<Optional>] ?num : int,
+            [<Optional>] ?endpoint : bool,
+            [<Optional>] ?lbase : double,
+            [<Optional>] ?dtype : DataType) = 
+            let operatorArguments = 
+                [
+                    start |> Option.map (fun x -> "start", Parameter(Some (box x)))
+                    stop |> Option.map (fun x -> "stop", Parameter(Some (box x)))
+                    num |> Option.map (fun x -> "num", Parameter(Some (box x)))
+                    endpoint |> Option.map (fun x -> "endpoint", Parameter(Some (box x)))
+                    lbase |> Option.map (fun x -> "base", Parameter(Some (box x)))
+                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiLogspace(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpTranspose private (operatorArguments) = 
         inherit SymbolOperator("_np_transpose", operatorArguments)
@@ -11713,7 +14108,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpReshape(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L167</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L349</summary>
         /// <param name="a">Array to be reshaped.</param>
         /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions.</param>
         /// <param name="order">Read the elements of a using this index order, and place the elements into the reshaped array using this index order. &#39;C&#39; means to read/write the elements using C-like index order, with the last axis index changing fastest, back to the first axis index changing slowest. Note that currently only C-like order is supported</param>
@@ -11729,7 +14124,7 @@ module SymbolOperators =
             new NpReshape(Arguments<Symbol>(operatorArguments))
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L167</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L349</summary>
         /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions.</param>
         /// <param name="a">Array to be reshaped.</param>
         /// <param name="order">Read the elements of a using this index order, and place the elements into the reshaped array using this index order. &#39;C&#39; means to read/write the elements using C-like index order, with the last axis index changing fastest, back to the first axis index changing slowest. Note that currently only C-like order is supported</param>
@@ -11768,18 +14163,93 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpReshape(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpxReshape private (operatorArguments) = 
+        inherit SymbolOperator("_npx_reshape", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpxReshape(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpxReshape(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L375</summary>
+        /// <param name="a">Array to be reshaped.</param>
+        /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions. -2 to -6 are used for data manipulation. -2 copy this dimension from the input to the output shape. -3 will skip current dimension if and only if the current dim size is one. -4 copy all remain of the input dimensions to the output shape. -5 use the product of two consecutive dimensions of the input shape as the output. -6 split one dimension of the input into two dimensions passed subsequent to -6 in the new shape.</param>
+        /// <param name="reverse">If true then the special values are inferred from right to left</param>
+        /// <param name="order">Read the elements of a using this index order, and place the elements into the reshaped array using this index order. &#39;C&#39; means to read/write the elements using C-like index order, with the last axis index changing fastest, back to the first axis index changing slowest. Note that currently only C-like order is supported</param>
+        new(a : Symbol,
+            newshape : int seq,
+            [<Optional>] ?reverse : bool,
+            [<Optional>] ?order : string) = 
+            let operatorArguments = 
+                [
+                    "a", Input a
+                    "newshape", Parameter(Some(box newshape))
+                    "reverse", reverse |> Option.map box |> Parameter
+                    "order", order |> Option.map box |> Parameter
+                ]
+            new NpxReshape(Arguments<Symbol>(operatorArguments))
+        /// <summary>
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L375</summary>
+        /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions. -2 to -6 are used for data manipulation. -2 copy this dimension from the input to the output shape. -3 will skip current dimension if and only if the current dim size is one. -4 copy all remain of the input dimensions to the output shape. -5 use the product of two consecutive dimensions of the input shape as the output. -6 split one dimension of the input into two dimensions passed subsequent to -6 in the new shape.</param>
+        /// <param name="a">Array to be reshaped.</param>
+        /// <param name="reverse">If true then the special values are inferred from right to left</param>
+        /// <param name="order">Read the elements of a using this index order, and place the elements into the reshaped array using this index order. &#39;C&#39; means to read/write the elements using C-like index order, with the last axis index changing fastest, back to the first axis index changing slowest. Note that currently only C-like order is supported</param>
+        new(newshape : int seq,
+            [<Optional>] ?a : Symbol,
+            [<Optional>] ?reverse : bool,
+            [<Optional>] ?order : string) = 
+            let a = defaultArg a (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "a", Input a
+                    "newshape", Parameter(Some(box newshape))
+                    "reverse", reverse |> Option.map box |> Parameter
+                    "order", order |> Option.map box |> Parameter
+                ]
+            new NpxReshape(Arguments<Symbol>(operatorArguments))
+        /// Default value for Reverse
+        /// If true then the special values are inferred from right to left
+        static member ReverseDefault : bool = false
+        /// Default value for Order
+        /// Read the elements of a using this index order, and place the elements into the reshaped array using this index order. &#39;C&#39; means to read/write the elements using C-like index order, with the last axis index changing fastest, back to the first axis index changing slowest. Note that currently only C-like order is supported
+        static member OrderDefault : string = "C"
+        /// Array to be reshaped.
+        member __.A = operatorArguments.GetInput "a"
+        /// The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions. -2 to -6 are used for data manipulation. -2 copy this dimension from the input to the output shape. -3 will skip current dimension if and only if the current dim size is one. -4 copy all remain of the input dimensions to the output shape. -5 use the product of two consecutive dimensions of the input shape as the output. -6 split one dimension of the input into two dimensions passed subsequent to -6 in the new shape.
+        member __.Newshape : int seq = match operatorArguments.GetParameter "newshape" with Some(v) -> unbox v | None -> failwithf "Required parameter newshape is missing"
+        /// If true then the special values are inferred from right to left
+        member __.Reverse = operatorArguments.GetParameter("reverse", NpxReshape.ReverseDefault)
+        /// Read the elements of a using this index order, and place the elements into the reshaped array using this index order. &#39;C&#39; means to read/write the elements using C-like index order, with the last axis index changing fastest, back to the first axis index changing slowest. Note that currently only C-like order is supported
+        member __.Order = operatorArguments.GetParameter("order", NpxReshape.OrderDefault)
+        /// <summary>Copy NpxReshape instance with updated inputs/parameters.</summary>
+        /// <param name="a">Array to be reshaped.</param>
+        /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions. -2 to -6 are used for data manipulation. -2 copy this dimension from the input to the output shape. -3 will skip current dimension if and only if the current dim size is one. -4 copy all remain of the input dimensions to the output shape. -5 use the product of two consecutive dimensions of the input shape as the output. -6 split one dimension of the input into two dimensions passed subsequent to -6 in the new shape.</param>
+        /// <param name="reverse">If true then the special values are inferred from right to left</param>
+        /// <param name="order">Read the elements of a using this index order, and place the elements into the reshaped array using this index order. &#39;C&#39; means to read/write the elements using C-like index order, with the last axis index changing fastest, back to the first axis index changing slowest. Note that currently only C-like order is supported</param>
+        member this.With([<Optional>] ?a : Symbol,
+            [<Optional>] ?newshape : int seq,
+            [<Optional>] ?reverse : bool,
+            [<Optional>] ?order : string) = 
+            let operatorArguments = 
+                [
+                    a |> Option.map (fun x -> "a", Input x)
+                    newshape |> Option.map (fun x -> "newshape", Parameter(Some (box x)))
+                    reverse |> Option.map (fun x -> "reverse", Parameter(Some (box x)))
+                    order |> Option.map (fun x -> "order", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpxReshape(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpSqueeze private (operatorArguments) = 
         inherit SymbolOperator("_np_squeeze", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpSqueeze(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpSqueeze(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="a">data to squeeze</param>
         /// <param name="axis">Selects a subset of the single-dimensional entries in the shape. If an axis is selected with shape entry greater than one, an error is raised.</param>
-        new([<Optional>] ?a : Symbol seq,
+        new([<Optional>] ?a : Symbol,
             [<Optional>] ?axis : int seq) = 
-            let a = defaultArg (a |> Option.map Seq.toArray) Array.empty
+            let a = defaultArg a (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
-                    "a", VarArg("", a)
+                    "a", Input a
                     "axis", axis |> Option.map box |> Parameter
                 ]
             new NpSqueeze(Arguments<Symbol>(operatorArguments))
@@ -11787,17 +14257,17 @@ module SymbolOperators =
         /// Selects a subset of the single-dimensional entries in the shape. If an axis is selected with shape entry greater than one, an error is raised.
         static member AxisDefault : int [] option = None
         /// data to squeeze
-        member __.A = operatorArguments.GetVarArg "a"
+        member __.A = operatorArguments.GetInput "a"
         /// Selects a subset of the single-dimensional entries in the shape. If an axis is selected with shape entry greater than one, an error is raised.
         member __.Axis = operatorArguments.GetParameter("axis", NpSqueeze.AxisDefault)
         /// <summary>Copy NpSqueeze instance with updated inputs/parameters.</summary>
         /// <param name="a">data to squeeze</param>
         /// <param name="axis">Selects a subset of the single-dimensional entries in the shape. If an axis is selected with shape entry greater than one, an error is raised.</param>
-        member this.With([<Optional>] ?a : Symbol seq,
+        member this.With([<Optional>] ?a : Symbol,
             [<Optional>] ?axis : int seq) = 
             let operatorArguments = 
                 [
-                    a |> Option.map (fun x -> "a", VarArg("", Seq.toArray x))
+                    a |> Option.map (fun x -> "a", Input x)
                     axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpSqueeze(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
@@ -11808,7 +14278,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpiConcatenate(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Join a sequence of arrays along an existing axis.
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L274</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L617</summary>
         /// <param name="data">List of arrays to concatenate</param>
         /// <param name="dim">the dimension to be concated.</param>
         new([<Optional>] ?data : Symbol seq,
@@ -11889,13 +14359,38 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiStack(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiColumnStack private (operatorArguments) = 
+        inherit SymbolOperator("_npi_column_stack", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiColumnStack(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiColumnStack(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L805</summary>
+        /// <param name="data">List of arrays to column_stack</param>
+        new([<ParamArray>] data : Symbol[]) =
+            let operatorArguments = 
+                [
+                    "data", VarArg("num_args", data)
+                ]
+            new NpiColumnStack(Arguments<Symbol>(operatorArguments))
+        /// List of arrays to column_stack
+        member __.Data = operatorArguments.GetVarArg "data"
+        /// <summary>Copy NpiColumnStack instance with updated inputs/parameters.</summary>
+        /// <param name="data">List of arrays to column_stack</param>
+        member this.With([<Optional>] ?data : Symbol seq) =
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+                ] |> List.choose id
+            new NpiColumnStack(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpiVstack private (operatorArguments) = 
         inherit SymbolOperator("_npi_vstack", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiVstack(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiVstack(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L459</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L947</summary>
         /// <param name="data">List of arrays to vstack</param>
         new([<ParamArray>] data : Symbol[]) =
             let operatorArguments = 
@@ -11913,6 +14408,43 @@ module SymbolOperators =
                     data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
                 ] |> List.choose id
             new NpiVstack(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiDstack private (operatorArguments) = 
+        inherit SymbolOperator("_npi_dstack", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiDstack(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiDstack(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Stack tensors in sequence depthwise (in third dimension)
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L982</summary>
+        /// <param name="data">List of arrays to concatenate</param>
+        /// <param name="dim">the dimension to be concated.</param>
+        new([<Optional>] ?data : Symbol seq,
+            [<Optional>] ?dim : int) = 
+            let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
+            let operatorArguments = 
+                [
+                    "data", VarArg("num_args", data)
+                    "dim", dim |> Option.map box |> Parameter
+                ]
+            new NpiDstack(Arguments<Symbol>(operatorArguments))
+        /// Default value for Dim
+        /// the dimension to be concated.
+        static member DimDefault : int = 1
+        /// List of arrays to concatenate
+        member __.Data = operatorArguments.GetVarArg "data"
+        /// the dimension to be concated.
+        member __.Dim = operatorArguments.GetParameter("dim", NpiDstack.DimDefault)
+        /// <summary>Copy NpiDstack instance with updated inputs/parameters.</summary>
+        /// <param name="data">List of arrays to concatenate</param>
+        /// <param name="dim">the dimension to be concated.</param>
+        member this.With([<Optional>] ?data : Symbol seq,
+            [<Optional>] ?dim : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+                    dim |> Option.map (fun x -> "dim", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiDstack(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpRoll private (operatorArguments) = 
         inherit SymbolOperator("_np_roll", operatorArguments)
@@ -11999,6 +14531,306 @@ module SymbolOperators =
                     axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiFlip(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpMoveaxis private (operatorArguments) = 
+        inherit SymbolOperator("_np_moveaxis", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpMoveaxis(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpMoveaxis(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Move axes of an array to new positions.
+        /// Other axes remain in their original order.
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L1165</summary>
+        /// <param name="a">Source input</param>
+        /// <param name="source">Original positions of the axes to move. These must be unique.</param>
+        /// <param name="destination">Destination positions for each of the original axes. These must also be unique.</param>
+        new(a : Symbol,
+            source : int seq,
+            destination : int seq) = 
+            let operatorArguments = 
+                [
+                    "a", Input a
+                    "source", Parameter(Some(box source))
+                    "destination", Parameter(Some(box destination))
+                ]
+            new NpMoveaxis(Arguments<Symbol>(operatorArguments))
+        /// <summary>Move axes of an array to new positions.
+        /// Other axes remain in their original order.
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L1165</summary>
+        /// <param name="source">Original positions of the axes to move. These must be unique.</param>
+        /// <param name="destination">Destination positions for each of the original axes. These must also be unique.</param>
+        /// <param name="a">Source input</param>
+        new(source : int seq,
+            destination : int seq,
+            [<Optional>] ?a : Symbol) = 
+            let a = defaultArg a (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "a", Input a
+                    "source", Parameter(Some(box source))
+                    "destination", Parameter(Some(box destination))
+                ]
+            new NpMoveaxis(Arguments<Symbol>(operatorArguments))
+        /// Source input
+        member __.A = operatorArguments.GetInput "a"
+        /// Original positions of the axes to move. These must be unique.
+        member __.Source : int seq = match operatorArguments.GetParameter "source" with Some(v) -> unbox v | None -> failwithf "Required parameter source is missing"
+        /// Destination positions for each of the original axes. These must also be unique.
+        member __.Destination : int seq = match operatorArguments.GetParameter "destination" with Some(v) -> unbox v | None -> failwithf "Required parameter destination is missing"
+        /// <summary>Copy NpMoveaxis instance with updated inputs/parameters.</summary>
+        /// <param name="a">Source input</param>
+        /// <param name="source">Original positions of the axes to move. These must be unique.</param>
+        /// <param name="destination">Destination positions for each of the original axes. These must also be unique.</param>
+        member this.With([<Optional>] ?a : Symbol,
+            [<Optional>] ?source : int seq,
+            [<Optional>] ?destination : int seq) = 
+            let operatorArguments = 
+                [
+                    a |> Option.map (fun x -> "a", Input x)
+                    source |> Option.map (fun x -> "source", Parameter(Some (box x)))
+                    destination |> Option.map (fun x -> "destination", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpMoveaxis(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiRot90 private (operatorArguments) = 
+        inherit SymbolOperator("_npi_rot90", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRot90(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiRot90(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">Input ndarray</param>
+        /// <param name="k">Number of times the array is rotated by 90 degrees.</param>
+        /// <param name="axes"> The array is rotated in the plane defined by the axes. Axes must be different.</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?k : int,
+            [<Optional>] ?axes : int seq) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "k", k |> Option.map box |> Parameter
+                    "axes", axes |> Option.map box |> Parameter
+                ]
+            new NpiRot90(Arguments<Symbol>(operatorArguments))
+        /// Default value for K
+        /// Number of times the array is rotated by 90 degrees.
+        static member KDefault : int = 1
+        /// Default value for Axes
+        ///  The array is rotated in the plane defined by the axes. Axes must be different.
+        static member AxesDefault : int [] option = None
+        /// Input ndarray
+        member __.Data = operatorArguments.GetInput "data"
+        /// Number of times the array is rotated by 90 degrees.
+        member __.K = operatorArguments.GetParameter("k", NpiRot90.KDefault)
+        ///  The array is rotated in the plane defined by the axes. Axes must be different.
+        member __.Axes = operatorArguments.GetParameter("axes", NpiRot90.AxesDefault)
+        /// <summary>Copy NpiRot90 instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input ndarray</param>
+        /// <param name="k">Number of times the array is rotated by 90 degrees.</param>
+        /// <param name="axes"> The array is rotated in the plane defined by the axes. Axes must be different.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?k : int,
+            [<Optional>] ?axes : int seq) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    k |> Option.map (fun x -> "k", Parameter(Some (box x)))
+                    axes |> Option.map (fun x -> "axes", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiRot90(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiHsplit private (operatorArguments) = 
+        inherit SymbolOperator("_npi_hsplit", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiHsplit(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiHsplit(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">The input</param>
+        /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
+        /// <param name="axis">Axis along which to split.</param>
+        /// <param name="squeezeAxis">If true, Removes the axis with length 1 from the shapes of the output arrays. **Note** that setting `squeeze_axis` to ``true`` removes axis with length 1 only along the `axis` which it is split. Also `squeeze_axis` can be set to ``true`` only if ``input.shape[axis] == num_outputs``.</param>
+        /// <param name="sections">Number of sections if equally splitted. Default to 0 which means split by indices.</param>
+        new(data : Symbol,
+            indices : int seq,
+            [<Optional>] ?axis : int,
+            [<Optional>] ?squeezeAxis : bool,
+            [<Optional>] ?sections : int) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "indices", Parameter(Some(box indices))
+                    "axis", axis |> Option.map box |> Parameter
+                    "squeeze_axis", squeezeAxis |> Option.map box |> Parameter
+                    "sections", sections |> Option.map box |> Parameter
+                ]
+            new NpiHsplit(Arguments<Symbol>(operatorArguments))
+        /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
+        /// <param name="data">The input</param>
+        /// <param name="axis">Axis along which to split.</param>
+        /// <param name="squeezeAxis">If true, Removes the axis with length 1 from the shapes of the output arrays. **Note** that setting `squeeze_axis` to ``true`` removes axis with length 1 only along the `axis` which it is split. Also `squeeze_axis` can be set to ``true`` only if ``input.shape[axis] == num_outputs``.</param>
+        /// <param name="sections">Number of sections if equally splitted. Default to 0 which means split by indices.</param>
+        new(indices : int seq,
+            [<Optional>] ?data : Symbol,
+            [<Optional>] ?axis : int,
+            [<Optional>] ?squeezeAxis : bool,
+            [<Optional>] ?sections : int) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "indices", Parameter(Some(box indices))
+                    "axis", axis |> Option.map box |> Parameter
+                    "squeeze_axis", squeezeAxis |> Option.map box |> Parameter
+                    "sections", sections |> Option.map box |> Parameter
+                ]
+            new NpiHsplit(Arguments<Symbol>(operatorArguments))
+        /// Default value for Axis
+        /// Axis along which to split.
+        static member AxisDefault : int = 1
+        /// Default value for SqueezeAxis
+        /// If true, Removes the axis with length 1 from the shapes of the output arrays. **Note** that setting `squeeze_axis` to ``true`` removes axis with length 1 only along the `axis` which it is split. Also `squeeze_axis` can be set to ``true`` only if ``input.shape[axis] == num_outputs``.
+        static member SqueezeAxisDefault : bool = false
+        /// Default value for Sections
+        /// Number of sections if equally splitted. Default to 0 which means split by indices.
+        static member SectionsDefault : int = 0
+        /// The input
+        member __.Data = operatorArguments.GetInput "data"
+        /// Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.
+        member __.Indices : int seq = match operatorArguments.GetParameter "indices" with Some(v) -> unbox v | None -> failwithf "Required parameter indices is missing"
+        /// Axis along which to split.
+        member __.Axis = operatorArguments.GetParameter("axis", NpiHsplit.AxisDefault)
+        /// If true, Removes the axis with length 1 from the shapes of the output arrays. **Note** that setting `squeeze_axis` to ``true`` removes axis with length 1 only along the `axis` which it is split. Also `squeeze_axis` can be set to ``true`` only if ``input.shape[axis] == num_outputs``.
+        member __.SqueezeAxis = operatorArguments.GetParameter("squeeze_axis", NpiHsplit.SqueezeAxisDefault)
+        /// Number of sections if equally splitted. Default to 0 which means split by indices.
+        member __.Sections = operatorArguments.GetParameter("sections", NpiHsplit.SectionsDefault)
+        /// <summary>Copy NpiHsplit instance with updated inputs/parameters.</summary>
+        /// <param name="data">The input</param>
+        /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
+        /// <param name="axis">Axis along which to split.</param>
+        /// <param name="squeezeAxis">If true, Removes the axis with length 1 from the shapes of the output arrays. **Note** that setting `squeeze_axis` to ``true`` removes axis with length 1 only along the `axis` which it is split. Also `squeeze_axis` can be set to ``true`` only if ``input.shape[axis] == num_outputs``.</param>
+        /// <param name="sections">Number of sections if equally splitted. Default to 0 which means split by indices.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?indices : int seq,
+            [<Optional>] ?axis : int,
+            [<Optional>] ?squeezeAxis : bool,
+            [<Optional>] ?sections : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    indices |> Option.map (fun x -> "indices", Parameter(Some (box x)))
+                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                    squeezeAxis |> Option.map (fun x -> "squeeze_axis", Parameter(Some (box x)))
+                    sections |> Option.map (fun x -> "sections", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiHsplit(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiHsplitBackward private (operatorArguments) = 
+        inherit SymbolOperator("_npi_hsplit_backward", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiHsplitBackward(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiHsplitBackward(this.OperatorArguments.AddReplace(args)) :> Symbol
+        new() =
+            let operatorArguments = 
+                [
+                ]
+            new NpiHsplitBackward(Arguments<Symbol>(operatorArguments))
+    
+    type NpDiag private (operatorArguments) = 
+        inherit SymbolOperator("_np_diag", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpDiag(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpDiag(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">Input ndarray</param>
+        /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?k : int) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "k", k |> Option.map box |> Parameter
+                ]
+            new NpDiag(Arguments<Symbol>(operatorArguments))
+        /// Default value for K
+        /// Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. 
+        static member KDefault : int = 0
+        /// Input ndarray
+        member __.Data = operatorArguments.GetInput "data"
+        /// Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. 
+        member __.K = operatorArguments.GetParameter("k", NpDiag.KDefault)
+        /// <summary>Copy NpDiag instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input ndarray</param>
+        /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?k : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    k |> Option.map (fun x -> "k", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpDiag(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpDiagflat private (operatorArguments) = 
+        inherit SymbolOperator("_np_diagflat", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpDiagflat(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpDiagflat(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">Input ndarray</param>
+        /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?k : int) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "k", k |> Option.map box |> Parameter
+                ]
+            new NpDiagflat(Arguments<Symbol>(operatorArguments))
+        /// Default value for K
+        /// Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. 
+        static member KDefault : int = 0
+        /// Input ndarray
+        member __.Data = operatorArguments.GetInput "data"
+        /// Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. 
+        member __.K = operatorArguments.GetParameter("k", NpDiagflat.KDefault)
+        /// <summary>Copy NpDiagflat instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input ndarray</param>
+        /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?k : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    k |> Option.map (fun x -> "k", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpDiagflat(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiShareMemory private (operatorArguments) = 
+        inherit SymbolOperator("_npi_share_memory", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiShareMemory(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiShareMemory(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="a">First input</param>
+        /// <param name="b">Second input</param>
+        new([<Optional>] ?a : Symbol,
+            [<Optional>] ?b : Symbol) = 
+            let a = defaultArg a (new ImplicitVariable() :> Symbol)
+            let b = defaultArg b (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "a", Input a
+                    "b", Input b
+                ]
+            new NpiShareMemory(Arguments<Symbol>(operatorArguments))
+        /// First input
+        member __.A = operatorArguments.GetInput "a"
+        /// Second input
+        member __.B = operatorArguments.GetInput "b"
+        /// <summary>Copy NpiShareMemory instance with updated inputs/parameters.</summary>
+        /// <param name="a">First input</param>
+        /// <param name="b">Second input</param>
+        member this.With([<Optional>] ?a : Symbol,
+            [<Optional>] ?b : Symbol) = 
+            let operatorArguments = 
+                [
+                    a |> Option.map (fun x -> "a", Input x)
+                    b |> Option.map (fun x -> "b", Input x)
+                ] |> List.choose id
+            new NpiShareMemory(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpxNonzero private (operatorArguments) = 
         inherit SymbolOperator("_npx_nonzero", operatorArguments)
@@ -12254,25 +15086,6 @@ module SymbolOperators =
         inherit SymbolOperator("_npi_true_divide", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTrueDivide(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiTrueDivide(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <summary>
-        /// Returns a true division of the inputs, element-wise.
-        /// 
-        /// It currently only supports dtype float16, float32, and float64.
-        /// 
-        /// Example::
-        /// 
-        ///    x = [[ 6.,  6.,  6.],
-        ///         [ 6.,  6.,  6.]]
-        /// 
-        ///    y = [[ 2.],
-        ///         [ 3.]]
-        /// 
-        ///    _true_divide(x, y) = [[ 3.,  3.,  3.],
-        ///                          [ 2.,  2.,  2.]]
-        /// 
-        /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_true_divide.cc:L74</summary>
         /// <param name="lhs">Dividend array</param>
         /// <param name="rhs">Divisor array</param>
         new([<Optional>] ?lhs : Symbol,
@@ -12450,6 +15263,47 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiUnique(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiWhere private (operatorArguments) = 
+        inherit SymbolOperator("_npi_where", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiWhere(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiWhere(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="condition">condition array</param>
+        /// <param name="x">input x</param>
+        /// <param name="y">input y</param>
+        new([<Optional>] ?condition : Symbol,
+            [<Optional>] ?x : Symbol,
+            [<Optional>] ?y : Symbol) = 
+            let condition = defaultArg condition (new ImplicitVariable() :> Symbol)
+            let x = defaultArg x (new ImplicitVariable() :> Symbol)
+            let y = defaultArg y (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "condition", Input condition
+                    "x", Input x
+                    "y", Input y
+                ]
+            new NpiWhere(Arguments<Symbol>(operatorArguments))
+        /// condition array
+        member __.Condition = operatorArguments.GetInput "condition"
+        /// input x
+        member __.X = operatorArguments.GetInput "x"
+        /// input y
+        member __.Y = operatorArguments.GetInput "y"
+        /// <summary>Copy NpiWhere instance with updated inputs/parameters.</summary>
+        /// <param name="condition">condition array</param>
+        /// <param name="x">input x</param>
+        /// <param name="y">input y</param>
+        member this.With([<Optional>] ?condition : Symbol,
+            [<Optional>] ?x : Symbol,
+            [<Optional>] ?y : Symbol) = 
+            let operatorArguments = 
+                [
+                    condition |> Option.map (fun x -> "condition", Input x)
+                    x |> Option.map (fun x -> "x", Input x)
+                    y |> Option.map (fun x -> "y", Input x)
+                ] |> List.choose id
+            new NpiWhere(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpiHanning private (operatorArguments) = 
         inherit SymbolOperator("_npi_hanning", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiHanning(args)
@@ -12551,6 +15405,103 @@ module SymbolOperators =
                     dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiBlackman(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBernoulli private (operatorArguments) = 
+        inherit SymbolOperator("_npi_bernoulli", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBernoulli(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBernoulli(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="input1">Source input</param>
+        /// <param name="isLogit"></param>
+        /// <param name="prob"></param>
+        /// <param name="logit"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        new(input1 : Symbol,
+            isLogit : bool,
+            [<Optional>] ?prob : float,
+            [<Optional>] ?logit : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : DataType) = 
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "is_logit", Parameter(Some(box isLogit))
+                    "prob", prob |> Option.map box |> Parameter
+                    "logit", logit |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                    "dtype", dtype |> Option.map box |> Parameter
+                ]
+            new NpiBernoulli(Arguments<Symbol>(operatorArguments))
+        /// <param name="isLogit"></param>
+        /// <param name="input1">Source input</param>
+        /// <param name="prob"></param>
+        /// <param name="logit"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        new(isLogit : bool,
+            [<Optional>] ?input1 : Symbol,
+            [<Optional>] ?prob : float,
+            [<Optional>] ?logit : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : DataType) = 
+            let input1 = defaultArg input1 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "is_logit", Parameter(Some(box isLogit))
+                    "prob", prob |> Option.map box |> Parameter
+                    "logit", logit |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                    "dtype", dtype |> Option.map box |> Parameter
+                ]
+            new NpiBernoulli(Arguments<Symbol>(operatorArguments))
+        /// Default value for Prob
+        /// 
+        static member ProbDefault : double option = None
+        /// Default value for Logit
+        /// 
+        static member LogitDefault : double option = None
+        /// Default value for Size
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        static member SizeDefault : int [] option = None
+        /// Default value for Dtype
+        /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+        static member DtypeDefault : DataType = DataType.Float32
+        /// Source input
+        member __.Input1 = operatorArguments.GetInput "input1"
+        /// 
+        member __.IsLogit : bool = match operatorArguments.GetParameter "is_logit" with Some(v) -> unbox v | None -> failwithf "Required parameter is_logit is missing"
+        /// 
+        member __.Prob = operatorArguments.GetParameter("prob", NpiBernoulli.ProbDefault)
+        /// 
+        member __.Logit = operatorArguments.GetParameter("logit", NpiBernoulli.LogitDefault)
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        member __.Size = operatorArguments.GetParameter("size", NpiBernoulli.SizeDefault)
+        /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+        member __.Dtype = operatorArguments.GetParameter("dtype", NpiBernoulli.DtypeDefault)
+        /// <summary>Copy NpiBernoulli instance with updated inputs/parameters.</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="isLogit"></param>
+        /// <param name="prob"></param>
+        /// <param name="logit"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        member this.With([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?isLogit : bool,
+            [<Optional>] ?prob : float,
+            [<Optional>] ?logit : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : DataType) = 
+            let operatorArguments = 
+                [
+                    input1 |> Option.map (fun x -> "input1", Input x)
+                    isLogit |> Option.map (fun x -> "is_logit", Parameter(Some (box x)))
+                    prob |> Option.map (fun x -> "prob", Parameter(Some (box x)))
+                    logit |> Option.map (fun x -> "logit", Parameter(Some (box x)))
+                    size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiBernoulli(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpiChoice private (operatorArguments) = 
         inherit SymbolOperator("_npi_choice", operatorArguments)
@@ -12803,6 +15754,83 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiNormal(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiNormalN private (operatorArguments) = 
+        inherit SymbolOperator("_npi_normal_n", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiNormalN(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiNormalN(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Ndarray behavior normal</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="loc"></param>
+        /// <param name="scale"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        new([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?loc : float,
+            [<Optional>] ?scale : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : FloatDType) = 
+            let input1 = defaultArg input1 (new ImplicitVariable() :> Symbol)
+            let input2 = defaultArg input2 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "input2", Input input2
+                    "loc", loc |> Option.map box |> Parameter
+                    "scale", scale |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                    "dtype", dtype |> Option.map box |> Parameter
+                ]
+            new NpiNormalN(Arguments<Symbol>(operatorArguments))
+        /// Default value for Loc
+        /// 
+        static member LocDefault : double option = None
+        /// Default value for Scale
+        /// 
+        static member ScaleDefault : double option = None
+        /// Default value for Size
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        static member SizeDefault : int [] option = None
+        /// Default value for Dtype
+        /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+        static member DtypeDefault : FloatDType = FloatDType.Float32
+        /// Source input
+        member __.Input1 = operatorArguments.GetInput "input1"
+        /// Source input
+        member __.Input2 = operatorArguments.GetInput "input2"
+        /// 
+        member __.Loc = operatorArguments.GetParameter("loc", NpiNormalN.LocDefault)
+        /// 
+        member __.Scale = operatorArguments.GetParameter("scale", NpiNormalN.ScaleDefault)
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        member __.Size = operatorArguments.GetParameter("size", NpiNormalN.SizeDefault)
+        /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+        member __.Dtype = operatorArguments.GetParameter("dtype", NpiNormalN.DtypeDefault)
+        /// <summary>Copy NpiNormalN instance with updated inputs/parameters.</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="loc"></param>
+        /// <param name="scale"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        member this.With([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?loc : float,
+            [<Optional>] ?scale : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : FloatDType) = 
+            let operatorArguments = 
+                [
+                    input1 |> Option.map (fun x -> "input1", Input x)
+                    input2 |> Option.map (fun x -> "input2", Input x)
+                    loc |> Option.map (fun x -> "loc", Parameter(Some (box x)))
+                    scale |> Option.map (fun x -> "scale", Parameter(Some (box x)))
+                    size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiNormalN(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpiUniform private (operatorArguments) = 
         inherit SymbolOperator("_npi_uniform", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiUniform(args)
@@ -12880,6 +15908,83 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiUniform(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiUniformN private (operatorArguments) = 
+        inherit SymbolOperator("_npi_uniform_n", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiUniformN(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiUniformN(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>numpy behavior uniform</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="low"></param>
+        /// <param name="high"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        new([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?low : float,
+            [<Optional>] ?high : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : FloatDType) = 
+            let input1 = defaultArg input1 (new ImplicitVariable() :> Symbol)
+            let input2 = defaultArg input2 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "input2", Input input2
+                    "low", low |> Option.map box |> Parameter
+                    "high", high |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                    "dtype", dtype |> Option.map box |> Parameter
+                ]
+            new NpiUniformN(Arguments<Symbol>(operatorArguments))
+        /// Default value for Low
+        /// 
+        static member LowDefault : double option = None
+        /// Default value for High
+        /// 
+        static member HighDefault : double option = None
+        /// Default value for Size
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        static member SizeDefault : int [] option = None
+        /// Default value for Dtype
+        /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+        static member DtypeDefault : FloatDType = FloatDType.Float32
+        /// Source input
+        member __.Input1 = operatorArguments.GetInput "input1"
+        /// Source input
+        member __.Input2 = operatorArguments.GetInput "input2"
+        /// 
+        member __.Low = operatorArguments.GetParameter("low", NpiUniformN.LowDefault)
+        /// 
+        member __.High = operatorArguments.GetParameter("high", NpiUniformN.HighDefault)
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        member __.Size = operatorArguments.GetParameter("size", NpiUniformN.SizeDefault)
+        /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+        member __.Dtype = operatorArguments.GetParameter("dtype", NpiUniformN.DtypeDefault)
+        /// <summary>Copy NpiUniformN instance with updated inputs/parameters.</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="low"></param>
+        /// <param name="high"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        member this.With([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?low : float,
+            [<Optional>] ?high : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : FloatDType) = 
+            let operatorArguments = 
+                [
+                    input1 |> Option.map (fun x -> "input1", Input x)
+                    input2 |> Option.map (fun x -> "input2", Input x)
+                    low |> Option.map (fun x -> "low", Parameter(Some (box x)))
+                    high |> Option.map (fun x -> "high", Parameter(Some (box x)))
+                    size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiUniformN(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type SignsgdUpdate private (operatorArguments) = 
         inherit SymbolOperator("signsgd_update", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new SignsgdUpdate(args)
@@ -12899,7 +16004,7 @@ module SymbolOperators =
         ///    - sparse ndarray not supported for this optimizer yet.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L61</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L63</summary>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
         /// <param name="lr">Learning rate</param>
@@ -12937,7 +16042,7 @@ module SymbolOperators =
         ///    - sparse ndarray not supported for this optimizer yet.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L61</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L63</summary>
         /// <param name="lr">Learning rate</param>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
@@ -13029,7 +16134,7 @@ module SymbolOperators =
         ///    - sparse ndarray not supported for this optimizer yet.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L90</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L92</summary>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
         /// <param name="mom">Momentum</param>
@@ -13079,7 +16184,7 @@ module SymbolOperators =
         ///    - sparse ndarray not supported for this optimizer yet.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L90</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L92</summary>
         /// <param name="lr">Learning rate</param>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
@@ -13192,7 +16297,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L327</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L329</summary>
         /// <param name="data">Weights</param>
         /// <param name="lrs">Learning rates.</param>
         /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -13223,7 +16328,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L327</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L329</summary>
         /// <param name="lrs">Learning rates.</param>
         /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
         /// <param name="data">Weights</param>
@@ -13316,7 +16421,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L372</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L374</summary>
         /// <param name="data">Weights, gradients and momentum</param>
         /// <param name="lrs">Learning rates.</param>
         /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -13362,7 +16467,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L372</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L374</summary>
         /// <param name="lrs">Learning rates.</param>
         /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
         /// <param name="data">Weights, gradients and momentum</param>
@@ -13454,7 +16559,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L415</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L417</summary>
         /// <param name="data">Weights</param>
         /// <param name="lrs">Learning rates.</param>
         /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -13485,7 +16590,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L415</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L417</summary>
         /// <param name="lrs">Learning rates.</param>
         /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
         /// <param name="data">Weights</param>
@@ -13578,7 +16683,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L470</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L472</summary>
         /// <param name="data">Weights</param>
         /// <param name="lrs">Learning rates.</param>
         /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -13624,7 +16729,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L470</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L472</summary>
         /// <param name="lrs">Learning rates.</param>
         /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
         /// <param name="data">Weights</param>
@@ -13722,7 +16827,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L522</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L524</summary>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
         /// <param name="lr">Learning rate</param>
@@ -13762,7 +16867,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L522</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L524</summary>
         /// <param name="lr">Learning rate</param>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
@@ -13875,7 +16980,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L563</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L565</summary>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
         /// <param name="mom">Momentum</param>
@@ -13935,7 +17040,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L563</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L565</summary>
         /// <param name="lr">Learning rate</param>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
@@ -14327,7 +17432,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L638</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L640</summary>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
         /// <param name="d">Internal state ``d_t``</param>
@@ -14386,7 +17491,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L638</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L640</summary>
         /// <param name="lr">Learning rate.</param>
         /// <param name="t">Number of update.</param>
         /// <param name="weight">Weight</param>
@@ -14558,7 +17663,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L686</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L688</summary>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
         /// <param name="mean">Moving mean</param>
@@ -14629,7 +17734,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L686</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L688</summary>
         /// <param name="lr">Learning rate</param>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
@@ -14780,7 +17885,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L724</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L726</summary>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
         /// <param name="mom">Momentum</param>
@@ -14824,7 +17929,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L724</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L726</summary>
         /// <param name="lr">Learning rate</param>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
@@ -14921,7 +18026,7 @@ module SymbolOperators =
         /// <summary>Update function for multi-precision Nesterov Accelerated Gradient( NAG) optimizer.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L743</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L745</summary>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
         /// <param name="mom">Momentum</param>
@@ -14956,7 +18061,7 @@ module SymbolOperators =
         /// <summary>Update function for multi-precision Nesterov Accelerated Gradient( NAG) optimizer.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L743</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L745</summary>
         /// <param name="lr">Learning rate</param>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
@@ -15094,7 +18199,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L795</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L797</summary>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
         /// <param name="n">n</param>
@@ -15164,7 +18269,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L795</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L797</summary>
         /// <param name="lr">Learning rate</param>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
@@ -15304,7 +18409,7 @@ module SymbolOperators =
         /// to be 0.9 and the learning rate :math:`\eta` to be 0.0001.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L834</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L836</summary>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
         /// <param name="n">n</param>
@@ -15372,7 +18477,7 @@ module SymbolOperators =
         /// to be 0.9 and the learning rate :math:`\eta` to be 0.0001.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L834</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L836</summary>
         /// <param name="lr">Learning rate</param>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
@@ -15539,7 +18644,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L874</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L876</summary>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
         /// <param name="z">z</param>
@@ -15596,7 +18701,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L874</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L876</summary>
         /// <param name="lr">Learning rate</param>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
@@ -15725,7 +18830,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L907</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L909</summary>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
         /// <param name="history">History</param>
@@ -15769,7 +18874,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L907</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L909</summary>
         /// <param name="lr">Learning rate</param>
         /// <param name="weight">Weight</param>
         /// <param name="grad">Gradient</param>
@@ -15858,6 +18963,389 @@ module SymbolOperators =
                     clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
                 ] |> List.choose id
             new SparseAdagradUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type LambUpdatePhase1 private (operatorArguments) = 
+        inherit SymbolOperator("lamb_update_phase1", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new LambUpdatePhase1(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new LambUpdatePhase1(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Phase I of lamb update it performs the following operations and returns g:.
+        /// 
+        /// Link to paper: https://arxiv.org/pdf/1904.00962.pdf
+        /// 
+        /// .. math::
+        ///     \begin{gather*}
+        ///     grad = grad * rescale_grad
+        ///     if (grad &lt; -clip_gradient)
+        ///     then
+        ///          grad = -clip_gradient
+        ///     if (grad &gt; clip_gradient)
+        ///     then
+        ///          grad = clip_gradient
+        /// 
+        ///     mean = beta1 * mean + (1 - beta1) * grad;
+        ///     variance = beta2 * variance + (1. - beta2) * grad ^ 2;
+        /// 
+        ///     if (bias_correction)
+        ///     then
+        ///          mean_hat = mean / (1. - beta1^t);
+        ///          var_hat = var / (1 - beta2^t);
+        ///          g = mean_hat / (var_hat^(1/2) + epsilon) + wd * weight;
+        ///     else
+        ///          g = mean / (var_data^(1/2) + epsilon) + wd * weight_data[i];
+        ///     \end{gather*}
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L953</summary>
+        /// <param name="weight">Weight</param>
+        /// <param name="grad">Gradient</param>
+        /// <param name="mean">Moving mean</param>
+        /// <param name="var">Moving variance</param>
+        /// <param name="t">Index update count.</param>
+        /// <param name="wd">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+        /// <param name="beta1">The decay rate for the 1st moment estimates.</param>
+        /// <param name="beta2">The decay rate for the 2nd moment estimates.</param>
+        /// <param name="epsilon">A small constant for numerical stability.</param>
+        /// <param name="biasCorrection">Whether to use bias correction.</param>
+        /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
+        /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+        new(weight : Symbol,
+            grad : Symbol,
+            mean : Symbol,
+            var : Symbol,
+            t : float,
+            wd : float,
+            [<Optional>] ?beta1 : float,
+            [<Optional>] ?beta2 : float,
+            [<Optional>] ?epsilon : float,
+            [<Optional>] ?biasCorrection : bool,
+            [<Optional>] ?rescaleGrad : float,
+            [<Optional>] ?clipGradient : float) = 
+            let operatorArguments = 
+                [
+                    "weight", Input weight
+                    "grad", Input grad
+                    "mean", Input mean
+                    "var", Input var
+                    "t", Parameter(Some(box t))
+                    "wd", Parameter(Some(box wd))
+                    "beta1", beta1 |> Option.map box |> Parameter
+                    "beta2", beta2 |> Option.map box |> Parameter
+                    "epsilon", epsilon |> Option.map box |> Parameter
+                    "bias_correction", biasCorrection |> Option.map box |> Parameter
+                    "rescale_grad", rescaleGrad |> Option.map box |> Parameter
+                    "clip_gradient", clipGradient |> Option.map box |> Parameter
+                ]
+            new LambUpdatePhase1(Arguments<Symbol>(operatorArguments))
+        /// <summary>Phase I of lamb update it performs the following operations and returns g:.
+        /// 
+        /// Link to paper: https://arxiv.org/pdf/1904.00962.pdf
+        /// 
+        /// .. math::
+        ///     \begin{gather*}
+        ///     grad = grad * rescale_grad
+        ///     if (grad &lt; -clip_gradient)
+        ///     then
+        ///          grad = -clip_gradient
+        ///     if (grad &gt; clip_gradient)
+        ///     then
+        ///          grad = clip_gradient
+        /// 
+        ///     mean = beta1 * mean + (1 - beta1) * grad;
+        ///     variance = beta2 * variance + (1. - beta2) * grad ^ 2;
+        /// 
+        ///     if (bias_correction)
+        ///     then
+        ///          mean_hat = mean / (1. - beta1^t);
+        ///          var_hat = var / (1 - beta2^t);
+        ///          g = mean_hat / (var_hat^(1/2) + epsilon) + wd * weight;
+        ///     else
+        ///          g = mean / (var_data^(1/2) + epsilon) + wd * weight_data[i];
+        ///     \end{gather*}
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L953</summary>
+        /// <param name="t">Index update count.</param>
+        /// <param name="wd">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+        /// <param name="weight">Weight</param>
+        /// <param name="grad">Gradient</param>
+        /// <param name="mean">Moving mean</param>
+        /// <param name="var">Moving variance</param>
+        /// <param name="beta1">The decay rate for the 1st moment estimates.</param>
+        /// <param name="beta2">The decay rate for the 2nd moment estimates.</param>
+        /// <param name="epsilon">A small constant for numerical stability.</param>
+        /// <param name="biasCorrection">Whether to use bias correction.</param>
+        /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
+        /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+        new(t : float,
+            wd : float,
+            [<Optional>] ?weight : Symbol,
+            [<Optional>] ?grad : Symbol,
+            [<Optional>] ?mean : Symbol,
+            [<Optional>] ?var : Symbol,
+            [<Optional>] ?beta1 : float,
+            [<Optional>] ?beta2 : float,
+            [<Optional>] ?epsilon : float,
+            [<Optional>] ?biasCorrection : bool,
+            [<Optional>] ?rescaleGrad : float,
+            [<Optional>] ?clipGradient : float) = 
+            let weight = defaultArg weight (new ImplicitVariable() :> Symbol)
+            let grad = defaultArg grad (new ImplicitVariable() :> Symbol)
+            let mean = defaultArg mean (new ImplicitVariable() :> Symbol)
+            let var = defaultArg var (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "weight", Input weight
+                    "grad", Input grad
+                    "mean", Input mean
+                    "var", Input var
+                    "t", Parameter(Some(box t))
+                    "wd", Parameter(Some(box wd))
+                    "beta1", beta1 |> Option.map box |> Parameter
+                    "beta2", beta2 |> Option.map box |> Parameter
+                    "epsilon", epsilon |> Option.map box |> Parameter
+                    "bias_correction", biasCorrection |> Option.map box |> Parameter
+                    "rescale_grad", rescaleGrad |> Option.map box |> Parameter
+                    "clip_gradient", clipGradient |> Option.map box |> Parameter
+                ]
+            new LambUpdatePhase1(Arguments<Symbol>(operatorArguments))
+        /// Default value for Beta1
+        /// The decay rate for the 1st moment estimates.
+        static member Beta1Default : double = 0.899999976
+        /// Default value for Beta2
+        /// The decay rate for the 2nd moment estimates.
+        static member Beta2Default : double = 0.999000013
+        /// Default value for Epsilon
+        /// A small constant for numerical stability.
+        static member EpsilonDefault : double = 0.000000999999997
+        /// Default value for BiasCorrection
+        /// Whether to use bias correction.
+        static member BiasCorrectionDefault : bool = true
+        /// Default value for RescaleGrad
+        /// Rescale gradient to grad = rescale_grad*grad.
+        static member RescaleGradDefault : double = 1.0
+        /// Default value for ClipGradient
+        /// Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).
+        static member ClipGradientDefault : double = -1.0
+        /// Weight
+        member __.Weight = operatorArguments.GetInput "weight"
+        /// Gradient
+        member __.Grad = operatorArguments.GetInput "grad"
+        /// Moving mean
+        member __.Mean = operatorArguments.GetInput "mean"
+        /// Moving variance
+        member __.Var = operatorArguments.GetInput "var"
+        /// Index update count.
+        member __.T : float = match operatorArguments.GetParameter "t" with Some(v) -> unbox v | None -> failwithf "Required parameter t is missing"
+        /// Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.
+        member __.Wd : float = match operatorArguments.GetParameter "wd" with Some(v) -> unbox v | None -> failwithf "Required parameter wd is missing"
+        /// The decay rate for the 1st moment estimates.
+        member __.Beta1 = operatorArguments.GetParameter("beta1", LambUpdatePhase1.Beta1Default)
+        /// The decay rate for the 2nd moment estimates.
+        member __.Beta2 = operatorArguments.GetParameter("beta2", LambUpdatePhase1.Beta2Default)
+        /// A small constant for numerical stability.
+        member __.Epsilon = operatorArguments.GetParameter("epsilon", LambUpdatePhase1.EpsilonDefault)
+        /// Whether to use bias correction.
+        member __.BiasCorrection = operatorArguments.GetParameter("bias_correction", LambUpdatePhase1.BiasCorrectionDefault)
+        /// Rescale gradient to grad = rescale_grad*grad.
+        member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", LambUpdatePhase1.RescaleGradDefault)
+        /// Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).
+        member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", LambUpdatePhase1.ClipGradientDefault)
+        /// <summary>Copy LambUpdatePhase1 instance with updated inputs/parameters.</summary>
+        /// <param name="weight">Weight</param>
+        /// <param name="grad">Gradient</param>
+        /// <param name="mean">Moving mean</param>
+        /// <param name="var">Moving variance</param>
+        /// <param name="t">Index update count.</param>
+        /// <param name="wd">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+        /// <param name="beta1">The decay rate for the 1st moment estimates.</param>
+        /// <param name="beta2">The decay rate for the 2nd moment estimates.</param>
+        /// <param name="epsilon">A small constant for numerical stability.</param>
+        /// <param name="biasCorrection">Whether to use bias correction.</param>
+        /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
+        /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+        member this.With([<Optional>] ?weight : Symbol,
+            [<Optional>] ?grad : Symbol,
+            [<Optional>] ?mean : Symbol,
+            [<Optional>] ?var : Symbol,
+            [<Optional>] ?t : float,
+            [<Optional>] ?wd : float,
+            [<Optional>] ?beta1 : float,
+            [<Optional>] ?beta2 : float,
+            [<Optional>] ?epsilon : float,
+            [<Optional>] ?biasCorrection : bool,
+            [<Optional>] ?rescaleGrad : float,
+            [<Optional>] ?clipGradient : float) = 
+            let operatorArguments = 
+                [
+                    weight |> Option.map (fun x -> "weight", Input x)
+                    grad |> Option.map (fun x -> "grad", Input x)
+                    mean |> Option.map (fun x -> "mean", Input x)
+                    var |> Option.map (fun x -> "var", Input x)
+                    t |> Option.map (fun x -> "t", Parameter(Some (box x)))
+                    wd |> Option.map (fun x -> "wd", Parameter(Some (box x)))
+                    beta1 |> Option.map (fun x -> "beta1", Parameter(Some (box x)))
+                    beta2 |> Option.map (fun x -> "beta2", Parameter(Some (box x)))
+                    epsilon |> Option.map (fun x -> "epsilon", Parameter(Some (box x)))
+                    biasCorrection |> Option.map (fun x -> "bias_correction", Parameter(Some (box x)))
+                    rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                    clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                ] |> List.choose id
+            new LambUpdatePhase1(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type LambUpdatePhase2 private (operatorArguments) = 
+        inherit SymbolOperator("lamb_update_phase2", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new LambUpdatePhase2(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new LambUpdatePhase2(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Phase II of lamb update it performs the following operations and updates grad.
+        /// 
+        /// Link to paper: https://arxiv.org/pdf/1904.00962.pdf
+        /// 
+        /// .. math::
+        ///     \begin{gather*}
+        ///     if (lower_bound &gt;= 0)
+        ///     then
+        ///          r1 = max(r1, lower_bound)
+        ///     if (upper_bound &gt;= 0)
+        ///     then
+        ///          r1 = max(r1, upper_bound)
+        /// 
+        ///     if (r1 == 0 or r2 == 0)
+        ///     then
+        ///          lr = lr
+        ///     else
+        ///          lr = lr * (r1/r2)
+        ///     weight = weight - lr * g
+        ///     \end{gather*}
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L992</summary>
+        /// <param name="weight">Weight</param>
+        /// <param name="g">Output of lamb_update_phase 1</param>
+        /// <param name="r1">r1</param>
+        /// <param name="r2">r2</param>
+        /// <param name="lr">Learning rate</param>
+        /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+        /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+        new(weight : Symbol,
+            g : Symbol,
+            r1 : Symbol,
+            r2 : Symbol,
+            lr : float,
+            [<Optional>] ?lowerBound : float,
+            [<Optional>] ?upperBound : float) = 
+            let operatorArguments = 
+                [
+                    "weight", Input weight
+                    "g", Input g
+                    "r1", Input r1
+                    "r2", Input r2
+                    "lr", Parameter(Some(box lr))
+                    "lower_bound", lowerBound |> Option.map box |> Parameter
+                    "upper_bound", upperBound |> Option.map box |> Parameter
+                ]
+            new LambUpdatePhase2(Arguments<Symbol>(operatorArguments))
+        /// <summary>Phase II of lamb update it performs the following operations and updates grad.
+        /// 
+        /// Link to paper: https://arxiv.org/pdf/1904.00962.pdf
+        /// 
+        /// .. math::
+        ///     \begin{gather*}
+        ///     if (lower_bound &gt;= 0)
+        ///     then
+        ///          r1 = max(r1, lower_bound)
+        ///     if (upper_bound &gt;= 0)
+        ///     then
+        ///          r1 = max(r1, upper_bound)
+        /// 
+        ///     if (r1 == 0 or r2 == 0)
+        ///     then
+        ///          lr = lr
+        ///     else
+        ///          lr = lr * (r1/r2)
+        ///     weight = weight - lr * g
+        ///     \end{gather*}
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L992</summary>
+        /// <param name="lr">Learning rate</param>
+        /// <param name="weight">Weight</param>
+        /// <param name="g">Output of lamb_update_phase 1</param>
+        /// <param name="r1">r1</param>
+        /// <param name="r2">r2</param>
+        /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+        /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+        new(lr : float,
+            [<Optional>] ?weight : Symbol,
+            [<Optional>] ?g : Symbol,
+            [<Optional>] ?r1 : Symbol,
+            [<Optional>] ?r2 : Symbol,
+            [<Optional>] ?lowerBound : float,
+            [<Optional>] ?upperBound : float) = 
+            let weight = defaultArg weight (new ImplicitVariable() :> Symbol)
+            let g = defaultArg g (new ImplicitVariable() :> Symbol)
+            let r1 = defaultArg r1 (new ImplicitVariable() :> Symbol)
+            let r2 = defaultArg r2 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "weight", Input weight
+                    "g", Input g
+                    "r1", Input r1
+                    "r2", Input r2
+                    "lr", Parameter(Some(box lr))
+                    "lower_bound", lowerBound |> Option.map box |> Parameter
+                    "upper_bound", upperBound |> Option.map box |> Parameter
+                ]
+            new LambUpdatePhase2(Arguments<Symbol>(operatorArguments))
+        /// Default value for LowerBound
+        /// Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set
+        static member LowerBoundDefault : double = -1.0
+        /// Default value for UpperBound
+        /// Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set
+        static member UpperBoundDefault : double = -1.0
+        /// Weight
+        member __.Weight = operatorArguments.GetInput "weight"
+        /// Output of lamb_update_phase 1
+        member __.G = operatorArguments.GetInput "g"
+        /// r1
+        member __.R1 = operatorArguments.GetInput "r1"
+        /// r2
+        member __.R2 = operatorArguments.GetInput "r2"
+        /// Learning rate
+        member __.Lr : float = match operatorArguments.GetParameter "lr" with Some(v) -> unbox v | None -> failwithf "Required parameter lr is missing"
+        /// Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set
+        member __.LowerBound = operatorArguments.GetParameter("lower_bound", LambUpdatePhase2.LowerBoundDefault)
+        /// Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set
+        member __.UpperBound = operatorArguments.GetParameter("upper_bound", LambUpdatePhase2.UpperBoundDefault)
+        /// <summary>Copy LambUpdatePhase2 instance with updated inputs/parameters.</summary>
+        /// <param name="weight">Weight</param>
+        /// <param name="g">Output of lamb_update_phase 1</param>
+        /// <param name="r1">r1</param>
+        /// <param name="r2">r2</param>
+        /// <param name="lr">Learning rate</param>
+        /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+        /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+        member this.With([<Optional>] ?weight : Symbol,
+            [<Optional>] ?g : Symbol,
+            [<Optional>] ?r1 : Symbol,
+            [<Optional>] ?r2 : Symbol,
+            [<Optional>] ?lr : float,
+            [<Optional>] ?lowerBound : float,
+            [<Optional>] ?upperBound : float) = 
+            let operatorArguments = 
+                [
+                    weight |> Option.map (fun x -> "weight", Input x)
+                    g |> Option.map (fun x -> "g", Input x)
+                    r1 |> Option.map (fun x -> "r1", Input x)
+                    r2 |> Option.map (fun x -> "r2", Input x)
+                    lr |> Option.map (fun x -> "lr", Parameter(Some (box x)))
+                    lowerBound |> Option.map (fun x -> "lower_bound", Parameter(Some (box x)))
+                    upperBound |> Option.map (fun x -> "upper_bound", Parameter(Some (box x)))
+                ] |> List.choose id
+            new LambUpdatePhase2(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type Pad private (operatorArguments) = 
         inherit SymbolOperator("Pad", operatorArguments)
@@ -16163,7 +19651,7 @@ module SymbolOperators =
         ///     This operator only supports forward propogation. DO NOT use it in training.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\dequantize.cc:L83</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\dequantize.cc:L81</summary>
         /// <param name="data">A ndarray/symbol of type `uint8`</param>
         /// <param name="minRange">The minimum scalar value possibly produced for the input in float32</param>
         /// <param name="maxRange">The maximum scalar value possibly produced for the input in float32</param>
@@ -16211,167 +19699,6 @@ module SymbolOperators =
                     outType |> Option.map (fun x -> "out_type", Parameter(Some (box x)))
                 ] |> List.choose id
             new ContribDequantize(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
-    
-    type ContribQuantize private (operatorArguments) = 
-        inherit SymbolOperator("_contrib_quantize", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantize(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantize(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <summary>Quantize a input tensor from float to `out_type`,
-        /// with user-specified `min_range` and `max_range`.
-        /// 
-        /// min_range and max_range are scalar floats that specify the range for
-        /// the input data.
-        /// 
-        /// When out_type is `uint8`, the output is calculated using the following equation:
-        /// 
-        /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
-        /// 
-        /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
-        /// 
-        /// When out_type is `int8`, the output is calculate using the following equation
-        /// by keep zero centered for the quantized value:
-        /// 
-        /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
-        /// 
-        /// where
-        /// `quantized_range = MinAbs(max(int8), min(int8))` and
-        /// `scale = quantized_range / MaxAbs(min_range, max_range).`
-        /// 
-        /// .. Note::
-        ///     This operator only supports forward propagation. DO NOT use it in training.
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantize.cc:L74</summary>
-        /// <param name="data">A ndarray/symbol of type `float32`</param>
-        /// <param name="minRange">The minimum scalar value possibly produced for the input</param>
-        /// <param name="maxRange">The maximum scalar value possibly produced for the input</param>
-        /// <param name="outType">Output data type.</param>
-        new([<Optional>] ?data : Symbol,
-            [<Optional>] ?minRange : Symbol,
-            [<Optional>] ?maxRange : Symbol,
-            [<Optional>] ?outType : ContribQuantizeOutType) = 
-            let data = defaultArg data (new ImplicitVariable() :> Symbol)
-            let minRange = defaultArg minRange (new ImplicitVariable() :> Symbol)
-            let maxRange = defaultArg maxRange (new ImplicitVariable() :> Symbol)
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "min_range", Input minRange
-                    "max_range", Input maxRange
-                    "out_type", outType |> Option.map box |> Parameter
-                ]
-            new ContribQuantize(Arguments<Symbol>(operatorArguments))
-        /// Default value for OutType
-        /// Output data type.
-        static member OutTypeDefault : ContribQuantizeOutType = ContribQuantizeOutType.Uint8
-        /// A ndarray/symbol of type `float32`
-        member __.Data = operatorArguments.GetInput "data"
-        /// The minimum scalar value possibly produced for the input
-        member __.MinRange = operatorArguments.GetInput "min_range"
-        /// The maximum scalar value possibly produced for the input
-        member __.MaxRange = operatorArguments.GetInput "max_range"
-        /// Output data type.
-        member __.OutType = operatorArguments.GetParameter("out_type", ContribQuantize.OutTypeDefault)
-        /// <summary>Copy ContribQuantize instance with updated inputs/parameters.</summary>
-        /// <param name="data">A ndarray/symbol of type `float32`</param>
-        /// <param name="minRange">The minimum scalar value possibly produced for the input</param>
-        /// <param name="maxRange">The maximum scalar value possibly produced for the input</param>
-        /// <param name="outType">Output data type.</param>
-        member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?minRange : Symbol,
-            [<Optional>] ?maxRange : Symbol,
-            [<Optional>] ?outType : ContribQuantizeOutType) = 
-            let operatorArguments = 
-                [
-                    data |> Option.map (fun x -> "data", Input x)
-                    minRange |> Option.map (fun x -> "min_range", Input x)
-                    maxRange |> Option.map (fun x -> "max_range", Input x)
-                    outType |> Option.map (fun x -> "out_type", Parameter(Some (box x)))
-                ] |> List.choose id
-            new ContribQuantize(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
-    
-    type ContribQuantizeV2 private (operatorArguments) = 
-        inherit SymbolOperator("_contrib_quantize_v2", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizeV2(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantizeV2(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <summary>Quantize a input tensor from float to `out_type`,
-        /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
-        /// 
-        /// Output `min_range` and `max_range` are scalar floats that specify the range for the input data.
-        /// 
-        /// When out_type is `uint8`, the output is calculated using the following equation:
-        /// 
-        /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
-        /// 
-        /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
-        /// 
-        /// When out_type is `int8`, the output is calculate using the following equation
-        /// by keep zero centered for the quantized value:
-        /// 
-        /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
-        /// 
-        /// where
-        /// `quantized_range = MinAbs(max(int8), min(int8))` and
-        /// `scale = quantized_range / MaxAbs(min_range, max_range).`
-        /// 
-        /// When out_type is `auto`, the output type is automatically determined by min_calib_range if presented.
-        /// If min_calib_range &lt; 0.0f, the output type will be int8, otherwise will be uint8.
-        /// If min_calib_range isn&#39;t presented, the output type will be int8.
-        /// 
-        /// .. Note::
-        ///     This operator only supports forward propagation. DO NOT use it in training.
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantize_v2.cc:L92</summary>
-        /// <param name="data">A ndarray/symbol of type `float32`</param>
-        /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
-        /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-        /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-        new([<Optional>] ?data : Symbol,
-            [<Optional>] ?outType : ContribQuantizeV2OutType,
-            [<Optional>] ?minCalibRange : float,
-            [<Optional>] ?maxCalibRange : float) = 
-            let data = defaultArg data (new ImplicitVariable() :> Symbol)
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "out_type", outType |> Option.map box |> Parameter
-                    "min_calib_range", minCalibRange |> Option.map box |> Parameter
-                    "max_calib_range", maxCalibRange |> Option.map box |> Parameter
-                ]
-            new ContribQuantizeV2(Arguments<Symbol>(operatorArguments))
-        /// Default value for OutType
-        /// Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.
-        static member OutTypeDefault : ContribQuantizeV2OutType = ContribQuantizeV2OutType.Int8
-        /// Default value for MinCalibRange
-        /// The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.
-        static member MinCalibRangeDefault : double option = None
-        /// Default value for MaxCalibRange
-        /// The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.
-        static member MaxCalibRangeDefault : double option = None
-        /// A ndarray/symbol of type `float32`
-        member __.Data = operatorArguments.GetInput "data"
-        /// Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.
-        member __.OutType = operatorArguments.GetParameter("out_type", ContribQuantizeV2.OutTypeDefault)
-        /// The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.
-        member __.MinCalibRange = operatorArguments.GetParameter("min_calib_range", ContribQuantizeV2.MinCalibRangeDefault)
-        /// The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.
-        member __.MaxCalibRange = operatorArguments.GetParameter("max_calib_range", ContribQuantizeV2.MaxCalibRangeDefault)
-        /// <summary>Copy ContribQuantizeV2 instance with updated inputs/parameters.</summary>
-        /// <param name="data">A ndarray/symbol of type `float32`</param>
-        /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
-        /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-        /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-        member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?outType : ContribQuantizeV2OutType,
-            [<Optional>] ?minCalibRange : float,
-            [<Optional>] ?maxCalibRange : float) = 
-            let operatorArguments = 
-                [
-                    data |> Option.map (fun x -> "data", Input x)
-                    outType |> Option.map (fun x -> "out_type", Parameter(Some (box x)))
-                    minCalibRange |> Option.map (fun x -> "min_calib_range", Parameter(Some (box x)))
-                    maxCalibRange |> Option.map (fun x -> "max_calib_range", Parameter(Some (box x)))
-                ] |> List.choose id
-            new ContribQuantizeV2(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type ContribQuantizedAct private (operatorArguments) = 
         inherit SymbolOperator("_contrib_quantized_act", operatorArguments)
@@ -17006,12 +20333,16 @@ module SymbolOperators =
         /// <param name="lhsMax">4th input</param>
         /// <param name="rhsMin">5th input</param>
         /// <param name="rhsMax">6th input</param>
+        /// <param name="minCalibRange">The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
+        /// <param name="maxCalibRange">The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
         new([<Optional>] ?lhs : Symbol,
             [<Optional>] ?rhs : Symbol,
             [<Optional>] ?lhsMin : Symbol,
             [<Optional>] ?lhsMax : Symbol,
             [<Optional>] ?rhsMin : Symbol,
-            [<Optional>] ?rhsMax : Symbol) = 
+            [<Optional>] ?rhsMax : Symbol,
+            [<Optional>] ?minCalibRange : float,
+            [<Optional>] ?maxCalibRange : float) = 
             let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
             let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
             let lhsMin = defaultArg lhsMin (new ImplicitVariable() :> Symbol)
@@ -17026,8 +20357,16 @@ module SymbolOperators =
                     "lhs_max", Input lhsMax
                     "rhs_min", Input rhsMin
                     "rhs_max", Input rhsMax
+                    "min_calib_range", minCalibRange |> Option.map box |> Parameter
+                    "max_calib_range", maxCalibRange |> Option.map box |> Parameter
                 ]
             new ContribQuantizedElemwiseAdd(Arguments<Symbol>(operatorArguments))
+        /// Default value for MinCalibRange
+        /// The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.
+        static member MinCalibRangeDefault : double option = None
+        /// Default value for MaxCalibRange
+        /// The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.
+        static member MaxCalibRangeDefault : double option = None
         /// first input
         member __.Lhs = operatorArguments.GetInput "lhs"
         /// second input
@@ -17040,6 +20379,10 @@ module SymbolOperators =
         member __.RhsMin = operatorArguments.GetInput "rhs_min"
         /// 6th input
         member __.RhsMax = operatorArguments.GetInput "rhs_max"
+        /// The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.
+        member __.MinCalibRange = operatorArguments.GetParameter("min_calib_range", ContribQuantizedElemwiseAdd.MinCalibRangeDefault)
+        /// The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.
+        member __.MaxCalibRange = operatorArguments.GetParameter("max_calib_range", ContribQuantizedElemwiseAdd.MaxCalibRangeDefault)
         /// <summary>Copy ContribQuantizedElemwiseAdd instance with updated inputs/parameters.</summary>
         /// <param name="lhs">first input</param>
         /// <param name="rhs">second input</param>
@@ -17047,12 +20390,16 @@ module SymbolOperators =
         /// <param name="lhsMax">4th input</param>
         /// <param name="rhsMin">5th input</param>
         /// <param name="rhsMax">6th input</param>
+        /// <param name="minCalibRange">The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
+        /// <param name="maxCalibRange">The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
         member this.With([<Optional>] ?lhs : Symbol,
             [<Optional>] ?rhs : Symbol,
             [<Optional>] ?lhsMin : Symbol,
             [<Optional>] ?lhsMax : Symbol,
             [<Optional>] ?rhsMin : Symbol,
-            [<Optional>] ?rhsMax : Symbol) = 
+            [<Optional>] ?rhsMax : Symbol,
+            [<Optional>] ?minCalibRange : float,
+            [<Optional>] ?maxCalibRange : float) = 
             let operatorArguments = 
                 [
                     lhs |> Option.map (fun x -> "lhs", Input x)
@@ -17061,6 +20408,8 @@ module SymbolOperators =
                     lhsMax |> Option.map (fun x -> "lhs_max", Input x)
                     rhsMin |> Option.map (fun x -> "rhs_min", Input x)
                     rhsMax |> Option.map (fun x -> "rhs_max", Input x)
+                    minCalibRange |> Option.map (fun x -> "min_calib_range", Parameter(Some (box x)))
+                    maxCalibRange |> Option.map (fun x -> "max_calib_range", Parameter(Some (box x)))
                 ] |> List.choose id
             new ContribQuantizedElemwiseAdd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -17105,22 +20454,342 @@ module SymbolOperators =
                 ] |> List.choose id
             new ContribQuantizedFlatten(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type ContribQuantizedPooling private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_quantized_pooling", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedPooling(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantizedPooling(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Pooling operator for input and output data type of int8.
+        /// The input and output data comes with min and max thresholds for quantizing
+        /// the float32 data into int8.
+        /// 
+        /// .. Note::
+        ///     This operator only supports forward propogation. DO NOT use it in training.
+        ///     This operator only supports `pool_type` of `avg` or `max`.
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_pooling.cc:L145</summary>
+        /// <param name="data">Input data.</param>
+        /// <param name="minData">Minimum value of data.</param>
+        /// <param name="maxData">Maximum value of data.</param>
+        /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
+        /// <param name="poolType">Pooling type to be applied.</param>
+        /// <param name="globalPool">Ignore kernel size, do global pooling based on current input feature map. </param>
+        /// <param name="cudnnOff">Turn off cudnn pooling and use MXNet pooling operator. </param>
+        /// <param name="poolingConvention">Pooling convention to be applied.</param>
+        /// <param name="stride">Stride: for pooling (y, x) or (d, y, x). Defaults to 1 for each dimension.</param>
+        /// <param name="pad">Pad for pooling: (y, x) or (d, y, x). Defaults to no padding.</param>
+        /// <param name="pValue">Value of p for Lp pooling, can be 1 or 2, required for Lp Pooling.</param>
+        /// <param name="countIncludePad">Only used for AvgPool, specify whether to count padding elements for averagecalculation. For example, with a 5*5 kernel on a 3*3 corner of a image,the sum of the 9 valid elements will be divided by 25 if this is set to true,or it will be divided by 9 if this is set to false. Defaults to true.</param>
+        /// <param name="layout">Set layout for input and output. Empty for
+        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?minData : Symbol,
+            [<Optional>] ?maxData : Symbol,
+            [<Optional>] ?kernel : int seq,
+            [<Optional>] ?poolType : PoolType,
+            [<Optional>] ?globalPool : bool,
+            [<Optional>] ?cudnnOff : bool,
+            [<Optional>] ?poolingConvention : PoolingConvention,
+            [<Optional>] ?stride : int seq,
+            [<Optional>] ?pad : int seq,
+            [<Optional>] ?pValue : int,
+            [<Optional>] ?countIncludePad : bool,
+            [<Optional>] ?layout : ContribQuantizedPoolingLayout) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let minData = defaultArg minData (new ImplicitVariable() :> Symbol)
+            let maxData = defaultArg maxData (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "min_data", Input minData
+                    "max_data", Input maxData
+                    "kernel", kernel |> Option.map box |> Parameter
+                    "pool_type", poolType |> Option.map box |> Parameter
+                    "global_pool", globalPool |> Option.map box |> Parameter
+                    "cudnn_off", cudnnOff |> Option.map box |> Parameter
+                    "pooling_convention", poolingConvention |> Option.map box |> Parameter
+                    "stride", stride |> Option.map box |> Parameter
+                    "pad", pad |> Option.map box |> Parameter
+                    "p_value", pValue |> Option.map box |> Parameter
+                    "count_include_pad", countIncludePad |> Option.map box |> Parameter
+                    "layout", layout |> Option.map box |> Parameter
+                ]
+            new ContribQuantizedPooling(Arguments<Symbol>(operatorArguments))
+        /// Default value for Kernel
+        /// Pooling kernel size: (y, x) or (d, y, x)
+        static member KernelDefault : int [] = [||]
+        /// Default value for PoolType
+        /// Pooling type to be applied.
+        static member PoolTypeDefault : PoolType = PoolType.Max
+        /// Default value for GlobalPool
+        /// Ignore kernel size, do global pooling based on current input feature map. 
+        static member GlobalPoolDefault : bool = false
+        /// Default value for CudnnOff
+        /// Turn off cudnn pooling and use MXNet pooling operator. 
+        static member CudnnOffDefault : bool = false
+        /// Default value for PoolingConvention
+        /// Pooling convention to be applied.
+        static member PoolingConventionDefault : PoolingConvention = PoolingConvention.Valid
+        /// Default value for Stride
+        /// Stride: for pooling (y, x) or (d, y, x). Defaults to 1 for each dimension.
+        static member StrideDefault : int [] = [||]
+        /// Default value for Pad
+        /// Pad for pooling: (y, x) or (d, y, x). Defaults to no padding.
+        static member PadDefault : int [] = [||]
+        /// Default value for PValue
+        /// Value of p for Lp pooling, can be 1 or 2, required for Lp Pooling.
+        static member PValueDefault : int option = None
+        /// Default value for CountIncludePad
+        /// Only used for AvgPool, specify whether to count padding elements for averagecalculation. For example, with a 5*5 kernel on a 3*3 corner of a image,the sum of the 9 valid elements will be divided by 25 if this is set to true,or it will be divided by 9 if this is set to false. Defaults to true.
+        static member CountIncludePadDefault : bool option = None
+        /// Default value for Layout
+        /// Set layout for input and output. Empty for
+        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.
+        static member LayoutDefault : ContribQuantizedPoolingLayout option = None
+        /// Input data.
+        member __.Data = operatorArguments.GetInput "data"
+        /// Minimum value of data.
+        member __.MinData = operatorArguments.GetInput "min_data"
+        /// Maximum value of data.
+        member __.MaxData = operatorArguments.GetInput "max_data"
+        /// Pooling kernel size: (y, x) or (d, y, x)
+        member __.Kernel = operatorArguments.GetParameter("kernel", ContribQuantizedPooling.KernelDefault)
+        /// Pooling type to be applied.
+        member __.PoolType = operatorArguments.GetParameter("pool_type", ContribQuantizedPooling.PoolTypeDefault)
+        /// Ignore kernel size, do global pooling based on current input feature map. 
+        member __.GlobalPool = operatorArguments.GetParameter("global_pool", ContribQuantizedPooling.GlobalPoolDefault)
+        /// Turn off cudnn pooling and use MXNet pooling operator. 
+        member __.CudnnOff = operatorArguments.GetParameter("cudnn_off", ContribQuantizedPooling.CudnnOffDefault)
+        /// Pooling convention to be applied.
+        member __.PoolingConvention = operatorArguments.GetParameter("pooling_convention", ContribQuantizedPooling.PoolingConventionDefault)
+        /// Stride: for pooling (y, x) or (d, y, x). Defaults to 1 for each dimension.
+        member __.Stride = operatorArguments.GetParameter("stride", ContribQuantizedPooling.StrideDefault)
+        /// Pad for pooling: (y, x) or (d, y, x). Defaults to no padding.
+        member __.Pad = operatorArguments.GetParameter("pad", ContribQuantizedPooling.PadDefault)
+        /// Value of p for Lp pooling, can be 1 or 2, required for Lp Pooling.
+        member __.PValue = operatorArguments.GetParameter("p_value", ContribQuantizedPooling.PValueDefault)
+        /// Only used for AvgPool, specify whether to count padding elements for averagecalculation. For example, with a 5*5 kernel on a 3*3 corner of a image,the sum of the 9 valid elements will be divided by 25 if this is set to true,or it will be divided by 9 if this is set to false. Defaults to true.
+        member __.CountIncludePad = operatorArguments.GetParameter("count_include_pad", ContribQuantizedPooling.CountIncludePadDefault)
+        /// Set layout for input and output. Empty for
+        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.
+        member __.Layout = operatorArguments.GetParameter("layout", ContribQuantizedPooling.LayoutDefault)
+        /// <summary>Copy ContribQuantizedPooling instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input data.</param>
+        /// <param name="minData">Minimum value of data.</param>
+        /// <param name="maxData">Maximum value of data.</param>
+        /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
+        /// <param name="poolType">Pooling type to be applied.</param>
+        /// <param name="globalPool">Ignore kernel size, do global pooling based on current input feature map. </param>
+        /// <param name="cudnnOff">Turn off cudnn pooling and use MXNet pooling operator. </param>
+        /// <param name="poolingConvention">Pooling convention to be applied.</param>
+        /// <param name="stride">Stride: for pooling (y, x) or (d, y, x). Defaults to 1 for each dimension.</param>
+        /// <param name="pad">Pad for pooling: (y, x) or (d, y, x). Defaults to no padding.</param>
+        /// <param name="pValue">Value of p for Lp pooling, can be 1 or 2, required for Lp Pooling.</param>
+        /// <param name="countIncludePad">Only used for AvgPool, specify whether to count padding elements for averagecalculation. For example, with a 5*5 kernel on a 3*3 corner of a image,the sum of the 9 valid elements will be divided by 25 if this is set to true,or it will be divided by 9 if this is set to false. Defaults to true.</param>
+        /// <param name="layout">Set layout for input and output. Empty for
+        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?minData : Symbol,
+            [<Optional>] ?maxData : Symbol,
+            [<Optional>] ?kernel : int seq,
+            [<Optional>] ?poolType : PoolType,
+            [<Optional>] ?globalPool : bool,
+            [<Optional>] ?cudnnOff : bool,
+            [<Optional>] ?poolingConvention : PoolingConvention,
+            [<Optional>] ?stride : int seq,
+            [<Optional>] ?pad : int seq,
+            [<Optional>] ?pValue : int,
+            [<Optional>] ?countIncludePad : bool,
+            [<Optional>] ?layout : ContribQuantizedPoolingLayout) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    minData |> Option.map (fun x -> "min_data", Input x)
+                    maxData |> Option.map (fun x -> "max_data", Input x)
+                    kernel |> Option.map (fun x -> "kernel", Parameter(Some (box x)))
+                    poolType |> Option.map (fun x -> "pool_type", Parameter(Some (box x)))
+                    globalPool |> Option.map (fun x -> "global_pool", Parameter(Some (box x)))
+                    cudnnOff |> Option.map (fun x -> "cudnn_off", Parameter(Some (box x)))
+                    poolingConvention |> Option.map (fun x -> "pooling_convention", Parameter(Some (box x)))
+                    stride |> Option.map (fun x -> "stride", Parameter(Some (box x)))
+                    pad |> Option.map (fun x -> "pad", Parameter(Some (box x)))
+                    pValue |> Option.map (fun x -> "p_value", Parameter(Some (box x)))
+                    countIncludePad |> Option.map (fun x -> "count_include_pad", Parameter(Some (box x)))
+                    layout |> Option.map (fun x -> "layout", Parameter(Some (box x)))
+                ] |> List.choose id
+            new ContribQuantizedPooling(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type ContribQuantize private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_quantize", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantize(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantize(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Quantize a input tensor from float to `out_type`,
+        /// with user-specified `min_range` and `max_range`.
+        /// 
+        /// min_range and max_range are scalar floats that specify the range for
+        /// the input data.
+        /// 
+        /// When out_type is `uint8`, the output is calculated using the following equation:
+        /// 
+        /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
+        /// 
+        /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
+        /// 
+        /// When out_type is `int8`, the output is calculate using the following equation
+        /// by keep zero centered for the quantized value:
+        /// 
+        /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
+        /// 
+        /// where
+        /// `quantized_range = MinAbs(max(int8), min(int8))` and
+        /// `scale = quantized_range / MaxAbs(min_range, max_range).`
+        /// 
+        /// .. Note::
+        ///     This operator only supports forward propagation. DO NOT use it in training.
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantize.cc:L74</summary>
+        /// <param name="data">A ndarray/symbol of type `float32`</param>
+        /// <param name="minRange">The minimum scalar value possibly produced for the input</param>
+        /// <param name="maxRange">The maximum scalar value possibly produced for the input</param>
+        /// <param name="outType">Output data type.</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?minRange : Symbol,
+            [<Optional>] ?maxRange : Symbol,
+            [<Optional>] ?outType : ContribQuantizeOutType) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let minRange = defaultArg minRange (new ImplicitVariable() :> Symbol)
+            let maxRange = defaultArg maxRange (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "min_range", Input minRange
+                    "max_range", Input maxRange
+                    "out_type", outType |> Option.map box |> Parameter
+                ]
+            new ContribQuantize(Arguments<Symbol>(operatorArguments))
+        /// Default value for OutType
+        /// Output data type.
+        static member OutTypeDefault : ContribQuantizeOutType = ContribQuantizeOutType.Uint8
+        /// A ndarray/symbol of type `float32`
+        member __.Data = operatorArguments.GetInput "data"
+        /// The minimum scalar value possibly produced for the input
+        member __.MinRange = operatorArguments.GetInput "min_range"
+        /// The maximum scalar value possibly produced for the input
+        member __.MaxRange = operatorArguments.GetInput "max_range"
+        /// Output data type.
+        member __.OutType = operatorArguments.GetParameter("out_type", ContribQuantize.OutTypeDefault)
+        /// <summary>Copy ContribQuantize instance with updated inputs/parameters.</summary>
+        /// <param name="data">A ndarray/symbol of type `float32`</param>
+        /// <param name="minRange">The minimum scalar value possibly produced for the input</param>
+        /// <param name="maxRange">The maximum scalar value possibly produced for the input</param>
+        /// <param name="outType">Output data type.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?minRange : Symbol,
+            [<Optional>] ?maxRange : Symbol,
+            [<Optional>] ?outType : ContribQuantizeOutType) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    minRange |> Option.map (fun x -> "min_range", Input x)
+                    maxRange |> Option.map (fun x -> "max_range", Input x)
+                    outType |> Option.map (fun x -> "out_type", Parameter(Some (box x)))
+                ] |> List.choose id
+            new ContribQuantize(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type ContribQuantizeV2 private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_quantize_v2", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizeV2(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantizeV2(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Quantize a input tensor from float to `out_type`,
+        /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
+        /// 
+        /// Output `min_range` and `max_range` are scalar floats that specify the range for the input data.
+        /// 
+        /// When out_type is `uint8`, the output is calculated using the following equation:
+        /// 
+        /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
+        /// 
+        /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
+        /// 
+        /// When out_type is `int8`, the output is calculate using the following equation
+        /// by keep zero centered for the quantized value:
+        /// 
+        /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
+        /// 
+        /// where
+        /// `quantized_range = MinAbs(max(int8), min(int8))` and
+        /// `scale = quantized_range / MaxAbs(min_range, max_range).`
+        /// 
+        /// When out_type is `auto`, the output type is automatically determined by min_calib_range if presented.
+        /// If min_calib_range &lt; 0.0f, the output type will be int8, otherwise will be uint8.
+        /// If min_calib_range isn&#39;t presented, the output type will be int8.
+        /// 
+        /// .. Note::
+        ///     This operator only supports forward propagation. DO NOT use it in training.
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantize_v2.cc:L92</summary>
+        /// <param name="data">A ndarray/symbol of type `float32`</param>
+        /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
+        /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
+        /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?outType : ContribQuantizeV2OutType,
+            [<Optional>] ?minCalibRange : float,
+            [<Optional>] ?maxCalibRange : float) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "out_type", outType |> Option.map box |> Parameter
+                    "min_calib_range", minCalibRange |> Option.map box |> Parameter
+                    "max_calib_range", maxCalibRange |> Option.map box |> Parameter
+                ]
+            new ContribQuantizeV2(Arguments<Symbol>(operatorArguments))
+        /// Default value for OutType
+        /// Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.
+        static member OutTypeDefault : ContribQuantizeV2OutType = ContribQuantizeV2OutType.Int8
+        /// Default value for MinCalibRange
+        /// The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.
+        static member MinCalibRangeDefault : double option = None
+        /// Default value for MaxCalibRange
+        /// The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.
+        static member MaxCalibRangeDefault : double option = None
+        /// A ndarray/symbol of type `float32`
+        member __.Data = operatorArguments.GetInput "data"
+        /// Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.
+        member __.OutType = operatorArguments.GetParameter("out_type", ContribQuantizeV2.OutTypeDefault)
+        /// The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.
+        member __.MinCalibRange = operatorArguments.GetParameter("min_calib_range", ContribQuantizeV2.MinCalibRangeDefault)
+        /// The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.
+        member __.MaxCalibRange = operatorArguments.GetParameter("max_calib_range", ContribQuantizeV2.MaxCalibRangeDefault)
+        /// <summary>Copy ContribQuantizeV2 instance with updated inputs/parameters.</summary>
+        /// <param name="data">A ndarray/symbol of type `float32`</param>
+        /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
+        /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
+        /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?outType : ContribQuantizeV2OutType,
+            [<Optional>] ?minCalibRange : float,
+            [<Optional>] ?maxCalibRange : float) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    outType |> Option.map (fun x -> "out_type", Parameter(Some (box x)))
+                    minCalibRange |> Option.map (fun x -> "min_calib_range", Parameter(Some (box x)))
+                    maxCalibRange |> Option.map (fun x -> "max_calib_range", Parameter(Some (box x)))
+                ] |> List.choose id
+            new ContribQuantizeV2(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type Flatten private (operatorArguments) = 
         inherit SymbolOperator("Flatten", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new Flatten(args)
         override this.WithArguments(args : Arguments<Symbol>) = new Flatten(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Flattens the input array into a 2-D array by collapsing the higher dimensions.
-        /// 
         /// .. note:: `Flatten` is deprecated. Use `flatten` instead.
-        /// 
         /// For an input array with shape ``(d1, d2, ..., dk)``, `flatten` operation reshapes
         /// the input array into an output array of shape ``(d1, d2*...*dk)``.
-        /// 
         /// Note that the behavior of this function is different from numpy.ndarray.flatten,
         /// which behaves similar to mxnet.ndarray.reshape((-1,)).
-        /// 
         /// Example::
-        /// 
         ///     x = [[
         ///         [1,2,3],
         ///         [4,5,6],
@@ -17130,13 +20799,11 @@ module SymbolOperators =
         ///         [4,5,6],
         ///         [7,8,9]
         ///     ]],
-        /// 
         ///     flatten(x) = [[ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.],
         ///        [ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.]]
         /// 
         /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L292</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L250</summary>
         /// <param name="data">Input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -17340,170 +21007,6 @@ module SymbolOperators =
                     flatten |> Option.map (fun x -> "flatten", Parameter(Some (box x)))
                 ] |> List.choose id
             new ContribQuantizedFullyConnected(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
-    
-    type ContribQuantizedPooling private (operatorArguments) = 
-        inherit SymbolOperator("_contrib_quantized_pooling", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedPooling(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantizedPooling(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <summary>Pooling operator for input and output data type of int8.
-        /// The input and output data comes with min and max thresholds for quantizing
-        /// the float32 data into int8.
-        /// 
-        /// .. Note::
-        ///     This operator only supports forward propogation. DO NOT use it in training.
-        ///     This operator only supports `pool_type` of `avg` or `max`.
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_pooling.cc:L145</summary>
-        /// <param name="data">Input data.</param>
-        /// <param name="minData">Minimum value of data.</param>
-        /// <param name="maxData">Maximum value of data.</param>
-        /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
-        /// <param name="poolType">Pooling type to be applied.</param>
-        /// <param name="globalPool">Ignore kernel size, do global pooling based on current input feature map. </param>
-        /// <param name="cudnnOff">Turn off cudnn pooling and use MXNet pooling operator. </param>
-        /// <param name="poolingConvention">Pooling convention to be applied.</param>
-        /// <param name="stride">Stride: for pooling (y, x) or (d, y, x). Defaults to 1 for each dimension.</param>
-        /// <param name="pad">Pad for pooling: (y, x) or (d, y, x). Defaults to no padding.</param>
-        /// <param name="pValue">Value of p for Lp pooling, can be 1 or 2, required for Lp Pooling.</param>
-        /// <param name="countIncludePad">Only used for AvgPool, specify whether to count padding elements for averagecalculation. For example, with a 5*5 kernel on a 3*3 corner of a image,the sum of the 9 valid elements will be divided by 25 if this is set to true,or it will be divided by 9 if this is set to false. Defaults to true.</param>
-        /// <param name="layout">Set layout for input and output. Empty for
-        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
-        new([<Optional>] ?data : Symbol,
-            [<Optional>] ?minData : Symbol,
-            [<Optional>] ?maxData : Symbol,
-            [<Optional>] ?kernel : int seq,
-            [<Optional>] ?poolType : PoolType,
-            [<Optional>] ?globalPool : bool,
-            [<Optional>] ?cudnnOff : bool,
-            [<Optional>] ?poolingConvention : PoolingConvention,
-            [<Optional>] ?stride : int seq,
-            [<Optional>] ?pad : int seq,
-            [<Optional>] ?pValue : int,
-            [<Optional>] ?countIncludePad : bool,
-            [<Optional>] ?layout : ContribQuantizedPoolingLayout) = 
-            let data = defaultArg data (new ImplicitVariable() :> Symbol)
-            let minData = defaultArg minData (new ImplicitVariable() :> Symbol)
-            let maxData = defaultArg maxData (new ImplicitVariable() :> Symbol)
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "min_data", Input minData
-                    "max_data", Input maxData
-                    "kernel", kernel |> Option.map box |> Parameter
-                    "pool_type", poolType |> Option.map box |> Parameter
-                    "global_pool", globalPool |> Option.map box |> Parameter
-                    "cudnn_off", cudnnOff |> Option.map box |> Parameter
-                    "pooling_convention", poolingConvention |> Option.map box |> Parameter
-                    "stride", stride |> Option.map box |> Parameter
-                    "pad", pad |> Option.map box |> Parameter
-                    "p_value", pValue |> Option.map box |> Parameter
-                    "count_include_pad", countIncludePad |> Option.map box |> Parameter
-                    "layout", layout |> Option.map box |> Parameter
-                ]
-            new ContribQuantizedPooling(Arguments<Symbol>(operatorArguments))
-        /// Default value for Kernel
-        /// Pooling kernel size: (y, x) or (d, y, x)
-        static member KernelDefault : int [] = [||]
-        /// Default value for PoolType
-        /// Pooling type to be applied.
-        static member PoolTypeDefault : PoolType = PoolType.Max
-        /// Default value for GlobalPool
-        /// Ignore kernel size, do global pooling based on current input feature map. 
-        static member GlobalPoolDefault : bool = false
-        /// Default value for CudnnOff
-        /// Turn off cudnn pooling and use MXNet pooling operator. 
-        static member CudnnOffDefault : bool = false
-        /// Default value for PoolingConvention
-        /// Pooling convention to be applied.
-        static member PoolingConventionDefault : PoolingConvention = PoolingConvention.Valid
-        /// Default value for Stride
-        /// Stride: for pooling (y, x) or (d, y, x). Defaults to 1 for each dimension.
-        static member StrideDefault : int [] = [||]
-        /// Default value for Pad
-        /// Pad for pooling: (y, x) or (d, y, x). Defaults to no padding.
-        static member PadDefault : int [] = [||]
-        /// Default value for PValue
-        /// Value of p for Lp pooling, can be 1 or 2, required for Lp Pooling.
-        static member PValueDefault : int option = None
-        /// Default value for CountIncludePad
-        /// Only used for AvgPool, specify whether to count padding elements for averagecalculation. For example, with a 5*5 kernel on a 3*3 corner of a image,the sum of the 9 valid elements will be divided by 25 if this is set to true,or it will be divided by 9 if this is set to false. Defaults to true.
-        static member CountIncludePadDefault : bool option = None
-        /// Default value for Layout
-        /// Set layout for input and output. Empty for
-        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.
-        static member LayoutDefault : ContribQuantizedPoolingLayout option = None
-        /// Input data.
-        member __.Data = operatorArguments.GetInput "data"
-        /// Minimum value of data.
-        member __.MinData = operatorArguments.GetInput "min_data"
-        /// Maximum value of data.
-        member __.MaxData = operatorArguments.GetInput "max_data"
-        /// Pooling kernel size: (y, x) or (d, y, x)
-        member __.Kernel = operatorArguments.GetParameter("kernel", ContribQuantizedPooling.KernelDefault)
-        /// Pooling type to be applied.
-        member __.PoolType = operatorArguments.GetParameter("pool_type", ContribQuantizedPooling.PoolTypeDefault)
-        /// Ignore kernel size, do global pooling based on current input feature map. 
-        member __.GlobalPool = operatorArguments.GetParameter("global_pool", ContribQuantizedPooling.GlobalPoolDefault)
-        /// Turn off cudnn pooling and use MXNet pooling operator. 
-        member __.CudnnOff = operatorArguments.GetParameter("cudnn_off", ContribQuantizedPooling.CudnnOffDefault)
-        /// Pooling convention to be applied.
-        member __.PoolingConvention = operatorArguments.GetParameter("pooling_convention", ContribQuantizedPooling.PoolingConventionDefault)
-        /// Stride: for pooling (y, x) or (d, y, x). Defaults to 1 for each dimension.
-        member __.Stride = operatorArguments.GetParameter("stride", ContribQuantizedPooling.StrideDefault)
-        /// Pad for pooling: (y, x) or (d, y, x). Defaults to no padding.
-        member __.Pad = operatorArguments.GetParameter("pad", ContribQuantizedPooling.PadDefault)
-        /// Value of p for Lp pooling, can be 1 or 2, required for Lp Pooling.
-        member __.PValue = operatorArguments.GetParameter("p_value", ContribQuantizedPooling.PValueDefault)
-        /// Only used for AvgPool, specify whether to count padding elements for averagecalculation. For example, with a 5*5 kernel on a 3*3 corner of a image,the sum of the 9 valid elements will be divided by 25 if this is set to true,or it will be divided by 9 if this is set to false. Defaults to true.
-        member __.CountIncludePad = operatorArguments.GetParameter("count_include_pad", ContribQuantizedPooling.CountIncludePadDefault)
-        /// Set layout for input and output. Empty for
-        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.
-        member __.Layout = operatorArguments.GetParameter("layout", ContribQuantizedPooling.LayoutDefault)
-        /// <summary>Copy ContribQuantizedPooling instance with updated inputs/parameters.</summary>
-        /// <param name="data">Input data.</param>
-        /// <param name="minData">Minimum value of data.</param>
-        /// <param name="maxData">Maximum value of data.</param>
-        /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
-        /// <param name="poolType">Pooling type to be applied.</param>
-        /// <param name="globalPool">Ignore kernel size, do global pooling based on current input feature map. </param>
-        /// <param name="cudnnOff">Turn off cudnn pooling and use MXNet pooling operator. </param>
-        /// <param name="poolingConvention">Pooling convention to be applied.</param>
-        /// <param name="stride">Stride: for pooling (y, x) or (d, y, x). Defaults to 1 for each dimension.</param>
-        /// <param name="pad">Pad for pooling: (y, x) or (d, y, x). Defaults to no padding.</param>
-        /// <param name="pValue">Value of p for Lp pooling, can be 1 or 2, required for Lp Pooling.</param>
-        /// <param name="countIncludePad">Only used for AvgPool, specify whether to count padding elements for averagecalculation. For example, with a 5*5 kernel on a 3*3 corner of a image,the sum of the 9 valid elements will be divided by 25 if this is set to true,or it will be divided by 9 if this is set to false. Defaults to true.</param>
-        /// <param name="layout">Set layout for input and output. Empty for
-        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
-        member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?minData : Symbol,
-            [<Optional>] ?maxData : Symbol,
-            [<Optional>] ?kernel : int seq,
-            [<Optional>] ?poolType : PoolType,
-            [<Optional>] ?globalPool : bool,
-            [<Optional>] ?cudnnOff : bool,
-            [<Optional>] ?poolingConvention : PoolingConvention,
-            [<Optional>] ?stride : int seq,
-            [<Optional>] ?pad : int seq,
-            [<Optional>] ?pValue : int,
-            [<Optional>] ?countIncludePad : bool,
-            [<Optional>] ?layout : ContribQuantizedPoolingLayout) = 
-            let operatorArguments = 
-                [
-                    data |> Option.map (fun x -> "data", Input x)
-                    minData |> Option.map (fun x -> "min_data", Input x)
-                    maxData |> Option.map (fun x -> "max_data", Input x)
-                    kernel |> Option.map (fun x -> "kernel", Parameter(Some (box x)))
-                    poolType |> Option.map (fun x -> "pool_type", Parameter(Some (box x)))
-                    globalPool |> Option.map (fun x -> "global_pool", Parameter(Some (box x)))
-                    cudnnOff |> Option.map (fun x -> "cudnn_off", Parameter(Some (box x)))
-                    poolingConvention |> Option.map (fun x -> "pooling_convention", Parameter(Some (box x)))
-                    stride |> Option.map (fun x -> "stride", Parameter(Some (box x)))
-                    pad |> Option.map (fun x -> "pad", Parameter(Some (box x)))
-                    pValue |> Option.map (fun x -> "p_value", Parameter(Some (box x)))
-                    countIncludePad |> Option.map (fun x -> "count_include_pad", Parameter(Some (box x)))
-                    layout |> Option.map (fun x -> "layout", Parameter(Some (box x)))
-                ] |> List.choose id
-            new ContribQuantizedPooling(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type ContribRequantize private (operatorArguments) = 
         inherit SymbolOperator("_contrib_requantize", operatorArguments)
@@ -18845,7 +22348,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L97</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L96</summary>
         /// <param name="low">Lower bound of the distribution.</param>
         /// <param name="high">Upper bound of the distribution.</param>
         /// <param name="shape">Shape of the output.</param>
@@ -18917,7 +22420,7 @@ module SymbolOperators =
         ///                                           [-1.23474145,  1.55807114]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L115</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L113</summary>
         /// <param name="loc">Mean of the distribution.</param>
         /// <param name="scale">Standard deviation of the distribution.</param>
         /// <param name="shape">Shape of the output.</param>
@@ -18986,7 +22489,7 @@ module SymbolOperators =
         ///                                             [ 3.91697288,  3.65933681]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L127</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L125</summary>
         /// <param name="alpha">Alpha parameter (shape) of the gamma distribution.</param>
         /// <param name="beta">Beta parameter (scale) of the gamma distribution.</param>
         /// <param name="shape">Shape of the output.</param>
@@ -19055,7 +22558,7 @@ module SymbolOperators =
         ///                                       [ 0.04146638,  0.31715935]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L139</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L137</summary>
         /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
         /// <param name="shape">Shape of the output.</param>
         /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
@@ -19114,7 +22617,7 @@ module SymbolOperators =
         ///                                   [ 4.,  6.]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L152</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L150</summary>
         /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
         /// <param name="shape">Shape of the output.</param>
         /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
@@ -19174,7 +22677,7 @@ module SymbolOperators =
         ///                                                  [ 2.,  5.]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L166</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L164</summary>
         /// <param name="k">Limit of unsuccessful experiments.</param>
         /// <param name="p">Failure probability in each experiment.</param>
         /// <param name="shape">Shape of the output.</param>
@@ -19246,7 +22749,7 @@ module SymbolOperators =
         ///                                                                     [ 6.,  4.]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L181</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L179</summary>
         /// <param name="mu">Mean of the negative binomial distribution.</param>
         /// <param name="alpha">Alpha (dispersion) parameter of the negative binomial distribution.</param>
         /// <param name="shape">Shape of the output.</param>
@@ -19317,7 +22820,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L196</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L194</summary>
         /// <param name="low">Lower bound of the distribution.</param>
         /// <param name="high">Upper bound of the distribution.</param>
         /// <param name="shape">Shape of the output.</param>
@@ -19382,7 +22885,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L211</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L209</summary>
         /// <param name="data">The input</param>
         /// <param name="low">Lower bound of the distribution.</param>
         /// <param name="high">Upper bound of the distribution.</param>
@@ -19439,7 +22942,7 @@ module SymbolOperators =
         ///                                              [-1.23474145,  1.55807114]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L223</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L221</summary>
         /// <param name="data">The input</param>
         /// <param name="loc">Mean of the distribution.</param>
         /// <param name="scale">Standard deviation of the distribution.</param>
@@ -19495,7 +22998,7 @@ module SymbolOperators =
         ///                                                [ 3.91697288,  3.65933681]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L234</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L232</summary>
         /// <param name="data">The input</param>
         /// <param name="alpha">Alpha parameter (shape) of the gamma distribution.</param>
         /// <param name="beta">Beta parameter (scale) of the gamma distribution.</param>
@@ -19551,7 +23054,7 @@ module SymbolOperators =
         ///                                          [ 0.04146638,  0.31715935]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L245</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L243</summary>
         /// <param name="data">The input</param>
         /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
         new([<Optional>] ?data : Symbol,
@@ -19597,7 +23100,7 @@ module SymbolOperators =
         ///                                      [ 4.,  6.]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L257</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L255</summary>
         /// <param name="data">The input</param>
         /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
         new([<Optional>] ?data : Symbol,
@@ -19644,7 +23147,7 @@ module SymbolOperators =
         ///                                                     [ 2.,  5.]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L270</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L268</summary>
         /// <param name="data">The input</param>
         /// <param name="k">Limit of unsuccessful experiments.</param>
         /// <param name="p">Failure probability in each experiment.</param>
@@ -19704,7 +23207,7 @@ module SymbolOperators =
         ///                                                                        [ 6.,  4.]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L286</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L284</summary>
         /// <param name="data">The input</param>
         /// <param name="mu">Mean of the negative binomial distribution.</param>
         /// <param name="alpha">Alpha (dispersion) parameter of the negative binomial distribution.</param>
@@ -20094,7 +23597,7 @@ module SymbolOperators =
         ///             \end{array}
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\rnn.cc:L707</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\rnn.cc:L351</summary>
         /// <param name="data">Input data to RNN</param>
         /// <param name="parameters">Vector of all RNN trainable parameters concatenated</param>
         /// <param name="state">initial hidden state of the RNN</param>
@@ -20202,7 +23705,7 @@ module SymbolOperators =
         ///             \end{array}
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\rnn.cc:L707</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\rnn.cc:L351</summary>
         /// <param name="stateSize">size of the state for each layer</param>
         /// <param name="numLayers">number of stacked layers</param>
         /// <param name="mode">the type of RNN to compute</param>
@@ -20932,7 +24435,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\softmax_output.cc:L230</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\softmax_output.cc:L231</summary>
         /// <param name="data">Input array.</param>
         /// <param name="label">Ground truth label.</param>
         /// <param name="gradScale">Scales the gradient by a float factor.</param>
@@ -21048,6 +24551,32 @@ module SymbolOperators =
                     smoothAlpha |> Option.map (fun x -> "smooth_alpha", Parameter(Some (box x)))
                 ] |> List.choose id
             new SoftmaxOutput(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type SgMkldnnConv private (operatorArguments) = 
+        inherit SymbolOperator("_sg_mkldnn_conv", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new SgMkldnnConv(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new SgMkldnnConv(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>_sg_mkldnn_conv
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\subgraph\mkldnn\mkldnn_conv.cc:L773</summary>
+        new() =
+            let operatorArguments = 
+                [
+                ]
+            new SgMkldnnConv(Arguments<Symbol>(operatorArguments))
+    
+    type SgMkldnnFullyConnected private (operatorArguments) = 
+        inherit SymbolOperator("_sg_mkldnn_fully_connected", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new SgMkldnnFullyConnected(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new SgMkldnnFullyConnected(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>_sg_mkldnn_fully_connected
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\subgraph\mkldnn\mkldnn_fc.cc:L452</summary>
+        new() =
+            let operatorArguments = 
+                [
+                ]
+            new SgMkldnnFullyConnected(Arguments<Symbol>(operatorArguments))
     
     type SwapAxis private (operatorArguments) = 
         inherit SymbolOperator("SwapAxis", operatorArguments)
@@ -21181,12 +24710,15 @@ module SymbolOperators =
         /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
         /// <param name="data">Weights</param>
         /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
+        /// <param name="castNarrow">Whether to cast to the narrowest type</param>
         new(data : Symbol seq,
-            numOutputs : int) = 
+            numOutputs : int,
+            [<Optional>] ?castNarrow : bool) = 
             let operatorArguments = 
                 [
                     "data", VarArg("", data |> Seq.toArray)
                     "num_outputs", Parameter(Some(box numOutputs))
+                    "cast_narrow", castNarrow |> Option.map box |> Parameter
                 ]
             new AmpMulticast(Arguments<Symbol>(operatorArguments))
         /// <summary>Cast function used by AMP, that casts its inputs to the common widest type.
@@ -21198,45 +24730,39 @@ module SymbolOperators =
         /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
         /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
         /// <param name="data">Weights</param>
+        /// <param name="castNarrow">Whether to cast to the narrowest type</param>
         new(numOutputs : int,
-            [<Optional>] ?data : Symbol seq) = 
+            [<Optional>] ?data : Symbol seq,
+            [<Optional>] ?castNarrow : bool) = 
             let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
             let operatorArguments = 
                 [
                     "data", VarArg("", data)
                     "num_outputs", Parameter(Some(box numOutputs))
+                    "cast_narrow", castNarrow |> Option.map box |> Parameter
                 ]
             new AmpMulticast(Arguments<Symbol>(operatorArguments))
-        /// <summary>Cast function used by AMP, that casts its inputs to the common widest type.
-        /// 
-        /// It casts only between low precision float/FP32 and does not do anything for other types.
-        /// 
-        /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
-        /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
-        /// <param name="data">Weights</param>
-        new(numOutputs : int,
-            [<ParamArray>] data : Symbol[]) = 
-            let operatorArguments = 
-                [
-                    "data", VarArg("", data)
-                    "num_outputs", Parameter(Some(box numOutputs))
-                ]
-            new AmpMulticast(Arguments<Symbol>(operatorArguments))
+        /// Default value for CastNarrow
+        /// Whether to cast to the narrowest type
+        static member CastNarrowDefault : bool = false
         /// Weights
         member __.Data = operatorArguments.GetVarArg "data"
         /// Number of input/output pairs to be casted to the widest type.
         member __.NumOutputs : int = match operatorArguments.GetParameter "num_outputs" with Some(v) -> unbox v | None -> failwithf "Required parameter num_outputs is missing"
+        /// Whether to cast to the narrowest type
+        member __.CastNarrow = operatorArguments.GetParameter("cast_narrow", AmpMulticast.CastNarrowDefault)
         /// <summary>Copy AmpMulticast instance with updated inputs/parameters.</summary>
         /// <param name="data">Weights</param>
         /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
+        /// <param name="castNarrow">Whether to cast to the narrowest type</param>
         member this.With([<Optional>] ?data : Symbol seq,
-            [<Optional>] ?numOutputs : int) = 
+            [<Optional>] ?numOutputs : int,
+            [<Optional>] ?castNarrow : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
                     numOutputs |> Option.map (fun x -> "num_outputs", Parameter(Some (box x)))
+                    castNarrow |> Option.map (fun x -> "cast_narrow", Parameter(Some (box x)))
                 ] |> List.choose id
             new AmpMulticast(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -21357,7 +24883,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new Min(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Computes the min of array elements over given axes.
         /// 
-        /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L46</summary>
+        /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L47</summary>
         /// <param name="data">The input</param>
         /// <param name="axis">The axis or axes along which to perform the reduction.
         /// 
@@ -22189,7 +25715,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_prod_value.cc:L46</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_prod_value.cc:L47</summary>
         /// <param name="data">The input</param>
         /// <param name="axis">The axis or axes along which to perform the reduction.
         /// 
@@ -22445,7 +25971,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new Mean(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Computes the mean of array elements over given axes.
         /// 
-        /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L83</summary>
+        /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L84</summary>
         /// <param name="data">The input</param>
         /// <param name="axis">The axis or axes along which to perform the reduction.
         /// 
@@ -22558,7 +26084,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_sum_value.cc:L100</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_sum_value.cc:L102</summary>
         /// <param name="data">The input</param>
         /// <param name="axis">The axis or axes along which to perform the reduction.
         /// 
@@ -23081,17 +26607,17 @@ module SymbolOperators =
         /// <summary>Batchwise dot product.
         /// 
         /// ``batch_dot`` is used to compute dot product of ``x`` and ``y`` when ``x`` and
-        /// ``y`` are data in batch, namely 3D arrays in shape of `(batch_size, :, :)`.
+        /// ``y`` are data in batch, namely N-D (N &gt;= 3) arrays in shape of `(B0, ..., B_i, :, :)`.
         /// 
-        /// For example, given ``x`` with shape `(batch_size, n, m)` and ``y`` with shape
-        /// `(batch_size, m, k)`, the result array will have shape `(batch_size, n, k)`,
+        /// For example, given ``x`` with shape `(B_0, ..., B_i, N, M)` and ``y`` with shape
+        /// `(B_0, ..., B_i, M, K)`, the result array will have shape `(B_0, ..., B_i, N, K)`,
         /// which is computed by::
         /// 
-        ///    batch_dot(x,y)[i,:,:] = dot(x[i,:,:], y[i,:,:])
+        ///    batch_dot(x,y)[b_0, ..., b_i, :, :] = dot(x[b_0, ..., b_i, :, :], y[b_0, ..., b_i, :, :])
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\dot.cc:L126</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\dot.cc:L127</summary>
         /// <param name="lhs">The first input</param>
         /// <param name="rhs">The second input</param>
         /// <param name="transposeA">If true then transpose the first input before dot.</param>
@@ -23644,7 +27170,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L47</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L46</summary>
         /// <param name="lhs">First input to the function</param>
         /// <param name="rhs">Second input to the function</param>
         new([<Optional>] ?lhs : Symbol,
@@ -23692,7 +27218,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L66</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L64</summary>
         /// <param name="lhs">First input to the function</param>
         /// <param name="rhs">Second input to the function</param>
         new([<Optional>] ?lhs : Symbol,
@@ -23740,7 +27266,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L85</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L82</summary>
         /// <param name="lhs">First input to the function</param>
         /// <param name="rhs">Second input to the function</param>
         new([<Optional>] ?lhs : Symbol,
@@ -23788,7 +27314,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L104</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L100</summary>
         /// <param name="lhs">First input to the function</param>
         /// <param name="rhs">Second input to the function</param>
         new([<Optional>] ?lhs : Symbol,
@@ -23836,7 +27362,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L123</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L118</summary>
         /// <param name="lhs">First input to the function</param>
         /// <param name="rhs">Second input to the function</param>
         new([<Optional>] ?lhs : Symbol,
@@ -23884,7 +27410,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L142</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L136</summary>
         /// <param name="lhs">First input to the function</param>
         /// <param name="rhs">Second input to the function</param>
         new([<Optional>] ?lhs : Symbol,
@@ -23932,7 +27458,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L160</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L154</summary>
         /// <param name="lhs">First input to the function</param>
         /// <param name="rhs">Second input to the function</param>
         new([<Optional>] ?lhs : Symbol,
@@ -23980,7 +27506,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L178</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L172</summary>
         /// <param name="lhs">First input to the function</param>
         /// <param name="rhs">Second input to the function</param>
         new([<Optional>] ?lhs : Symbol,
@@ -24028,7 +27554,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L196</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L190</summary>
         /// <param name="lhs">First input to the function</param>
         /// <param name="rhs">Second input to the function</param>
         new([<Optional>] ?lhs : Symbol,
@@ -26403,7 +29929,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L664</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
         /// <param name="data">The input.</param>
         /// <param name="dtype">Output data type.</param>
         new(data : Symbol,
@@ -26426,7 +29952,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L664</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
         /// <param name="dtype">Output data type.</param>
         /// <param name="data">The input.</param>
         new(dtype : DataType,
@@ -26504,7 +30030,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L720</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L721</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -26542,7 +30068,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L758</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L759</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -26580,7 +30106,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L777</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L778</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -26622,7 +30148,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L798</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L799</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -26662,7 +30188,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L817</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L818</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -26702,7 +30228,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L836</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L837</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -26743,7 +30269,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L856</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L857</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -26782,7 +30308,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L874</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L875</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -26814,7 +30340,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L885</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L887</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -26846,7 +30372,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L906</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L909</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -26970,7 +30496,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L63</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L64</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -27002,7 +30528,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L76</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L77</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -27034,7 +30560,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L93</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L94</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -27066,7 +30592,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L105</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L106</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -27103,7 +30629,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L206</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L199</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -27139,7 +30665,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L224</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L217</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -27914,7 +31440,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\histogram.cc:L136</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\histogram.cc:L137</summary>
         /// <param name="data">Input ndarray</param>
         /// <param name="bins">Input ndarray</param>
         /// <param name="binCnt">Number of bins for uniform case</param>
@@ -28022,7 +31548,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L534</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
         /// <param name="data">The input array to the embedding operator.</param>
         /// <param name="weight">The embedding weight matrix.</param>
         /// <param name="inputDim">Vocabulary size of the input indices.</param>
@@ -28098,7 +31624,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L534</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
         /// <param name="inputDim">Vocabulary size of the input indices.</param>
         /// <param name="outputDim">Dimension of the embedding vectors.</param>
         /// <param name="data">The input array to the embedding operator.</param>
@@ -28220,7 +31746,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L610</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
         /// <param name="data">The input array to the embedding operator.</param>
         /// <param name="weight">The embedding weight matrix.</param>
         /// <param name="inputDim">Vocabulary size of the input indices.</param>
@@ -28294,7 +31820,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L610</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
         /// <param name="inputDim">Vocabulary size of the input indices.</param>
         /// <param name="outputDim">Dimension of the embedding vectors.</param>
         /// <param name="data">The input array to the embedding operator.</param>
@@ -28416,7 +31942,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L711</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L718</summary>
         /// <param name="a">The input array.</param>
         /// <param name="indices">The indices of the values to be extracted.</param>
         /// <param name="axis">The axis of input array to be taken.For input tensor of rank r, it could be in the range of [-r, r-1]</param>
@@ -28492,7 +32018,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L769</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L777</summary>
         /// <param name="a">The input array</param>
         /// <param name="indices">The index array</param>
         new([<Optional>] ?a : Symbol,
@@ -28559,7 +32085,7 @@ module SymbolOperators =
         ///                                       [ 1.  0.  0.]]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L816</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
         /// <param name="indices">array of locations where to set on_value</param>
         /// <param name="depth">Depth of the one hot dimension.</param>
         /// <param name="onValue">The value assigned to the locations represented by indices.</param>
@@ -28613,7 +32139,7 @@ module SymbolOperators =
         ///                                       [ 1.  0.  0.]]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L816</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
         /// <param name="depth">Depth of the one hot dimension.</param>
         /// <param name="indices">array of locations where to set on_value</param>
         /// <param name="onValue">The value assigned to the locations represented by indices.</param>
@@ -30655,7 +34181,7 @@ module SymbolOperators =
         ///         [0.17157288, 5.82842712]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L867</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L868</summary>
         /// <param name="A">Tensor of input matrices to be factorized</param>
         new([<Optional>] ?A : Symbol) =
             let A = defaultArg A (new ImplicitVariable() :> Symbol)
@@ -30704,7 +34230,7 @@ module SymbolOperators =
         ///                  [[-2., 1.5], [1., -0.5]]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L917</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L920</summary>
         /// <param name="A">Tensor of square matrix</param>
         new([<Optional>] ?A : Symbol) =
             let A = defaultArg A (new ImplicitVariable() :> Symbol)
@@ -30756,7 +34282,7 @@ module SymbolOperators =
         ///    det(A) = [-5., 5.]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L970</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L974</summary>
         /// <param name="A">Tensor of square matrix</param>
         new([<Optional>] ?A : Symbol) =
             let A = defaultArg A (new ImplicitVariable() :> Symbol)
@@ -30814,7 +34340,7 @@ module SymbolOperators =
         ///    logabsdet = [1.609438, -inf, 1.609438]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L1027</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L1032</summary>
         /// <param name="A">Tensor of square matrix</param>
         new([<Optional>] ?A : Symbol) =
             let A = defaultArg A (new ImplicitVariable() :> Symbol)
@@ -30839,69 +34365,45 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new Reshape(args)
         override this.WithArguments(args : Arguments<Symbol>) = new Reshape(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Reshapes the input array.
-        /// 
         /// .. note:: ``Reshape`` is deprecated, use ``reshape``
-        /// 
         /// Given an array and a shape, this function returns a copy of the array in the new shape.
         /// The shape is a tuple of integers such as (2,3,4). The size of the new shape should be same as the size of the input array.
-        /// 
         /// Example::
-        /// 
         ///   reshape([1,2,3,4], shape=(2,2)) = [[1,2], [3,4]]
-        /// 
         /// Some dimensions of the shape can take special values from the set {0, -1, -2, -3, -4}. The significance of each is explained below:
-        /// 
         /// - ``0``  copy this dimension from the input to the output shape.
-        /// 
         ///   Example::
-        /// 
         ///   - input shape = (2,3,4), shape = (4,0,2), output shape = (4,3,2)
         ///   - input shape = (2,3,4), shape = (2,0,0), output shape = (2,3,4)
-        /// 
         /// - ``-1`` infers the dimension of the output shape by using the remainder of the input dimensions
         ///   keeping the size of the new array same as that of the input array.
         ///   At most one dimension of shape can be -1.
-        /// 
         ///   Example::
-        /// 
         ///   - input shape = (2,3,4), shape = (6,1,-1), output shape = (6,1,4)
         ///   - input shape = (2,3,4), shape = (3,-1,8), output shape = (3,1,8)
         ///   - input shape = (2,3,4), shape=(-1,), output shape = (24,)
-        /// 
         /// - ``-2`` copy all/remainder of the input dimensions to the output shape.
-        /// 
         ///   Example::
-        /// 
         ///   - input shape = (2,3,4), shape = (-2,), output shape = (2,3,4)
         ///   - input shape = (2,3,4), shape = (2,-2), output shape = (2,3,4)
         ///   - input shape = (2,3,4), shape = (-2,1,1), output shape = (2,3,4,1,1)
-        /// 
         /// - ``-3`` use the product of two consecutive dimensions of the input shape as the output dimension.
-        /// 
         ///   Example::
-        /// 
         ///   - input shape = (2,3,4), shape = (-3,4), output shape = (6,4)
         ///   - input shape = (2,3,4,5), shape = (-3,-3), output shape = (6,20)
         ///   - input shape = (2,3,4), shape = (0,-3), output shape = (2,12)
         ///   - input shape = (2,3,4), shape = (-3,-2), output shape = (6,4)
-        /// 
         /// - ``-4`` split one dimension of the input into two dimensions passed subsequent to -4 in shape (can contain -1).
-        /// 
         ///   Example::
-        /// 
         ///   - input shape = (2,3,4), shape = (-4,1,2,-2), output shape =(1,2,3,4)
         ///   - input shape = (2,3,4), shape = (2,-4,-1,3,-2), output shape = (2,1,3,4)
-        /// 
         /// If the argument `reverse` is set to 1, then the special values are inferred from right to left.
-        /// 
         ///   Example::
-        /// 
         ///   - without reverse=1, for input shape = (10,5,4), shape = (-1,0), output shape would be (40,5)
         ///   - with reverse=1, output shape will be (50,4).
         /// 
         /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L202</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L175</summary>
         /// <param name="data">Input data to reshape.</param>
         /// <param name="shape">The target shape</param>
         /// <param name="reverse">If true then the special values are inferred from right to left</param>
@@ -30970,35 +34472,26 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new Transpose(args)
         override this.WithArguments(args : Arguments<Symbol>) = new Transpose(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Permutes the dimensions of an array.
-        /// 
         /// Examples::
-        /// 
         ///   x = [[ 1, 2],
         ///        [ 3, 4]]
-        /// 
         ///   transpose(x) = [[ 1.,  3.],
         ///                   [ 2.,  4.]]
-        /// 
         ///   x = [[[ 1.,  2.],
         ///         [ 3.,  4.]],
-        /// 
         ///        [[ 5.,  6.],
         ///         [ 7.,  8.]]]
-        /// 
         ///   transpose(x) = [[[ 1.,  5.],
         ///                    [ 3.,  7.]],
-        /// 
         ///                   [[ 2.,  6.],
         ///                    [ 4.,  8.]]]
-        /// 
         ///   transpose(x, axes=(1,0,2)) = [[[ 1.,  2.],
         ///                                  [ 5.,  6.]],
-        /// 
         ///                                 [[ 3.,  4.],
         ///                                  [ 7.,  8.]]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L379</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L327</summary>
         /// <param name="data">Source input</param>
         /// <param name="axes">Target axis order. By default the axes will be inverted.</param>
         new([<Optional>] ?data : Symbol,
@@ -31034,13 +34527,11 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new ExpandDims(args)
         override this.WithArguments(args : Arguments<Symbol>) = new ExpandDims(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Inserts a new axis of size 1 into the array shape
-        /// 
         /// For example, given ``x`` with shape ``(2,3,4)``, then ``expand_dims(x, axis=1)``
         /// will return a new array with shape ``(2,1,3,4)``.
         /// 
         /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L421</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L394</summary>
         /// <param name="data">Source input</param>
         /// <param name="axis">Position where new axis is to be inserted. Suppose that the input `NDArray`&#39;s dimension is `ndim`, the range of the inserted axis is `[-ndim, ndim]`</param>
         new(data : Symbol,
@@ -31052,13 +34543,11 @@ module SymbolOperators =
                 ]
             new ExpandDims(Arguments<Symbol>(operatorArguments))
         /// <summary>Inserts a new axis of size 1 into the array shape
-        /// 
         /// For example, given ``x`` with shape ``(2,3,4)``, then ``expand_dims(x, axis=1)``
         /// will return a new array with shape ``(2,1,3,4)``.
         /// 
         /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L421</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L394</summary>
         /// <param name="axis">Position where new axis is to be inserted. Suppose that the input `NDArray`&#39;s dimension is `ndim`, the range of the inserted axis is `[-ndim, ndim]`</param>
         /// <param name="data">Source input</param>
         new(axis : int,
@@ -31091,44 +34580,33 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new Slice(args)
         override this.WithArguments(args : Arguments<Symbol>) = new Slice(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Slices a region of the array.
-        /// 
         /// .. note:: ``crop`` is deprecated. Use ``slice`` instead.
-        /// 
         /// This function returns a sliced array between the indices given
         /// by `begin` and `end` with the corresponding `step`.
-        /// 
         /// For an input array of ``shape=(d_0, d_1, ..., d_n-1)``,
         /// slice operation with ``begin=(b_0, b_1...b_m-1)``,
         /// ``end=(e_0, e_1, ..., e_m-1)``, and ``step=(s_0, s_1, ..., s_m-1)``,
         /// where m &lt;= n, results in an array with the shape
         /// ``(|e_0-b_0|/|s_0|, ..., |e_m-1-b_m-1|/|s_m-1|, d_m, ..., d_n-1)``.
-        /// 
         /// The resulting array&#39;s *k*-th dimension contains elements
         /// from the *k*-th dimension of the input array starting
         /// from index ``b_k`` (inclusive) with step ``s_k``
         /// until reaching ``e_k`` (exclusive).
-        /// 
         /// If the *k*-th elements are `None` in the sequence of `begin`, `end`,
         /// and `step`, the following rule will be used to set default values.
         /// If `s_k` is `None`, set `s_k=1`. If `s_k &gt; 0`, set `b_k=0`, `e_k=d_k`;
         /// else, set `b_k=d_k-1`, `e_k=-1`.
-        /// 
         /// The storage type of ``slice`` output depends on storage types of inputs
-        /// 
         /// - slice(csr) = csr
         /// - otherwise, ``slice`` generates output with default storage
-        /// 
         /// .. note:: When input data storage type is csr, it only supports
         ///    step=(), or step=(None,), or step=(1,) to generate a csr output.
         ///    For other step parameter values, it falls back to slicing
         ///    a dense tensor.
-        /// 
         /// Example::
-        /// 
         ///   x = [[  1.,   2.,   3.,   4.],
         ///        [  5.,   6.,   7.,   8.],
         ///        [  9.,  10.,  11.,  12.]]
-        /// 
         ///   slice(x, begin=(0,1), end=(2,4)) = [[ 2.,  3.,  4.],
         ///                                      [ 6.,  7.,  8.]]
         ///   slice(x, begin=(None, 0), end=(None, 3), step=(-1, 2)) = [[9., 11.],
@@ -31136,7 +34614,7 @@ module SymbolOperators =
         ///                                                             [1.,  3.]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L511</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L481</summary>
         /// <param name="data">Source input</param>
         /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
         /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
@@ -31154,44 +34632,33 @@ module SymbolOperators =
                 ]
             new Slice(Arguments<Symbol>(operatorArguments))
         /// <summary>Slices a region of the array.
-        /// 
         /// .. note:: ``crop`` is deprecated. Use ``slice`` instead.
-        /// 
         /// This function returns a sliced array between the indices given
         /// by `begin` and `end` with the corresponding `step`.
-        /// 
         /// For an input array of ``shape=(d_0, d_1, ..., d_n-1)``,
         /// slice operation with ``begin=(b_0, b_1...b_m-1)``,
         /// ``end=(e_0, e_1, ..., e_m-1)``, and ``step=(s_0, s_1, ..., s_m-1)``,
         /// where m &lt;= n, results in an array with the shape
         /// ``(|e_0-b_0|/|s_0|, ..., |e_m-1-b_m-1|/|s_m-1|, d_m, ..., d_n-1)``.
-        /// 
         /// The resulting array&#39;s *k*-th dimension contains elements
         /// from the *k*-th dimension of the input array starting
         /// from index ``b_k`` (inclusive) with step ``s_k``
         /// until reaching ``e_k`` (exclusive).
-        /// 
         /// If the *k*-th elements are `None` in the sequence of `begin`, `end`,
         /// and `step`, the following rule will be used to set default values.
         /// If `s_k` is `None`, set `s_k=1`. If `s_k &gt; 0`, set `b_k=0`, `e_k=d_k`;
         /// else, set `b_k=d_k-1`, `e_k=-1`.
-        /// 
         /// The storage type of ``slice`` output depends on storage types of inputs
-        /// 
         /// - slice(csr) = csr
         /// - otherwise, ``slice`` generates output with default storage
-        /// 
         /// .. note:: When input data storage type is csr, it only supports
         ///    step=(), or step=(None,), or step=(1,) to generate a csr output.
         ///    For other step parameter values, it falls back to slicing
         ///    a dense tensor.
-        /// 
         /// Example::
-        /// 
         ///   x = [[  1.,   2.,   3.,   4.],
         ///        [  5.,   6.,   7.,   8.],
         ///        [  9.,  10.,  11.,  12.]]
-        /// 
         ///   slice(x, begin=(0,1), end=(2,4)) = [[ 2.,  3.,  4.],
         ///                                      [ 6.,  7.,  8.]]
         ///   slice(x, begin=(None, 0), end=(None, 3), step=(-1, 2)) = [[9., 11.],
@@ -31199,7 +34666,7 @@ module SymbolOperators =
         ///                                                             [1.,  3.]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L511</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L481</summary>
         /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
         /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
         /// <param name="data">Source input</param>
@@ -31258,7 +34725,7 @@ module SymbolOperators =
         /// - lhs and rhs are of the same data type, and on the same device.
         /// 
         /// 
-        /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:543</summary>
+        /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:514</summary>
         /// <param name="lhs">Source input</param>
         /// <param name="rhs">value to assign</param>
         /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
@@ -31286,7 +34753,7 @@ module SymbolOperators =
         /// - lhs and rhs are of the same data type, and on the same device.
         /// 
         /// 
-        /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:543</summary>
+        /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:514</summary>
         /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
         /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
         /// <param name="lhs">Source input</param>
@@ -31353,7 +34820,7 @@ module SymbolOperators =
         /// - output should be explicitly given and be the same as input
         /// )
         /// 
-        /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:569</summary>
+        /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:540</summary>
         /// <param name="data">Source input</param>
         /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
         /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
@@ -31380,7 +34847,7 @@ module SymbolOperators =
         /// - output should be explicitly given and be the same as input
         /// )
         /// 
-        /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:569</summary>
+        /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:540</summary>
         /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
         /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
         /// <param name="data">Source input</param>
@@ -31443,29 +34910,23 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new SliceAxis(args)
         override this.WithArguments(args : Arguments<Symbol>) = new SliceAxis(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Slices along a given axis.
-        /// 
         /// Returns an array slice along a given `axis` starting from the `begin` index
         /// to the `end` index.
-        /// 
         /// Examples::
-        /// 
         ///   x = [[  1.,   2.,   3.,   4.],
         ///        [  5.,   6.,   7.,   8.],
         ///        [  9.,  10.,  11.,  12.]]
-        /// 
         ///   slice_axis(x, axis=0, begin=1, end=3) = [[  5.,   6.,   7.,   8.],
         ///                                            [  9.,  10.,  11.,  12.]]
-        /// 
         ///   slice_axis(x, axis=1, begin=0, end=2) = [[  1.,   2.],
         ///                                            [  5.,   6.],
         ///                                            [  9.,  10.]]
-        /// 
         ///   slice_axis(x, axis=1, begin=-3, end=-1) = [[  2.,   3.],
         ///                                              [  6.,   7.],
         ///                                              [ 10.,  11.]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L605</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L570</summary>
         /// <param name="data">Source input</param>
         /// <param name="axis">Axis along which to be sliced, supports negative indexes.</param>
         /// <param name="sliceBegin">The beginning index along the axis to be sliced,  supports negative indexes.</param>
@@ -31483,29 +34944,23 @@ module SymbolOperators =
                 ]
             new SliceAxis(Arguments<Symbol>(operatorArguments))
         /// <summary>Slices along a given axis.
-        /// 
         /// Returns an array slice along a given `axis` starting from the `begin` index
         /// to the `end` index.
-        /// 
         /// Examples::
-        /// 
         ///   x = [[  1.,   2.,   3.,   4.],
         ///        [  5.,   6.,   7.,   8.],
         ///        [  9.,  10.,  11.,  12.]]
-        /// 
         ///   slice_axis(x, axis=0, begin=1, end=3) = [[  5.,   6.,   7.,   8.],
         ///                                            [  9.,  10.,  11.,  12.]]
-        /// 
         ///   slice_axis(x, axis=1, begin=0, end=2) = [[  1.,   2.],
         ///                                            [  5.,   6.],
         ///                                            [  9.,  10.]]
-        /// 
         ///   slice_axis(x, axis=1, begin=-3, end=-1) = [[  2.,   3.],
         ///                                              [  6.,   7.],
         ///                                              [ 10.,  11.]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L605</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L570</summary>
         /// <param name="axis">Axis along which to be sliced, supports negative indexes.</param>
         /// <param name="sliceBegin">The beginning index along the axis to be sliced,  supports negative indexes.</param>
         /// <param name="data">Source input</param>
@@ -31557,46 +35012,31 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new SliceLike(args)
         override this.WithArguments(args : Arguments<Symbol>) = new SliceLike(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Slices a region of the array like the shape of another array.
-        /// 
         /// This function is similar to ``slice``, however, the `begin` are always `0`s
         /// and `end` of specific axes are inferred from the second input `shape_like`.
-        /// 
         /// Given the second `shape_like` input of ``shape=(d_0, d_1, ..., d_n-1)``,
         /// a ``slice_like`` operator with default empty `axes`, it performs the
         /// following operation:
-        /// 
         /// `` out = slice(input, begin=(0, 0, ..., 0), end=(d_0, d_1, ..., d_n-1))``.
-        /// 
         /// When `axes` is not empty, it is used to speficy which axes are being sliced.
-        /// 
         /// Given a 4-d input data, ``slice_like`` operator with ``axes=(0, 2, -1)``
         /// will perform the following operation:
-        /// 
         /// `` out = slice(input, begin=(0, 0, 0, 0), end=(d_0, None, d_2, d_3))``.
-        /// 
         /// Note that it is allowed to have first and second input with different dimensions,
         /// however, you have to make sure the `axes` are specified and not exceeding the
         /// dimension limits.
-        /// 
         /// For example, given `input_1` with ``shape=(2,3,4,5)`` and `input_2` with
         /// ``shape=(1,2,3)``, it is not allowed to use:
-        /// 
         /// `` out = slice_like(a, b)`` because ndim of `input_1` is 4, and ndim of `input_2`
         /// is 3.
-        /// 
         /// The following is allowed in this situation:
-        /// 
         /// `` out = slice_like(a, b, axes=(0, 2))``
-        /// 
         /// Example::
-        /// 
         ///   x = [[  1.,   2.,   3.,   4.],
         ///        [  5.,   6.,   7.,   8.],
         ///        [  9.,  10.,  11.,  12.]]
-        /// 
         ///   y = [[  0.,   0.,   0.],
         ///        [  0.,   0.,   0.]]
-        /// 
         ///   slice_like(x, y) = [[ 1.,  2.,  3.]
         ///                       [ 5.,  6.,  7.]]
         ///   slice_like(x, y, axes=(0, 1)) = [[ 1.,  2.,  3.]
@@ -31608,7 +35048,7 @@ module SymbolOperators =
         ///                                  [  9.,  10.,  11.]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L674</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L624</summary>
         /// <param name="data">Source input</param>
         /// <param name="shapeLike">Shape like input</param>
         /// <param name="axes">List of axes on which input data will be sliced according to the corresponding size of the second input. By default will slice on all axes. Negative axes are supported.</param>
@@ -31653,23 +35093,15 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new Clip(args)
         override this.WithArguments(args : Arguments<Symbol>) = new Clip(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Clips (limits) the values in an array.
-        /// 
         /// Given an interval, values outside the interval are clipped to the interval edges.
         /// Clipping ``x`` between `a_min` and `a_max` would be::
-        /// 
         /// .. math::
-        /// 
         ///    clip(x, a_min, a_max) = \max(\min(x, a_max), a_min))
-        /// 
         /// Example::
-        /// 
         ///     x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        /// 
         ///     clip(x,1,8) = [ 1.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  8.]
-        /// 
         /// The storage type of ``clip`` output depends on storage types of inputs and the a_min, a_max \
         /// parameter values:
-        /// 
         ///    - clip(default) = default
         ///    - clip(row_sparse, a_min &lt;= 0, a_max &gt;= 0) = row_sparse
         ///    - clip(csr, a_min &lt;= 0, a_max &gt;= 0) = csr
@@ -31679,8 +35111,7 @@ module SymbolOperators =
         ///    - clip(csr, a_min &gt; 0, a_max &gt; 0) = csr
         /// 
         /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L735</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L676</summary>
         /// <param name="data">Input array.</param>
         /// <param name="aMin">Minimum value</param>
         /// <param name="aMax">Maximum value</param>
@@ -31695,23 +35126,15 @@ module SymbolOperators =
                 ]
             new Clip(Arguments<Symbol>(operatorArguments))
         /// <summary>Clips (limits) the values in an array.
-        /// 
         /// Given an interval, values outside the interval are clipped to the interval edges.
         /// Clipping ``x`` between `a_min` and `a_max` would be::
-        /// 
         /// .. math::
-        /// 
         ///    clip(x, a_min, a_max) = \max(\min(x, a_max), a_min))
-        /// 
         /// Example::
-        /// 
         ///     x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        /// 
         ///     clip(x,1,8) = [ 1.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  8.]
-        /// 
         /// The storage type of ``clip`` output depends on storage types of inputs and the a_min, a_max \
         /// parameter values:
-        /// 
         ///    - clip(default) = default
         ///    - clip(row_sparse, a_min &lt;= 0, a_max &gt;= 0) = row_sparse
         ///    - clip(csr, a_min &lt;= 0, a_max &gt;= 0) = csr
@@ -31721,8 +35144,7 @@ module SymbolOperators =
         ///    - clip(csr, a_min &gt; 0, a_max &gt; 0) = csr
         /// 
         /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L735</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L676</summary>
         /// <param name="aMin">Minimum value</param>
         /// <param name="aMax">Maximum value</param>
         /// <param name="data">Input array.</param>
@@ -31763,31 +35185,23 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new Repeat(args)
         override this.WithArguments(args : Arguments<Symbol>) = new Repeat(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Repeats elements of an array.
-        /// 
         /// By default, ``repeat`` flattens the input array into 1-D and then repeats the
         /// elements::
-        /// 
         ///   x = [[ 1, 2],
         ///        [ 3, 4]]
-        /// 
         ///   repeat(x, repeats=2) = [ 1.,  1.,  2.,  2.,  3.,  3.,  4.,  4.]
-        /// 
         /// The parameter ``axis`` specifies the axis along which to perform repeat::
-        /// 
         ///   repeat(x, repeats=2, axis=1) = [[ 1.,  1.,  2.,  2.],
         ///                                   [ 3.,  3.,  4.,  4.]]
-        /// 
         ///   repeat(x, repeats=2, axis=0) = [[ 1.,  2.],
         ///                                   [ 1.,  2.],
         ///                                   [ 3.,  4.],
         ///                                   [ 3.,  4.]]
-        /// 
         ///   repeat(x, repeats=2, axis=-1) = [[ 1.,  1.,  2.,  2.],
         ///                                    [ 3.,  3.,  4.,  4.]]
         /// 
         /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L810</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L743</summary>
         /// <param name="data">Input data array</param>
         /// <param name="repeats">The number of repetitions for each element.</param>
         /// <param name="axis">The axis along which to repeat values. The negative numbers are interpreted counting from the backward. By default, use the flattened input array, and return a flat output array.</param>
@@ -31802,31 +35216,23 @@ module SymbolOperators =
                 ]
             new Repeat(Arguments<Symbol>(operatorArguments))
         /// <summary>Repeats elements of an array.
-        /// 
         /// By default, ``repeat`` flattens the input array into 1-D and then repeats the
         /// elements::
-        /// 
         ///   x = [[ 1, 2],
         ///        [ 3, 4]]
-        /// 
         ///   repeat(x, repeats=2) = [ 1.,  1.,  2.,  2.,  3.,  3.,  4.,  4.]
-        /// 
         /// The parameter ``axis`` specifies the axis along which to perform repeat::
-        /// 
         ///   repeat(x, repeats=2, axis=1) = [[ 1.,  1.,  2.,  2.],
         ///                                   [ 3.,  3.,  4.,  4.]]
-        /// 
         ///   repeat(x, repeats=2, axis=0) = [[ 1.,  2.],
         ///                                   [ 1.,  2.],
         ///                                   [ 3.,  4.],
         ///                                   [ 3.,  4.]]
-        /// 
         ///   repeat(x, repeats=2, axis=-1) = [[ 1.,  1.,  2.,  2.],
         ///                                    [ 3.,  3.,  4.,  4.]]
         /// 
         /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L810</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L743</summary>
         /// <param name="repeats">The number of repetitions for each element.</param>
         /// <param name="data">Input data array</param>
         /// <param name="axis">The axis along which to repeat values. The negative numbers are interpreted counting from the backward. By default, use the flattened input array, and return a flat output array.</param>
@@ -31870,42 +35276,32 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new Tile(args)
         override this.WithArguments(args : Arguments<Symbol>) = new Tile(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Repeats the whole array multiple times.
-        /// 
         /// If ``reps`` has length *d*, and input array has dimension of *n*. There are
         /// three cases:
-        /// 
         /// - **n=d**. Repeat *i*-th dimension of the input by ``reps[i]`` times::
-        /// 
         ///     x = [[1, 2],
         ///          [3, 4]]
-        /// 
         ///     tile(x, reps=(2,3)) = [[ 1.,  2.,  1.,  2.,  1.,  2.],
         ///                            [ 3.,  4.,  3.,  4.,  3.,  4.],
         ///                            [ 1.,  2.,  1.,  2.,  1.,  2.],
         ///                            [ 3.,  4.,  3.,  4.,  3.,  4.]]
-        /// 
         /// - **n&gt;d**. ``reps`` is promoted to length *n* by pre-pending 1&#39;s to it. Thus for
         ///   an input shape ``(2,3)``, ``repos=(2,)`` is treated as ``(1,2)``::
-        /// 
-        /// 
         ///     tile(x, reps=(2,)) = [[ 1.,  2.,  1.,  2.],
         ///                           [ 3.,  4.,  3.,  4.]]
-        /// 
         /// - **n&lt;d**. The input is promoted to be d-dimensional by prepending new axes. So a
         ///   shape ``(2,2)`` array is promoted to ``(1,2,2)`` for 3-D replication::
-        /// 
         ///     tile(x, reps=(2,2,3)) = [[[ 1.,  2.,  1.,  2.,  1.,  2.],
         ///                               [ 3.,  4.,  3.,  4.,  3.,  4.],
         ///                               [ 1.,  2.,  1.,  2.,  1.,  2.],
         ///                               [ 3.,  4.,  3.,  4.,  3.,  4.]],
-        /// 
         ///                              [[ 1.,  2.,  1.,  2.,  1.,  2.],
         ///                               [ 3.,  4.,  3.,  4.,  3.,  4.],
         ///                               [ 1.,  2.,  1.,  2.,  1.,  2.],
         ///                               [ 3.,  4.,  3.,  4.,  3.,  4.]]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L872</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L795</summary>
         /// <param name="data">Input data array</param>
         /// <param name="reps">The number of times for repeating the tensor a. Each dim size of reps must be a positive integer. If reps has length d, the result will have dimension of max(d, a.ndim); If a.ndim &lt; d, a is promoted to be d-dimensional by prepending new axes. If a.ndim &gt; d, reps is promoted to a.ndim by pre-pending 1&#39;s to it.</param>
         new(data : Symbol,
@@ -31917,42 +35313,32 @@ module SymbolOperators =
                 ]
             new Tile(Arguments<Symbol>(operatorArguments))
         /// <summary>Repeats the whole array multiple times.
-        /// 
         /// If ``reps`` has length *d*, and input array has dimension of *n*. There are
         /// three cases:
-        /// 
         /// - **n=d**. Repeat *i*-th dimension of the input by ``reps[i]`` times::
-        /// 
         ///     x = [[1, 2],
         ///          [3, 4]]
-        /// 
         ///     tile(x, reps=(2,3)) = [[ 1.,  2.,  1.,  2.,  1.,  2.],
         ///                            [ 3.,  4.,  3.,  4.,  3.,  4.],
         ///                            [ 1.,  2.,  1.,  2.,  1.,  2.],
         ///                            [ 3.,  4.,  3.,  4.,  3.,  4.]]
-        /// 
         /// - **n&gt;d**. ``reps`` is promoted to length *n* by pre-pending 1&#39;s to it. Thus for
         ///   an input shape ``(2,3)``, ``repos=(2,)`` is treated as ``(1,2)``::
-        /// 
-        /// 
         ///     tile(x, reps=(2,)) = [[ 1.,  2.,  1.,  2.],
         ///                           [ 3.,  4.,  3.,  4.]]
-        /// 
         /// - **n&lt;d**. The input is promoted to be d-dimensional by prepending new axes. So a
         ///   shape ``(2,2)`` array is promoted to ``(1,2,2)`` for 3-D replication::
-        /// 
         ///     tile(x, reps=(2,2,3)) = [[[ 1.,  2.,  1.,  2.,  1.,  2.],
         ///                               [ 3.,  4.,  3.,  4.,  3.,  4.],
         ///                               [ 1.,  2.,  1.,  2.,  1.,  2.],
         ///                               [ 3.,  4.,  3.,  4.,  3.,  4.]],
-        /// 
         ///                              [[ 1.,  2.,  1.,  2.,  1.,  2.],
         ///                               [ 3.,  4.,  3.,  4.,  3.,  4.],
         ///                               [ 1.,  2.,  1.,  2.,  1.,  2.],
         ///                               [ 3.,  4.,  3.,  4.,  3.,  4.]]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L872</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L795</summary>
         /// <param name="reps">The number of times for repeating the tensor a. Each dim size of reps must be a positive integer. If reps has length d, the result will have dimension of max(d, a.ndim); If a.ndim &lt; d, a is promoted to be d-dimensional by prepending new axes. If a.ndim &gt; d, reps is promoted to a.ndim by pre-pending 1&#39;s to it.</param>
         /// <param name="data">Input data array</param>
         new(reps : int seq,
@@ -31985,22 +35371,17 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new Reverse(args)
         override this.WithArguments(args : Arguments<Symbol>) = new Reverse(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Reverses the order of elements along given axis while preserving array shape.
-        /// 
         /// Note: reverse and flip are equivalent. We use reverse in the following examples.
-        /// 
         /// Examples::
-        /// 
         ///   x = [[ 0.,  1.,  2.,  3.,  4.],
         ///        [ 5.,  6.,  7.,  8.,  9.]]
-        /// 
         ///   reverse(x, axis=0) = [[ 5.,  6.,  7.,  8.,  9.],
         ///                         [ 0.,  1.,  2.,  3.,  4.]]
-        /// 
         ///   reverse(x, axis=1) = [[ 4.,  3.,  2.,  1.,  0.],
         ///                         [ 9.,  8.,  7.,  6.,  5.]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L913</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L831</summary>
         /// <param name="data">Input data array</param>
         /// <param name="axis">The axis which to reverse elements.</param>
         new(data : Symbol,
@@ -32012,22 +35393,17 @@ module SymbolOperators =
                 ]
             new Reverse(Arguments<Symbol>(operatorArguments))
         /// <summary>Reverses the order of elements along given axis while preserving array shape.
-        /// 
         /// Note: reverse and flip are equivalent. We use reverse in the following examples.
-        /// 
         /// Examples::
-        /// 
         ///   x = [[ 0.,  1.,  2.,  3.,  4.],
         ///        [ 5.,  6.,  7.,  8.,  9.]]
-        /// 
         ///   reverse(x, axis=0) = [[ 5.,  6.,  7.,  8.,  9.],
         ///                         [ 0.,  1.,  2.,  3.,  4.]]
-        /// 
         ///   reverse(x, axis=1) = [[ 4.,  3.,  2.,  1.,  0.],
         ///                         [ 9.,  8.,  7.,  6.,  5.]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L913</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L831</summary>
         /// <param name="axis">The axis which to reverse elements.</param>
         /// <param name="data">Input data array</param>
         new(axis : int seq,
@@ -32060,16 +35436,12 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new Stack(args)
         override this.WithArguments(args : Arguments<Symbol>) = new Stack(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Join a sequence of arrays along a new axis.
-        /// 
         /// The axis parameter specifies the index of the new axis in the dimensions of the
         /// result. For example, if axis=0 it will be the first dimension and if axis=-1 it
         /// will be the last dimension.
-        /// 
         /// Examples::
-        /// 
         ///   x = [1, 2]
         ///   y = [3, 4]
-        /// 
         ///   stack(x, y) = [[1, 2],
         ///                  [3, 4]]
         ///   stack(x, y, axis=1) = [[1, 3],
@@ -32112,27 +35484,24 @@ module SymbolOperators =
         /// <summary>Remove single-dimensional entries from the shape of an array.
         /// Same behavior of defining the output tensor shape as numpy.squeeze for the most of cases.
         /// See the following note for exception.
-        /// 
         /// Examples::
-        /// 
         ///   data = [[[0], [1], [2]]]
         ///   squeeze(data) = [0, 1, 2]
         ///   squeeze(data, axis=0) = [[0], [1], [2]]
         ///   squeeze(data, axis=2) = [[0, 1, 2]]
         ///   squeeze(data, axis=(0, 2)) = [0, 1, 2]
-        /// 
         /// .. Note::
         ///   The output of this operator will keep at least one dimension not removed. For example,
         ///   squeeze([[[4]]]) = [4], while in numpy.squeeze, the output will become a scalar.
         /// </summary>
         /// <param name="data">data to squeeze</param>
         /// <param name="axis">Selects a subset of the single-dimensional entries in the shape. If an axis is selected with shape entry greater than one, an error is raised.</param>
-        new([<Optional>] ?data : Symbol seq,
+        new([<Optional>] ?data : Symbol,
             [<Optional>] ?axis : int seq) = 
-            let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
-                    "data", VarArg("", data)
+                    "data", Input data
                     "axis", axis |> Option.map box |> Parameter
                 ]
             new Squeeze(Arguments<Symbol>(operatorArguments))
@@ -32140,17 +35509,17 @@ module SymbolOperators =
         /// Selects a subset of the single-dimensional entries in the shape. If an axis is selected with shape entry greater than one, an error is raised.
         static member AxisDefault : int [] option = None
         /// data to squeeze
-        member __.Data = operatorArguments.GetVarArg "data"
+        member __.Data = operatorArguments.GetInput "data"
         /// Selects a subset of the single-dimensional entries in the shape. If an axis is selected with shape entry greater than one, an error is raised.
         member __.Axis = operatorArguments.GetParameter("axis", Squeeze.AxisDefault)
         /// <summary>Copy Squeeze instance with updated inputs/parameters.</summary>
         /// <param name="data">data to squeeze</param>
         /// <param name="axis">Selects a subset of the single-dimensional entries in the shape. If an axis is selected with shape entry greater than one, an error is raised.</param>
-        member this.With([<Optional>] ?data : Symbol seq,
+        member this.With([<Optional>] ?data : Symbol,
             [<Optional>] ?axis : int seq) = 
             let operatorArguments = 
                 [
-                    data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                    data |> Option.map (fun x -> "data", Input x)
                     axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
                 ] |> List.choose id
             new Squeeze(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
@@ -32162,22 +35531,17 @@ module SymbolOperators =
         /// <summary>Rearranges(permutes) data from depth into blocks of spatial data.
         /// Similar to ONNX DepthToSpace operator:
         /// https://github.com/onnx/onnx/blob/master/docs/Operators.md#DepthToSpace.
-        /// The output is a new tensor where the values from depth dimension are moved in spatial blocks 
+        /// The output is a new tensor where the values from depth dimension are moved in spatial blocks
         /// to height and width dimension. The reverse of this operation is ``space_to_depth``.
-        /// 
         /// .. math::
-        /// 
         ///     \begin{gather*}
         ///     x \prime = reshape(x, [N, block\_size, block\_size, C / (block\_size ^ 2), H * block\_size, W * block\_size]) \\
         ///     x \prime \prime = transpose(x \prime, [0, 3, 4, 1, 5, 2]) \\
         ///     y = reshape(x \prime \prime, [N, C / (block\_size ^ 2), H * block\_size, W * block\_size])
         ///     \end{gather*}
-        /// 
-        /// where :math:`x` is an input tensor with default layout as :math:`[N, C, H, W]`: [batch, channels, height, width] 
+        /// where :math:`x` is an input tensor with default layout as :math:`[N, C, H, W]`: [batch, channels, height, width]
         /// and :math:`y` is the output tensor of layout :math:`[N, C / (block\_size ^ 2), H * block\_size, W * block\_size]`
-        /// 
         /// Example::
-        /// 
         ///   x = [[[[0, 1, 2],
         ///          [3, 4, 5]],
         ///         [[6, 7, 8],
@@ -32186,14 +35550,13 @@ module SymbolOperators =
         ///          [15, 16, 17]],
         ///         [[18, 19, 20],
         ///          [21, 22, 23]]]]
-        /// 
         ///   depth_to_space(x, 2) = [[[[0, 6, 1, 7, 2, 8],
         ///                             [12, 18, 13, 19, 14, 20],
         ///                             [3, 9, 4, 10, 5, 11],
         ///                             [15, 21, 16, 22, 17, 23]]]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1065</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L971</summary>
         /// <param name="data">Input ndarray</param>
         /// <param name="blockSize">Blocks of [block_size. block_size] are moved</param>
         new(data : Symbol,
@@ -32207,22 +35570,17 @@ module SymbolOperators =
         /// <summary>Rearranges(permutes) data from depth into blocks of spatial data.
         /// Similar to ONNX DepthToSpace operator:
         /// https://github.com/onnx/onnx/blob/master/docs/Operators.md#DepthToSpace.
-        /// The output is a new tensor where the values from depth dimension are moved in spatial blocks 
+        /// The output is a new tensor where the values from depth dimension are moved in spatial blocks
         /// to height and width dimension. The reverse of this operation is ``space_to_depth``.
-        /// 
         /// .. math::
-        /// 
         ///     \begin{gather*}
         ///     x \prime = reshape(x, [N, block\_size, block\_size, C / (block\_size ^ 2), H * block\_size, W * block\_size]) \\
         ///     x \prime \prime = transpose(x \prime, [0, 3, 4, 1, 5, 2]) \\
         ///     y = reshape(x \prime \prime, [N, C / (block\_size ^ 2), H * block\_size, W * block\_size])
         ///     \end{gather*}
-        /// 
-        /// where :math:`x` is an input tensor with default layout as :math:`[N, C, H, W]`: [batch, channels, height, width] 
+        /// where :math:`x` is an input tensor with default layout as :math:`[N, C, H, W]`: [batch, channels, height, width]
         /// and :math:`y` is the output tensor of layout :math:`[N, C / (block\_size ^ 2), H * block\_size, W * block\_size]`
-        /// 
         /// Example::
-        /// 
         ///   x = [[[[0, 1, 2],
         ///          [3, 4, 5]],
         ///         [[6, 7, 8],
@@ -32231,14 +35589,13 @@ module SymbolOperators =
         ///          [15, 16, 17]],
         ///         [[18, 19, 20],
         ///          [21, 22, 23]]]]
-        /// 
         ///   depth_to_space(x, 2) = [[[[0, 6, 1, 7, 2, 8],
         ///                             [12, 18, 13, 19, 14, 20],
         ///                             [3, 9, 4, 10, 5, 11],
         ///                             [15, 21, 16, 22, 17, 23]]]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1065</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L971</summary>
         /// <param name="blockSize">Blocks of [block_size. block_size] are moved</param>
         /// <param name="data">Input ndarray</param>
         new(blockSize : int,
@@ -32272,30 +35629,22 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new SpaceToDepth(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Rearranges(permutes) blocks of spatial data into depth.
         /// Similar to ONNX SpaceToDepth operator:
-        /// https://github.com/onnx/onnx/blob/master/docs/Operators.md#SpaceToDepth 
-        /// 
-        /// The output is a new tensor where the values from height and width dimension are 
+        /// https://github.com/onnx/onnx/blob/master/docs/Operators.md#SpaceToDepth
+        /// The output is a new tensor where the values from height and width dimension are
         /// moved to the depth dimension. The reverse of this operation is ``depth_to_space``.
-        /// 
         /// .. math::
-        /// 
         ///     \begin{gather*}
         ///     x \prime = reshape(x, [N, C, H / block\_size, block\_size, W / block\_size, block\_size]) \\
         ///     x \prime \prime = transpose(x \prime, [0, 3, 5, 1, 2, 4]) \\
         ///     y = reshape(x \prime \prime, [N, C * (block\_size ^ 2), H / block\_size, W / block\_size])
         ///     \end{gather*}
-        /// 
-        /// where :math:`x` is an input tensor with default layout as :math:`[N, C, H, W]`: [batch, channels, height, width] 
+        /// where :math:`x` is an input tensor with default layout as :math:`[N, C, H, W]`: [batch, channels, height, width]
         /// and :math:`y` is the output tensor of layout :math:`[N, C * (block\_size ^ 2), H / block\_size, W / block\_size]`
-        /// 
         /// Example::
-        /// 
         ///   x = [[[[0, 6, 1, 7, 2, 8],
         ///          [12, 18, 13, 19, 14, 20],
         ///          [3, 9, 4, 10, 5, 11],
         ///          [15, 21, 16, 22, 17, 23]]]]
-        /// 
-        /// 
         ///   space_to_depth(x, 2) = [[[[0, 1, 2],
         ///                             [3, 4, 5]],
         ///                            [[6, 7, 8],
@@ -32306,7 +35655,7 @@ module SymbolOperators =
         ///                             [21, 22, 23]]]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1119</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1018</summary>
         /// <param name="data">Input ndarray</param>
         /// <param name="blockSize">Blocks of [block_size. block_size] are moved</param>
         new(data : Symbol,
@@ -32319,30 +35668,22 @@ module SymbolOperators =
             new SpaceToDepth(Arguments<Symbol>(operatorArguments))
         /// <summary>Rearranges(permutes) blocks of spatial data into depth.
         /// Similar to ONNX SpaceToDepth operator:
-        /// https://github.com/onnx/onnx/blob/master/docs/Operators.md#SpaceToDepth 
-        /// 
-        /// The output is a new tensor where the values from height and width dimension are 
+        /// https://github.com/onnx/onnx/blob/master/docs/Operators.md#SpaceToDepth
+        /// The output is a new tensor where the values from height and width dimension are
         /// moved to the depth dimension. The reverse of this operation is ``depth_to_space``.
-        /// 
         /// .. math::
-        /// 
         ///     \begin{gather*}
         ///     x \prime = reshape(x, [N, C, H / block\_size, block\_size, W / block\_size, block\_size]) \\
         ///     x \prime \prime = transpose(x \prime, [0, 3, 5, 1, 2, 4]) \\
         ///     y = reshape(x \prime \prime, [N, C * (block\_size ^ 2), H / block\_size, W / block\_size])
         ///     \end{gather*}
-        /// 
-        /// where :math:`x` is an input tensor with default layout as :math:`[N, C, H, W]`: [batch, channels, height, width] 
+        /// where :math:`x` is an input tensor with default layout as :math:`[N, C, H, W]`: [batch, channels, height, width]
         /// and :math:`y` is the output tensor of layout :math:`[N, C * (block\_size ^ 2), H / block\_size, W / block\_size]`
-        /// 
         /// Example::
-        /// 
         ///   x = [[[[0, 6, 1, 7, 2, 8],
         ///          [12, 18, 13, 19, 14, 20],
         ///          [3, 9, 4, 10, 5, 11],
         ///          [15, 21, 16, 22, 17, 23]]]]
-        /// 
-        /// 
         ///   space_to_depth(x, 2) = [[[[0, 1, 2],
         ///                             [3, 4, 5]],
         ///                            [[6, 7, 8],
@@ -32353,7 +35694,7 @@ module SymbolOperators =
         ///                             [21, 22, 23]]]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1119</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1018</summary>
         /// <param name="blockSize">Blocks of [block_size. block_size] are moved</param>
         /// <param name="data">Input ndarray</param>
         new(blockSize : int,
@@ -32386,9 +35727,7 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new SplitV2(args)
         override this.WithArguments(args : Arguments<Symbol>) = new SplitV2(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Splits an array along a particular axis into multiple sub-arrays.
-        /// 
         /// Example::
-        /// 
         ///    x  = [[[ 1.]
         ///           [ 2.]]
         ///          [[ 3.]
@@ -32396,64 +35735,47 @@ module SymbolOperators =
         ///          [[ 5.]
         ///           [ 6.]]]
         ///    x.shape = (3, 2, 1)
-        /// 
         ///    y = split_v2(x, axis=1, indices_or_sections=2) // a list of 2 arrays with shape (3, 1, 1)
         ///    y = [[[ 1.]]
         ///         [[ 3.]]
         ///         [[ 5.]]]
-        /// 
         ///        [[[ 2.]]
         ///         [[ 4.]]
         ///         [[ 6.]]]
-        /// 
         ///    y[0].shape = (3, 1, 1)
-        /// 
         ///    z = split_v2(x, axis=0, indices_or_sections=3) // a list of 3 arrays with shape (1, 2, 1)
         ///    z = [[[ 1.]
         ///          [ 2.]]]
-        /// 
         ///        [[[ 3.]
         ///          [ 4.]]]
-        /// 
         ///        [[[ 5.]
         ///          [ 6.]]]
-        /// 
         ///    z[0].shape = (1, 2, 1)
-        /// 
         ///    w = split_v2(x, axis=0, indices_or_sections=(1,)) // a list of 2 arrays with shape [(1, 2, 1), (2, 2, 1)]
         ///    w = [[[ 1.]
         ///          [ 2.]]]
-        /// 
         ///        [[[3.]
         ///          [4.]]
-        /// 
         ///         [[5.]
         ///          [6.]]]
-        /// 
         ///   w[0].shape = (1, 2, 1)
         ///   w[1].shape = (2, 2, 1)
-        /// 
         /// `squeeze_axis=True` removes the axis with length 1 from the shapes of the output arrays.
         /// **Note** that setting `squeeze_axis` to ``1`` removes axis with length 1 only
         /// along the `axis` which it is split.
         /// Also `squeeze_axis` can be set to true only if ``input.shape[axis] == indices_or_sections``.
-        /// 
         /// Example::
-        /// 
         ///    z = split_v2(x, axis=0, indices_or_sections=3, squeeze_axis=1) // a list of 3 arrays with shape (2, 1)
         ///    z = [[ 1.]
         ///         [ 2.]]
-        /// 
         ///        [[ 3.]
         ///         [ 4.]]
-        /// 
         ///        [[ 5.]
         ///         [ 6.]]
         ///    z[0].shape = (2, 1)
         /// 
         /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1206</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1087</summary>
         /// <param name="data">The input</param>
         /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
         /// <param name="axis">Axis along which to split.</param>
@@ -32474,9 +35796,7 @@ module SymbolOperators =
                 ]
             new SplitV2(Arguments<Symbol>(operatorArguments))
         /// <summary>Splits an array along a particular axis into multiple sub-arrays.
-        /// 
         /// Example::
-        /// 
         ///    x  = [[[ 1.]
         ///           [ 2.]]
         ///          [[ 3.]
@@ -32484,64 +35804,47 @@ module SymbolOperators =
         ///          [[ 5.]
         ///           [ 6.]]]
         ///    x.shape = (3, 2, 1)
-        /// 
         ///    y = split_v2(x, axis=1, indices_or_sections=2) // a list of 2 arrays with shape (3, 1, 1)
         ///    y = [[[ 1.]]
         ///         [[ 3.]]
         ///         [[ 5.]]]
-        /// 
         ///        [[[ 2.]]
         ///         [[ 4.]]
         ///         [[ 6.]]]
-        /// 
         ///    y[0].shape = (3, 1, 1)
-        /// 
         ///    z = split_v2(x, axis=0, indices_or_sections=3) // a list of 3 arrays with shape (1, 2, 1)
         ///    z = [[[ 1.]
         ///          [ 2.]]]
-        /// 
         ///        [[[ 3.]
         ///          [ 4.]]]
-        /// 
         ///        [[[ 5.]
         ///          [ 6.]]]
-        /// 
         ///    z[0].shape = (1, 2, 1)
-        /// 
         ///    w = split_v2(x, axis=0, indices_or_sections=(1,)) // a list of 2 arrays with shape [(1, 2, 1), (2, 2, 1)]
         ///    w = [[[ 1.]
         ///          [ 2.]]]
-        /// 
         ///        [[[3.]
         ///          [4.]]
-        /// 
         ///         [[5.]
         ///          [6.]]]
-        /// 
         ///   w[0].shape = (1, 2, 1)
         ///   w[1].shape = (2, 2, 1)
-        /// 
         /// `squeeze_axis=True` removes the axis with length 1 from the shapes of the output arrays.
         /// **Note** that setting `squeeze_axis` to ``1`` removes axis with length 1 only
         /// along the `axis` which it is split.
         /// Also `squeeze_axis` can be set to true only if ``input.shape[axis] == indices_or_sections``.
-        /// 
         /// Example::
-        /// 
         ///    z = split_v2(x, axis=0, indices_or_sections=3, squeeze_axis=1) // a list of 3 arrays with shape (2, 1)
         ///    z = [[ 1.]
         ///         [ 2.]]
-        /// 
         ///        [[ 3.]
         ///         [ 4.]]
-        /// 
         ///        [[ 5.]
         ///         [ 6.]]
         ///    z[0].shape = (2, 1)
         /// 
         /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1206</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1087</summary>
         /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
         /// <param name="data">The input</param>
         /// <param name="axis">Axis along which to split.</param>
@@ -32616,7 +35919,10 @@ module SymbolOperators =
         inherit SymbolOperator("topk", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new Topk(args)
         override this.WithArguments(args : Arguments<Symbol>) = new Topk(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <summary>Returns the top *k* elements in an input array along the given axis.
+        /// <summary>Returns the indices of the top *k* elements in an input array along the given
+        ///  axis (by default).
+        ///  If ret_type is set to &#39;value&#39; returns the value of top *k* elements (instead of indices).
+        ///  In case of ret_type = &#39;both&#39;, both value and index would be returned.
         ///  The returned elements will be sorted.
         /// 
         /// Examples::
@@ -32645,7 +35951,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ordering_op.cc:L65</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ordering_op.cc:L68</summary>
         /// <param name="data">The input array</param>
         /// <param name="axis">Axis along which to choose the top k indices. If not given, the flattened array is used. Default is -1.</param>
         /// <param name="k">Number of top elements to select, should be always smaller than or equal to the element number in the given axis. A global sort is performed if set k &lt; 1.</param>
@@ -32752,7 +36058,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ordering_op.cc:L128</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ordering_op.cc:L132</summary>
         /// <param name="data">The input array</param>
         /// <param name="axis">Axis along which to choose sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
         /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
@@ -32820,7 +36126,7 @@ module SymbolOperators =
         ///   argsort(x, axis=None) = [ 3.,  1.,  5.,  0.,  4.,  2.]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ordering_op.cc:L178</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ordering_op.cc:L183</summary>
         /// <param name="data">The input array</param>
         /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
         /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
@@ -32932,7 +36238,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ravel.cc:L67</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ravel.cc:L68</summary>
         /// <param name="data">Array of flat indices</param>
         /// <param name="shape">Shape of the array into which the multi-indices apply.</param>
         new([<Optional>] ?data : Symbol,
@@ -33139,6 +36445,121 @@ module SymbolOperators =
                     exclude |> Option.map (fun x -> "exclude", Parameter(Some (box x)))
                 ] |> List.choose id
             new SquareSum(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type ContribMrcnnMaskTarget private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_mrcnn_mask_target", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribMrcnnMaskTarget(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribMrcnnMaskTarget(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Generate mask targets for Mask-RCNN.</summary>
+        /// <param name="rois">Bounding box coordinates, a 3D array</param>
+        /// <param name="gtMasks">Input masks of full image size, a 4D array</param>
+        /// <param name="matches">Index to a gt_mask, a 2D array</param>
+        /// <param name="clsTargets">Value [0, num_class), excluding background class, a 2D array</param>
+        /// <param name="numRois">Number of sampled RoIs.</param>
+        /// <param name="numClasses">Number of classes.</param>
+        /// <param name="maskSize">Size of the pooled masks height and width: (h, w).</param>
+        /// <param name="sampleRatio">Sampling ratio of ROI align. Set to -1 to use adaptative size.</param>
+        new(rois : Symbol,
+            gtMasks : Symbol,
+            matches : Symbol,
+            clsTargets : Symbol,
+            numRois : int,
+            numClasses : int,
+            maskSize : int seq,
+            [<Optional>] ?sampleRatio : int) = 
+            let operatorArguments = 
+                [
+                    "rois", Input rois
+                    "gt_masks", Input gtMasks
+                    "matches", Input matches
+                    "cls_targets", Input clsTargets
+                    "num_rois", Parameter(Some(box numRois))
+                    "num_classes", Parameter(Some(box numClasses))
+                    "mask_size", Parameter(Some(box maskSize))
+                    "sample_ratio", sampleRatio |> Option.map box |> Parameter
+                ]
+            new ContribMrcnnMaskTarget(Arguments<Symbol>(operatorArguments))
+        /// <summary>Generate mask targets for Mask-RCNN.</summary>
+        /// <param name="numRois">Number of sampled RoIs.</param>
+        /// <param name="numClasses">Number of classes.</param>
+        /// <param name="maskSize">Size of the pooled masks height and width: (h, w).</param>
+        /// <param name="rois">Bounding box coordinates, a 3D array</param>
+        /// <param name="gtMasks">Input masks of full image size, a 4D array</param>
+        /// <param name="matches">Index to a gt_mask, a 2D array</param>
+        /// <param name="clsTargets">Value [0, num_class), excluding background class, a 2D array</param>
+        /// <param name="sampleRatio">Sampling ratio of ROI align. Set to -1 to use adaptative size.</param>
+        new(numRois : int,
+            numClasses : int,
+            maskSize : int seq,
+            [<Optional>] ?rois : Symbol,
+            [<Optional>] ?gtMasks : Symbol,
+            [<Optional>] ?matches : Symbol,
+            [<Optional>] ?clsTargets : Symbol,
+            [<Optional>] ?sampleRatio : int) = 
+            let rois = defaultArg rois (new ImplicitVariable() :> Symbol)
+            let gtMasks = defaultArg gtMasks (new ImplicitVariable() :> Symbol)
+            let matches = defaultArg matches (new ImplicitVariable() :> Symbol)
+            let clsTargets = defaultArg clsTargets (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "rois", Input rois
+                    "gt_masks", Input gtMasks
+                    "matches", Input matches
+                    "cls_targets", Input clsTargets
+                    "num_rois", Parameter(Some(box numRois))
+                    "num_classes", Parameter(Some(box numClasses))
+                    "mask_size", Parameter(Some(box maskSize))
+                    "sample_ratio", sampleRatio |> Option.map box |> Parameter
+                ]
+            new ContribMrcnnMaskTarget(Arguments<Symbol>(operatorArguments))
+        /// Default value for SampleRatio
+        /// Sampling ratio of ROI align. Set to -1 to use adaptative size.
+        static member SampleRatioDefault : int = 2
+        /// Bounding box coordinates, a 3D array
+        member __.Rois = operatorArguments.GetInput "rois"
+        /// Input masks of full image size, a 4D array
+        member __.GtMasks = operatorArguments.GetInput "gt_masks"
+        /// Index to a gt_mask, a 2D array
+        member __.Matches = operatorArguments.GetInput "matches"
+        /// Value [0, num_class), excluding background class, a 2D array
+        member __.ClsTargets = operatorArguments.GetInput "cls_targets"
+        /// Number of sampled RoIs.
+        member __.NumRois : int = match operatorArguments.GetParameter "num_rois" with Some(v) -> unbox v | None -> failwithf "Required parameter num_rois is missing"
+        /// Number of classes.
+        member __.NumClasses : int = match operatorArguments.GetParameter "num_classes" with Some(v) -> unbox v | None -> failwithf "Required parameter num_classes is missing"
+        /// Size of the pooled masks height and width: (h, w).
+        member __.MaskSize : int seq = match operatorArguments.GetParameter "mask_size" with Some(v) -> unbox v | None -> failwithf "Required parameter mask_size is missing"
+        /// Sampling ratio of ROI align. Set to -1 to use adaptative size.
+        member __.SampleRatio = operatorArguments.GetParameter("sample_ratio", ContribMrcnnMaskTarget.SampleRatioDefault)
+        /// <summary>Copy ContribMrcnnMaskTarget instance with updated inputs/parameters.</summary>
+        /// <param name="rois">Bounding box coordinates, a 3D array</param>
+        /// <param name="gtMasks">Input masks of full image size, a 4D array</param>
+        /// <param name="matches">Index to a gt_mask, a 2D array</param>
+        /// <param name="clsTargets">Value [0, num_class), excluding background class, a 2D array</param>
+        /// <param name="numRois">Number of sampled RoIs.</param>
+        /// <param name="numClasses">Number of classes.</param>
+        /// <param name="maskSize">Size of the pooled masks height and width: (h, w).</param>
+        /// <param name="sampleRatio">Sampling ratio of ROI align. Set to -1 to use adaptative size.</param>
+        member this.With([<Optional>] ?rois : Symbol,
+            [<Optional>] ?gtMasks : Symbol,
+            [<Optional>] ?matches : Symbol,
+            [<Optional>] ?clsTargets : Symbol,
+            [<Optional>] ?numRois : int,
+            [<Optional>] ?numClasses : int,
+            [<Optional>] ?maskSize : int seq,
+            [<Optional>] ?sampleRatio : int) = 
+            let operatorArguments = 
+                [
+                    rois |> Option.map (fun x -> "rois", Input x)
+                    gtMasks |> Option.map (fun x -> "gt_masks", Input x)
+                    matches |> Option.map (fun x -> "matches", Input x)
+                    clsTargets |> Option.map (fun x -> "cls_targets", Input x)
+                    numRois |> Option.map (fun x -> "num_rois", Parameter(Some (box x)))
+                    numClasses |> Option.map (fun x -> "num_classes", Parameter(Some (box x)))
+                    maskSize |> Option.map (fun x -> "mask_size", Parameter(Some (box x)))
+                    sampleRatio |> Option.map (fun x -> "sample_ratio", Parameter(Some (box x)))
+                ] |> List.choose id
+            new ContribMrcnnMaskTarget(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type BilinearSampler private (operatorArguments) = 
         inherit SymbolOperator("BilinearSampler", operatorArguments)
@@ -33935,6 +37356,329 @@ module SymbolOperators =
                     computeSize |> Option.map (fun x -> "compute_size", Parameter(Some (box x)))
                 ] |> List.choose id
             new ContribIfft(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type ContribModulatedDeformableConvolution private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_ModulatedDeformableConvolution", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribModulatedDeformableConvolution(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribModulatedDeformableConvolution(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Compute 2-D modulated deformable convolution on 4-D input.
+        /// 
+        /// The modulated deformable convolution operation is described in https://arxiv.org/abs/1811.11168
+        /// 
+        /// For 2-D modulated deformable convolution, the shapes are
+        /// 
+        /// - **data**: *(batch_size, channel, height, width)*
+        /// - **offset**: *(batch_size, num_deformable_group * kernel[0] * kernel[1] * 2, height, width)*
+        /// - **mask**: *(batch_size, num_deformable_group * kernel[0] * kernel[1], height, width)*
+        /// - **weight**: *(num_filter, channel, kernel[0], kernel[1])*
+        /// - **bias**: *(num_filter,)*
+        /// - **out**: *(batch_size, num_filter, out_height, out_width)*.
+        /// 
+        /// Define::
+        /// 
+        ///   f(x,k,p,s,d) = floor((x+2*p-d*(k-1)-1)/s)+1
+        /// 
+        /// then we have::
+        /// 
+        ///   out_height=f(height, kernel[0], pad[0], stride[0], dilate[0])
+        ///   out_width=f(width, kernel[1], pad[1], stride[1], dilate[1])
+        /// 
+        /// If ``no_bias`` is set to be true, then the ``bias`` term is ignored.
+        /// 
+        /// The default data ``layout`` is *NCHW*, namely *(batch_size, channle, height,
+        /// width)*.
+        /// 
+        /// If ``num_group`` is larger than 1, denoted by *g*, then split the input ``data``
+        /// evenly into *g* parts along the channel axis, and also evenly split ``weight``
+        /// along the first dimension. Next compute the convolution on the *i*-th part of
+        /// the data with the *i*-th weight part. The output is obtained by concating all
+        /// the *g* results.
+        /// 
+        /// If ``num_deformable_group`` is larger than 1, denoted by *dg*, then split the
+        /// input ``offset`` evenly into *dg* parts along the channel axis, and also evenly
+        /// split ``out`` evenly into *dg* parts along the channel axis. Next compute the
+        /// deformable convolution, apply the *i*-th part of the offset part on the *i*-th
+        /// out.
+        /// 
+        /// 
+        /// Both ``weight`` and ``bias`` are learnable parameters.
+        /// 
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\modulated_deformable_convolution.cc:L102</summary>
+        /// <param name="data">Input data to the ModulatedDeformableConvolutionOp.</param>
+        /// <param name="offset">Input offset to ModulatedDeformableConvolutionOp.</param>
+        /// <param name="mask">Input mask to the ModulatedDeformableConvolutionOp.</param>
+        /// <param name="weight">Weight matrix.</param>
+        /// <param name="bias">Bias parameter.</param>
+        /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
+        /// <param name="numFilter">Convolution filter(channel) number</param>
+        /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
+        /// <param name="numGroup">Number of group partitions.</param>
+        /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
+        /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
+        /// <param name="noBias">Whether to disable bias parameter.</param>
+        /// <param name="im2colStep">Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.</param>
+        /// <param name="layout">Set layout for input, output and weight. Empty for
+        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
+        new(data : Symbol,
+            offset : Symbol,
+            mask : Symbol,
+            weight : Symbol,
+            bias : Symbol,
+            kernel : int seq,
+            numFilter : int,
+            [<Optional>] ?stride : int seq,
+            [<Optional>] ?dilate : int seq,
+            [<Optional>] ?pad : int seq,
+            [<Optional>] ?numGroup : int,
+            [<Optional>] ?numDeformableGroup : int,
+            [<Optional>] ?workspace : int64,
+            [<Optional>] ?noBias : bool,
+            [<Optional>] ?im2colStep : int,
+            [<Optional>] ?layout : ContribModulatedDeformableConvolutionLayout) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "offset", Input offset
+                    "mask", Input mask
+                    "weight", Input weight
+                    "bias", Input bias
+                    "kernel", Parameter(Some(box kernel))
+                    "num_filter", Parameter(Some(box numFilter))
+                    "stride", stride |> Option.map box |> Parameter
+                    "dilate", dilate |> Option.map box |> Parameter
+                    "pad", pad |> Option.map box |> Parameter
+                    "num_group", numGroup |> Option.map box |> Parameter
+                    "num_deformable_group", numDeformableGroup |> Option.map box |> Parameter
+                    "workspace", workspace |> Option.map box |> Parameter
+                    "no_bias", noBias |> Option.map box |> Parameter
+                    "im2col_step", im2colStep |> Option.map box |> Parameter
+                    "layout", layout |> Option.map box |> Parameter
+                ]
+            new ContribModulatedDeformableConvolution(Arguments<Symbol>(operatorArguments))
+        /// <summary>Compute 2-D modulated deformable convolution on 4-D input.
+        /// 
+        /// The modulated deformable convolution operation is described in https://arxiv.org/abs/1811.11168
+        /// 
+        /// For 2-D modulated deformable convolution, the shapes are
+        /// 
+        /// - **data**: *(batch_size, channel, height, width)*
+        /// - **offset**: *(batch_size, num_deformable_group * kernel[0] * kernel[1] * 2, height, width)*
+        /// - **mask**: *(batch_size, num_deformable_group * kernel[0] * kernel[1], height, width)*
+        /// - **weight**: *(num_filter, channel, kernel[0], kernel[1])*
+        /// - **bias**: *(num_filter,)*
+        /// - **out**: *(batch_size, num_filter, out_height, out_width)*.
+        /// 
+        /// Define::
+        /// 
+        ///   f(x,k,p,s,d) = floor((x+2*p-d*(k-1)-1)/s)+1
+        /// 
+        /// then we have::
+        /// 
+        ///   out_height=f(height, kernel[0], pad[0], stride[0], dilate[0])
+        ///   out_width=f(width, kernel[1], pad[1], stride[1], dilate[1])
+        /// 
+        /// If ``no_bias`` is set to be true, then the ``bias`` term is ignored.
+        /// 
+        /// The default data ``layout`` is *NCHW*, namely *(batch_size, channle, height,
+        /// width)*.
+        /// 
+        /// If ``num_group`` is larger than 1, denoted by *g*, then split the input ``data``
+        /// evenly into *g* parts along the channel axis, and also evenly split ``weight``
+        /// along the first dimension. Next compute the convolution on the *i*-th part of
+        /// the data with the *i*-th weight part. The output is obtained by concating all
+        /// the *g* results.
+        /// 
+        /// If ``num_deformable_group`` is larger than 1, denoted by *dg*, then split the
+        /// input ``offset`` evenly into *dg* parts along the channel axis, and also evenly
+        /// split ``out`` evenly into *dg* parts along the channel axis. Next compute the
+        /// deformable convolution, apply the *i*-th part of the offset part on the *i*-th
+        /// out.
+        /// 
+        /// 
+        /// Both ``weight`` and ``bias`` are learnable parameters.
+        /// 
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\modulated_deformable_convolution.cc:L102</summary>
+        /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
+        /// <param name="numFilter">Convolution filter(channel) number</param>
+        /// <param name="data">Input data to the ModulatedDeformableConvolutionOp.</param>
+        /// <param name="offset">Input offset to ModulatedDeformableConvolutionOp.</param>
+        /// <param name="mask">Input mask to the ModulatedDeformableConvolutionOp.</param>
+        /// <param name="weight">Weight matrix.</param>
+        /// <param name="bias">Bias parameter.</param>
+        /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
+        /// <param name="numGroup">Number of group partitions.</param>
+        /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
+        /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
+        /// <param name="noBias">Whether to disable bias parameter.</param>
+        /// <param name="im2colStep">Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.</param>
+        /// <param name="layout">Set layout for input, output and weight. Empty for
+        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
+        new(kernel : int seq,
+            numFilter : int,
+            [<Optional>] ?data : Symbol,
+            [<Optional>] ?offset : Symbol,
+            [<Optional>] ?mask : Symbol,
+            [<Optional>] ?weight : Symbol,
+            [<Optional>] ?bias : Symbol,
+            [<Optional>] ?stride : int seq,
+            [<Optional>] ?dilate : int seq,
+            [<Optional>] ?pad : int seq,
+            [<Optional>] ?numGroup : int,
+            [<Optional>] ?numDeformableGroup : int,
+            [<Optional>] ?workspace : int64,
+            [<Optional>] ?noBias : bool,
+            [<Optional>] ?im2colStep : int,
+            [<Optional>] ?layout : ContribModulatedDeformableConvolutionLayout) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let offset = defaultArg offset (new ImplicitVariable() :> Symbol)
+            let mask = defaultArg mask (new ImplicitVariable() :> Symbol)
+            let weight = defaultArg weight (new ImplicitVariable() :> Symbol)
+            let bias = defaultArg bias (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "offset", Input offset
+                    "mask", Input mask
+                    "weight", Input weight
+                    "bias", Input bias
+                    "kernel", Parameter(Some(box kernel))
+                    "num_filter", Parameter(Some(box numFilter))
+                    "stride", stride |> Option.map box |> Parameter
+                    "dilate", dilate |> Option.map box |> Parameter
+                    "pad", pad |> Option.map box |> Parameter
+                    "num_group", numGroup |> Option.map box |> Parameter
+                    "num_deformable_group", numDeformableGroup |> Option.map box |> Parameter
+                    "workspace", workspace |> Option.map box |> Parameter
+                    "no_bias", noBias |> Option.map box |> Parameter
+                    "im2col_step", im2colStep |> Option.map box |> Parameter
+                    "layout", layout |> Option.map box |> Parameter
+                ]
+            new ContribModulatedDeformableConvolution(Arguments<Symbol>(operatorArguments))
+        /// Default value for Stride
+        /// Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        static member StrideDefault : int [] = [||]
+        /// Default value for Dilate
+        /// Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        static member DilateDefault : int [] = [||]
+        /// Default value for Pad
+        /// Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.
+        static member PadDefault : int [] = [||]
+        /// Default value for NumGroup
+        /// Number of group partitions.
+        static member NumGroupDefault : int = 1
+        /// Default value for NumDeformableGroup
+        /// Number of deformable group partitions.
+        static member NumDeformableGroupDefault : int = 1
+        /// Default value for Workspace
+        /// Maximum temperal workspace allowed for convolution (MB).
+        static member WorkspaceDefault : int64 = 1024L
+        /// Default value for NoBias
+        /// Whether to disable bias parameter.
+        static member NoBiasDefault : bool = false
+        /// Default value for Im2colStep
+        /// Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.
+        static member Im2colStepDefault : int = 64
+        /// Default value for Layout
+        /// Set layout for input, output and weight. Empty for
+        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.
+        static member LayoutDefault : ContribModulatedDeformableConvolutionLayout option = None
+        /// Input data to the ModulatedDeformableConvolutionOp.
+        member __.Data = operatorArguments.GetInput "data"
+        /// Input offset to ModulatedDeformableConvolutionOp.
+        member __.Offset = operatorArguments.GetInput "offset"
+        /// Input mask to the ModulatedDeformableConvolutionOp.
+        member __.Mask = operatorArguments.GetInput "mask"
+        /// Weight matrix.
+        member __.Weight = operatorArguments.GetInput "weight"
+        /// Bias parameter.
+        member __.Bias = operatorArguments.GetInput "bias"
+        /// Convolution kernel size: (h, w) or (d, h, w)
+        member __.Kernel : int seq = match operatorArguments.GetParameter "kernel" with Some(v) -> unbox v | None -> failwithf "Required parameter kernel is missing"
+        /// Convolution filter(channel) number
+        member __.NumFilter : int = match operatorArguments.GetParameter "num_filter" with Some(v) -> unbox v | None -> failwithf "Required parameter num_filter is missing"
+        /// Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        member __.Stride = operatorArguments.GetParameter("stride", ContribModulatedDeformableConvolution.StrideDefault)
+        /// Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        member __.Dilate = operatorArguments.GetParameter("dilate", ContribModulatedDeformableConvolution.DilateDefault)
+        /// Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.
+        member __.Pad = operatorArguments.GetParameter("pad", ContribModulatedDeformableConvolution.PadDefault)
+        /// Number of group partitions.
+        member __.NumGroup = operatorArguments.GetParameter("num_group", ContribModulatedDeformableConvolution.NumGroupDefault)
+        /// Number of deformable group partitions.
+        member __.NumDeformableGroup = operatorArguments.GetParameter("num_deformable_group", ContribModulatedDeformableConvolution.NumDeformableGroupDefault)
+        /// Maximum temperal workspace allowed for convolution (MB).
+        member __.Workspace = operatorArguments.GetParameter("workspace", ContribModulatedDeformableConvolution.WorkspaceDefault)
+        /// Whether to disable bias parameter.
+        member __.NoBias = operatorArguments.GetParameter("no_bias", ContribModulatedDeformableConvolution.NoBiasDefault)
+        /// Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.
+        member __.Im2colStep = operatorArguments.GetParameter("im2col_step", ContribModulatedDeformableConvolution.Im2colStepDefault)
+        /// Set layout for input, output and weight. Empty for
+        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.
+        member __.Layout = operatorArguments.GetParameter("layout", ContribModulatedDeformableConvolution.LayoutDefault)
+        /// <summary>Copy ContribModulatedDeformableConvolution instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input data to the ModulatedDeformableConvolutionOp.</param>
+        /// <param name="offset">Input offset to ModulatedDeformableConvolutionOp.</param>
+        /// <param name="mask">Input mask to the ModulatedDeformableConvolutionOp.</param>
+        /// <param name="weight">Weight matrix.</param>
+        /// <param name="bias">Bias parameter.</param>
+        /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
+        /// <param name="numFilter">Convolution filter(channel) number</param>
+        /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
+        /// <param name="numGroup">Number of group partitions.</param>
+        /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
+        /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
+        /// <param name="noBias">Whether to disable bias parameter.</param>
+        /// <param name="im2colStep">Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.</param>
+        /// <param name="layout">Set layout for input, output and weight. Empty for
+        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?offset : Symbol,
+            [<Optional>] ?mask : Symbol,
+            [<Optional>] ?weight : Symbol,
+            [<Optional>] ?bias : Symbol,
+            [<Optional>] ?kernel : int seq,
+            [<Optional>] ?numFilter : int,
+            [<Optional>] ?stride : int seq,
+            [<Optional>] ?dilate : int seq,
+            [<Optional>] ?pad : int seq,
+            [<Optional>] ?numGroup : int,
+            [<Optional>] ?numDeformableGroup : int,
+            [<Optional>] ?workspace : int64,
+            [<Optional>] ?noBias : bool,
+            [<Optional>] ?im2colStep : int,
+            [<Optional>] ?layout : ContribModulatedDeformableConvolutionLayout) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    offset |> Option.map (fun x -> "offset", Input x)
+                    mask |> Option.map (fun x -> "mask", Input x)
+                    weight |> Option.map (fun x -> "weight", Input x)
+                    bias |> Option.map (fun x -> "bias", Input x)
+                    kernel |> Option.map (fun x -> "kernel", Parameter(Some (box x)))
+                    numFilter |> Option.map (fun x -> "num_filter", Parameter(Some (box x)))
+                    stride |> Option.map (fun x -> "stride", Parameter(Some (box x)))
+                    dilate |> Option.map (fun x -> "dilate", Parameter(Some (box x)))
+                    pad |> Option.map (fun x -> "pad", Parameter(Some (box x)))
+                    numGroup |> Option.map (fun x -> "num_group", Parameter(Some (box x)))
+                    numDeformableGroup |> Option.map (fun x -> "num_deformable_group", Parameter(Some (box x)))
+                    workspace |> Option.map (fun x -> "workspace", Parameter(Some (box x)))
+                    noBias |> Option.map (fun x -> "no_bias", Parameter(Some (box x)))
+                    im2colStep |> Option.map (fun x -> "im2col_step", Parameter(Some (box x)))
+                    layout |> Option.map (fun x -> "layout", Parameter(Some (box x)))
+                ] |> List.choose id
+            new ContribModulatedDeformableConvolution(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type ContribMultiProposal private (operatorArguments) = 
         inherit SymbolOperator("_contrib_MultiProposal", operatorArguments)
@@ -34780,7 +38524,7 @@ module SymbolOperators =
         /// If the input data is of shape [batch, channel, spacial_dim1, spacial_dim2, ...],
         /// `gamma` and `beta` parameters must be vectors of shape [channel].
         /// 
-        /// This implementation is based on paper:
+        /// This implementation is based on this paper [1]_
         /// 
         /// .. [1] Instance Normalization: The Missing Ingredient for Fast Stylization,
         ///    D. Ulyanov, A. Vedaldi, V. Lempitsky, 2016 (arXiv:1607.08022v2).
