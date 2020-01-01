@@ -124,9 +124,17 @@ let response = Parameter(shape = [numTrees; treeDim; pown 2 depth])
 let featureSelectionLogits = Parameter(ndarray = CPU(0).Zeros([inFeatures; numTrees; depth]))
 let featureThresholds = Parameter(shape = [numTrees; depth])
 let logTemperatures = Parameter(shape = [numTrees; depth])
+pown 2 0
+let ctx = CPU 0
+let indices = ctx.Arange(start = 0.0, stop = double(pown 2 depth))
+let offsets = 2.0 ** ctx.Arange(start = 0.0, stop = double depth)
 
-let indices = Arange(start = 0.0, stop = double(pown 2 depth))
-let offsets = 2.0 ** Arange(start = 0.0, stop = double depth)
+
+let binCodes = indices.Reshape(1,-1) ./ offsets.Reshape(-1,1)
+binCodes.ToFloat32Array()
+offsets.ToFloat32Array()
+ctx.Arange(start = 0.0, stop = double depth).ToFloat32Array()
+
 
 let featureSelectors = choicef featureSelectionLogits 0
 let featureValues = Dot(input, featureSelectors)
@@ -137,6 +145,9 @@ let thresholdLogits =
 
 
 let bins = binf thresholdLogits
+
+let binMatches = NpiEinsum([bins :> Symbol; binCodesOneHot :> Symbol], "btds,dcs->btdc")
+
 
 let f = (CPU 0).Arange(0.0, 24.0).Reshape(3,2,4)
 let i = (CPU 0).CopyFrom([|1.f;0.f;1.f|]).Reshape(1,3)

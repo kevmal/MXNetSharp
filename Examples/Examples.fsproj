@@ -22,7 +22,6 @@
     <None Include="MNIST VAE.fsx" />
     <None Include="CGAN.fsx" />
     <None Include="Node.fsx" />
-    <None Include="TCN.fsx" />
   </ItemGroup>
 
   <ItemGroup>
