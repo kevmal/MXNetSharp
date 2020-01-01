@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="DQN\qmodel.svg" />
     <Content Include="DQN\play1616.gif" />
     <Content Include="DQN\play1000.gif" />
     <None Include="DQN\README.MD" />
@@ -20,7 +21,6 @@
     <None Include="Neural Style Transfer.fsx" />
     <None Include="MNIST VAE.fsx" />
     <None Include="CGAN.fsx" />
-    <None Include="TCN.fsx" />
   </ItemGroup>
 
   <ItemGroup>
