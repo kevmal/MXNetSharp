@@ -18,13 +18,23 @@ module Basic =
         let observedY = actualY + MX.RandomNormalLike(actualY, 0.0, 0.1)
         let input = Input("x", ndarray = X)
         let label = Input("y", ndarray = observedY)
-        let m = Parameter("m",ndarray = ctx.RandomUniform(-1.0, 1.0, shape = [1]), grad = ctx.Zeros(shape = [1]), opReqType = OpReqType.WriteTo)
+        let g = ctx.Zeros(shape = [1])
+        let m = Parameter("m",ndarray = ctx.RandomUniform(-1.0, 1.0, shape = [1]), grad = g, opReqType = OpReqType.WriteTo)
         let b = Parameter("b",ndarray = ctx.RandomUniform(-1.0, 1.0, shape = [1]), grad = ctx.Zeros(shape = [1]), opReqType = OpReqType.WriteTo)
         let model = m.*input .+ b
         let loss = MakeLoss(Mean(Square(model - label)))
         let execOutput = SymbolGroup([loss :> Symbol; model :> Symbol])
         let bindings = execOutput.Bindings |> Seq.sortBy (fun x -> x.Name) |> Seq.toArray
         Assert.Equal(4, bindings.Length)
+        Assert.Equal("b", bindings.[0].Name)
+        Assert.Equal("m", bindings.[1].Name)
+        Assert.Equal("x", bindings.[2].Name)
+        Assert.Equal("y", bindings.[3].Name)
+        Assert.Same(X, bindings.[2].NDArray.Value)
+        Assert.Same(observedY, bindings.[3].NDArray.Value)
+        Assert.Same(g, bindings.[1].Grad.Value)
+
+
 
 
     // See issue #12
