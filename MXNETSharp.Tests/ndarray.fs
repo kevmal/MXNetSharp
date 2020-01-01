@@ -6,8 +6,8 @@ open Xunit
 open MXNetSharp
 //TODO: test mutation operators
 //TODO: add and test unary mutation operators
+module OpHelp = 
 
-module BasicBinaryOps =
     let nd (x : float32 seq) = 
         let data = x |> Seq.toArray
         NDArray.CopyFrom(data,[data.Length],CPU(0))
@@ -60,9 +60,9 @@ module BasicBinaryOps =
                 Assert.Equal(double expected.[i], double actual.[i], 6)
 
 
- 
-    open MXNetSharp.PrimitiveOperators
 
+module BasicBinaryOps =
+    open OpHelp
     [<Fact>]
     let ``add``() = testBinaryOp1 (+) (+) (+) (+) (.+) true
     [<Fact>]
@@ -72,7 +72,7 @@ module BasicBinaryOps =
     [<Fact>]
     let ``mul``() = testBinaryOp1 ( * ) ( * ) ( * ) ( * ) (.*) true
     [<Fact>] 
-    let ``pow``() = testBinaryOp1 ( ** ) ( ** ) ( ** ) ( ** ) (.**)
+    let ``pow``() = testBinaryOp1 ( ** ) (fun a b -> NDArray.Pow(a,b)) (fun a b -> NDArray.ApplyPow(a,b)) (fun a b -> NDArray.Pow(a,b)) (.**) true
     [<Fact>]
     let ``mod``() = testBinaryOp1 (%) (%) (%) (%) (%) false
     let boolValue (==) x y = if x == y then 1.f else 0.f
@@ -95,6 +95,50 @@ module BasicBinaryOps =
     let logicalOr() = testBinaryOp1 (logicalValue(||)) (.||) (.||) (.||) (..||) true
     [<Fact>]
     let logicalXor() = testBinaryOp1 (logicalValue(<>))  (.^^) (.^^) (.^^) (..^^) true
+
+module BasicBinaryOpsWithPrim =
+    open OpHelp
+    open MXNetSharp.PrimitiveOperators
+
+    [<Fact>]
+    let ``add``() = testBinaryOp1 (+) (+) (+) (+) (.+) true
+    [<Fact>]
+    let ``sub``() = testBinaryOp1 (-) (-) (-) (-) (.-) true
+    [<Fact>]
+    let ``div``() = testBinaryOp1 (/) (/) (/) (/) (./) true
+    [<Fact>]
+    let ``mul``() = testBinaryOp1 ( * ) ( * ) ( * ) ( * ) (.*) true
+    [<Fact>] 
+    let ``pow``() = testBinaryOp1 ( ** ) ( ** ) ( ** ) ( ** ) (.**) true
+    [<Fact>]
+    let ``mod``() = testBinaryOp1 (%) (%) (%) (%) (%) false
+    let boolValue (==) x y = if x == y then 1.f else 0.f
+    [<Fact>]
+    let eq() = testBinaryOp1 (boolValue(=)) (.=) (.=) (.=) (.=) false
+    [<Fact>]
+    let neq() = testBinaryOp1 (boolValue(<>)) (.<>) (.<>) (.<>) (.<>) false
+    [<Fact>]
+    let greater() = testBinaryOp1 (boolValue(>)) (.>) (.>) (.>) (.>) false
+    [<Fact>]
+    let lesser() = testBinaryOp1 (boolValue(<)) (.<) (.<) (.<) (.<) false
+    [<Fact>]
+    let greaterEq() = testBinaryOp1 (boolValue(>=)) (.>=) (.>=) (.>=) (.>=) false
+    [<Fact>]
+    let lesserEq() = testBinaryOp1 (boolValue(<=)) (.<=) (.<=) (.<=) (.<=) false
+    let logicalValue (==) x y = if (x <> 0.f) == (y <> 0.f) then 1.f else 0.f
+    [<Fact>]
+    let logicalAnd() = testBinaryOp1 (logicalValue(&&)) (.&&) (.&&) (.&&) (..&&) true
+    [<Fact>]
+    let logicalOr() = testBinaryOp1 (logicalValue(||)) (.||) (.||) (.||) (..||) true
+    [<Fact>]
+    let logicalXor() = testBinaryOp1 (logicalValue(<>))  (.^^) (.^^) (.^^) (..^^) true
+
+    [<Fact>]
+    let ``power op test 1``() = 
+        let ctx = CPU 0
+        let r = (2.0 ** ctx.Arange(0.0, 6.0)).ToDoubleArray() |> Array.map (round >> int)
+        let actual = [|0 .. 5|] |> Array.map (fun x -> pown 2 x)
+        Assert.True((actual = r))
 
 
 module BasicUnaryOps =    
