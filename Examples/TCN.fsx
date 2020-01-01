@@ -1,7 +1,6 @@
 ﻿// ********************** Incomplete "Example" *****************************
 
 // Adapted from https://github.com/locuslab/TCN
-
 open System.Collections.Generic
 open System.Runtime.InteropServices
 
@@ -16,7 +15,6 @@ open System.IO.Compression
 
 open MXNetSharp.PrimitiveOperators
     
-
 let withName name (symbol : #Symbol) = symbol.Name <- name; symbol
 
 let wnorm name = 
