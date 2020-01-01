@@ -574,6 +574,11 @@ module SymbolExtension =
                     match symbol with 
                     | :? Parameter as p -> Seq.singleton p
                     | :? SymbolOutput as s -> loop s.Parent
+                    | :? SymbolGroup as s -> 
+                        seq {
+                            for i = 0 to s.Count - 1 do 
+                                yield! loop s.[i]
+                        }
                     | :? SymbolOperator as s -> 
                         s.OperatorArguments
                         |> Seq.collect
