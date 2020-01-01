@@ -1,7 +1,6 @@
 ﻿// ********************** Incomplete "Example" *****************************
 
 // Adapted from https://github.com/locuslab/TCN
-
 open System.Collections.Generic
 open System.Runtime.InteropServices
 
