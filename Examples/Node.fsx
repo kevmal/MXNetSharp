@@ -102,8 +102,79 @@ let f = r.Bind(CPU 0, q)
 
 f.Forward(false)
 
-let json = MXNetSharp.Interop.MXSymbol.saveToJSON r.UnsafeHandle
-
-File.WriteAllText("dmfkmsdfkmsdfkmsdkfmsd.json", json)
+f.Backward()
 
 let aa : float32[] = f.Outputs.[0].ToArray() 
+
+
+let inFeatures = 10
+let numTrees = 10
+let treeDim = 2
+let depth = 5
+let flatten = true
+let choicef t d = Softmax(t,axis=d,useLength=false)
+let binf t= ()
+
+
+let response = Parameter(shape = [numTrees; treeDim; pown 2 depth])
+
+// init response
+
+let featureSelection = Parameter(ndarray = CPU(0).Zeros([inFeatures; numTrees; depth]))
+let featureThresholds = Parameter(shape = [numTrees; depth])
+let logTemperatures = Parameter(shape = [numTrees; depth])
+
+let indices = Arange(start = 0.0, stop = double(pown 2 depth))
+let offsets = 2.0 ** Arange(start = 0.0, stop = double depth)
+
+
+
+
+let f = (CPU 0).Arange(0.0, 24.0).Reshape(3,2,4)
+let i = (CPU 0).CopyFrom([|1.f;0.f;1.f|]).Reshape(1,3)
+
+
+
+let q1 = f.SwapAxis(0,2)
+let q = q1.SwapAxis(0,1)
+
+
+open MXNetSharp.Interop
+type Crap() =
+    static member FullyConnected(data : NDArray, 
+                                 weight : NDArray, 
+                                 numHidden : int, 
+                                 [<Optional; DefaultParameterValue(true)>] flatten : bool) =
+        let creator = AtomicSymbolCreator.FromName "FullyConnected"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|data.UnsafeHandle; weight.UnsafeHandle|]
+                                                 [|"num_hidden"; "no_bias"; "flatten"|]
+                                                 [|string numHidden; "true"; string flatten|]
+        (new NDArray(SafeNDArrayHandle(outputs.[0], true)))
+
+
+let a = MX.Dot(i,f)
+
+NDArray.WaitAll()
+
+
+a.ToFloat32Array()
+
+
+let poo = Crap.FullyConnected(q,i,1,flatten=false)
+
+poo
+
+poo.ToFloat32Array()
+
+
+
+
+
+f .* i
+
+MX.LinalgGemm2(i,f)
+
+MX.expa
+
+MX.einsu
