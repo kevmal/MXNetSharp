@@ -106,6 +106,7 @@ f.Backward()
 
 let aa : float32[] = f.Outputs.[0].ToArray() 
 
+let input = Input("x")
 
 let inFeatures = 10
 let numTrees = 10
@@ -113,22 +114,29 @@ let treeDim = 2
 let depth = 5
 let flatten = true
 let choicef t d = Softmax(t,axis=d,useLength=false)
-let binf t= ()
+let binf t = t
 
 
 let response = Parameter(shape = [numTrees; treeDim; pown 2 depth])
 
 // init response
 
-let featureSelection = Parameter(ndarray = CPU(0).Zeros([inFeatures; numTrees; depth]))
+let featureSelectionLogits = Parameter(ndarray = CPU(0).Zeros([inFeatures; numTrees; depth]))
 let featureThresholds = Parameter(shape = [numTrees; depth])
 let logTemperatures = Parameter(shape = [numTrees; depth])
 
 let indices = Arange(start = 0.0, stop = double(pown 2 depth))
 let offsets = 2.0 ** Arange(start = 0.0, stop = double depth)
 
+let featureSelectors = choicef featureSelectionLogits 0
+let featureValues = Dot(input, featureSelectors)
+
+let thresholdLogits = 
+    let tl = (featureValues - featureThresholds) * exp(-logTemperatures)
+    Stack([-tl; tl], -1)
 
 
+let bins = binf thresholdLogits
 
 let f = (CPU 0).Arange(0.0, 24.0).Reshape(3,2,4)
 let i = (CPU 0).CopyFrom([|1.f;0.f;1.f|]).Reshape(1,3)
