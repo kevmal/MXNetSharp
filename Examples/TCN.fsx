@@ -16,7 +16,6 @@ open System.IO.Compression
 
 open MXNetSharp.PrimitiveOperators
     
-
 let withName name (symbol : #Symbol) = symbol.Name <- name; symbol
 
 let wnorm name = 
