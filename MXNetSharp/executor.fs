@@ -411,6 +411,20 @@ type SafeExecutorHandle(owner) =
         else
             ObjectDisposedException("SafeExecutorHandle", "Executor handle has been closed") |> raise
 
+
+
+type BindingIncompleteException(bind : Bind option, fieldOrName : string) =
+    inherit Exception(
+        match bind with 
+        | Some bind -> 
+            let tp = 
+                match bind with 
+                | AuxBinding _ -> "Aux"
+                | ArgBinding _ -> "Arg"
+            sprintf "Bindings incomplete. Expecting %s in  %s binding '%s'" fieldOrName tp bind.Name
+        | None -> 
+            sprintf "Bindings incomplete. No binding for '%s'." fieldOrName 
+        )
  
 type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, argGrad, gradReqType, auxStates, sharedExecutor, outputs, bindMap) =   
     let mutable disposed = false
@@ -457,12 +471,12 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
             |> Array.map 
                 (fun name ->
                     match bindings.TryGetValue(name) with 
-                    | true, (ArgBinding b) ->  //TODO: exception clean up
-                        let a = match b.NDArray with Some a -> a | None -> failwithf "Must provide %s" name
-                        let g = match b.Grad with Some a -> a | None -> failwithf "Must provide %s" name
-                        let t = match b.OpReqType with Some a -> a | None -> failwithf "Must provide %s" name
+                    | true, (ArgBinding b) -> 
+                        let a = match b.NDArray with Some a -> a | None -> raise (BindingIncompleteException(Some(ArgBinding b), "NDArray"))
+                        let g = match b.Grad with Some a -> a | None -> raise (BindingIncompleteException(Some(ArgBinding b), "Grad"))
+                        let t = match b.OpReqType with Some a -> a | None -> raise (BindingIncompleteException(Some(ArgBinding b), "OpReqType"))
                         a,g,t
-                    | _ -> failwithf "No binding for %s" name
+                    | _ -> raise(BindingIncompleteException(None, name))
                 )
             |> Array.unzip3
         let aux = 
@@ -470,10 +484,10 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
             |> Array.map 
                 (fun name ->
                     match bindings.TryGetValue(name) with 
-                    | true, (AuxBinding b) ->  //TODO: exception clean up
-                        let a = match b.NDArray with Some a -> a | None -> failwithf "Must provide %s" name
+                    | true, (AuxBinding b) -> 
+                        let a = match b.NDArray with Some a -> a | None -> raise (BindingIncompleteException(Some(AuxBinding b), "NDArray"))
                         a
-                    | _ -> failwithf "No binding for %s" name
+                    | _ -> raise(BindingIncompleteException(None, name))
                 )
         new Executor(symbol, context, inArgs, argGrad, gradReqType, aux, Some bindings)
     /// Refresh executor outputs. Returns false if nothing is updated.
