@@ -628,7 +628,9 @@ module SymbolExtension =
         member x.Bind(context, batchSize) = 
             let bindmap = x.Bindings |> Bindings.batchSize batchSize |> Bindings.inferShapes x
             new Executor(x,context,bindmap)
-        member x.Bind(context) = new Executor(x,context,x.Bindings)
+        member x.Bind(context) = 
+            let bindmap = x.Bindings |> Bindings.inferShapes x
+            new Executor(x,context,bindmap)
         member x.Eval(context) = 
             let exe = x.Bind(context)
             exe.Forward(false)
