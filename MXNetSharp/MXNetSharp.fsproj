@@ -12,7 +12,6 @@
     <NeutralLanguage></NeutralLanguage>
     <Authors>Kevin Malenfant</Authors>
     <AssemblyVersion>0.0.2.0</AssemblyVersion>
-    <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
