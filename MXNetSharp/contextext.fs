@@ -122,12 +122,12 @@ type ContextExtensions private () =
     /// 
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L97</summary>
+    /// <param name="shape">Shape of the output.</param>
     /// <param name="low">Lower bound of the distribution.</param>
     /// <param name="high">Upper bound of the distribution.</param>
-    /// <param name="shape">Shape of the output.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     [<Extension>]
-    static member RandomUniform(ctx : Context, [<Optional>] low : float, [<Optional>] high : float, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
+    static member RandomUniform(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(0.0)>] low : float, [<Optional; DefaultParameterValue(1.0)>] high : float, [<Optional>] dtype : FloatDType) =
         MX.RandomUniformNDArray(ctx, low = low, high = high, shape = shape, dtype = dtype)
     /// <summary>Draw random samples from a normal (Gaussian) distribution.
     /// 
@@ -143,12 +143,12 @@ type ContextExtensions private () =
     /// 
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L115</summary>
+    /// <param name="shape">Shape of the output.</param>
     /// <param name="loc">Mean of the distribution.</param>
     /// <param name="scale">Standard deviation of the distribution.</param>
-    /// <param name="shape">Shape of the output.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     [<Extension>]
-    static member RandomNormal(ctx : Context, [<Optional>] loc : float, [<Optional>] scale : float, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
+    static member RandomNormal(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(0.0)>] loc : float, [<Optional; DefaultParameterValue(1.0)>] scale : float, [<Optional>] dtype : FloatDType) =
         MX.RandomNormalNDArray(ctx, loc = loc, scale = scale, shape = shape, dtype = dtype)
     /// <summary>Draw random samples from a gamma distribution.
     /// 
@@ -161,12 +161,12 @@ type ContextExtensions private () =
     /// 
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L127</summary>
+    /// <param name="shape">Shape of the output.</param>
     /// <param name="alpha">Alpha parameter (shape) of the gamma distribution.</param>
     /// <param name="beta">Beta parameter (scale) of the gamma distribution.</param>
-    /// <param name="shape">Shape of the output.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     [<Extension>]
-    static member RandomGamma(ctx : Context, [<Optional>] alpha : float, [<Optional>] beta : float, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
+    static member RandomGamma(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] alpha : float, [<Optional; DefaultParameterValue(1.0)>] beta : float, [<Optional>] dtype : FloatDType) =
         MX.RandomGammaNDArray(ctx, alpha = alpha, beta = beta, shape = shape, dtype = dtype)
     /// <summary>Draw random samples from an exponential distribution.
     /// 
@@ -179,11 +179,11 @@ type ContextExtensions private () =
     /// 
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L139</summary>
-    /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
     /// <param name="shape">Shape of the output.</param>
+    /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     [<Extension>]
-    static member RandomExponential(ctx : Context, [<Optional>] lam : float, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
+    static member RandomExponential(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] dtype : FloatDType) =
         MX.RandomExponentialNDArray(ctx, lam = lam, shape = shape, dtype = dtype)
     /// <summary>Draw random samples from a Poisson distribution.
     /// 
@@ -197,11 +197,11 @@ type ContextExtensions private () =
     /// 
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L152</summary>
-    /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
     /// <param name="shape">Shape of the output.</param>
+    /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     [<Extension>]
-    static member RandomPoisson(ctx : Context, [<Optional>] lam : float, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
+    static member RandomPoisson(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] dtype : FloatDType) =
         MX.RandomPoissonNDArray(ctx, lam = lam, shape = shape, dtype = dtype)
     /// <summary>Draw random samples from a negative binomial distribution.
     /// 
@@ -216,12 +216,12 @@ type ContextExtensions private () =
     /// 
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L166</summary>
+    /// <param name="shape">Shape of the output.</param>
     /// <param name="k">Limit of unsuccessful experiments.</param>
     /// <param name="p">Failure probability in each experiment.</param>
-    /// <param name="shape">Shape of the output.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     [<Extension>]
-    static member RandomNegativeBinomial(ctx : Context, [<Optional>] k : int, [<Optional>] p : float, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
+    static member RandomNegativeBinomial(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1)>] k : int, [<Optional; DefaultParameterValue(1.0)>] p : float, [<Optional>] dtype : FloatDType) =
         MX.RandomNegativeBinomialNDArray(ctx, k = k, p = p, shape = shape, dtype = dtype)
 
     /// <summary>Draw random samples from a generalized negative binomial distribution.
@@ -238,12 +238,12 @@ type ContextExtensions private () =
     /// 
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L181</summary>
+    /// <param name="shape">Shape of the output.</param>
     /// <param name="mu">Mean of the negative binomial distribution.</param>
     /// <param name="alpha">Alpha (dispersion) parameter of the negative binomial distribution.</param>
-    /// <param name="shape">Shape of the output.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     [<Extension>]
-    static member RandomGeneralizedNegativeBinomial(ctx : Context, [<Optional>] mu : float, [<Optional>] alpha : float, [<Optional>] shape : int seq, [<Optional>] dtype : FloatDType) =
+    static member RandomGeneralizedNegativeBinomial(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] mu : float, [<Optional; DefaultParameterValue(1.0)>] alpha : float, [<Optional>] dtype : FloatDType) =
         MX.RandomGeneralizedNegativeBinomialNDArray(ctx, mu = mu, alpha = alpha, shape = shape, dtype = dtype)
 
     /// <summary>Draw random samples from a discrete uniform distribution.
@@ -259,25 +259,25 @@ type ContextExtensions private () =
     /// 
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L196</summary>
+    /// <param name="shape">Shape of the output.</param>
     /// <param name="low">Lower bound of the distribution.</param>
     /// <param name="high">Upper bound of the distribution.</param>
-    /// <param name="shape">Shape of the output.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to int32 if not defined (dtype=None).</param>
     [<Extension>]
-    static member RandomRandint(ctx : Context, low : int64, high : int64, [<Optional>] shape : int seq, [<Optional>] dtype : RandomRandintDtype) =
+    static member RandomRandint(ctx : Context, shape : int seq, low : int64, high : int64, [<Optional>] dtype : RandomRandintDtype) =
         MX.RandomRandintNDArray(low, high, ctx, shape = shape, dtype = dtype)
      
     /// <summary>fill target with zeros without default dtype</summary>
     /// <param name="shape">The shape of the output</param>
     [<Extension>]
-    static member ZerosWithoutDtype(ctx : Context, [<Optional>] shape : int seq) =
+    static member ZerosWithoutDtype(ctx : Context, shape : int seq) =
         MX.ZerosWithoutDtypeNDArray(ctx, shape = shape)
     
     /// <summary>fill target with zeros</summary>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
     [<Extension>]
-    static member Zeros(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : DataType) =
+    static member Zeros(ctx : Context, shape : int seq, [<Optional>] dtype : DataType) =
         MX.ZerosNDArray(ctx, shape = shape, dtype = dtype)
     
     /// <summary>Return a 2-D array with ones on the diagonal and zeros elsewhere.</summary>
@@ -293,15 +293,15 @@ type ContextExtensions private () =
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
     [<Extension>]
-    static member Ones(ctx : Context, [<Optional>] shape : int seq, [<Optional>] dtype : DataType) =
+    static member Ones(ctx : Context, shape : int seq, [<Optional>] dtype : DataType) =
         MX.OnesNDArray(ctx, shape = shape, dtype = dtype)
     
     /// <summary>fill target with a scalar value</summary>
-    /// <param name="value">Value with which to fill newly created tensor</param>
     /// <param name="shape">The shape of the output</param>
+    /// <param name="value">Value with which to fill newly created tensor</param>
     /// <param name="dtype">Target data type.</param>
     [<Extension>]
-    static member Full(ctx : Context, value : double, [<Optional>] shape : int seq, [<Optional>] dtype : DataType) =
+    static member Full(ctx : Context, shape : int seq, value : double, [<Optional>] dtype : DataType) =
         MX.FullNDArray(ctx, value, shape = shape, dtype = dtype)
     
     /// <summary>Return evenly spaced values within a given interval. Similar to Numpy</summary>
