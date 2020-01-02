@@ -117,23 +117,20 @@ let choicef t d = Softmax(t,axis=d,useLength=false)
 let binf t = t
 
 
-let response = Parameter(shape = [numTrees; treeDim; pown 2 depth])
-
-// init response
+let response = Parameter(shape = [numTrees; treeDim; pown 2 depth]) //init normal 0.0 1.0
 
 let featureSelectionLogits = Parameter(ndarray = CPU(0).Zeros([inFeatures; numTrees; depth]))
 let featureThresholds = Parameter(shape = [numTrees; depth])
 let logTemperatures = Parameter(shape = [numTrees; depth])
-pown 2 0
-let ctx = CPU 0
-let indices = ctx.Arange(start = 0.0, stop = double(pown 2 depth))
-let offsets = 2.0 ** ctx.Arange(start = 0.0, stop = double depth)
-
-
-let binCodes = indices.Reshape(1,-1) ./ offsets.Reshape(-1,1)
-binCodes.ToFloat32Array()
-offsets.ToFloat32Array()
-ctx.Arange(start = 0.0, stop = double depth).ToFloat32Array()
+let binCodesOneHot = 
+    let ctx = CPU 0
+    let indices = ctx.Arange(start = 0.0, stop = double(pown 2 depth))
+    let offsets = 2.0 ** ctx.Arange(start = 0.0, stop = double depth)
+    let binCodes = 
+        let x = indices.AsType(DataType.Int32).Reshape(1,-1) ./ offsets.AsType(DataType.Int32).Reshape(-1,1)
+        (x % 2.0).AsType(DataType.Float32)
+    let binCodesOneHot = MX.Stack(binCodes, 1.0 - binCodes, axis = -1)
+    Constant(binCodesOneHot, "binCodesOneHot")
 
 
 let featureSelectors = choicef featureSelectionLogits 0
@@ -147,6 +144,11 @@ let thresholdLogits =
 let bins = binf thresholdLogits
 
 let binMatches = NpiEinsum([bins :> Symbol; binCodesOneHot :> Symbol], "btds,dcs->btdc")
+let responseWeights = Prod(binMatches, [-2])
+let output = NpiEinsum([responseWeights :> Symbol; response :> Symbol], "bnd,ncd->bnc")
+let result = if flatten then Flatten(output) :> Symbol else output :> Symbol
+
+
 
 
 let f = (CPU 0).Arange(0.0, 24.0).Reshape(3,2,4)
