@@ -25,118 +25,6 @@ let printShapes (b : Bindings) =
         )
     b
 
-//let x = CPU(0).Arange(0.0,32.0) |> cos
-//x.ToFloat32Array()
-(*
-CustomOp.register "entmax15"
-    (fun ins ->
-        {new CustomOperation() with
-             member this.CreateOperator(context: Context, inShapes: int [] [], inDataTypes: TypeFlag []): ICustomOperation = 
-                 let dim = int ins.["dim"] 
-                 {new ICustomOperation with
-                      member this.Backward(req: OpReqType [], inData: NDArray [], outData: NDArray [], inGrad: NDArray [], outGrad: NDArray [], auxData: NDArray []): unit = 
-                          raise (System.NotImplementedException())
-                      member this.Forward(isTrain: bool, req: OpReqType [], inData: NDArray [], outData: NDArray [], auxData: NDArray []): unit = 
-                          let x = inData.[0]
-                          let x2 = (x .- MX.Max(x, axis = [dim], keepdims=true)) / 2.0
-                          let sorted = MX.Topk(x, k = 0, axis = dim, isAscend = false,retTyp = RetTyp.Value).[0] //TODO fix Sort on NDArray
-                          let rho = MX.ContribArangeLike(x, ctx = CPU 0, start = 1.0, axis = dim).Reshape(-1,1)
-                          let mean = MX.NpCumsum(sorted, axis = dim) ./ rho
-                          let meanSq = MX.NpCumsum(MX.Square(sorted), axis = dim) ./ rho
-                          let ss = rho.*(meanSq - MX.Square(mean))
-                          let delta = (1.0 - ss) ./ rho
-                          let deltaNz = MX.Relu(delta)
-                          let tau = mean - sqrt deltaNz
-                          let supportSize = MX.Sum(tau .<= sorted, keepdims=true, axis = [dim])
-                          let ix = MX.ContribArangeLike(supportSize, ctx = CPU 0)
-                          let ix2 = MX.Concat(supportSize - 1.0, ix, dim = dim)
-                          let tauStar = MX.GatherNd(tau, ix2)
-                          let r = MX.MaximumScalar(x2 .- tauStar, 0.0) ** 2.0
-                          r.CopyTo(outData.[0])
-                 }
-             //member this.DeclareBackwardDependency(outGrad: int [], inData: int [], outData: int []): int [] = 
-             //    raise (System.NotImplementedException())
-             //member this.InferBackwardStorageType(storageTypes: BackwardStorageTypes): unit = 
-             //    raise (System.NotImplementedException())
-             //member this.InferShape(inShape: int [] []): int [] [] * int [] [] * int [] [] = 
-             //    raise (System.NotImplementedException())
-             //member this.InferStorageType(inputStorageTypes: StorageType []): StorageType [] * StorageType [] * StorageType [] = 
-             //    let outType = this.ListOutputs() |> Array.map (fun x -> StorageType.Default)
-             //    let auxType = this.ListAuxiliaryStates() |> Array.map (fun x -> StorageType.Default)
-             //    inputStorageTypes, outType, auxType
-             //member this.InferType(inType: TypeFlag []): TypeFlag [] * TypeFlag [] * TypeFlag [] = 
-             //    let outType = this.ListOutputs() |> Array.map (fun x -> inType.[0])
-             //    let auxType = this.ListAuxiliaryStates() |> Array.map (fun x -> inType.[0])
-             //    inType, outType, auxType
-             //member this.ListArguments(): string [] = [|"data"|]
-             //member this.ListAuxiliaryStates(): string [] = Array.empty
-             //member this.ListOutputs(): string [] = [|"output"|]
-        } :> _
-    )
-*)
-let k = 3
-let dim = 0
-
-let thresholdSupport2 (x : NDArray) dim = 
-    let sorted = MX.Topk(x, k = 0, axis = dim, isAscend = false,retTyp = RetTyp.Value).[0] //TODO fix Sort on NDArray
-    let rho = MX.ContribArangeLike(x, ctx = CPU 0, start = 1.0, axis = dim).Reshape(-1,1)
-    let mean = MX.NpCumsum(sorted, axis = dim) ./ rho
-    let meanSq = MX.NpCumsum(MX.Square(sorted), axis = dim) ./ rho
-    let ss = rho.*(meanSq - MX.Square(mean))
-    let delta = (1.0 - ss) ./ rho
-    let deltaNz = MX.Relu(delta)
-    let tau = mean - sqrt deltaNz
-    let supportSize = MX.Sum(tau .<= sorted, keepdims=true, axis = [dim])
-    let ix = MX.ContribArangeLike(supportSize, ctx = CPU 0)
-    let ix2 = MX.Concat(supportSize - 1.0, ix, dim = dim)
-    let tauStar = MX.GatherNd(tau, ix2)
-    tauStar, supportSize
-
-let entmax152 (x : NDArray) dim = 
-    let x2 = (x .- MX.Max(x, axis = [dim], keepdims=true)) / 2.0
-    let tauStar,_ = thresholdSupport2 x2 dim
-    MX.MaximumScalar(x2 .- tauStar, 0.0) ** 2.0
-
-
-let xx = (CPU(0).Arange(0.0,32.0) |> cos).Reshape(2,4,4)
-let x2 = (xx .- MX.Max(xx, axis = [dim], keepdims=true)) / 2.0
-let x = x2
-let sorted = MX.Topk(x, k = 0, axis = dim, isAscend = false,retTyp = RetTyp.Value).[0] //TODO fix Sort on NDArray
-let rho = MX.ContribArangeLike(x, ctx = CPU 0, start = 1.0, axis = dim).Reshape(-1,1,1)
-
-
-
-let mean = MX.NpCumsum(sorted, axis = dim) ./ rho
-let meanSq = MX.NpCumsum(MX.Square(sorted), axis = dim) ./ rho
-let ss = rho.*(meanSq - MX.Square(mean))
-let delta = (1.0 - ss) ./ rho
-let deltaNz = MX.Relu(delta)
-let tau = mean - sqrt deltaNz
-let supportSize = MX.Sum(tau .<= sorted, keepdims=true, axis = [dim])
-let s = supportSize.Shape
-let xs = 
-    [|
-        for a = 0 to s.Length - 1 do 
-            if a = dim then 
-                supportSize - 1.0
-            else
-                let x = MX.ArangeNDArray(start = 0.0, stop = double s.[a], ctx = CPU 0).Reshape(s |> Array.mapi (fun i x -> if i = a then x else 1))
-                MX.Tile(x, s |> Array.mapi (fun i x -> if i <> a then x else 1) )
-    |]
-let ix = MX.Stack(xs,0)
-
-let tauStar = MX.GatherNd(tau, ix)
-
-MX.Pi
-let r = MX.MaximumScalar(x2 .- tauStar, 0.0) ** 2.0
-ixx.ToFloat32Array()
-ix2.ToFloat32Array()
-tau.ToFloat32Array()
-tauStar.ToFloat32Array()
-(supportSize - 1.0).ToFloat32Array()
-(supportSize - 1.0).ToFloat32Array()
-
-
 let thresholdSupport (s : int []) (x : Symbol) dim = 
     let sorted = MX.Topk(x, k = 0, axis = dim, isAscend = false,retTyp = RetTyp.Value) //TODO fix Sort on NDArray
     let rho = MX.ContribArangeLike(x, start = 1.0, axis = dim) .>> Reshape(shape = [-1;1;1])
@@ -165,18 +53,6 @@ let entmax15 (s : int []) (x : Symbol) dim =
     let tauStar,_ = thresholdSupport s x2 dim
     MX.MaximumScalar(x2 .- tauStar, 0.0) ** 2.0
 
-
-let entmoid15nd (x : NDArray) =
-    let isPos = x .>= 0.0
-    let input = abs x
-    let poo = (input ** 2.0)
-    let tau = 
-        let tau = (input + sqrt(MX.Relu(8.0 - poo))) / 2.0
-        let c = tau .<= input
-        tau * (1.0 - c) + 2.0*c //TODO: Beter way to do mask assign
-    let yNeg = 0.25*((MX.Relu(tau - input)**2.0) : NDArray)
-    MX.Where(isPos, 1.0 - yNeg, yNeg)
-
 let entmoid15 (x : Symbol) =
     let isPos = x .>= 0.0
     let input = Abs(x)
@@ -190,15 +66,14 @@ let entmoid15 (x : Symbol) =
 
 let ctx = CPU 0
 let odst inFeatures numTrees treeDim depth flatten choicef binf (x : Symbol) = 
-
     //let response = Parameter("response", shape = [numTrees; treeDim; pown 2 depth]) //init normal 0.0 1.0
     let response = Parameter("response", ndarray = ctx.RandomNormal([numTrees; treeDim; pown 2 depth])) //init normal 0.0 1.0
-
     //let featureSelectionLogits = Parameter("featureSelectionLogits", shape = [inFeatures; numTrees; depth])
     let featureSelectionLogits = Parameter("featureSelectionLogits", ndarray = ctx.RandomUniform([inFeatures; numTrees; depth]))
     //let featureThresholds = Parameter("featureThresholds", shape = [numTrees; depth])
     let featureThresholds = Parameter("featureThresholds", ndarray = ctx.RandomNormal([numTrees; depth]))
-    let logTemperatures = Parameter("logTemperatures", shape = [numTrees; depth])
+    //let logTemperatures = Parameter("logTemperatures", shape = [numTrees; depth])
+    let logTemperatures = Parameter("logTemperatures", ndarray = ctx.RandomNormal([numTrees; depth]))
     let binCodesOneHot = 
         let ctx = CPU 0
         let indices = ctx.Arange(start = 0.0, stop = double(pown 2 depth))
@@ -294,7 +169,7 @@ let otp = l1.[*,*,0] .>> Reshape(shape = [0;0]) .>> Mean(axis = [-1])
 
 
 let label = Input("label", [0])
-let loss = label - otp .>> Square() .>> Mean()
+let loss = label - otp .>> Square() .>> Mean() .>> MakeLoss()
 
 
 //otp.Bindings |> Bindings.batchSize 1000 |> Bindings.inferShapes otp |> printShapes |> ignore
@@ -330,5 +205,33 @@ type AdamOptimizer(e : Executor, ?beta1, ?beta2) =
             )
 
 
-let exe = loss.Bindings |> Bindings.
-let opt = Adam
+let bm = loss.Bindings |> Bindings.batchSize 512 |> Bindings.inferShapes loss |> Bindings.init (fun _ s -> ctx.Zeros(s))
+let exe = loss.Bind(ctx,bm)
+bm |> printShapes |> ignore
+let opt = AdamOptimizer(exe)
+
+let epoch = MX.Shuffle(ctx.Arange(0.0, double trainSet.Length)).ToIntArray() |> Array.chunkBySize 512 |> Array.filter (fun x -> x.Length = 512)
+
+
+let bi = epoch.[0]
+
+let y,x = bi |> Array.map (fun i -> trainSet.[i]) |> Array.unzip
+
+exe.[label].CopyFrom(y)
+exe.[inp].CopyFrom(x |> Array.concat)
+
+exe.Forward(false)
+
+
+
+exe.Backward()
+
+NDArray.WaitAll()
+
+
+
+
+
+
+
+
