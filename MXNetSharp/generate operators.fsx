@@ -164,6 +164,7 @@ type UnionType =
 
 let registeredTypes = 
     [
+        "_npi_eye", "M", "int64"
         "_npi_hanning", "M", "int"
         "_npi_hamming", "M", "int"
         "_npi_blackman", "M", "int"
@@ -1279,6 +1280,17 @@ Mappings.Modify(fun (x : ProcessedAtomicSymbol) ->
         x
 )
 
+// **************************** _npi_logspace *******************************
+// 'base' parameter name
+
+Mappings.Modify(fun (x : ProcessedArg) -> 
+    match x.Arg.AtomicSymbolInfo.Name with 
+    | "_npi_logspace" ->
+        match x.Arg.ArgumentInfo.Name with 
+        | "base" -> {x with Name = "lbase"} |> argDoc
+        | _ -> x
+    | _ -> x
+    )
 // **************************** Slice ops *******************************
 // begin end names 
 
@@ -1339,6 +1351,14 @@ Mappings.Modify(fun (x : ProcessedArg) ->
     )
 
     
+Mappings.Modify(fun (x : ProcessedArg) -> 
+    if x.Arg.AtomicSymbolInfo.Name = "_npi_eye" then
+        match x.Arg.ArgumentInfo.Name with 
+        | "M" -> {x with TypeString = "int64"}
+        | _ -> x
+    else    
+        x
+    )
 // **************************** _npi_choice *******************************
 // Blank type for arg a and size
 
@@ -1489,6 +1509,13 @@ let processDefinedType (t : UnionType) (arg : ProcessedArg) =
                 TypeString = ""
                 Generate = true
             } 
+        | FName "CastDtype"
+        | FName "NpiBernoulliDtype"
+        | FName "NpiIdentityDtype"
+        | FName "NpiOnesDtype"
+        | FName "NpiZerosDtype"
+        | FName "ZerosDtype"
+        | FName "OnesDtype"
         | FName "NpSumDtype"
         | FName "NpProdDtype"
         | FName "NpiMeanDtype"
