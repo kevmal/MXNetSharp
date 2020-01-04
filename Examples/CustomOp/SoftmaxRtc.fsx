@@ -2,19 +2,9 @@
 open Load
 
 open MXNetSharp
-open MXNetSharp.Interop
-open MXNetSharp.IO
-open System
-open System.Net
-open System.IO
-open System.Collections.Generic
-open System.IO.Compression
-open Microsoft.FSharp.NativeInterop
-
 open MXNetSharp.PrimitiveOperators
 open MXNetSharp.SymbolOperators
 open MXNetSharp.Operator
-open MXNetSharp.Interop
 open MXNetSharp.SymbolArgument
 
 
@@ -58,7 +48,6 @@ __global__ void bwd(const DType* l, const DType* y, DType* dx, const int req) {
     }
 }
 """
-LibFeature.CUDA_RTC
 
 
 let fwdModule = Rtc.CudaModule(forwardSrc, exports = ["fwd<float>"; "fwd<double>"])
@@ -73,7 +62,6 @@ CustomOp.register "mysoftmax"
     (fun ins ->
         {new CustomOperation() with
              member this.CreateOperator(context: Context, inShapes: int [] [], inDataTypes: TypeFlag []): ICustomOperation = 
-                 let dim = int ins.["dim"] 
                  {new ICustomOperation with
                       member this.Backward(req: OpReqType [], inData: NDArray [], outData: NDArray [], inGrad: NDArray [], outGrad: NDArray [], auxData: NDArray []): unit = 
                           if req.[0] = OpReqType.NullOp then 
@@ -136,29 +124,21 @@ type MySoftmax private (operatorArguments) =
 
     member __.Data = operatorArguments.GetInput "data"
 
-let data = Variable("data")
-let mlp = 
-    data
-    .>> FullyConnected(128) .>> Relu()
-    .>> FullyConnected(64) .>> Relu()
-    .>> FullyConnected(10) .>> Relu()
-    .>> MySoftmax()
-
-
 let inp = (GPU 0).Arange(1.0,11.0).Reshape(2,5)
-let oup = (GPU 0).Arange(1.0,11.0).Reshape(2,5)
-let i1 = inp.Shape.[1]
-let i2 = 1
 
 open MXNetSharp
 let x = Input("x", ndarray = inp)
 let op = MySoftmax(x)
 
-op.Bindings
-let exe = op.Eval(GPU 0)
-exe.Outputs.[0]
+let bm = 
+    op.Bindings
+    |> Bindings.inferShapes op
+    |> Bindings.init (fun _ s -> (GPU 0).Zeros(s))
 
-exe.Bindings
+let exe = op.Bind(GPU 0, bm)
+exe.Forward(true)
+exe.Outputs.[0].ToFloat32Array()
+
 
 
 
