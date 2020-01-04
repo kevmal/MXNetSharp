@@ -8384,7 +8384,7 @@ type MX() =
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; movingMean.NDArrayHandle.UnsafeHandle; movingVar.NDArrayHandle.UnsafeHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "axis"; "cudnn_off"; "min_calib_range"; "max_calib_range"|]
                                                  [|(match eps with None -> "0.00100000004749745" | Some eps -> string eps); (match momentum with None -> "0.899999976" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
-        (new NDArray(outputs.[0]))
+        outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Batch normalization.
     /// 
     /// Normalizes a data batch by mean and variance, and applies a scale ``gamma`` as
@@ -9204,7 +9204,7 @@ type MX() =
                                                  [|data.NDArrayHandle.UnsafeHandle; label.NDArrayHandle.UnsafeHandle; dataLengths.NDArrayHandle.UnsafeHandle; labelLengths.NDArrayHandle.UnsafeHandle|]
                                                  [|"use_data_lengths"; "use_label_lengths"; "blank_label"|]
                                                  [|string useDataLengths; string useLabelLengths; (if isNull (blankLabel :> obj) then "first" else string blankLabel)|]
-        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
+        (new NDArray(outputs.[0]))
     /// <summary>Connectionist Temporal Classification Loss.
     /// 
     /// .. note:: The existing alias ``contrib_CTCLoss`` is deprecated.
@@ -9604,7 +9604,7 @@ type MX() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"p"; "mode"; "axes"; "cudnn_off"|]
                                                  [|(match p with None -> "0.5" | Some p -> string p); (match mode with None -> "training" | Some mode -> string mode); (match axes with None -> "[]" | Some axes -> (axes |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff)|]
-        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
+        (new NDArray(outputs.[0]))
     /// <summary>Applies dropout operation to input array.
     /// 
     /// - During training, each element of the input is set to zero with probability p.
@@ -9925,7 +9925,7 @@ type MX() =
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
                                                  [|"num_groups"; "eps"; "output_mean_var"|]
                                                  [|string numGroups; string eps; string outputMeanVar|]
-        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
+        outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Group normalization.
     /// 
     /// The input channels are separated into ``num_groups`` groups, each containing ``num_channels / num_groups`` channels.
@@ -10035,7 +10035,7 @@ type MX() =
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "eps"; "output_mean_var"|]
                                                  [|string axis; string eps; string outputMeanVar|]
-        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
+        outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Layer normalization.
     /// 
     /// Normalizes the channels of the input tensor by mean and variance, and applies a scale ``gamma`` as
@@ -10525,7 +10525,7 @@ type MX() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"kernel"; "pool_type"; "global_pool"; "cudnn_off"; "pooling_convention"; "stride"; "pad"; "p_value"; "count_include_pad"; "layout"|]
                                                  [|(match kernel with None -> "[]" | Some kernel -> (kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match poolType with None -> "max" | Some poolType -> string poolType); (match globalPool with None -> "false" | Some globalPool -> string globalPool); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match poolingConvention with None -> "valid" | Some poolingConvention -> string poolingConvention); (match stride with None -> "[]" | Some stride -> (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match pad with None -> "[]" | Some pad -> (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match pValue with None -> "None" | Some pValue -> string pValue); (match countIncludePad with None -> "None" | Some countIncludePad -> string countIncludePad); (match layout with None -> "None" | Some layout -> string layout)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Performs pooling on the input.
     /// 
     /// The shapes for 1-D pooling are
@@ -11782,7 +11782,7 @@ type MX() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "dtype"; "ddof"; "keepdims"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "None" | Some dtype -> string dtype); (match ddof with None -> "0" | Some ddof -> string ddof); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
-        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
@@ -11828,7 +11828,7 @@ type MX() =
                                                  [|a.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "dtype"; "ddof"; "keepdims"|]
                                                  [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "None" | Some dtype -> string dtype); (match ddof with None -> "0" | Some ddof -> string ddof); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
-        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
@@ -40264,7 +40264,7 @@ type MX() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
+        (new NDArray(outputs.[0]))
     /// <summary>Compute the determinant of a matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -40383,7 +40383,7 @@ type MX() =
                                                  [|A.NDArrayHandle.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2])), (new NDArray(outputs.[3]))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>Compute the sign and log of the determinant of a matrix.
     /// Input is a tensor *A* of dimension *n &gt;= 2*.
     /// 
@@ -42745,7 +42745,7 @@ type MX() =
                                                  [|data.NDArrayHandle.UnsafeHandle|]
                                                  [|"axis"; "is_ascend"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis); (match isAscend with None -> "true" | Some isAscend -> string isAscend)|]
-        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
+        (new NDArray(outputs.[0]))
     /// <summary>Returns a sorted copy of an input array along the given axis.
     /// 
     /// Examples::
