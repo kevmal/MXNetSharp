@@ -278,7 +278,31 @@ type SafeNDArrayHandle(owner) =
             x.handle
         else
             ObjectDisposedException("SafeNDArrayHandle", "NDArray handle has been closed") |> raise
-        
+
+type SafeCudaModuleHandle(owner) = 
+    inherit SafeHandle(0n, true)
+    new() = new SafeCudaModuleHandle(true)
+    new(ptr,owner) as this = new SafeCudaModuleHandle(owner) then this.SetHandle(ptr)
+    override x.IsInvalid = x.handle <= 0n
+    override x.ReleaseHandle() = CApi.MXRtcCudaModuleFree x.handle = 0
+    member internal x.UnsafeHandle = 
+        if not x.IsClosed then
+            x.handle
+        else
+            ObjectDisposedException("SafeCudaModuleHandle", "NDArray handle has been closed") |> raise
+
+type SafeCudaKernelHandle(owner) = 
+    inherit SafeHandle(0n, true)
+    new() = new SafeCudaKernelHandle(true)
+    new(ptr,owner) as this = new SafeCudaKernelHandle(owner) then this.SetHandle(ptr)
+    override x.IsInvalid = x.handle <= 0n
+    override x.ReleaseHandle() = CApi.MXRtcCudaKernelFree x.handle = 0
+    member internal x.UnsafeHandle = 
+        if not x.IsClosed then
+            x.handle
+        else
+            ObjectDisposedException("SafeCudaKernelHandle", "NDArray handle has been closed") |> raise
+                                
 [<Extension>]
 type ValueStringExtensions = ValueStringExtensions with
     [<Extension>] 

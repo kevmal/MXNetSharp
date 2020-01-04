@@ -224,7 +224,7 @@ extern int MXNotifyShutdown()
 extern int MXSetProcessProfilerConfig__(int num_params, string keys, string vals, KVStoreHandle kvstoreHandle)
 
 /// <summary>Set up configuration of profiler for worker/current process</summary>
-/// <param name="num_params">Number of parameters</param>
+/// <param name="num_params">Number of parameters</param>false
 /// <param name="keys">array of parameter keys</param>
 /// <param name="vals">array of parameter values</param>
 /// <returns>0 when success, -1 when failure happens.</returns>
@@ -2159,12 +2159,12 @@ extern int MXCustomFunctionRecord__(int num_inputs, NDArrayHandle[] inputs, int 
 /// <param name="exported"> function names</param>
 /// <param name="out"> handle to created module</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRtcCudaModuleCreate__(string source, int num_options, string[] options, int num_exports, string[] exports, CudaModuleHandle[] out)
+extern int MXRtcCudaModuleCreate(string source, int num_options, string[] options, int num_exports, string[] exports, [<Out>] CudaModuleHandle& out)
 
 /// <summary>rdelete cuda rtc module</summary>
 /// <param name="handle"> handle to cuda module</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRtcCudaModuleFree__(CudaModuleHandle handle)
+extern int MXRtcCudaModuleFree(CudaModuleHandle handle)
 
 /// <summary>rget kernel from module</summary>
 /// <param name="handle"> handle to cuda module</param>
@@ -2175,12 +2175,12 @@ extern int MXRtcCudaModuleFree__(CudaModuleHandle handle)
 /// <param name="arg_types"> data type of arguments</param>
 /// <param name="out"> created kernel</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRtcCudaKernelCreate__(CudaModuleHandle handle, string name, int num_args, int[] is_ndarray, int[] is_const, int[] arg_types, CudaKernelHandle[] out)
+extern int MXRtcCudaKernelCreate(CudaModuleHandle handle, string name, int num_args, int[] is_ndarray, int[] is_const, int[] arg_types, [<Out>] CudaModuleHandle& out)
 
 /// <summary>rdelete kernel</summary>
 /// <param name="handle"> handle to previously created kernel</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRtcCudaKernelFree__(CudaKernelHandle handle)
+extern int MXRtcCudaKernelFree(CudaKernelHandle handle)
 
 /// <summary>rlaunch cuda kernel</summary>
 /// <param name="handle"> handle to kernel</param>
@@ -2194,7 +2194,7 @@ extern int MXRtcCudaKernelFree__(CudaKernelHandle handle)
 /// <param name="block_dim_z"> block dimension z</param>
 /// <param name="shared_mem"> size of dynamically allocated shared memory</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRtcCudaKernelCall__(CudaKernelHandle handle, int dev_id, IntPtr args, uint32 grid_dim_x, uint32 grid_dim_y, uint32 grid_dim_z, uint32 block_dim_x, uint32 block_dim_y, uint32 block_dim_z, uint32 shared_mem)
+extern int MXRtcCudaKernelCall(CudaKernelHandle handle, int dev_id, IntPtr[] args, uint32 grid_dim_x, uint32 grid_dim_y, uint32 grid_dim_z, uint32 block_dim_x, uint32 block_dim_y, uint32 block_dim_z, uint32 shared_mem)
 
 /// <summary>Get shared memory handle from NDArray</summary>
 /// <param name="handle">NDArray handle.</param>

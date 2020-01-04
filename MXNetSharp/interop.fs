@@ -2377,3 +2377,49 @@ module MXAutograd =
         let mutable out = un
         MXAutogradGetSymbol(handle, &out) |> throwOnError "MXAutogradGetSymbol"
         out
+
+module MXRtc = 
+    /// <summary>rcreate cuda rtc module</summary>
+    /// <param name="source"> cuda source code</param>
+    /// <param name="options"> compiler flags</param>
+    /// <param name="exported"> function names</param>
+    /// <param name="out"> handle to created module</param>
+    let cudaModuleCreate source options exports = 
+        let mutable out = un
+        MXRtcCudaModuleCreate(source, length options, options, length exports, exports, &out) |> throwOnError "MXRtcCudaModuleCreate"
+        out
+    /// <summary>rdelete cuda rtc module</summary>
+    /// <param name="handle"> handle to cuda module</param>
+    let cudaModuleFree handle = 
+        MXRtcCudaModuleFree(handle) |> throwOnError "MXRtcCudaModuleFree"
+    
+    /// <summary>rget kernel from module</summary>
+    /// <param name="handle"> handle to cuda module</param>
+    /// <param name="name"> name of kernel function</param>
+    /// <param name="is_ndarray"> whether argument is ndarray</param>
+    /// <param name="is_const"> whether argument is constant</param>
+    /// <param name="arg_types"> data type of arguments</param>
+    /// <param name="out"> created kernel</param>
+    let cudaKernelCreate handle name is_ndarray is_const arg_types = 
+        let mutable out = un
+        MXRtcCudaKernelCreate(handle, name, length arg_types, is_ndarray, is_const, arg_types, &out) |> throwOnError "MXRtcCudaKernelCreate"
+        out
+
+    /// <summary>rdelete kernel</summary>
+    /// <param name="handle"> handle to previously created kernel</param>
+    let cudaKernelFree handle = 
+        MXRtcCudaKernelFree(handle) |> throwOnError "MXRtcCudaKernelFree"
+    
+    /// <summary>rlaunch cuda kernel</summary>
+    /// <param name="handle"> handle to kernel</param>
+    /// <param name="dev_id"> (GPU) device id</param>
+    /// <param name="args"> pointer to arguments</param>
+    /// <param name="grid_dim_x"> grid dimension x</param>
+    /// <param name="grid_dim_y"> grid dimension y</param>
+    /// <param name="grid_dim_z"> grid dimension z</param>
+    /// <param name="block_dim_x"> block dimension x</param>
+    /// <param name="block_dim_y"> block dimension y</param>
+    /// <param name="block_dim_z"> block dimension z</param>
+    /// <param name="shared_mem"> size of dynamically allocated shared memory</param>
+    let cudaKernelCall handle dev_id args grid_dim_x grid_dim_y grid_dim_z block_dim_x block_dim_y block_dim_z shared_mem = 
+        MXRtcCudaKernelCall(handle, dev_id, args, grid_dim_x, grid_dim_y, grid_dim_z, block_dim_x, block_dim_y, block_dim_z, shared_mem) |> throwOnError "MXRtcCudaKernelCall"
