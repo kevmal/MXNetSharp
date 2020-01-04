@@ -54,10 +54,12 @@ type Arguments<'a>(args : IDictionary<string, OpArg<'a>>, ordering : string []) 
         | w -> failwithf "Expecting %s to be a var arg but is a %A" name w
     interface IEnumerable<string*OpArg<'a>> with
         member x.GetEnumerator() = 
-            let d = Dictionary(args)
             (seq {
-                yield! ordering |> Seq.map (fun m -> d.Remove(m) |> ignore; m,args.[m])
-                yield! d.Keys |> Seq.map (fun k -> k, d.[k])
+                for m in ordering do 
+                    m, args.[m]
+                for kvp in args do 
+                    if not(Array.contains kvp.Key ordering) then 
+                        kvp.Key,kvp.Value
             }).GetEnumerator()
         member this.GetEnumerator() = (this :> IEnumerable<string*OpArg<'a>>).GetEnumerator() :> Collections.IEnumerator
            
