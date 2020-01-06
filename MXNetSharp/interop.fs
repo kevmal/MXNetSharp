@@ -2466,9 +2466,7 @@ module MXEngine =
     /// <param name="ctx_handle">Execution context.</param>
     /// <param name="const_nds_handle">The NDArrays that current operation will use
     ///                         but not mutate.</param>
-    /// <param name="num_const_nds">The number of const_nds_handle.</param>
     /// <param name="mutable_nds_handle">The NDArrays that current operation will mutate.</param>
-    /// <param name="num_mutable_nds">The number of mutable_nds_handle.</param>
     /// <param name="prop_handle">Property of the function.</param>
     /// <param name="priority">Priority of the action, as hint to the engine.</param>
     /// <param name="opr_name">The operation name.</param>
@@ -2483,9 +2481,7 @@ module MXEngine =
     /// <param name="ctx_handle">Execution context.</param>
     /// <param name="const_nds_handle">The NDArrays that current operation will use
     ///                         but not mutate.</param>
-    /// <param name="num_const_nds">The number of const_nds_handle.</param>
     /// <param name="mutable_nds_handle">The NDArrays that current operation will mutate.</param>
-    /// <param name="num_mutable_nds">The number of mutable_nds_handle.</param>
     /// <param name="prop_handle">Property of the function.</param>
     /// <param name="priority">Priority of the action, as hint to the engine.</param>
     /// <param name="opr_name">The operation name.</param>
