@@ -31,6 +31,7 @@
     <Compile Include="ndarray.fs" />
     <Compile Include="autograd.fs" />
     <Compile Include="customop.fs" />
+    <Compile Include="rtc.fs" />
     <Compile Include="dataiter.fs" />
     <Compile Include="operators.fs" />
     <Compile Include="contextext.fs" />

@@ -267,7 +267,10 @@ module CustomOp =
                     let shapes : int [] [] = 
                         [|
                             for i = 0 to inCount - 1 do 
-                                Helper.readStructArray tensorDims.[i] shapePtrs.[i]
+                                if tensorDims.[i] > 0 then 
+                                    Helper.readStructArray tensorDims.[i] shapePtrs.[i]
+                                else
+                                    Array.empty
                         |]
                     let inputShapes, outputShapes, auxShapes = opProp.InferShape shapes
                     assert(inputShapes.Length = inCount)

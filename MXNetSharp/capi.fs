@@ -224,7 +224,7 @@ extern int MXNotifyShutdown()
 extern int MXSetProcessProfilerConfig__(int num_params, string keys, string vals, KVStoreHandle kvstoreHandle)
 
 /// <summary>Set up configuration of profiler for worker/current process</summary>
-/// <param name="num_params">Number of parameters</param>
+/// <param name="num_params">Number of parameters</param>false
 /// <param name="keys">array of parameter keys</param>
 /// <param name="vals">array of parameter values</param>
 /// <returns>0 when success, -1 when failure happens.</returns>
@@ -2159,12 +2159,12 @@ extern int MXCustomFunctionRecord__(int num_inputs, NDArrayHandle[] inputs, int 
 /// <param name="exported"> function names</param>
 /// <param name="out"> handle to created module</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRtcCudaModuleCreate__(string source, int num_options, string[] options, int num_exports, string[] exports, CudaModuleHandle[] out)
+extern int MXRtcCudaModuleCreate(string source, int num_options, string[] options, int num_exports, string[] exports, [<Out>] CudaModuleHandle& out)
 
 /// <summary>rdelete cuda rtc module</summary>
 /// <param name="handle"> handle to cuda module</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRtcCudaModuleFree__(CudaModuleHandle handle)
+extern int MXRtcCudaModuleFree(CudaModuleHandle handle)
 
 /// <summary>rget kernel from module</summary>
 /// <param name="handle"> handle to cuda module</param>
@@ -2175,12 +2175,12 @@ extern int MXRtcCudaModuleFree__(CudaModuleHandle handle)
 /// <param name="arg_types"> data type of arguments</param>
 /// <param name="out"> created kernel</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRtcCudaKernelCreate__(CudaModuleHandle handle, string name, int num_args, int[] is_ndarray, int[] is_const, int[] arg_types, CudaKernelHandle[] out)
+extern int MXRtcCudaKernelCreate(CudaModuleHandle handle, string name, int num_args, int[] is_ndarray, int[] is_const, int[] arg_types, [<Out>] CudaModuleHandle& out)
 
 /// <summary>rdelete kernel</summary>
 /// <param name="handle"> handle to previously created kernel</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRtcCudaKernelFree__(CudaKernelHandle handle)
+extern int MXRtcCudaKernelFree(CudaKernelHandle handle)
 
 /// <summary>rlaunch cuda kernel</summary>
 /// <param name="handle"> handle to kernel</param>
@@ -2194,7 +2194,7 @@ extern int MXRtcCudaKernelFree__(CudaKernelHandle handle)
 /// <param name="block_dim_z"> block dimension z</param>
 /// <param name="shared_mem"> size of dynamically allocated shared memory</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRtcCudaKernelCall__(CudaKernelHandle handle, int dev_id, IntPtr args, uint32 grid_dim_x, uint32 grid_dim_y, uint32 grid_dim_z, uint32 block_dim_x, uint32 block_dim_y, uint32 block_dim_z, uint32 shared_mem)
+extern int MXRtcCudaKernelCall(CudaKernelHandle handle, int dev_id, IntPtr[] args, uint32 grid_dim_x, uint32 grid_dim_y, uint32 grid_dim_z, uint32 block_dim_x, uint32 block_dim_y, uint32 block_dim_z, uint32 shared_mem)
 
 /// <summary>Get shared memory handle from NDArray</summary>
 /// <param name="handle">NDArray handle.</param>
@@ -2246,7 +2246,7 @@ extern int MXNDArrayCreateFromSharedMemEx__(int shared_pid, int shared_id, int[]
 /// <param name="opr_name">The operation name.</param>
 /// <param name="wait">Whether this is a WaitForVar operation.</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXEnginePushAsync__(EngineAsyncFunc async_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, EngineVarHandle _vars_handle, int num_const_vars, EngineVarHandle mutable_vars_handle, int num_mutable_vars, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*), bool wait (*=false*))
+extern int MXEnginePushAsync(EngineAsyncFunc async_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, EngineVarHandle _vars_handle, int num_const_vars, EngineVarHandle mutable_vars_handle, int num_mutable_vars, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*), bool wait (*=false*))
 
 /// <summary>Push a synchronous operation to the engine.</summary>
 /// <param name="sync_func">Execution function that executes the operation.</param>
@@ -2262,19 +2262,7 @@ extern int MXEnginePushAsync__(EngineAsyncFunc async_func, IntPtr func_param, En
 /// <param name="priority">Priority of the action, as hint to the engine.</param>
 /// <param name="opr_name">The operation name.</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXEnginePushSync__(EngineSyncFunc sync_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, EngineVarHandle _vars_handle, int num_const_vars, EngineVarHandle mutable_vars_handle, int num_mutable_vars, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*))
-
-/// <summary>Create an NDArray from source sharing the same data chunk.</summary>
-/// <param name="src">source NDArray</param>
-/// <param name="out">new NDArray sharing the same data chunck with src</param>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXShallowCopyNDArray__(NDArrayHandle src, [<Out>] NDArrayHandle& out)
-
-/// <summary>Create an Symbol from source sharing the same graph structure.</summary>
-/// <param name="src">source Symbol</param>
-/// <param name="out">new Symbol sharing the same graph structure with src</param>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXShallowCopySymbol__(SymbolHandle src, SymbolHandle[] out)
+extern int MXEnginePushSync(EngineSyncFunc sync_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, EngineVarHandle _vars_handle, int num_const_vars, EngineVarHandle mutable_vars_handle, int num_mutable_vars, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*))
 
 /// <summary>Push an asynchronous operation to the engine.</summary>
 /// <param name="async_func">Execution function whici takes a parameter on_complete
@@ -2292,7 +2280,7 @@ extern int MXShallowCopySymbol__(SymbolHandle src, SymbolHandle[] out)
 /// <param name="opr_name">The operation name.</param>
 /// <param name="wait">Whether this is a WaitForVar operation.</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXEnginePushAsyncND__(EngineAsyncFunc async_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, NDArrayHandle[] _nds_handle, int num_const_nds, NDArrayHandle[] mutable_nds_handle, int num_mutable_nds, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*), bool wait (*=false*))
+extern int MXEnginePushAsyncND(EngineAsyncFunc async_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, NDArrayHandle[] _nds_handle, int num_const_nds, NDArrayHandle[] mutable_nds_handle, int num_mutable_nds, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*), bool wait (*=false*))
 
 /// <summary>Push a synchronous operation to the engine.</summary>
 /// <param name="sync_func">Execution function that executes the operation.</param>
@@ -2308,5 +2296,17 @@ extern int MXEnginePushAsyncND__(EngineAsyncFunc async_func, IntPtr func_param, 
 /// <param name="priority">Priority of the action, as hint to the engine.</param>
 /// <param name="opr_name">The operation name.</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXEnginePushSyncND__(EngineSyncFunc sync_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, NDArrayHandle[] _nds_handle, int num_const_nds, NDArrayHandle[] mutable_nds_handle, int num_mutable_nds, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*))
+extern int MXEnginePushSyncND(EngineSyncFunc sync_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, NDArrayHandle[] _nds_handle, int num_const_nds, NDArrayHandle[] mutable_nds_handle, int num_mutable_nds, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*))
+
+/// <summary>Create an NDArray from source sharing the same data chunk.</summary>
+/// <param name="src">source NDArray</param>
+/// <param name="out">new NDArray sharing the same data chunck with src</param>
+[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
+extern int MXShallowCopyNDArray__(NDArrayHandle src, [<Out>] NDArrayHandle& out)
+
+/// <summary>Create an Symbol from source sharing the same graph structure.</summary>
+/// <param name="src">source Symbol</param>
+/// <param name="out">new Symbol sharing the same graph structure with src</param>
+[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
+extern int MXShallowCopySymbol__(SymbolHandle src, SymbolHandle[] out)
 
