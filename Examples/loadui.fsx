@@ -1,6 +1,6 @@
 ﻿// .NET core
 (*
-#I @"bin\Debug\netcoreapp3.0"
+#I @"bin/Debug/netcoreapp3.0"
 //#I @"bin\Debug\netstandard2.0"
 open System
 open System.IO
@@ -13,7 +13,7 @@ Environment.SetEnvironmentVariable("PATH", libsearch + string Path.PathSeparator
 *)
 ////
 // .NET Framework
-#I @"bin\Debug\net48"
+#I @"bin/Debug/net48"
 ////
 
 

@@ -160,6 +160,8 @@ type NDArray(handle : SafeNDArrayHandle) =
         else
             raise (InvalidOperationException(sprintf "Source type of %s does not match NDArray type of %O" typeof<'a>.FullName x.DataTypeFlag))
 
+    member x.CopyFrom(data : NDArray) = data.CopyTo(x)
+
     member x.CopyFrom(data : Array) = 
         let etype = data.GetType().GetElementType()
         let dtype = DataType.FromNetType(etype)
