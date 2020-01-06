@@ -5,8 +5,8 @@
 open System.Collections.Generic
 open System.Runtime.InteropServices
 
-#I @"../MXNetSharp/bin/Debug/netstandard2.0./"
-#I @"bin/Debug/netstandard2.0./"
+#I @"../MXNetSharp/bin/Debug/netstandard2.0/"
+#I @"bin/Debug/netstandard2.0/"
 #r @"MXNetSharp.dll"
 #r @"MathNet.Numerics.dll"
 #r @"MathNet.Numerics.FSharp.dll"
@@ -211,7 +211,7 @@ q 1.0
 
 let rng = Random(3423)
 
-let ctx = CPU 0
+let ctx = GPU 0
 let odst (dat : NDArray option) inFeatures numTrees treeDim depth flatten (x : Symbol) = 
     //let response = Parameter("response", shape = [numTrees; treeDim; pown 2 depth]) //init normal 0.0 1.0
     let response = Parameter("response", ndarray = ctx.RandomNormal([numTrees; treeDim; pown 2 depth])) //init normal 0.0 1.0
@@ -222,7 +222,7 @@ let odst (dat : NDArray option) inFeatures numTrees treeDim depth flatten (x : S
     //let logTemperatures = Parameter("logTemperatures", shape = [numTrees; depth])
     let logTemperatures = Parameter("logTemperatures", ndarray = ctx.RandomNormal([numTrees; depth]))
     let binCodesOneHot = 
-        let ctx = CPU 0
+        let ctx = GPU 0
         let indices = ctx.Arange(start = 0.0, stop = double(pown 2 depth))
         let offsets = 2.0 ** ctx.Arange(start = 0.0, stop = double depth)
         let binCodes = 
@@ -381,7 +381,7 @@ type AdamOptimizer(e : Executor, ?beta1, ?beta2) =
                 match a with 
                 | ArgBinding ({Name = name; OpReqType = Some WriteTo; Grad = Some grad; NDArray = Some weight}) -> 
                     let m,v = lu name grad
-                    MX.AdamUpdate([weight], weight, grad, m, v, lr, beta1, beta2)
+                    MX.AdamUpdate([weight], weight, MX.Clip(grad,-0.1,0.1) , m, v, lr, beta1, beta2)
                 | _ -> ()
             )
 
@@ -397,6 +397,7 @@ epoch.Length
 
 for i = 0 to epoch.Length - 1 do
     printfn "%d" i
+    GC.Collect()
     let bi = epoch.[i]
     let x = bi |> Array.map (fun i -> trainSet2.[i] |> snd)
     let y = bi |> Array.map (fun i -> yTrain.[i])
@@ -405,6 +406,7 @@ for i = 0 to epoch.Length - 1 do
     exe.Forward(true)
     exe.Backward()
     opt.Update(0.001)
+    printfn "%f" (exe.Outputs.[0].ToFloat32Scalar())
 
 exe.Bindings
 |> Seq.iter 
