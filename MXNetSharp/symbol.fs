@@ -78,6 +78,9 @@ type Symbol() =
     default x.InputSymbols = MXSymbol.getInputSymbols x.UnsafeHandle |> Array.map (fun h -> new SymbolInput(x, new SafeSymbolHandle(h,true)) :> Symbol)
     abstract member Initialize : unit -> unit
    
+    member x.Reshape([<ParamArray>] dims : int []) = Reshape(x, dims)
+    member x.Reshape(dims : int seq) = Reshape(x, dims)
+
     member x.Slice(startIndices, endIndices, stepIndices) = Slice(x, startIndices, endIndices, stepIndices)
     member x.GetSlice([<ParamArray>] a : obj []) = 
         let b = ResizeArray<int option>()

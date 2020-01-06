@@ -6,6 +6,7 @@
 * Additional Context.CopyFrom convenience methods
 * Issue #22: NDArray.MutFull method fixed
 * Symbol.OutputCount property
+* Symbol.Reshape method
 * Compose op .>> now flows through Symbol.Outputs.[index]
 * Symbol.Bind now finds Parameter types and uses them as default bindings
 * Issue #25: opening PrimitiveOperators breaks ** operator
