@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="CustomOp\SoftmaxILGPU.fsx" />
     <None Include="CustomOp\SoftmaxRtc.fsx" />
     <None Include="DQN\qmodel.svg" />
     <Content Include="DQN\play1616.gif" />
@@ -17,6 +18,7 @@
     <None Include="DQN\README.MD" />
     <None Include="DQN\DQN.fsx" />
     <Compile Include="Library.fs" />
+    <None Include="loadilgpu.fsx" />
     <None Include="load.fsx" />
     <None Include="loadui.fsx" />
     <None Include="Neural Style Transfer.fsx" />

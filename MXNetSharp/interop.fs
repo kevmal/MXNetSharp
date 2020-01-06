@@ -2485,5 +2485,5 @@ module MXEngine =
     /// <param name="prop_handle">Property of the function.</param>
     /// <param name="priority">Priority of the action, as hint to the engine.</param>
     /// <param name="opr_name">The operation name.</param>
-    let pushSyncND sync_func func_param deleter ctx_handle _nds_handle num_const_nds mutable_nds_handle num_mutable_nds prop_handle priority opr_name = 
-        MXEnginePushSyncND(sync_func, func_param, deleter, ctx_handle, _nds_handle, num_const_nds, mutable_nds_handle, num_mutable_nds, prop_handle, priority, opr_name) |> throwOnError "MXEnginePushSyncND"
+    let pushSyncND sync_func func_param deleter ctx_handle _nds_handle mutable_nds_handle prop_handle priority opr_name = 
+        MXEnginePushSyncND(sync_func, func_param, deleter, ctx_handle, _nds_handle, length _nds_handle, mutable_nds_handle, length mutable_nds_handle, prop_handle, priority, opr_name) |> throwOnError "MXEnginePushSyncND"
