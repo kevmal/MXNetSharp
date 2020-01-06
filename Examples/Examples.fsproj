@@ -10,6 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Node - Copy - Copy - Copy - Copy (2).fsx" />
+    <None Include="Node - Copy - Copy - Copy - Copy.fsx" />
     <None Include="CustomOp\SoftmaxRtc.fsx" />
     <None Include="DQN\qmodel.svg" />
     <Content Include="DQN\play1616.gif" />
@@ -31,7 +33,12 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.8.3" />
     <PackageReference Include="Avalonia.Desktop" Version="0.8.3" />
+    <PackageReference Include="MathNet.Numerics.FSharp" Version="4.9.0" />
     <PackageReference Include="SkiaSharp" Version="1.68.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MXNetSharp\MXNetSharp.fsproj" />
   </ItemGroup>
 
 </Project>
