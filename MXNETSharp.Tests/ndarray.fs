@@ -361,6 +361,12 @@ module Basic =
         Assert.True(a.ToDoubleArray() = Array.zeroCreate 10)
         a.MutFull(123.0) |> ignore
         Assert.True(a.ToDoubleArray() = Array.create 10 123.0)
+    [<Fact>]
+    let ``Reshape invalid shape``() = 
+        let a = NDArray.CopyFrom([|0.0 .. 9.0|], [-1], CPU 0)
+        let b = a.Reshape([20;20;-1])
+        NDArray.WaitAll()
+        Assert.True(true)
 
 module Main = 
     [<EntryPoint>]
