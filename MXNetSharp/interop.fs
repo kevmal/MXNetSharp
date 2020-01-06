@@ -2423,3 +2423,71 @@ module MXRtc =
     /// <param name="shared_mem"> size of dynamically allocated shared memory</param>
     let cudaKernelCall handle dev_id args grid_dim_x grid_dim_y grid_dim_z block_dim_x block_dim_y block_dim_z shared_mem = 
         MXRtcCudaKernelCall(handle, dev_id, args, grid_dim_x, grid_dim_y, grid_dim_z, block_dim_x, block_dim_y, block_dim_z, shared_mem) |> throwOnError "MXRtcCudaKernelCall"
+
+module MXEngine = 
+    //TODO: Need to look into EngineVariable
+    ///// <summary>Push an asynchronous operation to the engine.</summary>
+    ///// <param name="async_func">Execution function whici takes a parameter on_complete
+    /////                  that must be called when the execution ompletes.</param>
+    ///// <param name="func_param">The parameter set on calling async_func, can be NULL.</param>
+    ///// <param name="deleter">The callback to free func_param, can be NULL.</param>
+    ///// <param name="ctx_handle">Execution context.</param>
+    ///// <param name="const_vars_handle">The variables that current operation will use
+    /////                         but not mutate.</param>
+    ///// <param name="mutable_vars_handle">The variables that current operation will mutate.</param>
+    ///// <param name="prop_handle">Property of the function.</param>
+    ///// <param name="priority">Priority of the action, as hint to the engine.</param>
+    ///// <param name="opr_name">The operation name.</param>
+    ///// <param name="wait">Whether this is a WaitForVar operation.</param>
+    //let pushAsync async_func func_param deleter ctx_handle _vars_handle num_const_vars mutable_vars_handle num_mutable_vars prop_handle priority opr_name wait = 
+    //    MXEnginePushAsync(async_func, func_param, deleter, ctx_handle, _vars_handle, length _vars_handle, mutable_vars_handle, length mutable_vars_handle, prop_handle, priority, opr_name, wait)  |> throwOnError "MXEnginePushAsync"
+
+    ///// <summary>Push a synchronous operation to the engine.</summary>
+    ///// <param name="sync_func">Execution function that executes the operation.</param>
+    ///// <param name="func_param">The parameter set on calling sync_func, can be NULL.</param>
+    ///// <param name="deleter">The callback to free func_param, can be NULL.</param>
+    ///// <param name="ctx_handle">Execution context.</param>
+    ///// <param name="const_vars_handle">The variables that current operation will use
+    /////                         but not mutate.</param>
+    ///// <param name="num_const_vars">The number of const_vars_handle.</param>
+    ///// <param name="mutable_vars_handle">The variables that current operation will mutate.</param>
+    ///// <param name="num_mutable_vars">The number of mutable_vars_handle.</param>
+    ///// <param name="prop_handle">Property of the function.</param>
+    ///// <param name="priority">Priority of the action, as hint to the engine.</param>
+    ///// <param name="opr_name">The operation name.</param>
+    //let pushSync sync_func func_param deleter ctx_handle _vars_handle num_const_vars mutable_vars_handle num_mutable_vars prop_handle priority opr_name = 
+    //    MXEnginePushSync(sync_func, func_param, deleter, ctx_handle, _vars_handle, num_const_vars, mutable_vars_handle, num_mutable_vars, prop_handle, priority, opr_name) |> throwOnError "MXEnginePushSync"
+
+    /// <summary>Push an asynchronous operation to the engine.</summary>
+    /// <param name="async_func">Execution function whici takes a parameter on_complete
+    ///                  that must be called when the execution ompletes.</param>
+    /// <param name="func_param">The parameter set on calling async_func, can be NULL.</param>
+    /// <param name="deleter">The callback to free func_param, can be NULL.</param>
+    /// <param name="ctx_handle">Execution context.</param>
+    /// <param name="const_nds_handle">The NDArrays that current operation will use
+    ///                         but not mutate.</param>
+    /// <param name="num_const_nds">The number of const_nds_handle.</param>
+    /// <param name="mutable_nds_handle">The NDArrays that current operation will mutate.</param>
+    /// <param name="num_mutable_nds">The number of mutable_nds_handle.</param>
+    /// <param name="prop_handle">Property of the function.</param>
+    /// <param name="priority">Priority of the action, as hint to the engine.</param>
+    /// <param name="opr_name">The operation name.</param>
+    /// <param name="wait">Whether this is a WaitForVar operation.</param>
+    let pushAsyncND async_func func_param deleter ctx_handle _nds_handle mutable_nds_handle prop_handle priority opr_name wait = 
+        MXEnginePushAsyncND(async_func, func_param, deleter, ctx_handle, _nds_handle, length _nds_handle, mutable_nds_handle, length mutable_nds_handle, prop_handle, priority, opr_name, wait) |> throwOnError "MXEnginePushAsyncND"
+
+    /// <summary>Push a synchronous operation to the engine.</summary>
+    /// <param name="sync_func">Execution function that executes the operation.</param>
+    /// <param name="func_param">The parameter set on calling sync_func, can be NULL.</param>
+    /// <param name="deleter">The callback to free func_param, can be NULL.</param>
+    /// <param name="ctx_handle">Execution context.</param>
+    /// <param name="const_nds_handle">The NDArrays that current operation will use
+    ///                         but not mutate.</param>
+    /// <param name="num_const_nds">The number of const_nds_handle.</param>
+    /// <param name="mutable_nds_handle">The NDArrays that current operation will mutate.</param>
+    /// <param name="num_mutable_nds">The number of mutable_nds_handle.</param>
+    /// <param name="prop_handle">Property of the function.</param>
+    /// <param name="priority">Priority of the action, as hint to the engine.</param>
+    /// <param name="opr_name">The operation name.</param>
+    let pushSyncND sync_func func_param deleter ctx_handle _nds_handle num_const_nds mutable_nds_handle num_mutable_nds prop_handle priority opr_name = 
+        MXEnginePushSyncND(sync_func, func_param, deleter, ctx_handle, _nds_handle, num_const_nds, mutable_nds_handle, num_mutable_nds, prop_handle, priority, opr_name) |> throwOnError "MXEnginePushSyncND"

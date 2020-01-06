@@ -2246,7 +2246,7 @@ extern int MXNDArrayCreateFromSharedMemEx__(int shared_pid, int shared_id, int[]
 /// <param name="opr_name">The operation name.</param>
 /// <param name="wait">Whether this is a WaitForVar operation.</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXEnginePushAsync__(EngineAsyncFunc async_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, EngineVarHandle _vars_handle, int num_const_vars, EngineVarHandle mutable_vars_handle, int num_mutable_vars, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*), bool wait (*=false*))
+extern int MXEnginePushAsync(EngineAsyncFunc async_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, EngineVarHandle _vars_handle, int num_const_vars, EngineVarHandle mutable_vars_handle, int num_mutable_vars, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*), bool wait (*=false*))
 
 /// <summary>Push a synchronous operation to the engine.</summary>
 /// <param name="sync_func">Execution function that executes the operation.</param>
@@ -2262,19 +2262,7 @@ extern int MXEnginePushAsync__(EngineAsyncFunc async_func, IntPtr func_param, En
 /// <param name="priority">Priority of the action, as hint to the engine.</param>
 /// <param name="opr_name">The operation name.</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXEnginePushSync__(EngineSyncFunc sync_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, EngineVarHandle _vars_handle, int num_const_vars, EngineVarHandle mutable_vars_handle, int num_mutable_vars, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*))
-
-/// <summary>Create an NDArray from source sharing the same data chunk.</summary>
-/// <param name="src">source NDArray</param>
-/// <param name="out">new NDArray sharing the same data chunck with src</param>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXShallowCopyNDArray__(NDArrayHandle src, [<Out>] NDArrayHandle& out)
-
-/// <summary>Create an Symbol from source sharing the same graph structure.</summary>
-/// <param name="src">source Symbol</param>
-/// <param name="out">new Symbol sharing the same graph structure with src</param>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXShallowCopySymbol__(SymbolHandle src, SymbolHandle[] out)
+extern int MXEnginePushSync(EngineSyncFunc sync_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, EngineVarHandle _vars_handle, int num_const_vars, EngineVarHandle mutable_vars_handle, int num_mutable_vars, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*))
 
 /// <summary>Push an asynchronous operation to the engine.</summary>
 /// <param name="async_func">Execution function whici takes a parameter on_complete
@@ -2292,7 +2280,7 @@ extern int MXShallowCopySymbol__(SymbolHandle src, SymbolHandle[] out)
 /// <param name="opr_name">The operation name.</param>
 /// <param name="wait">Whether this is a WaitForVar operation.</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXEnginePushAsyncND__(EngineAsyncFunc async_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, NDArrayHandle[] _nds_handle, int num_const_nds, NDArrayHandle[] mutable_nds_handle, int num_mutable_nds, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*), bool wait (*=false*))
+extern int MXEnginePushAsyncND(EngineAsyncFunc async_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, NDArrayHandle[] _nds_handle, int num_const_nds, NDArrayHandle[] mutable_nds_handle, int num_mutable_nds, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*), bool wait (*=false*))
 
 /// <summary>Push a synchronous operation to the engine.</summary>
 /// <param name="sync_func">Execution function that executes the operation.</param>
@@ -2308,5 +2296,17 @@ extern int MXEnginePushAsyncND__(EngineAsyncFunc async_func, IntPtr func_param, 
 /// <param name="priority">Priority of the action, as hint to the engine.</param>
 /// <param name="opr_name">The operation name.</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXEnginePushSyncND__(EngineSyncFunc sync_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, NDArrayHandle[] _nds_handle, int num_const_nds, NDArrayHandle[] mutable_nds_handle, int num_mutable_nds, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*))
+extern int MXEnginePushSyncND(EngineSyncFunc sync_func, IntPtr func_param, EngineFuncParamDeleter deleter, ContextHandle ctx_handle, NDArrayHandle[] _nds_handle, int num_const_nds, NDArrayHandle[] mutable_nds_handle, int num_mutable_nds, EngineFnPropertyHandle prop_handle (*=NULL*), int priority (*=0*), string opr_name (*=NULL*))
+
+/// <summary>Create an NDArray from source sharing the same data chunk.</summary>
+/// <param name="src">source NDArray</param>
+/// <param name="out">new NDArray sharing the same data chunck with src</param>
+[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
+extern int MXShallowCopyNDArray__(NDArrayHandle src, [<Out>] NDArrayHandle& out)
+
+/// <summary>Create an Symbol from source sharing the same graph structure.</summary>
+/// <param name="src">source Symbol</param>
+/// <param name="out">new Symbol sharing the same graph structure with src</param>
+[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
+extern int MXShallowCopySymbol__(SymbolHandle src, SymbolHandle[] out)
 
