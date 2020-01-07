@@ -211,7 +211,7 @@ q 1.0
 
 let rng = Random(3423)
 
-let ctx = GPU 0
+let ctx = CPU 0
 let odst (dat : NDArray option) inFeatures numTrees treeDim depth flatten (x : Symbol) = 
     //let response = Parameter("response", shape = [numTrees; treeDim; pown 2 depth]) //init normal 0.0 1.0
     let response = Parameter("response", ndarray = ctx.RandomNormal([numTrees; treeDim; pown 2 depth])) //init normal 0.0 1.0
@@ -222,7 +222,7 @@ let odst (dat : NDArray option) inFeatures numTrees treeDim depth flatten (x : S
     //let logTemperatures = Parameter("logTemperatures", shape = [numTrees; depth])
     let logTemperatures = Parameter("logTemperatures", ndarray = ctx.RandomNormal([numTrees; depth]))
     let binCodesOneHot = 
-        let ctx = GPU 0
+        let ctx = CPU 0
         let indices = ctx.Arange(start = 0.0, stop = double(pown 2 depth))
         let offsets = 2.0 ** ctx.Arange(start = 0.0, stop = double depth)
         let binCodes = 
@@ -279,8 +279,8 @@ let trainSize = 463715
 let testSize = 51630
 
 let allData = 
-    //File.ReadAllLines("D:\Data\yeaddataset\YearPredictionMSD.txt")
-    File.ReadAllLines("YearPredictionMSD.txt")
+    File.ReadAllLines("D:\Data\yeaddataset\YearPredictionMSD.txt")
+    //File.ReadAllLines("YearPredictionMSD.txt")
     |> Array.map 
         (fun line -> 
             let fields = line.Split(',')
