@@ -2365,8 +2365,8 @@ module MXAutograd =
         let create_graph = if create_graph then 1 else 0
         let is_train = if is_train then 1 else 0
         MXAutogradBackwardEx(ulength output_handles, output_handles, ograd_handles, ulength var_handles, var_handles, retain_graph, create_graph, is_train, &grad_handles, &grad_stypes) |> throwOnError "MXAutogradBackwardEx"
-        let g : NDArrayHandle [] = readStructArray output_handles.Length grad_handles
-        let st : int [] = readStructArray output_handles.Length grad_stypes
+        let g : NDArrayHandle [] = readStructArray var_handles.Length grad_handles
+        let st : int [] = readStructArray var_handles.Length grad_stypes
         g,st |> Array.map (StorageType.FromInt)
 
 
