@@ -210,7 +210,7 @@ module Game =
             txt.IsReadOnly <- true
             txt.TextWrapping <- Media.TextWrapping.Wrap
             let controlbtn = Button()
-            controlbtn.Content <- "Use QNN"
+            controlbtn.Content <- "Use DQN"
             let updatebtn = Button()
             updatebtn.Content <- "Update Model"
             let spanel = StackPanel()
@@ -716,15 +716,15 @@ let appendText str =
             c.CaretIndex <- Int32.MaxValue    
         )
 
-/// Keyboard / QNN toggle
+/// Keyboard / DQN toggle
 gameWindow.Window.ControlButton.Click
 |> Observable.add 
     (fun _ ->
         let b = gameWindow.Window.ControlButton
-        let useQnnTxt = "Use QNN"
+        let useDqnTxt = "Use DQN"
         let useKeysTxt = "Keyboard Control"
         match b.Content with 
-        | :? string as s when s = useQnnTxt -> 
+        | :? string as s when s = useDqnTxt -> 
             b.Content <- useKeysTxt
             let autoPlayAct (b : GameBoard) = 
                 lock playLock
@@ -753,7 +753,7 @@ gameWindow.Window.ControlButton.Click
                     )
             gameWindow.Window.GameMode <- GameMode.FunctionControl autoPlayAct
         | _ -> 
-            b.Content <- useQnnTxt 
+            b.Content <- useDqnTxt 
             gameWindow.Window.GameMode <- GameMode.KeyboardControl
     )
 

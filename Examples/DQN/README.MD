@@ -33,6 +33,10 @@ let loss = (qmodel - labels) .>> Square() .>> Mean() .>> MakeLoss()
 
 ```
 
+[Netron](https://github.com/lutzroeder/netron) export of model:
+
+![QModel](./qmodel.svg)
+
 ## Training process
 
 ### Executors

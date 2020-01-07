@@ -6,10 +6,14 @@
 * Additional Context.CopyFrom convenience methods
 * Issue #22: NDArray.MutFull method fixed
 * Symbol.OutputCount property
+* Symbol.Reshape method
 * Compose op .>> now flows through Symbol.Outputs.[index]
 * Symbol.Bind now finds Parameter types and uses them as default bindings
 * Issue #25: opening PrimitiveOperators breaks ** operator
 * Executor indexer on Variable for NDArray
+* Bindings.mapNDArray now named Bindings.fillNDArray
+* Symbol.Bind(ctx) will call inferShapes on symbol before creating Executor
+* Run-Time Compilation (RTC) support for custom CUDA kernels in C/C++
 
 #### 0.0.2 (2019-12-13)
 * OpOutCount.txt and OpOutCountRemainder.txt are no longer packaged

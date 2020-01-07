@@ -160,6 +160,8 @@ type NDArray(handle : SafeNDArrayHandle) =
         else
             raise (InvalidOperationException(sprintf "Source type of %s does not match NDArray type of %O" typeof<'a>.FullName x.DataTypeFlag))
 
+    member x.CopyFrom(data : NDArray) = data.CopyTo(x)
+
     member x.CopyFrom(data : Array) = 
         let etype = data.GetType().GetElementType()
         let dtype = DataType.FromNetType(etype)
@@ -269,9 +271,9 @@ type NDArray(handle : SafeNDArrayHandle) =
        
     static member Pow(x : NDArray, y : float) = invoke1 "_power_scalar" [|x|] [|"scalar" <-- y|]
     static member Pow(y : float, x : NDArray) = invoke1 "_rpower_scalar" [|x|] [|"scalar" <-- y|]
-    static member Pow(x : NDArray, y : NDArray) = invoke1 "elemwise_power" [|x; y|] Array.empty 
+    static member Pow(x : NDArray, y : NDArray) = invoke1 "_power" [|x; y|] Array.empty 
     //static member ApplyPow(x : NDArray, y : float) = NDArray.Pow(x,y)
-    static member ApplyPow(y : float, x : NDArray) = NDArray.Pow(x,y)
+    static member ApplyPow(x : float, y : NDArray) = NDArray.Pow(x,y)
     //static member ApplyPow(x : NDArray, y : NDArray) = NDArray.Pow(x,y)
     static member ( .** )(x : NDArray, y : NDArray) = invoke1 "broadcast_power" [|x; y|] Array.empty 
     //member x.ApplyPower(y : float) = NDArray.Pow(x,y)

@@ -303,6 +303,7 @@ module Bind =
 
 
 module Bindings = 
+    /// Apply map f : Bind -> Bind on all aux bindings
     let mapAux f (bm : Bindings) = 
         bm
         |> Seq.map 
@@ -313,6 +314,7 @@ module Bindings =
         |> Seq.map (fun (x : Bind) -> x.Name, x)
         |> dict 
         |> Bindings
+    /// Apply map f : Bind -> Bind on all arg bindings
     let mapArg f (bm : Bindings) = 
         bm
         |> Seq.map 
@@ -323,14 +325,18 @@ module Bindings =
         |> Seq.map (fun (x : Bind) -> x.Name, x)
         |> dict 
         |> Bindings
+    /// Apply map f : Bind -> Bind on all bindings
     let map f (bm : Bindings) = 
         bm
         |> Seq.map f
         |> Seq.map (fun (x : Bind) -> x.Name, x)
         |> dict 
         |> Bindings
+    /// Bindings from sequence of Bind
     let ofSeq l = Bindings().WithBindings l
+    /// Infer the shape of symbol and it's arguments given bindings
     let inferShapes (s : Symbol) (bm : Bindings) = bm.InferShapes s
+    /// Apply mapping f to all bindings which are arguments to symbol
     let mapSymbolArgs (symbol : Symbol) f (bm : Bindings) = 
         let argNames = symbol.ArgumentNames |> Set.ofSeq
         bm
@@ -341,12 +347,15 @@ module Bindings =
                 else
                     a
             )
+    /// All OpReqType's set to NullOp (no gradient calc)
     let freezeGraph (symbol : Symbol) (bm : Bindings) = 
         bm |> mapSymbolArgs symbol (fun a -> {a with OpReqType = Some NullOp} )
+    /// Initilize Bindings with given Variables
     let inputs (variables : Variable seq) = 
         variables 
         |> Seq.map Bind.fromVariable
         |> ofSeq
+    /// If shape[0] = 0 then set to given batchSize
     let batchSize batchSize (bm : Bindings) = 
         bm
         |> Seq.map 
@@ -357,6 +366,7 @@ module Bindings =
                 | _ -> x
             )
         |> ofSeq
+    /// Fill missing OpReqType
     let defaultOpReqType opReqType (bm : Bindings) = 
         bm
         |> mapArg 
@@ -365,18 +375,39 @@ module Bindings =
                 | None -> {a with OpReqType = Some opReqType}
                 | _ -> a
             )
-    let mapNDArray f (bm : Bindings) = 
+    /// Fill missing NDArray's with f : Bind -> NDArray
+    let fillNDArray f (bm : Bindings) = 
         bm
         |> map 
             (fun a ->
                 match a.NDArray with 
-                | None -> f a |> a.WithNDArray
+                | None -> 
+                    let nd : NDArray = f a 
+                    match a.Shape with 
+                    | None -> a.WithNDArray(nd).WithShape(nd.Shape)
+                    | Some s when s = nd.Shape -> nd |> a.WithNDArray
+                    | Some s -> 
+                        let nds = nd.Shape
+                        if s.Length = 0 then 
+                            a.WithNDArray(nd).WithShape(nds)
+                        elif s.Length <> nds.Length then 
+                            raise (RankException(sprintf "Given NDArray shape %A does not match binding %s shape %A" nds a.Name s))
+                        else
+                            for i = 0 to s.Length - 1 do 
+                                if s.[i] > 0 && s.[i] <> nds.[i] then 
+                                    raise (RankException(sprintf "Given NDArray shape %A does not match binding %s shape %A" nds a.Name s))
+                            a.WithNDArray(nd).WithShape(nds)
                 | _ -> a
             )
+    /// Default to OpReqType.WriteTo, zero grads and fill missing NDArray's using `f : b : Bind -> shape : int seq -> NDArray`
     let init f bm = 
         bm 
         |> defaultOpReqType OpReqType.WriteTo
-        |> mapNDArray (fun x -> f x x.Shape.Value) //TODO: check and throw
+        |> fillNDArray 
+            (fun x -> 
+                let shape = match x.Shape with | Some s -> s | _ -> Array.empty
+                f x shape
+            ) 
         |> map 
             (fun a ->
                 match a with
@@ -384,7 +415,6 @@ module Bindings =
                     ArgBinding {b with Grad = Some(MX.ZerosLike(a.NDArray.Value))}
                 | _ -> a
             )
-
 
 
 type SafeExecutorHandle(owner) = 
@@ -399,6 +429,20 @@ type SafeExecutorHandle(owner) =
         else
             ObjectDisposedException("SafeExecutorHandle", "Executor handle has been closed") |> raise
 
+
+
+type BindingIncompleteException(bind : Bind option, fieldOrName : string) =
+    inherit Exception(
+        match bind with 
+        | Some bind -> 
+            let tp = 
+                match bind with 
+                | AuxBinding _ -> "Aux"
+                | ArgBinding _ -> "Arg"
+            sprintf "Bindings incomplete. Expecting %s in  %s binding '%s'" fieldOrName tp bind.Name
+        | None -> 
+            sprintf "Bindings incomplete. No binding for '%s'." fieldOrName 
+        )
  
 type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, argGrad, gradReqType, auxStates, sharedExecutor, outputs, bindMap) =   
     let mutable disposed = false
@@ -445,12 +489,12 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
             |> Array.map 
                 (fun name ->
                     match bindings.TryGetValue(name) with 
-                    | true, (ArgBinding b) ->  //TODO: exception clean up
-                        let a = match b.NDArray with Some a -> a | None -> failwithf "Must provide %s" name
-                        let g = match b.Grad with Some a -> a | None -> failwithf "Must provide %s" name
-                        let t = match b.OpReqType with Some a -> a | None -> failwithf "Must provide %s" name
+                    | true, (ArgBinding b) -> 
+                        let a = match b.NDArray with Some a -> a | None -> raise (BindingIncompleteException(Some(ArgBinding b), "NDArray"))
+                        let g = match b.Grad with Some a -> a | None -> raise (BindingIncompleteException(Some(ArgBinding b), "Grad"))
+                        let t = match b.OpReqType with Some a -> a | None -> raise (BindingIncompleteException(Some(ArgBinding b), "OpReqType"))
                         a,g,t
-                    | _ -> failwithf "No binding for %s" name
+                    | _ -> raise(BindingIncompleteException(None, name))
                 )
             |> Array.unzip3
         let aux = 
@@ -458,10 +502,10 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
             |> Array.map 
                 (fun name ->
                     match bindings.TryGetValue(name) with 
-                    | true, (AuxBinding b) ->  //TODO: exception clean up
-                        let a = match b.NDArray with Some a -> a | None -> failwithf "Must provide %s" name
+                    | true, (AuxBinding b) -> 
+                        let a = match b.NDArray with Some a -> a | None -> raise (BindingIncompleteException(Some(AuxBinding b), "NDArray"))
                         a
-                    | _ -> failwithf "No binding for %s" name
+                    | _ -> raise(BindingIncompleteException(None, name))
                 )
         new Executor(symbol, context, inArgs, argGrad, gradReqType, aux, Some bindings)
     /// Refresh executor outputs. Returns false if nothing is updated.
@@ -562,34 +606,48 @@ module SymbolExtension =
     open MXNetSharp.SymbolArgument
     type Symbol with 
         member x.Bindings = 
+            let visited = HashSet<Symbol>({new IEqualityComparer<Symbol> with
+                                               member this.Equals(x: Symbol, y: Symbol): bool = 
+                                                   Object.ReferenceEquals(x,y)
+                                               member this.GetHashCode(obj: Symbol): int = 
+                                                   System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj)})
             let rec loop (symbol : Symbol) : Parameter seq = 
-                match symbol with 
-                | :? Parameter as p -> Seq.singleton p
-                | :? SymbolOutput as s -> loop s.Parent
-                | :? SymbolOperator as s -> 
-                    s.OperatorArguments
-                    |> Seq.collect
-                        (fun a -> 
-                            match a with 
-                            | name, VarArg(num, args) -> 
-                                args 
-                                |> Seq.collect 
-                                    (fun a ->
-                                        match a with 
-                                        | :? SymbolOperator as s -> 
-                                            loop s
-                                        | :? SymbolOutput as s -> 
-                                            loop s.Parent
-                                        | :? Parameter as p -> 
-                                            Seq.singleton p
-                                        | s -> Seq.empty
-                                    )
-                            | name, Input(:? SymbolOperator as s) -> loop s
-                            | name, Input(:? SymbolOutput as s) -> loop s.Parent
-                            | name, Input(:? Parameter as s) -> Seq.singleton s
-                            | otherwise -> Seq.empty
-                        )
-                | _ -> Seq.empty
+                if not(visited.Add symbol) then 
+                    Seq.empty 
+                else
+                    match symbol with 
+                    | :? Parameter as p -> Seq.singleton p
+                    | :? SymbolOutput as s -> loop s.Parent
+                    | :? SymbolGroup as s -> 
+                        seq {
+                            for i = 0 to s.Count - 1 do 
+                                yield! loop s.[i]
+                        }
+                    | :? SymbolOperator as s -> 
+                        s.OperatorArguments
+                        |> Seq.collect
+                            (fun a -> 
+                                match a with 
+                                | name, VarArg(num, args) -> 
+                                    args 
+                                    |> Seq.collect 
+                                        (fun a ->
+                                            match a with 
+                                            | :? SymbolOperator as s -> 
+                                                loop s
+                                            | :? SymbolOutput as s -> 
+                                                loop s.Parent
+                                            | :? Parameter as p -> 
+                                                Seq.singleton p
+                                            | s -> 
+                                                Seq.empty
+                                        )
+                                | name, Input(:? SymbolOperator as s) -> loop s
+                                | name, Input(:? SymbolOutput as s) -> loop s.Parent
+                                | name, Input(:? Parameter as s) -> Seq.singleton s
+                                | otherwise -> Seq.empty
+                            )
+                    | _ -> Seq.empty
             loop x 
             |> Seq.cast
             |> Bindings.inputs
@@ -602,7 +660,9 @@ module SymbolExtension =
         member x.Bind(context, batchSize) = 
             let bindmap = x.Bindings |> Bindings.batchSize batchSize |> Bindings.inferShapes x
             new Executor(x,context,bindmap)
-        member x.Bind(context) = new Executor(x,context,x.Bindings)
+        member x.Bind(context) = 
+            let bindmap = x.Bindings |> Bindings.inferShapes x
+            new Executor(x,context,bindmap)
         member x.Eval(context) = 
             let exe = x.Bind(context)
             exe.Forward(false)
@@ -611,4 +671,4 @@ module SymbolExtension =
             let exe = x.Bind(context,bindings)
             exe.Forward(false)
             exe
-
+    

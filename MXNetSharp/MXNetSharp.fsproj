@@ -12,7 +12,8 @@
     <NeutralLanguage></NeutralLanguage>
     <Authors>Kevin Malenfant</Authors>
     <AssemblyVersion>0.0.2.0</AssemblyVersion>
-    <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,6 +31,7 @@
     <Compile Include="ndarray.fs" />
     <Compile Include="autograd.fs" />
     <Compile Include="customop.fs" />
+    <Compile Include="rtc.fs" />
     <Compile Include="dataiter.fs" />
     <Compile Include="operators.fs" />
     <Compile Include="contextext.fs" />

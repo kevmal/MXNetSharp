@@ -13,6 +13,8 @@
     <None Include="TCN\MNIST.fsx" />
     <None Include="TCN\README.MD" />
     <None Include="TCN\adding.fsx" />
+    <None Include="CustomOp\SoftmaxRtc.fsx" />
+    <None Include="DQN\qmodel.svg" />
     <Content Include="DQN\play1616.gif" />
     <Content Include="DQN\play1000.gif" />
     <None Include="DQN\README.MD" />
