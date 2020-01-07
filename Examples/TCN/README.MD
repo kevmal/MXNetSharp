@@ -55,6 +55,32 @@ let weightNormalization name =
     w :> Symbol    
 ```
 
+When testing the F# implementation, I found matching the initializtion of the original code very important to having weight normalization work. The initilization used is as follows:
+
+```fsharp
+let bindings = 
+    loss.Bindings
+    |> Bindings.batchSize batchSize 
+    |> Bindings.inferShapes loss
+    |> Bindings.init 
+        (fun a shape ->  
+            let fanin = 
+                if shape.Length = 3 then    
+                    double a.Shape.Value.[1]*double a.Shape.Value.[2]
+                elif shape.Length = 1 then 
+                    double a.Shape.Value.[0]
+                else
+                    double a.Shape.Value.[1]
+            let alpha = sqrt 5.0
+            let gain = sqrt(2.0 / (1.0 + alpha*alpha))
+            let stdv = sqrt(3.0) * (gain) / sqrt(fanin)
+            MX.RandomUniformNDArray(context, -stdv, stdv, a.Shape.Value)
+        )
+
+```
+
+This matches PyTorch's initilization of weights which is [Kaiming Uniform](https://arxiv.org/abs/1502.01852) initilization. Bias initilization was found not as important and does not match PyTorch for simplicity. It did seem using batch normalization in place of weight normaliztion was less sensitive to weight initilization.
+
 Layers are stacked with dilation of `2^i - 1` for layer i in {0..layerCount-1} and finally mapped (for each time `t`) to "output count" by
 
 ```fsharp
