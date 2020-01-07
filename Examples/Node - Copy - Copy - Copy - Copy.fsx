@@ -253,14 +253,29 @@ let odst (dat : NDArray option) inFeatures numTrees treeDim depth flatten (x : S
         let q = output.ToDoubleArray() |> Statistics.quantileFunc
         let initV = Sample.betaSeq 1.0 1.0 rng |> Seq.take (numTrees * depth) |> Seq.map q |> Seq.toArray
         printfn "initV %A" initV
+        printfn "initVmax %A" (initV |> Array.max)
         featureThresholds.NDArray.Value.CopyFrom(initV)
-        let q2 = (abs(output .- MX.ExpandDims(featureThresholds.NDArray.Value,0))).ToDoubleArray() |> Statistics.quantileFunc
-        let temp = q2 1.0
+        let crap = abs(output .- MX.ExpandDims(featureThresholds.NDArray.Value,0))
+        printfn "crap %A" (crap.ToFloat32Array())
+        let temp = Array.CreateInstance(typeof<float32>, numTrees, depth)
+        [|
+            for i = 0 to numTrees - 1 do 
+            for j = 0 to depth - 1 do 
+                i,j
+        |]
+        |> Array.iter 
+            (fun (i,j) ->
+                let a = crap.[*,i,j]
+                //pritnfn "%A" (i,j,a.Shape)
+                let v = a.ToFloat32Array() |> Array.max   //q = 1
+                temp.SetValue(v,i,j)
+            )
         printfn "temp %A" temp
         //let temp = temp / 1.0
-        let initTemp = (log temp + 1e-6)
+        let initTemp = (log (ctx.CopyFrom(temp)) + 1e-6)
         printfn "inittemp %A" initTemp
-        logTemperatures.NDArray.Value.MutFull(initTemp) |> ignore
+        printfn "inittemp %A" (initTemp.ToFloat32Array())
+        initTemp.CopyTo(logTemperatures.NDArray.Value) |> ignore
     | None -> ()
 
     let thresholdLogits = 
@@ -279,8 +294,8 @@ let trainSize = 463715
 let testSize = 51630
 
 let allData = 
-    File.ReadAllLines("D:\Data\yeaddataset\YearPredictionMSD.txt")
-    //File.ReadAllLines("YearPredictionMSD.txt")
+    //File.ReadAllLines("D:\Data\yeaddataset\YearPredictionMSD.txt")
+    File.ReadAllLines("YearPredictionMSD.txt")
     |> Array.map 
         (fun line -> 
             let fields = line.Split(',')
@@ -335,7 +350,7 @@ let yTest = testSet2 |> Array.map fst |> Array.map (fun x -> (double x - tymu) /
 
 let initBatch = 
     let ix = MX.Shuffle(ctx.Arange(0.0, double trainSet.Length)).ToIntArray() |> Array.truncate 1000 
-    let y,x = ix |> Array.map (fun i -> trainSet.[i]) |> Array.unzip
+    let x = ix |> Array.map (fun i -> trainSet2.[i] |> snd)
     ctx.CopyFrom(x |> Array.concat, shape = [1000;flength])
 
 
@@ -381,7 +396,7 @@ type AdamOptimizer(e : Executor, ?beta1, ?beta2) =
                 match a with 
                 | ArgBinding ({Name = name; OpReqType = Some WriteTo; Grad = Some grad; NDArray = Some weight}) -> 
                     let m,v = lu name grad
-                    MX.AdamUpdate([weight], weight, MX.Clip(grad,-0.1,0.1) , m, v, lr, beta1, beta2)
+                    MX.AdamUpdate([weight], weight, grad , m, v, lr, beta1, beta2)
                 | _ -> ()
             )
 
