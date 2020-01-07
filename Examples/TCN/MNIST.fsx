@@ -149,27 +149,24 @@ type AdamOptimizer(e : Executor, lr, ?beta1, ?beta2) =
 
 
 // ******************************************** Initilization **********************************************
-let bm2 = 
-    let bm = 
-        loss.Bindings
-        |> Bindings.batchSize batchSize 
-        |> Bindings.inferShapes loss
-        |> Bindings.init 
-            (fun a shape ->  
-                let fanin = 
-                    if shape.Length = 3 then    
-                        double a.Shape.Value.[1]*double a.Shape.Value.[2]
-                    elif shape.Length = 1 then 
-                        double a.Shape.Value.[0]
-                    else
-                        double a.Shape.Value.[1]
-                let alpha = sqrt 5.0
-                let gain = sqrt(2.0 / (1.0 + alpha*alpha))
-                let stdv = sqrt(3.0) * (gain) / sqrt(fanin)
-                MX.RandomUniformNDArray(context, -stdv, stdv, a.Shape.Value)
-            )
-    bm
-
+let bindings = 
+    loss.Bindings
+    |> Bindings.batchSize batchSize 
+    |> Bindings.inferShapes loss
+    |> Bindings.init 
+        (fun a shape ->  
+            let fanin = 
+                if shape.Length = 3 then    
+                    double a.Shape.Value.[1]*double a.Shape.Value.[2]
+                elif shape.Length = 1 then 
+                    double a.Shape.Value.[0]
+                else
+                    double a.Shape.Value.[1]
+            let alpha = sqrt 5.0
+            let gain = sqrt(2.0 / (1.0 + alpha*alpha))
+            let stdv = sqrt(3.0) * (gain) / sqrt(fanin)
+            MX.RandomUniformNDArray(context, -stdv, stdv, a.Shape.Value)
+        )
 
 // ******************************************** Datasets **********************************************
 
@@ -208,7 +205,7 @@ let valIter   = new MNISTIter(@"t10k-images-idx3-ubyte",
 
 // ******************************************** Training **********************************************
 
-let exe = outp.Bind(context, bm2)
+let exe = outp.Bind(context, bindings)
 let opt = AdamOptimizer(exe,lr)
 
 let testEpoch () = 
@@ -218,8 +215,8 @@ let testEpoch () =
             while (valIter.Next()) do 
                 let inp = valIter.GetData().Reshape(batchSize,1,seqLength)
                 let inp = (inp - 0.1307) / 0.3081
-                inp.Reshape(batchSize,1,seqLength).CopyTo(bm2.NDArray(x))
-                valIter.GetLabel().Reshape(batchSize,1).CopyTo(bm2.NDArray(label))
+                inp.Reshape(batchSize,1,seqLength).CopyTo(bindings.NDArray(x))
+                valIter.GetLabel().Reshape(batchSize,1).CopyTo(bindings.NDArray(label))
                 exe.Forward(false)
                 exe.Outputs.[0].ToFloat32Scalar(), exe.Outputs.[1].ToDoubleScalar()
         |] |> Array.unzip
@@ -234,8 +231,8 @@ let trainEpoch () =
         while (trainIter.Next()) do 
             let inp = trainIter.GetData().Reshape(batchSize,1,seqLength)
             let inp = (inp - 0.1307) / 0.3081
-            inp.CopyTo(bm2.NDArray(x))
-            trainIter.GetLabel().Reshape(batchSize,1).CopyTo(bm2.NDArray(label))
+            inp.CopyTo(bindings.NDArray(x))
+            trainIter.GetLabel().Reshape(batchSize,1).CopyTo(bindings.NDArray(label))
             exe.Forward(true)
             exe.Backward()
             opt.Update()

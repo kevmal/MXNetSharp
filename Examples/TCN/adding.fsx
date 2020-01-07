@@ -142,27 +142,24 @@ type AdamOptimizer(e : Executor, lr, ?beta1, ?beta2) =
 
 
 // ******************************************** Initilization **********************************************
-let bm2 = 
-    let bm = 
-        loss.Bindings
-        |> Bindings.batchSize batchSize 
-        |> Bindings.inferShapes loss
-        |> Bindings.init 
-            (fun a shape ->  
-                let fanin = 
-                    if shape.Length = 3 then    
-                        double a.Shape.Value.[1]*double a.Shape.Value.[2]
-                    elif shape.Length = 1 then 
-                        double a.Shape.Value.[0]
-                    else
-                        double a.Shape.Value.[1]
-                let alpha = sqrt 5.0
-                let gain = sqrt(2.0 / (1.0 + alpha*alpha))
-                let stdv = sqrt(3.0) * (gain) / sqrt(fanin)
-                MX.RandomUniformNDArray(context, -stdv, stdv, a.Shape.Value)
-            )
-    bm
-
+let bindings = 
+    loss.Bindings
+    |> Bindings.batchSize batchSize 
+    |> Bindings.inferShapes loss
+    |> Bindings.init 
+        (fun a shape ->  
+            let fanin = 
+                if shape.Length = 3 then    
+                    double a.Shape.Value.[1]*double a.Shape.Value.[2]
+                elif shape.Length = 1 then 
+                    double a.Shape.Value.[0]
+                else
+                    double a.Shape.Value.[1]
+            let alpha = sqrt 5.0
+            let gain = sqrt(2.0 / (1.0 + alpha*alpha))
+            let stdv = sqrt(3.0) * (gain) / sqrt(fanin)
+            MX.RandomUniformNDArray(context, -stdv, stdv, a.Shape.Value)
+        )
 
 // ******************************************** Data gen **********************************************
 let genSample count = 
@@ -197,7 +194,7 @@ let testSet = genSample 1000
 
 // ******************************************** Training **********************************************
 
-let exe = loss.Bind(context, bm2)
+let exe = loss.Bind(context, bindings)
 let opt = AdamOptimizer(exe,lr)
 
 let testBatch (ix : int []) = 
@@ -205,8 +202,8 @@ let testBatch (ix : int []) =
     let ix2 = NDArray.CopyFrom(ix, allX.Context)
     let xs = MX.Take(allX, ix2, axis = 0)
     let ys = MX.Take(allY, ix2, axis = 0)
-    xs.CopyTo(bm2.NDArray(x))
-    ys.CopyTo(bm2.NDArray(label))
+    xs.CopyTo(bindings.NDArray(x))
+    ys.CopyTo(bindings.NDArray(label))
     exe.Forward(false)
     exe.Outputs.[0].ToFloat32Scalar()
 
@@ -236,8 +233,8 @@ let trainBatch (ix : int []) =
     let ix2 = NDArray.CopyFrom(ix, allX.Context)
     let xs = MX.Take(allX, ix2, axis = 0)
     let ys = MX.Take(allY, ix2, axis = 0)
-    xs.CopyTo(bm2.NDArray(x))
-    ys.CopyTo(bm2.NDArray(label))
+    xs.CopyTo(bindings.NDArray(x))
+    ys.CopyTo(bindings.NDArray(label))
     exe.Forward(true)
     exe.Backward()
     opt.Update()
