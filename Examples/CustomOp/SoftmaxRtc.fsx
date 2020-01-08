@@ -2,6 +2,7 @@
 open Load
 
 open MXNetSharp
+open MXNetSharp.Interop
 open MXNetSharp.PrimitiveOperators
 open MXNetSharp.SymbolOperators
 open MXNetSharp.Operator
