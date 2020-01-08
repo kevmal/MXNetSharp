@@ -78,6 +78,9 @@ type Symbol() =
     default x.InputSymbols = MXSymbol.getInputSymbols x.UnsafeHandle |> Array.map (fun h -> new SymbolInput(x, new SafeSymbolHandle(h,true)) :> Symbol)
     abstract member Initialize : unit -> unit
    
+    member x.Reshape([<ParamArray>] dims : int []) = Reshape(x, dims)
+    member x.Reshape(dims : int seq) = Reshape(x, dims)
+
     member x.Slice(startIndices, endIndices, stepIndices) = Slice(x, startIndices, endIndices, stepIndices)
     member x.GetSlice([<ParamArray>] a : obj []) = 
         let b = ResizeArray<int option>()
@@ -26235,7 +26238,7 @@ module SymbolOperators =
         /// <param name="data">The input.</param>
         /// <param name="stype">Output storage type.</param>
         new(data : Symbol,
-            stype : Stype) = 
+            stype : StorageType) = 
             let operatorArguments = 
                 [
                     "data", Input data
@@ -26283,7 +26286,7 @@ module SymbolOperators =
         /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\cast_storage.cc:L71</summary>
         /// <param name="stype">Output storage type.</param>
         /// <param name="data">The input.</param>
-        new(stype : Stype,
+        new(stype : StorageType,
             [<Optional>] ?data : Symbol) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
@@ -26295,12 +26298,12 @@ module SymbolOperators =
         /// The input.
         member __.Data = operatorArguments.GetInput "data"
         /// Output storage type.
-        member __.Stype : Stype = match operatorArguments.GetParameter "stype" with Some(v) -> unbox v | None -> failwithf "Required parameter stype is missing"
+        member __.Stype : StorageType = match operatorArguments.GetParameter "stype" with Some(v) -> unbox v | None -> failwithf "Required parameter stype is missing"
         /// <summary>Copy CastStorage instance with updated inputs/parameters.</summary>
         /// <param name="data">The input.</param>
         /// <param name="stype">Output storage type.</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?stype : Stype) = 
+            [<Optional>] ?stype : StorageType) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
@@ -26548,7 +26551,7 @@ module SymbolOperators =
             [<Optional>] ?rhs : Symbol,
             [<Optional>] ?transposeA : bool,
             [<Optional>] ?transposeB : bool,
-            [<Optional>] ?forwardStype : ForwardStype) = 
+            [<Optional>] ?forwardStype : StorageType) = 
             let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
             let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
@@ -26568,7 +26571,7 @@ module SymbolOperators =
         static member TransposeBDefault : bool = false
         /// Default value for ForwardStype
         /// The desired storage type of the forward output given by user, if thecombination of input storage types and this hint does not matchany implemented ones, the dot operator will perform fallback operationand still produce an output of the desired storage type.
-        static member ForwardStypeDefault : ForwardStype option = None
+        static member ForwardStypeDefault : StorageType option = None
         /// The first input
         member __.Lhs = operatorArguments.GetInput "lhs"
         /// The second input
@@ -26589,7 +26592,7 @@ module SymbolOperators =
             [<Optional>] ?rhs : Symbol,
             [<Optional>] ?transposeA : bool,
             [<Optional>] ?transposeB : bool,
-            [<Optional>] ?forwardStype : ForwardStype) = 
+            [<Optional>] ?forwardStype : StorageType) = 
             let operatorArguments = 
                 [
                     lhs |> Option.map (fun x -> "lhs", Input x)
@@ -26627,7 +26630,7 @@ module SymbolOperators =
             [<Optional>] ?rhs : Symbol,
             [<Optional>] ?transposeA : bool,
             [<Optional>] ?transposeB : bool,
-            [<Optional>] ?forwardStype : ForwardStype) = 
+            [<Optional>] ?forwardStype : StorageType) = 
             let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
             let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
@@ -26647,7 +26650,7 @@ module SymbolOperators =
         static member TransposeBDefault : bool = false
         /// Default value for ForwardStype
         /// The desired storage type of the forward output given by user, if thecombination of input storage types and this hint does not matchany implemented ones, the dot operator will perform fallback operationand still produce an output of the desired storage type.
-        static member ForwardStypeDefault : ForwardStype option = None
+        static member ForwardStypeDefault : StorageType option = None
         /// The first input
         member __.Lhs = operatorArguments.GetInput "lhs"
         /// The second input
@@ -26668,7 +26671,7 @@ module SymbolOperators =
             [<Optional>] ?rhs : Symbol,
             [<Optional>] ?transposeA : bool,
             [<Optional>] ?transposeB : bool,
-            [<Optional>] ?forwardStype : ForwardStype) = 
+            [<Optional>] ?forwardStype : StorageType) = 
             let operatorArguments = 
                 [
                     lhs |> Option.map (fun x -> "lhs", Input x)

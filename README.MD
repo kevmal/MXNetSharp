@@ -267,7 +267,46 @@ let y2 = Exp(2.0*x + 33.0) // same as above but explicitly creates the `Exp` sym
 MXNetSharp.NDArray class. Please see samples and quickstart section.
 
 ### Autodiff (TODO)
-MXNetSharp.Autodiff module.
+
+```fsharp
+open MXNetSharp
+let x = (CPU 0).Arange(1.0,5.0).Reshape(2,2)
+x.AttachGradient()
+let y,z = 
+    Autograd.record
+        (fun () ->
+            let y = x*2.0
+            let z = y*x
+            y,z
+        )
+z.Backward()
+
+x.Grad.Value.ToFloat32Array()
+// val it : float32 [] = [|4.0f; 8.0f; 12.0f; 16.0f|]
+```
+
+Higher order gradients (currently limited in MXNet):
+```fsharp
+
+open MXNetSharp
+let x = (CPU 0).CopyFrom([|1.f;2.f;3.f|], [1;1;-1])
+x.AttachGradient()
+let yGrad = 
+    Autograd.record 
+        (fun () ->
+            let y = sin x
+            let yGrad = Autograd.grad false true true Array.empty [y] [x]
+            yGrad.[0]
+        )
+yGrad.Backward()
+
+x.Grad.Value.ToFloat32Array()
+// val it : float32 [] = [|-0.841470957f; -0.909297407f; -0.141120002f|]
+(-sin x).ToFloat32Array() 
+// val it : float32 [] = [|-0.841470957f; -0.909297407f; -0.141120002f|]
+
+```
+
 
 ## Executor (TODO)
 MXNetSharp.Executor class. Please see samples.
