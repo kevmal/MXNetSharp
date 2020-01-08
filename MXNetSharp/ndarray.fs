@@ -188,6 +188,7 @@ type NDArray(handle : SafeNDArrayHandle) =
             | Int64 -> ArrayConverter.Int64(a) |> x.SyncCopyFromCPUUnchecked
             | Int8 -> ArrayConverter.Int8(a) |> x.SyncCopyFromCPUUnchecked
             | UInt8 -> ArrayConverter.UInt8(a) |> x.SyncCopyFromCPUUnchecked
+            | Bool -> ArrayConverter.Bool(a) |> x.SyncCopyFromCPUUnchecked
 
     static member CopyFrom(data : Array, ctx : Context) = 
         let etype = data.GetType().GetElementType()

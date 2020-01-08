@@ -6,8 +6,8 @@ open System.Diagnostics
 #load "capi.fs"
 #load "cpredictapi.fs"
 #load "cnnvmapi.fs"
-#load "coretypes.fs"
 #load "interop.fs"
+#load "coretypes.fs"
 #load "atomicsymbol.fs"
 
 open MXNetSharp
@@ -1489,8 +1489,8 @@ let processDefinedType (t : UnionType) (arg : ProcessedArg) =
                 TypeString = ""
                 Generate = true
             } 
-        | FName "Stype"
-        | FName "ForwardStype" -> 
+        | Name "Stype"
+        | Name "ForwardStype" -> 
             {
                 Name = "StorageType"
                 Cases = [||]

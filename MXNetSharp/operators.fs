@@ -28387,7 +28387,7 @@ type MX() =
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\cast_storage.cc:L71</summary>
     /// <param name="data">The input.</param>
     /// <param name="stype">Output storage type.</param>
-    static member CastStorage(data : NDArray, stype : Stype) =
+    static member CastStorage(data : NDArray, stype : StorageType) =
         let creator = AtomicSymbolCreator.FromName "cast_storage"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -28436,7 +28436,7 @@ type MX() =
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="stype">Output storage type.</param>
-    static member CastStorage(outputArray : NDArray seq, data : NDArray, stype : Stype) =
+    static member CastStorage(outputArray : NDArray seq, data : NDArray, stype : StorageType) =
         let creator = AtomicSymbolCreator.FromName "cast_storage"
         let names = [|"stype"|]
         let vals = [|string stype|]
@@ -28488,7 +28488,7 @@ type MX() =
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\cast_storage.cc:L71</summary>
     /// <param name="data">The input.</param>
     /// <param name="stype">Output storage type.</param>
-    static member CastStorage(data : Symbol, stype : Stype) =
+    static member CastStorage(data : Symbol, stype : StorageType) =
         CastStorage(data, stype)
     /// <summary>Casts tensor storage type to the new type.
     /// 
@@ -28531,7 +28531,7 @@ type MX() =
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\cast_storage.cc:L71</summary>
     /// <param name="stype">Output storage type.</param>
     /// <param name="data">The input.</param>
-    static member CastStorage(stype : Stype, [<Optional>] ?data : Symbol) =
+    static member CastStorage(stype : StorageType, [<Optional>] ?data : Symbol) =
         CastStorage(stype, ?data = data)
 
     /// <summary>Return the elements, either from x or y, depending on the condition.
@@ -28906,7 +28906,7 @@ type MX() =
                       rhs : NDArray, 
                       [<Optional; DefaultParameterValue(false)>] transposeA : bool, 
                       [<Optional; DefaultParameterValue(false)>] transposeB : bool, 
-                      [<Optional>] forwardStype : ForwardStype) =
+                      [<Optional>] forwardStype : StorageType) =
         let creator = AtomicSymbolCreator.FromName "dot"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
@@ -28971,7 +28971,7 @@ type MX() =
                       rhs : NDArray, 
                       [<Optional; DefaultParameterValue(false)>] transposeA : bool, 
                       [<Optional; DefaultParameterValue(false)>] transposeB : bool, 
-                      [<Optional>] forwardStype : ForwardStype) =
+                      [<Optional>] forwardStype : StorageType) =
         let creator = AtomicSymbolCreator.FromName "dot"
         let names = [|"transpose_a"; "transpose_b"; "forward_stype"|]
         let vals = [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|]
@@ -29034,7 +29034,7 @@ type MX() =
     /// <param name="transposeA">If true then transpose the first input before dot.</param>
     /// <param name="transposeB">If true then transpose the second input before dot.</param>
     /// <param name="forwardStype">The desired storage type of the forward output given by user, if thecombination of input storage types and this hint does not matchany implemented ones, the dot operator will perform fallback operationand still produce an output of the desired storage type.</param>
-    static member Dot([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol, [<Optional>] ?transposeA : bool, [<Optional>] ?transposeB : bool, [<Optional>] ?forwardStype : ForwardStype) =
+    static member Dot([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol, [<Optional>] ?transposeA : bool, [<Optional>] ?transposeB : bool, [<Optional>] ?forwardStype : StorageType) =
         Dot(?lhs = lhs, ?rhs = rhs, ?transposeA = transposeA, ?transposeB = transposeB, ?forwardStype = forwardStype)
 
 
@@ -29061,7 +29061,7 @@ type MX() =
                            rhs : NDArray, 
                            [<Optional; DefaultParameterValue(false)>] transposeA : bool, 
                            [<Optional; DefaultParameterValue(false)>] transposeB : bool, 
-                           [<Optional>] forwardStype : ForwardStype) =
+                           [<Optional>] forwardStype : StorageType) =
         let creator = AtomicSymbolCreator.FromName "batch_dot"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|lhs.NDArrayHandle.UnsafeHandle; rhs.NDArrayHandle.UnsafeHandle|]
@@ -29093,7 +29093,7 @@ type MX() =
                            rhs : NDArray, 
                            [<Optional; DefaultParameterValue(false)>] transposeA : bool, 
                            [<Optional; DefaultParameterValue(false)>] transposeB : bool, 
-                           [<Optional>] forwardStype : ForwardStype) =
+                           [<Optional>] forwardStype : StorageType) =
         let creator = AtomicSymbolCreator.FromName "batch_dot"
         let names = [|"transpose_a"; "transpose_b"; "forward_stype"|]
         let vals = [|string transposeA; string transposeB; (if isNull (forwardStype :> obj) then "None" else string forwardStype)|]
@@ -29123,7 +29123,7 @@ type MX() =
     /// <param name="transposeA">If true then transpose the first input before dot.</param>
     /// <param name="transposeB">If true then transpose the second input before dot.</param>
     /// <param name="forwardStype">The desired storage type of the forward output given by user, if thecombination of input storage types and this hint does not matchany implemented ones, the dot operator will perform fallback operationand still produce an output of the desired storage type.</param>
-    static member BatchDot([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol, [<Optional>] ?transposeA : bool, [<Optional>] ?transposeB : bool, [<Optional>] ?forwardStype : ForwardStype) =
+    static member BatchDot([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol, [<Optional>] ?transposeA : bool, [<Optional>] ?transposeB : bool, [<Optional>] ?forwardStype : StorageType) =
         BatchDot(?lhs = lhs, ?rhs = rhs, ?transposeA = transposeA, ?transposeB = transposeB, ?forwardStype = forwardStype)
 
     /// <summary>Returns element-wise sum of the input arrays with broadcasting.
