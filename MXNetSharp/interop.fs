@@ -1,5 +1,7 @@
 ﻿namespace MXNetSharp.Interop
 
+open System.Runtime.CompilerServices
+
 #nowarn "9"
 
 open System
@@ -7,6 +9,103 @@ open System.Runtime.InteropServices
 open CApi
 open MXNetSharp
 
+
+
+// defined in mshadow/base.h
+// https://github.com/apache/incubator-mxnet/blob/618c4811e417fb86cbb3fc0f7f38d55972eeb2af/3rdparty/mshadow/mshadow/base.h#L306
+type TypeFlag = 
+    | None = -1
+    | Float32 = 0
+    | Float64 = 1
+    | Float16 = 2
+    | Uint8 = 3
+    | Int32 = 4
+    | Int8  = 5
+    | Int64 = 6
+    | Bool = 7
+
+
+// defined in cpp-package/include/mxnet-cpp/ndarray.h
+// https://github.com/apache/incubator-mxnet/blob/745a41ca1a6d74a645911de8af46dece03db93ea/cpp-package/include/mxnet-cpp/ndarray.h#L41
+type DeviceTypeEnum =
+    | CPU = 1
+    | GPU = 2
+    | CPUPinned = 3
+
+
+type SafeSymbolHandle(owner) = 
+    inherit SafeHandle(0n, true)
+    new() = new SafeSymbolHandle(true)
+    new(ptr,owner) as this = new SafeSymbolHandle(owner) then this.SetHandle(ptr)
+    override x.IsInvalid = x.handle <= 0n
+    override x.ReleaseHandle() = CApi.MXSymbolFree x.handle = 0
+    member internal x.UnsafeHandle = 
+        if not x.IsClosed then
+            x.handle
+        else
+            ObjectDisposedException("SafeSymbolHandle", "Symbol handle has been closed") |> raise
+
+type SafeNDArrayHandle(owner) = 
+    inherit SafeHandle(0n, true)
+    new() = new SafeNDArrayHandle(true)
+    new(ptr,owner) as this = new SafeNDArrayHandle(owner) then this.SetHandle(ptr)
+    override x.IsInvalid = x.handle <= 0n
+    override x.ReleaseHandle() = CApi.MXNDArrayFree x.handle = 0
+    member internal x.UnsafeHandle = 
+        if not x.IsClosed then
+            x.handle
+        else
+            ObjectDisposedException("SafeNDArrayHandle", "NDArray handle has been closed") |> raise
+
+type SafeCudaModuleHandle(owner) = 
+    inherit SafeHandle(0n, true)
+    new() = new SafeCudaModuleHandle(true)
+    new(ptr,owner) as this = new SafeCudaModuleHandle(owner) then this.SetHandle(ptr)
+    override x.IsInvalid = x.handle <= 0n
+    override x.ReleaseHandle() = CApi.MXRtcCudaModuleFree x.handle = 0
+    member internal x.UnsafeHandle = 
+        if not x.IsClosed then
+            x.handle
+        else
+            ObjectDisposedException("SafeCudaModuleHandle", "NDArray handle has been closed") |> raise
+
+type SafeCudaKernelHandle(owner) = 
+    inherit SafeHandle(0n, true)
+    new() = new SafeCudaKernelHandle(true)
+    new(ptr,owner) as this = new SafeCudaKernelHandle(owner) then this.SetHandle(ptr)
+    override x.IsInvalid = x.handle <= 0n
+    override x.ReleaseHandle() = CApi.MXRtcCudaKernelFree x.handle = 0
+    member internal x.UnsafeHandle = 
+        if not x.IsClosed then
+            x.handle
+        else
+            ObjectDisposedException("SafeCudaKernelHandle", "NDArray handle has been closed") |> raise
+                                
+[<Extension>]
+type ValueStringExtensions = ValueStringExtensions with
+    [<Extension>] 
+    static member ValueString(x : int option seq) = x |> Seq.map (function Some x -> string x | _ -> "None") |> String.concat "," |> sprintf "[%s]"
+    [<Extension>] 
+    static member ValueString(x : int seq) = x |> Seq.map string |> String.concat "," |> sprintf "[%s]"
+    [<Extension>] 
+    static member ValueString(x : int64 seq) = x |> Seq.map string |> String.concat "," |> sprintf "[%s]"
+    [<Extension>] 
+    static member ValueString(x : double seq) = x |> Seq.map string |> String.concat "," |> sprintf "[%s]"
+    [<Extension>] 
+    static member ValueString(x : bool) = if x then "1" else "0"
+    [<Extension>] 
+    static member ValueString(x : string) = x
+    [<Extension>] 
+    static member ValueString(x : obj) = 
+        match x with 
+        | :? bool as x -> x.ValueString()
+        | :? string as x -> x
+        | :? seq<int> as x -> x.ValueString()
+        | :? seq<int option> as x -> x.ValueString()
+        | :? seq<double> as x -> x.ValueString()
+        | :? seq<int64> as x -> x.ValueString()
+        | _ -> string x
+        
 type KeyVarNumArgs = IntPtr
 exception MXNetException of string*string with
     override x.Message = 
@@ -2367,7 +2466,7 @@ module MXAutograd =
         MXAutogradBackwardEx(ulength output_handles, output_handles, ograd_handles, ulength var_handles, var_handles, retain_graph, create_graph, is_train, &grad_handles, &grad_stypes) |> throwOnError "MXAutogradBackwardEx"
         let g : NDArrayHandle [] = readStructArray var_handles.Length grad_handles
         let st : int [] = readStructArray var_handles.Length grad_stypes
-        g,st |> Array.map (StorageType.FromInt)
+        g,st
 
 
     /// <summary>get the graph constructed by autograd.</summary>
