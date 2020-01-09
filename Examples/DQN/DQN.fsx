@@ -31,7 +31,7 @@ let rewardProb = 0.3
 let initSpeed = 300.0
 let maxSpeed = 200.0
 
-let movesPerUpdate = 4      // This only applies to 
+let movesPerUpdate = 4      // This only applies to the agent, not a game rule
 
 // Number of state, action, reward tuples to remember for training
 let memoryLength = 10000
@@ -291,7 +291,6 @@ module Game =
     let game() = 
         let wnd = makeGameWindow()
         let moveq = wnd.MoveQueue
-        //let act x = lock playLck (fun _ -> act x)
         let mutable l = DateTime.MinValue
         let mutable m = 0
         let move act (b : GameBoard) = 
