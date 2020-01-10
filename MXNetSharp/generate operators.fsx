@@ -617,7 +617,7 @@ let toNDArrayCode suffix (x : ProcessedAtomicSymbol) =
                 )
             |> arr
     let inputsStr = 
-        let handle x = sprintf "%s.NDArrayHandle.UnsafeHandle" x
+        let handle x = sprintf "%s.UnsafeHandle" x
         let arr (x : _ []) = 
             match x with 
             | [| Choice2Of2 name |] -> sprintf "(%s |> Array.map (fun x -> %s))" name (handle "x")
@@ -634,7 +634,10 @@ let toNDArrayCode suffix (x : ProcessedAtomicSymbol) =
         |> Array.choose 
             (fun x ->
                 match x.SymbolOrNDArray with 
-                | Some NDArray | Some SymbolOrNDArray -> Choice1Of2(handle x.Name) |> Some
+                | Some NDArray | Some SymbolOrNDArray -> 
+                    let h = handle x.Name
+                    let str = sprintf "if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg %s)) then %s" x.Name h
+                    Choice1Of2(str) |> Some
                 | Some ManySymbolOrNDArray -> Choice2Of2(x.Name) |> Some
                 | _ -> None
             )
@@ -727,7 +730,7 @@ let toNDArrayCode suffix (x : ProcessedAtomicSymbol) =
             sprintf "let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip"
             sprintf "let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle"
             sprintf "                                             %s" inputsStr
-            sprintf "                                             (outputArray |> Seq.map (fun x -> x.NDArrayHandle.UnsafeHandle) |> Seq.toArray)"
+            sprintf "                                             (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)"
             sprintf "                                             names" //paramNamesStr
             sprintf "                                             vals" //paramValuesStr
             sprintf "()"
@@ -1734,6 +1737,7 @@ open MXNetSharp.SymbolOperators
         //yield! symboltypes |> Seq.filter (List.isEmpty >> not) |> breakBlocks
         """
 type MX() =  
+    static member inline NoArg() = (^t : (static member NoArg : ^t)())
 """  
         yield! members |> breakBlocks
         yield! skip |> breakBlocks

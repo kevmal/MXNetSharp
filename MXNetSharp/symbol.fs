@@ -22,6 +22,7 @@ type Symbol() =
     static let mutable count = 0L
     static let nameId() = Threading.Interlocked.Increment &count
     let sid = lazy(nameId())
+    member x.NoArg = ImplicitVariable() :> Symbol
     member x.Id = sid.Value
     member x.GeneratedName = sprintf "%s!%d" (x.GetType().Name) x.Id
     //let mutable disposed = false
