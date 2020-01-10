@@ -213,11 +213,11 @@ valIter.Reset()
 valIter.Next() |> ignore
 
 let update epoch mb = 
-    let loss1 : float32 = actualLoss.Outputs.[0].ToArray().[0]
-    let loss2 : float32 = fakeLoss.Outputs.[0].ToArray().[0]
-    let loss3 : float32 = genLoss.Outputs.[0].ToArray().[0]
+    let loss1 : float32 = actualLoss.Outputs.[0].ToArray<_>().[0]
+    let loss2 : float32 = fakeLoss.Outputs.[0].ToArray<_>().[0]
+    let loss3 : float32 = genLoss.Outputs.[0].ToArray<_>().[0]
     generated.Forward(false)
-    let out : float32 [] = generated.Outputs.[0].ToArray()
+    let out : float32 [] = generated.Outputs.[0].ToArray<_>()
     singleBmp out bmp1
     UI.uido(fun() ->
         wnd.Image.InvalidateVisual()
