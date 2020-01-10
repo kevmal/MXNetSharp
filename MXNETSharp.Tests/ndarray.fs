@@ -4,6 +4,8 @@
 open MXNetSharp.Interop
 open Xunit
 open MXNetSharp
+open MXNetSharp
+
 //TODO: test mutation operators
 //TODO: add and test unary mutation operators
 module OpHelp = 
@@ -361,6 +363,18 @@ module Basic =
         Assert.True(a.ToDoubleArray() = Array.zeroCreate 10)
         a.MutFull(123.0) |> ignore
         Assert.True(a.ToDoubleArray() = Array.create 10 123.0)
+
+    //https://github.com/kevmal/MXNetSharp/issues/37
+    [<Fact>]
+    let ``optional NDArray args``() = 
+        let a = CPU(0).Arange(0.0,10.0).Reshape(1,-1)
+        let b = CPU(0).Zeros [10]
+        let w = CPU(0).RandomUniform([10;10], -1.0,1.0)
+        let r1 = MX.FullyConnected(a,w,b,numHidden = 10)
+        let r2 = MX.FullyConnected(a,w,MX.NoArg(),numHidden = 10, noBias = true)
+        let s1 = r1.ToFloat32Array() |> Array.sum
+        let s2 = r2.ToFloat32Array() |> Array.sum
+        Assert.Equal(s1,s2)
 
 module Main = 
     [<EntryPoint>]

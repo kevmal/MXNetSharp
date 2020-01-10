@@ -12,6 +12,7 @@ open Helper
 
 type NDArray(handle : SafeNDArrayHandle) = 
     let mutable disposed = false
+    static let noarg = new NDArray()
     static let invoke opName inputs parameters =
         let creator = AtomicSymbolCreator.FromName opName
         let inputs = inputs |> Array.map (fun (x : NDArray) -> (x.NDArrayHandle : SafeNDArrayHandle).UnsafeHandle)
@@ -35,6 +36,7 @@ type NDArray(handle : SafeNDArrayHandle) =
         let delayAlloc = defaultArg delayAlloc true
         let shape = shape |> Seq.toArray
         new NDArray(MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype.TypeFlag)
+    static member NoArg = noarg
     static member ConvertCopyFrom(data : 'aa[], shape : int seq, ctx : Context, ?dtype : DataType) =
         let shape = 
             let shape = shape |> Seq.toArray
