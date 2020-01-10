@@ -686,6 +686,8 @@ type NDArray(handle : SafeNDArrayHandle) =
                     mutInvoke x "_slice_assign" [|x;y|] [|"begin", b; "end", e; "step", s|] |> ignore
                 | q -> failwithf "Unhandled slice assign type %s with value %A" (q.GetType().Name) q
     
+    member x.Concat(dim : int, [<ParamArray>] data : NDArray []) = invoke1 "Concat" data [|"num_args" <-- data.Length; "dim" <-- dim|]
+    member x.Concat(dim : int, data : NDArray seq) = x.Concat(dim, data = (data |> Seq.toArray))
     member x.SwapAxis(dim1 : int, dim2 : int) = invoke1 "SwapAxis" [|x|] [|"dim1" <-- dim1; "dim2" <-- dim2|]
     member x.Reshape([<ParamArray>] dims : int []) = invoke1 "Reshape" [|x|] [|"shape" <-- dims|]
     member x.Reshape(dims : int seq) = invoke1 "Reshape" [|x|] [|"shape" <-- dims|]

@@ -78,6 +78,8 @@ type Symbol() =
     default x.InputSymbols = MXSymbol.getInputSymbols x.UnsafeHandle |> Array.map (fun h -> new SymbolInput(x, new SafeSymbolHandle(h,true)) :> Symbol)
     abstract member Initialize : unit -> unit
    
+    member x.Concat(dim : int, [<ParamArray>] data : Symbol []) = Concat(data,dim = dim)
+    member x.Concat(dim : int, data : Symbol seq) = Concat(data,dim = dim)
     member x.Reshape([<ParamArray>] dims : int []) = Reshape(x, dims)
     member x.Reshape(dims : int seq) = Reshape(x, dims)
     member x.ReverseReshape([<ParamArray>] dims : int []) = Reshape(x, dims, true)
