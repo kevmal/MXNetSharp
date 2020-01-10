@@ -80,6 +80,8 @@ type Symbol() =
    
     member x.Reshape([<ParamArray>] dims : int []) = Reshape(x, dims)
     member x.Reshape(dims : int seq) = Reshape(x, dims)
+    member x.ReverseReshape([<ParamArray>] dims : int []) = Reshape(x, dims, true)
+    member x.ReverseReshape(dims : int seq) = Reshape(x, dims, true)
 
     member x.Slice(startIndices, endIndices, stepIndices) = Slice(x, startIndices, endIndices, stepIndices)
     member x.GetSlice([<ParamArray>] a : obj []) = 
