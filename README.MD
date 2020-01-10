@@ -55,7 +55,7 @@ let a2 = GPU(0).CopyFrom([|1.f .. 10.f|], [5;2])
 // NDArray's do not need the MXNetSharp.PrimitiveOperators namespace
 let b = sqrt(a + 20.0)
 
-let v : float32 [] = b.ToArray() //Copy back to CPU in managed array
+let v : float32 [] = b.ToArray<_>() //Copy back to CPU in managed array
 let v2 = b.ToFloat32Array() //Same as above
 let v3 = b.ToDoubleArray() // Float32 -> Double conversion happens implicitly
 
