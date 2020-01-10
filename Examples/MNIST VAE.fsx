@@ -253,11 +253,11 @@ valIter.Next() |> ignore
 let update epoch mb = 
     valIter.GetData().CopyTo(xa)
     exe.Forward(false)
-    let loss : float32 = exe.Outputs.[0].ToArray().[0]
+    let loss : float32 = exe.Outputs.[0].ToArray<_>().[0]
     texe.Forward(false)
     let imgs = texe.Outputs
-    singleBmp (xa.ToArray()) bmp1
-    singleBmp (imgs.[0].ToArray()) bmp2
+    singleBmp (xa.ToArray<_>()) bmp1
+    singleBmp (imgs.[0].ToArray<_>()) bmp2
     UI.uido (fun() ->
         wnd.Window.Title <- sprintf "Epoch % 4d  Mb % 7d  Loss: %f" epoch mb loss
         wnd.Image1.InvalidateVisual()

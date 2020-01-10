@@ -310,7 +310,7 @@ let save (filename : string) (img : NDArray) =
     let h = 224
     let w = 224
     //let img = Operators.ImageResize(img, contentImage.Height, contentImage.Width).[0]
-    let a : float32 [] = img.ToArray()
+    let a : float32 [] = img.ToArray<_>()
     use bmp = new Bitmap(w,h,PixelFormat.Format32bppRgb)
     let mutable i = 0
     for y = 0 to h - 1 do
@@ -338,7 +338,7 @@ let rec trainLoop epoch =
         img.CopyTo(executor.Args.["data"])
         executor.Executor.Forward(true)
         executor.Executor.Backward(gradArray)
-        let gnorm : float32 = MX.Norm(executor.ArgGrad.["data"]).ToArray().[0]
+        let gnorm : float32 = MX.Norm(executor.ArgGrad.["data"]).ToArray<_>().[0]
         if gnorm > clipNorm then 
             MX.MulScalar([executor.ArgGrad.["data"]], executor.ArgGrad.["data"], double(clipNorm / gnorm))
 
@@ -355,7 +355,7 @@ let rec trainLoop epoch =
 
         //let newImg = optResult.[0]
         let diff = MX.ElemwiseSub(oldImg, img)
-        let eps : float32 = MX.ElemwiseDiv(MX.Norm(diff), MX.Norm(img)).ToArray().[0]
+        let eps : float32 = MX.ElemwiseDiv(MX.Norm(diff), MX.Norm(img)).ToArray<_>().[0]
         oldImg <- img.CopyTo(context)
         printfn "%5d : %f" epoch eps
         if (epoch + 1) % lrScheduleDelay = 0 then 

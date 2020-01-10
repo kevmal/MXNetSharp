@@ -27,25 +27,25 @@ module OpHelp =
         let c = (nd d3).Reshape([2;2])
         do // a + b
             let expected = (d1,d2) ||> List.map2 (+) |> Seq.toArray
-            let actual : float32 [] = (a ++ b).ToArray()
+            let actual : float32 [] = (a ++ b).ToArray<_>()
             Assert.Equal(expected.Length, actual.Length)
             for i = 0 to expected.Length - 1 do    
                 Assert.Equal(double expected.[i], double actual.[i], 6)
         do // b + a
             let expected = (d2,d1) ||> List.map2 (+) |> Seq.toArray
-            let actual : float32 [] = (b ++ a).ToArray()
+            let actual : float32 [] = (b ++ a).ToArray<_>()
             Assert.Equal(expected.Length, actual.Length)
             for i = 0 to expected.Length - 1 do    
                 Assert.Equal(double expected.[i], double actual.[i], 6)
         do // a + scalar
             let expected = d1 |> List.map (fun x -> x + float32 scalar)
-            let actual : float32 [] = (a ++| scalar).ToArray()
+            let actual : float32 [] = (a ++| scalar).ToArray<_>()
             Assert.Equal(expected.Length, actual.Length)
             for i = 0 to expected.Length - 1 do    
                 Assert.Equal(double expected.[i], double actual.[i], 6)
         do // scalar + a
             let expected = d1 |> List.map (fun x -> float32 scalar + x)
-            let actual : float32 [] = (scalar |++ a).ToArray()
+            let actual : float32 [] = (scalar |++ a).ToArray<_>()
             Assert.Equal(expected.Length, actual.Length)
             for i = 0 to expected.Length - 1 do    
                 Assert.Equal(double expected.[i], double actual.[i], 6)
@@ -54,7 +54,7 @@ module OpHelp =
         do // a .+ c 
             let d1 = d1 @ d1
             let expected = (d1,d3) ||> List.map2 (+) |> Seq.toArray
-            let actual : float32 [] = (a .++ c).ToArray()
+            let actual : float32 [] = (a .++ c).ToArray<_>()
             Assert.Equal(expected.Length, actual.Length)
             for i = 0 to expected.Length - 1 do    
                 Assert.Equal(double expected.[i], double actual.[i], 6)
@@ -150,7 +150,7 @@ module BasicUnaryOps =
         let d1 = [155.01; 1.0] |> List.map float32
         let a = nd d1
         let expected = d1 |> List.map f |> Seq.toArray
-        let actual : float32 [] = (f2 a).ToArray()
+        let actual : float32 [] = (f2 a).ToArray<_>()
         Assert.Equal(expected.Length, actual.Length)
         for i = 0 to expected.Length - 1 do    
             Assert.Equal(double expected.[i], double actual.[i], 6)
@@ -201,7 +201,7 @@ module Slicing =
         let d1 = [0.0 .. 20.0] |> List.map float32
         let a = nd d1
         let expected = d1.[3 .. 5]
-        let actual : float32 [] = (a.[3 .. 5]).ToArray()
+        let actual : float32 [] = (a.[3 .. 5]).ToArray<_>()
         Assert.Equal(expected.Length, actual.Length)
         for i = 0 to expected.Length - 1 do    
             Assert.Equal(double expected.[i], double actual.[i], 6)
@@ -211,7 +211,7 @@ module Slicing =
         let d1 = [0.0 .. 20.0] |> List.map float32
         let a = nd d1
         let expected = d1.[.. 5]
-        let actual : float32 [] = (a.[.. 5]).ToArray()
+        let actual : float32 [] = (a.[.. 5]).ToArray<_>()
         Assert.Equal(expected.Length, actual.Length)
         for i = 0 to expected.Length - 1 do    
             Assert.Equal(double expected.[i], double actual.[i], 6)
@@ -221,7 +221,7 @@ module Slicing =
         let d1 = [0.0 .. 20.0] |> List.map float32
         let a = nd d1
         let expected = d1.[2 .. ]
-        let actual : float32 [] = (a.[2 ..]).ToArray()
+        let actual : float32 [] = (a.[2 ..]).ToArray<_>()
         Assert.Equal(expected.Length, actual.Length)
         for i = 0 to expected.Length - 1 do    
             Assert.Equal(double expected.[i], double actual.[i], 6)
@@ -231,25 +231,25 @@ module Slicing =
         let d1 = [|0.0 .. 9.0|] |> Array.map float32
         let a = (nd d1).Reshape([2; 5])
         do 
-            let actual : float32[] = a.[0].ToArray()
+            let actual : float32[] = a.[0].ToArray<_>()
             let expected = d1.[0 .. 4]
             Assert.Equal(expected.Length, actual.Length)
             for i = 0 to expected.Length - 1 do    
                 Assert.Equal(double expected.[i], double actual.[i], 6)
         do 
-            let actual : float32[] = a.[1].ToArray()
+            let actual : float32[] = a.[1].ToArray<_>()
             let expected = d1.[5 .. ]
             Assert.Equal(expected.Length, actual.Length)
             for i = 0 to expected.Length - 1 do    
                 Assert.Equal(double expected.[i], double actual.[i], 6)
         do 
-            let actual : float32[] = a.[0, 0].ToArray()
+            let actual : float32[] = a.[0, 0].ToArray<_>()
             let expected = [|d1.[0]|]
             Assert.Equal(expected.Length, actual.Length)
             for i = 0 to expected.Length - 1 do    
                 Assert.Equal(double expected.[i], double actual.[i], 6)
         do 
-            let actual : float32[] = a.[1, 1].ToArray()
+            let actual : float32[] = a.[1, 1].ToArray<_>()
             let expected = [|d1.[6]|]
             Assert.Equal(expected.Length, actual.Length)
             for i = 0 to expected.Length - 1 do    
@@ -262,7 +262,7 @@ module Slicing =
         let a = (nd d1).Reshape([2; 3])
         let check expected (a : NDArray) = 
             let expected = Seq.toArray expected
-            let actual : float32[] = a.ToArray()
+            let actual : float32[] = a.ToArray<_>()
             Assert.Equal(expected.Length, actual.Length)
             for i = 0 to expected.Length - 1 do    
                 Assert.Equal(double expected.[i], double actual.[i], 6)
@@ -289,7 +289,7 @@ module Slicing =
         let a = nd d1
         let check expected (a : NDArray) = 
             let expected = Seq.toArray expected
-            let actual : float32[] = a.ToArray()
+            let actual : float32[] = a.ToArray<_>()
             Assert.Equal(expected.Length, actual.Length)
             for i = 0 to expected.Length - 1 do    
                 Assert.Equal(double expected.[i], double actual.[i], 6)
@@ -300,7 +300,7 @@ module Slicing =
     //[<Fact>]
     //let sliceAssign() = 
     //    let a = new NDArray([1.f .. 100.f], shape = [50; 2], context  = CPU 0)
-    //    let bb : float32 [] = a.ToArray()
+    //    let bb : float32 [] = a.ToArray<_>()
     //    a.[30 .. 40, *] <- 10000.f
     //    a.[30 .. 40, *] <- a.[0 .. 10, *] 
     //    Assert.Equal(1,2)
@@ -321,7 +321,7 @@ module Basic =
         let nd2 = nd.AsType(DataType.Float64)
         Assert.Equal(Some(DataType.Float64), nd2.DataType)
         Assert.Equal(Some(DataType.Int32), nd.DataType)
-        Assert.True(nd2.ToArray() = [|0.0 .. 10.0|])
+        Assert.True(nd2.ToArray<_>() = [|0.0 .. 10.0|])
     [<Fact>]
     let ``CopyFrom Array``() = 
         let a1 = System.Array.CreateInstance(typeof<float32>, 2, 2)

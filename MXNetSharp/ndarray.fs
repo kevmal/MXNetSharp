@@ -705,42 +705,55 @@ type NDArray(handle : SafeNDArrayHandle) =
     member x.MutFull(value : uint8) = 
         mutInvoke x "_full" Array.empty [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType.Value; "ctx" <-- x.Context|]
     
-    member x.ToArray() : 'a[] = 
-        if typeof<'a> = typeof<obj> then //REVIEW: since 'a : unmanaged this will never hit
-            match x.DataType with 
-            | None -> [||]
-            | Some t -> 
-                match t.Type with 
-                | None -> failwithf "Type %O not yet supported" t.TypeFlag
-                | Some nt -> 
-                    Array.CreateInstance(nt, x.Shape |> Array.reduce (*)) :?> 'a []
+    member x.ToArray() : Array = 
+        let shape = x.Shape
+        if shape.Length > 0 then 
+            let a = 
+                match x.DataType with 
+                | None -> Array.CreateInstance(typeof<float32>, lengths = shape)
+                | Some Float16 -> Array.CreateInstance(typeof<uint16>, lengths = shape)
+                | Some dt -> 
+                    match dt.Type with 
+                    | Some t -> Array.CreateInstance(t, lengths = shape)
+                    | None -> Array.CreateInstance(typeof<float32>, lengths = shape)
+            MXNDArray.syncCopyToCPUArray x.UnsafeHandle a
+            a
         else
-            match DataType.TryFromNetType<'a>(), x.DataType with 
-            | Some t, Some t2 -> 
-                if t = t2 then 
-                    let a = Array.zeroCreate x.Size
-                    MXNDArray.syncCopyToCPU handle.UnsafeHandle a
-                    a
-                else
-                    use x2 = invoke1 "cast" [|x|] [|"dtype" <-- t|]
-                    let a = Array.zeroCreate x.Size
-                    MXNDArray.syncCopyToCPU x2.UnsafeHandle a
-                    a
-            | None, _ -> raise (InvalidCastException(sprintf "Type %s has no corresponding MXNet type" typeof<'a>.FullName))
-            | _ -> [||]
+            match x.DataType with 
+            | None -> Array.CreateInstance(typeof<float32>,0)
+            | Some Float16 -> Array.CreateInstance(typeof<uint16>,0)
+            | Some dt -> 
+                match dt.Type with 
+                | Some t -> Array.CreateInstance(t,0)
+                | None -> Array.CreateInstance(typeof<float32>,0)
+
+    member x.ToArray<'a when 'a : unmanaged>() : 'a[] = 
+        match DataType.TryFromNetType<'a>(), x.DataType with 
+        | Some t, Some t2 -> 
+            if t = t2 then 
+                let a = Array.zeroCreate x.Size
+                MXNDArray.syncCopyToCPU handle.UnsafeHandle a
+                a
+            else
+                use x2 = invoke1 "cast" [|x|] [|"dtype" <-- t|]
+                let a = Array.zeroCreate x.Size
+                MXNDArray.syncCopyToCPU x2.UnsafeHandle a
+                a
+        | None, _ -> raise (InvalidCastException(sprintf "Type %s has no corresponding MXNet type" typeof<'a>.FullName))
+        | _ -> [||]
             
-    member x.ToFloat32Array() : float32[] = x.ToArray()
-    member x.ToDoubleArray() : double[] = x.ToArray()
-    member x.ToIntArray() : int[] = x.ToArray()
-    member x.ToInt64Array() : int64[] = x.ToArray()
-    member x.ToInt8Array() : int8[] = x.ToArray()
-    member x.ToUInt8Array() : uint8[] = x.ToArray()
+    member x.ToFloat32Array() : float32[] = x.ToArray<_>()
+    member x.ToDoubleArray() : double[] = x.ToArray<_>()
+    member x.ToIntArray() : int[] = x.ToArray<_>()
+    member x.ToInt64Array() : int64[] = x.ToArray<_>()
+    member x.ToInt8Array() : int8[] = x.ToArray<_>()
+    member x.ToUInt8Array() : uint8[] = x.ToArray<_>()
 
     member x.ToScalar() : 'a = 
         let sz = x.Shape |> Array.reduce (*)
         if sz <> 1 then 
             raise (InvalidOperationException(sprintf "NDArray has size %d" sz))
-        let a = x.ToArray()
+        let a = x.ToArray<_>()
         assert(a.Length = 1)
         a.[0]
     member x.ToFloat32Scalar() : float32 = x.ToScalar()
