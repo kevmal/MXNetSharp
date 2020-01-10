@@ -1171,6 +1171,23 @@ module MXNDArray =
         let data = NativeInterop.NativePtr.toNativeInt ptr
         MXNDArraySyncCopyToCPU(handle, data, size) |> throwOnError "MXNDArraySyncCopyToCPU"
 
+    /// <summary>Perform a synchronize copyto a continugous CPU memory region.
+    ///
+    /// This function will call WaitToRead before the copy is performed.
+    /// This is useful to copy data from existing memory region that are
+    /// not wrapped by NDArray(thus dependency not being tracked).</summary>
+    /// <param name="handle">the NDArray handle</param>
+    /// <param name="data">the data source to copy into.</param>
+    /// <param name="size">the memory size we want to copy into.</param>
+    let syncCopyToCPUArray handle (data : Array) = 
+        let h = GCHandle.Alloc(data)
+        try
+            let iptr = System.Runtime.InteropServices.Marshal.UnsafeAddrOfPinnedArrayElement(data,0)
+            let sz = int64 data.Length
+            MXNDArraySyncCopyToCPU(handle, iptr, sz) |> throwOnError "MXNDArraySyncCopyToCPU"
+        finally
+            h.Free()
+
     // TODO: Storag type enum?
     /// <summary>create an empty sparse NDArray with specified shape and data type</summary>
     /// <param name="storage_type">the storage type of the ndarray</param>

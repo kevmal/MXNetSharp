@@ -1,7 +1,7 @@
 ﻿// Conditional Generative Adversarial Nets (https://arxiv.org/abs/1411.1784) Mehdi Mirza, Simon Osindero
 // Adapted from https://github.com/eriklindernoren/Keras-GAN/tree/master/cgan
 
-
+#nowarn "9" // Bitmap updates for displaying
 #load "loadui.fsx"
 open Loadui
 
@@ -54,11 +54,6 @@ let valIter   = new MNISTIter(@"t10k-images-idx3-ubyte",
                               batchSize = batchSize,
                               flat = false)
 
-
-
-let withName (name) (x : #Symbol) = x.Name <- name; x
-
-let noise = Input("noise", [0; 1])
 let label = Input("label", [0; 1])
 let generator = 
     let labelEmbedding = Embedding(data = label, inputDim = nClasses, outputDim = nLatent)
@@ -96,7 +91,7 @@ let ep = 0.000001
 let onActual = -Log(ep + (inputImage .|> discriminator)) .>> Mean() .>> MakeLoss()
 let onFake = -Log(ep + 1.0 - ((* freeze *) generator .|> discriminator)) .>> Mean() .>> MakeLoss()
 let gen = -Log(ep + (generator .|> (* freeze *) discriminator)) .>> Mean() .>> MakeLoss()
-let inputs = Bindings.inputs [ inputImage; label; noise ]
+let inputs = Bindings.inputs [ inputImage; label ]
 
 
 let bindings = 
@@ -218,11 +213,11 @@ valIter.Reset()
 valIter.Next() |> ignore
 
 let update epoch mb = 
-    let loss1 : float32 = actualLoss.Outputs.[0].ToArray().[0]
-    let loss2 : float32 = fakeLoss.Outputs.[0].ToArray().[0]
-    let loss3 : float32 = genLoss.Outputs.[0].ToArray().[0]
+    let loss1 : float32 = actualLoss.Outputs.[0].ToArray<_>().[0]
+    let loss2 : float32 = fakeLoss.Outputs.[0].ToArray<_>().[0]
+    let loss3 : float32 = genLoss.Outputs.[0].ToArray<_>().[0]
     generated.Forward(false)
-    let out : float32 [] = generated.Outputs.[0].ToArray()
+    let out : float32 [] = generated.Outputs.[0].ToArray<_>()
     singleBmp out bmp1
     UI.uido(fun() ->
         wnd.Image.InvalidateVisual()

@@ -1,4 +1,6 @@
 ﻿
+#nowarn "9" // Bitmap updates for UI
+
 #load "loadui.fsx"
 open Loadui
 
@@ -218,16 +220,12 @@ let wnd =
         split.ColumnDefinitions.Add(ColumnDefinition(GridLength.Parse "*"))
         split.ColumnDefinitions.Add(ColumnDefinition(GridLength.Parse "5"))
         split.ColumnDefinitions.Add(ColumnDefinition(GridLength.Parse "*"))
-        //split.RowDefinitions.Add(RowDefinition())
-        //p.SetValue(Grid.RowProperty, 0)
         p.SetValue(Grid.ColumnProperty, 0)
-        //p2.SetValue(Grid.RowProperty, 0)
         p2.SetValue(Grid.ColumnProperty, 2)
         split.Children.Add(p)
         let ss = GridSplitter()
         ss.SetValue(Grid.ColumnProperty, 1)
         ss.SetValue(Grid.WidthProperty, 5)
-        //ss.SetValue(Grid.HorizontalAlignmentProperty, "Stretch")
         split.Children.Add(ss)
         split.Children.Add(p2)
         f.Content <- split
@@ -255,11 +253,11 @@ valIter.Next() |> ignore
 let update epoch mb = 
     valIter.GetData().CopyTo(xa)
     exe.Forward(false)
-    let loss : float32 = exe.Outputs.[0].ToArray().[0]
+    let loss : float32 = exe.Outputs.[0].ToArray<_>().[0]
     texe.Forward(false)
     let imgs = texe.Outputs
-    singleBmp (xa.ToArray()) bmp1
-    singleBmp (imgs.[0].ToArray()) bmp2
+    singleBmp (xa.ToArray<_>()) bmp1
+    singleBmp (imgs.[0].ToArray<_>()) bmp2
     UI.uido (fun() ->
         wnd.Window.Title <- sprintf "Epoch % 4d  Mb % 7d  Loss: %f" epoch mb loss
         wnd.Image1.InvalidateVisual()
@@ -294,7 +292,6 @@ let trainTask =
                 mb <- mb + 1
                 if mb % 10 = 0 then 
                     update epoch mb
-                //printfn "%f" (eoutput.ToArray() : float32[]).[0]
             epoch <- epoch + 1
             update epoch mb
     } |> Async.StartAsTask        
