@@ -334,14 +334,9 @@ type ImplicitVariable() =
     default x.Copy() = ImplicitVariable() :> Symbol
 
 //TODO: Manually add CustomOp type and skip in codegen
-//TODO: fix histogram
-//TODO: override tostring
-//TODO: We should add valiation to the specific symbol types
 type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments<Symbol>) = 
     inherit Symbol()
-    //let parametersStr = parameters |> Array.map (fun (k,v) -> k, Util.valueString v)
     new(name, args) = new SymbolOperator(AtomicSymbolCreator.FromName name, args)
-    //new(creator,pnames,ps,inames,ins) = new SymbolOperator(creator, Array.zip pnames ps, Array.zip inames ins)
     override x.ToString() = 
         sprintf "%s(%s)" (x.GetType().Name)
             (operatorArguments 

@@ -218,7 +218,7 @@ With F# friendly wrappers in [MXNetSharp.Interop](MXNetSharp/interop.fs) with th
 - NNGraph
 - MXDataIter
 - MXAutograd
-
+- MXRtc
 
 
 ## Symbol API
