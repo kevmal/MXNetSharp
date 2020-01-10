@@ -849,10 +849,10 @@ module SymbolOperators =
             new BatchNormV1(Arguments<Symbol>(operatorArguments))
         /// Default value for Eps
         /// Epsilon to prevent div 0
-        static member EpsDefault : double = 0.00100000005
+        static member EpsDefault : double = 0.001
         /// Default value for Momentum
         /// Momentum for moving average
-        static member MomentumDefault : double = 0.899999976
+        static member MomentumDefault : double = 0.9
         /// Default value for FixGamma
         /// Fix gamma while training
         static member FixGammaDefault : bool = true
@@ -1058,13 +1058,13 @@ module SymbolOperators =
             new MpAdamwUpdate(Arguments<Symbol>(operatorArguments))
         /// Default value for Beta1
         /// The decay rate for the 1st moment estimates.
-        static member Beta1Default : double = 0.899999976
+        static member Beta1Default : double = 0.9
         /// Default value for Beta2
         /// The decay rate for the 2nd moment estimates.
-        static member Beta2Default : double = 0.999000013
+        static member Beta2Default : double = 0.999
         /// Default value for Epsilon
         /// A small constant for numerical stability.
-        static member EpsilonDefault : double = 0.0000000099999999
+        static member EpsilonDefault : double = 0.00000001
         /// Default value for Wd
         /// Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.
         static member WdDefault : double = 0.0
@@ -1281,13 +1281,13 @@ module SymbolOperators =
             new AdamwUpdate(Arguments<Symbol>(operatorArguments))
         /// Default value for Beta1
         /// The decay rate for the 1st moment estimates.
-        static member Beta1Default : double = 0.899999976
+        static member Beta1Default : double = 0.9
         /// Default value for Beta2
         /// The decay rate for the 2nd moment estimates.
-        static member Beta2Default : double = 0.999000013
+        static member Beta2Default : double = 0.999
         /// Default value for Epsilon
         /// A small constant for numerical stability.
-        static member EpsilonDefault : double = 0.0000000099999999
+        static member EpsilonDefault : double = 0.00000001
         /// Default value for Wd
         /// Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.
         static member WdDefault : double = 0.0
@@ -1481,13 +1481,13 @@ module SymbolOperators =
             new MultiAdamwUpdate(Arguments<Symbol>(operatorArguments))
         /// Default value for Beta1
         /// The decay rate for the 1st moment estimates.
-        static member Beta1Default : double = 0.899999976
+        static member Beta1Default : double = 0.9
         /// Default value for Beta2
         /// The decay rate for the 2nd moment estimates.
-        static member Beta2Default : double = 0.999000013
+        static member Beta2Default : double = 0.999
         /// Default value for Epsilon
         /// A small constant for numerical stability.
-        static member EpsilonDefault : double = 0.0000000099999999
+        static member EpsilonDefault : double = 0.00000001
         /// Default value for ClipGradient
         /// Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).
         static member ClipGradientDefault : double = -1.0
@@ -1666,13 +1666,13 @@ module SymbolOperators =
             new MultiMpAdamwUpdate(Arguments<Symbol>(operatorArguments))
         /// Default value for Beta1
         /// The decay rate for the 1st moment estimates.
-        static member Beta1Default : double = 0.899999976
+        static member Beta1Default : double = 0.9
         /// Default value for Beta2
         /// The decay rate for the 2nd moment estimates.
-        static member Beta2Default : double = 0.999000013
+        static member Beta2Default : double = 0.999
         /// Default value for Epsilon
         /// A small constant for numerical stability.
-        static member EpsilonDefault : double = 0.0000000099999999
+        static member EpsilonDefault : double = 0.00000001
         /// Default value for ClipGradient
         /// Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).
         static member ClipGradientDefault : double = -1.0
@@ -1878,10 +1878,10 @@ module SymbolOperators =
             new ContribAllclose(Arguments<Symbol>(operatorArguments))
         /// Default value for Rtol
         /// Relative tolerance.
-        static member RtolDefault : double = 0.00000999999975
+        static member RtolDefault : double = 0.00001
         /// Default value for Atol
         /// Absolute tolerance.
-        static member AtolDefault : double = 0.0000000099999999
+        static member AtolDefault : double = 0.00000001
         /// Default value for EqualNan
         /// Whether to compare NaN&#39;s as equal. If True, NaN&#39;s in A will be considered equal to NaN&#39;s in B in the output array.
         static member EqualNanDefault : bool = true
@@ -3939,7 +3939,7 @@ module SymbolOperators =
         static member ClipDefault : bool = true
         /// Default value for Threshold
         /// Threshold to be a positive prediction.
-        static member ThresholdDefault : double = 0.00999999978
+        static member ThresholdDefault : double = 0.01
         /// Default value for BackgroundId
         /// Background id.
         static member BackgroundIdDefault : int = 0
@@ -4344,7 +4344,7 @@ module SymbolOperators =
         static member ClipGradientDefault : double = -1.0
         /// Default value for Epsilon
         /// Epsilon for numerical stability
-        static member EpsilonDefault : double = 0.00000999999975
+        static member EpsilonDefault : double = 0.00001
         /// Weight
         member __.Weight = operatorArguments.GetInput "weight"
         /// Gradient
@@ -5383,10 +5383,10 @@ module SymbolOperators =
             new ContribSyncBatchNorm(Arguments<Symbol>(operatorArguments))
         /// Default value for Eps
         /// Epsilon to prevent div 0
-        static member EpsDefault : double = 0.00100000005
+        static member EpsDefault : double = 0.001
         /// Default value for Momentum
         /// Momentum for moving average
-        static member MomentumDefault : double = 0.899999976
+        static member MomentumDefault : double = 0.9
         /// Default value for FixGamma
         /// Fix gamma while training
         static member FixGammaDefault : bool = true
@@ -6362,13 +6362,13 @@ module SymbolOperators =
             new IdentityAttachKLSparseReg(Arguments<Symbol>(operatorArguments))
         /// Default value for SparsenessTarget
         /// The sparseness target
-        static member SparsenessTargetDefault : double = 0.100000001
+        static member SparsenessTargetDefault : double = 0.1
         /// Default value for Penalty
         /// The tradeoff parameter for the sparseness penalty
-        static member PenaltyDefault : double = 0.00100000005
+        static member PenaltyDefault : double = 0.001
         /// Default value for Momentum
         /// The momentum for running average
-        static member MomentumDefault : double = 0.899999976
+        static member MomentumDefault : double = 0.9
         /// Input data.
         member __.Data = operatorArguments.GetInput "data"
         /// The sparseness target
@@ -7195,7 +7195,7 @@ module SymbolOperators =
             new ImageRandomLighting(Arguments<Symbol>(operatorArguments))
         /// Default value for AlphaStd
         /// Level of the lighting noise.
-        static member AlphaStdDefault : double = 0.0500000007
+        static member AlphaStdDefault : double = 0.05
         /// The input.
         member __.Data = operatorArguments.GetInput "data"
         /// Level of the lighting noise.
@@ -7362,7 +7362,7 @@ module SymbolOperators =
         static member LowerBoundDefault : double = 0.125
         /// Default value for UpperBound
         /// Upper bound of random slope. (For rrelu only)
-        static member UpperBoundDefault : double = 0.333999991
+        static member UpperBoundDefault : double = 0.334
         /// Input data to activation function.
         member __.Data = operatorArguments.GetInput "data"
         /// Input data to activation function.
@@ -7638,10 +7638,10 @@ module SymbolOperators =
             new BatchNorm(Arguments<Symbol>(operatorArguments))
         /// Default value for Eps
         /// Epsilon to prevent div 0. Must be no less than CUDNN_BN_MIN_EPSILON defined in cudnn.h when using cudnn (usually 1e-5)
-        static member EpsDefault : double = 0.0010000000474975
+        static member EpsDefault : double = 0.001
         /// Default value for Momentum
         /// Momentum for moving average
-        static member MomentumDefault : double = 0.899999976
+        static member MomentumDefault : double = 0.9
         /// Default value for FixGamma
         /// Fix gamma while training
         static member FixGammaDefault : bool = true
@@ -8392,10 +8392,10 @@ module SymbolOperators =
             new CuDNNBatchNorm(Arguments<Symbol>(operatorArguments))
         /// Default value for Eps
         /// Epsilon to prevent div 0. Must be no less than CUDNN_BN_MIN_EPSILON defined in cudnn.h when using cudnn (usually 1e-5)
-        static member EpsDefault : double = 0.0010000000474975
+        static member EpsDefault : double = 0.001
         /// Default value for Momentum
         /// Momentum for moving average
-        static member MomentumDefault : double = 0.899999976
+        static member MomentumDefault : double = 0.9
         /// Default value for FixGamma
         /// Fix gamma while training
         static member FixGammaDefault : bool = true
@@ -9032,7 +9032,7 @@ module SymbolOperators =
         static member NumGroupsDefault : int = 1
         /// Default value for Eps
         /// An `epsilon` parameter to prevent division by 0.
-        static member EpsDefault : double = 0.00000999999975
+        static member EpsDefault : double = 0.00001
         /// Default value for OutputMeanVar
         /// Output the mean and std calculated along the given axis.
         static member OutputMeanVarDefault : bool = false
@@ -9134,7 +9134,7 @@ module SymbolOperators =
         static member AxisDefault : int = -1
         /// Default value for Eps
         /// An `epsilon` parameter to prevent division by 0.
-        static member EpsDefault : double = 0.00000999999975
+        static member EpsDefault : double = 0.00001
         /// Default value for OutputMeanVar
         /// Output the mean and std calculated along the given axis.
         static member OutputMeanVarDefault : bool = false
@@ -9338,7 +9338,7 @@ module SymbolOperators =
             new LRN(Arguments<Symbol>(operatorArguments))
         /// Default value for Alpha
         /// The variance scaling parameter :math:`lpha` in the LRN expression.
-        static member AlphaDefault : double = 0.0000999999975
+        static member AlphaDefault : double = 0.0001
         /// Default value for Beta
         /// The power parameter :math:`eta` in the LRN expression.
         static member BetaDefault : double = 0.75
@@ -17544,13 +17544,13 @@ module SymbolOperators =
             new FtmlUpdate(Arguments<Symbol>(operatorArguments))
         /// Default value for Beta1
         /// Generally close to 0.5.
-        static member Beta1Default : double = 0.600000024
+        static member Beta1Default : double = 0.6
         /// Default value for Beta2
         /// Generally close to 1.
-        static member Beta2Default : double = 0.999000013
+        static member Beta2Default : double = 0.999
         /// Default value for Epsilon
         /// Epsilon to prevent div 0.
-        static member EpsilonDefault : double = 0.0000000099999999
+        static member EpsilonDefault : double = 0.00000001
         /// Default value for Wd
         /// Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.
         static member WdDefault : double = 0.0
@@ -17783,13 +17783,13 @@ module SymbolOperators =
             new AdamUpdate(Arguments<Symbol>(operatorArguments))
         /// Default value for Beta1
         /// The decay rate for the 1st moment estimates.
-        static member Beta1Default : double = 0.899999976
+        static member Beta1Default : double = 0.9
         /// Default value for Beta2
         /// The decay rate for the 2nd moment estimates.
-        static member Beta2Default : double = 0.999000013
+        static member Beta2Default : double = 0.999
         /// Default value for Epsilon
         /// A small constant for numerical stability.
-        static member EpsilonDefault : double = 0.0000000099999999
+        static member EpsilonDefault : double = 0.00000001
         /// Default value for Wd
         /// Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.
         static member WdDefault : double = 0.0
@@ -18311,10 +18311,10 @@ module SymbolOperators =
             new RmspropUpdate(Arguments<Symbol>(operatorArguments))
         /// Default value for Gamma1
         /// The decay rate of momentum estimates.
-        static member Gamma1Default : double = 0.949999988
+        static member Gamma1Default : double = 0.95
         /// Default value for Epsilon
         /// A small constant for numerical stability.
-        static member EpsilonDefault : double = 0.0000000099999999
+        static member EpsilonDefault : double = 0.00000001
         /// Default value for Wd
         /// Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.
         static member WdDefault : double = 0.0
@@ -18530,13 +18530,13 @@ module SymbolOperators =
             new RmspropalexUpdate(Arguments<Symbol>(operatorArguments))
         /// Default value for Gamma1
         /// Decay rate.
-        static member Gamma1Default : double = 0.949999988
+        static member Gamma1Default : double = 0.95
         /// Default value for Gamma2
         /// Decay rate.
-        static member Gamma2Default : double = 0.899999976
+        static member Gamma2Default : double = 0.9
         /// Default value for Epsilon
         /// A small constant for numerical stability.
-        static member EpsilonDefault : double = 0.0000000099999999
+        static member EpsilonDefault : double = 0.00000001
         /// Default value for Wd
         /// Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.
         static member WdDefault : double = 0.0
@@ -18744,7 +18744,7 @@ module SymbolOperators =
             new FtrlUpdate(Arguments<Symbol>(operatorArguments))
         /// Default value for Lamda1
         /// The L1 regularization coefficient.
-        static member Lamda1Default : double = 0.00999999978
+        static member Lamda1Default : double = 0.01
         /// Default value for Beta
         /// Per-Coordinate Learning Rate beta.
         static member BetaDefault : double = 1.0
@@ -18910,7 +18910,7 @@ module SymbolOperators =
             new SparseAdagradUpdate(Arguments<Symbol>(operatorArguments))
         /// Default value for Epsilon
         /// epsilon
-        static member EpsilonDefault : double = 0.000000100000001
+        static member EpsilonDefault : double = 0.0000001
         /// Default value for Wd
         /// weight decay
         static member WdDefault : double = 0.0
@@ -19114,13 +19114,13 @@ module SymbolOperators =
             new LambUpdatePhase1(Arguments<Symbol>(operatorArguments))
         /// Default value for Beta1
         /// The decay rate for the 1st moment estimates.
-        static member Beta1Default : double = 0.899999976
+        static member Beta1Default : double = 0.9
         /// Default value for Beta2
         /// The decay rate for the 2nd moment estimates.
-        static member Beta2Default : double = 0.999000013
+        static member Beta2Default : double = 0.999
         /// Default value for Epsilon
         /// A small constant for numerical stability.
-        static member EpsilonDefault : double = 0.000000999999997
+        static member EpsilonDefault : double = 0.000001
         /// Default value for BiasCorrection
         /// Whether to use bias correction.
         static member BiasCorrectionDefault : bool = true
@@ -19859,10 +19859,10 @@ module SymbolOperators =
             new ContribQuantizedBatchNorm(Arguments<Symbol>(operatorArguments))
         /// Default value for Eps
         /// Epsilon to prevent div 0. Must be no less than CUDNN_BN_MIN_EPSILON defined in cudnn.h when using cudnn (usually 1e-5)
-        static member EpsDefault : double = 0.0010000000474975
+        static member EpsDefault : double = 0.001
         /// Default value for Momentum
         /// Momentum for moving average
-        static member MomentumDefault : double = 0.899999976
+        static member MomentumDefault : double = 0.9
         /// Default value for FixGamma
         /// Fix gamma while training
         static member FixGammaDefault : bool = true
@@ -29580,7 +29580,7 @@ module SymbolOperators =
             new HardSigmoid(Arguments<Symbol>(operatorArguments))
         /// Default value for Alpha
         /// Slope of hard sigmoid
-        static member AlphaDefault : double = 0.200000003
+        static member AlphaDefault : double = 0.2
         /// Default value for Beta
         /// Bias of hard sigmoid.
         static member BetaDefault : double = 0.5
@@ -37738,7 +37738,7 @@ module SymbolOperators =
         static member RpnPostNmsTopNDefault : int = 300
         /// Default value for Threshold
         /// NMS value, below which to suppress.
-        static member ThresholdDefault : double = 0.699999988
+        static member ThresholdDefault : double = 0.7
         /// Default value for RpnMinSize
         /// Minimum height or width in proposal
         static member RpnMinSizeDefault : int = 16
@@ -37879,7 +37879,7 @@ module SymbolOperators =
         static member RpnPostNmsTopNDefault : int = 300
         /// Default value for Threshold
         /// NMS value, below which to suppress.
-        static member ThresholdDefault : double = 0.699999988
+        static member ThresholdDefault : double = 0.7
         /// Default value for RpnMinSize
         /// Minimum height or width in proposal
         static member RpnMinSizeDefault : int = 16
@@ -38571,7 +38571,7 @@ module SymbolOperators =
             new InstanceNorm(Arguments<Symbol>(operatorArguments))
         /// Default value for Eps
         /// An `epsilon` parameter to prevent division by 0.
-        static member EpsDefault : double = 0.00100000005
+        static member EpsDefault : double = 0.001
         /// An n-dimensional input array (n &gt; 2) of the form [batch, channel, spatial_dim1, spatial_dim2, ...].
         member __.Data = operatorArguments.GetInput "data"
         /// A vector of length &#39;channel&#39;, which multiplies the normalized input.
@@ -38673,7 +38673,7 @@ module SymbolOperators =
             new L2Normalization(Arguments<Symbol>(operatorArguments))
         /// Default value for Eps
         /// A small constant for numerical stability.
-        static member EpsDefault : double = 0.0000000001
+        static member EpsDefault : double = 0.0
         /// Default value for Mode
         /// Specify the dimension along which to compute L2 norm.
         static member ModeDefault : L2NormalizationMode = L2NormalizationMode.Instance

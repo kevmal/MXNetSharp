@@ -204,17 +204,22 @@ type TranslatedType =
         | TupleInt64 _ -> "int64 " + tupleTypeString
         | Opt t -> (t.TargetTypeString(fsOption, tupleTypeString)) + " option"
     member x.DefaultString = 
+        let inline str x = 
+            if abs x < 0.000001 then 
+                x.ToString("0.0########")
+            else
+                x.ToString("0.0#####")
         match x with 
         | Int o -> o |> Option.map string
         | Int64 o -> o |> Option.map (fun n -> string n + "L")
-        | Double o -> o |> Option.map (fun n -> n.ToString("0.0###############"))
-        | Float32 o -> o |> Option.map (fun n -> n.ToString("0.0###############"))
+        | Double o -> o |> Option.map str 
+        | Float32 o -> o |> Option.map str
         | String o -> o |> Option.map quote
         | Bool o -> o |> Option.map (fun n -> if n then "true" else "false")
         | Context o -> o |> Option.map string
         | StringChoices(t,o) -> o |> Option.map (toCaseName)
         | TupleInt o -> o |> Option.map (fun n -> n |> Array.map string |> String.concat "; " |> sprintf "[|%s|]")
-        | TupleFloat o -> o |> Option.map (fun n -> n |> Array.map (fun i -> i.ToString("0.0###############")) |> String.concat "; " |> sprintf "[|%s|]")
+        | TupleFloat o -> o |> Option.map (fun n -> n |> Array.map (fun i -> str i) |> String.concat "; " |> sprintf "[|%s|]")
         | TupleInt64 o -> o |> Option.map (fun n -> n |> Array.map (fun i -> string i + "L") |> String.concat "; " |> sprintf "[|%s|]")
         | Opt t -> 
             match t.DefaultString with 
@@ -459,12 +464,12 @@ Mappings.Modify
 
 Mappings.Modify
     (fun (x : ProcessedArg) ->
-        let dblString x = 
-            let str = string x
-            if str.Contains "." then 
-                str
-            else 
-                str + ".0"
+        let dblString (x : string) = 
+            let d = double x
+            if abs d < 0.000001 then 
+                d.ToString("0.0########")
+            else
+                d.ToString("0.0#####")
         let dmode = 
             match x.Arg.RequiredOrOptional with 
             | Optional str -> 
@@ -474,7 +479,7 @@ Mappings.Modify
                 | "int (non-negative)" 
                 | "int" -> str.Trim ''' |> int |> string |> UseAttr |> Some
                 | "double"
-                | "float" -> str.Trim ''' |> double |> dblString |> UseAttr |> Some
+                | "float" -> str.Trim ''' |> dblString |> UseAttr |> Some
                 | "boolean" -> str |> toBoolVal |> UseAttr |> Some
                 | "string" -> str.Trim ''' |> quote |> UseAttr |> Some
                 | "tuple of <float>"

@@ -317,8 +317,8 @@ type MX() =
     static member BatchNormV1(data : NDArray, 
                               gamma : NDArray, 
                               beta : NDArray, 
-                              [<Optional; DefaultParameterValue(0.00100000005)>] eps : float, 
-                              [<Optional; DefaultParameterValue(0.899999976)>] momentum : float, 
+                              [<Optional; DefaultParameterValue(0.001)>] eps : float, 
+                              [<Optional; DefaultParameterValue(0.9)>] momentum : float, 
                               [<Optional; DefaultParameterValue(true)>] fixGamma : bool, 
                               [<Optional; DefaultParameterValue(false)>] useGlobalStats : bool, 
                               [<Optional; DefaultParameterValue(false)>] outputMeanVar : bool) =
@@ -389,8 +389,8 @@ type MX() =
                               data : NDArray, 
                               gamma : NDArray, 
                               beta : NDArray, 
-                              [<Optional; DefaultParameterValue(0.00100000005)>] eps : float, 
-                              [<Optional; DefaultParameterValue(0.899999976)>] momentum : float, 
+                              [<Optional; DefaultParameterValue(0.001)>] eps : float, 
+                              [<Optional; DefaultParameterValue(0.9)>] momentum : float, 
                               [<Optional; DefaultParameterValue(true)>] fixGamma : bool, 
                               [<Optional; DefaultParameterValue(false)>] useGlobalStats : bool, 
                               [<Optional; DefaultParameterValue(false)>] outputMeanVar : bool) =
@@ -510,9 +510,9 @@ type MX() =
                                 rescaleGrad : NDArray, 
                                 lr : float, 
                                 eta : float, 
-                                [<Optional; DefaultParameterValue(0.899999976)>] beta1 : float, 
-                                [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
-                                [<Optional; DefaultParameterValue(9.99999994E-09)>] epsilon : float, 
+                                [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                                [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                                [<Optional; DefaultParameterValue(0.00000001)>] epsilon : float, 
                                 [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                                 [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "_mp_adamw_update"
@@ -570,9 +570,9 @@ type MX() =
                                 rescaleGrad : NDArray, 
                                 lr : float, 
                                 eta : float, 
-                                [<Optional; DefaultParameterValue(0.899999976)>] beta1 : float, 
-                                [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
-                                [<Optional; DefaultParameterValue(9.99999994E-09)>] epsilon : float, 
+                                [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                                [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                                [<Optional; DefaultParameterValue(0.00000001)>] epsilon : float, 
                                 [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                                 [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "_mp_adamw_update"
@@ -711,9 +711,9 @@ type MX() =
                               rescaleGrad : NDArray, 
                               lr : float, 
                               eta : float, 
-                              [<Optional; DefaultParameterValue(0.899999976)>] beta1 : float, 
-                              [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
-                              [<Optional; DefaultParameterValue(9.99999994E-09)>] epsilon : float, 
+                              [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                              [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                              [<Optional; DefaultParameterValue(0.00000001)>] epsilon : float, 
                               [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                               [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "_adamw_update"
@@ -767,9 +767,9 @@ type MX() =
                               rescaleGrad : NDArray, 
                               lr : float, 
                               eta : float, 
-                              [<Optional; DefaultParameterValue(0.899999976)>] beta1 : float, 
-                              [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
-                              [<Optional; DefaultParameterValue(9.99999994E-09)>] epsilon : float, 
+                              [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                              [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                              [<Optional; DefaultParameterValue(0.00000001)>] epsilon : float, 
                               [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                               [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
         let creator = AtomicSymbolCreator.FromName "_adamw_update"
@@ -898,9 +898,9 @@ type MX() =
                                    lrs : double seq, 
                                    wds : double seq, 
                                    etas : double seq, 
-                                   [<Optional; DefaultParameterValue(0.899999976)>] beta1 : float, 
-                                   [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
-                                   [<Optional; DefaultParameterValue(9.99999994E-09)>] epsilon : float, 
+                                   [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                                   [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                                   [<Optional; DefaultParameterValue(0.00000001)>] epsilon : float, 
                                    [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
                                    [<Optional; DefaultParameterValue(1)>] numWeights : int) =
         let creator = AtomicSymbolCreator.FromName "_multi_adamw_update"
@@ -950,9 +950,9 @@ type MX() =
                                    lrs : double seq, 
                                    wds : double seq, 
                                    etas : double seq, 
-                                   [<Optional; DefaultParameterValue(0.899999976)>] beta1 : float, 
-                                   [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
-                                   [<Optional; DefaultParameterValue(9.99999994E-09)>] epsilon : float, 
+                                   [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                                   [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                                   [<Optional; DefaultParameterValue(0.00000001)>] epsilon : float, 
                                    [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
                                    [<Optional; DefaultParameterValue(1)>] numWeights : int) =
         let creator = AtomicSymbolCreator.FromName "_multi_adamw_update"
@@ -1079,9 +1079,9 @@ type MX() =
                                      lrs : double seq, 
                                      wds : double seq, 
                                      etas : double seq, 
-                                     [<Optional; DefaultParameterValue(0.899999976)>] beta1 : float, 
-                                     [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
-                                     [<Optional; DefaultParameterValue(9.99999994E-09)>] epsilon : float, 
+                                     [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                                     [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                                     [<Optional; DefaultParameterValue(0.00000001)>] epsilon : float, 
                                      [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
                                      [<Optional; DefaultParameterValue(1)>] numWeights : int) =
         let creator = AtomicSymbolCreator.FromName "_multi_mp_adamw_update"
@@ -1131,9 +1131,9 @@ type MX() =
                                      lrs : double seq, 
                                      wds : double seq, 
                                      etas : double seq, 
-                                     [<Optional; DefaultParameterValue(0.899999976)>] beta1 : float, 
-                                     [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
-                                     [<Optional; DefaultParameterValue(9.99999994E-09)>] epsilon : float, 
+                                     [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                                     [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                                     [<Optional; DefaultParameterValue(0.00000001)>] epsilon : float, 
                                      [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
                                      [<Optional; DefaultParameterValue(1)>] numWeights : int) =
         let creator = AtomicSymbolCreator.FromName "_multi_mp_adamw_update"
@@ -1396,8 +1396,8 @@ type MX() =
     /// <param name="equalNan">Whether to compare NaN&#39;s as equal. If True, NaN&#39;s in A will be considered equal to NaN&#39;s in B in the output array.</param>
     static member ContribAllclose(a : NDArray, 
                                   b : NDArray, 
-                                  [<Optional; DefaultParameterValue(9.99999975E-06)>] rtol : float, 
-                                  [<Optional; DefaultParameterValue(9.99999994E-09)>] atol : float, 
+                                  [<Optional; DefaultParameterValue(0.00001)>] rtol : float, 
+                                  [<Optional; DefaultParameterValue(0.00000001)>] atol : float, 
                                   [<Optional; DefaultParameterValue(true)>] equalNan : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_allclose"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
@@ -1439,8 +1439,8 @@ type MX() =
     static member ContribAllclose(outputArray : NDArray seq, 
                                   a : NDArray, 
                                   b : NDArray, 
-                                  [<Optional; DefaultParameterValue(9.99999975E-06)>] rtol : float, 
-                                  [<Optional; DefaultParameterValue(9.99999994E-09)>] atol : float, 
+                                  [<Optional; DefaultParameterValue(0.00001)>] rtol : float, 
+                                  [<Optional; DefaultParameterValue(0.00000001)>] atol : float, 
                                   [<Optional; DefaultParameterValue(true)>] equalNan : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_allclose"
         let names = [|"rtol"; "atol"; "equal_nan"|]
@@ -4135,7 +4135,7 @@ type MX() =
                                            locPred : NDArray, 
                                            anchor : NDArray, 
                                            [<Optional; DefaultParameterValue(true)>] clip : bool, 
-                                           [<Optional; DefaultParameterValue(0.00999999978)>] threshold : float, 
+                                           [<Optional; DefaultParameterValue(0.01)>] threshold : float, 
                                            [<Optional; DefaultParameterValue(0)>] backgroundId : int, 
                                            [<Optional; DefaultParameterValue(0.5)>] nmsThreshold : float, 
                                            [<Optional; DefaultParameterValue(false)>] forceSuppress : bool, 
@@ -4164,7 +4164,7 @@ type MX() =
                                            locPred : NDArray, 
                                            anchor : NDArray, 
                                            [<Optional; DefaultParameterValue(true)>] clip : bool, 
-                                           [<Optional; DefaultParameterValue(0.00999999978)>] threshold : float, 
+                                           [<Optional; DefaultParameterValue(0.01)>] threshold : float, 
                                            [<Optional; DefaultParameterValue(0)>] backgroundId : int, 
                                            [<Optional; DefaultParameterValue(0.5)>] nmsThreshold : float, 
                                            [<Optional; DefaultParameterValue(false)>] forceSuppress : bool, 
@@ -4399,7 +4399,7 @@ type MX() =
                                             lr : float, 
                                             [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                                             [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
-                                            [<Optional; DefaultParameterValue(9.99999975E-06)>] epsilon : float) =
+                                            [<Optional; DefaultParameterValue(0.00001)>] epsilon : float) =
         let creator = AtomicSymbolCreator.FromName "_contrib_group_adagrad_update"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|weight.NDArrayHandle.UnsafeHandle; grad.NDArrayHandle.UnsafeHandle; history.NDArrayHandle.UnsafeHandle|]
@@ -4441,7 +4441,7 @@ type MX() =
                                             lr : float, 
                                             [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                                             [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
-                                            [<Optional; DefaultParameterValue(9.99999975E-06)>] epsilon : float) =
+                                            [<Optional; DefaultParameterValue(0.00001)>] epsilon : float) =
         let creator = AtomicSymbolCreator.FromName "_contrib_group_adagrad_update"
         let names = [|"lr"; "rescale_grad"; "clip_gradient"; "epsilon"|]
         let vals = [|string lr; string rescaleGrad; string clipGradient; string epsilon|]
@@ -5569,8 +5569,8 @@ type MX() =
                                        movingMean : NDArray, 
                                        movingVar : NDArray, 
                                        key : string, 
-                                       [<Optional; DefaultParameterValue(0.00100000005)>] eps : float, 
-                                       [<Optional; DefaultParameterValue(0.899999976)>] momentum : float, 
+                                       [<Optional; DefaultParameterValue(0.001)>] eps : float, 
+                                       [<Optional; DefaultParameterValue(0.9)>] momentum : float, 
                                        [<Optional; DefaultParameterValue(true)>] fixGamma : bool, 
                                        [<Optional; DefaultParameterValue(false)>] useGlobalStats : bool, 
                                        [<Optional; DefaultParameterValue(false)>] outputMeanVar : bool, 
@@ -5652,8 +5652,8 @@ type MX() =
                                        movingMean : NDArray, 
                                        movingVar : NDArray, 
                                        key : string, 
-                                       [<Optional; DefaultParameterValue(0.00100000005)>] eps : float, 
-                                       [<Optional; DefaultParameterValue(0.899999976)>] momentum : float, 
+                                       [<Optional; DefaultParameterValue(0.001)>] eps : float, 
+                                       [<Optional; DefaultParameterValue(0.9)>] momentum : float, 
                                        [<Optional; DefaultParameterValue(true)>] fixGamma : bool, 
                                        [<Optional; DefaultParameterValue(false)>] useGlobalStats : bool, 
                                        [<Optional; DefaultParameterValue(false)>] outputMeanVar : bool, 
@@ -6759,7 +6759,7 @@ type MX() =
     /// <param name="sparsenessTarget">The sparseness target</param>
     /// <param name="penalty">The tradeoff parameter for the sparseness penalty</param>
     /// <param name="momentum">The momentum for running average</param>
-    static member IdentityAttachKLSparseReg(data : NDArray, [<Optional; DefaultParameterValue(0.100000001)>] sparsenessTarget : float, [<Optional; DefaultParameterValue(0.00100000005)>] penalty : float, [<Optional; DefaultParameterValue(0.899999976)>] momentum : float) =
+    static member IdentityAttachKLSparseReg(data : NDArray, [<Optional; DefaultParameterValue(0.1)>] sparsenessTarget : float, [<Optional; DefaultParameterValue(0.001)>] penalty : float, [<Optional; DefaultParameterValue(0.9)>] momentum : float) =
         let creator = AtomicSymbolCreator.FromName "IdentityAttachKLSparseReg"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -6772,7 +6772,7 @@ type MX() =
     /// <param name="sparsenessTarget">The sparseness target</param>
     /// <param name="penalty">The tradeoff parameter for the sparseness penalty</param>
     /// <param name="momentum">The momentum for running average</param>
-    static member IdentityAttachKLSparseReg(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(0.100000001)>] sparsenessTarget : float, [<Optional; DefaultParameterValue(0.00100000005)>] penalty : float, [<Optional; DefaultParameterValue(0.899999976)>] momentum : float) =
+    static member IdentityAttachKLSparseReg(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(0.1)>] sparsenessTarget : float, [<Optional; DefaultParameterValue(0.001)>] penalty : float, [<Optional; DefaultParameterValue(0.9)>] momentum : float) =
         let creator = AtomicSymbolCreator.FromName "IdentityAttachKLSparseReg"
         let names = [|"sparseness_target"; "penalty"; "momentum"|]
         let vals = [|string sparsenessTarget; string penalty; string momentum|]
@@ -7809,7 +7809,7 @@ type MX() =
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L262</summary>
     /// <param name="data">The input.</param>
     /// <param name="alphaStd">Level of the lighting noise.</param>
-    static member ImageRandomLighting(data : NDArray, [<Optional; DefaultParameterValue(0.0500000007)>] alphaStd : float) =
+    static member ImageRandomLighting(data : NDArray, [<Optional; DefaultParameterValue(0.05)>] alphaStd : float) =
         let creator = AtomicSymbolCreator.FromName "_image_random_lighting"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -7822,7 +7822,7 @@ type MX() =
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="alphaStd">Level of the lighting noise.</param>
-    static member ImageRandomLighting(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(0.0500000007)>] alphaStd : float) =
+    static member ImageRandomLighting(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(0.05)>] alphaStd : float) =
         let creator = AtomicSymbolCreator.FromName "_image_random_lighting"
         let names = [|"alpha_std"|]
         let vals = [|string alphaStd|]
@@ -8013,7 +8013,7 @@ type MX() =
                             [<Optional>] actType : LeakyReLUType, 
                             [<Optional; DefaultParameterValue(0.25)>] slope : float, 
                             [<Optional; DefaultParameterValue(0.125)>] lowerBound : float, 
-                            [<Optional; DefaultParameterValue(0.333999991)>] upperBound : float) =
+                            [<Optional; DefaultParameterValue(0.334)>] upperBound : float) =
         let creator = AtomicSymbolCreator.FromName "LeakyReLU"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle|]
@@ -8052,7 +8052,7 @@ type MX() =
                             [<Optional>] actType : LeakyReLUType, 
                             [<Optional; DefaultParameterValue(0.25)>] slope : float, 
                             [<Optional; DefaultParameterValue(0.125)>] lowerBound : float, 
-                            [<Optional; DefaultParameterValue(0.333999991)>] upperBound : float) =
+                            [<Optional; DefaultParameterValue(0.334)>] upperBound : float) =
         let creator = AtomicSymbolCreator.FromName "LeakyReLU"
         let names = [|"act_type"; "slope"; "lower_bound"; "upper_bound"|]
         let vals = [|(if isNull (actType :> obj) then "leaky" else string actType); string slope; string lowerBound; string upperBound|]
@@ -8383,7 +8383,7 @@ type MX() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; movingMean.NDArrayHandle.UnsafeHandle; movingVar.NDArrayHandle.UnsafeHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "axis"; "cudnn_off"; "min_calib_range"; "max_calib_range"|]
-                                                 [|(match eps with None -> "0.00100000004749745" | Some eps -> string eps); (match momentum with None -> "0.899999976" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
+                                                 [|(match eps with None -> "0.001" | Some eps -> string eps); (match momentum with None -> "0.9" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Batch normalization.
     /// 
@@ -8469,7 +8469,7 @@ type MX() =
                             [<Optional>] ?maxCalibRange : float) =
         let creator = AtomicSymbolCreator.FromName "BatchNorm"
         let names = [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "axis"; "cudnn_off"; "min_calib_range"; "max_calib_range"|]
-        let vals = [|(match eps with None -> "0.00100000004749745" | Some eps -> string eps); (match momentum with None -> "0.899999976" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
+        let vals = [|(match eps with None -> "0.001" | Some eps -> string eps); (match momentum with None -> "0.9" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; movingMean.NDArrayHandle.UnsafeHandle; movingVar.NDArrayHandle.UnsafeHandle|]
@@ -9371,7 +9371,7 @@ type MX() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; movingMean.NDArrayHandle.UnsafeHandle; movingVar.NDArrayHandle.UnsafeHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "axis"; "cudnn_off"; "min_calib_range"; "max_calib_range"|]
-                                                 [|(match eps with None -> "0.00100000004749745" | Some eps -> string eps); (match momentum with None -> "0.899999976" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
+                                                 [|(match eps with None -> "0.001" | Some eps -> string eps); (match momentum with None -> "0.9" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
         (new NDArray(outputs.[0]))
     /// <summary>Apply batch normalization to input.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -9406,7 +9406,7 @@ type MX() =
                                  [<Optional>] ?maxCalibRange : float) =
         let creator = AtomicSymbolCreator.FromName "CuDNNBatchNorm"
         let names = [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "axis"; "cudnn_off"; "min_calib_range"; "max_calib_range"|]
-        let vals = [|(match eps with None -> "0.00100000004749745" | Some eps -> string eps); (match momentum with None -> "0.899999976" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
+        let vals = [|(match eps with None -> "0.001" | Some eps -> string eps); (match momentum with None -> "0.9" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; movingMean.NDArrayHandle.UnsafeHandle; movingVar.NDArrayHandle.UnsafeHandle|]
@@ -9918,7 +9918,7 @@ type MX() =
                             gamma : NDArray, 
                             beta : NDArray, 
                             [<Optional; DefaultParameterValue(1)>] numGroups : int, 
-                            [<Optional; DefaultParameterValue(9.99999975E-06)>] eps : float, 
+                            [<Optional; DefaultParameterValue(0.00001)>] eps : float, 
                             [<Optional; DefaultParameterValue(false)>] outputMeanVar : bool) =
         let creator = AtomicSymbolCreator.FromName "GroupNorm"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
@@ -9953,7 +9953,7 @@ type MX() =
                             gamma : NDArray, 
                             beta : NDArray, 
                             [<Optional; DefaultParameterValue(1)>] numGroups : int, 
-                            [<Optional; DefaultParameterValue(9.99999975E-06)>] eps : float, 
+                            [<Optional; DefaultParameterValue(0.00001)>] eps : float, 
                             [<Optional; DefaultParameterValue(false)>] outputMeanVar : bool) =
         let creator = AtomicSymbolCreator.FromName "GroupNorm"
         let names = [|"num_groups"; "eps"; "output_mean_var"|]
@@ -10028,7 +10028,7 @@ type MX() =
                             gamma : NDArray, 
                             beta : NDArray, 
                             [<Optional; DefaultParameterValue(-1)>] axis : int, 
-                            [<Optional; DefaultParameterValue(9.99999975E-06)>] eps : float, 
+                            [<Optional; DefaultParameterValue(0.00001)>] eps : float, 
                             [<Optional; DefaultParameterValue(false)>] outputMeanVar : bool) =
         let creator = AtomicSymbolCreator.FromName "LayerNorm"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
@@ -10076,7 +10076,7 @@ type MX() =
                             gamma : NDArray, 
                             beta : NDArray, 
                             [<Optional; DefaultParameterValue(-1)>] axis : int, 
-                            [<Optional; DefaultParameterValue(9.99999975E-06)>] eps : float, 
+                            [<Optional; DefaultParameterValue(0.00001)>] eps : float, 
                             [<Optional; DefaultParameterValue(false)>] outputMeanVar : bool) =
         let creator = AtomicSymbolCreator.FromName "LayerNorm"
         let names = [|"axis"; "eps"; "output_mean_var"|]
@@ -10246,7 +10246,7 @@ type MX() =
     /// <param name="knorm">The parameter :math:`k` in the LRN expression.</param>
     static member LRN(data : NDArray, 
                       nsize : int, 
-                      [<Optional; DefaultParameterValue(9.99999975E-05)>] alpha : float, 
+                      [<Optional; DefaultParameterValue(0.0001)>] alpha : float, 
                       [<Optional; DefaultParameterValue(0.75)>] beta : float, 
                       [<Optional; DefaultParameterValue(2.0)>] knorm : float) =
         let creator = AtomicSymbolCreator.FromName "LRN"
@@ -10282,7 +10282,7 @@ type MX() =
     static member LRN(outputArray : NDArray seq, 
                       data : NDArray, 
                       nsize : int, 
-                      [<Optional; DefaultParameterValue(9.99999975E-05)>] alpha : float, 
+                      [<Optional; DefaultParameterValue(0.0001)>] alpha : float, 
                       [<Optional; DefaultParameterValue(0.75)>] beta : float, 
                       [<Optional; DefaultParameterValue(2.0)>] knorm : float) =
         let creator = AtomicSymbolCreator.FromName "LRN"
@@ -18211,9 +18211,9 @@ type MX() =
                              z : NDArray, 
                              lr : float, 
                              t : int, 
-                             [<Optional; DefaultParameterValue(0.600000024)>] beta1 : float, 
-                             [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
-                             [<Optional; DefaultParameterValue(9.99999993922529E-09)>] epsilon : double, 
+                             [<Optional; DefaultParameterValue(0.6)>] beta1 : float, 
+                             [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                             [<Optional; DefaultParameterValue(0.00000001)>] epsilon : double, 
                              [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                              [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                              [<Optional; DefaultParameterValue(-1.0)>] clipGrad : float) =
@@ -18261,9 +18261,9 @@ type MX() =
                              z : NDArray, 
                              lr : float, 
                              t : int, 
-                             [<Optional; DefaultParameterValue(0.600000024)>] beta1 : float, 
-                             [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
-                             [<Optional; DefaultParameterValue(9.99999993922529E-09)>] epsilon : double, 
+                             [<Optional; DefaultParameterValue(0.6)>] beta1 : float, 
+                             [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                             [<Optional; DefaultParameterValue(0.00000001)>] epsilon : double, 
                              [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                              [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                              [<Optional; DefaultParameterValue(-1.0)>] clipGrad : float) =
@@ -18388,9 +18388,9 @@ type MX() =
                              mean : NDArray, 
                              var : NDArray, 
                              lr : float, 
-                             [<Optional; DefaultParameterValue(0.899999976)>] beta1 : float, 
-                             [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
-                             [<Optional; DefaultParameterValue(9.99999994E-09)>] epsilon : float, 
+                             [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                             [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                             [<Optional; DefaultParameterValue(0.00000001)>] epsilon : float, 
                              [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                              [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                              [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
@@ -18451,9 +18451,9 @@ type MX() =
                              mean : NDArray, 
                              var : NDArray, 
                              lr : float, 
-                             [<Optional; DefaultParameterValue(0.899999976)>] beta1 : float, 
-                             [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
-                             [<Optional; DefaultParameterValue(9.99999994E-09)>] epsilon : float, 
+                             [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                             [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                             [<Optional; DefaultParameterValue(0.00000001)>] epsilon : float, 
                              [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                              [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                              [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
@@ -18837,8 +18837,8 @@ type MX() =
                                 grad : NDArray, 
                                 n : NDArray, 
                                 lr : float, 
-                                [<Optional; DefaultParameterValue(0.949999988)>] gamma1 : float, 
-                                [<Optional; DefaultParameterValue(9.99999994E-09)>] epsilon : float, 
+                                [<Optional; DefaultParameterValue(0.95)>] gamma1 : float, 
+                                [<Optional; DefaultParameterValue(0.00000001)>] epsilon : float, 
                                 [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                                 [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                                 [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
@@ -18901,8 +18901,8 @@ type MX() =
                                 grad : NDArray, 
                                 n : NDArray, 
                                 lr : float, 
-                                [<Optional; DefaultParameterValue(0.949999988)>] gamma1 : float, 
-                                [<Optional; DefaultParameterValue(9.99999994E-09)>] epsilon : float, 
+                                [<Optional; DefaultParameterValue(0.95)>] gamma1 : float, 
+                                [<Optional; DefaultParameterValue(0.00000001)>] epsilon : float, 
                                 [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                                 [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                                 [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
@@ -19058,9 +19058,9 @@ type MX() =
                                     g : NDArray, 
                                     delta : NDArray, 
                                     lr : float, 
-                                    [<Optional; DefaultParameterValue(0.949999988)>] gamma1 : float, 
-                                    [<Optional; DefaultParameterValue(0.899999976)>] gamma2 : float, 
-                                    [<Optional; DefaultParameterValue(9.99999994E-09)>] epsilon : float, 
+                                    [<Optional; DefaultParameterValue(0.95)>] gamma1 : float, 
+                                    [<Optional; DefaultParameterValue(0.9)>] gamma2 : float, 
+                                    [<Optional; DefaultParameterValue(0.00000001)>] epsilon : float, 
                                     [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                                     [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                                     [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
@@ -19117,9 +19117,9 @@ type MX() =
                                     g : NDArray, 
                                     delta : NDArray, 
                                     lr : float, 
-                                    [<Optional; DefaultParameterValue(0.949999988)>] gamma1 : float, 
-                                    [<Optional; DefaultParameterValue(0.899999976)>] gamma2 : float, 
-                                    [<Optional; DefaultParameterValue(9.99999994E-09)>] epsilon : float, 
+                                    [<Optional; DefaultParameterValue(0.95)>] gamma1 : float, 
+                                    [<Optional; DefaultParameterValue(0.9)>] gamma2 : float, 
+                                    [<Optional; DefaultParameterValue(0.00000001)>] epsilon : float, 
                                     [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                                     [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                                     [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
@@ -19253,7 +19253,7 @@ type MX() =
                              z : NDArray, 
                              n : NDArray, 
                              lr : float, 
-                             [<Optional; DefaultParameterValue(0.00999999978)>] lamda1 : float, 
+                             [<Optional; DefaultParameterValue(0.01)>] lamda1 : float, 
                              [<Optional; DefaultParameterValue(1.0)>] beta : float, 
                              [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                              [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
@@ -19304,7 +19304,7 @@ type MX() =
                              z : NDArray, 
                              n : NDArray, 
                              lr : float, 
-                             [<Optional; DefaultParameterValue(0.00999999978)>] lamda1 : float, 
+                             [<Optional; DefaultParameterValue(0.01)>] lamda1 : float, 
                              [<Optional; DefaultParameterValue(1.0)>] beta : float, 
                              [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                              [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
@@ -19418,7 +19418,7 @@ type MX() =
                                       grad : NDArray, 
                                       history : NDArray, 
                                       lr : float, 
-                                      [<Optional; DefaultParameterValue(1.00000001E-07)>] epsilon : float, 
+                                      [<Optional; DefaultParameterValue(0.0000001)>] epsilon : float, 
                                       [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                                       [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                                       [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
@@ -19458,7 +19458,7 @@ type MX() =
                                       grad : NDArray, 
                                       history : NDArray, 
                                       lr : float, 
-                                      [<Optional; DefaultParameterValue(1.00000001E-07)>] epsilon : float, 
+                                      [<Optional; DefaultParameterValue(0.0000001)>] epsilon : float, 
                                       [<Optional; DefaultParameterValue(0.0)>] wd : float, 
                                       [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                                       [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
@@ -19572,9 +19572,9 @@ type MX() =
                                    var : NDArray, 
                                    t : float, 
                                    wd : float, 
-                                   [<Optional; DefaultParameterValue(0.899999976)>] beta1 : float, 
-                                   [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
-                                   [<Optional; DefaultParameterValue(9.99999997E-07)>] epsilon : float, 
+                                   [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                                   [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                                   [<Optional; DefaultParameterValue(0.000001)>] epsilon : float, 
                                    [<Optional; DefaultParameterValue(true)>] biasCorrection : bool, 
                                    [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                                    [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
@@ -19633,9 +19633,9 @@ type MX() =
                                    var : NDArray, 
                                    t : float, 
                                    wd : float, 
-                                   [<Optional; DefaultParameterValue(0.899999976)>] beta1 : float, 
-                                   [<Optional; DefaultParameterValue(0.999000013)>] beta2 : float, 
-                                   [<Optional; DefaultParameterValue(9.99999997E-07)>] epsilon : float, 
+                                   [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                                   [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                                   [<Optional; DefaultParameterValue(0.000001)>] epsilon : float, 
                                    [<Optional; DefaultParameterValue(true)>] biasCorrection : bool, 
                                    [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
                                    [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
@@ -20531,7 +20531,7 @@ type MX() =
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; movingMean.NDArrayHandle.UnsafeHandle; movingVar.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
                                                  [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "axis"; "cudnn_off"; "min_calib_range"; "max_calib_range"|]
-                                                 [|(match eps with None -> "0.00100000004749745" | Some eps -> string eps); (match momentum with None -> "0.899999976" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
+                                                 [|(match eps with None -> "0.001" | Some eps -> string eps); (match momentum with None -> "0.9" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
         (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>BatchNorm operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
@@ -20578,7 +20578,7 @@ type MX() =
                                             [<Optional>] ?maxCalibRange : float) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_batch_norm"
         let names = [|"eps"; "momentum"; "fix_gamma"; "use_global_stats"; "output_mean_var"; "axis"; "cudnn_off"; "min_calib_range"; "max_calib_range"|]
-        let vals = [|(match eps with None -> "0.00100000004749745" | Some eps -> string eps); (match momentum with None -> "0.899999976" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
+        let vals = [|(match eps with None -> "0.001" | Some eps -> string eps); (match momentum with None -> "0.9" | Some momentum -> string momentum); (match fixGamma with None -> "true" | Some fixGamma -> string fixGamma); (match useGlobalStats with None -> "false" | Some useGlobalStats -> string useGlobalStats); (match outputMeanVar with None -> "false" | Some outputMeanVar -> string outputMeanVar); (match axis with None -> "1" | Some axis -> string axis); (match cudnnOff with None -> "false" | Some cudnnOff -> string cudnnOff); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle; movingMean.NDArrayHandle.UnsafeHandle; movingVar.NDArrayHandle.UnsafeHandle; minData.NDArrayHandle.UnsafeHandle; maxData.NDArrayHandle.UnsafeHandle|]
@@ -32661,7 +32661,7 @@ type MX() =
     /// <param name="data">The input array.</param>
     /// <param name="alpha">Slope of hard sigmoid</param>
     /// <param name="beta">Bias of hard sigmoid.</param>
-    static member HardSigmoid(data : NDArray, [<Optional; DefaultParameterValue(0.200000003)>] alpha : float, [<Optional; DefaultParameterValue(0.5)>] beta : float) =
+    static member HardSigmoid(data : NDArray, [<Optional; DefaultParameterValue(0.2)>] alpha : float, [<Optional; DefaultParameterValue(0.5)>] beta : float) =
         let creator = AtomicSymbolCreator.FromName "hard_sigmoid"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -32680,7 +32680,7 @@ type MX() =
     /// <param name="data">The input array.</param>
     /// <param name="alpha">Slope of hard sigmoid</param>
     /// <param name="beta">Bias of hard sigmoid.</param>
-    static member HardSigmoid(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(0.200000003)>] alpha : float, [<Optional; DefaultParameterValue(0.5)>] beta : float) =
+    static member HardSigmoid(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(0.2)>] alpha : float, [<Optional; DefaultParameterValue(0.5)>] beta : float) =
         let creator = AtomicSymbolCreator.FromName "hard_sigmoid"
         let names = [|"alpha"; "beta"|]
         let vals = [|string alpha; string beta|]
@@ -44537,7 +44537,7 @@ type MX() =
                                        imInfo : NDArray, 
                                        [<Optional; DefaultParameterValue(6000)>] rpnPreNmsTopN : int, 
                                        [<Optional; DefaultParameterValue(300)>] rpnPostNmsTopN : int, 
-                                       [<Optional; DefaultParameterValue(0.699999988)>] threshold : float, 
+                                       [<Optional; DefaultParameterValue(0.7)>] threshold : float, 
                                        [<Optional; DefaultParameterValue(16)>] rpnMinSize : int, 
                                        [<Optional>] scales : double seq, 
                                        [<Optional>] ratios : double seq, 
@@ -44570,7 +44570,7 @@ type MX() =
                                        imInfo : NDArray, 
                                        [<Optional; DefaultParameterValue(6000)>] rpnPreNmsTopN : int, 
                                        [<Optional; DefaultParameterValue(300)>] rpnPostNmsTopN : int, 
-                                       [<Optional; DefaultParameterValue(0.699999988)>] threshold : float, 
+                                       [<Optional; DefaultParameterValue(0.7)>] threshold : float, 
                                        [<Optional; DefaultParameterValue(16)>] rpnMinSize : int, 
                                        [<Optional>] scales : double seq, 
                                        [<Optional>] ratios : double seq, 
@@ -44625,7 +44625,7 @@ type MX() =
                                   imInfo : NDArray, 
                                   [<Optional; DefaultParameterValue(6000)>] rpnPreNmsTopN : int, 
                                   [<Optional; DefaultParameterValue(300)>] rpnPostNmsTopN : int, 
-                                  [<Optional; DefaultParameterValue(0.699999988)>] threshold : float, 
+                                  [<Optional; DefaultParameterValue(0.7)>] threshold : float, 
                                   [<Optional; DefaultParameterValue(16)>] rpnMinSize : int, 
                                   [<Optional>] scales : double seq, 
                                   [<Optional>] ratios : double seq, 
@@ -44658,7 +44658,7 @@ type MX() =
                                   imInfo : NDArray, 
                                   [<Optional; DefaultParameterValue(6000)>] rpnPreNmsTopN : int, 
                                   [<Optional; DefaultParameterValue(300)>] rpnPostNmsTopN : int, 
-                                  [<Optional; DefaultParameterValue(0.699999988)>] threshold : float, 
+                                  [<Optional; DefaultParameterValue(0.7)>] threshold : float, 
                                   [<Optional; DefaultParameterValue(16)>] rpnMinSize : int, 
                                   [<Optional>] scales : double seq, 
                                   [<Optional>] ratios : double seq, 
@@ -45142,7 +45142,7 @@ type MX() =
     /// <param name="gamma">A vector of length &#39;channel&#39;, which multiplies the normalized input.</param>
     /// <param name="beta">A vector of length &#39;channel&#39;, which is added to the product of the normalized input and the weight.</param>
     /// <param name="eps">An `epsilon` parameter to prevent division by 0.</param>
-    static member InstanceNorm(data : NDArray, gamma : NDArray, beta : NDArray, [<Optional; DefaultParameterValue(0.00100000005)>] eps : float) =
+    static member InstanceNorm(data : NDArray, gamma : NDArray, beta : NDArray, [<Optional; DefaultParameterValue(0.001)>] eps : float) =
         let creator = AtomicSymbolCreator.FromName "InstanceNorm"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle; gamma.NDArrayHandle.UnsafeHandle; beta.NDArrayHandle.UnsafeHandle|]
@@ -45196,7 +45196,7 @@ type MX() =
     /// <param name="gamma">A vector of length &#39;channel&#39;, which multiplies the normalized input.</param>
     /// <param name="beta">A vector of length &#39;channel&#39;, which is added to the product of the normalized input and the weight.</param>
     /// <param name="eps">An `epsilon` parameter to prevent division by 0.</param>
-    static member InstanceNorm(outputArray : NDArray seq, data : NDArray, gamma : NDArray, beta : NDArray, [<Optional; DefaultParameterValue(0.00100000005)>] eps : float) =
+    static member InstanceNorm(outputArray : NDArray seq, data : NDArray, gamma : NDArray, beta : NDArray, [<Optional; DefaultParameterValue(0.001)>] eps : float) =
         let creator = AtomicSymbolCreator.FromName "InstanceNorm"
         let names = [|"eps"|]
         let vals = [|string eps|]
@@ -45315,7 +45315,7 @@ type MX() =
     /// <param name="data">Input array to normalize.</param>
     /// <param name="eps">A small constant for numerical stability.</param>
     /// <param name="mode">Specify the dimension along which to compute L2 norm.</param>
-    static member L2Normalization(data : NDArray, [<Optional; DefaultParameterValue(1.00000001E-10)>] eps : float, [<Optional>] mode : L2NormalizationMode) =
+    static member L2Normalization(data : NDArray, [<Optional; DefaultParameterValue(0.0)>] eps : float, [<Optional>] mode : L2NormalizationMode) =
         let creator = AtomicSymbolCreator.FromName "L2Normalization"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|data.NDArrayHandle.UnsafeHandle|]
@@ -45381,7 +45381,7 @@ type MX() =
     /// <param name="data">Input array to normalize.</param>
     /// <param name="eps">A small constant for numerical stability.</param>
     /// <param name="mode">Specify the dimension along which to compute L2 norm.</param>
-    static member L2Normalization(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.00000001E-10)>] eps : float, [<Optional>] mode : L2NormalizationMode) =
+    static member L2Normalization(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(0.0)>] eps : float, [<Optional>] mode : L2NormalizationMode) =
         let creator = AtomicSymbolCreator.FromName "L2Normalization"
         let names = [|"eps"; "mode"|]
         let vals = [|string eps; (if isNull (mode :> obj) then "instance" else string mode)|]
