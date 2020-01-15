@@ -111,7 +111,7 @@ let copyToTarget() =
                 b.NDArray.Value.CopyTo(a.NDArray.Value)
         | _ -> ()
 ```
-every `updateTargetStepCount` steps. More spefically this is done by passing an `onStep` function to `makeTrainer : onStep -> onEpisode -> TrainerAgent`:
+every `updateTargetStepCount` steps. More specifically this is done by passing an `onStep` function to `makeTrainer : onStep -> onEpisode -> TrainerAgent`:
 ```fsharp 
 let trainer = 
     makeTrainer

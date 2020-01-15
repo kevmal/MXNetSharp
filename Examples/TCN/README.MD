@@ -55,7 +55,7 @@ let weightNormalization name =
     w :> Symbol    
 ```
 
-When testing the F# implementation, I found matching the initializtion of the original code very important to having weight normalization work. The initilization used is as follows:
+When testing the F# implementation, I found matching the initialization of the original code very important to having weight normalization work. The initialization used is as follows:
 
 ```fsharp
 let bindings = 
@@ -79,7 +79,7 @@ let bindings =
 
 ```
 
-This matches PyTorch's initilization of weights which is [Kaiming Uniform](https://arxiv.org/abs/1502.01852) initilization. Bias initilization was found not as important and does not match PyTorch for simplicity. It did seem using batch normalization in place of weight normaliztion was less sensitive to weight initilization.
+This matches PyTorch's initialization of weights which is [Kaiming Uniform](https://arxiv.org/abs/1502.01852) initialization. Bias initialization was found not as important and does not match PyTorch for simplicity. It did seem using batch normalization in place of weight normalization was less sensitive to weight initialization.
 
 Layers are stacked with dilation of `2^i - 1` for layer i in {0..layerCount-1} and finally mapped (for each time `t`) to "output count" by
 
@@ -143,7 +143,7 @@ Identify MNIST digits by treating each pixel as a single item in a sequence.
 
 ### Model
 
-The last output of the sequence is used to classify the digit (using Argmax). Loss is negative log-liklihood and `correct` is calculated to display testset accuracy.
+The last output of the sequence is used to classify the digit (using Argmax). Loss is negative log-likelihood and `correct` is calculated to display testset accuracy.
 
 ```fsharp
 let x = Input("xIn", shape = [0; 1; seqLength])
