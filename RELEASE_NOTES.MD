@@ -1,4 +1,4 @@
-#### MASTER
+#### 0.0.3 (2020-01-14)
 * Issue #20: Added Constant:>Variable type
 * Issue #19: Empty NDArray error on ToString
 * Issue #18: Add NDArray.CopyFrom(_:NDArray) method
@@ -14,6 +14,9 @@
 * Bindings.mapNDArray now named Bindings.fillNDArray
 * Symbol.Bind(ctx) will call inferShapes on symbol before creating Executor
 * Run-Time Compilation (RTC) support for custom CUDA kernels in C/C++
+* TCN Sample
+* Symbol.NoArg and NDArray.NoArg for passing 'noarg' to operators (see issue #37)
+* Bindings updated to libmxnet b20191125
 
 #### 0.0.2 (2019-12-13)
 * OpOutCount.txt and OpOutCountRemainder.txt are no longer packaged
