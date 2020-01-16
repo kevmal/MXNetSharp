@@ -12,10 +12,13 @@
   <ItemGroup>
     <None Include="Node - Copy - Copy - Copy - Copy (2).fsx" />
     <None Include="Node - Copy - Copy - Copy - Copy.fsx" />
+    <None Include="TCN\MNIST.fsx" />
+    <None Include="TCN\README.MD" />
+    <None Include="TCN\adding.fsx" />
     <None Include="CustomOp\SoftmaxRtc.fsx" />
     <None Include="DQN\qmodel.svg" />
-    <Content Include="DQN\play1616.gif" />
-    <Content Include="DQN\play1000.gif" />
+    <None Include="DQN\play1616.gif" />
+    <None Include="DQN\play1000.gif" />
     <None Include="DQN\README.MD" />
     <None Include="DQN\DQN.fsx" />
     <Compile Include="Library.fs" />

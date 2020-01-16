@@ -5,15 +5,28 @@ open System
 open MXNetSharp.Interop
 open System.Runtime.CompilerServices
 open System
+open MXNetSharp.Interop
+open System.Collections.Generic
 
 /// Add new axis within indexer
 type NewAxis = NewAxis
+
+module Dim =  
+    [<Literal>]
+    let Copy = 0
+    [<Literal>]
+    let Infer = -1
+    [<Literal>]
+    let CopyRest = -2
+    [<Literal>]
+    let Product = -3
+    [<Literal>]
+    let Split = -4
 
 type SliceRange(?start : int64, ?stop : int64, ?step : int64) = 
     member x.Start = start
     member x.Stop = stop
     member x.Step = step
-
 
 //https://github.com/apache/incubator-mxnet/blob/62b063802634048fe9da0a736dd6ee429e410f27/python/mxnet/ndarray/ndarray.py#L57-L60
 type StorageType = 
@@ -41,27 +54,6 @@ type StorageType =
             | Default -> "default"
             | RowSparse -> "row_sparse"
             | Undefined -> ""
-
-
-// defined in mshadow/base.h
-// https://github.com/apache/incubator-mxnet/blob/618c4811e417fb86cbb3fc0f7f38d55972eeb2af/3rdparty/mshadow/mshadow/base.h#L306
-type TypeFlag = 
-    | None = -1
-    | Float32 = 0
-    | Float64 = 1
-    | Float16 = 2
-    | Uint8 = 3
-    | Int32 = 4
-    | Int8  = 5
-    | Int64 = 6
-
-
-// defined in cpp-package/include/mxnet-cpp/ndarray.h
-// https://github.com/apache/incubator-mxnet/blob/745a41ca1a6d74a645911de8af46dece03db93ea/cpp-package/include/mxnet-cpp/ndarray.h#L41
-type DeviceTypeEnum =
-    | CPU = 1
-    | GPU = 2
-    | CPUPinned = 3
 
 type DeviceType = 
     | CPU 
@@ -131,6 +123,7 @@ type DataType =
     | Int64
     | Int8
     | UInt8
+    | Bool
     override x.ToString() =
         match x with
             | Float16 -> "float16"
@@ -140,6 +133,7 @@ type DataType =
             | Int64 -> "int64"
             | Int8 -> "int8"
             | UInt8 -> "uint8"
+            | Bool -> "bool"
     member x.Type = 
         match x with 
         | Float16 -> None
@@ -149,6 +143,7 @@ type DataType =
         | Int64 -> Some(typeof<int64>)
         | Int8 -> Some(typeof<sbyte>)
         | UInt8 -> Some(typeof<byte>)
+        | Bool -> Some(typeof<bool>)
     member x.TypeFlag =  
         match x with 
         | Float16 -> TypeFlag.Float16
@@ -158,6 +153,7 @@ type DataType =
         | Int64 -> TypeFlag.Int64
         | Int8 -> TypeFlag.Int8
         | UInt8 -> TypeFlag.Uint8
+        | Bool -> TypeFlag.Bool
     static member FromTypeFlag(typeflag : TypeFlag) = 
         match typeflag with 
         | TypeFlag.None -> None 
@@ -168,6 +164,7 @@ type DataType =
         | TypeFlag.Int64 -> Some Int64
         | TypeFlag.Int8 -> Some Int8
         | TypeFlag.Uint8 -> Some UInt8
+        | TypeFlag.Bool -> Some Bool
         | _ -> None
     static member FromInt(typeFlagInt) = DataType.FromTypeFlag(enum typeFlagInt)
     static member FromNetType(t : Type) = 
@@ -183,6 +180,8 @@ type DataType =
             Int8
         elif t = typeof<byte> then 
             UInt8
+        elif t = typeof<bool> then 
+            Bool
         else
             failwithf "No corresponding MXNet type for type %s" (t.Name)
     static member TryFromNetType(t : Type) = 
@@ -198,6 +197,8 @@ type DataType =
             Some Int8
         elif t = typeof<byte> then 
             Some UInt8
+        elif t = typeof<bool> then 
+            Some Bool
         else
             None
     static member FromNetType<'a>() = 
@@ -213,6 +214,8 @@ type DataType =
             Int8
         elif typeof<'a> = typeof<byte> then 
             UInt8
+        elif typeof<'a> = typeof<bool> then 
+            Bool
         else
             failwithf "No corresponding MXNet type for type %s" (typeof<'a>.Name)
     static member TryFromNetType<'a>() = 
@@ -228,6 +231,8 @@ type DataType =
             Some Int8
         elif typeof<'a> = typeof<byte> then 
             Some UInt8
+        elif typeof<'a> = typeof<bool> then 
+            Some Bool
         else
             None
 
@@ -254,80 +259,6 @@ type OpReqType =
     static member op_Explicit(st : OpReqType) = st.OpReqTypeInt
     static member op_Explicit(st : OpReqType) = uint32 st.OpReqTypeInt
 
-type SafeSymbolHandle(owner) = 
-    inherit SafeHandle(0n, true)
-    new() = new SafeSymbolHandle(true)
-    new(ptr,owner) as this = new SafeSymbolHandle(owner) then this.SetHandle(ptr)
-    override x.IsInvalid = x.handle <= 0n
-    override x.ReleaseHandle() = CApi.MXSymbolFree x.handle = 0
-    member internal x.UnsafeHandle = 
-        if not x.IsClosed then
-            x.handle
-        else
-            ObjectDisposedException("SafeSymbolHandle", "Symbol handle has been closed") |> raise
-
-
-type SafeNDArrayHandle(owner) = 
-    inherit SafeHandle(0n, true)
-    new() = new SafeNDArrayHandle(true)
-    new(ptr,owner) as this = new SafeNDArrayHandle(owner) then this.SetHandle(ptr)
-    override x.IsInvalid = x.handle <= 0n
-    override x.ReleaseHandle() = CApi.MXNDArrayFree x.handle = 0
-    member internal x.UnsafeHandle = 
-        if not x.IsClosed then
-            x.handle
-        else
-            ObjectDisposedException("SafeNDArrayHandle", "NDArray handle has been closed") |> raise
-
-type SafeCudaModuleHandle(owner) = 
-    inherit SafeHandle(0n, true)
-    new() = new SafeCudaModuleHandle(true)
-    new(ptr,owner) as this = new SafeCudaModuleHandle(owner) then this.SetHandle(ptr)
-    override x.IsInvalid = x.handle <= 0n
-    override x.ReleaseHandle() = CApi.MXRtcCudaModuleFree x.handle = 0
-    member internal x.UnsafeHandle = 
-        if not x.IsClosed then
-            x.handle
-        else
-            ObjectDisposedException("SafeCudaModuleHandle", "NDArray handle has been closed") |> raise
-
-type SafeCudaKernelHandle(owner) = 
-    inherit SafeHandle(0n, true)
-    new() = new SafeCudaKernelHandle(true)
-    new(ptr,owner) as this = new SafeCudaKernelHandle(owner) then this.SetHandle(ptr)
-    override x.IsInvalid = x.handle <= 0n
-    override x.ReleaseHandle() = CApi.MXRtcCudaKernelFree x.handle = 0
-    member internal x.UnsafeHandle = 
-        if not x.IsClosed then
-            x.handle
-        else
-            ObjectDisposedException("SafeCudaKernelHandle", "NDArray handle has been closed") |> raise
-                                
-[<Extension>]
-type ValueStringExtensions = ValueStringExtensions with
-    [<Extension>] 
-    static member ValueString(x : int option seq) = x |> Seq.map (function Some x -> string x | _ -> "None") |> String.concat "," |> sprintf "[%s]"
-    [<Extension>] 
-    static member ValueString(x : int seq) = x |> Seq.map string |> String.concat "," |> sprintf "[%s]"
-    [<Extension>] 
-    static member ValueString(x : int64 seq) = x |> Seq.map string |> String.concat "," |> sprintf "[%s]"
-    [<Extension>] 
-    static member ValueString(x : double seq) = x |> Seq.map string |> String.concat "," |> sprintf "[%s]"
-    [<Extension>] 
-    static member ValueString(x : bool) = if x then "1" else "0"
-    [<Extension>] 
-    static member ValueString(x : string) = x
-    [<Extension>] 
-    static member ValueString(x : obj) = 
-        match x with 
-        | :? bool as x -> x.ValueString()
-        | :? string as x -> x
-        | :? seq<int> as x -> x.ValueString()
-        | :? seq<int option> as x -> x.ValueString()
-        | :? seq<double> as x -> x.ValueString()
-        | :? seq<int64> as x -> x.ValueString()
-        | _ -> string x
-        
 type ArrayConverter private () = 
     static member inline Float32(a : float32 []) = a
     static member inline Float32(a : double []) = a |> Array.map float32
@@ -336,6 +267,7 @@ type ArrayConverter private () =
     static member inline Float32(a : decimal []) = a |> Array.map float32
     static member inline Float32(a : int8 []) = a |> Array.map float32
     static member inline Float32(a : uint8 []) = a |> Array.map float32
+    static member inline Float32(a : bool []) : float32 [] = a |> Array.map (fun x -> if x then LanguagePrimitives.GenericOne else LanguagePrimitives.GenericZero)
     static member inline Float32(a : 'a []) = 
         if typeof<'a> = typeof<float32> then 
             ArrayConverter.Float32(unbox(box a) : float32 [])
@@ -351,6 +283,8 @@ type ArrayConverter private () =
             ArrayConverter.Float32(unbox(box a) : int8 [])
         elif typeof<'a> = typeof<uint8> then 
             ArrayConverter.Float32(unbox(box a) : uint8 [])
+        elif typeof<'a> = typeof<bool> then 
+            ArrayConverter.Float32(unbox(box a) : bool [])
         else
             a |> Array.map (fun x -> Convert.ChangeType(x, typeof<float32>) :?> float32)
     static member inline Float64(a : float32 []) = a |> Array.map double
@@ -360,6 +294,7 @@ type ArrayConverter private () =
     static member inline Float64(a : decimal []) = a |> Array.map double
     static member inline Float64(a : int8 []) = a |> Array.map double
     static member inline Float64(a : uint8 []) = a |> Array.map double
+    static member inline Float64(a : bool []) : double [] = a |> Array.map (fun x -> if x then LanguagePrimitives.GenericOne else LanguagePrimitives.GenericZero)
     static member inline Float64(a : 'a []) = 
         if typeof<'a> = typeof<float32> then 
             ArrayConverter.Float64(unbox(box a) : float32 [])
@@ -375,6 +310,8 @@ type ArrayConverter private () =
             ArrayConverter.Float64(unbox(box a) : int8 [])
         elif typeof<'a> = typeof<uint8> then 
             ArrayConverter.Float64(unbox(box a) : uint8 [])
+        elif typeof<'a> = typeof<bool> then 
+            ArrayConverter.Float64(unbox(box a) : bool [])
         else
             a |> Array.map (fun x -> Convert.ChangeType(x, typeof<double>) :?> double)
     static member inline Int32(a : float32 []) = a |> Array.map int
@@ -384,6 +321,7 @@ type ArrayConverter private () =
     static member inline Int32(a : decimal []) = a |> Array.map int
     static member inline Int32(a : int8 []) = a |> Array.map int
     static member inline Int32(a : uint8 []) = a |> Array.map int
+    static member inline Int32(a : bool []) : int [] = a |> Array.map (fun x -> if x then LanguagePrimitives.GenericOne else LanguagePrimitives.GenericZero)
     static member inline Int32(a : 'a []) = 
         if typeof<'a> = typeof<float32> then 
             ArrayConverter.Int32(unbox(box a) : float32 [])
@@ -399,6 +337,8 @@ type ArrayConverter private () =
             ArrayConverter.Int32(unbox(box a) : int8 [])
         elif typeof<'a> = typeof<uint8> then 
             ArrayConverter.Int32(unbox(box a) : uint8 [])
+        elif typeof<'a> = typeof<bool> then 
+            ArrayConverter.Int32(unbox(box a) : bool [])
         else
             a |> Array.map (fun x -> Convert.ChangeType(x, typeof<int>) :?> int)
     static member inline Int64(a : float32 []) = a |> Array.map int64
@@ -408,6 +348,7 @@ type ArrayConverter private () =
     static member inline Int64(a : decimal []) = a |> Array.map int64
     static member inline Int64(a : int8 []) = a |> Array.map int64
     static member inline Int64(a : uint8 []) = a |> Array.map int64
+    static member inline Int64(a : bool []) : int64 [] = a |> Array.map (fun x -> if x then LanguagePrimitives.GenericOne else LanguagePrimitives.GenericZero)
     static member inline Int64(a : 'a []) = 
         if typeof<'a> = typeof<float32> then 
             ArrayConverter.Int64(unbox(box a) : float32 [])
@@ -423,6 +364,8 @@ type ArrayConverter private () =
             ArrayConverter.Int64(unbox(box a) : int8 [])
         elif typeof<'a> = typeof<uint8> then 
             ArrayConverter.Int64(unbox(box a) : uint8 [])
+        elif typeof<'a> = typeof<bool> then 
+            ArrayConverter.Int64(unbox(box a) : bool [])
         else
             a |> Array.map (fun x -> Convert.ChangeType(x, typeof<int64>) :?> int64)
     static member inline Int8(a : float32 []) = a |> Array.map int8
@@ -432,6 +375,7 @@ type ArrayConverter private () =
     static member inline Int8(a : decimal []) = a |> Array.map int8
     static member inline Int8(a : int8 []) = a
     static member inline Int8(a : uint8 []) = a |> Array.map int8
+    static member inline Int8(a : bool []) : int8 [] = a |> Array.map (fun x -> if x then LanguagePrimitives.GenericOne else LanguagePrimitives.GenericZero)
     static member inline Int8(a : 'a []) = 
         if typeof<'a> = typeof<float32> then 
             ArrayConverter.Int8(unbox(box a) : float32 [])
@@ -447,6 +391,8 @@ type ArrayConverter private () =
             ArrayConverter.Int8(unbox(box a) : int8 [])
         elif typeof<'a> = typeof<uint8> then 
             ArrayConverter.Int8(unbox(box a) : uint8 [])
+        elif typeof<'a> = typeof<bool> then 
+            ArrayConverter.Int8(unbox(box a) : bool [])
         else
             a |> Array.map (fun x -> Convert.ChangeType(x, typeof<int8>) :?> int8)
     static member inline UInt8(a : float32 []) = a |> Array.map uint8
@@ -456,6 +402,7 @@ type ArrayConverter private () =
     static member inline UInt8(a : decimal []) = a |> Array.map uint8
     static member inline UInt8(a : int8 []) = a |> Array.map uint8
     static member inline UInt8(a : uint8 []) = a
+    static member inline UInt8(a : bool []) : uint8 [] = a |> Array.map (fun x -> if x then LanguagePrimitives.GenericOne else LanguagePrimitives.GenericZero)
     static member inline UInt8(a : 'a []) = 
         if typeof<'a> = typeof<float32> then 
             ArrayConverter.UInt8(unbox(box a) : float32 [])
@@ -471,8 +418,37 @@ type ArrayConverter private () =
             ArrayConverter.UInt8(unbox(box a) : int8 [])
         elif typeof<'a> = typeof<uint8> then 
             ArrayConverter.UInt8(unbox(box a) : uint8 [])
+        elif typeof<'a> = typeof<bool> then 
+            ArrayConverter.UInt8(unbox(box a) : bool [])
         else
             a |> Array.map (fun x -> Convert.ChangeType(x, typeof<uint8>) :?> uint8)
+    static member inline Bool(a : float32 []) = a |> Array.map (fun x -> x <> LanguagePrimitives.GenericZero)
+    static member inline Bool(a : double []) = a |> Array.map (fun x -> x <> LanguagePrimitives.GenericZero)
+    static member inline Bool(a : int32 []) = a |> Array.map (fun x -> x <> LanguagePrimitives.GenericZero)
+    static member inline Bool(a : int64 []) = a |> Array.map (fun x -> x <> LanguagePrimitives.GenericZero)
+    static member inline Bool(a : decimal []) = a |> Array.map (fun x -> x <> LanguagePrimitives.GenericZero)
+    static member inline Bool(a : int8 []) = a |> Array.map (fun x -> x <> LanguagePrimitives.GenericZero)
+    static member inline Bool(a : uint8 []) = a |> Array.map (fun x -> x <> LanguagePrimitives.GenericZero)
+    static member inline Bool(a : bool []) = a
+    static member inline Bool(a : 'a []) = 
+        if typeof<'a> = typeof<float32> then 
+            ArrayConverter.Bool(unbox(box a) : float32 [])
+        elif typeof<'a> = typeof<double> then 
+            ArrayConverter.Bool(unbox(box a) : double [])
+        elif typeof<'a> = typeof<int32> then 
+            ArrayConverter.Bool(unbox(box a) : int32 [])
+        elif typeof<'a> = typeof<int64> then 
+            ArrayConverter.Bool(unbox(box a) : int64 [])
+        elif typeof<'a> = typeof<decimal> then 
+            ArrayConverter.Bool(unbox(box a) : decimal [])
+        elif typeof<'a> = typeof<int8> then 
+            ArrayConverter.Bool(unbox(box a) : int8 [])
+        elif typeof<'a> = typeof<uint8> then 
+            ArrayConverter.Bool(unbox(box a) : uint8 [])
+        elif typeof<'a> = typeof<bool> then 
+            ArrayConverter.Bool(unbox(box a) : bool [])
+        else
+            a |> Array.map (fun x -> Convert.ChangeType(x, typeof<bool>) :?> bool)
 
 
 
@@ -492,3 +468,4 @@ module Util =
         | Int64 -> ArrayConverter.Int64(a) :> Array
         | Int8 -> ArrayConverter.Int8(a) :> Array
         | UInt8 -> ArrayConverter.UInt8(a) :> Array
+        | Bool -> ArrayConverter.Bool(a) :> Array

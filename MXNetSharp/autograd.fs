@@ -2,6 +2,7 @@
 
 open MXNetSharp.Interop
 
+
 module Autograd = 
     let internal lck = obj()
     let isRecording() = MXAutograd.isRecording()
@@ -48,3 +49,18 @@ module Autograd =
         let g = g |> Array.map (fun (g : NDArray) -> g.UnsafeHandle)
         MXAutograd.markVariables a req g
 
+    let grad train retainGraph createGraph headGrads heads variables = 
+        let headHandles = heads |> Seq.map (fun (x : NDArray) -> x.UnsafeHandle) |> Seq.toArray
+        let hgradHandles = 
+            if Seq.isEmpty headGrads then 
+                null
+            else
+                let handles = headGrads |> Seq.map (fun (x : NDArray) -> x.UnsafeHandle) |> Seq.toArray
+                if handles.Length <> headHandles.Length then 
+                    invalidArg "headGrads" "headGrads must be empty or of the same length as heads"
+                handles
+        let varHandles = variables |> Seq.map (fun (x : NDArray) -> x.UnsafeHandle) |> Seq.toArray
+        let h,_st = MXAutograd.backwardEx headHandles hgradHandles varHandles retainGraph createGraph train
+        h |> Array.map (fun x -> new NDArray(x))
+
+        

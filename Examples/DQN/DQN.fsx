@@ -31,7 +31,7 @@ let rewardProb = 0.3
 let initSpeed = 300.0
 let maxSpeed = 200.0
 
-let movesPerUpdate = 4      // This only applies to 
+let movesPerUpdate = 4      // This only applies to the agent, not a game rule
 
 // Number of state, action, reward tuples to remember for training
 let memoryLength = 10000
@@ -210,7 +210,7 @@ module Game =
             txt.IsReadOnly <- true
             txt.TextWrapping <- Media.TextWrapping.Wrap
             let controlbtn = Button()
-            controlbtn.Content <- "Use QNN"
+            controlbtn.Content <- "Use DQN"
             let updatebtn = Button()
             updatebtn.Content <- "Update Model"
             let spanel = StackPanel()
@@ -291,7 +291,6 @@ module Game =
     let game() = 
         let wnd = makeGameWindow()
         let moveq = wnd.MoveQueue
-        //let act x = lock playLck (fun _ -> act x)
         let mutable l = DateTime.MinValue
         let mutable m = 0
         let move act (b : GameBoard) = 
@@ -716,15 +715,15 @@ let appendText str =
             c.CaretIndex <- Int32.MaxValue    
         )
 
-/// Keyboard / QNN toggle
+/// Keyboard / DQN toggle
 gameWindow.Window.ControlButton.Click
 |> Observable.add 
     (fun _ ->
         let b = gameWindow.Window.ControlButton
-        let useQnnTxt = "Use QNN"
+        let useDqnTxt = "Use DQN"
         let useKeysTxt = "Keyboard Control"
         match b.Content with 
-        | :? string as s when s = useQnnTxt -> 
+        | :? string as s when s = useDqnTxt -> 
             b.Content <- useKeysTxt
             let autoPlayAct (b : GameBoard) = 
                 lock playLock
@@ -753,7 +752,7 @@ gameWindow.Window.ControlButton.Click
                     )
             gameWindow.Window.GameMode <- GameMode.FunctionControl autoPlayAct
         | _ -> 
-            b.Content <- useQnnTxt 
+            b.Content <- useDqnTxt 
             gameWindow.Window.GameMode <- GameMode.KeyboardControl
     )
 

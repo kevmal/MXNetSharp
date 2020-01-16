@@ -12,6 +12,7 @@ open Helper
 
 type NDArray(handle : SafeNDArrayHandle) = 
     let mutable disposed = false
+    static let noarg = new NDArray()
     static let invoke opName inputs parameters =
         let creator = AtomicSymbolCreator.FromName opName
         let inputs = inputs |> Array.map (fun (x : NDArray) -> (x.NDArrayHandle : SafeNDArrayHandle).UnsafeHandle)
@@ -35,6 +36,7 @@ type NDArray(handle : SafeNDArrayHandle) =
         let delayAlloc = defaultArg delayAlloc true
         let shape = shape |> Seq.toArray
         new NDArray(MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype.TypeFlag)
+    static member NoArg = noarg
     static member ConvertCopyFrom(data : 'aa[], shape : int seq, ctx : Context, ?dtype : DataType) =
         let shape = 
             let shape = shape |> Seq.toArray
@@ -160,6 +162,8 @@ type NDArray(handle : SafeNDArrayHandle) =
         else
             raise (InvalidOperationException(sprintf "Source type of %s does not match NDArray type of %O" typeof<'a>.FullName x.DataTypeFlag))
 
+    member x.CopyFrom(data : NDArray) = data.CopyTo(x)
+
     member x.CopyFrom(data : Array) = 
         let etype = data.GetType().GetElementType()
         let dtype = DataType.FromNetType(etype)
@@ -186,6 +190,7 @@ type NDArray(handle : SafeNDArrayHandle) =
             | Int64 -> ArrayConverter.Int64(a) |> x.SyncCopyFromCPUUnchecked
             | Int8 -> ArrayConverter.Int8(a) |> x.SyncCopyFromCPUUnchecked
             | UInt8 -> ArrayConverter.UInt8(a) |> x.SyncCopyFromCPUUnchecked
+            | Bool -> ArrayConverter.Bool(a) |> x.SyncCopyFromCPUUnchecked
 
     static member CopyFrom(data : Array, ctx : Context) = 
         let etype = data.GetType().GetElementType()
@@ -683,9 +688,13 @@ type NDArray(handle : SafeNDArrayHandle) =
                     mutInvoke x "_slice_assign" [|x;y|] [|"begin", b; "end", e; "step", s|] |> ignore
                 | q -> failwithf "Unhandled slice assign type %s with value %A" (q.GetType().Name) q
     
+    member x.Concat(dim : int, [<ParamArray>] data : NDArray []) = invoke1 "Concat" data [|"num_args" <-- data.Length; "dim" <-- dim|]
+    member x.Concat(dim : int, data : NDArray seq) = x.Concat(dim, data = (data |> Seq.toArray))
     member x.SwapAxis(dim1 : int, dim2 : int) = invoke1 "SwapAxis" [|x|] [|"dim1" <-- dim1; "dim2" <-- dim2|]
     member x.Reshape([<ParamArray>] dims : int []) = invoke1 "Reshape" [|x|] [|"shape" <-- dims|]
     member x.Reshape(dims : int seq) = invoke1 "Reshape" [|x|] [|"shape" <-- dims|]
+    member x.ReverseReshape([<ParamArray>] dims : int []) = invoke1 "Reshape" [|x|] [|"shape" <-- dims; "reverse" <-- true|]
+    member x.ReverseReshape(dims : int seq) = invoke1 "Reshape" [|x|] [|"shape" <-- dims; "reverse" <-- true|]
     member x.BroadcastTo(shape : int seq) = invoke1 "broadcast_to" [|x|] [|"shape" <-- shape|]
     member x.MutFull(value : double) = 
         mutInvoke x "_full" Array.empty [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType.Value; "ctx" <-- x.Context|]
@@ -702,42 +711,55 @@ type NDArray(handle : SafeNDArrayHandle) =
     member x.MutFull(value : uint8) = 
         mutInvoke x "_full" Array.empty [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType.Value; "ctx" <-- x.Context|]
     
-    member x.ToArray() : 'a[] = 
-        if typeof<'a> = typeof<obj> then //REVIEW: since 'a : unmanaged this will never hit
-            match x.DataType with 
-            | None -> [||]
-            | Some t -> 
-                match t.Type with 
-                | None -> failwithf "Type %O not yet supported" t.TypeFlag
-                | Some nt -> 
-                    Array.CreateInstance(nt, x.Shape |> Array.reduce (*)) :?> 'a []
+    member x.ToArray() : Array = 
+        let shape = x.Shape
+        if shape.Length > 0 then 
+            let a = 
+                match x.DataType with 
+                | None -> Array.CreateInstance(typeof<float32>, lengths = shape)
+                | Some Float16 -> Array.CreateInstance(typeof<uint16>, lengths = shape)
+                | Some dt -> 
+                    match dt.Type with 
+                    | Some t -> Array.CreateInstance(t, lengths = shape)
+                    | None -> Array.CreateInstance(typeof<float32>, lengths = shape)
+            MXNDArray.syncCopyToCPUArray x.UnsafeHandle a
+            a
         else
-            match DataType.TryFromNetType<'a>(), x.DataType with 
-            | Some t, Some t2 -> 
-                if t = t2 then 
-                    let a = Array.zeroCreate x.Size
-                    MXNDArray.syncCopyToCPU handle.UnsafeHandle a
-                    a
-                else
-                    use x2 = invoke1 "cast" [|x|] [|"dtype" <-- t|]
-                    let a = Array.zeroCreate x.Size
-                    MXNDArray.syncCopyToCPU x2.UnsafeHandle a
-                    a
-            | None, _ -> raise (InvalidCastException(sprintf "Type %s has no corresponding MXNet type" typeof<'a>.FullName))
-            | _ -> [||]
+            match x.DataType with 
+            | None -> Array.CreateInstance(typeof<float32>,0)
+            | Some Float16 -> Array.CreateInstance(typeof<uint16>,0)
+            | Some dt -> 
+                match dt.Type with 
+                | Some t -> Array.CreateInstance(t,0)
+                | None -> Array.CreateInstance(typeof<float32>,0)
+
+    member x.ToArray<'a when 'a : unmanaged>() : 'a[] = 
+        match DataType.TryFromNetType<'a>(), x.DataType with 
+        | Some t, Some t2 -> 
+            if t = t2 then 
+                let a = Array.zeroCreate x.Size
+                MXNDArray.syncCopyToCPU handle.UnsafeHandle a
+                a
+            else
+                use x2 = invoke1 "cast" [|x|] [|"dtype" <-- t|]
+                let a = Array.zeroCreate x.Size
+                MXNDArray.syncCopyToCPU x2.UnsafeHandle a
+                a
+        | None, _ -> raise (InvalidCastException(sprintf "Type %s has no corresponding MXNet type" typeof<'a>.FullName))
+        | _ -> [||]
             
-    member x.ToFloat32Array() : float32[] = x.ToArray()
-    member x.ToDoubleArray() : double[] = x.ToArray()
-    member x.ToIntArray() : int[] = x.ToArray()
-    member x.ToInt64Array() : int64[] = x.ToArray()
-    member x.ToInt8Array() : int8[] = x.ToArray()
-    member x.ToUInt8Array() : uint8[] = x.ToArray()
+    member x.ToFloat32Array() : float32[] = x.ToArray<_>()
+    member x.ToDoubleArray() : double[] = x.ToArray<_>()
+    member x.ToIntArray() : int[] = x.ToArray<_>()
+    member x.ToInt64Array() : int64[] = x.ToArray<_>()
+    member x.ToInt8Array() : int8[] = x.ToArray<_>()
+    member x.ToUInt8Array() : uint8[] = x.ToArray<_>()
 
     member x.ToScalar() : 'a = 
         let sz = x.Shape |> Array.reduce (*)
         if sz <> 1 then 
             raise (InvalidOperationException(sprintf "NDArray has size %d" sz))
-        let a = x.ToArray()
+        let a = x.ToArray<_>()
         assert(a.Length = 1)
         a.[0]
     member x.ToFloat32Scalar() : float32 = x.ToScalar()

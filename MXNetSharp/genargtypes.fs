@@ -344,28 +344,6 @@ module GeneratedArgumentTypes =
                 | Wrap -> "wrap"
     
     [<RequireQualifiedAccess>]
-    type Stype = 
-        | Csr
-        | Default
-        | RowSparse
-        override x.ToString() =
-            match x with
-                | Csr -> "csr"
-                | Default -> "default"
-                | RowSparse -> "row_sparse"
-    
-    [<RequireQualifiedAccess>]
-    type ForwardStype = 
-        | Csr
-        | Default
-        | RowSparse
-        override x.ToString() =
-            match x with
-                | Csr -> "csr"
-                | Default -> "default"
-                | RowSparse -> "row_sparse"
-    
-    [<RequireQualifiedAccess>]
     type TakeMode = 
         | Clip
         | Raise
