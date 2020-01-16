@@ -1405,7 +1405,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg b)) then b.UnsafeHandle|]
                                                  [|"rtol"; "atol"; "equal_nan"|]
                                                  [|string rtol; string atol; string equalNan|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>This operators implements the numpy.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
     /// 
     /// .. math::
@@ -2172,7 +2172,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg samples)) then samples.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg matches)) then matches.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg anchors)) then anchors.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg refs)) then refs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg means)) then means.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg stds)) then stds.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>Encode bounding boxes training target with normalized center offsets.
     ///     Input bounding boxes are using corner type: `x_{min}, y_{min}, x_{max}, y_{max}`.) array
     /// 
@@ -2244,7 +2244,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg anchors)) then anchors.UnsafeHandle|]
                                                  [|"std0"; "std1"; "std2"; "std3"; "clip"; "format"|]
                                                  [|string std0; string std1; string std2; string std3; string clip; (if isNull (format :> obj) then "center" else string format)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Decode bounding boxes training target with normalized center offsets.
     ///     Input bounding boxes are using corner type: `x_{min}, y_{min}, x_{max}, y_{max}`
     ///     or center type: `x, y, width, height.) array
@@ -3369,7 +3369,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lda)) then lda.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg alpha)) then alpha.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg beta)) then beta.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg state)) then state.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lags)) then lags.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg marks)) then marks.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg validLength)) then validLength.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxTime)) then maxTime.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>Computes the log likelihood of a univariate Hawkes process.
     /// 
     /// The log likelihood is calculated on point process observations represented
@@ -4007,7 +4007,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lrs)) then lrs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weightsSumSq)) then weightsSumSq.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg gradsSumSq)) then gradsSumSq.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg wds)) then wds.UnsafeHandle|]
                                                  [|"eta"; "eps"; "rescale_grad"|]
                                                  [|string eta; string eps; string rescaleGrad|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Compute the LARS coefficients of multiple weights and grads from their sums of square&quot;
     /// 
     /// 
@@ -4077,7 +4077,7 @@ type MX() =
                                                  (data |> Array.map (fun x -> x.UnsafeHandle))
                                                  [|"num_arrays"|]
                                                  [|string numArrays|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Compute the sums of squares of multiple arrays
     /// 
     /// 
@@ -4147,7 +4147,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg clsProb)) then clsProb.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg locPred)) then locPred.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg anchor)) then anchor.UnsafeHandle|]
                                                  [|"clip"; "threshold"; "background_id"; "nms_threshold"; "force_suppress"; "variances"; "nms_topk"|]
                                                  [|string clip; string threshold; string backgroundId; string nmsThreshold; string forceSuppress; (if isNull (variances :> obj) then "[0.1,0.1,0.2,0.2]" else string variances); string nmsTopk|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Convert multibox detection predictions.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="clsProb">Class probabilities.</param>
@@ -4213,7 +4213,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"sizes"; "ratios"; "clip"; "steps"; "offsets"|]
                                                  [|(if isNull (sizes :> obj) then "[1]" else string sizes); (if isNull (ratios :> obj) then "[1]" else string ratios); string clip; (if isNull (steps :> obj) then "[-1,-1]" else string steps); (if isNull (offsets :> obj) then "[0.5,0.5]" else string offsets)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Generate prior(anchor) boxes from data, sizes and ratios.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data.</param>
@@ -4273,7 +4273,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg anchor)) then anchor.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg label)) then label.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg clsPred)) then clsPred.UnsafeHandle|]
                                                  [|"overlap_threshold"; "ignore_label"; "negative_mining_ratio"; "negative_mining_thresh"; "minimum_negative_samples"; "variances"|]
                                                  [|string overlapThreshold; string ignoreLabel; string negativeMiningRatio; string negativeMiningThresh; string minimumNegativeSamples; (if isNull (variances :> obj) then "[0.1,0.1,0.2,0.2]" else string variances)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>Compute Multibox training targets</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="anchor">Generated anchor boxes.</param>
@@ -5343,7 +5343,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Straight-through-estimator of `round()`.
     /// 
     /// In forward pass, returns element-wise rounded value to the nearest integer of the input (same as `round()`).
@@ -5437,7 +5437,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Straight-through-estimator of `sign()`.
     /// 
     /// In forward pass, returns element-wise sign of the input (same as `sign()`).
@@ -5828,7 +5828,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg queriesKeysValues)) then queriesKeysValues.UnsafeHandle|]
                                                  [|"heads"|]
                                                  [|string heads|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Compute the matrix multiplication between the projections of
     /// queries and keys in multihead attention use as self attention.
     /// 
@@ -5945,7 +5945,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg queriesKeysValues)) then queriesKeysValues.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg attention)) then attention.UnsafeHandle|]
                                                  [|"heads"|]
                                                  [|string heads|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Compute the matrix multiplication between the projections of
     /// values and the attention weights in multihead attention use as self attention.
     /// 
@@ -6073,7 +6073,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg queries)) then queries.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg keysValues)) then keysValues.UnsafeHandle|]
                                                  [|"heads"|]
                                                  [|string heads|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Compute the matrix multiplication between the projections of
     /// queries and keys in multihead attention use as encoder-decoder.
     /// 
@@ -6200,7 +6200,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg keysValues)) then keysValues.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg attention)) then attention.UnsafeHandle|]
                                                  [|"heads"|]
                                                  [|string heads|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Compute the matrix multiplication between the projections of
     /// values and the attention weights in multihead attention use as encoder-decoder.
     /// 
@@ -6766,7 +6766,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"sparseness_target"; "penalty"; "momentum"|]
                                                  [|string sparsenessTarget; string penalty; string momentum|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Apply a sparse regularization to the output a sigmoid activation function.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data.</param>
@@ -7378,7 +7378,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L195</summary>
@@ -7412,7 +7412,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L200</summary>
@@ -7446,7 +7446,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L205</summary>
@@ -7480,7 +7480,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L210</summary>
@@ -7516,7 +7516,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"min_factor"; "max_factor"|]
                                                  [|string minFactor; string maxFactor|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L215</summary>
@@ -7564,7 +7564,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"min_factor"; "max_factor"|]
                                                  [|string minFactor; string maxFactor|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L222</summary>
@@ -7612,7 +7612,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"min_factor"; "max_factor"|]
                                                  [|string minFactor; string maxFactor|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L230</summary>
@@ -7660,7 +7660,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"min_factor"; "max_factor"|]
                                                  [|string minFactor; string maxFactor|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L238</summary>
@@ -7714,7 +7714,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"brightness"; "contrast"; "saturation"; "hue"|]
                                                  [|string brightness; string contrast; string saturation; string hue|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L246</summary>
@@ -7772,7 +7772,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"alpha"|]
                                                  [|string alpha|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Adjust the lighting level of the input. Follow the AlexNet style.
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L254</summary>
@@ -7816,7 +7816,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"alpha_std"|]
                                                  [|string alphaStd|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Randomly add PCA noise. Follow the AlexNet style.
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L262</summary>
@@ -11321,7 +11321,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\linalg\np_gesvd.cc:L93</summary>
@@ -11356,7 +11356,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\linalg\np_potrf.cc:L47</summary>
@@ -11392,7 +11392,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mask)) then mask.UnsafeHandle|]
                                                  [|"value"|]
                                                  [|string value|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Scalar version of boolean assign
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
@@ -11440,7 +11440,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mask)) then mask.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg value)) then value.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Tensor version of boolean assign
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L246</summary>
@@ -11508,7 +11508,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"axis"; "keepdims"|]
                                                  [|(match axis with None -> "None" | Some axis -> string axis); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
@@ -11939,7 +11939,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
                                                  [|"n"; "axis"|]
                                                  [|string n; string axis|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">Input ndarray</param>
     /// <param name="n">The number of times values are differenced. If zero, the input is returned as-is.</param>
@@ -12061,7 +12061,7 @@ type MX() =
                                                  (data |> Array.map (fun x -> x.UnsafeHandle))
                                                  [|"num_args"; "subscripts"; "optimize"|]
                                                  [|string data.Length; subscripts; string optimize|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_einsum_op.cc:L333</summary>
@@ -12954,7 +12954,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -12982,7 +12982,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -13010,7 +13010,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -13042,7 +13042,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -13264,7 +13264,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -13292,7 +13292,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -13324,7 +13324,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"scalar"|]
                                                  [|string scalar|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -14906,7 +14906,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"copy"; "nan"; "posinf"; "neginf"|]
                                                  [|(match copy with None -> "true" | Some copy -> string copy); (match nan with None -> "0.0" | Some nan -> string nan); (match posinf with None -> "None" | Some posinf -> string posinf); (match neginf with None -> "None" | Some neginf -> string neginf)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L425</summary>
@@ -15182,7 +15182,7 @@ type MX() =
                                                  Array.empty
                                                  [|"N"; "M"; "ctx"; "k"; "dtype"|]
                                                  [|string N; string M; string ctx; string k; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return a 2-D array with ones on the diagonal and zeros elsewhere.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="N">Number of rows in the output.</param>
@@ -15267,7 +15267,7 @@ type MX() =
                                                  Array.empty
                                                  [|"start"; "stop"; "num"; "ctx"; "endpoint"; "base"; "dtype"|]
                                                  [|string start; string stop; string num; string ctx; string endpoint; string lbase; (if isNull (dtype :> obj) then "float32" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Return numbers spaced evenly on a log scale.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="start">The starting value of the sequence.</param>
@@ -15394,7 +15394,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
                                                  [|"newshape"; "reverse"; "order"|]
                                                  [|(newshape |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string reverse; order|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L375</summary>
@@ -15590,7 +15590,7 @@ type MX() =
                                                  (data |> Array.map (fun x -> x.UnsafeHandle))
                                                  [|"num_args"|]
                                                  [|string data.Length|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L805</summary>
@@ -15665,7 +15665,7 @@ type MX() =
                                                  (data |> Array.map (fun x -> x.UnsafeHandle))
                                                  [|"num_args"; "dim"|]
                                                  [|string data.Length; string dim|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Stack tensors in sequence depthwise (in third dimension)
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L982</summary>
@@ -15771,7 +15771,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
                                                  [|"source"; "destination"|]
                                                  [|(source |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (destination |> Seq.map string |> String.concat ", " |> sprintf "[%s]")|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Move axes of an array to new positions.
     /// Other axes remain in their original order.
     /// 
@@ -15822,7 +15822,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"k"; "axes"|]
                                                  [|(match k with None -> "1" | Some k -> string k); (match axes with None -> "None" | Some axes -> (axes |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     /// <param name="k">Number of times the array is rotated by 90 degrees.</param>
@@ -15927,7 +15927,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"k"|]
                                                  [|string k|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
@@ -15956,7 +15956,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"k"|]
                                                  [|string k|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
@@ -15985,7 +15985,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg b)) then b.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">First input</param>
     /// <param name="b">Second input</param>
@@ -16211,7 +16211,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"k"|]
                                                  [|string k|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. If input has shape (S0 S1) k must be between -S0 and S1</param>
@@ -16379,7 +16379,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg condition)) then condition.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg y)) then y.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="condition">condition array</param>
     /// <param name="x">input x</param>
@@ -16520,7 +16520,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle|]
                                                  [|"ctx"; "is_logit"; "prob"; "logit"; "size"; "dtype"|]
                                                  [|string ctx; string isLogit; (match prob with None -> "None" | Some prob -> string prob); (match logit with None -> "None" | Some logit -> string logit); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="input1">Source input</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
@@ -16777,7 +16777,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
                                                  [|"ctx"; "loc"; "scale"; "size"; "dtype"|]
                                                  [|string ctx; (match loc with None -> "None" | Some loc -> string loc); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Ndarray behavior normal</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="input1">Source input</param>
@@ -16894,7 +16894,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
                                                  [|"ctx"; "low"; "high"; "size"; "dtype"|]
                                                  [|string ctx; (match low with None -> "None" | Some low -> string low); (match high with None -> "None" | Some high -> string high); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>numpy behavior uniform</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="input1">Source input</param>
@@ -19584,7 +19584,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg grad)) then grad.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mean)) then mean.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg var)) then var.UnsafeHandle|]
                                                  [|"t"; "wd"; "beta1"; "beta2"; "epsilon"; "bias_correction"; "rescale_grad"; "clip_gradient"|]
                                                  [|string t; string wd; string beta1; string beta2; string epsilon; string biasCorrection; string rescaleGrad; string clipGradient|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Phase I of lamb update it performs the following operations and returns g:.
     /// 
     /// Link to paper: https://arxiv.org/pdf/1904.00962.pdf
@@ -19780,7 +19780,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg g)) then g.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg r1)) then r1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg r2)) then r2.UnsafeHandle|]
                                                  [|"lr"; "lower_bound"; "upper_bound"|]
                                                  [|string lr; string lowerBound; string upperBound|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Phase II of lamb update it performs the following operations and updates grad.
     /// 
     /// Link to paper: https://arxiv.org/pdf/1904.00962.pdf
@@ -19992,7 +19992,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"mode"; "pad_width"; "constant_value"|]
                                                  [|string mode; (padWidth |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string constantValue|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Pads an input array with a constant or edge values of the array.
     /// 
     /// .. note:: `Pad` is deprecated. Use `pad` instead.
@@ -20968,7 +20968,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minData)) then minData.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxData)) then maxData.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">A ndarray/symbol of type `float32`</param>
     /// <param name="minData">The minimum scalar value possibly produced for the data</param>
@@ -21675,7 +21675,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg low)) then low.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg high)) then high.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Concurrent sampling from multiple
     /// uniform distributions on the intervals given by *[low,high)*.
     /// 
@@ -21793,7 +21793,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mu)) then mu.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg sigma)) then sigma.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Concurrent sampling from multiple
     /// normal distributions with parameters *mu* (mean) and *sigma* (standard deviation).
     /// 
@@ -21911,7 +21911,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg alpha)) then alpha.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg beta)) then beta.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Concurrent sampling from multiple
     /// gamma distributions with parameters *alpha* (shape) and *beta* (scale).
     /// 
@@ -22027,7 +22027,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lam)) then lam.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Concurrent sampling from multiple
     /// exponential distributions with parameters lambda (rate).
     /// 
@@ -22141,7 +22141,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lam)) then lam.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Concurrent sampling from multiple
     /// Poisson distributions with parameters lambda (rate).
     /// 
@@ -22261,7 +22261,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg k)) then k.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg p)) then p.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Concurrent sampling from multiple
     /// negative binomial distributions with parameters *k* (failure limit) and *p* (failure probability).
     /// 
@@ -22385,7 +22385,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mu)) then mu.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg alpha)) then alpha.UnsafeHandle|]
                                                  [|"shape"; "dtype"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dtype :> obj) then "None" else string dtype)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Concurrent sampling from multiple
     /// generalized negative binomial distributions with parameters *mu* (mean) and *alpha* (dispersion).
     /// 
@@ -22510,7 +22510,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg sample)) then sample.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg low)) then low.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg high)) then high.UnsafeHandle|]
                                                  [|"is_log"|]
                                                  [|string isLog|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the value of the PDF of *sample* of
     /// uniform distributions on the intervals given by *[low,high)*.
     /// 
@@ -22629,7 +22629,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg sample)) then sample.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mu)) then mu.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg sigma)) then sigma.UnsafeHandle|]
                                                  [|"is_log"|]
                                                  [|string isLog|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the value of the PDF of *sample* of
     /// normal distributions with parameters *mu* (mean) and *sigma* (standard deviation).
     /// 
@@ -22734,7 +22734,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg sample)) then sample.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg alpha)) then alpha.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg beta)) then beta.UnsafeHandle|]
                                                  [|"is_log"|]
                                                  [|string isLog|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the value of the PDF of *sample* of
     /// gamma distributions with parameters *alpha* (shape) and *beta* (rate).
     /// 
@@ -22846,7 +22846,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg sample)) then sample.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lam)) then lam.UnsafeHandle|]
                                                  [|"is_log"|]
                                                  [|string isLog|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the value of the PDF of *sample* of
     /// exponential distributions with parameters *lam* (rate).
     /// 
@@ -22956,7 +22956,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg sample)) then sample.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lam)) then lam.UnsafeHandle|]
                                                  [|"is_log"|]
                                                  [|string isLog|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the value of the PDF of *sample* of
     /// Poisson distributions with parameters *lam* (rate).
     /// 
@@ -23065,7 +23065,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg sample)) then sample.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg k)) then k.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg p)) then p.UnsafeHandle|]
                                                  [|"is_log"|]
                                                  [|string isLog|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the value of the PDF of samples of
     /// negative binomial distributions with parameters *k* (failure limit) and *p* (failure probability).
     /// 
@@ -23173,7 +23173,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg sample)) then sample.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mu)) then mu.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg alpha)) then alpha.UnsafeHandle|]
                                                  [|"is_log"|]
                                                  [|string isLog|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the value of the PDF of *sample* of
     /// generalized negative binomial distributions with parameters *mu* (mean)
     /// and *alpha* (dispersion).  This can be understood as a reparameterization of
@@ -23281,7 +23281,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg sample)) then sample.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg alpha)) then alpha.UnsafeHandle|]
                                                  [|"is_log"|]
                                                  [|string isLog|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Computes the value of the PDF of *sample* of
     /// Dirichlet distributions with parameter *alpha*.
     /// 
@@ -25452,7 +25452,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rois)) then rois.UnsafeHandle|]
                                                  [|"pooled_size"; "spatial_scale"|]
                                                  [|(pooledSize |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string spatialScale|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Performs region of interest(ROI) pooling on the input array.
     /// 
     /// ROI pooling is a variant of a max pooling layer, in which the output size is fixed and
@@ -26633,7 +26633,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"dtype"|]
                                                  [|string dtype|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Cast function between low precision float/FP32 used by AMP.
     /// 
     /// It casts only between low precision float/FP32 and does not do anything for other types.
@@ -33013,7 +33013,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
                                                  Array.empty
                                                  Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input.</param>
     /// <param name="rhs">Second input.</param>
@@ -40832,7 +40832,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"begin"; "end"; "step"|]
                                                  [|string sliceBegin; string sliceEnd; (if isNull (step :> obj) then "[]" else string step)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Slices a region of the array.
     /// .. note:: ``crop`` is deprecated. Use ``slice`` instead.
     /// This function returns a sliced array between the indices given
@@ -43279,7 +43279,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rois)) then rois.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg gtMasks)) then gtMasks.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg matches)) then matches.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg clsTargets)) then clsTargets.UnsafeHandle|]
                                                  [|"num_rois"; "num_classes"; "mask_size"; "sample_ratio"|]
                                                  [|string numRois; string numClasses; (maskSize |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string sampleRatio|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>Generate mask targets for Mask-RCNN.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="rois">Bounding box coordinates, a 3D array</param>
@@ -43416,7 +43416,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg grid)) then grid.UnsafeHandle|]
                                                  [|"cudnn_off"|]
                                                  [|(match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Applies bilinear sampling to input feature map.
     /// 
     /// Bilinear Sampling is the key of  [NIPS2015] \&quot;Spatial Transformer Networks\&quot;. The usage of the operator is very similar to remap function in OpenCV,
@@ -43626,7 +43626,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg h)) then h.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg s)) then s.UnsafeHandle|]
                                                  [|"out_dim"; "processing_batch_size"|]
                                                  [|string outDim; string processingBatchSize|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Apply CountSketch to input: map a d-dimension data to k-dimension data&quot;
     /// 
     /// .. note:: `count_sketch` is only available on GPU.
@@ -43816,7 +43816,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg offset)) then offset.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg bias)) then bias.UnsafeHandle|]
                                                  [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "layout"|]
                                                  [|(kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string numDeformableGroup; string workspace; string noBias; (if isNull (layout :> obj) then "None" else string layout)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Compute 2-D deformable convolution on 4-D input.
     /// 
     /// The deformable convolution operation is described in https://arxiv.org/abs/1703.06211
@@ -44084,7 +44084,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"compute_size"|]
                                                  [|string computeSize|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Apply 1D FFT to input&quot;
     /// 
     /// .. note:: `fft` is only available on GPU.
@@ -44159,7 +44159,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"compute_size"|]
                                                  [|string computeSize|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Apply 1D ifft to input&quot;
     /// 
     /// .. note:: `ifft` is only available on GPU.
@@ -44296,7 +44296,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg offset)) then offset.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mask)) then mask.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg bias)) then bias.UnsafeHandle|]
                                                  [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "im2col_step"; "layout"|]
                                                  [|(kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string numDeformableGroup; string workspace; string noBias; string im2colStep; (if isNull (layout :> obj) then "None" else string layout)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Compute 2-D modulated deformable convolution on 4-D input.
     /// 
     /// The modulated deformable convolution operation is described in https://arxiv.org/abs/1811.11168
@@ -44917,7 +44917,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data1)) then data1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data2)) then data2.UnsafeHandle|]
                                                  [|"kernel_size"; "max_displacement"; "stride1"; "stride2"; "pad_size"; "is_multiply"|]
                                                  [|string kernelSize; string maxDisplacement; string stride1; string stride2; string padSize; string isMultiply|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Applies correlation to inputs.
     /// 
     /// The correlation layer performs multiplicative patch comparisons between two feature maps.
@@ -45065,7 +45065,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
                                                  [|"transform_type"; "target_shape"|]
                                                  [|string transformType; (if isNull (targetShape :> obj) then "[0,0]" else (targetShape |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Generates 2D sampling grid for bilinear sampling.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the function.</param>
@@ -45995,7 +45995,7 @@ type MX() =
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg loc)) then loc.UnsafeHandle|]
                                                  [|"transform_type"; "sampler_type"; "target_shape"; "cudnn_off"|]
                                                  [|"affine"; "bilinear"; (match targetShape with None -> "[0,0]" | Some targetShape -> (targetShape |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match cudnnOff with None -> "None" | Some cudnnOff -> string cudnnOff)|]
-        outputs |> Array.map (fun h -> new NDArray(h))
+        (new NDArray(outputs.[0]))
     /// <summary>Applies a spatial transformer to input feature map.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the SpatialTransformerOp.</param>
