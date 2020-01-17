@@ -67,7 +67,7 @@ type SafeCudaModuleHandle(owner) =
         if not x.IsClosed then
             x.handle
         else
-            ObjectDisposedException("SafeCudaModuleHandle", "NDArray handle has been closed") |> raise
+            ObjectDisposedException("SafeCudaModuleHandle", "CudaModule handle has been closed") |> raise
 
 type SafeCudaKernelHandle(owner) = 
     inherit SafeHandle(0n, true)
@@ -79,8 +79,20 @@ type SafeCudaKernelHandle(owner) =
         if not x.IsClosed then
             x.handle
         else
-            ObjectDisposedException("SafeCudaKernelHandle", "NDArray handle has been closed") |> raise
-                                
+            ObjectDisposedException("SafeCudaKernelHandle", "CudaKernel handle has been closed") |> raise
+
+type SafeKVStoreHandle(owner) = 
+    inherit SafeHandle(0n, true)
+    new() = new SafeKVStoreHandle(true)
+    new(ptr,owner) as this = new SafeKVStoreHandle(owner) then this.SetHandle(ptr)
+    override x.IsInvalid = x.handle <= 0n
+    override x.ReleaseHandle() = CApi.MXKVStoreFree x.handle = 0
+    member internal x.UnsafeHandle = 
+        if not x.IsClosed then
+            x.handle
+        else
+            ObjectDisposedException("SafeKVStoreHandle", "KVStore handle has been closed") |> raise
+                                                
 [<Extension>]
 type ValueStringExtensions = ValueStringExtensions with
     [<Extension>] 
@@ -2220,14 +2232,16 @@ module MXKVStore =
     let create ``type`` = 
         let mutable out = un
         MXKVStoreCreate(``type``, &out) |> throwOnError "MXKVStoreCreate"
+        out
 
     /// <summary>Set parameters to use low-bit compressed gradients</summary>
     /// <param name="handle">handle to the kvstore</param>
     /// <param name="keys">keys for compression parameters</param>
     /// <param name="vals">values for compression parameters</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let setGradientCompression handle num_params keys vals = 
-        MXKVStoreSetGradientCompression(handle, num_params, keys, vals) |> throwOnError "MXKVStoreSetGradientCompression"
+    let setGradientCompression handle keys vals =
+        assert(length keys = length vals) 
+        MXKVStoreSetGradientCompression(handle, ulength keys, keys, vals) |> throwOnError "MXKVStoreSetGradientCompression"
 
     /// <summary>Delete a KVStore handle.</summary>
     /// <param name="handle">handle to the kvstore</param>
@@ -2237,21 +2251,21 @@ module MXKVStore =
 
     /// <summary>Init a list of (key,value) pairs in kvstore</summary>
     /// <param name="handle">handle to the kvstore</param>
-    /// <param name="num">the number of key-value pairs</param>
     /// <param name="keys">the list of keys</param>
     /// <param name="vals">the list of values</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let init handle num keys vals = 
-        MXKVStoreInit(handle, num, keys, vals) |> throwOnError "MXKVStoreInit"
+    let init handle (keys : int []) (vals : NDArrayHandle []) = 
+        assert(length keys = length vals)
+        MXKVStoreInit(handle, ulength keys, keys, vals) |> throwOnError "MXKVStoreInit"
 
     /// <summary>Init a list of (key,value) pairs in kvstore, where each key is a string</summary>
     /// <param name="handle">handle to the kvstore</param>
-    /// <param name="num">the number of key-value pairs</param>
     /// <param name="keys">the list of keys</param>
     /// <param name="vals">the list of values</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let initEx handle num keys vals = 
-        MXKVStoreInitEx(handle, num, keys, vals) |> throwOnError "MXKVStoreInitEx"
+    let initEx handle keys vals = 
+        assert(length keys = length vals)
+        MXKVStoreInitEx(handle, ulength keys, keys, vals) |> throwOnError "MXKVStoreInitEx"
 
     /// <summary>Push a list of (key,value) pairs to kvstore</summary>
     /// <param name="handle">handle to the kvstore</param>
@@ -2293,31 +2307,27 @@ module MXKVStore =
     /// <param name="ignore_sparse">whether to ignore sparse arrays in the request</param>
     /// <returns>0 when success, -1 when failure happens</returns>
     let pullWithSparseEx handle keys priority ignore_sparse : NDArrayHandle[] = 
-        let mutable vals = un //REVIEW is this right or should it be preallocated?
+        let mutable vals = un 
         MXKVStorePullWithSparseEx(handle, ulength keys, keys, &vals, priority, ignore_sparse) |> throwOnError "MXKVStorePullWithSparseEx"
         readStructArray (ulength keys) vals
 
     /// <summary>pull a list of (key, value) pairs from the kvstore</summary>
     /// <param name="handle">handle to the kvstore</param>
-    /// <param name="num">the number of key-value pairs</param>
     /// <param name="keys">the list of keys</param>
-    /// <param name="vals">the list of values</param>
     /// <param name="priority">the priority of the action</param>
     /// <returns>0 when success, -1 when failure happens</returns>
     let pull handle keys priority : NDArrayHandle[] = 
-        let mutable vals = un //REVIEW is this right or should it be preallocated?
+        let mutable vals = un 
         MXKVStorePull(handle, ulength keys, keys, &vals, priority) |> throwOnError "MXKVStorePull"
         readStructArray (ulength keys) vals
 
     /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is a string</summary>
     /// <param name="handle">handle to the kvstore</param>
-    /// <param name="num">the number of key-value pairs</param>
     /// <param name="keys">the list of keys</param>
-    /// <param name="vals">the list of values</param>
     /// <param name="priority">the priority of the action</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let pullEx handle num keys vals priority : NDArrayHandle[] = 
-        let mutable vals = un //REVIEW is this right or should it be preallocated?
+    let pullEx handle keys priority : NDArrayHandle[] = 
+        let mutable vals = un 
         MXKVStorePullEx(handle, ulength keys, keys, &vals, priority) |> throwOnError "MXKVStorePullEx"
         readStructArray (ulength keys) vals
 
@@ -2332,7 +2342,7 @@ module MXKVStore =
     /// <param name="priority">the priority of the action</param>
     /// <returns>0 when success, -1 when failure happens</returns>
     let pullRowSparse handle keys priority = 
-        let mutable vals = un //REVIEW is this right or should it be preallocated?
+        let mutable vals = un 
         let mutable row_ids = un
         MXKVStorePullRowSparse(handle, ulength keys, keys, &vals, &row_ids, priority) |> throwOnError "MXKVStorePullRowSparse"
         let vals = readStructArray (ulength keys) vals : NDArrayHandle[]
@@ -2411,6 +2421,149 @@ module MXKVStore =
         MXKVStoreGetType(handle, &tp) |> throwOnError "MXKVStoreGetType"
         str tp
 
+    /// <summary> return The rank of this node in its group, which is in [0, GroupSize).</summary>
+    /// <param name="handle"> handle to the KVStore</param>
+    /// <returns>the node rank</returns>
+    let getRank handle = 
+        let mutable ret = un
+        MXKVStoreGetRank(handle, &ret) |> throwOnError "MXKVStoreGetRank"
+        ret
+
+    /// <summary>return The number of nodes in this group, which is 
+    /// - number of workers if if `IsWorkerNode() == true`,
+    /// - number of servers if if `IsServerNode() == true`,
+    /// - 1 if `IsSchedulerNode() == true`, </summary>
+    /// <param name="handle"> handle to the KVStore</param>
+    /// <returns> the group size</returns>
+    let getGroupSize handle = 
+        let mutable ret = un
+        MXKVStoreGetGroupSize(handle, &ret) |> throwOnError "MXKVStoreGetGroupSize"
+        ret
+
+    /// <summary> return whether or not this process is a worker node.</summary>
+    /// <returns> 1 for yes, 0 for no</returns>
+    let isWorkerNode() = 
+        let mutable ret = un
+        MXKVStoreIsWorkerNode(&ret) |> throwOnError "MXKVStoreIsWorkerNode"
+        ret
+
+
+    /// <summar>return whether or not this process is a server node.</summary>
+    /// <returns> 1 for yes, 0 for no</returns>
+    let isServerNode() = 
+        let mutable ret = un
+        MXKVStoreIsServerNode(&ret) |> throwOnError "MXKVStoreIsServerNode"
+        ret
+
+    /// <summary>return whether or not this process is a scheduler node.</summary>
+    /// <returns> 1 for yes, 0 for no</returns>
+    let isSchedulerNode() = 
+        let mutable ret = un
+        MXKVStoreIsSchedulerNode(&ret) |> throwOnError "MXKVStoreIsSchedulerNode"
+        ret
+
+    /// <summary>global barrier among all worker machines</summary>
+    /// <param name="handle"> handle to the KVStore</param>
+    let barrier handle = 
+        MXKVStoreBarrier(handle) |> throwOnError "MXKVStoreBarrier"
+
+    /// <summary>rwhether to do barrier when finalize</summary>
+    /// <param name="handle"> handle to the KVStore</param>
+    /// <param name="barrier_before_exit"> whether to do barrier when kvstore finalize</param>
+    let setBarrierBeforeExit handle barrier_before_exit = 
+        MXKVStoreSetBarrierBeforeExit(handle, barrier_before_exit) |> throwOnError "MXKVStoreSetBarrierBeforeExit"
+
+    /// <summary>rRun as server (or scheduler)</summary>
+    /// <param name="handle"> handle to the KVStore</param>
+    /// <param name="controller"> the user-defined server controller</param>
+    /// <param name="controller_handle"> helper handle for implementing controller</param>
+    let runServer handle controller controller_handle = 
+        MXKVStoreRunServer(handle, controller, controller_handle) |> throwOnError "MXKVStoreRunServer"
+
+    /// <summary>rSend a command to all server nodes</summary>
+    /// <param name="handle"> handle to the KVStore</param>
+    /// <param name="cmd_id"> the head of the command</param>
+    /// <param name="cmd_body"> the body of the command</param>
+    let sendCommmandToServers handle cmd_id cmd_body = 
+        MXKVStoreSendCommmandToServers(handle, cmd_id, cmd_body) |> throwOnError "MXKVStoreSendCommmandToServers"
+
+    /// <summary>rGet the number of ps dead node(s) specified by {node_id}</summary>
+    /// <param name="handle"> handle to the KVStore</param>
+    /// <param name="node_id"> Can be a node group or a single node.
+    ///    kScheduler = 1, kServerGroup = 2, kWorkerGroup = 4</param>
+    /// <param name="timeout_sec"> A node fails to send heartbeart in {timeout_sec} seconds
+    /// will be presumed as 'dead'</param>
+    /// <returns> Ouptut number of dead nodes</returns>
+    let getNumDeadNode handle node_id timeout_sec = 
+        let mutable number = un
+        MXKVStoreGetNumDeadNode(handle, node_id, &number, timeout_sec) |> throwOnError "MXKVStoreGetNumDeadNode"
+        number
+
+
+module MXRecordIO = 
+    /// <summary>rCreate a RecordIO writer object</summary>
+    /// <param name="uri"> path to file</param>
+    /// <returns> handle pointer to the created object</returns>
+    let writerCreate uri = 
+        let mutable out = un
+        MXRecordIOWriterCreate(uri, &out) |> throwOnError "MXRecordIOWriterCreate"
+        out
+
+    /// <summary>rDelete a RecordIO writer object</summary>
+    /// <param name="handle"> handle to RecordIO object</param>
+    let writerFree handle = 
+        MXRecordIOWriterFree(handle) |> throwOnError "MXRecordIOWriterFree"
+
+    /// <summary>rWrite a record to a RecordIO object</summary>
+    /// <param name="handle"> handle to RecordIO object</param>
+    /// <param name="buf"> buffer to write</param>
+    /// <param name="size"> size of buffer</param>
+    let writerWriteRecord handle buf size = 
+        MXRecordIOWriterWriteRecord(handle, buf, size) |> throwOnError "MXRecordIOWriterWriteRecord"
+
+    /// <summary>rGet the current writer pointer position</summary>
+    /// <param name="handle"> handle to RecordIO object</param>
+    /// <returns> handle to output position</returns>
+    let writerTell handle = 
+        let mutable pos = un
+        MXRecordIOWriterTell(handle, &pos) |> throwOnError "MXRecordIOWriterTell"
+        pos
+
+    /// <summary>rCreate a RecordIO reader object</summary>
+    /// <param name="uri"> path to file</param>
+    /// <returns> handle pointer to the created object</returns>
+    let readerCreate uri = 
+        let mutable out = un
+        MXRecordIOReaderCreate(uri, &out) |> throwOnError "MXRecordIOReaderCreate"
+        out
+
+    /// <summary>rDelete a RecordIO reader object</summary>
+    /// <param name="handle"> handle to RecordIO object</param>
+    let readerFree handle = 
+        MXRecordIOReaderFree(handle) |> throwOnError "MXRecordIOReaderFree"
+
+    /// <summary>rWrite a record to a RecordIO object</summary>
+    /// <param name="handle"> handle to RecordIO object</param>
+    /// <param name="buf"> pointer to return buffer</param>
+    /// <returns> point to size of buffer</returns>
+    let readerReadRecord handle buf size = 
+        let mutable size = un
+        MXRecordIOReaderReadRecord(handle, buf, &size) |> throwOnError "MXRecordIOReaderReadRecord"
+        size
+ 
+    /// <summary>rSet the current reader pointer position</summary>
+    /// <param name="handle"> handle to RecordIO object</param>
+    /// <param name="pos"> target position</param>
+    let readerSeek handle pos = 
+        MXRecordIOReaderSeek(handle, pos) |> throwOnError "MXRecordIOReaderSeek"
+
+    /// <summary>rGet the current writer pointer position</summary>
+    /// <param name="handle"> handle to RecordIO object</param>
+    /// <param name="pos"> handle to output position</param>
+    let readerTell handle = 
+        let mutable size = un
+        MXRecordIOReaderTell(handle, &size) |> throwOnError "MXRecordIOReaderTell"
+        size
 
 module MXAutograd = 
     /// <summary>set whether to record operator for autograd</summary>

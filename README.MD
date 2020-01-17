@@ -221,6 +221,7 @@ With F# friendly wrappers in [MXNetSharp.Interop](MXNetSharp/interop.fs) with th
 - MXAutograd
 - MXRtc
 - MXEngine
+- MXRecordIO
 
 
 ## Symbol API
