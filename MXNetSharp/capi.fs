@@ -2002,7 +2002,7 @@ extern int MXKVStoreGetType(KVStoreHandle handle, [<Out>] IntPtr& ``type``)
 /// <param name="handle"> handle to the KVStore</param>
 /// <param name="ret">the node rank</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreGetRank__(KVStoreHandle handle, int[] ret)
+extern int MXKVStoreGetRank(KVStoreHandle handle, [<Out>] int& ret)
 
 /// <summary>return The number of nodes in this group, which is 
 /// - number of workers if if `IsWorkerNode() == true`,
@@ -2011,34 +2011,34 @@ extern int MXKVStoreGetRank__(KVStoreHandle handle, int[] ret)
 /// <param name="handle"> handle to the KVStore</param>
 /// <param name="ret"> the group size</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreGetGroupSize__(KVStoreHandle handle, int[] ret)
+extern int MXKVStoreGetGroupSize(KVStoreHandle handle, [<Out>] int& ret)
 
 /// <summary> return whether or not this process is a worker node.</summary>
 /// <param name="ret"> 1 for yes, 0 for no</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreIsWorkerNode__(int[] ret)
+extern int MXKVStoreIsWorkerNode([<Out>] int& ret)
 
 
 /// <summar>return whether or not this process is a server node.</summary>
 /// <param name="ret"> 1 for yes, 0 for no</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreIsServerNode__(int[] ret)
+extern int MXKVStoreIsServerNode([<Out>] int& ret)
 
 /// <summary>return whether or not this process is a scheduler node.</summary>
 /// <param name="ret"> 1 for yes, 0 for no</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreIsSchedulerNode__(int[] ret)
+extern int MXKVStoreIsSchedulerNode([<Out>] int& ret)
 
 /// <summary>global barrier among all worker machines</summary>
 /// <param name="handle"> handle to the KVStore</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreBarrier__(KVStoreHandle handle)
+extern int MXKVStoreBarrier(KVStoreHandle handle)
 
 /// <summary>rwhether to do barrier when finalize</summary>
 /// <param name="handle"> handle to the KVStore</param>
 /// <param name="barrier_before_exit"> whether to do barrier when kvstore finalize</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreSetBarrierBeforeExit__(KVStoreHandle handle, int barrier_before_exit)
+extern int MXKVStoreSetBarrierBeforeExit(KVStoreHandle handle, int barrier_before_exit)
 
 /// <summary>rthe prototype of a server controller</summary>
 /// <param name="head"> the head of the command</param>
@@ -2051,14 +2051,14 @@ type MXKVStoreServerController = delegate of int * string * IntPtr -> unit
 /// <param name="controller"> the user-defined server controller</param>
 /// <param name="controller_handle"> helper handle for implementing controller</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreRunServer__(KVStoreHandle handle, MXKVStoreServerController controller, IntPtr controller_handle)
+extern int MXKVStoreRunServer(KVStoreHandle handle, MXKVStoreServerController controller, IntPtr controller_handle)
 
 /// <summary>rSend a command to all server nodes</summary>
 /// <param name="handle"> handle to the KVStore</param>
 /// <param name="cmd_id"> the head of the command</param>
 /// <param name="cmd_body"> the body of the command</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreSendCommmandToServers__(KVStoreHandle handle, int cmd_id, string cmd_body)
+extern int MXKVStoreSendCommmandToServers(KVStoreHandle handle, int cmd_id, string cmd_body)
 
 /// <summary>rGet the number of ps dead node(s) specified by {node_id}</summary>
 /// <param name="handle"> handle to the KVStore</param>
@@ -2068,61 +2068,61 @@ extern int MXKVStoreSendCommmandToServers__(KVStoreHandle handle, int cmd_id, st
 /// <param name="timeout_sec"> A node fails to send heartbeart in {timeout_sec} seconds
 /// will be presumed as 'dead'</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStoreGetNumDeadNode__(KVStoreHandle handle, int node_id, int[] number, int timeout_sec (*=60*))
+extern int MXKVStoreGetNumDeadNode(KVStoreHandle handle, int node_id, [<Out>] int& number, int timeout_sec (*=60*))
 
 /// <summary>rCreate a RecordIO writer object</summary>
 /// <param name="uri"> path to file</param>
 /// <param name="out"> handle pointer to the created object</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRecordIOWriterCreate__(string uri, RecordIOHandle[] out)
+extern int MXRecordIOWriterCreate(string uri, [<Out>] RecordIOHandle& out)
 
 /// <summary>rDelete a RecordIO writer object</summary>
 /// <param name="handle"> handle to RecordIO object</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRecordIOWriterFree__(RecordIOHandle handle)
+extern int MXRecordIOWriterFree(RecordIOHandle handle)
 
 /// <summary>rWrite a record to a RecordIO object</summary>
 /// <param name="handle"> handle to RecordIO object</param>
 /// <param name="buf"> buffer to write</param>
 /// <param name="size"> size of buffer</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRecordIOWriterWriteRecord__(RecordIOHandle handle, string buf, size_t size)
+extern int MXRecordIOWriterWriteRecord(RecordIOHandle handle, string buf, size_t size)
 
 /// <summary>rGet the current writer pointer position</summary>
 /// <param name="handle"> handle to RecordIO object</param>
 /// <param name="pos"> handle to output position</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRecordIOWriterTell__(RecordIOHandle handle, size_t[] pos)
+extern int MXRecordIOWriterTell(RecordIOHandle handle, [<Out>]size_t& pos)
 
 /// <summary>rCreate a RecordIO reader object</summary>
 /// <param name="uri"> path to file</param>
 /// <param name="out"> handle pointer to the created object</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRecordIOReaderCreate__(string uri, RecordIOHandle[] out)
+extern int MXRecordIOReaderCreate(string uri, [<Out>] RecordIOHandle& out)
 
 /// <summary>rDelete a RecordIO reader object</summary>
 /// <param name="handle"> handle to RecordIO object</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRecordIOReaderFree__(RecordIOHandle handle)
+extern int MXRecordIOReaderFree(RecordIOHandle handle)
 
 /// <summary>rWrite a record to a RecordIO object</summary>
 /// <param name="handle"> handle to RecordIO object</param>
 /// <param name="buf"> pointer to return buffer</param>
 /// <param name="size"> point to size of buffer</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRecordIOReaderReadRecord__(RecordIOHandle handle, string[] buf, size_t[] size)
+extern int MXRecordIOReaderReadRecord(RecordIOHandle handle, [<Out>] IntPtr buf, [<Out>]size_t& size)
 
 /// <summary>rSet the current reader pointer position</summary>
 /// <param name="handle"> handle to RecordIO object</param>
 /// <param name="pos"> target position</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRecordIOReaderSeek__(RecordIOHandle handle, size_t pos)
+extern int MXRecordIOReaderSeek(RecordIOHandle handle, size_t pos)
 
 /// <summary>rGet the current writer pointer position</summary>
 /// <param name="handle"> handle to RecordIO object</param>
 /// <param name="pos"> handle to output position</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXRecordIOReaderTell__(RecordIOHandle handle, size_t[] pos)
+extern int MXRecordIOReaderTell(RecordIOHandle handle, [<Out>]size_t& size)
 
 /// <summary>rCreate a MXRtc object</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
