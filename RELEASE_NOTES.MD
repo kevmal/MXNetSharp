@@ -1,3 +1,7 @@
+#### Master
+* Custom type to simplify implementing custom operators on Symbol
+
+
 #### 0.0.3 (2020-01-14)
 * Issue #20: Added Constant:>Variable type
 * Issue #19: Empty NDArray error on ToString
