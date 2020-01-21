@@ -30,6 +30,7 @@ open MathNet.Numerics.Distributions
 open MathNet.Numerics.Statistics
 
 
+
 let printShapes (b : Bindings) = 
     b.Bindings.Values
     |> Seq.iter 
@@ -237,228 +238,43 @@ module MyOps =
         member __.Data = operatorArguments.GetInput "data"
 
 
-let q = Statistics.quantileFunc [|1.0 .. 100.0|]
-q 1.0
 
-let rng = Random(3423)
-
-let ctx = CPU 0
-let odst (dat : NDArray option) inFeatures numTrees treeDim depth flatten (x : Symbol) = 
-    //let response = Parameter("response", shape = [numTrees; treeDim; pown 2 depth]) //init normal 0.0 1.0
-    let response = Parameter("response", ndarray = ctx.RandomNormal([numTrees; treeDim; pown 2 depth])) //init normal 0.0 1.0
-    //let featureSelectionLogits = Parameter("featureSelectionLogits", shape = [inFeatures; numTrees; depth])
-    let featureSelectionLogits = Parameter("featureSelectionLogits", ndarray = ctx.RandomUniform([inFeatures; numTrees; depth]))
-    //let featureThresholds = Parameter("featureThresholds", shape = [numTrees; depth])
-    let featureThresholds = Parameter("featureThresholds", ndarray = ctx.RandomNormal([numTrees; depth]))
-    //let logTemperatures = Parameter("logTemperatures", shape = [numTrees; depth])
-    let logTemperatures = Parameter("logTemperatures", ndarray = ctx.RandomNormal([numTrees; depth]))
-    let binCodesOneHot = 
-        let ctx = CPU 0
-        let indices = ctx.Arange(start = 0.0, stop = double(pown 2 depth))
-        let offsets = 2.0 ** ctx.Arange(start = 0.0, stop = double depth)
-        let binCodes = 
-            let x = indices.AsType(DataType.Int32).Reshape(1,-1) ./ offsets.AsType(DataType.Int32).Reshape(-1,1)
-            (x % 2.0).AsType(DataType.Float32)
-        let binCodesOneHot = MX.Stack(binCodes, 1.0 - binCodes, axis = -1)
-        Constant(binCodesOneHot, "binCodesOneHot")
+let c = CPU 0
 
 
-    let featureSelectors = Entmax15(featureSelectionLogits, 0)
+let m = c.Arange(0.0, double (6*5*4)).Reshape(6,5,4)
+let x = Parameter("x", ndarray = m,grad = MX.ZerosLike(m), opReqType = OpReqType.WriteTo)
+let s = Entmoid15(x)
 
-    let featureValues = Dot(x, featureSelectors)
-    
-    match dat with 
-    | Some nd ->
-        let bm = 
-            featureValues.Bindings
-            |> Bindings.map
-                (fun a -> 
-                    if a.Name = x.Name then 
-                        Bind.Arg(name = x.Name, ndarray = nd, grad = new NDArray(), opReqType = OpReqType.NullOp, shape = nd.Shape)
-                    else a
-                )
-            |> Bindings.inferShapes featureValues
-            |> Bindings.init (fun a b -> printfn "---> %A" a.Name; ctx.Zeros(b))
-        let output = featureValues.Eval(ctx,bm).Outputs.[0]
-        printfn "vals %A" output
-        let q = output.ToDoubleArray() |> Statistics.quantileFunc
-        let initV = Sample.betaSeq 1.0 1.0 rng |> Seq.take (numTrees * depth) |> Seq.map q |> Seq.toArray
-        printfn "initV %A" initV
-        printfn "initVmax %A" (initV |> Array.max)
-        featureThresholds.NDArray.Value.CopyFrom(initV)
-        let crap = abs(output .- MX.ExpandDims(featureThresholds.NDArray.Value,0))
-        printfn "crap %A" (crap.ToFloat32Array())
-        let temp = Array.CreateInstance(typeof<float32>, numTrees, depth)
-        [|
-            for i = 0 to numTrees - 1 do 
-            for j = 0 to depth - 1 do 
-                i,j
-        |]
-        |> Array.iter 
-            (fun (i,j) ->
-                let a = crap.[*,i,j]
-                //pritnfn "%A" (i,j,a.Shape)
-                let v = a.ToFloat32Array() |> Array.max   //q = 1
-                temp.SetValue(v,i,j)
-            )
-        printfn "temp %A" temp
-        //let temp = temp / 1.0
-        let initTemp = (log (ctx.CopyFrom(temp)) + 1e-6)
-        printfn "inittemp %A" initTemp
-        printfn "inittemp %A" (initTemp.ToFloat32Array())
-        initTemp.CopyTo(logTemperatures.NDArray.Value) |> ignore
-    | None -> ()
+let r = s.Bind(c)
 
-    let thresholdLogits = 
-        let tl = (featureValues .- ExpandDims(featureThresholds, 0)) .* ExpandDims(exp(-logTemperatures), 0)
-        Stack([-tl; tl], -1)
+r.Forward(true)
+//r.Backward([MX.OnesLike(x.NDArray.Value)])
+m.UnsafeHandle
+r.Backward([m])
 
 
-    let bins = Entmoid15(thresholdLogits)
+NDArray.WaitAll()
 
-    let binMatches = NpiEinsum([bins :> Symbol; binCodesOneHot :> Symbol], "btds,dcs->btdc")
-    let responseWeights = Prod(binMatches, [-2])
-    let output = NpiEinsum([responseWeights :> Symbol; response :> Symbol], "bnd,ncd->bnc")
-    if flatten then Flatten(output) :> Symbol else output :> Symbol
-
-let trainSize = 463715
-let testSize = 51630
-
-let allData = 
-    //File.ReadAllLines("D:\Data\yeaddataset\YearPredictionMSD.txt")
-    File.ReadAllLines("YearPredictionMSD.txt")
-    |> Array.map 
-        (fun line -> 
-            let fields = line.Split(',')
-            let year = fields.[0] |> int
-            let features = fields.[1 ..] |> Array.map float32
-            year,features
-        )
-let trainSet, testSet = allData |> Array.splitAt 463715
-
-
-let flength = (snd trainSet.[0]).Length
-
-let norm = Normal()
-let transforms = 
-    let samples = 
-        Array.init flength (fun _ -> norm.Samples() |> Seq.take trainSet.Length |> Seq.toArray)
-    Array.Parallel.init flength
-        (fun i -> 
-            let c = trainSet |> Array.map (fun (_,x) -> double x.[i]) 
-            let qnoise = 1e-3
-            let std = ArrayStatistics.StandardDeviation(c)
-            let nstd = qnoise / (max std qnoise)
-            for j = 0 to c.Length - 1 do 
-                c.[j] <- c.[j] + nstd*samples.[i].[j]
-            let cdf = Statistics.empiricalCDFFunc c
-            (fun x -> norm.InverseCumulativeDistribution(cdf x))
-        )
-
-let trainSet2 = 
-    let a = trainSet |> Array.Parallel.map (fun (year,fs) -> year, Array.copy fs)
-    a
-    |> Array.Parallel.iter 
-        (fun (_year,fs) ->
-            for i = 0 to fs.Length - 1 do 
-                fs.[i] <- transforms.[i] (double fs.[i]) |> float32
-        )
-    a
-let testSet2 = 
-    let a = testSet |> Array.Parallel.map (fun (year,fs) -> year, Array.copy fs)
-    a
-    |> Array.Parallel.iter 
-        (fun (_year,fs) ->
-            for i = 0 to fs.Length - 1 do 
-                fs.[i] <- transforms.[i] (double fs.[i]) |> float32
-        )
-    a
-
-let tymu,tystd = ArrayStatistics.MeanStandardDeviation(trainSet2 |> Array.map fst)
-
-let yTrain = trainSet2 |> Array.map fst |> Array.map (fun x -> (double x - tymu) / tystd |> float32)
-let yTest = testSet2 |> Array.map fst |> Array.map (fun x -> (double x - tymu) / tystd |> float32)
-
-let initBatch = 
-    let ix = MX.Shuffle(ctx.Arange(0.0, double trainSet.Length)).ToIntArray() |> Array.truncate 1000 
-    let x = ix |> Array.map (fun i -> trainSet2.[i] |> snd)
-    ctx.CopyFrom(x |> Array.concat, shape = [1000;flength])
-
-
-
-let inp = Input("x", [0; flength])
-
-
-let l1 = odst (Some initBatch) flength 2048 3 6 false inp
-
-
-let otp = l1.[*,*,0] .>> Reshape(shape = [0;0]) .>> Mean(axis = [-1])
-
-
-let label = Input("label", [0])
-let loss = label - otp .>> Square() .>> Mean() .>> MakeLoss()
-
-
-//otp.Bindings |> Bindings.batchSize 1000 |> Bindings.inferShapes otp |> printShapes |> ignore
-//loss.Bindings |> Bindings.batchSize 1000 |> Bindings.inferShapes loss |> printShapes |> ignore
-
-
-type AdamOptimizer(e : Executor, ?beta1, ?beta2) =
-    let beta1 = defaultArg beta1 0.9
-    let beta2 = defaultArg beta2 0.999
-    let mutable updateCount = 0
-    let lu = 
-        let d = Dictionary<string, NDArray*NDArray>()
-        fun (s : String) (a : NDArray) ->
-            let scc,v = d.TryGetValue(s)
-            if scc then 
-                v
-            else
-                let v = MX.ZerosLike(a),MX.ZerosLike(a)
-                d.[s] <- v
-                v
-    member x.Update(learningRate) = 
-        updateCount <- updateCount + 1
-        let t = double updateCount
-        let lr = learningRate*sqrt(1.0 - Math.Pow(beta2,t)) / (1.0 - Math.Pow(beta1,t))
-        e.Bindings
-        |> Seq.iter
-            (fun a ->
-                match a with 
-                | ArgBinding ({Name = name; OpReqType = Some WriteTo; Grad = Some grad; NDArray = Some weight}) -> 
-                    let m,v = lu name grad
-                    MX.AdamUpdate([weight], weight, grad , m, v, lr, beta1, beta2)
-                | _ -> ()
-            )
-
-
-let bm = loss.Bindings |> Bindings.batchSize 512 |> Bindings.inferShapes loss |> Bindings.init (fun _ s -> ctx.Zeros(s))
-let exe = loss.Bind(ctx,bm)
-bm |> printShapes |> ignore
-let opt = AdamOptimizer(exe)
-
-let epoch = MX.Shuffle(ctx.Arange(0.0, double trainSet.Length)).ToIntArray() |> Array.chunkBySize 512 |> Array.filter (fun x -> x.Length = 512)
-epoch.Length
-
-
-for i = 0 to epoch.Length - 1 do
-    printfn "%d" i
-    GC.Collect()
-    let bi = epoch.[i]
-    let x = bi |> Array.map (fun i -> trainSet2.[i] |> snd)
-    let y = bi |> Array.map (fun i -> yTrain.[i])
-    exe.[label].CopyFrom(y)
-    exe.[inp].CopyFrom(x |> Array.concat)
-    exe.Forward(true)
-    exe.Backward()
-    opt.Update(0.001)
-    printfn "%f" (exe.Outputs.[0].ToFloat32Scalar())
-
-exe.Bindings
-|> Seq.iter 
+r.Bindings.[x].Shape
+r.Bindings.[x].Grad.Value.ToArray<float32>()
+|> Array.chunkBySize 4
+|> Array.iter 
     (fun x ->
-        match x.Grad with 
-        | Some g -> printfn "%A" (x.Name, g.ToFloat32Array() )
-        | _ -> ()
+        x |> Array.map (sprintf "%0.4f") |> String.concat ", " |> printfn "%s"
     )
+
+
+
+r.Outputs.[0].Shape
+r.Outputs.[0].DataType
+r.Outputs.[0].ToArray()
+r.Outputs.[0].ToArray<float32>()
+|> Array.chunkBySize 4
+|> Array.iter 
+    (fun x ->
+        x |> Array.map (sprintf "%0.4f") |> String.concat ", " |> printfn "%s"
+    )
+
+
 

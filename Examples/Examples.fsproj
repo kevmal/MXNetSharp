@@ -10,6 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="entmoidtest.fsx" />
+    <None Include="entmaxtest.fsx" />
     <None Include="Node - Copy - Copy - Copy - Copy (2).fsx" />
     <None Include="Node - Copy - Copy - Copy - Copy.fsx" />
     <None Include="TCN\MNIST.fsx" />
