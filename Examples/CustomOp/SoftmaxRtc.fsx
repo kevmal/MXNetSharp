@@ -1,12 +1,8 @@
 ﻿#load "../load.fsx"
-open Load
 
 open MXNetSharp
 open MXNetSharp.Interop
-open MXNetSharp.PrimitiveOperators
-open MXNetSharp.SymbolOperators
 open MXNetSharp.Operator
-open MXNetSharp.SymbolArgument
 
 
 
@@ -110,24 +106,12 @@ CustomOp.register "mysoftmax"
         } :> _
     )
  
-type MySoftmax private (operatorArguments) = 
-    inherit SymbolOperator("Custom", operatorArguments)
-    static member CreateFromArguments(args : Arguments<Symbol>) = new MySoftmax(args)
-    override this.WithArguments(args : Arguments<Symbol>) = new MySoftmax(this.OperatorArguments.AddReplace(args)) :> Symbol
-    new(?data : Symbol) = 
-        let data = defaultArg data (new ImplicitVariable() :> Symbol)
-        let operatorArguments = 
-            [
-                "data", Input data
-                "op_type", Parameter(Some("mysoftmax" :> obj))
-            ]
-        new MySoftmax(Arguments<Symbol>(operatorArguments))
-
-    member __.Data = operatorArguments.GetInput "data"
+type MySoftmax(?data) = 
+    inherit Custom("mysoftmax", Array.empty, [|data|])
+    member x.Data = x.OperatorArguments.GetInput "data"
 
 let inp = (GPU 0).Arange(1.0,11.0).Reshape(2,5)
 
-open MXNetSharp
 let x = Input("x", ndarray = inp)
 let op = MySoftmax(x)
 
