@@ -1666,6 +1666,7 @@ let skipped =
         "Crop" //DEPRECATED
         "_NDArray" // ptr type
         "_Native" // ptr type
+        "Custom" // manually implemented
     ] |> Set.ofSeq
 
 

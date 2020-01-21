@@ -6604,87 +6604,6 @@ type MX() =
         Cond(numOutputs, condInputLocs, thenInputLocs, elseInputLocs, ?cond = cond, ?thenBranch = thenBranch, ?elseBranch = elseBranch, ?data = data)
 
 
-    /// <summary>Apply a custom operator implemented in a frontend language (like Python).
-    /// 
-    /// Custom operators should override required methods like `forward` and `backward`.
-    /// The custom operator must be registered before it can be used.
-    /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
-    /// <param name="data">Input data for the custom operator.</param>
-    /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
-    static member Custom([<ParamArray>] data : NDArray[], opType : string) =
-        let creator = AtomicSymbolCreator.FromName "Custom"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 (data |> Array.map (fun x -> x.UnsafeHandle))
-                                                 [|"op_type"|]
-                                                 [|opType|]
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>Apply a custom operator implemented in a frontend language (like Python).
-    /// 
-    /// Custom operators should override required methods like `forward` and `backward`.
-    /// The custom operator must be registered before it can be used.
-    /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input data for the custom operator.</param>
-    /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
-    static member Custom(outputArray : NDArray seq, [<ParamArray>] data : NDArray[], opType : string) =
-        let creator = AtomicSymbolCreator.FromName "Custom"
-        let names = [|"op_type"|]
-        let vals = [|opType|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     (data |> Array.map (fun x -> x.UnsafeHandle))
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Apply a custom operator implemented in a frontend language (like Python).
-    /// 
-    /// Custom operators should override required methods like `forward` and `backward`.
-    /// The custom operator must be registered before it can be used.
-    /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
-    /// <param name="data">Input data for the custom operator.</param>
-    /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
-    static member Custom(data : Symbol seq, opType : string) =
-        Custom(data, opType)
-    /// <summary>Apply a custom operator implemented in a frontend language (like Python).
-    /// 
-    /// Custom operators should override required methods like `forward` and `backward`.
-    /// The custom operator must be registered before it can be used.
-    /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
-    /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
-    /// <param name="data">Input data for the custom operator.</param>
-    static member Custom(opType : string, [<Optional>] ?data : Symbol seq) =
-        Custom(opType, ?data = data)
-    /// <summary>Apply a custom operator implemented in a frontend language (like Python).
-    /// 
-    /// Custom operators should override required methods like `forward` and `backward`.
-    /// The custom operator must be registered before it can be used.
-    /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
-    /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
-    /// <param name="data">Input data for the custom operator.</param>
-    static member Custom(opType : string, [<ParamArray>] data : Symbol[]) =
-        Custom(opType, data)
-
 
     /// <param name="data">Data</param>
     static member FusedOp([<ParamArray>] data : NDArray[]) =
@@ -46252,6 +46171,87 @@ type MX() =
     /// <param name="mean">image mean</param>
     static member Imdecode(index : int, x0 : int, y0 : int, x1 : int, y1 : int, c : int, size : int, [<Optional>] ?mean : Symbol) =
         Imdecode(index, x0, y0, x1, y1, c, size, ?mean = mean)
+//     /// <summary>Apply a custom operator implemented in a frontend language (like Python).
+//     /// 
+//     /// Custom operators should override required methods like `forward` and `backward`.
+//     /// The custom operator must be registered before it can be used.
+//     /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
+//     /// 
+//     /// 
+//     /// 
+//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
+//     /// <param name="data">Input data for the custom operator.</param>
+//     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
+//     static member Custom([<ParamArray>] data : NDArray[], opType : string) =
+//         let creator = AtomicSymbolCreator.FromName "Custom"
+//         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+//                                                  (data |> Array.map (fun x -> x.UnsafeHandle))
+//                                                  [|"op_type"|]
+//                                                  [|opType|]
+//         outputs |> Array.map (fun h -> new NDArray(h))
+//     /// <summary>Apply a custom operator implemented in a frontend language (like Python).
+//     /// 
+//     /// Custom operators should override required methods like `forward` and `backward`.
+//     /// The custom operator must be registered before it can be used.
+//     /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
+//     /// 
+//     /// 
+//     /// 
+//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
+//     /// <param name = "outputArray">Array of NDArray for outputs</param>
+//     /// <param name="data">Input data for the custom operator.</param>
+//     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
+//     static member Custom(outputArray : NDArray seq, [<ParamArray>] data : NDArray[], opType : string) =
+//         let creator = AtomicSymbolCreator.FromName "Custom"
+//         let names = [|"op_type"|]
+//         let vals = [|opType|]
+//         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+//         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+//                                                      (data |> Array.map (fun x -> x.UnsafeHandle))
+//                                                      (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+//                                                      names
+//                                                      vals
+//         ()
+//     /// <summary>Apply a custom operator implemented in a frontend language (like Python).
+//     /// 
+//     /// Custom operators should override required methods like `forward` and `backward`.
+//     /// The custom operator must be registered before it can be used.
+//     /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
+//     /// 
+//     /// 
+//     /// 
+//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
+//     /// <param name="data">Input data for the custom operator.</param>
+//     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
+//     static member Custom(data : Symbol seq, opType : string) =
+//         Custom(data, opType)
+//     /// <summary>Apply a custom operator implemented in a frontend language (like Python).
+//     /// 
+//     /// Custom operators should override required methods like `forward` and `backward`.
+//     /// The custom operator must be registered before it can be used.
+//     /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
+//     /// 
+//     /// 
+//     /// 
+//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
+//     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
+//     /// <param name="data">Input data for the custom operator.</param>
+//     static member Custom(opType : string, [<Optional>] ?data : Symbol seq) =
+//         Custom(opType, ?data = data)
+//     /// <summary>Apply a custom operator implemented in a frontend language (like Python).
+//     /// 
+//     /// Custom operators should override required methods like `forward` and `backward`.
+//     /// The custom operator must be registered before it can be used.
+//     /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
+//     /// 
+//     /// 
+//     /// 
+//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
+//     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
+//     /// <param name="data">Input data for the custom operator.</param>
+//     static member Custom(opType : string, [<ParamArray>] data : Symbol[]) =
+//         Custom(opType, data)
+
 //     /// <summary>
 //     /// 
 //     /// .. note:: `Crop` is deprecated. Use `slice` instead.

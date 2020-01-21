@@ -484,6 +484,39 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
     interface ISymbolComposable with 
         member x.ComposedWith(y) = x.ComposedWith(y)
 
+type Custom(name : string, parameters : (string*(obj option)) [], inputs : Symbol option []) = 
+    inherit 
+        SymbolOperator("Custom", 
+            Arguments(
+                [|
+                    "op_type",  Parameter(Some(name :> obj))
+                    "data", VarArg("num_args", inputs |> Seq.map (function None -> ImplicitVariable() :> Symbol | Some v -> v) |> Seq.toArray)
+                    yield! parameters |> Seq.map (fun (n,v) -> n, Parameter(v))
+                |]))
+    override x.Initialize() =   
+        match x.InternalHandle with 
+        | Some _ -> ()
+        | None ->
+            try
+                let keys,vals =     
+                    [|
+                        "op_type", name
+                        "num_args", inputs.Length.ValueString()
+                        yield! 
+                            parameters 
+                            |> Array.choose 
+                                (fun (k,v) -> 
+                                    match v with 
+                                    | Some v -> Some(k,v.ValueString())
+                                    | None -> None)
+                    |] |> Array.unzip
+                let symbol = MXSymbol.createAtomicSymbol x.AtomicSymbolCreator.AtomicSymbolCreatorHandle keys vals
+                x.InternalHandle <- Some(new SafeSymbolHandle(symbol, true))
+                let ivals = x.OperatorArguments.GetVarArg("data") |> Array.map (fun x -> x.UnsafeHandle)
+                MXSymbol.compose symbol name null ivals
+            with
+            | e -> raise(SymbolInitilizationException(x, e))
+
 type Hole() = 
     inherit Variable()
     default x.Copy() = Hole() :> Symbol
@@ -6218,84 +6251,6 @@ module SymbolOperators =
                     elseInputLocs |> Option.map (fun x -> "else_input_locs", Parameter(Some (box x)))
                 ] |> List.choose id
             new Cond(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
-    
-    type Custom private (operatorArguments) = 
-        inherit SymbolOperator("Custom", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new Custom(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new Custom(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <summary>Apply a custom operator implemented in a frontend language (like Python).
-        /// 
-        /// Custom operators should override required methods like `forward` and `backward`.
-        /// The custom operator must be registered before it can be used.
-        /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
-        /// 
-        /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
-        /// <param name="data">Input data for the custom operator.</param>
-        /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
-        new(data : Symbol seq,
-            opType : string) = 
-            let operatorArguments = 
-                [
-                    "data", VarArg("", data |> Seq.toArray)
-                    "op_type", Parameter(Some(box opType))
-                ]
-            new Custom(Arguments<Symbol>(operatorArguments))
-        /// <summary>Apply a custom operator implemented in a frontend language (like Python).
-        /// 
-        /// Custom operators should override required methods like `forward` and `backward`.
-        /// The custom operator must be registered before it can be used.
-        /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
-        /// 
-        /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
-        /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
-        /// <param name="data">Input data for the custom operator.</param>
-        new(opType : string,
-            [<Optional>] ?data : Symbol seq) = 
-            let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
-            let operatorArguments = 
-                [
-                    "data", VarArg("", data)
-                    "op_type", Parameter(Some(box opType))
-                ]
-            new Custom(Arguments<Symbol>(operatorArguments))
-        /// <summary>Apply a custom operator implemented in a frontend language (like Python).
-        /// 
-        /// Custom operators should override required methods like `forward` and `backward`.
-        /// The custom operator must be registered before it can be used.
-        /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
-        /// 
-        /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
-        /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
-        /// <param name="data">Input data for the custom operator.</param>
-        new(opType : string,
-            [<ParamArray>] data : Symbol[]) = 
-            let operatorArguments = 
-                [
-                    "data", VarArg("", data)
-                    "op_type", Parameter(Some(box opType))
-                ]
-            new Custom(Arguments<Symbol>(operatorArguments))
-        /// Input data for the custom operator.
-        member __.Data = operatorArguments.GetVarArg "data"
-        /// Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.
-        member __.OpType : string = match operatorArguments.GetParameter "op_type" with Some(v) -> unbox v | None -> failwithf "Required parameter op_type is missing"
-        /// <summary>Copy Custom instance with updated inputs/parameters.</summary>
-        /// <param name="data">Input data for the custom operator.</param>
-        /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
-        member this.With([<Optional>] ?data : Symbol seq,
-            [<Optional>] ?opType : string) = 
-            let operatorArguments = 
-                [
-                    data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
-                    opType |> Option.map (fun x -> "op_type", Parameter(Some (box x)))
-                ] |> List.choose id
-            new Custom(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type FusedOp private (operatorArguments) = 
         inherit SymbolOperator("_FusedOp", operatorArguments)
