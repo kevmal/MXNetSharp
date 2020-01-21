@@ -45,7 +45,7 @@ let thresholdSupport (ctx : Context) (x : NDArray) dim =
     //NDArray.WaitAll()
     let rho = 
         let s = s |> Array.mapi (fun i d -> if i = dim then -1 else 1)
-        printfn "%A" s
+        //printfn "%A" s
         MX.ContribArangeLike(x, ctx, start = 1.0, axis = dim).Reshape(dims = s)
     //NDArray.WaitAll()
     let mean = MX.NpCumsum(sorted, axis = dim) ./ rho
@@ -72,9 +72,9 @@ let thresholdSupport (ctx : Context) (x : NDArray) dim =
                     MX.Tile(x, s |> Array.mapi (fun i x -> if i <> a then x else 1) )
         |]
     //NDArray.WaitAll()
-    printfn "------"
+    //printfn "------"
     xs |> Array.iter (fun x -> printfn "%A" x.Shape)
-    printfn "------"
+    //printfn "------"
     let ix = MX.Stack(xs,0)
     //NDArray.WaitAll()
     let tauStar = MX.GatherNd(tau, ix)
@@ -101,41 +101,24 @@ CustomOp.register "entmax15"
     (fun ins ->
         {new CustomOperation() with
              member this.CreateOperator(ctx: Context, inShapes: int [] [], inDataTypes: TypeFlag []): ICustomOperation = 
-                 printfn "%A" ins.Count
-                 printfn "%A" ins
+                 //printfn "%A" ins.Count
+                 //printfn "%A" ins
                  let dim = 
                      let scc,v = ins.TryGetValue("dim")
                      if scc then 
                         int v
                      else
-                        printfn "default dim....."
+                        //printfn "default dim....."
                         0
                  {new ICustomOperation with
                       member this.Backward(req: OpReqType [], inData: NDArray [], outData: NDArray [], inGrad: NDArray [], outGrad: NDArray [], auxData: NDArray []): unit = 
-                          printfn "ddddl"
+                          //printfn "ddddl"
                           if req.[0] = OpReqType.NullOp then 
                               () 
                           else
-                              printfn "ghell"
-                              let pp (x : NDArray) = 
-                                    x.ToArray<float32>()
-                                    |> Array.chunkBySize 4
-                                    |> Array.iter 
-                                        (fun x ->
-                                            x |> Array.map (sprintf "%0.4f") |> String.concat ", " |> printfn "%s"
-                                        )
-                              pp outData.[0]
                               let gppr = sqrt outData.[0]
-                              printfn "InGrad"
-                              pp outGrad.[0]
-                              printfn "OGrad"
-                              pp inGrad.[0]
                               let dx = outGrad.[0] * gppr
-                              printfn "dx"
-                              pp dx
                               let q = MX.Sum(dx, axis = [dim], keepdims = true) / MX.Sum(gppr, axis = [dim], keepdims = true)
-                              printfn "q %A" q.Shape 
-                              q.ToArray<float32>() |> printfn "%A"
                               let o = dx - q.*gppr
                               match req.[0] with 
                               | OpReqType.AddTo -> (inGrad.[0] - o).CopyTo(inGrad.[0])
@@ -173,11 +156,9 @@ CustomOp.register "entmoid15"
              member this.CreateOperator(ctx: Context, inShapes: int [] [], inDataTypes: TypeFlag []): ICustomOperation = 
                  {new ICustomOperation with
                       member this.Backward(req: OpReqType [], inData: NDArray [], outData: NDArray [], inGrad: NDArray [], outGrad: NDArray [], auxData: NDArray []): unit = 
-                          printfn "vvv"
                           if req.[0] = OpReqType.NullOp then 
                               () 
                           else
-                              printfn "ghell"
                               let gppr0 = sqrt outData.[0]
                               let gppr1 = sqrt (1.0 - outData.[0])
                               let gi = outGrad.[0]*gppr0
@@ -280,14 +261,14 @@ let odst (dat : NDArray option) inFeatures numTrees treeDim depth flatten (x : S
             |> Bindings.inferShapes featureValues
             |> Bindings.init (fun a b -> printfn "---> %A" a.Name; ctx.Zeros(b))
         let output = featureValues.Eval(ctx,bm).Outputs.[0]
-        printfn "vals %A" output
+        //printfn "vals %A" output
         let q = output.ToDoubleArray() |> Statistics.quantileFunc
         let initV = Sample.betaSeq 1.0 1.0 rng |> Seq.take (numTrees * depth) |> Seq.map q |> Seq.toArray
-        printfn "initV %A" initV
-        printfn "initVmax %A" (initV |> Array.max)
+        ////printfn "initV %A" initV
+        //printfn "initVmax %A" (initV |> Array.max)
         featureThresholds.NDArray.Value.CopyFrom(initV)
         let crap = abs(output .- MX.ExpandDims(featureThresholds.NDArray.Value,0))
-        printfn "crap %A" (crap.ToFloat32Array())
+        //printfn "crap %A" (crap.ToFloat32Array())
         let temp = Array.CreateInstance(typeof<float32>, numTrees, depth)
         [|
             for i = 0 to numTrees - 1 do 
@@ -301,11 +282,11 @@ let odst (dat : NDArray option) inFeatures numTrees treeDim depth flatten (x : S
                 let v = a.ToFloat32Array() |> Array.max   //q = 1
                 temp.SetValue(v,i,j)
             )
-        printfn "temp %A" temp
+        //printfn "temp %A" temp
         //let temp = temp / 1.0
         let initTemp = (log (ctx.CopyFrom(temp)) + 1e-6)
-        printfn "inittemp %A" initTemp
-        printfn "inittemp %A" (initTemp.ToFloat32Array())
+        //printfn "inittemp %A" initTemp
+        //printfn "inittemp %A" (initTemp.ToFloat32Array())
         initTemp.CopyTo(logTemperatures.NDArray.Value) |> ignore
     | None -> ()
 
