@@ -86,6 +86,9 @@ type Symbol() =
     member x.ReverseReshape([<ParamArray>] dims : int []) = Reshape(x, dims, true)
     member x.ReverseReshape(dims : int seq) = Reshape(x, dims, true)
 
+    member x.Save(filename : string) = MXSymbol.saveToFile x.UnsafeHandle filename
+    member x.Json() = MXSymbol.saveToJSON x.UnsafeHandle
+
     member x.Slice(startIndices, endIndices, stepIndices) = Slice(x, startIndices, endIndices, stepIndices)
     member x.GetSlice([<ParamArray>] a : obj []) = 
         let b = ResizeArray<int option>()
