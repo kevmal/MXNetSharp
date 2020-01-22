@@ -280,6 +280,14 @@ type ContextExtensions private () =
     static member Zeros(ctx : Context, shape : int seq, [<Optional>] dtype : DataType) =
         MX.ZerosNDArray(ctx, shape = shape, dtype = dtype)
     
+    /// <summary>fill target with zeros</summary>
+    /// <param name="data">The NDArray to copy shape and data type from</param>
+    [<Extension>]
+    static member ZerosLike(ctx : Context, data : NDArray) =
+        match data.DataType with 
+        | Some dt -> MX.ZerosNDArray(ctx, shape = data.Shape, dtype = dt)
+        | None -> MX.ZerosNDArray(ctx, shape = data.Shape)
+
     /// <summary>Return a 2-D array with ones on the diagonal and zeros elsewhere.</summary>
     /// <param name="N">Number of rows in the output.</param>
     /// <param name="M">Number of columns in the output. If 0, defaults to N</param>
@@ -296,6 +304,14 @@ type ContextExtensions private () =
     static member Ones(ctx : Context, shape : int seq, [<Optional>] dtype : DataType) =
         MX.OnesNDArray(ctx, shape = shape, dtype = dtype)
     
+    /// <summary>fill target with zeros</summary>
+    /// <param name="data">The NDArray to copy shape and data type from</param>
+    [<Extension>]
+    static member OnesLike(ctx : Context, data : NDArray) =
+        match data.DataType with 
+        | Some dt -> MX.OnesNDArray(ctx, shape = data.Shape, dtype = dt)
+        | None -> MX.OnesNDArray(ctx, shape = data.Shape)
+
     /// <summary>fill target with a scalar value</summary>
     /// <param name="shape">The shape of the output</param>
     /// <param name="value">Value with which to fill newly created tensor</param>
