@@ -2,7 +2,7 @@
 // Adapted from https://github.com/eriklindernoren/Keras-GAN/tree/master/cgan
 
 #nowarn "9" // Bitmap updates for displaying
-#load "loadui.fsx"
+#load "../loadui.fsx"
 open Loadui
 
 open MXNetSharp

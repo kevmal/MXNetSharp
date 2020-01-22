@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="README.md" />
+    <None Include="Style\Neural Style Transfer.fsx" />
+    <None Include="GAN\CGAN.fsx" />
+    <None Include="VAE\MNIST VAE.fsx" />
     <None Include="TCN\MNIST.fsx" />
     <None Include="TCN\README.MD" />
     <None Include="TCN\adding.fsx" />
@@ -22,9 +26,6 @@
     <Compile Include="Library.fs" />
     <None Include="load.fsx" />
     <None Include="loadui.fsx" />
-    <None Include="Neural Style Transfer.fsx" />
-    <None Include="MNIST VAE.fsx" />
-    <None Include="CGAN.fsx" />
   </ItemGroup>
 
   <ItemGroup>

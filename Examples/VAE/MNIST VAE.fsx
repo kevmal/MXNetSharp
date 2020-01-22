@@ -1,7 +1,7 @@
 ﻿
 #nowarn "9" // Bitmap updates for UI
 
-#load "loadui.fsx"
+#load "../loadui.fsx"
 open Loadui
 
 open MXNetSharp

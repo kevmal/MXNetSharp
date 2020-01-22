@@ -2,7 +2,7 @@
 // Ported from https://github.com/apache/incubator-mxnet/tree/225f71f744ac5e7bd29868b6d3ba0e4fe2527c43/example/neural-style
 
 
-#load "load.fsx"
+#load "../load.fsx"
 open MXNetSharp
 open MXNetSharp.SymbolOperators
 open MXNetSharp.Interop
