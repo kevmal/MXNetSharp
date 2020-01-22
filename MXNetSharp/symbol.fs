@@ -461,10 +461,11 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
                     let vals = pValues.ToArray()
                     assert (keys.Length = vals.Length)
                     MXSymbol.createAtomicSymbol creator.AtomicSymbolCreatorHandle keys vals
+                let safeHandle = new SafeSymbolHandle(symbol, true)
                 let ivals = inputValues |> Seq.map (fun i -> i.UnsafeHandle) |> Seq.toArray
                 if inputKeys.Count <> inputValues.Count then 
                     MXSymbol.compose symbol name null ivals
-                else //REVIEW: we could just never use keys
+                else 
                     let keys = inputKeys.ToArray()
                     Seq.zip keys inputValues 
                     |> Seq.filter 
@@ -477,7 +478,7 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
                     |> Seq.toArray
                     |> Array.unzip
                     ||> MXSymbol.compose symbol name
-                x.InternalHandle <- Some(new SafeSymbolHandle(symbol, true))
+                x.InternalHandle <- Some safeHandle
             with
             | e -> raise(SymbolInitilizationException(x, e))
     interface ISymbolComposable with 
