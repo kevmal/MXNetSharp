@@ -46,7 +46,7 @@ type Symbol() =
                 match x.InternalName with Some n -> n | _ -> x.GeneratedName
         and set v = 
             if x.IsInitialized then
-                failwith "Cannot set name. Symbol has already been created." //TODO: make exception
+                invalidOp (sprintf "Cannot set name to %s. Symbol(%s) has already been created." v x.Name)
             x.InternalName <- Some v 
     member x.SetName(name) = x.Name <- name; x
     member x.SetName(symbol : Symbol) =
@@ -334,7 +334,6 @@ type ImplicitVariable() =
     inherit Variable() 
     default x.Copy() = ImplicitVariable() :> Symbol
 
-//TODO: Manually add CustomOp type and skip in codegen
 type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments<Symbol>) = 
     inherit Symbol()
     new(name, args) = new SymbolOperator(AtomicSymbolCreator.FromName name, args)

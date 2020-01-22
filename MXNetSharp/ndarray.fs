@@ -473,7 +473,7 @@ type NDArray(handle : SafeNDArrayHandle) =
                     sliceAxis.Add sliceAx
                     sliceAx <- sliceAx + 1
                 | :? NewAxis -> newAxis.Add sliceAx
-                | _ -> failwithf "invalid argument to get slice %A" a.[i] //TODO create ex
+                | _ -> invalidArg "index" (sprintf "invalid argument to get slice %A" a.[i])
                 i <- i + 1
             // check continuous
             // https://github.com/apache/incubator-mxnet/blob/6bff547465c83ed343a5ef8241d22f56738534bd/python/mxnet/ndarray/ndarray.py#L846
@@ -618,7 +618,7 @@ type NDArray(handle : SafeNDArrayHandle) =
                     sliceAxis.Add sliceAx
                     sliceAx <- sliceAx + 1
                 | :? NewAxis -> newAxis.Add sliceAx //TODO: handle NewAxis for SetSlice
-                | _ -> failwithf "invalid argument to get slice %A" a.[i] //TODO create ex
+                | _ -> invalidArg "index" (sprintf "invalid argument to set slice %A" a.[i])
                 i <- i + 1
             let indices k = 
                 let start = match b.[k] with ValueNone -> 0L | ValueSome v -> v
