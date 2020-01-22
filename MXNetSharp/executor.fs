@@ -1,9 +1,11 @@
-namespace MXNetSharp
+namespace rec MXNetSharp
 open System
 open System.Runtime.InteropServices
 open MXNetSharp.Interop
 open System.Collections.Generic
  
+type IInitializer = 
+    abstract member Initialize : Bind -> bool
 
 [<NoComparison>]
 type AuxBind = 
@@ -13,6 +15,8 @@ type AuxBind =
         Shape : int [] option
         DataType : DataType option
         StorageType : StorageType option
+        IsInitialized : bool
+        Initializer : IInitializer option
     }
     static member Named(name) =     
         {
@@ -21,6 +25,8 @@ type AuxBind =
             Shape = None 
             DataType = None 
             StorageType = None
+            IsInitialized = false
+            Initializer = None
         }
 
 [<NoComparison>]
@@ -33,6 +39,8 @@ type ArgBind =
         Shape : int [] option
         DataType : DataType option
         StorageType : StorageType option
+        IsInitialized : bool
+        Initializer : IInitializer option
     }
     static member Named(name) =     
         {
@@ -43,6 +51,8 @@ type ArgBind =
             Shape = None 
             DataType = None 
             StorageType = None
+            IsInitialized = false
+            Initializer = None
         }
 
 [<NoComparison>]
@@ -117,11 +127,223 @@ type Bind =
                 StorageType = storageType
             }
 
-type IInitializer = 
-    abstract member Initialize : Bind -> unit
+[<AutoOpen>]
+module ParameterPatterns = 
+    let (|NameStart|_|) prefix (b : Bind) = if b.Name.StartsWith(prefix) then Some() else None
+    let (|NameEnd|_|) prefix (b : Bind) = if b.Name.EndsWith(prefix) then Some() else None
+    let internal pat f = if f() then Some() else None
+    //let (|IsUpSampling|_|) (b : Bind) = pat(fun () -> b.Name.StartsWith("upsampling"))
+    //let (|IsStnLoc|_|) (b : Bind) = pat(fun () -> b.Name.StartsWith("stn_loc"))
+    let (|IsBias|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("bias"))
+    let (|IsGamma|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("gamma"))
+    let (|IsBeta|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("beta"))
+    let (|IsWeight|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("weight"))
+    //let (|IsMovingMean|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("moving_mean"))
+    //let (|IsMovingVar|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("moving_var"))
+    //let (|IsMovingInvVar|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("moving_inv_var"))
+    //let (|IsMovingAvg|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("moving_avg"))
+    let (|IsMin|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("min"))
+    let (|IsMax|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("max"))
+    let (|IsWeightQuantize|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("weight_quantize"))
+    let (|IsBiasQuantize|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("bias_quantize"))
 
-type Parameter(?name, ?shape : int seq, ?opReqType, ?grad, ?ndarray, ?dataType, ?storageType, ?init : IInitializer) = 
+
+module Init = 
+    let arg f = 
+        {new IInitializer with
+             member this.Initialize(b: Bind): bool = 
+                match b with 
+                | ArgBinding a -> f a
+                | b -> false
+        }
+[<RequireQualifiedAccess>]
+type OrthogonalRandType =
+    | Uniform 
+    | Normal
+[<RequireQualifiedAccess>]
+type FactorType = 
+    | In
+    | Out 
+    | Avg
+[<RequireQualifiedAccess>]
+type XavierRandType = 
+    | Uniform
+    | Gaussian
+
+module Initilizer = 
+    type Default() = 
+        interface IInitializer with
+            member x.Initialize(b : Bind) =   
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                match b with 
+                | IsBias -> 
+                    MX.ZerosLike([a],a)
+                    true
+                | IsGamma -> 
+                    MX.OnesLike([a],a)
+                    true
+                | IsBeta -> 
+                    MX.ZerosLike([a],a)
+                    true
+                | IsMin -> 
+                    MX.ZerosLike([a],a)
+                    true
+                | IsMax -> 
+                    MX.OnesLike([a],a)
+                    true
+                | IsWeightQuantize -> 
+                    use r = MX.RandomRandintNDArray(-127L, 127L, a.Context, a.Shape, RandomRandintDtype.Int32)
+                    r.CopyTo(a)
+                    true
+                | IsBiasQuantize -> 
+                    MX.ZerosLike([a],a)
+                    true
+                | _ -> false
+            
+    type Zero() = 
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                MX.ZerosLike([a],a)
+                true
+    type One() = 
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                MX.OnesLike([a],a)
+                true
+    type Constant(value : double) = 
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                a.MutFull(value) |> ignore
+                true
+    type Uniform(?scale) =
+        let scale = abs(defaultArg scale 0.07)
+        member x.Scale = scale
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                match b with 
+                | IsWeight -> 
+                    MX.RandomUniformLike([a], a, -scale, scale)
+                    true 
+                | _ -> false
+    type Normal(?sigma) = 
+        let sigma = defaultArg sigma 0.01
+        member x.Sigma = sigma
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                match b with 
+                | IsWeight -> 
+                    MX.RandomNormalLike([a], a, 0.0, sigma)
+                    true 
+                | _ -> false
+
+    type Orthogonal(?scale, ?randType) = 
+        let scale = defaultArg scale 1.414
+        let randType = defaultArg randType OrthogonalRandType.Uniform
+        member x.Scale = scale
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                if a.Shape.Length < 2 then 
+                    false
+                else 
+                    match b with 
+                    | IsWeight -> 
+                        let shape = a.Shape
+                        let nout = shape.[0]
+                        let nin = shape.[1..] |> Array.reduce (*)
+                        use tmp = 
+                            match randType with 
+                            | OrthogonalRandType.Uniform -> 
+                                MX.RandomUniformNDArray(a.Context, -1.0, 1.0, [nout; nin])
+                            | OrthogonalRandType.Normal -> 
+                                MX.RandomNormalNDArray(a.Context, 0.0, 1.0, [nout; nin])
+                        let u, _d, v = MX.NpiSvd(tmp)
+                        if u.Shape = tmp.Shape then 
+                            u.CopyTo(a)
+                        else
+                            v.CopyTo(a)
+                        u.Dispose()
+                        _d.Dispose()
+                        v.Dispose()
+                        true 
+                    | _ -> false
+        
+    type Xavier(?magnitude, ?randType, ?factorType) = 
+        let magnitude = defaultArg magnitude 3.0
+        let factorType = defaultArg factorType FactorType.Avg
+        let randType = defaultArg randType XavierRandType.Uniform
+        member x.Magnitude = magnitude
+        member x.FactorType = factorType
+        member x.RandType = randType
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                if a.Shape.Length < 2 then 
+                    false
+                else 
+                    match b with 
+                    | IsWeight -> 
+                        let shape = a.Shape
+                        let hwScale = 
+                            if shape.Length > 2 then 
+                                shape.[2..] |> Array.reduce (*) |> double
+                            else 
+                                1.0
+                        let fanIn = double shape.[1]*hwScale
+                        let fanOut = double shape.[0]*hwScale
+                        let factor = 
+                            match factorType with 
+                            | FactorType.Avg -> (fanIn + fanOut) / 2.0
+                            | FactorType.In -> fanIn
+                            | FactorType.Out -> fanOut
+                        let scale = sqrt(magnitude / factor)
+                        match randType with 
+                        | XavierRandType.Uniform -> 
+                            MX.RandomUniformLike([a],a,-scale,scale)
+                            true
+                        | XavierRandType.Gaussian -> 
+                            MX.RandomNormalLike([a],a,0.0,scale)
+                            true
+                    | _ -> false
+        
+    type MSRAPrelu(slope, factorType) = 
+        inherit Xavier(2.0 / (1.0 + slope ** 2.0), XavierRandType.Gaussian, factorType)
+        new(slope) = MSRAPrelu(slope,FactorType.Avg)
+        new(factorType) = MSRAPrelu(0.25,factorType)
+        new() = MSRAPrelu(0.25,FactorType.Avg)
+    type Bilinear() = 
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                if a.Shape.Length < 2 then 
+                    false
+                else 
+                    match b with 
+                    | IsWeight -> 
+                        let shape = a.Shape
+                        let l = shape |> Array.reduce (*)
+                        let f = ceil(float32 shape.[3] / 2.f)
+                        let c = (2.f*f - 1.f - f % 2.f) / (2.f * f)
+                        let weight = 
+                            Array.init l
+                                (fun i ->
+                                    let x = i % shape.[3] |> float32
+                                    let y = (i / shape.[3]) % shape.[2] |> float32
+                                    (1.f - abs(x / f - c)) * (1.f - abs(y / f - c))
+                                )
+                        a.CopyFrom(weight)
+                        true 
+                    | _ -> false
+
+
+type Parameter(?name, ?shape : int seq, ?opReqType, ?grad, ?ndarray, ?dataType, ?storageType, ?isInitialized : bool, ?init : IInitializer) = 
     inherit Variable()
+    let isInitialized = defaultArg isInitialized false
     let shape = 
         match ndarray, shape with 
         | Some (ndarray : NDArray), None -> ndarray.Shape |> Some
@@ -161,6 +383,8 @@ type Parameter(?name, ?shape : int seq, ?opReqType, ?grad, ?ndarray, ?dataType, 
            Shape = x.Shape
            DataType = x.DataType 
            StorageType = x.StorageType
+           Initializer = init
+           IsInitialized = isInitialized
        }
 
 type Input(?name, ?shape, ?ndarray, ?dataType, ?storageType) = 
@@ -571,6 +795,8 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                                     OpReqType = Some t
                                     StorageType = Some a.StorageType
                                     DataType = a.DataType 
+                                    IsInitialized = true
+                                    Initializer = None
                                 }
                         )
                 yield!
@@ -584,6 +810,8 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                                     NDArray = Some a
                                     StorageType = Some a.StorageType
                                     DataType = a.DataType
+                                    IsInitialized = true
+                                    Initializer = None
                                 }
                         )
                 yield!
@@ -599,6 +827,8 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                                     OpReqType = None
                                     StorageType = Some a.StorageType
                                     DataType = a.DataType 
+                                    IsInitialized = true
+                                    Initializer = None
                                 }
                         )
             }
