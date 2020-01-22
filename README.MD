@@ -7,9 +7,9 @@ MXNet binaries need to be on library search path, bindings were generated agains
 ## Examples
 - [Temporal Convolutional Networks (TCN)](Examples/TCN)
 - [DQN](Examples/DQN)
-- [CGAN](Examples/CGAN.fsx)
-- [Variational Autoencoder](Examples/MNIST%20VAE.fsx)
-- [Neural style transfer](Examples/Neural%20Style%20Transfer.fsx)
+- [CGAN](Examples/GAN/CGAN.fsx)
+- [Variational Autoencoder](Examples/VAE/MNIST%20VAE.fsx)
+- [Neural style transfer](Examples/Style/Neural%20Style%20Transfer.fsx)
 
 Note: Samples which use UI (CGAN, VAE) need to specifically reference either net46 or netcore assemblies. By default they're loading net46, to use netcore uncomment the ".NET core" section in loadui.fsx in the Examples directory and comment the Net46 section.
 
