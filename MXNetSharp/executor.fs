@@ -257,18 +257,30 @@ type Bindings(bindings : IDictionary<string, Bind>) =
         x.WithBindings(seq {yield! inBindings; yield! outBindings; yield! auxBindings})
     member x.Bindings = bindings
     member x.Item 
-        with get(v : Variable) = 
-            let scc, b = x.TryGetValue(v.Name)
+        with get(name : string) = 
+            let scc, b = x.TryGetValue(name)
             if not scc then 
-                raise (KeyNotFoundException(sprintf "No binding for %s" b.Name))
+                raise (KeyNotFoundException(sprintf "No binding for %s" name))
             b
+    member x.Item 
+        with get(v : Variable) = x.[v.Name]
+    member x.NDArray(name : string) = 
+        match x.[name].NDArray with 
+        | Some x -> x
+        | None -> 
+            raise (NullReferenceException(sprintf "NDArray not set for binding %s" name))
     member x.NDArray(v : Variable) = 
-        match x.Item(v).NDArray with 
+        match x.[v].NDArray with 
         | Some x -> x
         | None -> 
             raise (NullReferenceException(sprintf "NDArray not set for binding %s" v.Name))
+    member x.Grad(name : string) = 
+        match x.[name].Grad with 
+        | Some x -> x
+        | None -> 
+            raise (NullReferenceException(sprintf "Grad not set for binding %s" name))
     member x.Grad(v : Variable) = 
-        match x.Item(v).Grad with 
+        match x.[v].Grad with 
         | Some x -> x
         | None -> 
             raise (NullReferenceException(sprintf "Grad not set for binding %s" v.Name))
@@ -598,6 +610,8 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
     member x.ExecutorHandle = handle
     member x.Item 
         with get(v : Variable) = x.Bindings.NDArray(v)
+    member x.Item 
+        with get(name : string) = x.Bindings.NDArray(name)
     interface IDisposable with  
         member x.Dispose() = x.Dispose()
 
