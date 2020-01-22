@@ -79,6 +79,15 @@ type Bind =
         | ArgBinding(a) -> a.NDArray
     member x.HasNDArray = x.NDArray.IsSome
     static member Arg(name, ?ndarray : NDArray, ?grad : NDArray, ?opReqType : OpReqType, ?shape : int seq, ?dataType : DataType, ?storageType : StorageType) = 
+        let shape = 
+            match shape, ndarray with 
+            | None, Some nd -> 
+                let shape = nd.Shape
+                if shape.Length > 0 then
+                    Some(shape |> Seq.ofArray)
+                else 
+                    None
+            | _ -> shape
         ArgBinding 
             {ArgBind.Named name with 
                 Name = name
@@ -89,7 +98,16 @@ type Bind =
                 DataType = dataType 
                 StorageType = storageType
             }
-    static member Aux(name, ?ndarray : NDArray, ?shape : int [], ?dataType : DataType, ?storageType : StorageType) = 
+    static member Aux(name, ?ndarray : NDArray, ?shape : int seq, ?dataType : DataType, ?storageType : StorageType) =
+        let shape = 
+            match shape, ndarray with 
+            | None, Some nd -> 
+                let shape = nd.Shape
+                if shape.Length > 0 then
+                    Some(shape |> Seq.ofArray)
+                else 
+                    None
+            | _ -> shape    
         AuxBinding 
             {AuxBind.Named name with 
                 Name = name
