@@ -22,11 +22,12 @@ module Composition =
                     printfn "%A" x
                     x
                 )
-            |> Bindings.init    
-                (fun x s ->
-                    let a = (CPU 0).Zeros(s)
-                    a.MutFull(2.0)
-                )
+            |> Bindings.defaultInitializer    
+                (Init.create (fun _ a ->
+                    a.MutFull(2.0) |> ignore
+                    true
+                ))
+            |> Bindings.init
         let exe = model.Bind(CPU 0, bm)
         exe.Forward(false)
         Assert.Equal(4.0*1.4*10.0 |> round, exe.Outputs.[0].ToDoubleScalar()*10.0 |> round)

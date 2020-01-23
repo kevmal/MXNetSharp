@@ -75,7 +75,7 @@ type Bind =
         | {BindType = ArgBind(ort,_)} -> ort
         | _ -> None
     member x.HasNDArray = x.NDArray.IsSome
-    static member Arg(name, ?ndarray : NDArray, ?grad : NDArray, ?opReqType : OpReqType, ?shape : int seq, ?dataType : DataType, ?storageType : StorageType, ?ctx : Context) = 
+    static member Arg(name, ?ndarray : NDArray, ?grad : NDArray, ?opReqType : OpReqType, ?shape : int seq, ?dataType : DataType, ?storageType : StorageType, ?ctx : Context, ?isInitialized) = 
         let shape = 
             match shape, ndarray with 
             | None, Some nd -> 
@@ -92,7 +92,7 @@ type Bind =
             DataType = dataType 
             StorageType = storageType
             Context = ctx
-            IsInitialized = false
+            IsInitialized = defaultArg isInitialized false
             Initializer = None
             BindType = ArgBind(opReqType, grad)
         }
@@ -145,6 +145,28 @@ module ParameterPatterns =
         match b with 
         | {BindType = AuxBind} -> Some b
         | _ -> None
+    let (|FanInFanOut|_|) (b : Bind) =
+        match b, b.NDArray with 
+        | IsWeight, Some nd -> 
+            let shape = nd.Shape
+            if shape.Length < 2 then 
+                None 
+            elif shape.Length = 2 then 
+                Some(shape.[1], shape.[0])
+            else
+                let rf = shape.[2 .. ] |> Array.reduce (*)
+                Some(shape.[1]*rf, shape.[0]*rf)
+        | _ -> None
+    let (|Factor|_|) (factorType : FactorType) (b : Bind) = 
+        match b with 
+        | FanInFanOut(fanIn, fanOut) -> 
+            match factorType with 
+            | FactorType.Avg -> Some (double (fanIn + fanOut) / 2.0)
+            | FactorType.In -> Some (double fanIn)
+            | FactorType.Out -> Some (double fanOut)
+        | _ -> None
+
+
 
 [<RequireQualifiedAccess>]
 type OrthogonalRandType =
@@ -164,10 +186,22 @@ module Initializer =
     type Skip() = 
         interface IInitializer with 
             member x.Initialize(b : Bind) = true
+    type Mixed([<ParamArray>] inits : IInitializer []) = 
+        member x.Initializers = Array.copy inits
+        interface IInitializer with 
+            member x.Initialize(b : Bind) = 
+                let rec loop i =
+                    if i >= inits.Length then 
+                        false
+                    elif inits.[i].Initialize(b) then 
+                        true
+                    else 
+                        loop (i + 1)
+                loop 0
     type Default() = 
         interface IInitializer with
             member x.Initialize(b : Bind) =   
-                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
                 match b with 
                 | IsBias -> 
                     MX.ZerosLike([a],a)
@@ -196,19 +230,19 @@ module Initializer =
     type Zero() = 
         interface IInitializer with 
             member x.Initialize(b : Bind) =     
-                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
                 MX.ZerosLike([a],a)
                 true
     type One() = 
         interface IInitializer with 
             member x.Initialize(b : Bind) =     
-                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
                 MX.OnesLike([a],a)
                 true
     type Constant(value : double) = 
         interface IInitializer with 
             member x.Initialize(b : Bind) =     
-                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
                 a.MutFull(value) |> ignore
                 true
     type Uniform(?scale) =
@@ -216,7 +250,7 @@ module Initializer =
         member x.Scale = scale
         interface IInitializer with 
             member x.Initialize(b : Bind) =     
-                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
                 match b with 
                 | IsWeight -> 
                     MX.RandomUniformLike([a], a, -scale, scale)
@@ -227,7 +261,7 @@ module Initializer =
         member x.Sigma = sigma
         interface IInitializer with 
             member x.Initialize(b : Bind) =     
-                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
                 match b with 
                 | IsWeight -> 
                     MX.RandomNormalLike([a], a, 0.0, sigma)
@@ -240,7 +274,7 @@ module Initializer =
         member x.Scale = scale
         interface IInitializer with 
             member x.Initialize(b : Bind) =     
-                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
                 if a.Shape.Length < 2 then 
                     false
                 else 
@@ -275,35 +309,19 @@ module Initializer =
         member x.RandType = randType
         interface IInitializer with 
             member x.Initialize(b : Bind) =     
-                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
-                if a.Shape.Length < 2 then 
-                    false
-                else 
-                    match b with 
-                    | IsWeight -> 
-                        let shape = a.Shape
-                        let hwScale = 
-                            if shape.Length > 2 then 
-                                shape.[2..] |> Array.reduce (*) |> double
-                            else 
-                                1.0
-                        let fanIn = double shape.[1]*hwScale
-                        let fanOut = double shape.[0]*hwScale
-                        let factor = 
-                            match factorType with 
-                            | FactorType.Avg -> (fanIn + fanOut) / 2.0
-                            | FactorType.In -> fanIn
-                            | FactorType.Out -> fanOut
-                        let scale = sqrt(magnitude / factor)
-                        match randType with 
-                        | XavierRandType.Uniform -> 
-                            MX.RandomUniformLike([a],a,-scale,scale)
-                            true
-                        | XavierRandType.Gaussian -> 
-                            MX.RandomNormalLike([a],a,0.0,scale)
-                            true
-                    | _ -> false
-        
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                match b with 
+                | Factor factorType factor -> 
+                    let scale = sqrt(magnitude / factor)
+                    match randType with 
+                    | XavierRandType.Uniform -> 
+                        MX.RandomUniformLike([a],a,-scale,scale)
+                        true
+                    | XavierRandType.Gaussian -> 
+                        MX.RandomNormalLike([a],a,0.0,scale)
+                        true
+                | _ -> false
+
     type MSRAPrelu(slope, factorType) = 
         inherit Xavier(2.0 / (1.0 + slope ** 2.0), XavierRandType.Gaussian, factorType)
         new(slope) = MSRAPrelu(slope,FactorType.Avg)
@@ -312,7 +330,7 @@ module Initializer =
     type Bilinear() = 
         interface IInitializer with 
             member x.Initialize(b : Bind) =     
-                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initilizers expect NDArray to be created"
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
                 if a.Shape.Length < 2 then 
                     false
                 else 
@@ -332,6 +350,39 @@ module Initializer =
                         a.CopyFrom(weight)
                         true 
                     | _ -> false
+
+module Init =
+    open Initializer
+    let create f = 
+        {new IInitializer with
+             member __.Initialize(b: Bind): bool = 
+                 let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                 f b a
+        }
+    let weight f = 
+        {new IInitializer with
+             member __.Initialize(b: Bind): bool = 
+                 let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                 match b with 
+                 | IsWeight -> f a
+                 | _ -> false
+        }
+    let bias f = 
+        {new IInitializer with
+             member __.Initialize(b: Bind): bool = 
+                 let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                 match b with 
+                 | IsBias -> f a
+                 | _ -> false
+        }
+    let combine inits =  
+        let inits = inits |> Seq.toArray
+        Mixed(inits = inits)
+    let skip = Skip()
+    let one = One()
+    let zero = Zero()
+    let defaultInit = Default()
+
 
 
 type Parameter(?name, ?shape : int seq, ?opReqType, ?grad, ?ndarray, ?dataType, ?storageType, ?isInitialized : bool, ?init : IInitializer) = 
@@ -438,7 +489,7 @@ type Bindings(bindings : IDictionary<string, Bind>) =
                     let shape = shape |> Array.map int
                     match bindings.TryGetValue(name) with
                     | true, ({BindType = ArgBind _} as a) -> {a with Shape = Some shape }
-                    | _ -> Bind.Arg(name, shape = shape)
+                    | _ -> Bind.Arg(name, shape = shape, isInitialized = true)
                 )
         let inBindings = 
             (argNames, result.InputShapes)
@@ -533,6 +584,32 @@ module Bind =
     let gradWriteTo (b : Bind) = setOpReqType OpReqType.WriteTo b
     let gradWriteInPlace (b : Bind) = setOpReqType OpReqType.WriteInplace b
     let gradAddTo (b : Bind) = setOpReqType OpReqType.AddTo b
+    let init (x : Bind) = 
+        if x.IsInitialized then 
+            x
+        else
+            match x.Initializer with 
+            | Some initializer -> 
+                let x = 
+                    match x.NDArray, x.Shape, x.Context with 
+                    | Some nd, Some shape, _ when nd.Shape.Length = 0 -> 
+                        //TODO: validate shape
+                        nd.MutReshape(shape) |> ignore
+                        x
+                    | Some nd, None, _ -> 
+                        {x with Shape = Some nd.Shape}
+                    | Some nd, Some s, _ -> x
+                    | None, Some(shape), Some ctx -> 
+                        {x with NDArray = Some(new NDArray(shape, ctx, ?dtype = x.DataType))}
+                    | None, None, _ -> 
+                        invalidOp (sprintf"Init called on '%s' with no NDArray or shape set" x.Name)
+                    | None, _, None -> 
+                        invalidOp (sprintf"Init called on '%s' with no context set" x.Name)
+                if initializer.Initialize(x) then 
+                    {x with IsInitialized = true}
+                else 
+                    x
+            | None -> invalidOp (sprintf "Init called with no initializer set on %s" x.Name)
 
 
 
@@ -637,17 +714,75 @@ module Bindings =
                             {a with NDArray = Some nd; Shape = Some nds}
                 | _ -> a
             )
-    /// Default to OpReqType.WriteTo, zero grads and fill missing NDArray's using `f : b : Bind -> shape : int seq -> NDArray`
-    let init f bm = 
+    let defaultContext ctx (bm : Bindings) =
         bm 
+        |> Bindings.map 
+            (fun a -> 
+                if a.Context.IsNone then 
+                    {a with Context = Some ctx}
+                else a
+            )
+    let setContext ctx (bm : Bindings) =
+        bm 
+        |> Bindings.map 
+            (fun a -> 
+                match a.NDArray with 
+                | Some nd -> 
+                    if nd.Context = ctx then 
+                        {a with Context = Some ctx}
+                    else 
+                        {a with Context = Some ctx; NDArray = Some(ctx.CopyFrom nd)}
+                | None -> 
+                        {a with Context = Some ctx}
+            )
+    let defaultInitializer init (bm : Bindings) = 
+        bm 
+        |> Bindings.map 
+            (fun a -> 
+                if a.Initializer.IsNone then 
+                    {a with Initializer = Some init}
+                else a
+            )
+    let initWith initializer bm = bm |> defaultInitializer initializer |> init
+    let initWithFunc f bm = bm |> defaultInitializer (Init.create f) |> init
+    let appendInitializer initializer bm = 
+        bm 
+        |> Bindings.map 
+            (fun b ->
+                match b.Initializer with 
+                | None -> {b with Initializer = Some initializer}
+                | Some (:? Initializer.Mixed as i) -> 
+                    {b with Initializer = Some(Initializer.Mixed(inits = [|yield! i.Initializers; initializer|]) :> IInitializer)}
+                | Some i -> 
+                    {b with Initializer = Some(Initializer.Mixed(i, initializer) :> IInitializer)}
+            )
+    let prependInitializer initializer bm = 
+        bm 
+        |> Bindings.map 
+            (fun b ->
+                match b.Initializer with 
+                | None -> {b with Initializer = Some initializer}
+                | Some (:? Initializer.Mixed as i) -> 
+                    {b with Initializer = Some(Initializer.Mixed(inits = [|initializer; yield! i.Initializers|]) :> IInitializer)}
+                | Some i -> 
+                    {b with Initializer = Some(Initializer.Mixed(initializer, i) :> IInitializer)}
+            )
+    /// Default to OpReqType.WriteTo, zero grads and initialize NDArray
+    let init (bm : Bindings) = 
+        // infer context if possible
+        let bm2 = 
+            let ctx = 
+                bm 
+                |> Seq.choose (fun x -> match x.Context with | None -> x.NDArray |> Option.map (fun x -> x.Context) | c -> c)
+                |> Seq.toList
+            match ctx with 
+            | [c] -> defaultContext c bm
+            | _ -> bm
+            
+        bm2 
         |> defaultOpReqType OpReqType.WriteTo
-        |> fillNDArray 
-            (fun x -> 
-                let shape = match x.Shape with | Some s -> s | _ -> Array.empty
-                f x shape
-            ) 
-        |> map 
-            (fun a -> {a with IsInitialized = true})
+        |> Bindings.appendInitializer Init.defaultInit
+        |> Bindings.map Bind.init
         |> map 
             (fun a ->
                 match a with
@@ -655,7 +790,35 @@ module Bindings =
                     {a with BindType = ArgBind(opReqType, Some(MX.ZerosLike(a.NDArray.Value)))}
                 | _ -> a
             )
-
+    let withBindings (bs : Bind seq) (bm : Bindings) = bm.WithBindings(ofSeq bs)
+    let shareParameters (referenceBindings : Bindings) (bindings : Bindings) = 
+        bindings 
+        |> map 
+            (fun a -> 
+                let scc,v = referenceBindings.TryGetValue(a.Name)
+                if scc && a.Shape = v.Shape then 
+                    { a with NDArray = v.NDArray }
+                else
+                    a
+            )
+    let copyParameters (referenceBindings : Bindings) (bindings : Bindings) = 
+        bindings 
+        |> map 
+            (fun a -> 
+                let scc,v = referenceBindings.TryGetValue(a.Name)
+                if scc && a.Shape = v.Shape then 
+                    match a.NDArray, v.NDArray, a.Context with 
+                    | _, None, _ -> a
+                    | Some nd, Some src, _ -> 
+                        nd.CopyFrom(src)
+                        a
+                    | None, Some src, Some ctx -> 
+                        {a with NDArray = Some (ctx.CopyFrom(src))}
+                    | None, Some src, None -> 
+                        invalidOp (sprintf "Could not copy parameter %s. No context set on binding."  a.Name)
+                else
+                    a
+            )
 
 type SafeExecutorHandle(owner) = 
     inherit SafeHandle(0n, true)
