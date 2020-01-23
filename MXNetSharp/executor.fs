@@ -17,6 +17,7 @@ type AuxBind =
         StorageType : StorageType option
         IsInitialized : bool
         Initializer : IInitializer option
+        Context : Context option
     }
     static member Named(name) =     
         {
@@ -27,6 +28,7 @@ type AuxBind =
             StorageType = None
             IsInitialized = false
             Initializer = None
+            Context = None
         }
 
 [<NoComparison>]
@@ -41,54 +43,39 @@ type ArgBind =
         StorageType : StorageType option
         IsInitialized : bool
         Initializer : IInitializer option
+        Context : Context option
     }
-    static member Named(name) =     
-        {
-            Name = name 
-            NDArray = None 
-            Grad = None 
-            OpReqType = None 
-            Shape = None 
-            DataType = None 
-            StorageType = None
-            IsInitialized = false
-            Initializer = None
-        }
+type BindType = 
+    | AuxBind
+    | ArgBind of (OpReqType option)*(NDArray option)
+    member x.WithOpReqType(opReqType : OpReqType) = 
+        match x with 
+        | AuxBind -> x
+        | ArgBind(_,g) -> ArgBind(Some opReqType,g)
 
 [<NoComparison>]
 type Bind = 
-    | AuxBinding of AuxBind
-    | ArgBinding of ArgBind
-    member x.Name = 
-        match x with 
-        | AuxBinding r -> r.Name
-        | ArgBinding r -> r.Name
-    member x.Shape = 
-        match x with 
-        | AuxBinding {Shape = s}
-        | ArgBinding {Shape = s} -> s
-    member x.WithShape(s) = 
-        match x with 
-        | AuxBinding b -> {b with Shape = Some (Array.ofSeq s)} |> AuxBinding
-        | ArgBinding b -> {b with Shape = Some (Array.ofSeq s)} |> ArgBinding
-    member x.DataType = 
-        match x with 
-        | AuxBinding {DataType = s}
-        | ArgBinding {DataType = s} -> s
-    member x.WithNDArray ndarray = 
-        match x with 
-        | AuxBinding(a) -> AuxBinding{a with NDArray = Some ndarray}
-        | ArgBinding(a) -> ArgBinding{a with NDArray = Some ndarray}
+    {
+        Name : string
+        NDArray : NDArray option
+        Shape : int [] option
+        DataType : DataType option
+        StorageType : StorageType option
+        IsInitialized : bool
+        Initializer : IInitializer option
+        Context : Context option
+        BindType : BindType
+    }
     member x.Grad = 
         match x with 
-        | AuxBinding(a) -> None
-        | ArgBinding(a) -> a.Grad
-    member x.NDArray = 
+        | {BindType = ArgBind(_,g)} -> g
+        | _ -> None
+    member x.OpReqType = 
         match x with 
-        | AuxBinding(a) -> a.NDArray
-        | ArgBinding(a) -> a.NDArray
+        | {BindType = ArgBind(ort,_)} -> ort
+        | _ -> None
     member x.HasNDArray = x.NDArray.IsSome
-    static member Arg(name, ?ndarray : NDArray, ?grad : NDArray, ?opReqType : OpReqType, ?shape : int seq, ?dataType : DataType, ?storageType : StorageType) = 
+    static member Arg(name, ?ndarray : NDArray, ?grad : NDArray, ?opReqType : OpReqType, ?shape : int seq, ?dataType : DataType, ?storageType : StorageType, ?ctx : Context) = 
         let shape = 
             match shape, ndarray with 
             | None, Some nd -> 
@@ -98,17 +85,18 @@ type Bind =
                 else 
                     None
             | _ -> shape
-        ArgBinding 
-            {ArgBind.Named name with 
-                Name = name
-                NDArray = ndarray
-                Grad = grad 
-                OpReqType = opReqType
-                Shape = shape |> Option.map Seq.toArray
-                DataType = dataType 
-                StorageType = storageType
-            }
-    static member Aux(name, ?ndarray : NDArray, ?shape : int seq, ?dataType : DataType, ?storageType : StorageType) =
+        {
+            Name = name
+            NDArray = ndarray
+            Shape = shape |> Option.map Seq.toArray
+            DataType = dataType 
+            StorageType = storageType
+            Context = ctx
+            IsInitialized = false
+            Initializer = None
+            BindType = ArgBind(opReqType, grad)
+        }
+    static member Aux(name, ?ndarray : NDArray, ?shape : int seq, ?dataType : DataType, ?storageType : StorageType, ?ctx : Context) =
         let shape = 
             match shape, ndarray with 
             | None, Some nd -> 
@@ -118,14 +106,17 @@ type Bind =
                 else 
                     None
             | _ -> shape    
-        AuxBinding 
-            {AuxBind.Named name with 
-                Name = name
-                NDArray = ndarray
-                Shape = shape |> Option.map Seq.toArray
-                DataType = dataType 
-                StorageType = storageType
-            }
+        {
+            Name = name
+            NDArray = ndarray
+            Shape = shape |> Option.map Seq.toArray
+            DataType = dataType 
+            StorageType = storageType
+            Context = ctx
+            IsInitialized = false
+            Initializer = None
+            BindType = AuxBind
+        }
 
 [<AutoOpen>]
 module ParameterPatterns = 
@@ -146,16 +137,15 @@ module ParameterPatterns =
     let (|IsMax|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("max"))
     let (|IsWeightQuantize|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("weight_quantize"))
     let (|IsBiasQuantize|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("bias_quantize"))
+    let (|ArgBinding|_|) (b : Bind) = 
+        match b with 
+        | {BindType = ArgBind _} -> Some b
+        | _ -> None
+    let (|AuxBinding|_|) (b : Bind) = 
+        match b with 
+        | {BindType = AuxBind} -> Some b
+        | _ -> None
 
-
-module Init = 
-    let arg f = 
-        {new IInitializer with
-             member this.Initialize(b: Bind): bool = 
-                match b with 
-                | ArgBinding a -> f a
-                | b -> false
-        }
 [<RequireQualifiedAccess>]
 type OrthogonalRandType =
     | Uniform 
@@ -170,7 +160,10 @@ type XavierRandType =
     | Uniform
     | Gaussian
 
-module Initilizer = 
+module Initializer = 
+    type Skip() = 
+        interface IInitializer with 
+            member x.Initialize(b : Bind) = true
     type Default() = 
         interface IInitializer with
             member x.Initialize(b : Bind) =   
@@ -378,23 +371,24 @@ type Parameter(?name, ?shape : int seq, ?opReqType, ?grad, ?ndarray, ?dataType, 
        {
            Name = x.Name 
            NDArray = x.NDArray 
-           Grad = x.Grad
-           OpReqType = x.OpReqType
            Shape = x.Shape
            DataType = x.DataType 
            StorageType = x.StorageType
            Initializer = init
            IsInitialized = isInitialized
+           Context = None
+           BindType = ArgBind(x.OpReqType, x.Grad)
        }
 
-type Input(?name, ?shape, ?ndarray, ?dataType, ?storageType) = 
+type Input(?name, ?shape, ?ndarray, ?dataType, ?storageType, ?init) = 
     inherit Parameter(?name = name, 
                       ?shape = shape, 
                       opReqType = OpReqType.NullOp, 
                       grad = new NDArray(), 
                       ?ndarray = ndarray, 
                       ?dataType = dataType, 
-                      ?storageType = storageType)
+                      ?storageType = storageType,
+                      init = defaultArg init (Initializer.Skip()))
 
 type Constant(ndarray : NDArray, ?name) = 
     inherit Parameter(?name = name, 
@@ -403,7 +397,8 @@ type Constant(ndarray : NDArray, ?name) =
                       grad = new NDArray(), 
                       ndarray = ndarray, 
                       ?dataType = ndarray.DataType, 
-                      storageType = ndarray.StorageType)
+                      storageType = ndarray.StorageType,
+                      isInitialized = true)
 
 type Bindings(bindings : IDictionary<string, Bind>) = 
     new() = Bindings(Map.empty)
@@ -423,7 +418,7 @@ type Bindings(bindings : IDictionary<string, Bind>) =
             |> Array.choose 
                 (fun name -> 
                     match bindings.TryGetValue(name) with 
-                    | true, ArgBinding {Shape = Some s} -> Some(name, s)
+                    | true, {Shape = Some s; BindType = ArgBind _} -> Some(name, s)
                     | _ -> None)
             |> MXSymbol.keyShapeToCsrForm uint32 
             |||> MXSymbol.inferShapePartial symbol.UnsafeHandle 
@@ -433,9 +428,8 @@ type Bindings(bindings : IDictionary<string, Bind>) =
                 (fun name shape -> 
                     let shape = shape |> Array.map int
                     match bindings.TryGetValue(name) with
-                    | true, AuxBinding(b) -> AuxBinding { b with Shape = Some shape}
-                    //| true, _ ->  TODO: Log?
-                    | _ -> AuxBinding {AuxBind.Named name with Shape = Some shape}
+                    | true, ({Shape = Some s; BindType = AuxBind} as b) -> { b with Shape = Some shape}
+                    | _ -> Bind.Aux(name, shape = shape)
                 )
         let outBindings = 
             (symbol.OutputNames, result.OutputShapes)
@@ -443,9 +437,8 @@ type Bindings(bindings : IDictionary<string, Bind>) =
                 (fun name shape -> 
                     let shape = shape |> Array.map int
                     match bindings.TryGetValue(name) with
-                    | true, ArgBinding(a)-> ArgBinding {a with Shape = Some shape }
-                    //| true, _ ->  TODO: Log?
-                    | _ -> ArgBinding {ArgBind.Named name with Shape = Some shape}
+                    | true, ({BindType = ArgBind _} as a) -> {a with Shape = Some shape }
+                    | _ -> Bind.Arg(name, shape = shape)
                 )
         let inBindings = 
             (argNames, result.InputShapes)
@@ -453,9 +446,8 @@ type Bindings(bindings : IDictionary<string, Bind>) =
                 (fun name shape -> 
                     let shape = shape |> Array.map int
                     match bindings.TryGetValue(name) with
-                    | true, ArgBinding(a)-> ArgBinding {a with Shape = Some shape }
-                    //| true, _ ->  TODO: Log?
-                    | _ -> ArgBinding {ArgBind.Named name with Shape = Some shape}
+                    | true, ({BindType = ArgBind _} as a) -> {a with Shape = Some shape }
+                    | _ -> Bind.Arg(name, shape = shape)
                 )
         x.WithBindings(seq {yield! inBindings; yield! outBindings; yield! auxBindings})
     member x.InferTypes(symbol : Symbol) =    
@@ -465,7 +457,7 @@ type Bindings(bindings : IDictionary<string, Bind>) =
             |> Array.choose 
                 (fun name -> 
                     match bindings.TryGetValue(name) with 
-                    | true, ArgBinding {DataType = Some dt} -> Some (name, int dt.TypeFlag)
+                    | true, {DataType = Some dt; BindType = ArgBind _} -> Some (name, int dt.TypeFlag)
                     | _ -> None)
             |> Array.unzip
             ||> MXSymbol.inferTypePartial symbol.UnsafeHandle 
@@ -474,27 +466,24 @@ type Bindings(bindings : IDictionary<string, Bind>) =
             ||> Array.map2 
                 (fun name t -> 
                     match bindings.TryGetValue(name) with
-                    | true, AuxBinding a -> AuxBinding { a with DataType = DataType.FromInt t}
-                    //| true, _ ->  TODO: Log?
-                    | _ ->  AuxBinding { AuxBind.Named name with DataType = DataType.FromInt t} 
+                    | true, ({BindType = AuxBind} as a) -> { a with DataType = DataType.FromInt t}
+                    | _ ->  Bind.Aux(name, ?dataType = DataType.FromInt t)
                 )
         let outBindings = 
             (symbol.OutputNames, result.OutputTypes)
             ||> Array.map2 
                 (fun name t -> 
                     match bindings.TryGetValue(name) with
-                    | true, ArgBinding a -> ArgBinding {a with DataType = DataType.FromInt t}
-                    //| true, _ ->  TODO: Log?
-                    | _ -> ArgBinding { ArgBind.Named name with DataType = DataType.FromInt t} 
+                    | true, ({BindType = ArgBind _} as a)  -> {a with DataType = DataType.FromInt t}
+                    | _ -> Bind.Arg(name, ?dataType = DataType.FromInt t)
                 )
         let inBindings = 
             (argNames, result.InputTypes)
             ||> Array.map2 
                 (fun name t -> 
                     match bindings.TryGetValue(name) with
-                    | true, ArgBinding a -> ArgBinding {a with DataType = DataType.FromInt t}
-                    //| true, _ ->  TODO: Log?
-                    | _ -> ArgBinding { ArgBind.Named name with DataType = DataType.FromInt t} 
+                    | true, ({BindType = ArgBind _} as a)  -> {a with DataType = DataType.FromInt t}
+                    | _ -> Bind.Arg(name, ?dataType = DataType.FromInt t)
                 )
         x.WithBindings(seq {yield! inBindings; yield! outBindings; yield! auxBindings})
     member x.Bindings = bindings
@@ -517,42 +506,33 @@ type Bindings(bindings : IDictionary<string, Bind>) =
         | None -> 
             raise (NullReferenceException(sprintf "NDArray not set for binding %s" v.Name))
     member x.Grad(name : string) = 
-        match x.[name].Grad with 
-        | Some x -> x
-        | None -> 
+        match x.[name] with 
+        | {BindType = ArgBind(_,Some g)} -> g
+        | _ -> 
             raise (NullReferenceException(sprintf "Grad not set for binding %s" name))
     member x.Grad(v : Variable) = 
-        match x.[v].Grad with 
-        | Some x -> x
-        | None -> 
+        match x.[v] with 
+        | {BindType = ArgBind(_,Some g)} -> g
+        | _ -> 
             raise (NullReferenceException(sprintf "Grad not set for binding %s" v.Name))
     interface IEnumerable<Bind> with 
         member x.GetEnumerator() = bindings.Values.GetEnumerator()
         member x.GetEnumerator() = bindings.Values.GetEnumerator() :> System.Collections.IEnumerator
 
 module Bind = 
-    let fromVariable (v : Variable) = 
+    let fromVariable (v : Variable) =
         match v with 
-        | :? Parameter as p -> p.Binding |> ArgBinding
-        | _ -> ArgBind.Named v.Name |> ArgBinding
-    let shape (shape) (b : Bind) = b.WithShape shape
-    let noGrad (b : Bind) = 
+        | :? Parameter as p -> p.Binding
+        | _ -> Bind.Arg(v.Name)
+    let shape (shape) (b : Bind) = {b with Shape = Some shape}
+    let setOpReqType opReqType (b : Bind) = 
         match b with 
-        | AuxBinding _ -> b
-        | ArgBinding b -> ArgBinding {b with OpReqType = Some OpReqType.NullOp}
-    let gradWriteTo (b : Bind) = 
-        match b with 
-        | AuxBinding _ -> b
-        | ArgBinding b -> ArgBinding {b with OpReqType = Some OpReqType.WriteTo}
-    let gradWriteInPlace (b : Bind) = 
-        match b with 
-        | AuxBinding _ -> b
-        | ArgBinding b -> ArgBinding {b with OpReqType = Some OpReqType.WriteInplace}
-    let gradAddTo (b : Bind) = 
-        match b with 
-        | AuxBinding _ -> b
-        | ArgBinding b -> ArgBinding {b with OpReqType = Some OpReqType.AddTo}
-
+        | {BindType = ArgBind(_,g)} -> {b with BindType = ArgBind(Some opReqType, g)}
+        | _ -> b
+    let noGrad (b : Bind) = setOpReqType OpReqType.NullOp b
+    let gradWriteTo (b : Bind) = setOpReqType OpReqType.WriteTo b
+    let gradWriteInPlace (b : Bind) = setOpReqType OpReqType.WriteInplace b
+    let gradAddTo (b : Bind) = setOpReqType OpReqType.AddTo b
 
 
 
@@ -562,7 +542,7 @@ module Bindings =
         bm
         |> Seq.map 
             (function 
-             | AuxBinding a -> f a |> AuxBinding
+             | AuxBinding a -> f a
              | x -> x
             )
         |> Seq.map (fun (x : Bind) -> x.Name, x)
@@ -573,7 +553,7 @@ module Bindings =
         bm
         |> Seq.map 
             (function 
-             | ArgBinding a -> f a |> ArgBinding
+             | ArgBinding a -> f a
              | x -> x
             )
         |> Seq.map (fun (x : Bind) -> x.Name, x)
@@ -603,7 +583,11 @@ module Bindings =
             )
     /// All OpReqType's set to NullOp (no gradient calc)
     let freezeGraph (symbol : Symbol) (bm : Bindings) = 
-        bm |> mapSymbolArgs symbol (fun a -> {a with OpReqType = Some NullOp} )
+        bm 
+        |> mapSymbolArgs symbol 
+            (fun a -> 
+                {a with BindType = a.BindType.WithOpReqType(NullOp)} 
+            )
     /// Initilize Bindings with given Variables
     let inputs (variables : Variable seq) = 
         variables 
@@ -616,7 +600,7 @@ module Bindings =
             (fun x -> 
                 match x.Shape with 
                 | Some a when a.Length > 0 && a.[0] = 0 -> 
-                    x.WithShape [yield batchSize; yield! a.[1..]]
+                    {x with Shape = Some [|yield batchSize; yield! a.[1..]|]}
                 | _ -> x
             )
         |> ofSeq
@@ -625,8 +609,8 @@ module Bindings =
         bm
         |> mapArg 
             (fun a ->
-                match a.OpReqType with 
-                | None -> {a with OpReqType = Some opReqType}
+                match a with 
+                | {BindType = ArgBind(None,g)} -> {a with BindType = ArgBind(Some opReqType,g)}
                 | _ -> a
             )
     /// Fill missing NDArray's with f : Bind -> NDArray
@@ -638,19 +622,19 @@ module Bindings =
                 | None -> 
                     let nd : NDArray = f a 
                     match a.Shape with 
-                    | None -> a.WithNDArray(nd).WithShape(nd.Shape)
-                    | Some s when s = nd.Shape -> nd |> a.WithNDArray
+                    | None -> {a with NDArray = Some nd; Shape = Some nd.Shape}
+                    | Some s when s = nd.Shape -> {a with NDArray = Some nd}
                     | Some s -> 
                         let nds = nd.Shape
                         if s.Length = 0 then 
-                            a.WithNDArray(nd).WithShape(nds)
+                            {a with NDArray = Some nd; Shape = Some nds}
                         elif s.Length <> nds.Length then 
                             raise (RankException(sprintf "Given NDArray shape %A does not match binding %s shape %A" nds a.Name s))
                         else
                             for i = 0 to s.Length - 1 do 
                                 if s.[i] > 0 && s.[i] <> nds.[i] then 
                                     raise (RankException(sprintf "Given NDArray shape %A does not match binding %s shape %A" nds a.Name s))
-                            a.WithNDArray(nd).WithShape(nds)
+                            {a with NDArray = Some nd; Shape = Some nds}
                 | _ -> a
             )
     /// Default to OpReqType.WriteTo, zero grads and fill missing NDArray's using `f : b : Bind -> shape : int seq -> NDArray`
@@ -663,10 +647,12 @@ module Bindings =
                 f x shape
             ) 
         |> map 
+            (fun a -> {a with IsInitialized = true})
+        |> map 
             (fun a ->
                 match a with
-                | ArgBinding b when b.Grad.IsNone -> 
-                    ArgBinding {b with Grad = Some(MX.ZerosLike(a.NDArray.Value))}
+                | { BindType = ArgBind(opReqType, None) } ->
+                    {a with BindType = ArgBind(opReqType, Some(MX.ZerosLike(a.NDArray.Value)))}
                 | _ -> a
             )
 
@@ -744,9 +730,9 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                 (fun name ->
                     match bindings.TryGetValue(name) with 
                     | true, (ArgBinding b) -> 
-                        let a = match b.NDArray with Some a -> a | None -> raise (BindingIncompleteException(Some(ArgBinding b), "NDArray"))
-                        let g = match b.Grad with Some a -> a | None -> raise (BindingIncompleteException(Some(ArgBinding b), "Grad"))
-                        let t = match b.OpReqType with Some a -> a | None -> raise (BindingIncompleteException(Some(ArgBinding b), "OpReqType"))
+                        let a = match b.NDArray with Some a -> a | None -> raise (BindingIncompleteException(Some(b), "NDArray"))
+                        let g = match b.BindType with ArgBind(_, Some grad) -> grad | _ -> raise (BindingIncompleteException(Some(b), "Grad"))
+                        let t = match b.BindType with ArgBind(Some opReqType, _) -> opReqType | _ -> raise (BindingIncompleteException(Some(b), "OpReqType"))
                         a,g,t
                     | _ -> raise(BindingIncompleteException(None, name))
                 )
@@ -757,7 +743,7 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                 (fun name ->
                     match bindings.TryGetValue(name) with 
                     | true, (AuxBinding b) -> 
-                        let a = match b.NDArray with Some a -> a | None -> raise (BindingIncompleteException(Some(AuxBinding b), "NDArray"))
+                        let a = match b.NDArray with Some a -> a | None -> raise (BindingIncompleteException(Some(b), "NDArray"))
                         a
                     | _ -> raise(BindingIncompleteException(None, name))
                 )
@@ -786,49 +772,48 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                     (symbol.ArgumentNames, args)
                     ||> Seq.map2
                         (fun name (a,g,t) ->
-                            ArgBinding 
-                                { 
-                                    Name = name
-                                    Shape = Some a.Shape
-                                    NDArray = Some a
-                                    Grad = Some g
-                                    OpReqType = Some t
-                                    StorageType = Some a.StorageType
-                                    DataType = a.DataType 
-                                    IsInitialized = true
-                                    Initializer = None
-                                }
+                            { 
+                                Name = name
+                                Shape = Some a.Shape
+                                NDArray = Some a
+                                StorageType = Some a.StorageType
+                                DataType = a.DataType 
+                                IsInitialized = true
+                                Initializer = None
+                                Context = Some a.Context
+                                BindType = ArgBind(Some t, Some g)
+                            }
                         )
                 yield!
                     (symbol.AuxiliaryStateNames, auxStates)
                     ||> Seq.map2
                         (fun name a ->
-                            AuxBinding 
-                                { 
-                                    Name = name
-                                    Shape = Some a.Shape
-                                    NDArray = Some a
-                                    StorageType = Some a.StorageType
-                                    DataType = a.DataType
-                                    IsInitialized = true
-                                    Initializer = None
-                                }
+                            { 
+                                Name = name
+                                Shape = Some a.Shape
+                                NDArray = Some a
+                                StorageType = Some a.StorageType
+                                DataType = a.DataType
+                                IsInitialized = true
+                                Initializer = None
+                                Context = Some a.Context
+                                BindType = AuxBind
+                            }
                         )
                 yield!
                     (symbol.OutputNames, outputs)
                     ||> Seq.map2
                         (fun name a ->
-                            ArgBinding 
                                 { 
                                     Name = name
                                     Shape = Some a.Shape
                                     NDArray = Some a
-                                    Grad = None
-                                    OpReqType = None
                                     StorageType = Some a.StorageType
                                     DataType = a.DataType 
                                     IsInitialized = true
                                     Initializer = None
+                                    Context = Some a.Context
+                                    BindType = ArgBind(None,None)
                                 }
                         )
             }

@@ -17,6 +17,11 @@ module Composition =
         let bm = 
             Bindings.inputs [x] 
             |> Bindings.inferShapes model
+            |> Bindings.map 
+                (fun x ->
+                    printfn "%A" x
+                    x
+                )
             |> Bindings.init    
                 (fun x s ->
                     let a = (CPU 0).Zeros(s)

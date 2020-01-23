@@ -142,7 +142,7 @@ let optUpdate (e : Executor) =
         |> Seq.iter
             (fun a ->
                 match a with 
-                | ArgBinding ({Name = name; OpReqType = Some WriteTo; Grad = Some grad; NDArray = Some weight}) -> 
+                | {Name = name; BindType = ArgBind(Some WriteTo, Some grad); NDArray = Some weight} -> 
                     let m,v = lu name grad
                     MX.AdamUpdate([weight], weight, grad, m, v, lr, beta1, beta2)
                 | _ -> ()
