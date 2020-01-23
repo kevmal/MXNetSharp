@@ -691,6 +691,8 @@ type NDArray(handle : SafeNDArrayHandle) =
     member x.Concat(dim : int, [<ParamArray>] data : NDArray []) = invoke1 "Concat" data [|"num_args" <-- data.Length; "dim" <-- dim|]
     member x.Concat(dim : int, data : NDArray seq) = x.Concat(dim, data = (data |> Seq.toArray))
     member x.SwapAxis(dim1 : int, dim2 : int) = invoke1 "SwapAxis" [|x|] [|"dim1" <-- dim1; "dim2" <-- dim2|]
+    member x.MutReshape([<ParamArray>] dims : int []) = mutInvoke x "Reshape" [|x|] [|"shape" <-- dims|]
+    member x.MutReshape(dims : int seq) =  mutInvoke x "Reshape" [|x|] [|"shape" <-- dims|]
     member x.Reshape([<ParamArray>] dims : int []) = invoke1 "Reshape" [|x|] [|"shape" <-- dims|]
     member x.Reshape(dims : int seq) = invoke1 "Reshape" [|x|] [|"shape" <-- dims|]
     member x.ReverseReshape([<ParamArray>] dims : int []) = invoke1 "Reshape" [|x|] [|"shape" <-- dims; "reverse" <-- true|]
