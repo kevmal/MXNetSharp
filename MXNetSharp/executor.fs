@@ -677,8 +677,8 @@ type BindingIncompleteException(bind : Bind option, fieldOrName : string) =
         | Some bind -> 
             let tp = 
                 match bind with 
-                | AuxBinding _ -> "Aux"
-                | ArgBinding _ -> "Arg"
+                | {BindType = AuxBind } -> "Aux"
+                | {BindType = ArgBind _} -> "Arg"
             sprintf "Bindings incomplete. Expecting %s in  %s binding '%s'" fieldOrName tp bind.Name
         | None -> 
             sprintf "Bindings incomplete. No binding for '%s'." fieldOrName 
