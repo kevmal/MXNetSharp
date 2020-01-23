@@ -118,7 +118,7 @@ let op = MySoftmax(x)
 let bm = 
     op.Bindings
     |> Bindings.inferShapes op
-    |> Bindings.init (fun _ s -> (GPU 0).Zeros(s))
+    |> Bindings.initWith Init.zero
 
 let exe = op.Bind(GPU 0, bm)
 exe.Forward(true)

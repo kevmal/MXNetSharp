@@ -107,7 +107,8 @@ let genNoise = randNormal.Bind(context)
 let trainBindings = 
     bindings 
     |> Bindings.batchSize 128
-    |> Bindings.init (fun a shape ->  MX.RandomUniformNDArray(context, -0.1, 0.1, shape))
+    |> Bindings.setContext context
+    |> Bindings.initWith (Initializer.Xavier())
 
 
 let actualLoss = onActual.Bind(context, trainBindings)

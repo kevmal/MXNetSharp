@@ -461,58 +461,42 @@ let bindings =
 let evalBindings = 
     bindings 
     |> Bindings.batchSize 1
-    |> Bindings.init 
-        (fun a shape ->  
-            let fanin = 
-                if shape.Length = 3 then    
-                    double a.Shape.Value.[1]*double a.Shape.Value.[2]
-                elif shape.Length = 1 then 
-                    double a.Shape.Value.[0]
-                else
-                    double a.Shape.Value.[1]
-            let alpha = sqrt 5.0
-            let gain = sqrt(2.0 / (1.0 + alpha*alpha))
-            let stdv = sqrt(3.0) * (gain) / sqrt(fanin)
-            MX.RandomUniformNDArray(context, -stdv, stdv, a.Shape.Value)
+    |> Bindings.setContext context
+    |> Bindings.initWithFunc 
+        (fun binding ndarray ->  
+            match binding with 
+            | Factor FactorType.In fanin ->
+                let alpha = sqrt 5.0
+                let gain = sqrt(2.0 / (1.0 + alpha*alpha))
+                let stdv = sqrt(3.0) * (gain) / sqrt(fanin)
+                MX.RandomUniform([ndarray], ndarray.Context, -stdv, stdv)
+                true 
+            | _ -> false
         )
-
 // Target executor maintains copies of the model parameters and updates at deliberate times
 // Keeping the parameters fixed for a number of steps allows the network train against a fixed target during that time
 let targetBindings = 
     bindings 
     |> Bindings.batchSize batchSz
-    |> Bindings.init 
-        (fun a shape ->  
-            let scc,v = evalBindings.TryGetValue(a.Name)
-            if scc && shape = v.Shape.Value then 
-                v.NDArray.Value
-            else
-                context.Zeros shape
-        )
+    |> Bindings.setContext context 
+    |> Bindings.shareParameters evalBindings
+    |> Bindings.init
 
-// Train executor will receive paramter updates every training step
+// Train executor will receive parameter updates every training step
 let trainBindings = 
     bindings 
     |> Bindings.inferShapes loss
     |> Bindings.batchSize batchSz
-    |> Bindings.init 
-        (fun a shape ->  
-            let scc,v = evalBindings.TryGetValue(a.Name)
-            if scc && shape = v.Shape.Value then 
-                v.NDArray.Value.CopyTo(context)
-            else
-                context.Zeros shape
-        )
+    |> Bindings.setContext context 
+    |> Bindings.copyParameters evalBindings
+    |> Bindings.init
 
 /// Copy trained parameters to target network
 let copyToTarget() = 
     for a in targetBindings do 
-        match a with 
-        | ArgBinding(a) -> 
-            let scc,b = trainBindings.TryGetValue(a.Name)
-            if scc && a.Shape = b.Shape then 
-                b.NDArray.Value.CopyTo(a.NDArray.Value)
-        | _ -> ()
+        let scc,b = trainBindings.TryGetValue(a.Name)
+        if scc && a.Shape = b.Shape then 
+            b.NDArray.Value.CopyTo(a.NDArray.Value)
 
 
 // Create the needed executors for training
@@ -671,26 +655,18 @@ let playLock = obj()
 let runBindings = 
     bindings 
     |> Bindings.batchSize 1
-    |> Bindings.init 
-        (fun a shape ->  
-            let scc,v = evalBindings.TryGetValue(a.Name)
-            if scc && shape = v.Shape.Value then 
-                v.NDArray.Value.CopyTo(runContext)
-            else
-                context.Zeros shape
-        )
+    |> Bindings.setContext runContext
+    |> Bindings.copyParameters evalBindings 
+    |> Bindings.init
 
 /// update parameters of the live model
 let copyToRun() = 
     lock playLock
         (fun _ ->
             for a in runBindings do 
-                match a with 
-                | ArgBinding(a) -> 
-                    let scc,b = trainBindings.TryGetValue(a.Name)
-                    if scc && a.Shape = b.Shape then 
-                        b.NDArray.Value.CopyTo(a.NDArray.Value)
-                | _ -> ()
+                let scc,b = trainBindings.TryGetValue(a.Name)
+                if scc && a.Shape = b.Shape then 
+                    b.NDArray.Value.CopyTo(a.NDArray.Value)
         )
 
 /// Live executor

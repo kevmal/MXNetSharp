@@ -489,7 +489,7 @@ type Bindings(bindings : IDictionary<string, Bind>) =
                     let shape = shape |> Array.map int
                     match bindings.TryGetValue(name) with
                     | true, ({BindType = ArgBind _} as a) -> {a with Shape = Some shape }
-                    | _ -> Bind.Arg(name, shape = shape, isInitialized = true)
+                    | _ -> Bind.Arg(name, shape = shape)
                 )
         let inBindings = 
             (argNames, result.InputShapes)

@@ -17,11 +17,6 @@ module Composition =
         let bm = 
             Bindings.inputs [x] 
             |> Bindings.inferShapes model
-            |> Bindings.map 
-                (fun x ->
-                    printfn "%A" x
-                    x
-                )
             |> Bindings.defaultInitializer    
                 (Init.create (fun _ a ->
                     a.MutFull(2.0) |> ignore
