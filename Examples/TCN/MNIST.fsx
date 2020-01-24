@@ -44,8 +44,8 @@ let withName name (symbol : #Symbol) = symbol.Name <- name; symbol
 
 // ******************************************** Model **********************************************
 let weightNormalization name =
-    let g = Variable(name + "_g")
-    let v = Variable(name + "_v")
+    let g = Variable(name + "_g_weight")
+    let v = Variable(name + "_v_weight")
     let n = Norm(v, 2, [1;2], keepdims = true)
     let f = BroadcastLike(g / n, v)
     let w = f * v |> withName (name + "_w")
@@ -53,7 +53,7 @@ let weightNormalization name =
 
 let temporalBlock name inCount outputCount kernelSize stride dilation padding dropout (x : Symbol) = 
     let conv1 = Convolution(x, 
-                            weightNormalization (name + "_conv1_weight"),
+                            weightNormalization (name + "_conv1"),
                             Variable("_conv1_bias"),
                             [kernelSize],  
                             outputCount, 
@@ -66,7 +66,7 @@ let temporalBlock name inCount outputCount kernelSize stride dilation padding dr
     let relu1 = Relu(conv1Sliced, Name = name + "_relu1")
     let dropout1 = Dropout(relu1, dropout, DropoutMode.Training)
     let conv2 = Convolution(dropout1,
-                            weightNormalization (name + "_conv2_weight"),
+                            weightNormalization (name + "_conv2"),
                             Variable(name + "_conv2_bias"),
                             [kernelSize],  
                             outputCount, 
@@ -113,7 +113,7 @@ let z =
 
 let correct = Argmax(z, axis = 1) .= Reshape(label, [-1]) .>> Sum()
 let loss = -Mean(Pick(LogSoftmax(z, axis=1), Reshape(label, [-1]))) .>> MakeLoss()
-let outp = SymbolGroup([loss :> Symbol; correct :> Symbol])
+let outp = SymbolGroup(loss, correct)
 
 
 // ******************************************** Optimizer **********************************************
@@ -141,7 +141,7 @@ type AdamOptimizer(e : Executor, lr, ?beta1, ?beta2) =
         |> Seq.iter
             (fun a ->
                 match a with 
-                | ArgBinding ({Name = name; OpReqType = Some WriteTo; Grad = Some grad; NDArray = Some weight}) -> 
+                | {Name = name; BindType = ArgBind(Some WriteTo, Some grad); NDArray = Some weight} -> 
                     let m,v = lu name grad
                     MX.AdamUpdate([weight], weight, grad, m, v, lr, beta1, beta2, epsilon)
                 | _ -> ()
@@ -153,19 +153,17 @@ let bindings =
     loss.Bindings
     |> Bindings.batchSize batchSize 
     |> Bindings.inferShapes loss
-    |> Bindings.init 
-        (fun a shape ->  
-            let fanin = 
-                if shape.Length = 3 then    
-                    double a.Shape.Value.[1]*double a.Shape.Value.[2]
-                elif shape.Length = 1 then 
-                    double a.Shape.Value.[0]
-                else
-                    double a.Shape.Value.[1]
-            let alpha = sqrt 5.0
-            let gain = sqrt(2.0 / (1.0 + alpha*alpha))
-            let stdv = sqrt(3.0) * (gain) / sqrt(fanin)
-            MX.RandomUniformNDArray(context, -stdv, stdv, a.Shape.Value)
+    |> Bindings.setContext context
+    |> Bindings.initWithFunc 
+        (fun binding ndarray ->  
+            match binding with 
+            | Factor FactorType.In fanin ->
+                let alpha = sqrt 5.0
+                let gain = sqrt(2.0 / (1.0 + alpha*alpha))
+                let stdv = sqrt(3.0) * (gain) / sqrt(fanin)
+                MX.RandomUniform([ndarray], ndarray.Context, -stdv, stdv)
+                true 
+            | _ -> false
         )
 
 // ******************************************** Datasets **********************************************

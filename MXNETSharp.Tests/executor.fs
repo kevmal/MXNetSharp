@@ -102,9 +102,9 @@ module Basic =
             |> Bindings.ofSeq
             |> Bindings.mapArg 
                 (fun a ->
-                    match a.OpReqType with 
-                    | Some NullOp -> {a with Grad = Some(new NDArray())}
-                    | _ -> {a with Grad = Some(MX.ZerosLike(a.NDArray.Value))}
+                    match a with 
+                    | {BindType = ArgBind(Some NullOp,_)} -> {a with BindType = ArgBind(Some NullOp,Some(new NDArray()))}
+                    | _ -> {a with BindType = ArgBind(a.OpReqType,Some(new NDArray()))}
                 )
             |> Bindings.inferShapes r
         

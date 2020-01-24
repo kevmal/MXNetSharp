@@ -104,12 +104,9 @@ Above notice the x,y training pairs are generated using the target network (`exe
 /// Copy trained parameters to target network
 let copyToTarget() = 
     for a in targetBindings do 
-        match a with 
-        | ArgBinding(a) -> 
-            let scc,b = trainBindings.TryGetValue(a.Name)
-            if scc && a.Shape = b.Shape then 
-                b.NDArray.Value.CopyTo(a.NDArray.Value)
-        | _ -> ()
+        let scc,b = trainBindings.TryGetValue(a.Name)
+        if scc && a.Shape = b.Shape then 
+            b.NDArray.Value.CopyTo(a.NDArray.Value)
 ```
 every `updateTargetStepCount` steps. More specifically this is done by passing an `onStep` function to `makeTrainer : onStep -> onEpisode -> TrainerAgent`:
 ```fsharp 
