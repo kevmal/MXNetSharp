@@ -513,6 +513,8 @@ type Bindings(bindings : IDictionary<string, Bind>) =
                 (fun name -> 
                     match bindings.TryGetValue(name) with 
                     | true, {DataType = Some dt; BindType = ArgBind _} -> Some (name, int dt.TypeFlag)
+                    | true, {DataType = None; NDArray = Some nd; BindType = ArgBind _} when nd.DataType.IsSome -> 
+                        Some (name, int nd.DataTypeFlag)
                     | _ -> None)
             |> Array.unzip
             ||> MXSymbol.inferTypePartial symbol.UnsafeHandle 
