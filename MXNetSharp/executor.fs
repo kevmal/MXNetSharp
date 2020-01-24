@@ -447,7 +447,7 @@ type Bindings(bindings : IDictionary<string, Bind>) =
         let d = Dictionary(bindings)
         newBindings |> Seq.iter (fun b -> d.[b.Name] <- b)
         Bindings d
-    member x.ImpliedContext() =
+    member x.ImpliedContext(?context : Context) =
         let ctx = 
             x 
             |> Seq.choose (fun x -> match x.Context with | None -> x.NDArray |> Option.map (fun x -> x.Context) | c -> c)
@@ -455,17 +455,18 @@ type Bindings(bindings : IDictionary<string, Bind>) =
             |> Seq.toList
         match ctx with 
         | [c] -> Some c
-        | _ -> None
-    member x.ImpliedContextOrDefault(context : Context) =
-        let ctx = 
-            x 
-            |> Seq.choose (fun x -> match x.Context with | None -> x.NDArray |> Option.map (fun x -> x.Context) | c -> c)
-            |> Seq.distinct
-            |> Seq.toList
-        match ctx with 
-        | [c] -> Some c
-        | [] -> Some context
-        | _ -> None
+        | [] -> context
+        | _ -> 
+            if x |> Seq.exists (fun x -> x.CanCopy) then 
+                let bs = 
+                    x 
+                    |> Seq.filter (fun x -> not x.CanCopy)
+                    |> Seq.map (fun x -> x.Name, x)
+                    |> dict
+                    |> Bindings
+                bs.ImpliedContext(?context = context)
+            else 
+                None
     member x.InferShapes(symbol : Symbol) =    
         let argNames = symbol.ArgumentNames
         let result = 
