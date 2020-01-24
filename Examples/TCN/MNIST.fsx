@@ -113,7 +113,7 @@ let z =
 
 let correct = Argmax(z, axis = 1) .= Reshape(label, [-1]) .>> Sum()
 let loss = -Mean(Pick(LogSoftmax(z, axis=1), Reshape(label, [-1]))) .>> MakeLoss()
-let outp = SymbolGroup([loss :> Symbol; correct :> Symbol])
+let outp = SymbolGroup(loss, correct)
 
 
 // ******************************************** Optimizer **********************************************
