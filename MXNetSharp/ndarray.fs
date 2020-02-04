@@ -235,8 +235,8 @@ type NDArray(handle : SafeNDArrayHandle) =
     static member (+)(x : NDArray, y : NDArray) = invoke1 "elemwise_add" [|x; y|] Array.empty 
     static member (.+)(x : NDArray, y : NDArray) = invoke1 "broadcast_plus" [|x; y|] Array.empty 
     member x.MutPlus(y : float) = mutInvoke x "_plus_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutPlus(y : NDArray) = mutInvoke x "elemwise_add" [|x; y|]
-    member x.MutPlusBroadcast(y : NDArray) = mutInvoke x "broadcast_add" [|x; y|] 
+    member x.MutPlus(y : NDArray) = mutInvoke x "elemwise_add" [|x; y|] Array.empty 
+    member x.MutPlusBroadcast(y : NDArray) = mutInvoke x "broadcast_add" [|x; y|] Array.empty 
 
    
     static member (-)(x : NDArray, y : float) = invoke1 "_minus_scalar" [|x|] [|"scalar" <-- y|]
@@ -244,11 +244,11 @@ type NDArray(handle : SafeNDArrayHandle) =
     static member (-)(x : NDArray, y : NDArray) = invoke1 "elemwise_sub" [|x; y|] Array.empty 
     static member (.-)(x : NDArray, y : NDArray) = invoke1 "broadcast_sub" [|x; y|] Array.empty 
     member x.MutSubstract(y : float) = mutInvoke x "_sub_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutSubstract(y : NDArray) = mutInvoke x "elemwise_sub" [|x; y|]
+    member x.MutSubstract(y : NDArray) = mutInvoke x "elemwise_sub" [|x; y|] Array.empty 
     member x.MutSubstractFrom(y : float) = mutInvoke x "_rminus_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutSubstractFrom(y : NDArray) = mutInvoke x "elemwise_sub" [|y; x|]
-    member x.MutSubstractBroadcast(y : NDArray) = mutInvoke x "broadcast_sub" [|x; y|] 
-    member x.MutSubstractBroadcastFrom(y : NDArray) = mutInvoke x "broadcast_sub" [|y; x|] 
+    member x.MutSubstractFrom(y : NDArray) = mutInvoke x "elemwise_sub" [|y; x|] Array.empty 
+    member x.MutSubstractBroadcast(y : NDArray) = mutInvoke x "broadcast_sub" [|x; y|] Array.empty 
+    member x.MutSubstractBroadcastFrom(y : NDArray) = mutInvoke x "broadcast_sub" [|y; x|] Array.empty  
  
  
     static member (/)(x : NDArray, y : float) = invoke1 "_div_scalar" [|x|] [|"scalar" <-- y|]
@@ -256,11 +256,11 @@ type NDArray(handle : SafeNDArrayHandle) =
     static member (/)(x : NDArray, y : NDArray) = invoke1 "elemwise_div" [|x; y|] Array.empty 
     static member (./)(x : NDArray, y : NDArray) = invoke1 "broadcast_div" [|x; y|] Array.empty 
     member x.MutDividedBy(y : float) = mutInvoke x "_div_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutDividedBy(y : NDArray) = mutInvoke x "elemwise_div" [|x; y|]
+    member x.MutDividedBy(y : NDArray) = mutInvoke x "elemwise_div" [|x; y|] Array.empty 
     member x.MutDividedInto(y : float) = mutInvoke x "_rdiv_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutDividedInto(y : NDArray) = mutInvoke x "elemwise_div" [|y; x|]
-    member x.MutDividedBroadcastBy(y : NDArray) = mutInvoke x "broadcast_div" [|x; y|] 
-    member x.MutDividedBroadcastInto(y : NDArray) = mutInvoke x "broadcast_div" [|y; x|] 
+    member x.MutDividedInto(y : NDArray) = mutInvoke x "elemwise_div" [|y; x|] Array.empty 
+    member x.MutDividedBroadcastBy(y : NDArray) = mutInvoke x "broadcast_div" [|x; y|] Array.empty 
+    member x.MutDividedBroadcastInto(y : NDArray) = mutInvoke x "broadcast_div" [|y; x|] Array.empty 
 
 
     static member ( * )(x : NDArray, y : float) = invoke1 "_mul_scalar" [|x|] [|"scalar" <-- y|]
@@ -268,8 +268,8 @@ type NDArray(handle : SafeNDArrayHandle) =
     static member ( * )(x : NDArray, y : NDArray) = invoke1 "elemwise_mul" [|x; y|] Array.empty 
     static member ( .* )(x : NDArray, y : NDArray) = invoke1 "broadcast_mul" [|x; y|] Array.empty 
     member x.MutMultiply(y : float) = mutInvoke x "_mul_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutMultiply(y : NDArray) = mutInvoke x "elemwise_mul" [|x; y|]
-    member x.MutMultiplyBroadcast(y : NDArray) = mutInvoke x "broadcast_mul" [|x; y|] 
+    member x.MutMultiply(y : NDArray) = mutInvoke x "elemwise_mul" [|x; y|] Array.empty 
+    member x.MutMultiplyBroadcast(y : NDArray) = mutInvoke x "broadcast_mul" [|x; y|] Array.empty 
 
        
     static member Pow(x : NDArray, y : float) = invoke1 "_power_scalar" [|x|] [|"scalar" <-- y|]
@@ -282,11 +282,11 @@ type NDArray(handle : SafeNDArrayHandle) =
     //member x.ApplyPower(y : float) = NDArray.Pow(x,y)
     //member x.ApplyPowerBaseOf(y : float) = NDArray.Pow(y,x)
     member x.MutPower(y : float) = mutInvoke x "_power_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutPower(y : NDArray) = mutInvoke x "_power" [|x; y|]
+    member x.MutPower(y : NDArray) = mutInvoke x "_power" [|x; y|] Array.empty 
     member x.MutPowerBaseOf(y : float) = mutInvoke x "_rpower_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutPowerBaseOf(y : NDArray) = mutInvoke x "_power" [|y; x|]
-    member x.MutPowerBroadcast(y : NDArray) = mutInvoke x "broadcast_power" [|x; y|] 
-    member x.MutPowerBaseOfBroadcast(y : NDArray) = mutInvoke x "broadcast_power" [|y; x|] 
+    member x.MutPowerBaseOf(y : NDArray) = mutInvoke x "_power" [|y; x|] Array.empty 
+    member x.MutPowerBroadcast(y : NDArray) = mutInvoke x "broadcast_power" [|x; y|] Array.empty 
+    member x.MutPowerBaseOfBroadcast(y : NDArray) = mutInvoke x "broadcast_power" [|y; x|] Array.empty 
 
 
     member x.Negate() = -1.0*x
@@ -297,45 +297,45 @@ type NDArray(handle : SafeNDArrayHandle) =
     static member (%)(y : float, x : NDArray) = invoke1 "_rmod_scalar" [|x|] [|"scalar" <-- y|]
     static member (%)(x : NDArray, y : NDArray) = invoke1 "broadcast_mod" [|x; y|] Array.empty 
     member x.MutMod(y : float) = mutInvoke x "_mod_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutMod(y : NDArray) = mutInvoke x "broadcast_mod" [|x; y|]
+    member x.MutMod(y : NDArray) = mutInvoke x "broadcast_mod" [|x; y|] Array.empty 
     member x.MutModOf(y : float) = mutInvoke x "_rmod_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutModOf(y : NDArray) = mutInvoke x "broadcast_mod" [|y; x|]
+    member x.MutModOf(y : NDArray) = mutInvoke x "broadcast_mod" [|y; x|] Array.empty 
 
     static member (.=)(x : NDArray, y : float) = invoke1 "_equal_scalar" [|x|] [|"scalar" <-- y|]
     static member (.=)(y : float, x : NDArray) = invoke1 "_equal_scalar" [|x|] [|"scalar" <-- y|]
     static member (.=)(x : NDArray, y : NDArray) = invoke1 "broadcast_equal" [|x; y|] Array.empty 
     member x.MutEqual(y : float) = mutInvoke x "_mod_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutEqual(y : NDArray) = mutInvoke x "broadcast_mod" [|x; y|]
+    member x.MutEqual(y : NDArray) = mutInvoke x "broadcast_mod" [|x; y|] Array.empty 
 
     static member (.<>)(x : NDArray, y : float) = invoke1 "_not_equal_scalar" [|x|] [|"scalar" <-- y|]
     static member (.<>)(y : float, x : NDArray) = invoke1 "_not_equal_scalar" [|x|] [|"scalar" <-- y|]
     static member (.<>)(x : NDArray, y : NDArray) = invoke1 "broadcast_not_equal" [|x; y|] Array.empty 
     member x.MutNotEqual(y : float) = mutInvoke x "_not_equal_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutNotEqual(y : NDArray) = mutInvoke x "broadcast_not_equal" [|x; y|]
+    member x.MutNotEqual(y : NDArray) = mutInvoke x "broadcast_not_equal" [|x; y|] Array.empty 
 
     static member (.>)(x : NDArray, y : float) = invoke1 "_greater_scalar" [|x|] [|"scalar" <-- y|]
     static member (.>)(y : float, x : NDArray) = invoke1 "_lesser_scalar" [|x|] [|"scalar" <-- y|]
     static member (.>)(x : NDArray, y : NDArray) = invoke1 "broadcast_greater" [|x; y|] Array.empty 
     member x.MutGreater(y : float) = mutInvoke x "_greater_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutGreater(y : NDArray) = mutInvoke x "broadcast_greater" [|x; y|]
+    member x.MutGreater(y : NDArray) = mutInvoke x "broadcast_greater" [|x; y|] Array.empty 
 
     static member (.<)(x : NDArray, y : float) = invoke1 "_lesser_scalar" [|x|] [|"scalar" <-- y|]
     static member (.<)(y : float, x : NDArray) = invoke1 "_greater_scalar" [|x|] [|"scalar" <-- y|]
     static member (.<)(x : NDArray, y : NDArray) = invoke1 "broadcast_lesser" [|x; y|] Array.empty 
     member x.MutLesser(y : float) = mutInvoke x "_lesser_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutLesser(y : NDArray) = mutInvoke x "broadcast_lesser" [|x; y|]
+    member x.MutLesser(y : NDArray) = mutInvoke x "broadcast_lesser" [|x; y|] Array.empty 
 
     static member (.>=)(x : NDArray, y : float) = invoke1 "_greater_equal_scalar" [|x|] [|"scalar" <-- y|]
     static member (.>=)(y : float, x : NDArray) = invoke1 "_lesser_equal_scalar" [|x|] [|"scalar" <-- y|]
     static member (.>=)(x : NDArray, y : NDArray) = invoke1 "broadcast_greater_equal" [|x; y|] Array.empty 
     member x.MutGreaterOrEqual(y : float) = mutInvoke x "_greater_equal_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutGreaterOrEqual(y : NDArray) = mutInvoke x "broadcast_greater_equal" [|x; y|]
+    member x.MutGreaterOrEqual(y : NDArray) = mutInvoke x "broadcast_greater_equal" [|x; y|] Array.empty 
 
     static member (.<=)(x : NDArray, y : float) = invoke1 "_lesser_equal_scalar" [|x|] [|"scalar" <-- y|]
     static member (.<=)(y : float, x : NDArray) = invoke1 "_greater_equal_scalar" [|x|] [|"scalar" <-- y|]
     static member (.<=)(x : NDArray, y : NDArray) = invoke1 "broadcast_lesser_equal" [|x; y|] Array.empty 
     member x.MutLesserOrEqual(y : float) = mutInvoke x "_lesser_equal_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutLesserOrEqual(y : NDArray) = mutInvoke x "broadcast_lesser_equal" [|x; y|]
+    member x.MutLesserOrEqual(y : NDArray) = mutInvoke x "broadcast_lesser_equal" [|x; y|] Array.empty 
 
  
     static member (.&&)(x : NDArray, y : float) = invoke1 "_logical_and_scalar" [|x|] [|"scalar" <-- y|]
@@ -343,25 +343,25 @@ type NDArray(handle : SafeNDArrayHandle) =
     static member (.&&)(x : NDArray, y : NDArray) = invoke1 "_logical_and" [|x; y|] Array.empty 
     static member (..&&)(x : NDArray, y : NDArray) = invoke1 "broadcast_logical_and" [|x; y|] Array.empty 
     member x.MutLogicalAnd(y : float) = mutInvoke x "_logical_and_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutLogicalAnd(y : NDArray) = mutInvoke x "_logical_and" [|x; y|]
-    member x.MutLogicalAndBroadcast(y : NDArray) = mutInvoke x "broadcast_logical_and" [|x; y|] 
-
+    member x.MutLogicalAnd(y : NDArray) = mutInvoke x "_logical_and" [|x; y|] Array.empty 
+    member x.MutLogicalAndBroadcast(y : NDArray) = mutInvoke x "broadcast_logical_and" [|x; y|] Array.empty 
+ 
 
     static member (.||)(x : NDArray, y : float) = invoke1 "_logical_or_scalar" [|x|] [|"scalar" <-- y|]
     static member (.||)(y : float, x : NDArray) = invoke1 "_logical_or_scalar" [|x|] [|"scalar" <-- y|]
     static member (.||)(x : NDArray, y : NDArray) = invoke1 "_logical_or" [|x; y|] Array.empty 
     static member (..||)(x : NDArray, y : NDArray) = invoke1 "broadcast_logical_or" [|x; y|] Array.empty 
     member x.MutLogicalOr(y : float) = mutInvoke x "_logical_or_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutLogicalOr(y : NDArray) = mutInvoke x "_logical_or" [|x; y|]
-    member x.MutLogicalOrBroadcast(y : NDArray) = mutInvoke x "broadcast_logical_or" [|x; y|] 
+    member x.MutLogicalOr(y : NDArray) = mutInvoke x "_logical_or" [|x; y|] Array.empty 
+    member x.MutLogicalOrBroadcast(y : NDArray) = mutInvoke x "broadcast_logical_or" [|x; y|] Array.empty 
 
     static member (.^^)(x : NDArray, y : float) = invoke1 "_logical_xor_scalar" [|x|] [|"scalar" <-- y|]
     static member (.^^)(y : float, x : NDArray) = invoke1 "_logical_xor_scalar" [|x|] [|"scalar" <-- y|]
     static member (.^^)(x : NDArray, y : NDArray) = invoke1 "_logical_xor" [|x; y|] Array.empty 
     static member (..^^)(x : NDArray, y : NDArray) = invoke1 "broadcast_logical_xor" [|x; y|] Array.empty 
     member x.MutLogicalXor(y : float) = mutInvoke x "_logical_xor_scalar" [|x|] [|"scalar" <-- y|]
-    member x.MutLogicalXor(y : NDArray) = mutInvoke x "_logical_xor" [|x; y|]
-    member x.MutLogicalXorBroadcast(y : NDArray) = mutInvoke x "broadcast_logical_xor" [|x; y|] 
+    member x.MutLogicalXor(y : NDArray) = mutInvoke x "_logical_xor" [|x; y|] Array.empty 
+    member x.MutLogicalXorBroadcast(y : NDArray) = mutInvoke x "broadcast_logical_xor" [|x; y|] Array.empty 
 
 
     member x.Exp() = invoke "exp" [|x|] Array.empty |> Array.head
