@@ -31,6 +31,10 @@ type Bind =
         BindType : BindType
         CanCopy : bool
     }
+    member x.IsOutBind =    
+        match x.BindType with
+        | OutBind -> true 
+        | _ -> false
     member x.Grad = 
         match x with 
         | {BindType = ArgBind(_,g)} -> g
@@ -592,7 +596,7 @@ module Bind =
     let gradWriteInPlace (b : Bind) = setOpReqType OpReqType.WriteInplace b
     let gradAddTo (b : Bind) = setOpReqType OpReqType.AddTo b
     let init (x : Bind) = 
-        if x.IsInitialized then 
+        if x.IsInitialized || x.IsOutBind then 
             x
         else
             match x.Initializer with 
@@ -1028,52 +1032,15 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
 
 [<AutoOpen>]
 module SymbolExtension =
-    open MXNetSharp.SymbolArgument
     type Symbol with 
         member x.Bindings = 
-            let visited = HashSet<Symbol>({new IEqualityComparer<Symbol> with
-                                               member this.Equals(x: Symbol, y: Symbol): bool = 
-                                                   Object.ReferenceEquals(x,y)
-                                               member this.GetHashCode(obj: Symbol): int = 
-                                                   System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj)})
-            let rec loop (symbol : Symbol) : Parameter seq = 
-                if not(visited.Add symbol) then 
-                    Seq.empty 
-                else
+            x 
+            |> SymUtil.choose
+                (fun symbol -> 
                     match symbol with 
-                    | :? Parameter as p -> Seq.singleton p
-                    | :? SymbolOutput as s -> loop s.Parent
-                    | :? SymbolGroup as s -> 
-                        seq {
-                            for i = 0 to s.Count - 1 do 
-                                yield! loop s.[i]
-                        }
-                    | :? SymbolOperator as s -> 
-                        s.OperatorArguments
-                        |> Seq.collect
-                            (fun a -> 
-                                match a with 
-                                | name, VarArg(num, args) -> 
-                                    args 
-                                    |> Seq.collect 
-                                        (fun a ->
-                                            match a with 
-                                            | :? SymbolOperator as s -> 
-                                                loop s
-                                            | :? SymbolOutput as s -> 
-                                                loop s.Parent
-                                            | :? Parameter as p -> 
-                                                Seq.singleton p
-                                            | s -> 
-                                                Seq.empty
-                                        )
-                                | name, Input(:? SymbolOperator as s) -> loop s
-                                | name, Input(:? SymbolOutput as s) -> loop s.Parent
-                                | name, Input(:? Parameter as s) -> Seq.singleton s
-                                | otherwise -> Seq.empty
-                            )
-                    | _ -> Seq.empty
-            loop x 
+                    | :? Parameter as p -> Some(false,p)
+                    | _ -> None
+                )
             |> Seq.cast
             |> Bindings.inputs
         member x.Bind(context, batchSize, bindings) = 
