@@ -525,6 +525,42 @@ type Hole() =
     default x.Copy() = Hole() :> Symbol
 
 module SymUtil = 
+    let rec choose (filter : Symbol -> (bool*'a) option) (target : Symbol) =  
+        let visited = HashSet<Symbol>(HashIdentity.Reference)
+        let rec check symbol = 
+            match filter symbol with 
+            | Some(flowThrough, v) -> 
+                if flowThrough then 
+                    seq {
+                        v
+                        yield! loop symbol
+                    }
+                else
+                    Seq.singleton v
+            | None -> 
+                loop symbol
+        and loop (symbol : Symbol) : 'a seq = 
+            if visited.Add symbol then 
+                match symbol with 
+                | :? SymbolOutput as s -> check s.Parent
+                | :? SymbolGroup as s -> 
+                    seq {
+                        for i = 0 to s.Count - 1 do 
+                            yield! check s.[i]
+                    }
+                | :? SymbolOperator as s -> 
+                    s.OperatorArguments
+                    |> Seq.collect
+                        (fun a -> 
+                            match a with 
+                            | _name, VarArg(_num, args) -> args |> Seq.collect check
+                            | _name, Input(s) -> check s
+                            | _otherwise -> Seq.empty
+                        )
+                | _ -> Seq.empty
+             else Seq.empty
+        check target
+       
     let rec tryReplaceSymbol (search : Symbol) (replacement : Symbol) (target : Symbol) = 
         match target with 
         | :? SymbolOperator as s -> 
