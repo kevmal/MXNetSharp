@@ -85,6 +85,9 @@ type Symbol() =
     member x.Reshape(dims : int seq) = Reshape(x, dims)
     member x.ReverseReshape([<ParamArray>] dims : int []) = Reshape(x, dims, true)
     member x.ReverseReshape(dims : int seq) = Reshape(x, dims, true)
+    member x.Transpose([<ParamArray>] axes : int []) = Transpose(x, axes)
+    member x.Transpose(axes : int seq) = Transpose(x, axes)
+    member x.SwapAxis(dim1 : int, dim2 : int) = SwapAxis(x, dim1, dim2)
 
     member x.Save(filename : string) = MXSymbol.saveToFile x.UnsafeHandle filename
     member x.Json() = MXSymbol.saveToJSON x.UnsafeHandle

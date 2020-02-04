@@ -697,6 +697,8 @@ type NDArray(handle : SafeNDArrayHandle) =
     member x.Reshape(dims : int seq) = invoke1 "Reshape" [|x|] [|"shape" <-- dims|]
     member x.ReverseReshape([<ParamArray>] dims : int []) = invoke1 "Reshape" [|x|] [|"shape" <-- dims; "reverse" <-- true|]
     member x.ReverseReshape(dims : int seq) = invoke1 "Reshape" [|x|] [|"shape" <-- dims; "reverse" <-- true|]
+    member x.Transpose([<ParamArray>] axes : int []) = invoke1 "transpose" [|x|] [|"axes" <-- axes|]
+    member x.Transpose(axes : int seq) = invoke1 "transpose" [|x|] [|"axes" <-- axes|]
     member x.BroadcastTo(shape : int seq) = invoke1 "broadcast_to" [|x|] [|"shape" <-- shape|]
     member x.MutFull(value : double) = 
         mutInvoke x "_full" Array.empty [|"shape" <-- x.Shape; "value" <-- value; "dtype" <-- x.DataType.Value; "ctx" <-- x.Context|]
