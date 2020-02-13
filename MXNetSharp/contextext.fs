@@ -128,21 +128,9 @@ type ContextExtensions private () =
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     /// <param name="stype">Storage type of output.</param>
     [<Extension>]
-    static member RandomUniform(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(0.0)>] low : float, [<Optional; DefaultParameterValue(1.0)>] high : float, [<Optional>] ?dtype : FloatDType, [<Optional>] ?stype : StorageType) =
+    static member RandomUniform(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(0.0)>] low : float, [<Optional; DefaultParameterValue(1.0)>] high : float, [<Optional>] ?dtype : FloatDType) =
         let dtype = defaultArg dtype FloatDType.Float32
-        match stype with 
-        | None | Some (Default | Undefined) ->
-            MX.RandomUniformNDArray(ctx, low = low, high = high, shape = shape, dtype = dtype)
-        | Some(stype) -> 
-            let a = 
-                let dtype = 
-                    match dtype with 
-                    | FloatDType.Float16 -> Float16
-                    | FloatDType.Float32 -> Float32
-                    | FloatDType.Float64 -> Float64
-                new NDArray(shape, ctx, dtype, true, stype) 
-            MX.RandomUniform([a], ctx, low = low, high = high, shape = shape, dtype = dtype)
-            a
+        MX.RandomUniformNDArray(ctx, low = low, high = high, shape = shape, dtype = dtype)
     /// <summary>Draw random samples from a normal (Gaussian) distribution.
     /// 
     /// .. note:: The existing alias ``normal`` is deprecated.
@@ -161,23 +149,10 @@ type ContextExtensions private () =
     /// <param name="loc">Mean of the distribution.</param>
     /// <param name="scale">Standard deviation of the distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    /// <param name="stype">Storage type of output.</param>
     [<Extension>]
-    static member RandomNormal(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(0.0)>] loc : float, [<Optional; DefaultParameterValue(1.0)>] scale : float, [<Optional>] ?dtype : FloatDType, [<Optional>] ?stype : StorageType) =
+    static member RandomNormal(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(0.0)>] loc : float, [<Optional; DefaultParameterValue(1.0)>] scale : float, [<Optional>] ?dtype : FloatDType) =
         let dtype = defaultArg dtype FloatDType.Float32
-        match stype with 
-        | None | Some (Default | Undefined) ->
-            MX.RandomNormalNDArray(ctx, loc = loc, scale = scale, shape = shape, dtype = dtype)
-        | Some(stype) -> 
-            let a = 
-                let dtype = 
-                    match dtype with 
-                    | FloatDType.Float16 -> Float16
-                    | FloatDType.Float32 -> Float32
-                    | FloatDType.Float64 -> Float64
-                new NDArray(shape, ctx, dtype, true, stype) 
-            MX.RandomNormal([a], ctx, loc = loc, scale = scale, shape = shape, dtype = dtype)
-            a
+        MX.RandomNormalNDArray(ctx, loc = loc, scale = scale, shape = shape, dtype = dtype)
     /// <summary>Draw random samples from a gamma distribution.
     /// 
     /// Samples are distributed according to a gamma distribution parametrized by *alpha* (shape) and *beta* (scale).
@@ -193,23 +168,10 @@ type ContextExtensions private () =
     /// <param name="alpha">Alpha parameter (shape) of the gamma distribution.</param>
     /// <param name="beta">Beta parameter (scale) of the gamma distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    /// <param name="stype">Storage type of output.</param>
     [<Extension>]
-    static member RandomGamma(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] alpha : float, [<Optional; DefaultParameterValue(1.0)>] beta : float, [<Optional>] dtype, [<Optional>] ?stype : StorageType) =
+    static member RandomGamma(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] alpha : float, [<Optional; DefaultParameterValue(1.0)>] beta : float, [<Optional>] ?dtype : FloatDType) =
         let dtype = defaultArg dtype FloatDType.Float32
-        match stype with 
-        | None | Some (Default | Undefined) ->
-            MX.RandomGammaNDArray(ctx, alpha = alpha, beta = beta, shape = shape, dtype = dtype)
-        | Some(stype) -> 
-            let a = 
-                let dtype = 
-                    match dtype with 
-                    | FloatDType.Float16 -> Float16
-                    | FloatDType.Float32 -> Float32
-                    | FloatDType.Float64 -> Float64
-                new NDArray(shape, ctx, dtype, true, stype) 
-            MX.RandomGamma([a], ctx, alpha = alpha, beta = beta, shape = shape, dtype = dtype)
-            a
+        MX.RandomGammaNDArray(ctx, alpha = alpha, beta = beta, shape = shape, dtype = dtype)
     /// <summary>Draw random samples from an exponential distribution.
     /// 
     /// Samples are distributed according to an exponential distribution parametrized by *lambda* (rate).
@@ -224,23 +186,10 @@ type ContextExtensions private () =
     /// <param name="shape">Shape of the output.</param>
     /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    /// <param name="stype">Storage type of output.</param>
     [<Extension>]
-    static member RandomExponential(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] ?dtype : FloatDType, [<Optional>] ?stype : StorageType) =
+    static member RandomExponential(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] ?dtype : FloatDType) =
         let dtype = defaultArg dtype FloatDType.Float32
-        match stype with 
-        | None | Some (Default | Undefined) ->
-            MX.RandomExponentialNDArray(ctx, lam = lam, shape = shape, dtype = dtype)
-        | Some(stype) -> 
-            let a = 
-                let dtype = 
-                    match dtype with 
-                    | FloatDType.Float16 -> Float16
-                    | FloatDType.Float32 -> Float32
-                    | FloatDType.Float64 -> Float64
-                new NDArray(shape, ctx, dtype, true, stype) 
-            MX.RandomExponential([a], ctx, lam = lam, shape = shape, dtype = dtype)
-            a
+        MX.RandomExponentialNDArray(ctx, lam = lam, shape = shape, dtype = dtype)
     /// <summary>Draw random samples from a Poisson distribution.
     /// 
     /// Samples are distributed according to a Poisson distribution parametrized by *lambda* (rate).
@@ -256,23 +205,10 @@ type ContextExtensions private () =
     /// <param name="shape">Shape of the output.</param>
     /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    /// <param name="stype">Storage type of output.</param>
     [<Extension>]
-    static member RandomPoisson(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] ?dtype : FloatDType, [<Optional>] ?stype : StorageType) =
+    static member RandomPoisson(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] ?dtype : FloatDType) =
         let dtype = defaultArg dtype FloatDType.Float32
-        match stype with 
-        | None | Some (Default | Undefined) ->
-            MX.RandomPoissonNDArray(ctx, lam = lam, shape = shape, dtype = dtype)
-        | Some(stype) -> 
-            let a = 
-                let dtype = 
-                    match dtype with 
-                    | FloatDType.Float16 -> Float16
-                    | FloatDType.Float32 -> Float32
-                    | FloatDType.Float64 -> Float64
-                new NDArray(shape, ctx, dtype, true, stype) 
-            MX.RandomPoisson([a], ctx, lam = lam, shape = shape, dtype = dtype)
-            a
+        MX.RandomPoissonNDArray(ctx, lam = lam, shape = shape, dtype = dtype)
     /// <summary>Draw random samples from a negative binomial distribution.
     /// 
     /// Samples are distributed according to a negative binomial distribution parametrized by
@@ -290,23 +226,10 @@ type ContextExtensions private () =
     /// <param name="k">Limit of unsuccessful experiments.</param>
     /// <param name="p">Failure probability in each experiment.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    /// <param name="stype">Storage type of output.</param>
     [<Extension>]
-    static member RandomNegativeBinomial(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1)>] k : int, [<Optional; DefaultParameterValue(1.0)>] p : float, [<Optional>] ?dtype : FloatDType, [<Optional>] ?stype : StorageType) =
+    static member RandomNegativeBinomial(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1)>] k : int, [<Optional; DefaultParameterValue(1.0)>] p : float, [<Optional>] ?dtype : FloatDType) =
         let dtype = defaultArg dtype FloatDType.Float32
-        match stype with 
-        | None | Some (Default | Undefined) ->
-            MX.RandomNegativeBinomialNDArray(ctx, k = k, p = p, shape = shape, dtype = dtype)
-        | Some(stype) -> 
-            let a = 
-                let dtype = 
-                    match dtype with 
-                    | FloatDType.Float16 -> Float16
-                    | FloatDType.Float32 -> Float32
-                    | FloatDType.Float64 -> Float64
-                new NDArray(shape, ctx, dtype, true, stype) 
-            MX.RandomNegativeBinomial([a], ctx, k = k, p = p, shape = shape, dtype = dtype)
-            a
+        MX.RandomNegativeBinomialNDArray(ctx, k = k, p = p, shape = shape, dtype = dtype)
 
     /// <summary>Draw random samples from a generalized negative binomial distribution.
     /// 
@@ -326,23 +249,10 @@ type ContextExtensions private () =
     /// <param name="mu">Mean of the negative binomial distribution.</param>
     /// <param name="alpha">Alpha (dispersion) parameter of the negative binomial distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    /// <param name="stype">Storage type of output.</param>
     [<Extension>]
-    static member RandomGeneralizedNegativeBinomial(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] mu : float, [<Optional; DefaultParameterValue(1.0)>] alpha : float, [<Optional>] ?dtype : FloatDType, [<Optional>] ?stype : StorageType) =
+    static member RandomGeneralizedNegativeBinomial(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] mu : float, [<Optional; DefaultParameterValue(1.0)>] alpha : float, [<Optional>] ?dtype : FloatDType) =
         let dtype = defaultArg dtype FloatDType.Float32
-        match stype with 
-        | None | Some (Default | Undefined) ->
-            MX.RandomGeneralizedNegativeBinomialNDArray(ctx, mu = mu, alpha = alpha, shape = shape, dtype = dtype)
-        | Some(stype) -> 
-            let a = 
-                let dtype = 
-                    match dtype with 
-                    | FloatDType.Float16 -> Float16
-                    | FloatDType.Float32 -> Float32
-                    | FloatDType.Float64 -> Float64
-                new NDArray(shape, ctx, dtype, true, stype) 
-            MX.RandomGeneralizedNegativeBinomial([a], ctx, mu = mu, alpha = alpha, shape = shape, dtype = dtype)
-            a
+        MX.RandomGeneralizedNegativeBinomialNDArray(ctx, mu = mu, alpha = alpha, shape = shape, dtype = dtype)
 
     /// <summary>Draw random samples from a discrete uniform distribution.
     /// 
@@ -361,22 +271,10 @@ type ContextExtensions private () =
     /// <param name="low">Lower bound of the distribution.</param>
     /// <param name="high">Upper bound of the distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to int32 if not defined (dtype=None).</param>
-    /// <param name="stype">Storage type of output.</param>
     [<Extension>]
-    static member RandomRandint(ctx : Context, shape : int seq, low : int64, high : int64, [<Optional>] ?dtype : RandomRandintDtype, [<Optional>] ?stype : StorageType) =
+    static member RandomRandint(ctx : Context, shape : int seq, low : int64, high : int64, [<Optional>] ?dtype : RandomRandintDtype) =
         let dtype = defaultArg dtype RandomRandintDtype.Int32
-        match stype with 
-        | None | Some (Default | Undefined) ->
-            MX.RandomRandintNDArray(low, high, ctx, shape = shape, dtype = dtype)
-        | Some(stype) -> 
-            let a = 
-                let dtype = 
-                    match dtype with 
-                    | RandomRandintDtype.Int32 -> Int32
-                    | RandomRandintDtype.Int64 -> Int64
-                new NDArray(shape, ctx, dtype, true, stype) 
-            MX.RandomRandint([a], low, high, ctx, shape = shape, dtype = dtype)
-            a
+        MX.RandomRandintNDArray(low, high, ctx, shape = shape, dtype = dtype)
      
     /// <summary>fill target with zeros without default dtype</summary>
     /// <param name="shape">The shape of the output</param>
