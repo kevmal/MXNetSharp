@@ -5,6 +5,7 @@
 * Bind.Arg/Bind.Aux uses defaults shape to that of the given NDArray
 * Bindings.[name] and Executor.[name] indexers
 * Symbol.Save (save json to file) and Symbol.Json (json string) instance methods
+* Sparse NDArray ctor
 
 #### 0.0.3 (2020-01-14)
 * Issue #20: Added Constant:>Variable type
