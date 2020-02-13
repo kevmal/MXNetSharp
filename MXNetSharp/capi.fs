@@ -1871,7 +1871,7 @@ extern int MXKVStorePushEx(KVStoreHandle handle, uint32 num, string[] keys, NDAr
 /// <param name="ignore_sparse">whether to ignore sparse arrays in the request</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePullWithSparse(KVStoreHandle handle, uint32 num, int[] keys, [<Out>] IntPtr& vals, int priority, bool ignore_sparse)
+extern int MXKVStorePullWithSparse(KVStoreHandle handle, uint32 num, int[] keys, NDArrayHandle[] vals, int priority, bool ignore_sparse)
 
 /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is a string</summary>
 /// <param name="handle">handle to the kvstore</param>
@@ -1882,7 +1882,7 @@ extern int MXKVStorePullWithSparse(KVStoreHandle handle, uint32 num, int[] keys,
 /// <param name="ignore_sparse">whether to ignore sparse arrays in the request</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePullWithSparseEx(KVStoreHandle handle, uint32 num, string[] keys, [<Out>] NDArrayHandle& vals, int priority, bool ignore_sparse)
+extern int MXKVStorePullWithSparseEx(KVStoreHandle handle, uint32 num, string[] keys, NDArrayHandle[] vals, int priority, bool ignore_sparse)
 
 /// <summary>pull a list of (key, value) pairs from the kvstore</summary>
 /// <param name="handle">handle to the kvstore</param>
@@ -1892,7 +1892,7 @@ extern int MXKVStorePullWithSparseEx(KVStoreHandle handle, uint32 num, string[] 
 /// <param name="priority">the priority of the action</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePull(KVStoreHandle handle, uint32 num, int[] keys, [<Out>] NDArrayHandle& vals, int priority)
+extern int MXKVStorePull(KVStoreHandle handle, uint32 num, int[] keys, NDArrayHandle[] vals, int priority)
 
 /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is a string</summary>
 /// <param name="handle">handle to the kvstore</param>
@@ -1902,7 +1902,7 @@ extern int MXKVStorePull(KVStoreHandle handle, uint32 num, int[] keys, [<Out>] N
 /// <param name="priority">the priority of the action</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePullEx(KVStoreHandle handle, uint32 num, string[] keys, [<Out>] NDArrayHandle& vals, int priority)
+extern int MXKVStorePullEx(KVStoreHandle handle, uint32 num, string[] keys, NDArrayHandle[] vals, int priority)
 
 /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is an integer.
 ///       The NDArray pulled back will be in row_sparse storage with only the specified
@@ -1915,7 +1915,7 @@ extern int MXKVStorePullEx(KVStoreHandle handle, uint32 num, string[] keys, [<Ou
 /// <param name="priority">the priority of the action</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePullRowSparse(KVStoreHandle handle, uint32 num, int[] keys, [<Out>] NDArrayHandle& vals, [<Out>] NDArrayHandle& row_ids, int priority)
+extern int MXKVStorePullRowSparse(KVStoreHandle handle, uint32 num, int[] keys, NDArrayHandle[] vals, NDArrayHandle[] row_ids, int priority)
 
 /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is a string.
 ///       The NDArray pulled back will be in row_sparse storage with only the specified
@@ -1928,7 +1928,7 @@ extern int MXKVStorePullRowSparse(KVStoreHandle handle, uint32 num, int[] keys, 
 /// <param name="priority">the priority of the action</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePullRowSparseEx(KVStoreHandle handle, uint32 num, string[] keys, [<Out>] NDArrayHandle& vals, [<Out>] NDArrayHandle& row_ids, int priority)
+extern int MXKVStorePullRowSparseEx(KVStoreHandle handle, uint32 num, string[] keys, NDArrayHandle[] vals, NDArrayHandle[] row_ids, int priority)
 
 /// <summary>push and pull a list of (key, value) pairs from the kvstore</summary>
 /// <param name="handle">handle to the kvstore</param>
@@ -1941,7 +1941,7 @@ extern int MXKVStorePullRowSparseEx(KVStoreHandle handle, uint32 num, string[] k
 /// <param name="priority">the priority of the action</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePushPull(KVStoreHandle handle, mx_uint vnum, int[] vkeys, mx_uint onum, int[] okeys, NDArrayHandle[] vals, [<Out>] NDArrayHandle& outs, int priority)
+extern int MXKVStorePushPull(KVStoreHandle handle, mx_uint vnum, int[] vkeys, mx_uint onum, int[] okeys, NDArrayHandle[] vals, NDArrayHandle[] outs, int priority)
 
 /// <summary>push and pull a list of (key, value) pairs from the kvstore,
 ///where each key is a string</summary>
@@ -1955,7 +1955,7 @@ extern int MXKVStorePushPull(KVStoreHandle handle, mx_uint vnum, int[] vkeys, mx
 /// <param name="priority">the priority of the action</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXKVStorePushPullEx(KVStoreHandle handle, mx_uint vnum, string[] vkeys, mx_uint onum, string[] okeys, NDArrayHandle[] vals, [<Out>] NDArrayHandle& outs, int priority)
+extern int MXKVStorePushPullEx(KVStoreHandle handle, mx_uint vnum, string[] vkeys, mx_uint onum, string[] okeys, NDArrayHandle[] vals, NDArrayHandle[], int priority)
 
 /// <summary>user-defined updater for the kvstore
 ///It's this updater's responsibility to delete\a recv and\a local</summary>

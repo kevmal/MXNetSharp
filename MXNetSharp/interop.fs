@@ -2291,10 +2291,8 @@ module MXKVStore =
     /// <param name="priority">the priority of the action</param>
     /// <param name="ignore_sparse">whether to ignore sparse arrays in the request</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let pullWithSparse handle keys priority ignore_sparse : NDArrayHandle [] = 
-        let mutable vals = un //REVIEW is this right or should it be preallocated?
-        MXKVStorePullWithSparse(handle, ulength keys, keys, &vals, priority, ignore_sparse) |> throwOnError "MXKVStorePullWithSparse"
-        readStructArray (ulength keys) vals
+    let pullWithSparse handle keys vals priority ignore_sparse : NDArrayHandle [] = 
+        MXKVStorePullWithSparse(handle, ulength keys, keys, vals, priority, ignore_sparse) |> throwOnError "MXKVStorePullWithSparse"
 
     /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is a string</summary>
     /// <param name="handle">handle to the kvstore</param>
@@ -2304,30 +2302,24 @@ module MXKVStore =
     /// <param name="priority">the priority of the action</param>
     /// <param name="ignore_sparse">whether to ignore sparse arrays in the request</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let pullWithSparseEx handle keys priority ignore_sparse : NDArrayHandle[] = 
-        let mutable vals = un 
-        MXKVStorePullWithSparseEx(handle, ulength keys, keys, &vals, priority, ignore_sparse) |> throwOnError "MXKVStorePullWithSparseEx"
-        readStructArray (ulength keys) vals
+    let pullWithSparseEx handle keys vals priority ignore_sparse : NDArrayHandle[] = 
+        MXKVStorePullWithSparseEx(handle, ulength keys, keys, vals, priority, ignore_sparse) |> throwOnError "MXKVStorePullWithSparseEx"
 
     /// <summary>pull a list of (key, value) pairs from the kvstore</summary>
     /// <param name="handle">handle to the kvstore</param>
     /// <param name="keys">the list of keys</param>
     /// <param name="priority">the priority of the action</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let pull handle keys priority : NDArrayHandle[] = 
-        let mutable vals = un 
-        MXKVStorePull(handle, ulength keys, keys, &vals, priority) |> throwOnError "MXKVStorePull"
-        readStructArray (ulength keys) vals
+    let pull handle keys vals priority : NDArrayHandle[] = 
+        MXKVStorePull(handle, ulength keys, keys, vals, priority) |> throwOnError "MXKVStorePull"
 
     /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is a string</summary>
     /// <param name="handle">handle to the kvstore</param>
     /// <param name="keys">the list of keys</param>
     /// <param name="priority">the priority of the action</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let pullEx handle keys priority : NDArrayHandle[] = 
-        let mutable vals = un 
-        MXKVStorePullEx(handle, ulength keys, keys, &vals, priority) |> throwOnError "MXKVStorePullEx"
-        readStructArray (ulength keys) vals
+    let pullEx handle keys vals priority : NDArrayHandle[] = 
+        MXKVStorePullEx(handle, ulength keys, keys, vals, priority) |> throwOnError "MXKVStorePullEx"
 
     /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is an integer.
     ///       The NDArray pulled back will be in row_sparse storage with only the specified
@@ -2339,13 +2331,8 @@ module MXKVStore =
     /// <param name="row_ids">the list of row_id NDArrays</param>
     /// <param name="priority">the priority of the action</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let pullRowSparse handle keys priority = 
-        let mutable vals = un 
-        let mutable row_ids = un
-        MXKVStorePullRowSparse(handle, ulength keys, keys, &vals, &row_ids, priority) |> throwOnError "MXKVStorePullRowSparse"
-        let vals = readStructArray (ulength keys) vals : NDArrayHandle[]
-        let row_ids = readStructArray (ulength keys) row_ids : NDArrayHandle[]
-        vals, row_ids
+    let pullRowSparse handle keys vals row_ids priority = 
+        MXKVStorePullRowSparse(handle, ulength keys, keys, vals, row_ids, priority) |> throwOnError "MXKVStorePullRowSparse"
 
     /// <summary>pull a list of (key, value) pairs from the kvstore, where each key is a string.
     ///       The NDArray pulled back will be in row_sparse storage with only the specified
@@ -2372,10 +2359,8 @@ module MXKVStore =
     /// <param name="vals">the list of values</param>
     /// <param name="priority">the priority of the action</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let pushPull handle vkeys okeys vals priority : NDArrayHandle[] = 
-        let mutable outs = un
-        MXKVStorePushPull(handle, ulength vkeys, vkeys, ulength okeys, okeys, vals, &outs, priority) |> throwOnError "MXKVStorePushPull"
-        readStructArray (ulength okeys) outs
+    let pushPull handle vkeys okeys vals outs priority : NDArrayHandle[] = 
+        MXKVStorePushPull(handle, ulength vkeys, vkeys, ulength okeys, okeys, vals, outs, priority) |> throwOnError "MXKVStorePushPull"
 
     /// <summary>push and pull a list of (key, value) pairs from the kvstore,
     ///where each key is a string</summary>
@@ -2388,10 +2373,8 @@ module MXKVStore =
     /// <param name="outs">the list of outputs</param>
     /// <param name="priority">the priority of the action</param>
     /// <returns>0 when success, -1 when failure happens</returns>
-    let pushPullEx handle vkeys okeys vals priority = 
-        let mutable outs = un
-        MXKVStorePushPullEx(handle, ulength vkeys, vkeys, ulength okeys, okeys, vals, &outs, priority) |> throwOnError "MXKVStorePushPullEx"
-        readStructArray (ulength okeys) outs
+    let pushPullEx handle vkeys okeys vals outs priority = 
+        MXKVStorePushPullEx(handle, ulength vkeys, vkeys, ulength okeys, okeys, vals, outs, priority) |> throwOnError "MXKVStorePushPullEx"
 
     /// <summary>register a push updater</summary>
     /// <param name="handle">handle to the KVStore</param>
