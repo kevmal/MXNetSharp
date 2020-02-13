@@ -1,109 +1,379 @@
-namespace MXNetSharp
+namespace rec MXNetSharp
 open System
 open System.Runtime.InteropServices
 open MXNetSharp.Interop
 open System.Collections.Generic
  
+type IInitializer = 
+    abstract member Initialize : Bind -> bool
 
-[<NoComparison>]
-type AuxBind = 
-    {
-        Name : string
-        NDArray : NDArray option
-        Shape : int [] option
-        DataType : DataType option
-        StorageType : StorageType option
-    }
-    static member Named(name) =     
-        {
-            Name = name 
-            NDArray = None 
-            Shape = None 
-            DataType = None 
-            StorageType = None
-        }
-
-[<NoComparison>]
-type ArgBind = 
-    {
-        Name : string
-        NDArray : NDArray option
-        Grad : NDArray option
-        OpReqType : OpReqType option
-        Shape : int [] option
-        DataType : DataType option
-        StorageType : StorageType option
-    }
-    static member Named(name) =     
-        {
-            Name = name 
-            NDArray = None 
-            Grad = None 
-            OpReqType = None 
-            Shape = None 
-            DataType = None 
-            StorageType = None
-        }
+type BindType = 
+    | OutBind
+    | AuxBind
+    | ArgBind of (OpReqType option)*(NDArray option)
+    member x.WithOpReqType(opReqType : OpReqType) = 
+        match x with 
+        | OutBind -> x
+        | AuxBind -> x
+        | ArgBind(_,g) -> ArgBind(Some opReqType,g)
 
 [<NoComparison>]
 type Bind = 
-    | AuxBinding of AuxBind
-    | ArgBinding of ArgBind
-    member x.Name = 
-        match x with 
-        | AuxBinding r -> r.Name
-        | ArgBinding r -> r.Name
-    member x.Shape = 
-        match x with 
-        | AuxBinding {Shape = s}
-        | ArgBinding {Shape = s} -> s
-    member x.WithShape(s) = 
-        match x with 
-        | AuxBinding b -> {b with Shape = Some (Array.ofSeq s)} |> AuxBinding
-        | ArgBinding b -> {b with Shape = Some (Array.ofSeq s)} |> ArgBinding
-    member x.DataType = 
-        match x with 
-        | AuxBinding {DataType = s}
-        | ArgBinding {DataType = s} -> s
-    member x.WithNDArray ndarray = 
-        match x with 
-        | AuxBinding(a) -> AuxBinding{a with NDArray = Some ndarray}
-        | ArgBinding(a) -> ArgBinding{a with NDArray = Some ndarray}
+    {
+        Name : string
+        NDArray : NDArray option
+        Shape : int [] option
+        DataType : DataType option
+        StorageType : StorageType option
+        IsInitialized : bool
+        Initializer : IInitializer option
+        Context : Context option
+        BindType : BindType
+        CanCopy : bool
+    }
+    member x.IsOutBind =    
+        match x.BindType with
+        | OutBind -> true 
+        | _ -> false
     member x.Grad = 
         match x with 
-        | AuxBinding(a) -> None
-        | ArgBinding(a) -> a.Grad
-    member x.NDArray = 
+        | {BindType = ArgBind(_,g)} -> g
+        | _ -> None
+    member x.OpReqType = 
         match x with 
-        | AuxBinding(a) -> a.NDArray
-        | ArgBinding(a) -> a.NDArray
+        | {BindType = ArgBind(ort,_)} -> ort
+        | _ -> None
     member x.HasNDArray = x.NDArray.IsSome
-    static member Arg(name, ?ndarray : NDArray, ?grad : NDArray, ?opReqType : OpReqType, ?shape : int seq, ?dataType : DataType, ?storageType : StorageType) = 
-        ArgBinding 
-            {ArgBind.Named name with 
-                Name = name
-                NDArray = ndarray
-                Grad = grad 
-                OpReqType = opReqType
-                Shape = shape |> Option.map Seq.toArray
-                DataType = dataType 
-                StorageType = storageType
-            }
-    static member Aux(name, ?ndarray : NDArray, ?shape : int [], ?dataType : DataType, ?storageType : StorageType) = 
-        AuxBinding 
-            {AuxBind.Named name with 
-                Name = name
-                NDArray = ndarray
-                Shape = shape |> Option.map Seq.toArray
-                DataType = dataType 
-                StorageType = storageType
-            }
+    static member Out(name, ?shape, ?dataType) = 
+        {
+            Name = name 
+            NDArray = None 
+            Shape = shape
+            DataType = dataType
+            StorageType = None
+            Context = None
+            IsInitialized = false
+            Initializer = None
+            BindType = OutBind
+            CanCopy = false
 
-type IInitializer = 
-    abstract member Initialize : Bind -> unit
+        }
+    static member Arg(name, ?ndarray : NDArray, ?grad : NDArray, ?opReqType : OpReqType, ?shape : int seq, ?dataType : DataType, ?storageType : StorageType, ?ctx : Context, ?isInitialized, ?init, ?canCopy) = 
+        let shape = 
+            match shape, ndarray with 
+            | None, Some nd -> 
+                let shape = nd.Shape
+                if shape.Length > 0 then
+                    Some(shape |> Seq.ofArray)
+                else 
+                    None
+            | _ -> shape
+        {
+            Name = name
+            NDArray = ndarray
+            Shape = shape |> Option.map Seq.toArray
+            DataType = dataType 
+            StorageType = storageType
+            Context = ctx
+            IsInitialized = defaultArg isInitialized false
+            Initializer = init
+            BindType = ArgBind(opReqType, grad)
+            CanCopy = defaultArg canCopy false
+        }
+    static member Aux(name, ?ndarray : NDArray, ?shape : int seq, ?dataType : DataType, ?storageType : StorageType, ?ctx : Context, ?isInitialized, ?init, ?canCopy) =
+        let shape = 
+            match shape, ndarray with 
+            | None, Some nd -> 
+                let shape = nd.Shape
+                if shape.Length > 0 then
+                    Some(shape |> Seq.ofArray)
+                else 
+                    None
+            | _ -> shape    
+        {
+            Name = name
+            NDArray = ndarray
+            Shape = shape |> Option.map Seq.toArray
+            DataType = dataType 
+            StorageType = storageType
+            Context = ctx
+            IsInitialized = defaultArg isInitialized false
+            Initializer = init
+            BindType = AuxBind
+            CanCopy = defaultArg canCopy false
+        }
 
-type Parameter(?name, ?shape : int seq, ?opReqType, ?grad, ?ndarray, ?dataType, ?storageType, ?init : IInitializer) = 
+[<AutoOpen>]
+module ParameterPatterns = 
+    let (|NameStart|_|) prefix (b : Bind) = if b.Name.StartsWith(prefix) then Some() else None
+    let (|NameEnd|_|) prefix (b : Bind) = if b.Name.EndsWith(prefix) then Some() else None
+    let internal pat f = if f() then Some() else None
+    //let (|IsUpSampling|_|) (b : Bind) = pat(fun () -> b.Name.StartsWith("upsampling"))
+    //let (|IsStnLoc|_|) (b : Bind) = pat(fun () -> b.Name.StartsWith("stn_loc"))
+    let (|IsBias|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("bias"))
+    let (|IsGamma|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("gamma"))
+    let (|IsBeta|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("beta"))
+    let (|IsWeight|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("weight"))
+    //let (|IsMovingMean|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("moving_mean"))
+    //let (|IsMovingVar|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("moving_var"))
+    //let (|IsMovingInvVar|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("moving_inv_var"))
+    //let (|IsMovingAvg|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("moving_avg"))
+    let (|IsMin|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("min"))
+    let (|IsMax|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("max"))
+    let (|IsWeightQuantize|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("weight_quantize"))
+    let (|IsBiasQuantize|_|) (b : Bind) = pat(fun () -> b.Name.EndsWith("bias_quantize"))
+    let (|ArgBinding|_|) (b : Bind) = 
+        match b with 
+        | {BindType = ArgBind _} -> Some b
+        | _ -> None
+    let (|AuxBinding|_|) (b : Bind) = 
+        match b with 
+        | {BindType = AuxBind} -> Some b
+        | _ -> None
+    let (|FanInFanOut|_|) (b : Bind) =
+        match b, b.NDArray with 
+        | IsWeight, Some nd -> 
+            let shape = nd.Shape
+            if shape.Length < 2 then 
+                None 
+            elif shape.Length = 2 then 
+                Some(shape.[1], shape.[0])
+            else
+                let rf = shape.[2 .. ] |> Array.reduce (*)
+                Some(shape.[1]*rf, shape.[0]*rf)
+        | _ -> None
+    let (|Factor|_|) (factorType : FactorType) (b : Bind) = 
+        match b with 
+        | FanInFanOut(fanIn, fanOut) -> 
+            match factorType with 
+            | FactorType.Avg -> Some (double (fanIn + fanOut) / 2.0)
+            | FactorType.In -> Some (double fanIn)
+            | FactorType.Out -> Some (double fanOut)
+        | _ -> None
+
+
+
+[<RequireQualifiedAccess>]
+type OrthogonalRandType =
+    | Uniform 
+    | Normal
+[<RequireQualifiedAccess>]
+type FactorType = 
+    | In
+    | Out 
+    | Avg
+[<RequireQualifiedAccess>]
+type XavierRandType = 
+    | Uniform
+    | Gaussian
+
+module Initializer = 
+    type Skip() = 
+        interface IInitializer with 
+            member x.Initialize(b : Bind) = true
+    type Mixed([<ParamArray>] inits : IInitializer []) = 
+        member x.Initializers = Array.copy inits
+        interface IInitializer with 
+            member x.Initialize(b : Bind) = 
+                let rec loop i =
+                    if i >= inits.Length then 
+                        false
+                    elif inits.[i].Initialize(b) then 
+                        true
+                    else 
+                        loop (i + 1)
+                loop 0
+    type Default() = 
+        interface IInitializer with
+            member x.Initialize(b : Bind) =   
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                match b with 
+                | IsBias -> 
+                    MX.ZerosLike([a],a)
+                    true
+                | IsGamma -> 
+                    MX.OnesLike([a],a)
+                    true
+                | IsBeta -> 
+                    MX.ZerosLike([a],a)
+                    true
+                | IsMin -> 
+                    MX.ZerosLike([a],a)
+                    true
+                | IsMax -> 
+                    MX.OnesLike([a],a)
+                    true
+                | IsWeightQuantize -> 
+                    use r = MX.RandomRandintNDArray(-127L, 127L, a.Context, a.Shape, RandomRandintDtype.Int32)
+                    r.CopyTo(a)
+                    true
+                | IsBiasQuantize -> 
+                    MX.ZerosLike([a],a)
+                    true
+                | _ -> false
+            
+    type Zero() = 
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                MX.ZerosLike([a],a)
+                true
+    type One() = 
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                MX.OnesLike([a],a)
+                true
+    type Constant(value : double) = 
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                a.MutFull(value) |> ignore
+                true
+    type Uniform(?scale) =
+        let scale = abs(defaultArg scale 0.07)
+        member x.Scale = scale
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                match b with 
+                | IsWeight -> 
+                    MX.RandomUniformLike([a], a, -scale, scale)
+                    true 
+                | _ -> false
+    type Normal(?sigma) = 
+        let sigma = defaultArg sigma 0.01
+        member x.Sigma = sigma
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                match b with 
+                | IsWeight -> 
+                    MX.RandomNormalLike([a], a, 0.0, sigma)
+                    true 
+                | _ -> false
+
+    type Orthogonal(?scale, ?randType) = 
+        let scale = defaultArg scale 1.414
+        let randType = defaultArg randType OrthogonalRandType.Uniform
+        member x.Scale = scale
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                if a.Shape.Length < 2 then 
+                    false
+                else 
+                    match b with 
+                    | IsWeight -> 
+                        let shape = a.Shape
+                        let nout = shape.[0]
+                        let nin = shape.[1..] |> Array.reduce (*)
+                        use tmp = 
+                            match randType with 
+                            | OrthogonalRandType.Uniform -> 
+                                MX.RandomUniformNDArray(a.Context, -1.0, 1.0, [nout; nin])
+                            | OrthogonalRandType.Normal -> 
+                                MX.RandomNormalNDArray(a.Context, 0.0, 1.0, [nout; nin])
+                        let u, _d, v = MX.NpiSvd(tmp)
+                        if u.Shape = tmp.Shape then 
+                            u.CopyTo(a)
+                        else
+                            v.CopyTo(a)
+                        u.Dispose()
+                        _d.Dispose()
+                        v.Dispose()
+                        true 
+                    | _ -> false
+        
+    type Xavier(?magnitude, ?randType, ?factorType) = 
+        let magnitude = defaultArg magnitude 3.0
+        let factorType = defaultArg factorType FactorType.Avg
+        let randType = defaultArg randType XavierRandType.Uniform
+        member x.Magnitude = magnitude
+        member x.FactorType = factorType
+        member x.RandType = randType
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                match b with 
+                | Factor factorType factor -> 
+                    let scale = sqrt(magnitude / factor)
+                    match randType with 
+                    | XavierRandType.Uniform -> 
+                        MX.RandomUniformLike([a],a,-scale,scale)
+                        true
+                    | XavierRandType.Gaussian -> 
+                        MX.RandomNormalLike([a],a,0.0,scale)
+                        true
+                | _ -> false
+
+    type MSRAPrelu(slope, factorType) = 
+        inherit Xavier(2.0 / (1.0 + slope ** 2.0), XavierRandType.Gaussian, factorType)
+        new(slope) = MSRAPrelu(slope,FactorType.Avg)
+        new(factorType) = MSRAPrelu(0.25,factorType)
+        new() = MSRAPrelu(0.25,FactorType.Avg)
+    type Bilinear() = 
+        interface IInitializer with 
+            member x.Initialize(b : Bind) =     
+                let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                if a.Shape.Length < 2 then 
+                    false
+                else 
+                    match b with 
+                    | IsWeight -> 
+                        let shape = a.Shape
+                        let l = shape |> Array.reduce (*)
+                        let f = ceil(float32 shape.[3] / 2.f)
+                        let c = (2.f*f - 1.f - f % 2.f) / (2.f * f)
+                        let weight = 
+                            Array.init l
+                                (fun i ->
+                                    let x = i % shape.[3] |> float32
+                                    let y = (i / shape.[3]) % shape.[2] |> float32
+                                    (1.f - abs(x / f - c)) * (1.f - abs(y / f - c))
+                                )
+                        a.CopyFrom(weight)
+                        true 
+                    | _ -> false
+
+module Init =
+    open Initializer
+    let create f = 
+        {new IInitializer with
+             member __.Initialize(b: Bind): bool = 
+                 let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                 f b a
+        }
+    let weight f = 
+        {new IInitializer with
+             member __.Initialize(b: Bind): bool = 
+                 let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                 match b with 
+                 | IsWeight -> f a
+                 | _ -> false
+        }
+    let bias f = 
+        {new IInitializer with
+             member __.Initialize(b: Bind): bool = 
+                 let a = match b.NDArray with Some a -> a | None -> invalidOp "Initializers expect NDArray to be created"
+                 match b with 
+                 | IsBias -> f a
+                 | _ -> false
+        }
+    let combine inits =  
+        let inits = inits |> Seq.toArray
+        Mixed(inits = inits)
+    let skip = Skip()
+    let one = One()
+    let zero = Zero()
+    let defaultInit = Default()
+
+
+
+type Parameter(?name, ?shape : int seq, ?opReqType, ?grad, ?ndarray, ?dataType, ?storageType, ?isInitialized : bool, ?init : IInitializer, ?canCopy, ?ctx) = 
     inherit Variable()
+    let isInitialized = defaultArg isInitialized false
+    let canCopy = defaultArg canCopy false
     let shape = 
         match ndarray, shape with 
         | Some (ndarray : NDArray), None -> ndarray.Shape |> Some
@@ -134,25 +404,30 @@ type Parameter(?name, ?shape : int seq, ?opReqType, ?grad, ?ndarray, ?dataType, 
     member x.DataType = dataType 
     member x.StorageType = storageType
     member x.Initializer = init
+    member x.CanCopy = canCopy
     member x.Binding = 
        {
            Name = x.Name 
            NDArray = x.NDArray 
-           Grad = x.Grad
-           OpReqType = x.OpReqType
            Shape = x.Shape
            DataType = x.DataType 
            StorageType = x.StorageType
+           Initializer = init
+           IsInitialized = isInitialized
+           Context = ctx
+           BindType = ArgBind(x.OpReqType, x.Grad)
+           CanCopy = canCopy
        }
 
-type Input(?name, ?shape, ?ndarray, ?dataType, ?storageType) = 
+type Input(?name, ?shape, ?ndarray, ?dataType, ?storageType, ?init) = 
     inherit Parameter(?name = name, 
                       ?shape = shape, 
                       opReqType = OpReqType.NullOp, 
                       grad = new NDArray(), 
                       ?ndarray = ndarray, 
                       ?dataType = dataType, 
-                      ?storageType = storageType)
+                      ?storageType = storageType,
+                      init = defaultArg init (Initializer.Skip()))
 
 type Constant(ndarray : NDArray, ?name) = 
     inherit Parameter(?name = name, 
@@ -161,7 +436,9 @@ type Constant(ndarray : NDArray, ?name) =
                       grad = new NDArray(), 
                       ndarray = ndarray, 
                       ?dataType = ndarray.DataType, 
-                      storageType = ndarray.StorageType)
+                      storageType = ndarray.StorageType,
+                      isInitialized = true,
+                      canCopy = true)
 
 type Bindings(bindings : IDictionary<string, Bind>) = 
     new() = Bindings(Map.empty)
@@ -174,6 +451,26 @@ type Bindings(bindings : IDictionary<string, Bind>) =
         let d = Dictionary(bindings)
         newBindings |> Seq.iter (fun b -> d.[b.Name] <- b)
         Bindings d
+    member x.ImpliedContext(?context : Context) =
+        let ctx = 
+            x 
+            |> Seq.choose (fun x -> match x.Context with | None -> x.NDArray |> Option.map (fun x -> x.Context) | c -> c)
+            |> Seq.distinct
+            |> Seq.toList
+        match ctx with 
+        | [c] -> Some c
+        | [] -> context
+        | _ -> 
+            if x |> Seq.exists (fun x -> x.CanCopy) then 
+                let bs = 
+                    x 
+                    |> Seq.filter (fun x -> not x.CanCopy)
+                    |> Seq.map (fun x -> x.Name, x)
+                    |> dict
+                    |> Bindings
+                bs.ImpliedContext(?context = context)
+            else 
+                None
     member x.InferShapes(symbol : Symbol) =    
         let argNames = symbol.ArgumentNames
         let result = 
@@ -181,7 +478,7 @@ type Bindings(bindings : IDictionary<string, Bind>) =
             |> Array.choose 
                 (fun name -> 
                     match bindings.TryGetValue(name) with 
-                    | true, ArgBinding {Shape = Some s} -> Some(name, s)
+                    | true, {Shape = Some s; BindType = ArgBind _} -> Some(name, s)
                     | _ -> None)
             |> MXSymbol.keyShapeToCsrForm uint32 
             |||> MXSymbol.inferShapePartial symbol.UnsafeHandle 
@@ -191,9 +488,8 @@ type Bindings(bindings : IDictionary<string, Bind>) =
                 (fun name shape -> 
                     let shape = shape |> Array.map int
                     match bindings.TryGetValue(name) with
-                    | true, AuxBinding(b) -> AuxBinding { b with Shape = Some shape}
-                    //| true, _ ->  TODO: Log?
-                    | _ -> AuxBinding {AuxBind.Named name with Shape = Some shape}
+                    | true, ({Shape = Some s; BindType = AuxBind} as b) -> { b with Shape = Some shape}
+                    | _ -> Bind.Aux(name, shape = shape)
                 )
         let outBindings = 
             (symbol.OutputNames, result.OutputShapes)
@@ -201,9 +497,8 @@ type Bindings(bindings : IDictionary<string, Bind>) =
                 (fun name shape -> 
                     let shape = shape |> Array.map int
                     match bindings.TryGetValue(name) with
-                    | true, ArgBinding(a)-> ArgBinding {a with Shape = Some shape }
-                    //| true, _ ->  TODO: Log?
-                    | _ -> ArgBinding {ArgBind.Named name with Shape = Some shape}
+                    | true, a -> {a with Shape = Some shape }
+                    | _ -> Bind.Out(name, shape = shape)
                 )
         let inBindings = 
             (argNames, result.InputShapes)
@@ -211,9 +506,8 @@ type Bindings(bindings : IDictionary<string, Bind>) =
                 (fun name shape -> 
                     let shape = shape |> Array.map int
                     match bindings.TryGetValue(name) with
-                    | true, ArgBinding(a)-> ArgBinding {a with Shape = Some shape }
-                    //| true, _ ->  TODO: Log?
-                    | _ -> ArgBinding {ArgBind.Named name with Shape = Some shape}
+                    | true, ({BindType = ArgBind _} as a) -> {a with Shape = Some shape }
+                    | _ -> Bind.Arg(name, shape = shape)
                 )
         x.WithBindings(seq {yield! inBindings; yield! outBindings; yield! auxBindings})
     member x.InferTypes(symbol : Symbol) =    
@@ -223,7 +517,9 @@ type Bindings(bindings : IDictionary<string, Bind>) =
             |> Array.choose 
                 (fun name -> 
                     match bindings.TryGetValue(name) with 
-                    | true, ArgBinding {DataType = Some dt} -> Some (name, int dt.TypeFlag)
+                    | true, {DataType = Some dt; BindType = ArgBind _} -> Some (name, int dt.TypeFlag)
+                    | true, {DataType = None; NDArray = Some nd; BindType = ArgBind _} when nd.DataType.IsSome -> 
+                        Some (name, int nd.DataTypeFlag)
                     | _ -> None)
             |> Array.unzip
             ||> MXSymbol.inferTypePartial symbol.UnsafeHandle 
@@ -232,73 +528,99 @@ type Bindings(bindings : IDictionary<string, Bind>) =
             ||> Array.map2 
                 (fun name t -> 
                     match bindings.TryGetValue(name) with
-                    | true, AuxBinding a -> AuxBinding { a with DataType = DataType.FromInt t}
-                    //| true, _ ->  TODO: Log?
-                    | _ ->  AuxBinding { AuxBind.Named name with DataType = DataType.FromInt t} 
+                    | true, ({BindType = AuxBind} as a) -> { a with DataType = DataType.FromInt t}
+                    | _ ->  Bind.Aux(name, ?dataType = DataType.FromInt t)
                 )
         let outBindings = 
             (symbol.OutputNames, result.OutputTypes)
             ||> Array.map2 
                 (fun name t -> 
                     match bindings.TryGetValue(name) with
-                    | true, ArgBinding a -> ArgBinding {a with DataType = DataType.FromInt t}
-                    //| true, _ ->  TODO: Log?
-                    | _ -> ArgBinding { ArgBind.Named name with DataType = DataType.FromInt t} 
+                    | true, a -> {a with DataType = DataType.FromInt t}
+                    | _ -> Bind.Out(name, ?dataType = DataType.FromInt t)
                 )
         let inBindings = 
             (argNames, result.InputTypes)
             ||> Array.map2 
                 (fun name t -> 
                     match bindings.TryGetValue(name) with
-                    | true, ArgBinding a -> ArgBinding {a with DataType = DataType.FromInt t}
-                    //| true, _ ->  TODO: Log?
-                    | _ -> ArgBinding { ArgBind.Named name with DataType = DataType.FromInt t} 
+                    | true, ({BindType = ArgBind _} as a)  -> {a with DataType = DataType.FromInt t}
+                    | _ -> Bind.Arg(name, ?dataType = DataType.FromInt t)
                 )
         x.WithBindings(seq {yield! inBindings; yield! outBindings; yield! auxBindings})
     member x.Bindings = bindings
     member x.Item 
-        with get(v : Variable) = 
-            let scc, b = x.TryGetValue(v.Name)
+        with get(name : string) = 
+            let scc, b = x.TryGetValue(name)
             if not scc then 
-                raise (KeyNotFoundException(sprintf "No binding for %s" b.Name))
+                raise (KeyNotFoundException(sprintf "No binding for %s" name))
             b
+    member x.Item 
+        with get(v : Variable) = x.[v.Name]
+    member x.NDArray(name : string) = 
+        match x.[name].NDArray with 
+        | Some x -> x
+        | None -> 
+            raise (NullReferenceException(sprintf "NDArray not set for binding %s" name))
     member x.NDArray(v : Variable) = 
-        match x.Item(v).NDArray with 
+        match x.[v].NDArray with 
         | Some x -> x
         | None -> 
             raise (NullReferenceException(sprintf "NDArray not set for binding %s" v.Name))
+    member x.Grad(name : string) = 
+        match x.[name] with 
+        | {BindType = ArgBind(_,Some g)} -> g
+        | _ -> 
+            raise (NullReferenceException(sprintf "Grad not set for binding %s" name))
     member x.Grad(v : Variable) = 
-        match x.Item(v).Grad with 
-        | Some x -> x
-        | None -> 
+        match x.[v] with 
+        | {BindType = ArgBind(_,Some g)} -> g
+        | _ -> 
             raise (NullReferenceException(sprintf "Grad not set for binding %s" v.Name))
     interface IEnumerable<Bind> with 
         member x.GetEnumerator() = bindings.Values.GetEnumerator()
         member x.GetEnumerator() = bindings.Values.GetEnumerator() :> System.Collections.IEnumerator
 
 module Bind = 
-    let fromVariable (v : Variable) = 
+    let fromVariable (v : Variable) =
         match v with 
-        | :? Parameter as p -> p.Binding |> ArgBinding
-        | _ -> ArgBind.Named v.Name |> ArgBinding
-    let shape (shape) (b : Bind) = b.WithShape shape
-    let noGrad (b : Bind) = 
+        | :? Parameter as p -> p.Binding
+        | _ -> Bind.Arg(v.Name)
+    let shape (shape) (b : Bind) = {b with Shape = Some shape}
+    let setOpReqType opReqType (b : Bind) = 
         match b with 
-        | AuxBinding _ -> b
-        | ArgBinding b -> ArgBinding {b with OpReqType = Some OpReqType.NullOp}
-    let gradWriteTo (b : Bind) = 
-        match b with 
-        | AuxBinding _ -> b
-        | ArgBinding b -> ArgBinding {b with OpReqType = Some OpReqType.WriteTo}
-    let gradWriteInPlace (b : Bind) = 
-        match b with 
-        | AuxBinding _ -> b
-        | ArgBinding b -> ArgBinding {b with OpReqType = Some OpReqType.WriteInplace}
-    let gradAddTo (b : Bind) = 
-        match b with 
-        | AuxBinding _ -> b
-        | ArgBinding b -> ArgBinding {b with OpReqType = Some OpReqType.AddTo}
-
+        | {BindType = ArgBind(_,g)} -> {b with BindType = ArgBind(Some opReqType, g)}
+        | _ -> b
+    let noGrad (b : Bind) = setOpReqType OpReqType.NullOp b
+    let gradWriteTo (b : Bind) = setOpReqType OpReqType.WriteTo b
+    let gradWriteInPlace (b : Bind) = setOpReqType OpReqType.WriteInplace b
+    let gradAddTo (b : Bind) = setOpReqType OpReqType.AddTo b
+    let init (x : Bind) = 
+        if x.IsInitialized || x.IsOutBind then 
+            x
+        else
+            match x.Initializer with 
+            | Some initializer -> 
+                let x = 
+                    match x.NDArray, x.Shape, x.Context with 
+                    | Some nd, Some shape, _ when nd.Shape.Length = 0 -> 
+                        //TODO: validate shape
+                        nd.MutReshape(shape) |> ignore
+                        x
+                    | Some nd, None, _ -> 
+                        {x with Shape = Some nd.Shape}
+                    | Some nd, Some s, _ -> x
+                    | None, Some(shape), Some ctx -> 
+                        {x with NDArray = Some(new NDArray(shape, ctx, ?dtype = x.DataType))}
+                    | None, None, _ -> 
+                        invalidOp (sprintf"Init called on '%s' with no NDArray or shape set" x.Name)
+                    | None, _, None -> 
+                        invalidOp (sprintf"Init called on '%s' with no context set" x.Name)
+                if initializer.Initialize(x) then 
+                    {x with IsInitialized = true}
+                else 
+                    x
+            | None -> invalidOp (sprintf "Init called with no initializer set on %s" x.Name)
 
 
 
@@ -308,7 +630,7 @@ module Bindings =
         bm
         |> Seq.map 
             (function 
-             | AuxBinding a -> f a |> AuxBinding
+             | AuxBinding a -> f a
              | x -> x
             )
         |> Seq.map (fun (x : Bind) -> x.Name, x)
@@ -319,7 +641,7 @@ module Bindings =
         bm
         |> Seq.map 
             (function 
-             | ArgBinding a -> f a |> ArgBinding
+             | ArgBinding a -> f a
              | x -> x
             )
         |> Seq.map (fun (x : Bind) -> x.Name, x)
@@ -336,6 +658,8 @@ module Bindings =
     let ofSeq l = Bindings().WithBindings l
     /// Infer the shape of symbol and it's arguments given bindings
     let inferShapes (s : Symbol) (bm : Bindings) = bm.InferShapes s
+    /// Infer the data type of symbol and it's arguments given bindings
+    let inferDataTypes (s : Symbol) (bm : Bindings) = bm.InferTypes s
     /// Apply mapping f to all bindings which are arguments to symbol
     let mapSymbolArgs (symbol : Symbol) f (bm : Bindings) = 
         let argNames = symbol.ArgumentNames |> Set.ofSeq
@@ -349,7 +673,11 @@ module Bindings =
             )
     /// All OpReqType's set to NullOp (no gradient calc)
     let freezeGraph (symbol : Symbol) (bm : Bindings) = 
-        bm |> mapSymbolArgs symbol (fun a -> {a with OpReqType = Some NullOp} )
+        bm 
+        |> mapSymbolArgs symbol 
+            (fun a -> 
+                {a with BindType = a.BindType.WithOpReqType(NullOp)} 
+            )
     /// Initilize Bindings with given Variables
     let inputs (variables : Variable seq) = 
         variables 
@@ -362,7 +690,7 @@ module Bindings =
             (fun x -> 
                 match x.Shape with 
                 | Some a when a.Length > 0 && a.[0] = 0 -> 
-                    x.WithShape [yield batchSize; yield! a.[1..]]
+                    {x with Shape = Some [|yield batchSize; yield! a.[1..]|]}
                 | _ -> x
             )
         |> ofSeq
@@ -371,8 +699,8 @@ module Bindings =
         bm
         |> mapArg 
             (fun a ->
-                match a.OpReqType with 
-                | None -> {a with OpReqType = Some opReqType}
+                match a with 
+                | {BindType = ArgBind(None,g)} -> {a with BindType = ArgBind(Some opReqType,g)}
                 | _ -> a
             )
     /// Fill missing NDArray's with f : Bind -> NDArray
@@ -384,38 +712,128 @@ module Bindings =
                 | None -> 
                     let nd : NDArray = f a 
                     match a.Shape with 
-                    | None -> a.WithNDArray(nd).WithShape(nd.Shape)
-                    | Some s when s = nd.Shape -> nd |> a.WithNDArray
+                    | None -> {a with NDArray = Some nd; Shape = Some nd.Shape}
+                    | Some s when s = nd.Shape -> {a with NDArray = Some nd}
                     | Some s -> 
                         let nds = nd.Shape
                         if s.Length = 0 then 
-                            a.WithNDArray(nd).WithShape(nds)
+                            {a with NDArray = Some nd; Shape = Some nds}
                         elif s.Length <> nds.Length then 
                             raise (RankException(sprintf "Given NDArray shape %A does not match binding %s shape %A" nds a.Name s))
                         else
                             for i = 0 to s.Length - 1 do 
                                 if s.[i] > 0 && s.[i] <> nds.[i] then 
                                     raise (RankException(sprintf "Given NDArray shape %A does not match binding %s shape %A" nds a.Name s))
-                            a.WithNDArray(nd).WithShape(nds)
+                            {a with NDArray = Some nd; Shape = Some nds}
                 | _ -> a
             )
-    /// Default to OpReqType.WriteTo, zero grads and fill missing NDArray's using `f : b : Bind -> shape : int seq -> NDArray`
-    let init f bm = 
+    let defaultContext ctx (bm : Bindings) =
         bm 
+        |> Bindings.map 
+            (fun a -> 
+                if a.Context.IsNone then 
+                    if a.NDArray.IsSome && a.NDArray.Value.Context <> ctx && a.CanCopy then 
+                        {a with Context = Some ctx; NDArray = Some(ctx.CopyFrom a.NDArray.Value)}
+                    else
+                        {a with Context = Some ctx}
+                else a
+            )
+    let setContext ctx (bm : Bindings) =
+        bm 
+        |> Bindings.map 
+            (fun a -> 
+                match a.NDArray with 
+                | Some nd -> 
+                    if nd.Context = ctx then 
+                        {a with Context = Some ctx}
+                    elif a.CanCopy then 
+                        {a with Context = Some ctx; NDArray = Some(ctx.CopyFrom nd)}
+                    else
+                        invalidOp (sprintf "Cannot set context of %s to %O. Specified NDArray is on %O and is set to not copy." a.Name ctx nd.Context)
+                | None -> 
+                        {a with Context = Some ctx}
+            )
+    let defaultInitializer init (bm : Bindings) = 
+        bm 
+        |> Bindings.map 
+            (fun a -> 
+                if a.Initializer.IsNone then 
+                    {a with Initializer = Some init}
+                else a
+            )
+    let initWith initializer bm = bm |> defaultInitializer initializer |> init
+    let initWithFunc f bm = bm |> defaultInitializer (Init.create f) |> init
+    let appendInitializer initializer bm = 
+        bm 
+        |> Bindings.map 
+            (fun b ->
+                match b.Initializer with 
+                | None -> {b with Initializer = Some initializer}
+                | Some (:? Initializer.Mixed as i) -> 
+                    {b with Initializer = Some(Initializer.Mixed(inits = [|yield! i.Initializers; initializer|]) :> IInitializer)}
+                | Some i -> 
+                    {b with Initializer = Some(Initializer.Mixed(i, initializer) :> IInitializer)}
+            )
+    let prependInitializer initializer bm = 
+        bm 
+        |> Bindings.map 
+            (fun b ->
+                match b.Initializer with 
+                | None -> {b with Initializer = Some initializer}
+                | Some (:? Initializer.Mixed as i) -> 
+                    {b with Initializer = Some(Initializer.Mixed(inits = [|initializer; yield! i.Initializers|]) :> IInitializer)}
+                | Some i -> 
+                    {b with Initializer = Some(Initializer.Mixed(initializer, i) :> IInitializer)}
+            )
+    /// Default to OpReqType.WriteTo, zero grads and initialize NDArray
+    let init (bm : Bindings) = 
+        // if bindings contain a single context will assume that context for all bindings
+        let bm2 = 
+            match bm.ImpliedContext() with 
+            | Some c -> defaultContext c bm
+            | _ -> bm
+        bm2 
         |> defaultOpReqType OpReqType.WriteTo
-        |> fillNDArray 
-            (fun x -> 
-                let shape = match x.Shape with | Some s -> s | _ -> Array.empty
-                f x shape
-            ) 
+        |> Bindings.appendInitializer Init.defaultInit
+        |> Bindings.map Bind.init
         |> map 
             (fun a ->
                 match a with
-                | ArgBinding b when b.Grad.IsNone -> 
-                    ArgBinding {b with Grad = Some(MX.ZerosLike(a.NDArray.Value))}
+                | { BindType = ArgBind((Some OpReqType.NullOp) as opReqType, None) } ->
+                    {a with BindType = ArgBind(opReqType, Some(new NDArray()))}
+                | { BindType = ArgBind(opReqType, None) } ->
+                    {a with BindType = ArgBind(opReqType, Some(MX.ZerosLike(a.NDArray.Value)))}
                 | _ -> a
             )
-
+    let withBindings (bs : Bind seq) (bm : Bindings) = bm.WithBindings(ofSeq bs)
+    let shareParameters (referenceBindings : Bindings) (bindings : Bindings) = 
+        bindings 
+        |> map 
+            (fun a -> 
+                let scc,v = referenceBindings.TryGetValue(a.Name)
+                if scc && a.Shape = v.Shape then 
+                    { a with NDArray = v.NDArray }
+                else
+                    a
+            )
+    let copyParameters (referenceBindings : Bindings) (bindings : Bindings) = 
+        bindings 
+        |> map 
+            (fun a -> 
+                let scc,v = referenceBindings.TryGetValue(a.Name)
+                if scc && a.Shape = v.Shape then 
+                    match a.NDArray, v.NDArray, a.Context with 
+                    | _, None, _ -> a
+                    | Some nd, Some src, _ -> 
+                        nd.CopyFrom(src)
+                        a
+                    | None, Some src, Some ctx -> 
+                        {a with NDArray = Some (ctx.CopyFrom(src))}
+                    | None, Some src, None -> 
+                        invalidOp (sprintf "Could not copy parameter %s. No context set on binding."  a.Name)
+                else
+                    a
+            )
 
 type SafeExecutorHandle(owner) = 
     inherit SafeHandle(0n, true)
@@ -437,8 +855,9 @@ type BindingIncompleteException(bind : Bind option, fieldOrName : string) =
         | Some bind -> 
             let tp = 
                 match bind with 
-                | AuxBinding _ -> "Aux"
-                | ArgBinding _ -> "Arg"
+                | {BindType = AuxBind } -> "Aux"
+                | {BindType = ArgBind _} -> "Arg"
+                | {BindType = OutBind _} -> "Out"
             sprintf "Bindings incomplete. Expecting %s in  %s binding '%s'" fieldOrName tp bind.Name
         | None -> 
             sprintf "Bindings incomplete. No binding for '%s'." fieldOrName 
@@ -490,9 +909,9 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                 (fun name ->
                     match bindings.TryGetValue(name) with 
                     | true, (ArgBinding b) -> 
-                        let a = match b.NDArray with Some a -> a | None -> raise (BindingIncompleteException(Some(ArgBinding b), "NDArray"))
-                        let g = match b.Grad with Some a -> a | None -> raise (BindingIncompleteException(Some(ArgBinding b), "Grad"))
-                        let t = match b.OpReqType with Some a -> a | None -> raise (BindingIncompleteException(Some(ArgBinding b), "OpReqType"))
+                        let a = match b.NDArray with Some a -> a | None -> raise (BindingIncompleteException(Some(b), "NDArray"))
+                        let g = match b.BindType with ArgBind(_, Some grad) -> grad | _ -> raise (BindingIncompleteException(Some(b), "Grad"))
+                        let t = match b.BindType with ArgBind(Some opReqType, _) -> opReqType | _ -> raise (BindingIncompleteException(Some(b), "OpReqType"))
                         a,g,t
                     | _ -> raise(BindingIncompleteException(None, name))
                 )
@@ -503,7 +922,7 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                 (fun name ->
                     match bindings.TryGetValue(name) with 
                     | true, (AuxBinding b) -> 
-                        let a = match b.NDArray with Some a -> a | None -> raise (BindingIncompleteException(Some(AuxBinding b), "NDArray"))
+                        let a = match b.NDArray with Some a -> a | None -> raise (BindingIncompleteException(Some(b), "NDArray"))
                         a
                     | _ -> raise(BindingIncompleteException(None, name))
                 )
@@ -532,43 +951,51 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
                     (symbol.ArgumentNames, args)
                     ||> Seq.map2
                         (fun name (a,g,t) ->
-                            ArgBinding 
-                                { 
-                                    Name = name
-                                    Shape = Some a.Shape
-                                    NDArray = Some a
-                                    Grad = Some g
-                                    OpReqType = Some t
-                                    StorageType = Some a.StorageType
-                                    DataType = a.DataType 
-                                }
+                            { 
+                                Name = name
+                                Shape = Some a.Shape
+                                NDArray = Some a
+                                StorageType = Some a.StorageType
+                                DataType = a.DataType 
+                                IsInitialized = true
+                                Initializer = None
+                                Context = Some a.Context
+                                BindType = ArgBind(Some t, Some g)
+                                CanCopy = false
+                            }
                         )
                 yield!
                     (symbol.AuxiliaryStateNames, auxStates)
                     ||> Seq.map2
                         (fun name a ->
-                            AuxBinding 
-                                { 
-                                    Name = name
-                                    Shape = Some a.Shape
-                                    NDArray = Some a
-                                    StorageType = Some a.StorageType
-                                    DataType = a.DataType
-                                }
+                            { 
+                                Name = name
+                                Shape = Some a.Shape
+                                NDArray = Some a
+                                StorageType = Some a.StorageType
+                                DataType = a.DataType
+                                IsInitialized = true
+                                Initializer = None
+                                Context = Some a.Context
+                                BindType = AuxBind
+                                CanCopy = false
+                            }
                         )
                 yield!
                     (symbol.OutputNames, outputs)
                     ||> Seq.map2
                         (fun name a ->
-                            ArgBinding 
                                 { 
                                     Name = name
                                     Shape = Some a.Shape
                                     NDArray = Some a
-                                    Grad = None
-                                    OpReqType = None
                                     StorageType = Some a.StorageType
                                     DataType = a.DataType 
+                                    IsInitialized = true
+                                    Initializer = None
+                                    Context = Some a.Context
+                                    BindType = ArgBind(None,None)
+                                    CanCopy = false
                                 }
                         )
             }
@@ -598,71 +1025,78 @@ type Executor(handle : SafeExecutorHandle, symbol, context, contextMap, inArgs, 
     member x.ExecutorHandle = handle
     member x.Item 
         with get(v : Variable) = x.Bindings.NDArray(v)
+    member x.Item 
+        with get(name : string) = x.Bindings.NDArray(name)
     interface IDisposable with  
         member x.Dispose() = x.Dispose()
 
 [<AutoOpen>]
 module SymbolExtension =
-    open MXNetSharp.SymbolArgument
     type Symbol with 
         member x.Bindings = 
-            let visited = HashSet<Symbol>({new IEqualityComparer<Symbol> with
-                                               member this.Equals(x: Symbol, y: Symbol): bool = 
-                                                   Object.ReferenceEquals(x,y)
-                                               member this.GetHashCode(obj: Symbol): int = 
-                                                   System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj)})
-            let rec loop (symbol : Symbol) : Parameter seq = 
-                if not(visited.Add symbol) then 
-                    Seq.empty 
-                else
+            x 
+            |> SymUtil.choose
+                (fun symbol -> 
                     match symbol with 
-                    | :? Parameter as p -> Seq.singleton p
-                    | :? SymbolOutput as s -> loop s.Parent
-                    | :? SymbolGroup as s -> 
-                        seq {
-                            for i = 0 to s.Count - 1 do 
-                                yield! loop s.[i]
-                        }
-                    | :? SymbolOperator as s -> 
-                        s.OperatorArguments
-                        |> Seq.collect
-                            (fun a -> 
-                                match a with 
-                                | name, VarArg(num, args) -> 
-                                    args 
-                                    |> Seq.collect 
-                                        (fun a ->
-                                            match a with 
-                                            | :? SymbolOperator as s -> 
-                                                loop s
-                                            | :? SymbolOutput as s -> 
-                                                loop s.Parent
-                                            | :? Parameter as p -> 
-                                                Seq.singleton p
-                                            | s -> 
-                                                Seq.empty
-                                        )
-                                | name, Input(:? SymbolOperator as s) -> loop s
-                                | name, Input(:? SymbolOutput as s) -> loop s.Parent
-                                | name, Input(:? Parameter as s) -> Seq.singleton s
-                                | otherwise -> Seq.empty
-                            )
-                    | _ -> Seq.empty
-            loop x 
+                    | :? Parameter as p -> Some(false,p)
+                    | _ -> None
+                )
             |> Seq.cast
             |> Bindings.inputs
         member x.Bind(context, batchSize, bindings) = 
-            let bindmap = x.Bindings.WithBindings(bindings) |> Bindings.batchSize batchSize |> Bindings.inferShapes x
+            let bindmap = 
+                x.Bindings
+                |> Bindings.withBindings bindings
+                |> Bindings.batchSize batchSize 
+                |> Bindings.setContext context
+                |> Bindings.inferShapes x
+                |> Bindings.inferDataTypes x
+                |> Bindings.init
             new Executor(x,context,bindmap)
         member x.Bind(context, bindings) = 
-            let bindmap = x.Bindings.WithBindings(bindings) |> Bindings.inferShapes x
+            let bindmap = 
+                x.Bindings
+                |> Bindings.withBindings bindings
+                |> Bindings.setContext context
+                |> Bindings.inferShapes x
+                |> Bindings.inferDataTypes x
+                |> Bindings.init
             new Executor(x,context,bindmap)
         member x.Bind(context, batchSize) = 
-            let bindmap = x.Bindings |> Bindings.batchSize batchSize |> Bindings.inferShapes x
+            let bindmap = 
+                x.Bindings
+                |> Bindings.batchSize batchSize 
+                |> Bindings.setContext context
+                |> Bindings.inferShapes x
+                |> Bindings.inferDataTypes x
+                |> Bindings.init
             new Executor(x,context,bindmap)
         member x.Bind(context) = 
-            let bindmap = x.Bindings |> Bindings.inferShapes x
+            let bindmap = 
+                x.Bindings
+                |> Bindings.setContext context
+                |> Bindings.inferShapes x
+                |> Bindings.inferDataTypes x
+                |> Bindings.init
             new Executor(x,context,bindmap)
+        member x.Bind(batchSize, bindings : Bindings) = 
+            let bindmap = x.Bindings |> Bindings.withBindings bindings
+            match bindmap.ImpliedContext() with 
+            | Some context -> x.Bind(context, batchSize, bindings)
+            | None -> invalidOp "Could not determine context for Bind"
+        member x.Bind(bindings : Bindings) = 
+            let bindmap = x.Bindings |> Bindings.withBindings bindings
+            match bindmap.ImpliedContext() with 
+            | Some context -> x.Bind(context, bindings)
+            | None -> invalidOp "Could not determine context for Bind"
+        member x.Bind(batchSize : int) = 
+            match x.Bindings.ImpliedContext() with 
+            | Some context -> x.Bind(context, batchSize)
+            | None -> invalidOp "Could not determine context for Bind"
+        member x.Bind() = 
+            match x.Bindings.ImpliedContext() with 
+            | Some context -> x.Bind(context)
+            | None -> invalidOp "Could not determine context for Bind"
         member x.Eval(context) = 
             let exe = x.Bind(context)
             exe.Forward(false)
@@ -671,4 +1105,13 @@ module SymbolExtension =
             let exe = x.Bind(context,bindings)
             exe.Forward(false)
             exe
+        member x.Eval() = 
+            let exe = x.Bind()
+            exe.Forward(false)
+            exe
+        member x.Eval(bindings : Bindings) = 
+            let exe = x.Bind(bindings)
+            exe.Forward(false)
+            exe
+    
     

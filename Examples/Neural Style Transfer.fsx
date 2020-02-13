@@ -214,7 +214,6 @@ let gradArray =
             |> Array.mapi 
                 (fun i a ->
                     a.CopyTo(executor.Args.[sprintf "target_gram_%d" i])
-                    //TODO: handle ctx parameters in op gen
                     let w = MX.OnesNDArray(context, shape = [1])
                     MX.MulScalar([|w|], w, styleWeight / double gradScale.[i])
                     w
@@ -257,12 +256,7 @@ let makeTvGradExecutor (img : NDArray) tvWeight =
                  | "kernel" -> kernel, new NDArray(), OpReqType.NullOp
                  | v -> failwithf "Unhandled arg %s" v)
             |> Array.unzip3
-        {|
-            Executor = new Executor(out, context, inArgs, argGrad, grapReqType, Array.empty)
-            //KeepAlive = ([box simg; skernel; channels; convs; out; kernel] : obj list)
-            //KeepAlive = ([channels] : obj list) //TODO: we should not need to ref this
-        |}
-        |> Some
+        Some(new Executor(out, context, inArgs, argGrad, grapReqType, Array.empty))
     | None -> None
 
 // Train
@@ -345,8 +339,8 @@ let rec trainLoop epoch =
         let optResult = 
             match tvGradExe with 
             | Some e -> 
-                e.Executor.Forward(true)
-                let outs = e.Executor.Outputs
+                e.Forward(true)
+                let outs = e.Outputs
                 //opti
                 let g = MX.ElemwiseAdd(executor.ArgGrad.["data"], outs.[0])
                 opt img g

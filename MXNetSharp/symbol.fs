@@ -22,7 +22,7 @@ type Symbol() =
     static let mutable count = 0L
     static let nameId() = Threading.Interlocked.Increment &count
     let sid = lazy(nameId())
-    member x.NoArg = ImplicitVariable() :> Symbol
+    static member NoArg = ImplicitVariable() :> Symbol
     member x.Id = sid.Value
     member x.GeneratedName = sprintf "%s!%d" (x.GetType().Name) x.Id
     //let mutable disposed = false
@@ -46,7 +46,7 @@ type Symbol() =
                 match x.InternalName with Some n -> n | _ -> x.GeneratedName
         and set v = 
             if x.IsInitialized then
-                failwith "Cannot set name. Symbol has already been created." //TODO: make exception
+                invalidOp (sprintf "Cannot set name to %s. Symbol(%s) has already been created." v x.Name)
             x.InternalName <- Some v 
     member x.SetName(name) = x.Name <- name; x
     member x.SetName(symbol : Symbol) =
@@ -85,6 +85,12 @@ type Symbol() =
     member x.Reshape(dims : int seq) = Reshape(x, dims)
     member x.ReverseReshape([<ParamArray>] dims : int []) = Reshape(x, dims, true)
     member x.ReverseReshape(dims : int seq) = Reshape(x, dims, true)
+    member x.Transpose([<ParamArray>] axes : int []) = Transpose(x, axes)
+    member x.Transpose(axes : int seq) = Transpose(x, axes)
+    member x.SwapAxis(dim1 : int, dim2 : int) = SwapAxis(x, dim1, dim2)
+
+    member x.Save(filename : string) = MXSymbol.saveToFile x.UnsafeHandle filename
+    member x.Json() = MXSymbol.saveToJSON x.UnsafeHandle
 
     member x.Slice(startIndices, endIndices, stepIndices) = Slice(x, startIndices, endIndices, stepIndices)
     member x.GetSlice([<ParamArray>] a : obj []) = 
@@ -334,7 +340,6 @@ type ImplicitVariable() =
     inherit Variable() 
     default x.Copy() = ImplicitVariable() :> Symbol
 
-//TODO: Manually add CustomOp type and skip in codegen
 type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments<Symbol>) = 
     inherit Symbol()
     new(name, args) = new SymbolOperator(AtomicSymbolCreator.FromName name, args)
@@ -462,10 +467,11 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
                     let vals = pValues.ToArray()
                     assert (keys.Length = vals.Length)
                     MXSymbol.createAtomicSymbol creator.AtomicSymbolCreatorHandle keys vals
+                let safeHandle = new SafeSymbolHandle(symbol, true)
                 let ivals = inputValues |> Seq.map (fun i -> i.UnsafeHandle) |> Seq.toArray
                 if inputKeys.Count <> inputValues.Count then 
                     MXSymbol.compose symbol name null ivals
-                else //REVIEW: we could just never use keys
+                else 
                     let keys = inputKeys.ToArray()
                     Seq.zip keys inputValues 
                     |> Seq.filter 
@@ -478,17 +484,86 @@ type SymbolOperator(creator : AtomicSymbolCreator, operatorArguments : Arguments
                     |> Seq.toArray
                     |> Array.unzip
                     ||> MXSymbol.compose symbol name
-                x.InternalHandle <- Some(new SafeSymbolHandle(symbol, true))
+                x.InternalHandle <- Some safeHandle
             with
             | e -> raise(SymbolInitilizationException(x, e))
     interface ISymbolComposable with 
         member x.ComposedWith(y) = x.ComposedWith(y)
+
+type Custom(name : string, parameters : (string*(obj option)) [], inputs : Symbol option []) = 
+    inherit 
+        SymbolOperator("Custom", 
+            Arguments(
+                [|
+                    "op_type",  Parameter(Some(name :> obj))
+                    "data", VarArg("num_args", inputs |> Seq.map (function None -> ImplicitVariable() :> Symbol | Some v -> v) |> Seq.toArray)
+                    yield! parameters |> Seq.map (fun (n,v) -> n, Parameter(v))
+                |]))
+    override x.Initialize() =   
+        match x.InternalHandle with 
+        | Some _ -> ()
+        | None ->
+            try
+                let keys,vals =     
+                    [|
+                        "op_type", name
+                        "num_args", inputs.Length.ValueString()
+                        yield! 
+                            parameters 
+                            |> Array.choose 
+                                (fun (k,v) -> 
+                                    match v with 
+                                    | Some v -> Some(k,v.ValueString())
+                                    | None -> None)
+                    |] |> Array.unzip
+                let symbol = MXSymbol.createAtomicSymbol x.AtomicSymbolCreator.AtomicSymbolCreatorHandle keys vals
+                x.InternalHandle <- Some(new SafeSymbolHandle(symbol, true))
+                let ivals = x.OperatorArguments.GetVarArg("data") |> Array.map (fun x -> x.UnsafeHandle)
+                MXSymbol.compose symbol name null ivals
+            with
+            | e -> raise(SymbolInitilizationException(x, e))
 
 type Hole() = 
     inherit Variable()
     default x.Copy() = Hole() :> Symbol
 
 module SymUtil = 
+    let rec choose (filter : Symbol -> (bool*'a) option) (target : Symbol) =  
+        let visited = HashSet<Symbol>(HashIdentity.Reference)
+        let rec check symbol = 
+            match filter symbol with 
+            | Some(flowThrough, v) -> 
+                if flowThrough then 
+                    seq {
+                        v
+                        yield! loop symbol
+                    }
+                else
+                    Seq.singleton v
+            | None -> 
+                loop symbol
+        and loop (symbol : Symbol) : 'a seq = 
+            if visited.Add symbol then 
+                match symbol with 
+                | :? SymbolOutput as s -> check s.Parent
+                | :? SymbolGroup as s -> 
+                    seq {
+                        for i = 0 to s.Count - 1 do 
+                            yield! check s.[i]
+                    }
+                | :? SymbolOperator as s -> 
+                    s.OperatorArguments
+                    |> Seq.collect
+                        (fun a -> 
+                            match a with 
+                            | _name, VarArg(_num, args) -> args |> Seq.collect check
+                            | _name, Input(s) -> check s
+                            | _otherwise -> Seq.empty
+                        )
+                | _ -> Seq.empty
+             else Seq.empty
+        check target
+       
     let rec tryReplaceSymbol (search : Symbol) (replacement : Symbol) (target : Symbol) = 
         match target with 
         | :? SymbolOperator as s -> 
@@ -6218,84 +6293,6 @@ module SymbolOperators =
                     elseInputLocs |> Option.map (fun x -> "else_input_locs", Parameter(Some (box x)))
                 ] |> List.choose id
             new Cond(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
-    
-    type Custom private (operatorArguments) = 
-        inherit SymbolOperator("Custom", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new Custom(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new Custom(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <summary>Apply a custom operator implemented in a frontend language (like Python).
-        /// 
-        /// Custom operators should override required methods like `forward` and `backward`.
-        /// The custom operator must be registered before it can be used.
-        /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
-        /// 
-        /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
-        /// <param name="data">Input data for the custom operator.</param>
-        /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
-        new(data : Symbol seq,
-            opType : string) = 
-            let operatorArguments = 
-                [
-                    "data", VarArg("", data |> Seq.toArray)
-                    "op_type", Parameter(Some(box opType))
-                ]
-            new Custom(Arguments<Symbol>(operatorArguments))
-        /// <summary>Apply a custom operator implemented in a frontend language (like Python).
-        /// 
-        /// Custom operators should override required methods like `forward` and `backward`.
-        /// The custom operator must be registered before it can be used.
-        /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
-        /// 
-        /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
-        /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
-        /// <param name="data">Input data for the custom operator.</param>
-        new(opType : string,
-            [<Optional>] ?data : Symbol seq) = 
-            let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
-            let operatorArguments = 
-                [
-                    "data", VarArg("", data)
-                    "op_type", Parameter(Some(box opType))
-                ]
-            new Custom(Arguments<Symbol>(operatorArguments))
-        /// <summary>Apply a custom operator implemented in a frontend language (like Python).
-        /// 
-        /// Custom operators should override required methods like `forward` and `backward`.
-        /// The custom operator must be registered before it can be used.
-        /// Please check the tutorial here: https://mxnet.incubator.apache.org/api/faq/new_op
-        /// 
-        /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
-        /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
-        /// <param name="data">Input data for the custom operator.</param>
-        new(opType : string,
-            [<ParamArray>] data : Symbol[]) = 
-            let operatorArguments = 
-                [
-                    "data", VarArg("", data)
-                    "op_type", Parameter(Some(box opType))
-                ]
-            new Custom(Arguments<Symbol>(operatorArguments))
-        /// Input data for the custom operator.
-        member __.Data = operatorArguments.GetVarArg "data"
-        /// Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.
-        member __.OpType : string = match operatorArguments.GetParameter "op_type" with Some(v) -> unbox v | None -> failwithf "Required parameter op_type is missing"
-        /// <summary>Copy Custom instance with updated inputs/parameters.</summary>
-        /// <param name="data">Input data for the custom operator.</param>
-        /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
-        member this.With([<Optional>] ?data : Symbol seq,
-            [<Optional>] ?opType : string) = 
-            let operatorArguments = 
-                [
-                    data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
-                    opType |> Option.map (fun x -> "op_type", Parameter(Some (box x)))
-                ] |> List.choose id
-            new Custom(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type FusedOp private (operatorArguments) = 
         inherit SymbolOperator("_FusedOp", operatorArguments)

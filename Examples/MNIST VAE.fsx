@@ -54,7 +54,7 @@ let xIn = new Variable("X")
 let scaledInput = xIn + 0.0 //1.0 - xIn/255.0
 let dropProb = 0.2
 let decInChannels = 1
-let nLatent = 10
+let nLatent = 100
 
 let reshapedDim = [batchSize;decInChannels;7;7]
 let inputsDecoder = 49*decInChannels / 2

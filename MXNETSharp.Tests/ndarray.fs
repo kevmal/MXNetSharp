@@ -6,8 +6,6 @@ open Xunit
 open MXNetSharp
 open MXNetSharp
 
-//TODO: test mutation operators
-//TODO: add and test unary mutation operators
 module OpHelp = 
 
     let nd (x : float32 seq) = 
@@ -193,6 +191,209 @@ module BasicUnaryOps =
     [<Fact>]
     let tanh() = uop tanh tanh
 
+module MutatingOps = 
+    open MXNetSharp.PrimitiveOperators
+    let checkUni mop op = 
+        MXLib.randomSeed 123423
+        let c = CPU 0
+        let a = c.RandomNormal([10;10])
+        let b = a.CopyTo(CPU 0)
+        mop b |> ignore
+        let expected = (op a : NDArray).ToFloat32Array()
+        let actual = b.ToFloat32Array()
+        Assert.Equal(expected.Length, actual.Length)
+        for i = 0 to expected.Length - 1 do    
+            Assert.Equal(double expected.[i], double actual.[i], 6)
+
+    let check (scalar : double) (a1 : NDArray) (a2 : NDArray) (b1 : NDArray) (+@) (+) (+@.) (+.) (+@|) (+|) = 
+        let c = CPU 0
+        do 
+            let expected = ((a1 + a2) : NDArray).ToFloat32Array()
+            let actual = 
+                let a = c.CopyFrom(a1)
+                a +@ a2 |> ignore
+                a.ToFloat32Array()
+            Assert.Equal(expected.Length, actual.Length)
+            for i = 0 to expected.Length - 1 do    
+                Assert.Equal(double expected.[i], double actual.[i], 6)
+        do 
+            let expected = ((a1 +. scalar) : NDArray).ToFloat32Array()
+            let actual = 
+                let a = c.CopyFrom(a1)
+                a +@. scalar |> ignore
+                a.ToFloat32Array()
+            Assert.Equal(expected.Length, actual.Length)
+            for i = 0 to expected.Length - 1 do    
+                Assert.Equal(double expected.[i], double actual.[i], 6)
+        do 
+            let expected = ((a1 +| b1) : NDArray).ToFloat32Array()
+            let actual = 
+                let a = c.CopyFrom(a1)
+                a +@| b1 |> ignore
+                a.ToFloat32Array()
+            Assert.Equal(expected.Length, actual.Length)
+            for i = 0 to expected.Length - 1 do    
+                Assert.Equal(double expected.[i], double actual.[i], 6)
+    let checkr (a1 : NDArray) a2 op1 op2 = 
+        let a = a1.CopyTo(CPU 0)
+        op1 a a2 |> ignore
+        let expectednd : NDArray = op2 a2 a1
+        let actual = a.ToFloat32Array()
+        let expected = expectednd.ToFloat32Array()
+        Assert.Equal(expected.Length, actual.Length)
+        for i = 0 to expected.Length - 1 do    
+            Assert.Equal(double expected.[i], double actual.[i], 6)
+
+    let checkr1 = 
+        MXLib.randomSeed 123423
+        let c = CPU 0
+        let a1 = c.RandomNormal([10;10])
+        let a2 = c.RandomNormal([10;10])
+        checkr a1 a2
+    let checkrs1 = 
+        MXLib.randomSeed 123423
+        let c = CPU 0
+        let a1 = c.RandomNormal([10;10])
+        let a2 = 22.3423
+        checkr a1 a2
+    let checkrb1 = 
+        MXLib.randomSeed 123423
+        let c = CPU 0
+        let a1 = c.RandomNormal([10;10])
+        let a2 = c.RandomNormal([1;10])
+        checkr a1 a2
+        
+    let check1 = 
+        MXLib.randomSeed 123423
+        let c = CPU 0
+        let a1 = c.RandomNormal([10;10])
+        let a2 = c.RandomNormal([10;10])
+        let b1 = c.RandomNormal([1;10])
+        check 23.23234 a1 a2 b1
+    let check2 = 
+        MXLib.randomSeed 123423
+        let c = CPU 0
+        let a1 = MX.Cast(c.RandomRandint([10;10],0L, 5L), DataType.Float32)
+        let a2 = MX.Cast(c.RandomRandint([10;10],0L, 5L), DataType.Float32)
+        let b1 = MX.Cast(c.RandomRandint([1;10],0L, 5L), DataType.Float32)
+        check 2.0 a1 a2 b1
+
+
+    [<Fact>]
+    let ``add``() = check1 (fun (x : NDArray) (y : NDArray) -> x.MutPlus(y)) (+) 
+                           (fun (x : NDArray) (y : double) -> x.MutPlus(y)) (+) 
+                           (fun (x : NDArray) (y : NDArray) -> x.MutPlusBroadcast(y)) (.+) 
+    [<Fact>]
+    let ``sub``() = 
+        check1 (fun (x : NDArray) (y : NDArray) -> x.MutSubstract(y)) (-) 
+               (fun (x : NDArray) (y : double) -> x.MutSubstract(y)) (-) 
+               (fun (x : NDArray) (y : NDArray) -> x.MutSubstractBroadcast(y)) (.-) 
+        checkr1 (fun (x : NDArray) (y : NDArray) -> x.MutSubstractFrom(y)) (-)
+        checkrs1 (fun (x : NDArray) (y : double) -> x.MutSubstractFrom(y)) (-)
+        checkrb1 (fun (x : NDArray) (y : NDArray) -> x.MutSubstractBroadcastFrom(y)) (.-)
+
+    [<Fact>]
+    let ``div``() = 
+        check1 (fun (x : NDArray) (y : NDArray) -> x.MutDividedBy(y)) (/) 
+               (fun (x : NDArray) (y : double) -> x.MutDividedBy(y)) (/) 
+               (fun (x : NDArray) (y : NDArray) -> x.MutDividedBroadcastBy(y)) (./) 
+        checkr1 (fun (x : NDArray) (y : NDArray) -> x.MutDividedInto(y)) (/)
+        checkrs1 (fun (x : NDArray) (y : double) -> x.MutDividedInto(y)) (/)
+        checkrb1 (fun (x : NDArray) (y : NDArray) -> x.MutDividedBroadcastInto(y)) (./)
+    [<Fact>]
+    let ``mul``() = check1 (fun (x : NDArray) (y : NDArray) -> x.MutMultiply(y)) ( * ) 
+                           (fun (x : NDArray) (y : double) -> x.MutMultiply(y)) ( * ) 
+                           (fun (x : NDArray) (y : NDArray) -> x.MutMultiplyBroadcast(y)) ( .* ) 
+    [<Fact>] 
+    let ``pow``() = 
+        check1 (fun (x : NDArray) (y : NDArray) -> x.MutPower(y)) (fun (x : NDArray) (y : NDArray) -> x ** y)
+               (fun (x : NDArray) (y : double) -> x.MutPower(y)) (fun (x : NDArray) (y : double) -> x ** y)
+               (fun (x : NDArray) (y : NDArray) -> x.MutPowerBroadcast(y)) (fun (x : NDArray) (y : NDArray) -> x .** y)
+        checkr1 (fun (x : NDArray) (y : NDArray) -> x.MutPowerBaseOf(y)) (fun (x : NDArray) (y : NDArray) -> x ** y)
+        checkrs1 (fun (x : NDArray) (y : double) -> x.MutPowerBaseOf(y)) (fun (x : double) (y : NDArray) -> (x ** y) : NDArray)
+        checkrb1 (fun (x : NDArray) (y : NDArray) -> x.MutPowerBaseOfBroadcast(y)) 
+    [<Fact>]
+    let ``mod``() = 
+        check1 (fun (x : NDArray) (y : NDArray) -> x.MutMod(y)) (%) 
+               (fun (x : NDArray) (y : double) -> x.MutMod(y)) (%) 
+               (fun (x : NDArray) (y : NDArray) -> x.MutMod(y)) (%) 
+        checkr1 (fun (x : NDArray) (y : NDArray) -> x.MutModOf(y)) (%)
+        checkrs1 (fun (x : NDArray) (y : double) -> x.MutModOf(y)) (%)
+
+
+    [<Fact>]
+    let eq() = check2 (fun (x : NDArray) (y : NDArray) -> x.MutEqual(y)) (.=) 
+                      (fun (x : NDArray) (y : double) -> x.MutEqual(y)) (.=) 
+                      (fun (x : NDArray) (y : NDArray) -> x.MutEqual(y)) (.=) 
+    [<Fact>]
+    let neq() = check2 (fun (x : NDArray) (y : NDArray) -> x.MutNotEqual(y)) (.<>) 
+                       (fun (x : NDArray) (y : double) -> x.MutNotEqual(y)) (.<>) 
+                       (fun (x : NDArray) (y : NDArray) -> x.MutNotEqual(y)) (.<>) 
+    [<Fact>]
+    let greater() = check2 (fun (x : NDArray) (y : NDArray) -> x.MutGreater(y)) (.>) 
+                              (fun (x : NDArray) (y : double) -> x.MutGreater(y)) (.>) 
+                              (fun (x : NDArray) (y : NDArray) -> x.MutGreater(y)) (.>) 
+    [<Fact>]
+    let lesser() = check2 (fun (x : NDArray) (y : NDArray) -> x.MutLesser(y)) (.<) 
+                              (fun (x : NDArray) (y : double) -> x.MutLesser(y)) (.<) 
+                              (fun (x : NDArray) (y : NDArray) -> x.MutLesser(y)) (.<) 
+    [<Fact>]
+    let greaterEq() = check2 (fun (x : NDArray) (y : NDArray) -> x.MutGreaterOrEqual(y)) (.>=) 
+                              (fun (x : NDArray) (y : double) -> x.MutGreaterOrEqual(y)) (.>=) 
+                              (fun (x : NDArray) (y : NDArray) -> x.MutGreaterOrEqual(y)) (.>=)
+    [<Fact>]
+    let lesserEq() = check2 (fun (x : NDArray) (y : NDArray) -> x.MutLesserOrEqual(y)) (.<=) 
+                              (fun (x : NDArray) (y : double) -> x.MutLesserOrEqual(y)) (.<=) 
+                              (fun (x : NDArray) (y : NDArray) -> x.MutLesserOrEqual(y)) (.<=) 
+    [<Fact>]
+    let logicalAnd() = check2 (fun (x : NDArray) (y : NDArray) -> x.MutLogicalAnd(y)) (.&&) 
+                              (fun (x : NDArray) (y : double) -> x.MutLogicalAnd(y)) (.&&) 
+                              (fun (x : NDArray) (y : NDArray) -> x.MutLogicalAndBroadcast(y)) (..&&) 
+    [<Fact>]
+    let logicalOr() = check2 (fun (x : NDArray) (y : NDArray) -> x.MutLogicalOr(y)) (.||) 
+                              (fun (x : NDArray) (y : double) -> x.MutLogicalOr(y)) (.||) 
+                              (fun (x : NDArray) (y : NDArray) -> x.MutLogicalOrBroadcast(y)) (..||) 
+    [<Fact>]
+    let logicalXor() = check2 (fun (x : NDArray) (y : NDArray) -> x.MutLogicalXor(y)) (.^^) 
+                              (fun (x : NDArray) (y : double) -> x.MutLogicalXor(y)) (.^^) 
+                              (fun (x : NDArray) (y : NDArray) -> x.MutLogicalXorBroadcast(y)) (..^^) 
+
+    [<Fact>]
+    let exp() = checkUni (fun x -> x.MutExp()) exp
+    [<Fact>]
+    let log() = checkUni (fun x -> x.MutLog()) log
+    [<Fact>]
+    let abs() = checkUni (fun x -> x.MutAbs()) abs
+    [<Fact>]
+    let atan() = checkUni (fun x -> x.MutAtan()) atan
+    [<Fact>]
+    let acos() = checkUni (fun x -> x.MutAcos()) acos
+    [<Fact>]
+    let asin() = checkUni (fun x -> x.MutAsin()) asin
+    [<Fact>]
+    let ceil() = checkUni (fun x -> x.MutCeiling()) ceil
+    [<Fact>]
+    let floor() = checkUni (fun x -> x.MutFloor()) floor
+    [<Fact>]
+    let truncate() = checkUni (fun x -> x.MutTruncate()) truncate
+    [<Fact>]
+    let round() = checkUni (fun x -> x.MutRound()) round
+    [<Fact>]
+    let log10() = checkUni (fun x -> x.MutLog10()) log10
+    [<Fact>]
+    let sqrt() = checkUni (fun x -> x.MutSqrt()) sqrt
+    [<Fact>]
+    let cos() = checkUni (fun x -> x.MutCos()) cos
+    [<Fact>]
+    let cosh() = checkUni (fun x -> x.MutCosh()) cosh
+    [<Fact>]
+    let sin() = checkUni (fun x -> x.MutSin()) sin
+    [<Fact>]
+    let sinh() = checkUni (fun x -> x.MutSinh()) sinh
+    [<Fact>]
+    let tan() = checkUni (fun x -> x.MutTan()) tan
+    [<Fact>]
+    let tanh() = checkUni (fun x -> x.MutTanh()) tanh
 
 module Slicing =  
     let nd (x : float32 seq) = 

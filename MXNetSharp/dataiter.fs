@@ -44,7 +44,7 @@ type SafeDataIterHandle(owner) =
     new() = new SafeDataIterHandle(true)
     new(ptr,owner) as this = new SafeDataIterHandle(owner) then this.SetHandle(ptr)
     override x.IsInvalid = x.handle <= 0n
-    override x.ReleaseHandle() = CApi.MXNDArrayFree x.handle = 0
+    override x.ReleaseHandle() = CApi.MXDataIterFree x.handle = 0
     member internal x.UnsafeHandle = 
         if not x.IsClosed then
             x.handle

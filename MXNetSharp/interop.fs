@@ -1200,7 +1200,6 @@ module MXNDArray =
         finally
             h.Free()
 
-    // TODO: Storag type enum?
     /// <summary>create an empty sparse NDArray with specified shape and data type</summary>
     /// <param name="storage_type">the storage type of the ndarray</param>
     /// <param name="shape">the pointer to the shape</param>
@@ -1500,7 +1499,6 @@ module MXExecutor =
         MXExecutorBindEX(symbol_handle, dev_type, dev_id, ulength map_keys, map_keys, map_dev_types, map_dev_ids, ulength in_args, in_args, arg_grad_store, grad_req_type, ulength aux_states, aux_states, shared_exec, &out) |> throwOnError "MXExecutorBindEX"
         out
 
-    // TODO: simpleBindEx wrapper
     //let simpleBindEx symbol_handle dev_type dev_id num_g2c_keys g2c_keys g2c_dev_types g2c_dev_ids provided_grad_req_list_len provided_grad_req_names provided_grad_req_types num_provided_arg_shapes provided_arg_shape_names provided_arg_shape_data provided_arg_shape_idx num_provided_arg_dtypes provided_arg_dtype_names provided_arg_dtypes num_provided_arg_stypes provided_arg_stype_names provided_arg_stypes num_shared_arg_names shared_arg_name_list shared_buffer_len shared_buffer_name_list shared_buffer_handle_list updated_shared_buffer_name_list updated_shared_buffer_handle_list num_in_args in_args arg_grads num_aux_states aux_states shared_exec_handle = 
     //    let mutable out = un
     //    MXExecutorSimpleBindEx(symbol_handle, dev_type, dev_id, num_g2c_keys, g2c_keys, g2c_dev_types, g2c_dev_ids, provided_grad_req_list_len, provided_grad_req_names, provided_grad_req_types, num_provided_arg_shapes, provided_arg_shape_names, provided_arg_shape_data, provided_arg_shape_idx, num_provided_arg_dtypes, provided_arg_dtype_names, provided_arg_dtypes, num_provided_arg_stypes, provided_arg_stype_names, provided_arg_stypes, num_shared_arg_names, shared_arg_name_list, shared_buffer_len, shared_buffer_name_list, shared_buffer_handle_list, updated_shared_buffer_name_list, updated_shared_buffer_handle_list, num_in_args, in_args, arg_grads, num_aux_states, aux_states, shared_exec_handle, &out) |> throwOnError "MXExecutorSimpleBindEx"
