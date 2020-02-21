@@ -3,8 +3,6 @@ open System
 open System.Runtime.InteropServices
 open MXNetSharp.Interop
 
-
-
 module internal Helper = 
     let inline (<--) x y = x, Util.valueString y
         
@@ -31,11 +29,37 @@ type NDArray(handle : SafeNDArrayHandle) =
     new() = 
         let h1 = MXNDArray.createNone()
         new NDArray(h1)
-    new(shape : int seq, context : Context, ?dtype, ?delayAlloc) = 
+    new(shape : int seq, context : Context, ?dtype, ?delayAlloc, ?storageType) = 
         let dtype = defaultArg dtype Float32
         let delayAlloc = defaultArg delayAlloc true
         let shape = shape |> Seq.toArray
-        new NDArray(MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype.TypeFlag)
+        match storageType with 
+        | None | Some (StorageType.Default | StorageType.Undefined) -> 
+            new NDArray(MXNDArray.createEx shape context.DeviceType context.DeviceId delayAlloc dtype.TypeFlag)
+        | Some CSR ->  
+            let handle = 
+                MXNDArray.createSparseEx
+                    (int CSR)
+                    (shape |> Array.map uint32)
+                    (int context.DeviceType)
+                    context.DeviceId
+                    (if delayAlloc then 1 else 0)
+                    (int dtype.TypeFlag)
+                    [|int TypeFlag.Int64; int TypeFlag.Int64|]
+                    [|[|0u|] ; [|0u|]|]
+            new NDArray(handle)
+        | Some RowSparse ->  
+            let handle = 
+                MXNDArray.createSparseEx
+                    (int RowSparse)
+                    (shape |> Array.map uint32)
+                    (int context.DeviceType)
+                    context.DeviceId
+                    (if delayAlloc then 1 else 0)
+                    (int dtype.TypeFlag)
+                    [|int TypeFlag.Int64|] 
+                    [|[|0u|]|]
+            new NDArray(handle)
     static member NoArg = noarg
     static member ConvertCopyFrom(data : 'aa[], shape : int seq, ctx : Context, ?dtype : DataType) =
         let shape = 
@@ -92,27 +116,14 @@ type NDArray(handle : SafeNDArrayHandle) =
                     invoke1 "_zeros" Array.empty [|"shape" <-- x.Shape; "ctx" <-- x.Context; "dtype" <-- dtype |]
                 | None ->
                     invoke1 "_zeros" Array.empty [|"shape" <-- x.Shape; "ctx" <-- x.Context |]
-            | Some stype ->  //TODO: pull this out into general ctor for sparse ndarray
-                let types,shapes = 
-                    match stype with 
-                    | CSR -> [|int TypeFlag.Int64; int TypeFlag.Int64|], [|[|0u|] ; [|0u|]|]
-                    | RowSparse -> [|int TypeFlag.Int64|], [|[|0u|]|]
-                    | StorageType.Default 
-                    | StorageType.Undefined -> failwith "Unreachable. Default/Undefined case matched"
-                let dtype : TypeFlag = x.DataTypeFlag
-                let ctx : Context = x.Context
-                let handle = 
-                    MXNDArray.createSparseEx
-                        (int stype)
-                        (x.Shape |> Array.map uint32)
-                        (int ctx.DeviceType)
-                        ctx.DeviceId
-                        1 //delay alloc REVIEW: 
-                        (int dtype)
-                        types 
-                        shapes
-                let a = new NDArray(new SafeNDArrayHandle(handle, true))
-                mutInvoke a "_zeros" [|a|] Array.empty
+            | Some stype ->  
+                match x.DataType with 
+                | Some dtype -> 
+                    let a = new NDArray(x.Shape, x.Context, dtype, true, stype)
+                    mutInvoke a "_zeros" [|a|] Array.empty
+                | None -> 
+                    let a = new NDArray(x.Shape, x.Context, delayAlloc = true, storageType = stype)
+                    mutInvoke a "_zeros" [|a|] Array.empty
             | None -> invoke1 "zeros_like" [|x|] Array.empty
         MXAutograd.markVariables [|x.UnsafeHandle|] [|uint32 gradReq|] [|grad.UnsafeHandle|]
     member x.Backward(?outGrad, ?retainGraph, ?train, ?createGraph) = 

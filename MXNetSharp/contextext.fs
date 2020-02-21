@@ -126,8 +126,10 @@ type ContextExtensions private () =
     /// <param name="low">Lower bound of the distribution.</param>
     /// <param name="high">Upper bound of the distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    /// <param name="stype">Storage type of output.</param>
     [<Extension>]
-    static member RandomUniform(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(0.0)>] low : float, [<Optional; DefaultParameterValue(1.0)>] high : float, [<Optional>] dtype : FloatDType) =
+    static member RandomUniform(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(0.0)>] low : float, [<Optional; DefaultParameterValue(1.0)>] high : float, [<Optional>] ?dtype : FloatDType) =
+        let dtype = defaultArg dtype FloatDType.Float32
         MX.RandomUniformNDArray(ctx, low = low, high = high, shape = shape, dtype = dtype)
     /// <summary>Draw random samples from a normal (Gaussian) distribution.
     /// 
@@ -148,7 +150,8 @@ type ContextExtensions private () =
     /// <param name="scale">Standard deviation of the distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     [<Extension>]
-    static member RandomNormal(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(0.0)>] loc : float, [<Optional; DefaultParameterValue(1.0)>] scale : float, [<Optional>] dtype : FloatDType) =
+    static member RandomNormal(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(0.0)>] loc : float, [<Optional; DefaultParameterValue(1.0)>] scale : float, [<Optional>] ?dtype : FloatDType) =
+        let dtype = defaultArg dtype FloatDType.Float32
         MX.RandomNormalNDArray(ctx, loc = loc, scale = scale, shape = shape, dtype = dtype)
     /// <summary>Draw random samples from a gamma distribution.
     /// 
@@ -166,7 +169,8 @@ type ContextExtensions private () =
     /// <param name="beta">Beta parameter (scale) of the gamma distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     [<Extension>]
-    static member RandomGamma(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] alpha : float, [<Optional; DefaultParameterValue(1.0)>] beta : float, [<Optional>] dtype : FloatDType) =
+    static member RandomGamma(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] alpha : float, [<Optional; DefaultParameterValue(1.0)>] beta : float, [<Optional>] ?dtype : FloatDType) =
+        let dtype = defaultArg dtype FloatDType.Float32
         MX.RandomGammaNDArray(ctx, alpha = alpha, beta = beta, shape = shape, dtype = dtype)
     /// <summary>Draw random samples from an exponential distribution.
     /// 
@@ -183,7 +187,8 @@ type ContextExtensions private () =
     /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     [<Extension>]
-    static member RandomExponential(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] dtype : FloatDType) =
+    static member RandomExponential(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] ?dtype : FloatDType) =
+        let dtype = defaultArg dtype FloatDType.Float32
         MX.RandomExponentialNDArray(ctx, lam = lam, shape = shape, dtype = dtype)
     /// <summary>Draw random samples from a Poisson distribution.
     /// 
@@ -201,7 +206,8 @@ type ContextExtensions private () =
     /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     [<Extension>]
-    static member RandomPoisson(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] dtype : FloatDType) =
+    static member RandomPoisson(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] lam : float, [<Optional>] ?dtype : FloatDType) =
+        let dtype = defaultArg dtype FloatDType.Float32
         MX.RandomPoissonNDArray(ctx, lam = lam, shape = shape, dtype = dtype)
     /// <summary>Draw random samples from a negative binomial distribution.
     /// 
@@ -221,7 +227,8 @@ type ContextExtensions private () =
     /// <param name="p">Failure probability in each experiment.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     [<Extension>]
-    static member RandomNegativeBinomial(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1)>] k : int, [<Optional; DefaultParameterValue(1.0)>] p : float, [<Optional>] dtype : FloatDType) =
+    static member RandomNegativeBinomial(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1)>] k : int, [<Optional; DefaultParameterValue(1.0)>] p : float, [<Optional>] ?dtype : FloatDType) =
+        let dtype = defaultArg dtype FloatDType.Float32
         MX.RandomNegativeBinomialNDArray(ctx, k = k, p = p, shape = shape, dtype = dtype)
 
     /// <summary>Draw random samples from a generalized negative binomial distribution.
@@ -243,7 +250,8 @@ type ContextExtensions private () =
     /// <param name="alpha">Alpha (dispersion) parameter of the negative binomial distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     [<Extension>]
-    static member RandomGeneralizedNegativeBinomial(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] mu : float, [<Optional; DefaultParameterValue(1.0)>] alpha : float, [<Optional>] dtype : FloatDType) =
+    static member RandomGeneralizedNegativeBinomial(ctx : Context, shape : int seq, [<Optional; DefaultParameterValue(1.0)>] mu : float, [<Optional; DefaultParameterValue(1.0)>] alpha : float, [<Optional>] ?dtype : FloatDType) =
+        let dtype = defaultArg dtype FloatDType.Float32
         MX.RandomGeneralizedNegativeBinomialNDArray(ctx, mu = mu, alpha = alpha, shape = shape, dtype = dtype)
 
     /// <summary>Draw random samples from a discrete uniform distribution.
@@ -264,7 +272,8 @@ type ContextExtensions private () =
     /// <param name="high">Upper bound of the distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to int32 if not defined (dtype=None).</param>
     [<Extension>]
-    static member RandomRandint(ctx : Context, shape : int seq, low : int64, high : int64, [<Optional>] dtype : RandomRandintDtype) =
+    static member RandomRandint(ctx : Context, shape : int seq, low : int64, high : int64, [<Optional>] ?dtype : RandomRandintDtype) =
+        let dtype = defaultArg dtype RandomRandintDtype.Int32
         MX.RandomRandintNDArray(low, high, ctx, shape = shape, dtype = dtype)
      
     /// <summary>fill target with zeros without default dtype</summary>
@@ -276,49 +285,88 @@ type ContextExtensions private () =
     /// <summary>fill target with zeros</summary>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
+    /// <param name="stype">Storage type of output.</param>
     [<Extension>]
-    static member Zeros(ctx : Context, shape : int seq, [<Optional>] dtype : DataType) =
-        MX.ZerosNDArray(ctx, shape = shape, dtype = dtype)
+    static member Zeros(ctx : Context, shape : int seq, [<Optional>] ?dtype : DataType, [<Optional>] ?stype : StorageType) =
+        let dtype = defaultArg dtype Float32
+        match stype with 
+        | None | Some (Default | Undefined) ->
+            MX.ZerosNDArray(ctx, shape = shape, dtype = dtype)
+        | Some(stype) -> 
+            let a = new NDArray(shape, ctx, dtype, true, stype) 
+            MX.Zeros([a], ctx, shape = shape, dtype = dtype)
+            a
     
     /// <summary>fill target with zeros</summary>
     /// <param name="data">The NDArray to copy shape and data type from</param>
+    /// <param name="stype">Storage type of output.</param>
     [<Extension>]
-    static member ZerosLike(ctx : Context, data : NDArray) =
-        match data.DataType with 
-        | Some dt -> MX.ZerosNDArray(ctx, shape = data.Shape, dtype = dt)
-        | None -> MX.ZerosNDArray(ctx, shape = data.Shape)
+    static member ZerosLike(ctx : Context, data : NDArray, [<Optional>] ?stype : StorageType) =
+        match data.DataType, stype with 
+        | None, None -> ctx.Zeros(data.Shape)
+        | Some dtype, None -> ctx.Zeros(data.Shape, dtype)
+        | Some dtype, Some stype -> ctx.Zeros(data.Shape, dtype, stype)
+        | None, Some stype -> ctx.Zeros(data.Shape, stype = stype)
 
     /// <summary>Return a 2-D array with ones on the diagonal and zeros elsewhere.</summary>
     /// <param name="N">Number of rows in the output.</param>
     /// <param name="M">Number of columns in the output. If 0, defaults to N</param>
     /// <param name="k">Index of the diagonal. 0 (the default) refers to the main diagonal.A positive value refers to an upper diagonal.A negative value to a lower diagonal.</param>
     /// <param name="dtype">Target data type.</param>
+    /// <param name="stype">Storage type of output.</param>
     [<Extension>]
-    static member Eye(ctx : Context, N : int64, [<Optional>] M : int64, [<Optional>] k : int64, [<Optional>] dtype : DataType) =
-        MX.EyeNDArray(N, ctx, M = M, k = k, dtype = dtype)
+    static member Eye(ctx : Context, N : int64, [<Optional>] M : int64, [<Optional>] k : int64, [<Optional>] ?dtype : DataType, [<Optional>] ?stype : StorageType) =
+        let dtype = defaultArg dtype Float32
+        match stype with 
+        | None | Some (Default | Undefined) ->
+            MX.EyeNDArray(N, ctx, M = M, k = k, dtype = dtype)
+        | Some(stype) -> 
+            let shape = [|int N; if M = 0L then int N else int M|]
+            let a = new NDArray(shape, ctx, dtype, true, stype) 
+            MX.Eye([a], N, ctx, M = M, k = k, dtype = dtype)
+            a
     
     /// <summary>fill target with ones</summary>
     /// <param name="shape">The shape of the output</param>
     /// <param name="dtype">Target data type.</param>
+    /// <param name="stype">Storage type of output.</param>
     [<Extension>]
-    static member Ones(ctx : Context, shape : int seq, [<Optional>] dtype : DataType) =
-        MX.OnesNDArray(ctx, shape = shape, dtype = dtype)
+    static member Ones(ctx : Context, shape : int seq, [<Optional>] ?dtype : DataType, [<Optional>] ?stype : StorageType) =
+        let dtype = defaultArg dtype Float32
+        match stype with 
+        | None | Some (Default | Undefined) ->
+            MX.OnesNDArray(ctx, shape = shape, dtype = dtype)
+        | Some(stype) -> 
+            let a = new NDArray(shape, ctx, dtype, true, stype) 
+            MX.Ones([a], ctx, shape = shape, dtype = dtype)
+            a
     
     /// <summary>fill target with zeros</summary>
     /// <param name="data">The NDArray to copy shape and data type from</param>
+    /// <param name="stype">Storage type of output.</param>
     [<Extension>]
-    static member OnesLike(ctx : Context, data : NDArray) =
-        match data.DataType with 
-        | Some dt -> MX.OnesNDArray(ctx, shape = data.Shape, dtype = dt)
-        | None -> MX.OnesNDArray(ctx, shape = data.Shape)
+    static member OnesLike(ctx : Context, data : NDArray, [<Optional>] ?stype : StorageType) =
+        match data.DataType, stype with 
+        | None, None -> ctx.Ones(data.Shape)
+        | Some dtype, None -> ctx.Ones(data.Shape, dtype)
+        | Some dtype, Some stype -> ctx.Ones(data.Shape, dtype, stype)
+        | None, Some stype -> ctx.Ones(data.Shape, stype = stype)
 
     /// <summary>fill target with a scalar value</summary>
     /// <param name="shape">The shape of the output</param>
     /// <param name="value">Value with which to fill newly created tensor</param>
     /// <param name="dtype">Target data type.</param>
+    /// <param name="stype">Storage type of output.</param>
     [<Extension>]
-    static member Full(ctx : Context, shape : int seq, value : double, [<Optional>] dtype : DataType) =
-        MX.FullNDArray(ctx, value, shape = shape, dtype = dtype)
+    static member Full(ctx : Context, shape : int seq, value : double, [<Optional>] ?dtype : DataType, [<Optional>] ?stype : StorageType) =
+        let dtype = defaultArg dtype Float32
+        match stype with 
+        | None | Some (Default | Undefined) ->
+            MX.FullNDArray(ctx, value, shape = shape, dtype = dtype)
+        | Some(stype) -> 
+            let a = new NDArray(shape, ctx, dtype, true, stype) 
+            MX.Full([a], ctx, value, shape = shape, dtype = dtype)
+            [|a|]
     
     /// <summary>Return evenly spaced values within a given interval. Similar to Numpy</summary>
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
@@ -371,5 +419,6 @@ type ContextExtensions private () =
     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
     /// <param name="dtype">Target data type.</param>
     [<Extension>]
-    static member Linspace(ctx : Context, start : double, [<Optional>] stop : float, [<Optional>] step : double, [<Optional>] repeat : int, [<Optional>] inferRange : bool, [<Optional>] dtype : DataType) =
-        MX.LinspaceNDArray(start, ctx, stop = stop, step = step, repeat = repeat, inferRange = inferRange, dtype = dtype)
+    static member Linspace(ctx : Context, start : double, [<Optional>] stop : float, [<Optional>] step : double, [<Optional>] repeat : int, [<Optional>] inferRange : bool, [<Optional>] ?dtype : DataType, [<Optional>] ?stype : StorageType) =
+        MX.LinspaceNDArray(start, ctx, stop = stop, step = step, repeat = repeat, inferRange = inferRange, ?dtype = dtype)
+        
