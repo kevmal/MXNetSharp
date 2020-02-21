@@ -1009,19 +1009,19 @@ extern int MXAutogradGetSymbol(NDArrayHandle handle, [<Out>] SymbolHandle& out)
 
 /// <summary>create cached operator</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXCreateCachedOp__(SymbolHandle handle, CachedOpHandle[] out)
+extern int MXCreateCachedOp(SymbolHandle handle, [<Out>] CachedOpHandle& out)
 
 /// <summary>create cached operator</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXCreateCachedOpEx__(SymbolHandle handle, int num_flags, string[] keys, string[] vals, CachedOpHandle[] out)
+extern int MXCreateCachedOpEx(SymbolHandle handle, int num_flags, string[] keys, string[] vals, [<Out>]CachedOpHandle& out)
 
 /// <summary>free cached operator</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXFreeCachedOp__(CachedOpHandle handle)
+extern int MXFreeCachedOp(CachedOpHandle handle)
 
 /// <summary>invoke cached operator</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXInvokeCachedOp__(CachedOpHandle handle, int num_inputs, NDArrayHandle[] inputs, int[] num_outputs, NDArrayHandle[]& outputs)
+extern int MXInvokeCachedOp(CachedOpHandle handle, int num_inputs, NDArrayHandle[] inputs, [<Out>] int& num_outputs, [<Out>] IntPtr& outputs)
 
 /// <summary>invoke a cached op</summary>
 /// <param name="handle">the handle to the cached op</param>
@@ -1032,11 +1032,11 @@ extern int MXInvokeCachedOp__(CachedOpHandle handle, int num_inputs, NDArrayHand
 /// <param name="out_stypes">output ndarrays' stypes</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXInvokeCachedOpEx__(CachedOpHandle handle, int num_inputs, NDArrayHandle[] inputs, int[] num_outputs, NDArrayHandle[]& outputs, int[]& out_stypes)
+extern int MXInvokeCachedOpEx(CachedOpHandle handle, int num_inputs, NDArrayHandle[] inputs, [<Out>] int& num_outputs, [<Out>] IntPtr& outputs, [<Out>] IntPtr& out_stypes)
 
 /// <summary>cached op set monitor callback</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXCachedOpRegisterOpHook__(NDArrayHandle handle, CachedOpMonitorCallback callback, bool monitor_all)
+extern int MXCachedOpRegisterOpHook(NDArrayHandle handle, CachedOpMonitorCallback callback, bool monitor_all)
 
 //--------------------------------------------
 // Part 3: symbolic configuration generation

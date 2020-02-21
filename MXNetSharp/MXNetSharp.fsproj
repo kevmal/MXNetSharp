@@ -29,6 +29,7 @@
     <Compile Include="genargtypes.fs" />
     <Compile Include="symbol.fs" />
     <Compile Include="ndarray.fs" />
+    <Compile Include="cachedop.fs" />
     <Compile Include="autograd.fs" />
     <Compile Include="customop.fs" />
     <Compile Include="rtc.fs" />

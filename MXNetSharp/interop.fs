@@ -92,7 +92,19 @@ type SafeKVStoreHandle(owner) =
             x.handle
         else
             ObjectDisposedException("SafeKVStoreHandle", "KVStore handle has been closed") |> raise
-                                                
+
+type SafeCachedOpHandle(owner) = 
+    inherit SafeHandle(0n, true)
+    new() = new SafeCachedOpHandle(true)
+    new(ptr,owner) as this = new SafeCachedOpHandle(owner) then this.SetHandle(ptr)
+    override x.IsInvalid = x.handle <= 0n
+    override x.ReleaseHandle() = CApi.MXFreeCachedOp x.handle = 0
+    member internal x.UnsafeHandle = 
+        if not x.IsClosed then
+            x.handle
+        else
+            ObjectDisposedException("SafeCachedOpHandle", "CachedOp handle has been closed") |> raise
+                                                                        
 [<Extension>]
 type ValueStringExtensions = ValueStringExtensions with
     [<Extension>] 
@@ -2754,3 +2766,39 @@ module MXEngine =
     /// <param name="opr_name">The operation name.</param>
     let pushSyncND sync_func func_param deleter ctx_handle _nds_handle mutable_nds_handle prop_handle priority opr_name = 
         MXEnginePushSyncND(sync_func, func_param, deleter, ctx_handle, _nds_handle, length _nds_handle, mutable_nds_handle, length mutable_nds_handle, prop_handle, priority, opr_name) |> throwOnError "MXEnginePushSyncND"
+
+
+
+module MXCachedOp = 
+    /// <summary>create cached operator</summary>
+    let create handle = 
+        let mutable out = un
+        MXCreateCachedOp(handle, &out) |> throwOnError "MXCreateCachedOp"
+        out
+
+    /// <summary>create cached operator</summary>
+    let createEx handle keys values = 
+        assert(length keys = length values)
+        let mutable out = un
+        MXCreateCachedOpEx(handle, length keys, keys, values, &out) |> throwOnError "MXCreateCachedOpEx"
+        out
+   
+    /// <summary>free cached operator</summary> 
+    let free handle = MXFreeCachedOp(handle) |> throwOnError "MXFreeCachedOp"
+
+    /// <summary>invoke a cached op</summary>
+    /// <param name="handle">the handle to the cached op</param>
+    /// <param name="inputs">input NDArrays</param>
+    /// <returns>NDArrayHandle[], int[] (storage type)</returns>
+    let invoke handle inputs =
+        let mutable num_outputs = un
+        let mutable outputs = un
+        let mutable stypes = un
+        MXInvokeCachedOpEx(handle, length inputs, inputs, &num_outputs, &outputs, &stypes) |> throwOnError "MXInvokeCachedOpEx"
+        let outs : NDArrayHandle [] = readStructArray num_outputs outputs
+        let stypes : int [] = readStructArray num_outputs stypes
+        outs, stypes
+
+    /// <summary>cached op set monitor callback</summary>
+    let registerOpHook handle callback monitorAll = MXCachedOpRegisterOpHook(handle, callback, monitorAll) |> throwOnError "registerOpHook"
+        
