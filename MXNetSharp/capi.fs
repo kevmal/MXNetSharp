@@ -1537,7 +1537,7 @@ extern int MXGenAtomicSymbolFromSymbol(SymbolHandle sym_handle, [<Out>] SymbolHa
 /// <param name="keys">keys for options</param>
 /// <param name="vals">values corresponding to keys</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXOptimizeForBackend(SymbolHandle sym_handle, string backend_name, int dev_type, SymbolHandle[] ret_sym_handle, uint32 len, NDArrayHandle[] in_args_handle, uint32 num_options, string[] keys, string[] vals)
+extern int MXOptimizeForBackend(SymbolHandle sym_handle, string backend_name, int dev_type, [<Out>] SymbolHandle& ret_sym_handle, uint32 len, NDArrayHandle[] in_args_handle, uint32 num_options, string[] keys, string[] vals)
 
 //--------------------------------------------
 // Part 4: Executor interface

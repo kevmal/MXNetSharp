@@ -914,14 +914,14 @@ module MXSymbol =
     /// <param name="sym_handle">symbol to be partitioned</param>
     /// <param name="dev_type">context device type</param>
     /// <param name="backend_name">backend name</param>
-    /// <param name="ret_sym_handle">partitioned symbol returned</param>
-    /// <param name="len">number of args</param>
     /// <param name="in_args_handle">args array</param>
-    /// <param name="num_options">number of key value pairs</param>
     /// <param name="keys">keys for options</param>
     /// <param name="vals">values corresponding to keys</param>
-    let optimizeForBackend sym_handle backend_name dev_type ret_sym_handle len in_args_handle num_options keys vals = 
-        MXOptimizeForBackend(sym_handle, backend_name, dev_type, ret_sym_handle, len, in_args_handle, num_options, keys, vals) |> throwOnError "MXOptimizeForBackend"
+    let optimizeForBackend sym_handle backend_name dev_type in_args_handle keys vals = 
+        assert(ulength keys = ulength vals)
+        let mutable ret_sym_handle = un
+        MXOptimizeForBackend(sym_handle, backend_name, dev_type, &ret_sym_handle, ulength in_args_handle, in_args_handle, ulength keys, keys, vals) |> throwOnError "MXOptimizeForBackend"
+        ret_sym_handle
         
 
 
