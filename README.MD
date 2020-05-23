@@ -2,7 +2,7 @@
 
 ## Prerequisites 
 
-MXNet binaries need to be on library search path, bindings were generated against libmxnet b20191125 so older versions of libmxnet may not support all operators present. For GPU support, relevant CUDA libraries also need to be accessible. 
+MXNet binaries need to be on library search path, bindings were generated against libmxnet 1.6.0 so older versions of libmxnet may not support all operators present. For GPU support, relevant CUDA libraries also need to be accessible. 
 
 ## Examples
 - [Temporal Convolutional Networks (TCN)](Examples/TCN)
