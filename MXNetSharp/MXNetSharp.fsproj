@@ -36,7 +36,6 @@
     <Compile Include="dataiter.fs" />
     <Compile Include="operators.fs" />
     <Compile Include="contextext.fs" />
-    <Compile Include="executor.fs" />
     <None Include="load.fsx" />
     <None Include="explore operators.fsx" />
     <None Include="generate operators.fsx" />

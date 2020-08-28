@@ -49,8 +49,6 @@ type CachedOpHandle = IntPtr
 type SymbolHandle = IntPtr
 /// <summary>handle to a AtomicSymbol</summary>
 type AtomicSymbolHandle = IntPtr
-/// <summary>handle to an Executor</summary>
-type ExecutorHandle = IntPtr
 /// <summary>handle a dataiter creator</summary>
 type DataIterCreator = IntPtr
 /// <summary>handle to a DataIterator</summary>
@@ -81,7 +79,6 @@ type EngineAsyncFunc = delegate of IntPtr * IntPtr * IntPtr -> unit
 type EngineSyncFunc = delegate of IntPtr * IntPtr -> unit
 /// <summary>Callback to free the param for EngineAsyncFunc/EngineSyncFunc</summary>
 type EngineFuncParamDeleter = delegate of IntPtr -> unit
-type ExecutorMonitorCallback = delegate of string * NDArrayHandle * IntPtr -> unit
 /// <summary>Monitor callback called at operator level for cached op</summary>
 type CachedOpMonitorCallback = delegate of string * string * NDArrayHandle -> unit
 type NativeOpInfo_forward = delegate of int * float32[] byref * int[] * int[] byref * int[] * IntPtr -> unit
@@ -563,7 +560,7 @@ extern int MXNDArrayLoad(string fname, [<Out>] uint32& out_size, [<Out>] IntPtr&
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXNDArrayLoadFromBuffer(IntPtr ndarray_buffer, size_t size, [<Out>] uint32& out_size, [<Out>] NDArrayHandle& out_arr, [<Out>] uint32& out_name_size, [<Out>] IntPtr& out_names)
 
-/// <summary>Perform a synchronize copy from a continugous CPU memory region.
+/// <summary>Perform a synchronize copy from a contiguous CPU memory region.
 /// This function will call WaitToWrite before the copy is performed.
 /// This is useful to copy data from existing memory region that are
 /// not wrapped by NDArray(thus dependency not being tracked).</summary>
@@ -573,7 +570,7 @@ extern int MXNDArrayLoadFromBuffer(IntPtr ndarray_buffer, size_t size, [<Out>] u
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXNDArraySyncCopyFromCPU(NDArrayHandle handle, IntPtr data, size_t size)
 
-/// <summary>Perform a synchronize copyto a continugous CPU memory region.
+/// <summary>Perform a synchronize copyto a contiguous CPU memory region.
 ///
 /// This function will call WaitToRead before the copy is performed.
 /// This is useful to copy data from existing memory region that are
@@ -958,14 +955,28 @@ extern int MXAutogradIsTraining([<Out>] bool& curr)
 /// <param name="curr">returns the current status</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXIsNumpyShape([<Out>] bool& curr)
+extern int MXIsNumpyShape([<Out>] int& curr)
 
 /// <summary>set numpy compatibility switch</summary>
-/// <param name="is_np_shape">1 when numpy shape semantics is on, 0 when off</param>
+/// <param name="is_np_shape">1 when numpy shape semantics is thread local on, 2 when numpy shape semantics is global on and 0 when off</param>
 /// <param name="prev">returns the previous status before this set</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXSetIsNumpyShape(int is_np_shape, [<Out>] int& prev)
+
+/// <summary>get numpy default data type</summary>
+/// <param name="curr">returns the current status</param>
+/// <returns>0 when success, -1 when failure happens</returns>
+[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl)>]
+extern int MXIsNumpyDefaultDtype([<Out>] bool& curr)
+
+/// <summary>set numpy default data type</summary>
+/// <param name="dtype_flag">false when default dtype is flaot32,
+///                  true when default dtype is flaot64.</param>
+/// <param name="prev">returns the previous status before this set</param>
+/// <returns>0 when success, -1 when failure happens</returns>
+[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl)>]
+extern int MXSetIsNumpyDefaultDtype(bool dtype_flag, [<Out>] bool& prev)
 
 /// <summary>mark NDArrays as variables to compute gradient for autograd</summary>
 /// <param name="num_var">number of variable NDArrays</param>
@@ -1013,30 +1024,62 @@ extern int MXCreateCachedOp(SymbolHandle handle, [<Out>] CachedOpHandle& out)
 
 /// <summary>create cached operator</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXCreateCachedOpEx(SymbolHandle handle, int num_flags, string[] keys, string[] vals, [<Out>]CachedOpHandle& out)
+extern int MXCreateCachedOpEx(SymbolHandle handle, int num_flags, string[] keys, string[] vals, [<Out>]CachedOpHandle& out, bool thread_safe)
 
 /// <summary>free cached operator</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXFreeCachedOp(CachedOpHandle handle)
 
-/// <summary>invoke cached operator</summary>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXInvokeCachedOp(CachedOpHandle handle, int num_inputs, NDArrayHandle[] inputs, [<Out>] int& num_outputs, [<Out>] IntPtr& outputs)
 
 /// <summary>invoke a cached op</summary>
 /// <param name="handle">the handle to the cached op</param>
 /// <param name="num_inputs">number of input NDArrays</param>
 /// <param name="inputs">input NDArrays</param>
 /// <param name="num_outputs">number of output NDArrays</param>
+/// <param name="default_dev_type">the default context type</param>
+/// <param name="default_dev_id">the default context device id</param>
 /// <param name="outputs">output NDArrays</param>
 /// <param name="out_stypes">output ndarrays' stypes</param>
 /// <returns>0 when success, -1 when failure happens</returns>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXInvokeCachedOpEx(CachedOpHandle handle, int num_inputs, NDArrayHandle[] inputs, [<Out>] int& num_outputs, [<Out>] IntPtr& outputs, [<Out>] IntPtr& out_stypes)
+extern int MXInvokeCachedOpEx(CachedOpHandle handle, int num_inputs, NDArrayHandle[] inputs, [<Out>] int& num_outputs, int default_dev_type, int default_dev_id, [<Out>] IntPtr& outputs, [<Out>] IntPtr& out_stypes)
 
 /// <summary>cached op set monitor callback</summary>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
 extern int MXCachedOpRegisterOpHook(NDArrayHandle handle, CachedOpMonitorCallback callback, bool monitor_all)
+
+
+/// <summary>Get current status of deferred compute mode</summary>
+/// <param name="curr">returns the current status.</param>
+/// <returns>0 when success, -1 when failure happens</returns>
+[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl)>]
+extern int MXNDArrayIsDeferredCompute([<Out>] int& curr)
+
+/// <summary>set whether to enable deferred compute mode</summary>
+/// <param name="deferred_compute_enabled">1 to enable, 0 to disable.</param>
+/// <param name="prev">returns the previous status before this set.</param>
+/// <returns>0 when success, -1 when failure happens</returns>
+[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl)>]
+extern int MXNDArraySetIsDeferredCompute(int deferred_compute_enabled, [<Out>] int& prev)
+
+/// <summary>Associate variables with deferred compute arrays</summary>
+/// <param name="arrays">ndarray handles to be matched with variables</param>
+/// <param name="variables">symbol handles of variables to be matched with ndarrays</param>
+/// <param name="num">number of arrays and variables respectively</param>
+/// <returns>0 when success, -1 when failure happens</returns>
+[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl)>]
+extern int MXNDArraySetDeferredComputeVariable(NDArrayHandle[] arrays, SymbolHandle[] variables, int num)
+
+/// <summary>Convert the graph constructed during deferred computation mode to a Symbol.</summary>
+/// <param name="output_handles">ndarray handles of outputs</param>
+/// <param name="out">grouped output symbol handle
+///
+///Construct a Symbol for the deferred computation graph. output_handles
+///specifies the outputs of interest which the returned symbol will compute.</param>
+[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl)>]
+extern int MXNDArrayGetDeferredComputeSymbol([<Out>] NDArrayHandle& output_handles, [<Out>] int& num_outputs, [<Out>] SymbolHandle& out)
+
+
 
 //--------------------------------------------
 // Part 3: symbolic configuration generation
@@ -1537,180 +1580,7 @@ extern int MXGenAtomicSymbolFromSymbol(SymbolHandle sym_handle, [<Out>] SymbolHa
 /// <param name="keys">keys for options</param>
 /// <param name="vals">values corresponding to keys</param>
 [<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXOptimizeForBackend(SymbolHandle sym_handle, string backend_name, int dev_type, [<Out>] SymbolHandle& ret_sym_handle, uint32 len, NDArrayHandle[] in_args_handle, uint32 num_options, string[] keys, string[] vals)
-
-//--------------------------------------------
-// Part 4: Executor interface
-//--------------------------------------------
-/// <summary>Delete the executor</summary>
-/// <param name="handle">the executor.</param>
-/// <returns>0 when success, -1 when failure happens</returns>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorFree(ExecutorHandle handle)
-
-/// <summary>Print the content of execution plan, used for debug.</summary>
-/// <param name="handle">the executor.</param>
-/// <param name="out_str">pointer to hold the output string of the printing.</param>
-/// <returns>0 when success, -1 when failure happens</returns>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorPrint(ExecutorHandle handle, [<Out>] IntPtr& out_str)
-
-/// <summary>Executor forward method</summary>
-/// <param name="handle">executor handle</param>
-/// <param name="is_train">int value to indicate whether the forward pass is for evaluation</param>
-/// <returns>0 when success, -1 when failure happens</returns>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorForward(ExecutorHandle handle, int is_train)
-
-/// <summary>Excecutor run backward</summary>
-/// <param name="handle">execute handle</param>
-/// <param name="len">lenth</param>
-/// <param name="head_grads">NDArray handle for heads' gradient</param>
-/// <returns>0 when success, -1 when failure happens</returns>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorBackward(ExecutorHandle handle, uint32 len, NDArrayHandle[] head_grads)
-
-/// <summary>Excecutor run backward</summary>
-/// <param name="handle">execute handle</param>
-/// <param name="len">lenth</param>
-/// <param name="head_grads">NDArray handle for heads' gradient</param>
-/// <param name="is_train">int value to indicate whether the backward pass is for evaluation</param>
-/// <returns>0 when success, -1 when failure happens</returns>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorBackwardEx(ExecutorHandle handle, uint32 len, NDArrayHandle[] head_grads, int is_train)
-
-/// <summary>Get executor's head NDArray</summary>
-/// <param name="handle">executor handle</param>
-/// <param name="out_size">output narray vector size</param>
-/// <param name="out">out put narray handles</param>
-/// <returns>0 when success, -1 when failure happens</returns>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorOutputs(ExecutorHandle handle, [<Out>] uint32& out_size, [<Out>] IntPtr& out)
-
-/// <summary>Generate Executor from symbol</summary>
-/// <param name="symbol_handle">symbol handle</param>
-/// <param name="dev_type">device type</param>
-/// <param name="dev_id">device id</param>
-/// <param name="len">length</param>
-/// <param name="in_args">in args array</param>
-/// <param name="arg_grad_store">arg grads handle array</param>
-/// <param name="grad_req_type">grad req array</param>
-/// <param name="aux_states_len">length of auxiliary states</param>
-/// <param name="aux_states">auxiliary states array</param>
-/// <param name="out">output executor handle</param>
-/// <returns>0 when success, -1 when failure happens</returns>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorBind(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 len, NDArrayHandle[] in_args, NDArrayHandle[] arg_grad_store, uint32[] grad_req_type, uint32 aux_states_len, NDArrayHandle[] aux_states, [<Out>] ExecutorHandle& out)
-
-/// <summary>Generate Executor from symbol,
-/// This is advanced function, allow specify group2ctx map.
-/// The user can annotate "ctx_group" attribute to name each group.</summary>
-/// <param name="symbol_handle">symbol handle</param>
-/// <param name="dev_type">device type of default context</param>
-/// <param name="dev_id">device id of default context</param>
-/// <param name="num_map_keys">size of group2ctx map</param>
-/// <param name="map_keys">keys of group2ctx map</param>
-/// <param name="map_dev_types">device type of group2ctx map</param>
-/// <param name="map_dev_ids">device id of group2ctx map</param>
-/// <param name="len">length</param>
-/// <param name="in_args">in args array</param>
-/// <param name="arg_grad_store">arg grads handle array</param>
-/// <param name="grad_req_type">grad req array</param>
-/// <param name="aux_states_len">length of auxiliary states</param>
-/// <param name="aux_states">auxiliary states array</param>
-/// <param name="out">output executor handle</param>
-/// <returns>0 when success, -1 when failure happens</returns>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorBindX(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 len, NDArrayHandle[] in_args, NDArrayHandle[] arg_grad_store, uint32[] grad_req_type, uint32 aux_states_len, NDArrayHandle[] aux_states, [<Out>] ExecutorHandle& out)
-
-/// <summary>Generate Executor from symbol,
-/// This is advanced function, allow specify group2ctx map.
-/// The user can annotate "ctx_group" attribute to name each group.</summary>
-/// <param name="symbol_handle">symbol handle</param>
-/// <param name="dev_type">device type of default context</param>
-/// <param name="dev_id">device id of default context</param>
-/// <param name="num_map_keys">size of group2ctx map</param>
-/// <param name="map_keys">keys of group2ctx map</param>
-/// <param name="map_dev_types">device type of group2ctx map</param>
-/// <param name="map_dev_ids">device id of group2ctx map</param>
-/// <param name="len">length</param>
-/// <param name="in_args">in args array</param>
-/// <param name="arg_grad_store">arg grads handle array</param>
-/// <param name="grad_req_type">grad req array</param>
-/// <param name="aux_states_len">length of auxiliary states</param>
-/// <param name="aux_states">auxiliary states array</param>
-/// <param name="shared_exec">input executor handle for memory sharing</param>
-/// <param name="out">output executor handle</param>
-/// <returns>0 when success, -1 when failure happens</returns>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorBindEX(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 len, NDArrayHandle[] in_args, NDArrayHandle[] arg_grad_store, uint32[] grad_req_type, uint32 aux_states_len, NDArrayHandle[] aux_states, ExecutorHandle shared_exec, [<Out>] ExecutorHandle& out)
-
-(* Exclude DEPRECATED
-/// <summary>DEPRECATED. Use MXExecutorSimpleBindEx instead.</summary>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorSimpleBind(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_g2c_keys, string[] g2c_keys, int[] g2c_dev_types, int[] g2c_dev_ids, uint32 provided_grad_req_list_len, string[] provided_grad_req_names, string[] provided_grad_req_types, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, uint32[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32 num_provided_arg_dtypes, string[] provided_arg_dtype_names, int[] provided_arg_dtypes, uint32 num_provided_arg_stypes, string[] provided_arg_stype_names, int[] provided_arg_stypes, uint32 num_shared_arg_names, string[] shared_arg_name_list, int[] shared_buffer_len, string[] shared_buffer_name_list, NDArrayHandle[] shared_buffer_handle_list, string[]& updated_shared_buffer_name_list, NDArrayHandle[]& updated_shared_buffer_handle_list, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec_handle, ExecutorHandle[] out)
-*)
-
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorSimpleBindEx(SymbolHandle symbol_handle, int dev_type, int dev_id, uint32 num_g2c_keys, string[] g2c_keys, int[] g2c_dev_types, int[] g2c_dev_ids, uint32 provided_grad_req_list_len, string[] provided_grad_req_names, string[] provided_grad_req_types, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, int[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32 num_provided_arg_dtypes, string[] provided_arg_dtype_names, int[] provided_arg_dtypes, uint32 num_provided_arg_stypes, string[] provided_arg_stype_names, int[] provided_arg_stypes, uint32 num_shared_arg_names, string[] shared_arg_name_list, int[] shared_buffer_len, string[] shared_buffer_name_list, NDArrayHandle[] shared_buffer_handle_list, string[]& updated_shared_buffer_name_list, NDArrayHandle[]& updated_shared_buffer_handle_list, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec_handle, [<Out>] ExecutorHandle& out)
-
-(* Exclude DEPRECATED
-/// <summary>DEPRECATED. Use MXExecutorReshapeEx instead.
-///Return a new executor with the same symbol and shared memory,
-///but different input/output shapes.</summary>
-/// <param name="partial_shaping">Whether to allow changing the shape of unspecified arguments.</param>
-/// <param name="allow_up_sizing">Whether to allow allocating new ndarrays that's larger than the original.</param>
-/// <param name="dev_type">device type of default context</param>
-/// <param name="dev_id">device id of default context</param>
-/// <param name="num_map_keys">size of group2ctx map</param>
-/// <param name="map_keys">keys of group2ctx map</param>
-/// <param name="map_dev_types">device type of group2ctx map</param>
-/// <param name="map_dev_ids">device id of group2ctx map</param>
-/// <param name="num_in_args">length of in_args</param>
-/// <param name="in_args">in args array</param>
-/// <param name="arg_grads">arg grads handle array</param>
-/// <param name="num_aux_states">length of auxiliary states</param>
-/// <param name="aux_states">auxiliary states array</param>
-/// <param name="shared_exec">input executor handle for memory sharing</param>
-/// <param name="out">output executor handle</param>
-/// <returns>a new executor</returns>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorReshape(int partial_shaping, int allow_up_sizing, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, uint32[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32[] num_in_args, NDArrayHandle[]& in_args, NDArrayHandle[]& arg_grads, uint32[] num_aux_states, NDArrayHandle[]& aux_states, ExecutorHandle shared_exec, ExecutorHandle[] out)
-*)
-
-/// <summary>Return a new executor with the same symbol and shared memory,
-///but different input/output shapes.</summary>
-/// <param name="partial_shaping">Whether to allow changing the shape of unspecified arguments.</param>
-/// <param name="allow_up_sizing">Whether to allow allocating new ndarrays that's larger than the original.</param>
-/// <param name="dev_type">device type of default context</param>
-/// <param name="dev_id">device id of default context</param>
-/// <param name="num_map_keys">size of group2ctx map</param>
-/// <param name="map_keys">keys of group2ctx map</param>
-/// <param name="map_dev_types">device type of group2ctx map</param>
-/// <param name="map_dev_ids">device id of group2ctx map</param>
-/// <param name="num_in_args">length of in_args</param>
-/// <param name="in_args">in args array</param>
-/// <param name="arg_grads">arg grads handle array</param>
-/// <param name="num_aux_states">length of auxiliary states</param>
-/// <param name="aux_states">auxiliary states array</param>
-/// <param name="shared_exec">input executor handle for memory sharing</param>
-/// <param name="out">output executor handle</param>
-/// <returns>a new executor</returns>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorReshapeEx(int partial_shaping, int allow_up_sizing, int dev_type, int dev_id, uint32 num_map_keys, string[] map_keys, int[] map_dev_types, int[] map_dev_ids, uint32 num_provided_arg_shapes, string[] provided_arg_shape_names, int[] provided_arg_shape_data, uint32[] provided_arg_shape_idx, uint32 num_in_args, NDArrayHandle[] in_args, NDArrayHandle[] arg_grads, uint32 num_aux_states, NDArrayHandle[] aux_states, ExecutorHandle shared_exec, [<Out>]ExecutorHandle& out)
-
-/// <summary>get optimized graph from graph executor</summary>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorGetOptimizedSymbol(ExecutorHandle handle, [<Out>] SymbolHandle& out)
-
-/// <summary>set a call back to notify the completion of operation</summary>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorSetMonitorCallback(ExecutorHandle handle, ExecutorMonitorCallback callback, [<Out>] IntPtr& callback_handle)
-
-/// <summary>set a call back to notify the completion of operation</summary>
-/// <param name="monitor_all">If true, monitor both input and output, otherwise monitor output only.</param>
-[<DllImport(MXNETLIB, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)>]
-extern int MXExecutorSetMonitorCallbackEX(ExecutorHandle handle, ExecutorMonitorCallback callback, [<Out>] IntPtr& callback_handle, bool monitor_all)
+extern int MXOptimizeForBackend(SymbolHandle sym_handle, string backend_name, int dev_type, [<Out>] SymbolHandle& ret_sym_handle, uint32 args_len, NDArrayHandle[] in_args_handle, uint32 aux_len, NDArrayHandle[] in_aux_handle, uint32 num_options, string[] keys, string[] vals)
 
 //--------------------------------------------
 // Part 5: IO Interface

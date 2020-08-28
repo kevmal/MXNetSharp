@@ -1216,6 +1216,13 @@ Mappings.Modify
 
 Mappings.Modify(fun (x : ProcessedArg) -> {x with Name = toParamName x.Name} |> argDoc)
 
+// **************************** val -> value *******************************
+
+Mappings.Modify(fun (x : ProcessedArg) -> 
+    match x.Name with 
+    | "val" -> {x with Name = "value" }   
+    | _ -> x
+    )
 
 // **************************** (non-negative) types *******************************
 // REVIEW: Should we check and throw on negatives?
