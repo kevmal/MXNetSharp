@@ -224,6 +224,26 @@ module GeneratedArgumentTypes =
                 | Float32 -> "float32"
     
     [<RequireQualifiedAccess>]
+    type ContribQuantizeOutType = 
+        | Int8
+        | Uint8
+        override x.ToString() =
+            match x with
+                | Int8 -> "int8"
+                | Uint8 -> "uint8"
+    
+    [<RequireQualifiedAccess>]
+    type ContribQuantizeV2OutType = 
+        | Auto
+        | Int8
+        | Uint8
+        override x.ToString() =
+            match x with
+                | Auto -> "auto"
+                | Int8 -> "int8"
+                | Uint8 -> "uint8"
+    
+    [<RequireQualifiedAccess>]
     type ContribQuantizedConvLayout = 
         | NCDHW
         | NCHW
@@ -254,26 +274,6 @@ module GeneratedArgumentTypes =
                 | NDHWC -> "NDHWC"
                 | NHWC -> "NHWC"
                 | NWC -> "NWC"
-    
-    [<RequireQualifiedAccess>]
-    type ContribQuantizeOutType = 
-        | Int8
-        | Uint8
-        override x.ToString() =
-            match x with
-                | Int8 -> "int8"
-                | Uint8 -> "uint8"
-    
-    [<RequireQualifiedAccess>]
-    type ContribQuantizeV2OutType = 
-        | Auto
-        | Int8
-        | Uint8
-        override x.ToString() =
-            match x with
-                | Auto -> "auto"
-                | Int8 -> "int8"
-                | Uint8 -> "uint8"
     
     [<RequireQualifiedAccess>]
     type ContribRequantizeOutType = 
@@ -369,17 +369,6 @@ module GeneratedArgumentTypes =
     
     [<RequireQualifiedAccess>]
     type ContribDeformableConvolutionLayout = 
-        | NCDHW
-        | NCHW
-        | NCW
-        override x.ToString() =
-            match x with
-                | NCDHW -> "NCDHW"
-                | NCHW -> "NCHW"
-                | NCW -> "NCW"
-    
-    [<RequireQualifiedAccess>]
-    type ContribModulatedDeformableConvolutionLayout = 
         | NCDHW
         | NCHW
         | NCW

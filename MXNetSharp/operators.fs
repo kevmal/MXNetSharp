@@ -306,7 +306,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\batch_norm_v1.cc:L95</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\batch_norm_v1.cc:L95</summary>
     /// <param name="data">Input data to batch normalization</param>
     /// <param name="gamma">gamma array</param>
     /// <param name="beta">beta array</param>
@@ -376,7 +376,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\batch_norm_v1.cc:L95</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\batch_norm_v1.cc:L95</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to batch normalization</param>
     /// <param name="gamma">gamma array</param>
@@ -452,7 +452,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\batch_norm_v1.cc:L95</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\batch_norm_v1.cc:L95</summary>
     /// <param name="data">Input data to batch normalization</param>
     /// <param name="gamma">gamma array</param>
     /// <param name="beta">beta array</param>
@@ -489,7 +489,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L58</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mean">Moving mean</param>
@@ -547,7 +547,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L58</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -611,7 +611,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L58</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mean">Moving mean</param>
@@ -652,7 +652,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L58</summary>
     /// <param name="lr">Learning rate</param>
     /// <param name="eta">Learning rate schedule multiplier</param>
     /// <param name="weight">Weight</param>
@@ -692,7 +692,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L101</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L101</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mean">Moving mean</param>
@@ -746,7 +746,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L101</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L101</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -806,7 +806,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L101</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L101</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mean">Moving mean</param>
@@ -844,7 +844,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L101</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L101</summary>
     /// <param name="lr">Learning rate</param>
     /// <param name="eta">Learning rate schedule multiplier</param>
     /// <param name="weight">Weight</param>
@@ -885,7 +885,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L167</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L167</summary>
     /// <param name="data">data</param>
     /// <param name="lrs">Learning rates</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -935,7 +935,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L167</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L167</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">data</param>
     /// <param name="lrs">Learning rates</param>
@@ -991,7 +991,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L167</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L167</summary>
     /// <param name="data">data</param>
     /// <param name="lrs">Learning rates</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -1028,7 +1028,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L167</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L167</summary>
     /// <param name="lrs">Learning rates</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
     /// <param name="etas">Learning rates schedule multiplier</param>
@@ -1066,7 +1066,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L223</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L223</summary>
     /// <param name="data">data</param>
     /// <param name="lrs">Learning rates</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -1116,7 +1116,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L223</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L223</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">data</param>
     /// <param name="lrs">Learning rates</param>
@@ -1172,7 +1172,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L223</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L223</summary>
     /// <param name="data">data</param>
     /// <param name="lrs">Learning rates</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -1209,7 +1209,7 @@ type MX() =
     /// the update is skipped.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adamw.cc:L223</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adamw.cc:L223</summary>
     /// <param name="lrs">Learning rates</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
     /// <param name="etas">Learning rates schedule multiplier</param>
@@ -1234,7 +1234,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adaptive_avg_pooling.cc:L214</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adaptive_avg_pooling.cc:L214</summary>
     /// <param name="data">Input data</param>
     /// <param name="outputSize">int (output size) or a tuple of int for output (height, width).</param>
     static member ContribAdaptiveAvgPooling2D(data : NDArray, [<Optional>] outputSize : int seq) =
@@ -1256,7 +1256,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adaptive_avg_pooling.cc:L214</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adaptive_avg_pooling.cc:L214</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data</param>
     /// <param name="outputSize">int (output size) or a tuple of int for output (height, width).</param>
@@ -1283,7 +1283,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\adaptive_avg_pooling.cc:L214</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\adaptive_avg_pooling.cc:L214</summary>
     /// <param name="data">Input data</param>
     /// <param name="outputSize">int (output size) or a tuple of int for output (height, width).</param>
     static member ContribAdaptiveAvgPooling2D([<Optional>] ?data : Symbol, [<Optional>] ?outputSize : int seq) =
@@ -1293,7 +1293,7 @@ type MX() =
     /// <summary>Check if all the float numbers in the array are finite (used for AMP)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\all_finite.cc:L101</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\all_finite.cc:L101</summary>
     /// <param name="data">Array</param>
     /// <param name="initOutput">Initialize output to 1.</param>
     static member AllFinite(data : NDArray, [<Optional; DefaultParameterValue(true)>] initOutput : bool) =
@@ -1306,7 +1306,7 @@ type MX() =
     /// <summary>Check if all the float numbers in the array are finite (used for AMP)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\all_finite.cc:L101</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\all_finite.cc:L101</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Array</param>
     /// <param name="initOutput">Initialize output to 1.</param>
@@ -1325,7 +1325,7 @@ type MX() =
     /// <summary>Check if all the float numbers in all the arrays are finite (used for AMP)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\all_finite.cc:L133</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\all_finite.cc:L133</summary>
     /// <param name="data">Arrays</param>
     /// <param name="numArrays">Number of arrays.</param>
     /// <param name="initOutput">Initialize output to 1.</param>
@@ -1339,7 +1339,7 @@ type MX() =
     /// <summary>Check if all the float numbers in all the arrays are finite (used for AMP)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\all_finite.cc:L133</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\all_finite.cc:L133</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Arrays</param>
     /// <param name="numArrays">Number of arrays.</param>
@@ -1358,7 +1358,7 @@ type MX() =
     /// <summary>Check if all the float numbers in all the arrays are finite (used for AMP)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\all_finite.cc:L133</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\all_finite.cc:L133</summary>
     /// <param name="data">Arrays</param>
     /// <param name="numArrays">Number of arrays.</param>
     /// <param name="initOutput">Initialize output to 1.</param>
@@ -1389,7 +1389,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\allclose_op.cc:L55</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\allclose_op.cc:L55</summary>
     /// <param name="a">Input array a</param>
     /// <param name="b">Input array b</param>
     /// <param name="rtol">Relative tolerance.</param>
@@ -1430,7 +1430,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\allclose_op.cc:L55</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\allclose_op.cc:L55</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">Input array a</param>
     /// <param name="b">Input array b</param>
@@ -1477,7 +1477,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\allclose_op.cc:L55</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\allclose_op.cc:L55</summary>
     /// <param name="a">Input array a</param>
     /// <param name="b">Input array b</param>
     /// <param name="rtol">Relative tolerance.</param>
@@ -1497,7 +1497,7 @@ type MX() =
     /// for more details.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bilinear_resize.cc:L220</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bilinear_resize.cc:L215</summary>
     /// <param name="data">Input data</param>
     /// <param name="like">Resize data to it&#39;s shape</param>
     /// <param name="height">output height (required, but ignored if scale_height is defined or mode is not &quot;size&quot;)</param>
@@ -1505,20 +1505,18 @@ type MX() =
     /// <param name="scaleHeight">sampling scale of the height (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
     /// <param name="scaleWidth">sampling scale of the width (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
     /// <param name="mode">resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);</param>
-    /// <param name="alignCorners">With align_corners = True, the interpolating doesn&#39;t proportionally align theoutput and input pixels, and thus the output values can depend on the input size.</param>
     static member ContribBilinearResize2D(data : NDArray, 
                                           like : NDArray, 
                                           [<Optional>] ?height : int, 
                                           [<Optional>] ?width : int, 
                                           [<Optional>] ?scaleHeight : float, 
                                           [<Optional>] ?scaleWidth : float, 
-                                          [<Optional>] ?mode : ContribBilinearResize2DMode, 
-                                          [<Optional>] ?alignCorners : bool) =
+                                          [<Optional>] ?mode : ContribBilinearResize2DMode) =
         let creator = AtomicSymbolCreator.FromName "_contrib_BilinearResize2D"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg like)) then like.UnsafeHandle|]
-                                                 [|"height"; "width"; "scale_height"; "scale_width"; "mode"; "align_corners"|]
-                                                 [|(match height with None -> "1" | Some height -> string height); (match width with None -> "1" | Some width -> string width); (match scaleHeight with None -> "None" | Some scaleHeight -> string scaleHeight); (match scaleWidth with None -> "None" | Some scaleWidth -> string scaleWidth); (match mode with None -> "size" | Some mode -> string mode); (match alignCorners with None -> "true" | Some alignCorners -> string alignCorners)|]
+                                                 [|"height"; "width"; "scale_height"; "scale_width"; "mode"|]
+                                                 [|(match height with None -> "1" | Some height -> string height); (match width with None -> "1" | Some width -> string width); (match scaleHeight with None -> "None" | Some scaleHeight -> string scaleHeight); (match scaleWidth with None -> "None" | Some scaleWidth -> string scaleWidth); (match mode with None -> "size" | Some mode -> string mode)|]
         (new NDArray(outputs.[0]))
     /// <summary>
     /// Perform 2D resizing (upsampling or downsampling) for 4D input using bilinear interpolation.
@@ -1531,7 +1529,7 @@ type MX() =
     /// for more details.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bilinear_resize.cc:L220</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bilinear_resize.cc:L215</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data</param>
     /// <param name="like">Resize data to it&#39;s shape</param>
@@ -1540,7 +1538,6 @@ type MX() =
     /// <param name="scaleHeight">sampling scale of the height (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
     /// <param name="scaleWidth">sampling scale of the width (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
     /// <param name="mode">resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);</param>
-    /// <param name="alignCorners">With align_corners = True, the interpolating doesn&#39;t proportionally align theoutput and input pixels, and thus the output values can depend on the input size.</param>
     static member ContribBilinearResize2D(outputArray : NDArray seq, 
                                           data : NDArray, 
                                           like : NDArray, 
@@ -1548,11 +1545,10 @@ type MX() =
                                           [<Optional>] ?width : int, 
                                           [<Optional>] ?scaleHeight : float, 
                                           [<Optional>] ?scaleWidth : float, 
-                                          [<Optional>] ?mode : ContribBilinearResize2DMode, 
-                                          [<Optional>] ?alignCorners : bool) =
+                                          [<Optional>] ?mode : ContribBilinearResize2DMode) =
         let creator = AtomicSymbolCreator.FromName "_contrib_BilinearResize2D"
-        let names = [|"height"; "width"; "scale_height"; "scale_width"; "mode"; "align_corners"|]
-        let vals = [|(match height with None -> "1" | Some height -> string height); (match width with None -> "1" | Some width -> string width); (match scaleHeight with None -> "None" | Some scaleHeight -> string scaleHeight); (match scaleWidth with None -> "None" | Some scaleWidth -> string scaleWidth); (match mode with None -> "size" | Some mode -> string mode); (match alignCorners with None -> "true" | Some alignCorners -> string alignCorners)|]
+        let names = [|"height"; "width"; "scale_height"; "scale_width"; "mode"|]
+        let vals = [|(match height with None -> "1" | Some height -> string height); (match width with None -> "1" | Some width -> string width); (match scaleHeight with None -> "None" | Some scaleHeight -> string scaleHeight); (match scaleWidth with None -> "None" | Some scaleWidth -> string scaleWidth); (match mode with None -> "size" | Some mode -> string mode)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg like)) then like.UnsafeHandle|]
@@ -1571,7 +1567,7 @@ type MX() =
     /// for more details.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bilinear_resize.cc:L220</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bilinear_resize.cc:L215</summary>
     /// <param name="data">Input data</param>
     /// <param name="like">Resize data to it&#39;s shape</param>
     /// <param name="height">output height (required, but ignored if scale_height is defined or mode is not &quot;size&quot;)</param>
@@ -1579,9 +1575,8 @@ type MX() =
     /// <param name="scaleHeight">sampling scale of the height (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
     /// <param name="scaleWidth">sampling scale of the width (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
     /// <param name="mode">resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);</param>
-    /// <param name="alignCorners">With align_corners = True, the interpolating doesn&#39;t proportionally align theoutput and input pixels, and thus the output values can depend on the input size.</param>
-    static member ContribBilinearResize2D([<Optional>] ?data : Symbol, [<Optional>] ?like : Symbol, [<Optional>] ?height : int, [<Optional>] ?width : int, [<Optional>] ?scaleHeight : float, [<Optional>] ?scaleWidth : float, [<Optional>] ?mode : ContribBilinearResize2DMode, [<Optional>] ?alignCorners : bool) =
-        ContribBilinearResize2D(?data = data, ?like = like, ?height = height, ?width = width, ?scaleHeight = scaleHeight, ?scaleWidth = scaleWidth, ?mode = mode, ?alignCorners = alignCorners)
+    static member ContribBilinearResize2D([<Optional>] ?data : Symbol, [<Optional>] ?like : Symbol, [<Optional>] ?height : int, [<Optional>] ?width : int, [<Optional>] ?scaleHeight : float, [<Optional>] ?scaleWidth : float, [<Optional>] ?mode : ContribBilinearResize2DMode) =
+        ContribBilinearResize2D(?data = data, ?like = like, ?height = height, ?width = width, ?scaleHeight = scaleHeight, ?scaleWidth = scaleWidth, ?mode = mode)
 
 
     /// <summary>
@@ -1599,7 +1594,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\boolean_mask.cc:L196</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\boolean_mask.cc:L196</summary>
     /// <param name="data">Data</param>
     /// <param name="index">Mask</param>
     /// <param name="axis">An integer that represents the axis in NDArray to mask from.</param>
@@ -1625,7 +1620,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\boolean_mask.cc:L196</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\boolean_mask.cc:L196</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Data</param>
     /// <param name="index">Mask</param>
@@ -1656,7 +1651,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\boolean_mask.cc:L196</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\boolean_mask.cc:L196</summary>
     /// <param name="data">Data</param>
     /// <param name="index">Mask</param>
     /// <param name="axis">An integer that represents the axis in NDArray to mask from.</param>
@@ -1721,7 +1716,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L95</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L94</summary>
     /// <param name="data">The input</param>
     /// <param name="overlapThresh">Overlapping(IoU) threshold to suppress object with smaller score.</param>
     /// <param name="validThresh">Filter input boxes to those whose scores greater than valid_thresh.</param>
@@ -1809,7 +1804,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L95</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L94</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="overlapThresh">Overlapping(IoU) threshold to suppress object with smaller score.</param>
@@ -1903,7 +1898,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L95</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L94</summary>
     /// <param name="data">The input</param>
     /// <param name="overlapThresh">Overlapping(IoU) threshold to suppress object with smaller score.</param>
     /// <param name="validThresh">Filter input boxes to those whose scores greater than valid_thresh.</param>
@@ -1939,7 +1934,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L136</summary>
     /// <param name="lhs">The first input</param>
     /// <param name="rhs">The second input</param>
     /// <param name="format">The box encoding type. 
@@ -1969,7 +1964,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L136</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">The first input</param>
     /// <param name="rhs">The second input</param>
@@ -2004,7 +1999,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L136</summary>
     /// <param name="lhs">The first input</param>
     /// <param name="rhs">The second input</param>
     /// <param name="format">The box encoding type. 
@@ -2036,7 +2031,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L183</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L182</summary>
     /// <param name="data">The input</param>
     /// <param name="threshold">Ignore matching when score &lt; thresh, if is_ascend=false, or ignore score &gt; thresh, if is_ascend=true.</param>
     /// <param name="isAscend">Use ascend order for scores instead of descending. Please set threshold accordingly.</param>
@@ -2071,7 +2066,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L183</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L182</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="threshold">Ignore matching when score &lt; thresh, if is_ascend=false, or ignore score &gt; thresh, if is_ascend=true.</param>
@@ -2111,7 +2106,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L183</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L182</summary>
     /// <param name="data">The input</param>
     /// <param name="threshold">Ignore matching when score &lt; thresh, if is_ascend=false, or ignore score &gt; thresh, if is_ascend=true.</param>
     /// <param name="isAscend">Use ascend order for scores instead of descending. Please set threshold accordingly.</param>
@@ -2141,7 +2136,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L183</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L182</summary>
     /// <param name="threshold">Ignore matching when score &lt; thresh, if is_ascend=false, or ignore score &gt; thresh, if is_ascend=true.</param>
     /// <param name="data">The input</param>
     /// <param name="isAscend">Use ascend order for scores instead of descending. Please set threshold accordingly.</param>
@@ -2154,7 +2149,7 @@ type MX() =
     ///     Input bounding boxes are using corner type: `x_{min}, y_{min}, x_{max}, y_{max}`.) array
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L211</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L210</summary>
     /// <param name="samples">(B, N) value +1 (positive), -1 (negative), 0 (ignore)</param>
     /// <param name="matches">(B, N) value range [0, M)</param>
     /// <param name="anchors">(B, N, 4) encoded in corner</param>
@@ -2177,7 +2172,7 @@ type MX() =
     ///     Input bounding boxes are using corner type: `x_{min}, y_{min}, x_{max}, y_{max}`.) array
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L211</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L210</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="samples">(B, N) value +1 (positive), -1 (negative), 0 (ignore)</param>
     /// <param name="matches">(B, N) value range [0, M)</param>
@@ -2206,7 +2201,7 @@ type MX() =
     ///     Input bounding boxes are using corner type: `x_{min}, y_{min}, x_{max}, y_{max}`.) array
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L211</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L210</summary>
     /// <param name="samples">(B, N) value +1 (positive), -1 (negative), 0 (ignore)</param>
     /// <param name="matches">(B, N) value range [0, M)</param>
     /// <param name="anchors">(B, N, 4) encoded in corner</param>
@@ -2221,7 +2216,7 @@ type MX() =
     ///     or center type: `x, y, width, height.) array
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L234</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L233</summary>
     /// <param name="data">(B, N, 4) predicted bbox offset</param>
     /// <param name="anchors">(1, N, 4) encoded in corner or center</param>
     /// <param name="std0">value to be divided from the 1st encoded values</param>
@@ -2250,7 +2245,7 @@ type MX() =
     ///     or center type: `x, y, width, height.) array
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L234</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L233</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">(B, N, 4) predicted bbox offset</param>
     /// <param name="anchors">(1, N, 4) encoded in corner or center</param>
@@ -2285,7 +2280,7 @@ type MX() =
     ///     or center type: `x, y, width, height.) array
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\bounding_box.cc:L234</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L233</summary>
     /// <param name="data">(B, N, 4) predicted bbox offset</param>
     /// <param name="anchors">(1, N, 4) encoded in corner or center</param>
     /// <param name="std0">value to be divided from the 1st encoded values</param>
@@ -2339,7 +2334,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L784</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L784</summary>
     /// <param name="csrMatrix">csr matrix</param>
     /// <param name="seedArrays">seed vertices</param>
     /// <param name="numArgs">Number of input NDArray.</param>
@@ -2398,7 +2393,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L784</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L784</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="csrMatrix">csr matrix</param>
     /// <param name="seedArrays">seed vertices</param>
@@ -2463,7 +2458,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L784</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L784</summary>
     /// <param name="csrMatrix">csr matrix</param>
     /// <param name="seedArrays">seed vertices</param>
     /// <param name="numHops">Number of hops.</param>
@@ -2518,7 +2513,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L883</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L883</summary>
     /// <param name="csrMatrix">csr matrix</param>
     /// <param name="probability">probability vector</param>
     /// <param name="seedArrays">seed vertices</param>
@@ -2584,7 +2579,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L883</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L883</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="csrMatrix">csr matrix</param>
     /// <param name="probability">probability vector</param>
@@ -2656,7 +2651,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L883</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L883</summary>
     /// <param name="csrMatrix">csr matrix</param>
     /// <param name="probability">probability vector</param>
     /// <param name="seedArrays">seed vertices</param>
@@ -2692,7 +2687,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L1140</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L1140</summary>
     /// <param name="graph">Input graph where we sample vertices.</param>
     /// <param name="data">The input arrays that include data arrays and states.</param>
     /// <param name="numArgs">Number of input arguments, including all symbol inputs.</param>
@@ -2730,7 +2725,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L1140</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L1140</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="graph">Input graph where we sample vertices.</param>
     /// <param name="data">The input arrays that include data arrays and states.</param>
@@ -2773,7 +2768,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L1140</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L1140</summary>
     /// <param name="graph">Input graph where we sample vertices.</param>
     /// <param name="data">The input arrays that include data arrays and states.</param>
     /// <param name="returnMapping">Return mapping of vid and eid between the subgraph and the parent graph.</param>
@@ -2805,7 +2800,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L1140</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L1140</summary>
     /// <param name="returnMapping">Return mapping of vid and eid between the subgraph and the parent graph.</param>
     /// <param name="graph">Input graph where we sample vertices.</param>
     /// <param name="data">The input arrays that include data arrays and states.</param>
@@ -2834,7 +2829,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L1321</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L1321</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="u">u ndarray</param>
     /// <param name="v">v ndarray</param>
@@ -2867,7 +2862,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L1321</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L1321</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     /// <param name="u">u ndarray</param>
@@ -2905,7 +2900,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L1321</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L1321</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="u">u ndarray</param>
     /// <param name="v">v ndarray</param>
@@ -2930,7 +2925,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L1393</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L1393</summary>
     /// <param name="data">Input ndarray</param>
     static member ContribDglAdjacency(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_contrib_dgl_adjacency"
@@ -2957,7 +2952,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L1393</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L1393</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     static member ContribDglAdjacency(outputArray : NDArray seq, data : NDArray) =
@@ -2989,7 +2984,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L1393</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L1393</summary>
     /// <param name="data">Input ndarray</param>
     static member ContribDglAdjacency([<Optional>] ?data : Symbol) =
         ContribDglAdjacency(?data = data)
@@ -3026,7 +3021,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L1582</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L1582</summary>
     /// <param name="graphData">Input graphs and input vertex Ids.</param>
     /// <param name="numArgs">Number of input arguments.</param>
     /// <param name="returnMapping">Return mapping of vid and eid between the subgraph and the parent graph.</param>
@@ -3070,7 +3065,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L1582</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L1582</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="graphData">Input graphs and input vertex Ids.</param>
     /// <param name="numArgs">Number of input arguments.</param>
@@ -3119,7 +3114,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L1582</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L1582</summary>
     /// <param name="graphData">Input graphs and input vertex Ids.</param>
     /// <param name="returnMapping">Return mapping of vid and eid between the subgraph and the parent graph.</param>
     /// <param name="graphSizes">the number of vertices in each graph.</param>
@@ -3157,7 +3152,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L1582</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L1582</summary>
     /// <param name="returnMapping">Return mapping of vid and eid between the subgraph and the parent graph.</param>
     /// <param name="graphSizes">the number of vertices in each graph.</param>
     /// <param name="graphData">Input graphs and input vertex Ids.</param>
@@ -3195,7 +3190,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\dgl_graph.cc:L1582</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\dgl_graph.cc:L1582</summary>
     /// <param name="returnMapping">Return mapping of vid and eid between the subgraph and the parent graph.</param>
     /// <param name="graphSizes">the number of vertices in each graph.</param>
     /// <param name="graphData">Input graphs and input vertex Ids.</param>
@@ -3208,7 +3203,7 @@ type MX() =
     /// the preceding layer.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L78</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L78</summary>
     /// <param name="data">The input array.</param>
     /// <param name="scalar">lambda multiplier</param>
     static member ContribGradientmultiplier(data : NDArray, scalar : float) =
@@ -3224,7 +3219,7 @@ type MX() =
     /// the preceding layer.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L78</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L78</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     /// <param name="scalar">lambda multiplier</param>
@@ -3245,7 +3240,7 @@ type MX() =
     /// the preceding layer.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L78</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L78</summary>
     /// <param name="data">The input array.</param>
     /// <param name="scalar">lambda multiplier</param>
     static member ContribGradientmultiplier(data : Symbol, scalar : float) =
@@ -3256,7 +3251,7 @@ type MX() =
     /// the preceding layer.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L78</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L78</summary>
     /// <param name="scalar">lambda multiplier</param>
     /// <param name="data">The input array.</param>
     static member ContribGradientmultiplier(scalar : float, [<Optional>] ?data : Symbol) =
@@ -3347,7 +3342,7 @@ type MX() =
     ///    , 1(01), 1550005.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\hawkes_ll.cc:L84</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\hawkes_ll.cc:L84</summary>
     /// <param name="lda">Shape (N, K) The intensity for each of the K processes, for each sample</param>
     /// <param name="alpha">Shape (K,) The infectivity factor (branching ratio) for each process</param>
     /// <param name="beta">Shape (K,) The decay parameter for each process</param>
@@ -3423,7 +3418,7 @@ type MX() =
     ///    , 1(01), 1550005.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\hawkes_ll.cc:L84</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\hawkes_ll.cc:L84</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lda">Shape (N, K) The intensity for each of the K processes, for each sample</param>
     /// <param name="alpha">Shape (K,) The infectivity factor (branching ratio) for each process</param>
@@ -3505,7 +3500,7 @@ type MX() =
     ///    , 1(01), 1550005.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\hawkes_ll.cc:L84</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\hawkes_ll.cc:L84</summary>
     /// <param name="lda">Shape (N, K) The intensity for each of the K processes, for each sample</param>
     /// <param name="alpha">Shape (K,) The infectivity factor (branching ratio) for each process</param>
     /// <param name="beta">Shape (K,) The decay parameter for each process</param>
@@ -3586,7 +3581,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\index_array.cc:L118</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\index_array.cc:L118</summary>
     /// <param name="data">Input data</param>
     /// <param name="axes">The axes to include in the index array. Supports negative values.</param>
     static member ContribIndexArray(data : NDArray, [<Optional>] ?axes : int seq) =
@@ -3643,7 +3638,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\index_array.cc:L118</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\index_array.cc:L118</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data</param>
     /// <param name="axes">The axes to include in the index array. Supports negative values.</param>
@@ -3705,7 +3700,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\index_array.cc:L118</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\index_array.cc:L118</summary>
     /// <param name="data">Input data</param>
     /// <param name="axes">The axes to include in the index array. Supports negative values.</param>
     static member ContribIndexArray([<Optional>] ?data : Symbol, [<Optional>] ?axes : int seq) =
@@ -3740,7 +3735,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\index_copy.cc:L183</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\index_copy.cc:L183</summary>
     /// <param name="oldTensor">Old tensor</param>
     /// <param name="indexVector">Index vector</param>
     /// <param name="newTensor">New tensor to be copied</param>
@@ -3780,7 +3775,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\index_copy.cc:L183</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\index_copy.cc:L183</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="oldTensor">Old tensor</param>
     /// <param name="indexVector">Index vector</param>
@@ -3825,7 +3820,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\index_copy.cc:L183</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\index_copy.cc:L183</summary>
     /// <param name="oldTensor">Old tensor</param>
     /// <param name="indexVector">Index vector</param>
     /// <param name="newTensor">New tensor to be copied</param>
@@ -3888,7 +3883,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\krprod.cc:L108</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\krprod.cc:L108</summary>
     /// <param name="args">Positional input matrices</param>
     static member KhatriRao([<ParamArray>] args : NDArray[]) =
         let creator = AtomicSymbolCreator.FromName "khatri_rao"
@@ -3931,7 +3926,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\krprod.cc:L108</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\krprod.cc:L108</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="args">Positional input matrices</param>
     static member KhatriRao(outputArray : NDArray seq, [<ParamArray>] args : NDArray[]) =
@@ -3979,7 +3974,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\krprod.cc:L108</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\krprod.cc:L108</summary>
     /// <param name="args">Positional input matrices</param>
     static member KhatriRao([<ParamArray>] args : Symbol[]) =
         KhatriRao(args)
@@ -3987,7 +3982,7 @@ type MX() =
     /// <summary>Compute the LARS coefficients of multiple weights and grads from their sums of square&quot;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\multi_lars.cc:L37</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lars.cc:L37</summary>
     /// <param name="lrs">Learning rates to scale by LARS coefficient</param>
     /// <param name="weightsSumSq">sum of square of weights arrays</param>
     /// <param name="gradsSumSq">sum of square of gradients arrays</param>
@@ -4011,7 +4006,7 @@ type MX() =
     /// <summary>Compute the LARS coefficients of multiple weights and grads from their sums of square&quot;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\multi_lars.cc:L37</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lars.cc:L37</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lrs">Learning rates to scale by LARS coefficient</param>
     /// <param name="weightsSumSq">sum of square of weights arrays</param>
@@ -4041,7 +4036,7 @@ type MX() =
     /// <summary>Compute the LARS coefficients of multiple weights and grads from their sums of square&quot;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\multi_lars.cc:L37</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lars.cc:L37</summary>
     /// <param name="lrs">Learning rates to scale by LARS coefficient</param>
     /// <param name="weightsSumSq">sum of square of weights arrays</param>
     /// <param name="gradsSumSq">sum of square of gradients arrays</param>
@@ -4054,7 +4049,7 @@ type MX() =
     /// <summary>Compute the LARS coefficients of multiple weights and grads from their sums of square&quot;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\multi_lars.cc:L37</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lars.cc:L37</summary>
     /// <param name="eta">LARS eta</param>
     /// <param name="eps">LARS eps</param>
     /// <param name="lrs">Learning rates to scale by LARS coefficient</param>
@@ -4068,7 +4063,7 @@ type MX() =
     /// <summary>Compute the sums of squares of multiple arrays
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\multi_sum_sq.cc:L36</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_sum_sq.cc:L36</summary>
     /// <param name="data">Arrays</param>
     /// <param name="numArrays">number of input arrays.</param>
     static member MultiSumSq([<ParamArray>] data : NDArray[], numArrays : int) =
@@ -4081,7 +4076,7 @@ type MX() =
     /// <summary>Compute the sums of squares of multiple arrays
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\multi_sum_sq.cc:L36</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_sum_sq.cc:L36</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Arrays</param>
     /// <param name="numArrays">number of input arrays.</param>
@@ -4099,7 +4094,7 @@ type MX() =
     /// <summary>Compute the sums of squares of multiple arrays
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\multi_sum_sq.cc:L36</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_sum_sq.cc:L36</summary>
     /// <param name="data">Arrays</param>
     /// <param name="numArrays">number of input arrays.</param>
     static member MultiSumSq(data : Symbol seq, numArrays : int) =
@@ -4107,7 +4102,7 @@ type MX() =
     /// <summary>Compute the sums of squares of multiple arrays
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\multi_sum_sq.cc:L36</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_sum_sq.cc:L36</summary>
     /// <param name="numArrays">number of input arrays.</param>
     /// <param name="data">Arrays</param>
     static member MultiSumSq(numArrays : int, [<Optional>] ?data : Symbol seq) =
@@ -4115,7 +4110,7 @@ type MX() =
     /// <summary>Compute the sums of squares of multiple arrays
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\multi_sum_sq.cc:L36</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_sum_sq.cc:L36</summary>
     /// <param name="numArrays">number of input arrays.</param>
     /// <param name="data">Arrays</param>
     static member MultiSumSq(numArrays : int, [<ParamArray>] data : Symbol[]) =
@@ -4324,7 +4319,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\nnz.cc:L177</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\nnz.cc:L177</summary>
     /// <param name="data">Input</param>
     /// <param name="axis">Select between the number of values across the whole matrix, in each column, or in each row.</param>
     static member ContribGetnnz(data : NDArray, [<Optional>] ?axis : int) =
@@ -4340,7 +4335,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\nnz.cc:L177</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\nnz.cc:L177</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input</param>
     /// <param name="axis">Select between the number of values across the whole matrix, in each column, or in each row.</param>
@@ -4361,7 +4356,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\nnz.cc:L177</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\nnz.cc:L177</summary>
     /// <param name="data">Input</param>
     /// <param name="axis">Select between the number of values across the whole matrix, in each column, or in each row.</param>
     static member ContribGetnnz([<Optional>] ?data : Symbol, [<Optional>] ?axis : int) =
@@ -4386,7 +4381,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\optimizer_op.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\optimizer_op.cc:L71</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="history">History</param>
@@ -4426,7 +4421,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\optimizer_op.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\optimizer_op.cc:L71</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -4472,7 +4467,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\optimizer_op.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\optimizer_op.cc:L71</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="history">History</param>
@@ -4501,7 +4496,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\optimizer_op.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\optimizer_op.cc:L71</summary>
     /// <param name="lr">Learning rate</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -4520,7 +4515,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L42</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L42</summary>
     /// <param name="data">Weights, gradients, learning rates and weight decays</param>
     /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
     /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
@@ -4540,7 +4535,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L42</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L42</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Weights, gradients, learning rates and weight decays</param>
     /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
@@ -4565,7 +4560,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L42</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L42</summary>
     /// <param name="data">Weights, gradients, learning rates and weight decays</param>
     /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
     /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
@@ -4593,7 +4588,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L91</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L91</summary>
     /// <param name="data">Weights, gradients, momentum, learning rates and weight decays</param>
     /// <param name="momentum">The decay rate of momentum estimates at each epoch.</param>
     /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
@@ -4630,7 +4625,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L91</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L91</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Weights, gradients, momentum, learning rates and weight decays</param>
     /// <param name="momentum">The decay rate of momentum estimates at each epoch.</param>
@@ -4673,7 +4668,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L91</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L91</summary>
     /// <param name="data">Weights, gradients, momentum, learning rates and weight decays</param>
     /// <param name="momentum">The decay rate of momentum estimates at each epoch.</param>
     /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
@@ -4690,7 +4685,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L140</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L140</summary>
     /// <param name="data">Weights, gradients, learning rates and weight decays</param>
     /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
     /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
@@ -4710,7 +4705,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L140</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L140</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Weights, gradients, learning rates and weight decays</param>
     /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
@@ -4735,7 +4730,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L140</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L140</summary>
     /// <param name="data">Weights, gradients, learning rates and weight decays</param>
     /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
     /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
@@ -4763,7 +4758,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L200</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L200</summary>
     /// <param name="data">Weights, gradients, momentums, learning rates and weight decays</param>
     /// <param name="momentum">The decay rate of momentum estimates at each epoch.</param>
     /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
@@ -4800,7 +4795,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L200</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L200</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Weights, gradients, momentums, learning rates and weight decays</param>
     /// <param name="momentum">The decay rate of momentum estimates at each epoch.</param>
@@ -4843,7 +4838,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L200</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\preloaded_multi_sgd.cc:L200</summary>
     /// <param name="data">Weights, gradients, momentums, learning rates and weight decays</param>
     /// <param name="momentum">The decay rate of momentum estimates at each epoch.</param>
     /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
@@ -4872,7 +4867,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\quadratic_op.cc:L50</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\quadratic_op.cc:L50</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="a">Coefficient of the quadratic term in the quadratic function.</param>
     /// <param name="b">Coefficient of the linear term in the quadratic function.</param>
@@ -4904,7 +4899,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\quadratic_op.cc:L50</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\quadratic_op.cc:L50</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     /// <param name="a">Coefficient of the quadratic term in the quadratic function.</param>
@@ -4941,7 +4936,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\quadratic_op.cc:L50</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\quadratic_op.cc:L50</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="a">Coefficient of the quadratic term in the quadratic function.</param>
     /// <param name="b">Coefficient of the linear term in the quadratic function.</param>
@@ -4974,7 +4969,7 @@ type MX() =
     /// <summary>Set to zero multiple arrays
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\reset_arrays.cc:L36</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\reset_arrays.cc:L36</summary>
     /// <param name="data">Arrays</param>
     /// <param name="numArrays">number of input arrays.</param>
     static member ResetArrays([<ParamArray>] data : NDArray[], numArrays : int) =
@@ -4987,7 +4982,7 @@ type MX() =
     /// <summary>Set to zero multiple arrays
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\reset_arrays.cc:L36</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\reset_arrays.cc:L36</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Arrays</param>
     /// <param name="numArrays">number of input arrays.</param>
@@ -5005,7 +5000,7 @@ type MX() =
     /// <summary>Set to zero multiple arrays
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\reset_arrays.cc:L36</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\reset_arrays.cc:L36</summary>
     /// <param name="data">Arrays</param>
     /// <param name="numArrays">number of input arrays.</param>
     static member ResetArrays(data : Symbol seq, numArrays : int) =
@@ -5013,7 +5008,7 @@ type MX() =
     /// <summary>Set to zero multiple arrays
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\reset_arrays.cc:L36</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\reset_arrays.cc:L36</summary>
     /// <param name="numArrays">number of input arrays.</param>
     /// <param name="data">Arrays</param>
     static member ResetArrays(numArrays : int, [<Optional>] ?data : Symbol seq) =
@@ -5021,7 +5016,7 @@ type MX() =
     /// <summary>Set to zero multiple arrays
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\reset_arrays.cc:L36</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\reset_arrays.cc:L36</summary>
     /// <param name="numArrays">number of input arrays.</param>
     /// <param name="data">Arrays</param>
     static member ResetArrays(numArrays : int, [<ParamArray>] data : Symbol[]) =
@@ -5048,7 +5043,7 @@ type MX() =
     /// He, Kaiming, et al. &quot;Mask R-CNN.&quot; ICCV, 2017
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
     /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
     /// <param name="rois">Bounding box coordinates, a 2D array, if batchid is less than 0, it will be ignored.</param>
     /// <param name="pooledSize">ROI Align output roi feature map height and width: (h, w)</param>
@@ -5088,7 +5083,7 @@ type MX() =
     /// He, Kaiming, et al. &quot;Mask R-CNN.&quot; ICCV, 2017
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
     /// <param name="rois">Bounding box coordinates, a 2D array, if batchid is less than 0, it will be ignored.</param>
@@ -5134,7 +5129,7 @@ type MX() =
     /// He, Kaiming, et al. &quot;Mask R-CNN.&quot; ICCV, 2017
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
     /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
     /// <param name="rois">Bounding box coordinates, a 2D array, if batchid is less than 0, it will be ignored.</param>
     /// <param name="pooledSize">ROI Align output roi feature map height and width: (h, w)</param>
@@ -5164,7 +5159,7 @@ type MX() =
     /// He, Kaiming, et al. &quot;Mask R-CNN.&quot; ICCV, 2017
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
     /// <param name="pooledSize">ROI Align output roi feature map height and width: (h, w)</param>
     /// <param name="spatialScale">Ratio of input feature map height (or w) to raw image height (or w). Equals the reciprocal of total stride in convolutional layers</param>
     /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
@@ -5195,7 +5190,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\rroi_align.cc:L274</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\rroi_align.cc:L274</summary>
     /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
     /// <param name="rois">Bounding box coordinates, a 2D array</param>
     /// <param name="pooledSize">RROI align output shape (h,w) </param>
@@ -5232,7 +5227,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\rroi_align.cc:L274</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\rroi_align.cc:L274</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
     /// <param name="rois">Bounding box coordinates, a 2D array</param>
@@ -5275,7 +5270,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\rroi_align.cc:L274</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\rroi_align.cc:L274</summary>
     /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
     /// <param name="rois">Bounding box coordinates, a 2D array</param>
     /// <param name="pooledSize">RROI align output shape (h,w) </param>
@@ -5303,7 +5298,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\rroi_align.cc:L274</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\rroi_align.cc:L274</summary>
     /// <param name="pooledSize">RROI align output shape (h,w) </param>
     /// <param name="spatialScale">Ratio of input feature map height (or width) to raw image height (or width). Equals the reciprocal of total stride in convolutional layers</param>
     /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
@@ -5335,7 +5330,7 @@ type MX() =
     ///   - round_ste(csr) = csr
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\stes_op.cc:L55</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\stes_op.cc:L55</summary>
     /// <param name="data">The input array.</param>
     static member ContribRoundSte(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_contrib_round_ste"
@@ -5366,7 +5361,7 @@ type MX() =
     ///   - round_ste(csr) = csr
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\stes_op.cc:L55</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\stes_op.cc:L55</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member ContribRoundSte(outputArray : NDArray seq, data : NDArray) =
@@ -5402,7 +5397,7 @@ type MX() =
     ///   - round_ste(csr) = csr
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\stes_op.cc:L55</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\stes_op.cc:L55</summary>
     /// <param name="data">The input array.</param>
     static member ContribRoundSte([<Optional>] ?data : Symbol) =
         ContribRoundSte(?data = data)
@@ -5429,7 +5424,7 @@ type MX() =
     ///   - round_ste(csr) = csr
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\stes_op.cc:L80</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\stes_op.cc:L80</summary>
     /// <param name="data">The input array.</param>
     static member ContribSignSte(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_contrib_sign_ste"
@@ -5460,7 +5455,7 @@ type MX() =
     ///   - round_ste(csr) = csr
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\stes_op.cc:L80</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\stes_op.cc:L80</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member ContribSignSte(outputArray : NDArray seq, data : NDArray) =
@@ -5496,7 +5491,7 @@ type MX() =
     ///   - round_ste(csr) = csr
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\stes_op.cc:L80</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\stes_op.cc:L80</summary>
     /// <param name="data">The input array.</param>
     static member ContribSignSte([<Optional>] ?data : Symbol) =
         ContribSignSte(?data = data)
@@ -5551,7 +5546,7 @@ type MX() =
     ///     Ambrish Tyagi, and Amit Agrawal. &quot;Context Encoding for Semantic Segmentation.&quot; *CVPR 2018*
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\sync_batch_norm.cc:L97</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\sync_batch_norm.cc:L97</summary>
     /// <param name="data">Input data to batch normalization</param>
     /// <param name="gamma">gamma array</param>
     /// <param name="beta">beta array</param>
@@ -5632,7 +5627,7 @@ type MX() =
     ///     Ambrish Tyagi, and Amit Agrawal. &quot;Context Encoding for Semantic Segmentation.&quot; *CVPR 2018*
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\sync_batch_norm.cc:L97</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\sync_batch_norm.cc:L97</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to batch normalization</param>
     /// <param name="gamma">gamma array</param>
@@ -5719,7 +5714,7 @@ type MX() =
     ///     Ambrish Tyagi, and Amit Agrawal. &quot;Context Encoding for Semantic Segmentation.&quot; *CVPR 2018*
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\sync_batch_norm.cc:L97</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\sync_batch_norm.cc:L97</summary>
     /// <param name="data">Input data to batch normalization</param>
     /// <param name="gamma">gamma array</param>
     /// <param name="beta">beta array</param>
@@ -5784,7 +5779,7 @@ type MX() =
     ///     Ambrish Tyagi, and Amit Agrawal. &quot;Context Encoding for Semantic Segmentation.&quot; *CVPR 2018*
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\sync_batch_norm.cc:L97</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\sync_batch_norm.cc:L97</summary>
     /// <param name="key">Hash key for synchronization, please set the same hash key for same layer, Block.prefix is typically used as in :class:`gluon.nn.contrib.SyncBatchNorm`.</param>
     /// <param name="data">Input data to batch normalization</param>
     /// <param name="gamma">gamma array</param>
@@ -5816,10 +5811,8 @@ type MX() =
     /// k_proj = mx.nd.reshap(k_proj, shape=(-1, 0, 0), reverse=True)
     /// output = mx.nd.batch_dot(q_proj, k_proj, transpose_b=True)
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L143</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L666</summary>
     /// <param name="queriesKeysValues">Interleaved queries, keys and values</param>
     /// <param name="heads">Set number of heads</param>
     static member ContribInterleavedMatmulSelfattQk(queriesKeysValues : NDArray, heads : int) =
@@ -5845,10 +5838,8 @@ type MX() =
     /// k_proj = mx.nd.reshap(k_proj, shape=(-1, 0, 0), reverse=True)
     /// output = mx.nd.batch_dot(q_proj, k_proj, transpose_b=True)
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L143</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L666</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="queriesKeysValues">Interleaved queries, keys and values</param>
     /// <param name="heads">Set number of heads</param>
@@ -5879,10 +5870,8 @@ type MX() =
     /// k_proj = mx.nd.reshap(k_proj, shape=(-1, 0, 0), reverse=True)
     /// output = mx.nd.batch_dot(q_proj, k_proj, transpose_b=True)
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L143</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L666</summary>
     /// <param name="queriesKeysValues">Interleaved queries, keys and values</param>
     /// <param name="heads">Set number of heads</param>
     static member ContribInterleavedMatmulSelfattQk(queriesKeysValues : Symbol, heads : int) =
@@ -5903,10 +5892,8 @@ type MX() =
     /// k_proj = mx.nd.reshap(k_proj, shape=(-1, 0, 0), reverse=True)
     /// output = mx.nd.batch_dot(q_proj, k_proj, transpose_b=True)
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L143</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L666</summary>
     /// <param name="heads">Set number of heads</param>
     /// <param name="queriesKeysValues">Interleaved queries, keys and values</param>
     static member ContribInterleavedMatmulSelfattQk(heads : int, [<Optional>] ?queriesKeysValues : Symbol) =
@@ -5932,10 +5919,8 @@ type MX() =
     /// output = mx.nd.transpose(output, axes=(0, 2, 1, 3))
     /// output = mx.nd.reshape(output, shape=(0, 0, -1))
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L187</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L710</summary>
     /// <param name="queriesKeysValues">Queries, keys and values interleaved</param>
     /// <param name="attention">Attention maps</param>
     /// <param name="heads">Set number of heads</param>
@@ -5965,10 +5950,8 @@ type MX() =
     /// output = mx.nd.transpose(output, axes=(0, 2, 1, 3))
     /// output = mx.nd.reshape(output, shape=(0, 0, -1))
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L187</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L710</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="queriesKeysValues">Queries, keys and values interleaved</param>
     /// <param name="attention">Attention maps</param>
@@ -6003,10 +5986,8 @@ type MX() =
     /// output = mx.nd.transpose(output, axes=(0, 2, 1, 3))
     /// output = mx.nd.reshape(output, shape=(0, 0, -1))
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L187</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L710</summary>
     /// <param name="queriesKeysValues">Queries, keys and values interleaved</param>
     /// <param name="attention">Attention maps</param>
     /// <param name="heads">Set number of heads</param>
@@ -6031,10 +6012,8 @@ type MX() =
     /// output = mx.nd.transpose(output, axes=(0, 2, 1, 3))
     /// output = mx.nd.reshape(output, shape=(0, 0, -1))
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L187</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L710</summary>
     /// <param name="heads">Set number of heads</param>
     /// <param name="queriesKeysValues">Queries, keys and values interleaved</param>
     /// <param name="attention">Attention maps</param>
@@ -6060,10 +6039,8 @@ type MX() =
     /// k_proj = mx.nd.reshap(k_proj, shape=(-1, 0, 0), reverse=True)
     /// output = mx.nd.batch_dot(q_proj, k_proj, transpose_b=True)
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L231</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L754</summary>
     /// <param name="queries">Queries</param>
     /// <param name="keysValues">Keys and values interleaved</param>
     /// <param name="heads">Set number of heads</param>
@@ -6092,10 +6069,8 @@ type MX() =
     /// k_proj = mx.nd.reshap(k_proj, shape=(-1, 0, 0), reverse=True)
     /// output = mx.nd.batch_dot(q_proj, k_proj, transpose_b=True)
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L231</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L754</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="queries">Queries</param>
     /// <param name="keysValues">Keys and values interleaved</param>
@@ -6129,10 +6104,8 @@ type MX() =
     /// k_proj = mx.nd.reshap(k_proj, shape=(-1, 0, 0), reverse=True)
     /// output = mx.nd.batch_dot(q_proj, k_proj, transpose_b=True)
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L231</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L754</summary>
     /// <param name="queries">Queries</param>
     /// <param name="keysValues">Keys and values interleaved</param>
     /// <param name="heads">Set number of heads</param>
@@ -6156,10 +6129,8 @@ type MX() =
     /// k_proj = mx.nd.reshap(k_proj, shape=(-1, 0, 0), reverse=True)
     /// output = mx.nd.batch_dot(q_proj, k_proj, transpose_b=True)
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L231</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L754</summary>
     /// <param name="heads">Set number of heads</param>
     /// <param name="queries">Queries</param>
     /// <param name="keysValues">Keys and values interleaved</param>
@@ -6187,10 +6158,8 @@ type MX() =
     /// output = mx.nd.transpose(output, axes=(0, 2, 1, 3))
     /// output = mx.nd.reshape(output, shape=(0, 0, -1))
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L277</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L800</summary>
     /// <param name="keysValues">Keys and values interleaved</param>
     /// <param name="attention">Attention maps</param>
     /// <param name="heads">Set number of heads</param>
@@ -6221,10 +6190,8 @@ type MX() =
     /// output = mx.nd.transpose(output, axes=(0, 2, 1, 3))
     /// output = mx.nd.reshape(output, shape=(0, 0, -1))
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L277</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L800</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="keysValues">Keys and values interleaved</param>
     /// <param name="attention">Attention maps</param>
@@ -6260,10 +6227,8 @@ type MX() =
     /// output = mx.nd.transpose(output, axes=(0, 2, 1, 3))
     /// output = mx.nd.reshape(output, shape=(0, 0, -1))
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L277</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L800</summary>
     /// <param name="keysValues">Keys and values interleaved</param>
     /// <param name="attention">Attention maps</param>
     /// <param name="heads">Set number of heads</param>
@@ -6289,10 +6254,8 @@ type MX() =
     /// output = mx.nd.transpose(output, axes=(0, 2, 1, 3))
     /// output = mx.nd.reshape(output, shape=(0, 0, -1))
     /// 
-    /// This Op is GPU only
     /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L277</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L800</summary>
     /// <param name="heads">Set number of heads</param>
     /// <param name="keysValues">Keys and values interleaved</param>
     /// <param name="attention">Attention maps</param>
@@ -6306,7 +6269,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L308</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L833</summary>
     /// <param name="data">The input array.</param>
     static member ContribDivSqrtDim(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_contrib_div_sqrt_dim"
@@ -6321,7 +6284,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L308</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L833</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member ContribDivSqrtDim(outputArray : NDArray seq, data : NDArray) =
@@ -6341,14 +6304,14 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\transformer.cc:L308</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\transformer.cc:L833</summary>
     /// <param name="data">The input array.</param>
     static member ContribDivSqrtDim([<Optional>] ?data : Symbol) =
         ContribDivSqrtDim(?data = data)
 
     /// <summary>Run a for loop over an NDArray with user-defined computation
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\control_flow.cc:1090</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\control_flow.cc:1090</summary>
     /// <param name="fn">Input graph.</param>
     /// <param name="data">The input arrays that include data arrays and states.</param>
     /// <param name="numArgs">Number of inputs.</param>
@@ -6372,7 +6335,7 @@ type MX() =
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Run a for loop over an NDArray with user-defined computation
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\control_flow.cc:1090</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\control_flow.cc:1090</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="fn">Input graph.</param>
     /// <param name="data">The input arrays that include data arrays and states.</param>
@@ -6402,7 +6365,7 @@ type MX() =
         ()
     /// <summary>Run a for loop over an NDArray with user-defined computation
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\control_flow.cc:1090</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\control_flow.cc:1090</summary>
     /// <param name="fn">Input graph.</param>
     /// <param name="data">The input arrays that include data arrays and states.</param>
     /// <param name="numOutputs">The number of outputs of the subgraph.</param>
@@ -6414,7 +6377,7 @@ type MX() =
         Foreach(fn, data, numOutputs, numOutData, inStateLocs, inDataLocs, remainLocs)
     /// <summary>Run a for loop over an NDArray with user-defined computation
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\control_flow.cc:1090</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\control_flow.cc:1090</summary>
     /// <param name="numOutputs">The number of outputs of the subgraph.</param>
     /// <param name="numOutData">The number of output data of the subgraph.</param>
     /// <param name="inStateLocs">The locations of loop states among the inputs.</param>
@@ -6428,7 +6391,7 @@ type MX() =
 
     /// <summary>Run a while loop over with user-defined condition and computation
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\control_flow.cc:1151</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\control_flow.cc:1151</summary>
     /// <param name="cond">Input graph for the loop condition.</param>
     /// <param name="func">Input graph for the loop body.</param>
     /// <param name="data">The input arrays that include data arrays and states.</param>
@@ -6456,7 +6419,7 @@ type MX() =
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Run a while loop over with user-defined condition and computation
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\control_flow.cc:1151</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\control_flow.cc:1151</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="cond">Input graph for the loop condition.</param>
     /// <param name="func">Input graph for the loop body.</param>
@@ -6490,7 +6453,7 @@ type MX() =
         ()
     /// <summary>Run a while loop over with user-defined condition and computation
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\control_flow.cc:1151</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\control_flow.cc:1151</summary>
     /// <param name="cond">Input graph for the loop condition.</param>
     /// <param name="func">Input graph for the loop body.</param>
     /// <param name="data">The input arrays that include data arrays and states.</param>
@@ -6504,7 +6467,7 @@ type MX() =
         WhileLoop(cond, func, data, numOutputs, numOutData, maxIterations, condInputLocs, funcInputLocs, funcVarLocs)
     /// <summary>Run a while loop over with user-defined condition and computation
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\control_flow.cc:1151</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\control_flow.cc:1151</summary>
     /// <param name="numOutputs">The number of outputs of the subgraph.</param>
     /// <param name="numOutData">The number of outputs from the function body.</param>
     /// <param name="maxIterations">Maximum number of iterations.</param>
@@ -6520,7 +6483,7 @@ type MX() =
 
     /// <summary>Run a if-then-else using user-defined condition and computation
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\control_flow.cc:1212</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\control_flow.cc:1212</summary>
     /// <param name="cond">Input graph for the condition.</param>
     /// <param name="thenBranch">Input graph for the then branch.</param>
     /// <param name="elseBranch">Input graph for the else branch.</param>
@@ -6546,7 +6509,7 @@ type MX() =
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <summary>Run a if-then-else using user-defined condition and computation
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\control_flow.cc:1212</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\control_flow.cc:1212</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="cond">Input graph for the condition.</param>
     /// <param name="thenBranch">Input graph for the then branch.</param>
@@ -6578,7 +6541,7 @@ type MX() =
         ()
     /// <summary>Run a if-then-else using user-defined condition and computation
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\control_flow.cc:1212</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\control_flow.cc:1212</summary>
     /// <param name="cond">Input graph for the condition.</param>
     /// <param name="thenBranch">Input graph for the then branch.</param>
     /// <param name="elseBranch">Input graph for the else branch.</param>
@@ -6591,7 +6554,7 @@ type MX() =
         Cond(cond, thenBranch, elseBranch, data, numOutputs, condInputLocs, thenInputLocs, elseInputLocs)
     /// <summary>Run a if-then-else using user-defined condition and computation
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\control_flow.cc:1212</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\control_flow.cc:1212</summary>
     /// <param name="numOutputs">The number of outputs of the subgraph.</param>
     /// <param name="condInputLocs">The locations of cond&#39;s inputs in the given inputs.</param>
     /// <param name="thenInputLocs">The locations of then&#39;s inputs in the given inputs.</param>
@@ -6740,7 +6703,7 @@ type MX() =
     ///             &lt;NDArray 2x2x2x3 @cpu(0)&gt;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\crop.cc:L66</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\crop.cc:L66</summary>
     /// <param name="data">The input.</param>
     /// <param name="x">Left boundary of the cropping area.</param>
     /// <param name="y">Top boundary of the cropping area.</param>
@@ -6786,7 +6749,7 @@ type MX() =
     ///             &lt;NDArray 2x2x2x3 @cpu(0)&gt;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\crop.cc:L66</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\crop.cc:L66</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="x">Left boundary of the cropping area.</param>
@@ -6838,7 +6801,7 @@ type MX() =
     ///             &lt;NDArray 2x2x2x3 @cpu(0)&gt;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\crop.cc:L66</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\crop.cc:L66</summary>
     /// <param name="data">The input.</param>
     /// <param name="x">Left boundary of the cropping area.</param>
     /// <param name="y">Top boundary of the cropping area.</param>
@@ -6875,7 +6838,7 @@ type MX() =
     ///             &lt;NDArray 2x2x2x3 @cpu(0)&gt;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\crop.cc:L66</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\crop.cc:L66</summary>
     /// <param name="x">Left boundary of the cropping area.</param>
     /// <param name="y">Top boundary of the cropping area.</param>
     /// <param name="width">Width of the cropping area.</param>
@@ -6936,7 +6899,7 @@ type MX() =
     ///             &lt;NDArray 2x3x4x2 @cpu(0)&gt;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L92</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L92</summary>
     /// <param name="data">Input ndarray</param>
     static member ImageToTensor(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_image_to_tensor"
@@ -6996,7 +6959,7 @@ type MX() =
     ///             &lt;NDArray 2x3x4x2 @cpu(0)&gt;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L92</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L92</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     static member ImageToTensor(outputArray : NDArray seq, data : NDArray) =
@@ -7061,7 +7024,7 @@ type MX() =
     ///             &lt;NDArray 2x3x4x2 @cpu(0)&gt;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L92</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L92</summary>
     /// <param name="data">Input ndarray</param>
     static member ImageToTensor([<Optional>] ?data : Symbol) =
         ImageToTensor(?data = data)
@@ -7128,7 +7091,7 @@ type MX() =
     ///             &lt;NDArray 2x3x4x2 @cpu(0)&gt;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L167</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L167</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="mean">Sequence of means for each channel. Default value is 0.</param>
     /// <param name="std">Sequence of standard deviations for each channel. Default value is 1.</param>
@@ -7201,7 +7164,7 @@ type MX() =
     ///             &lt;NDArray 2x3x4x2 @cpu(0)&gt;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L167</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L167</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     /// <param name="mean">Sequence of means for each channel. Default value is 0.</param>
@@ -7279,7 +7242,7 @@ type MX() =
     ///             &lt;NDArray 2x3x4x2 @cpu(0)&gt;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L167</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L167</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="mean">Sequence of means for each channel. Default value is 0.</param>
     /// <param name="std">Sequence of standard deviations for each channel. Default value is 1.</param>
@@ -7289,7 +7252,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L195</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L195</summary>
     /// <param name="data">The input.</param>
     static member ImageFlipLeftRight(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_image_flip_left_right"
@@ -7300,7 +7263,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L195</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L195</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     static member ImageFlipLeftRight(outputArray : NDArray seq, data : NDArray) =
@@ -7316,14 +7279,14 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L195</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L195</summary>
     /// <param name="data">The input.</param>
     static member ImageFlipLeftRight([<Optional>] ?data : Symbol) =
         ImageFlipLeftRight(?data = data)
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L200</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L200</summary>
     /// <param name="data">The input.</param>
     static member ImageRandomFlipLeftRight(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_image_random_flip_left_right"
@@ -7334,7 +7297,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L200</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L200</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     static member ImageRandomFlipLeftRight(outputArray : NDArray seq, data : NDArray) =
@@ -7350,14 +7313,14 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L200</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L200</summary>
     /// <param name="data">The input.</param>
     static member ImageRandomFlipLeftRight([<Optional>] ?data : Symbol) =
         ImageRandomFlipLeftRight(?data = data)
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L205</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L205</summary>
     /// <param name="data">The input.</param>
     static member ImageFlipTopBottom(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_image_flip_top_bottom"
@@ -7368,7 +7331,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L205</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L205</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     static member ImageFlipTopBottom(outputArray : NDArray seq, data : NDArray) =
@@ -7384,14 +7347,14 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L205</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L205</summary>
     /// <param name="data">The input.</param>
     static member ImageFlipTopBottom([<Optional>] ?data : Symbol) =
         ImageFlipTopBottom(?data = data)
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L210</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L210</summary>
     /// <param name="data">The input.</param>
     static member ImageRandomFlipTopBottom(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_image_random_flip_top_bottom"
@@ -7402,7 +7365,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L210</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L210</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     static member ImageRandomFlipTopBottom(outputArray : NDArray seq, data : NDArray) =
@@ -7418,14 +7381,14 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L210</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L210</summary>
     /// <param name="data">The input.</param>
     static member ImageRandomFlipTopBottom([<Optional>] ?data : Symbol) =
         ImageRandomFlipTopBottom(?data = data)
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L215</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L215</summary>
     /// <param name="data">The input.</param>
     /// <param name="minFactor">Minimum factor.</param>
     /// <param name="maxFactor">Maximum factor.</param>
@@ -7438,7 +7401,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L215</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L215</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="minFactor">Minimum factor.</param>
@@ -7456,7 +7419,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L215</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L215</summary>
     /// <param name="data">The input.</param>
     /// <param name="minFactor">Minimum factor.</param>
     /// <param name="maxFactor">Maximum factor.</param>
@@ -7464,7 +7427,7 @@ type MX() =
         ImageRandomBrightness(data, minFactor, maxFactor)
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L215</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L215</summary>
     /// <param name="minFactor">Minimum factor.</param>
     /// <param name="maxFactor">Maximum factor.</param>
     /// <param name="data">The input.</param>
@@ -7473,7 +7436,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L222</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L222</summary>
     /// <param name="data">The input.</param>
     /// <param name="minFactor">Minimum factor.</param>
     /// <param name="maxFactor">Maximum factor.</param>
@@ -7486,7 +7449,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L222</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L222</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="minFactor">Minimum factor.</param>
@@ -7504,7 +7467,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L222</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L222</summary>
     /// <param name="data">The input.</param>
     /// <param name="minFactor">Minimum factor.</param>
     /// <param name="maxFactor">Maximum factor.</param>
@@ -7512,7 +7475,7 @@ type MX() =
         ImageRandomContrast(data, minFactor, maxFactor)
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L222</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L222</summary>
     /// <param name="minFactor">Minimum factor.</param>
     /// <param name="maxFactor">Maximum factor.</param>
     /// <param name="data">The input.</param>
@@ -7521,7 +7484,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L230</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L230</summary>
     /// <param name="data">The input.</param>
     /// <param name="minFactor">Minimum factor.</param>
     /// <param name="maxFactor">Maximum factor.</param>
@@ -7534,7 +7497,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L230</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L230</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="minFactor">Minimum factor.</param>
@@ -7552,7 +7515,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L230</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L230</summary>
     /// <param name="data">The input.</param>
     /// <param name="minFactor">Minimum factor.</param>
     /// <param name="maxFactor">Maximum factor.</param>
@@ -7560,7 +7523,7 @@ type MX() =
         ImageRandomSaturation(data, minFactor, maxFactor)
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L230</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L230</summary>
     /// <param name="minFactor">Minimum factor.</param>
     /// <param name="maxFactor">Maximum factor.</param>
     /// <param name="data">The input.</param>
@@ -7569,7 +7532,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L238</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L238</summary>
     /// <param name="data">The input.</param>
     /// <param name="minFactor">Minimum factor.</param>
     /// <param name="maxFactor">Maximum factor.</param>
@@ -7582,7 +7545,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L238</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L238</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="minFactor">Minimum factor.</param>
@@ -7600,7 +7563,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L238</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L238</summary>
     /// <param name="data">The input.</param>
     /// <param name="minFactor">Minimum factor.</param>
     /// <param name="maxFactor">Maximum factor.</param>
@@ -7608,7 +7571,7 @@ type MX() =
         ImageRandomHue(data, minFactor, maxFactor)
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L238</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L238</summary>
     /// <param name="minFactor">Minimum factor.</param>
     /// <param name="maxFactor">Maximum factor.</param>
     /// <param name="data">The input.</param>
@@ -7617,7 +7580,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L246</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L246</summary>
     /// <param name="data">The input.</param>
     /// <param name="brightness">How much to jitter brightness.</param>
     /// <param name="contrast">How much to jitter contrast.</param>
@@ -7636,7 +7599,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L246</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L246</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="brightness">How much to jitter brightness.</param>
@@ -7661,7 +7624,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L246</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L246</summary>
     /// <param name="data">The input.</param>
     /// <param name="brightness">How much to jitter brightness.</param>
     /// <param name="contrast">How much to jitter contrast.</param>
@@ -7671,7 +7634,7 @@ type MX() =
         ImageRandomColorJitter(data, brightness, contrast, saturation, hue)
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L246</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L246</summary>
     /// <param name="brightness">How much to jitter brightness.</param>
     /// <param name="contrast">How much to jitter contrast.</param>
     /// <param name="saturation">How much to jitter saturation.</param>
@@ -7682,7 +7645,7 @@ type MX() =
 
     /// <summary>Adjust the lighting level of the input. Follow the AlexNet style.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L254</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L254</summary>
     /// <param name="data">The input.</param>
     /// <param name="alpha">The lighting alphas for the R, G, B channels.</param>
     static member ImageAdjustLighting(data : NDArray, alpha : double seq) =
@@ -7694,7 +7657,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Adjust the lighting level of the input. Follow the AlexNet style.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L254</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L254</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="alpha">The lighting alphas for the R, G, B channels.</param>
@@ -7711,14 +7674,14 @@ type MX() =
         ()
     /// <summary>Adjust the lighting level of the input. Follow the AlexNet style.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L254</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L254</summary>
     /// <param name="data">The input.</param>
     /// <param name="alpha">The lighting alphas for the R, G, B channels.</param>
     static member ImageAdjustLighting(data : Symbol, alpha : double seq) =
         ImageAdjustLighting(data, alpha)
     /// <summary>Adjust the lighting level of the input. Follow the AlexNet style.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L254</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L254</summary>
     /// <param name="alpha">The lighting alphas for the R, G, B channels.</param>
     /// <param name="data">The input.</param>
     static member ImageAdjustLighting(alpha : double seq, [<Optional>] ?data : Symbol) =
@@ -7726,7 +7689,7 @@ type MX() =
 
     /// <summary>Randomly add PCA noise. Follow the AlexNet style.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L262</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L262</summary>
     /// <param name="data">The input.</param>
     /// <param name="alphaStd">Level of the lighting noise.</param>
     static member ImageRandomLighting(data : NDArray, [<Optional; DefaultParameterValue(0.05)>] alphaStd : float) =
@@ -7738,7 +7701,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Randomly add PCA noise. Follow the AlexNet style.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L262</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L262</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="alphaStd">Level of the lighting noise.</param>
@@ -7755,7 +7718,7 @@ type MX() =
         ()
     /// <summary>Randomly add PCA noise. Follow the AlexNet style.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\image_random.cc:L262</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\image_random.cc:L262</summary>
     /// <param name="data">The input.</param>
     /// <param name="alphaStd">Level of the lighting noise.</param>
     static member ImageRandomLighting([<Optional>] ?data : Symbol, [<Optional>] ?alphaStd : float) =
@@ -7796,11 +7759,11 @@ type MX() =
     ///             &lt;NDArray 2x2x2x3 @cpu(0)&gt;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\resize.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\resize.cc:L71</summary>
     /// <param name="data">The input.</param>
     /// <param name="size">Size of new image. Could be (width, height) or (size)</param>
     /// <param name="keepRatio">Whether to resize the short edge or both edges to `size`, if size is give as an integer.</param>
-    /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1)</param>
+    /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu</param>
     static member ImageResize(data : NDArray, [<Optional>] size : int seq, [<Optional; DefaultParameterValue(false)>] keepRatio : bool, [<Optional; DefaultParameterValue(1)>] interp : int) =
         let creator = AtomicSymbolCreator.FromName "_image_resize"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
@@ -7843,12 +7806,12 @@ type MX() =
     ///             &lt;NDArray 2x2x2x3 @cpu(0)&gt;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\resize.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\resize.cc:L71</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="size">Size of new image. Could be (width, height) or (size)</param>
     /// <param name="keepRatio">Whether to resize the short edge or both edges to `size`, if size is give as an integer.</param>
-    /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1)</param>
+    /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu</param>
     static member ImageResize(outputArray : NDArray seq, data : NDArray, [<Optional>] size : int seq, [<Optional; DefaultParameterValue(false)>] keepRatio : bool, [<Optional; DefaultParameterValue(1)>] interp : int) =
         let creator = AtomicSymbolCreator.FromName "_image_resize"
         let names = [|"size"; "keep_ratio"; "interp"|]
@@ -7895,11 +7858,11 @@ type MX() =
     ///             &lt;NDArray 2x2x2x3 @cpu(0)&gt;
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\image\resize.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\image\resize.cc:L71</summary>
     /// <param name="data">The input.</param>
     /// <param name="size">Size of new image. Could be (width, height) or (size)</param>
     /// <param name="keepRatio">Whether to resize the short edge or both edges to `size`, if size is give as an integer.</param>
-    /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1)</param>
+    /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu</param>
     static member ImageResize([<Optional>] ?data : Symbol, [<Optional>] ?size : int seq, [<Optional>] ?keepRatio : bool, [<Optional>] ?interp : int) =
         ImageResize(?data = data, ?size = size, ?keepRatio = keepRatio, ?interp = interp)
 
@@ -7921,7 +7884,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\leaky_relu.cc:L161</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\leaky_relu.cc:L161</summary>
     /// <param name="data">Input data to activation function.</param>
     /// <param name="gamma">Input data to activation function.</param>
     /// <param name="actType">Activation function to be applied.</param>
@@ -7958,7 +7921,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\leaky_relu.cc:L161</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\leaky_relu.cc:L161</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to activation function.</param>
     /// <param name="gamma">Input data to activation function.</param>
@@ -8001,7 +7964,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\leaky_relu.cc:L161</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\leaky_relu.cc:L161</summary>
     /// <param name="data">Input data to activation function.</param>
     /// <param name="gamma">Input data to activation function.</param>
     /// <param name="actType">Activation function to be applied.</param>
@@ -8042,7 +8005,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\loss_binary_op.cc:L59</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\loss_binary_op.cc:L59</summary>
     /// <param name="data">Input data</param>
     /// <param name="label">Input label</param>
     static member SoftmaxCrossEntropy(data : NDArray, label : NDArray) =
@@ -8082,7 +8045,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\loss_binary_op.cc:L59</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\loss_binary_op.cc:L59</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data</param>
     /// <param name="label">Input label</param>
@@ -8127,7 +8090,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\loss_binary_op.cc:L59</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\loss_binary_op.cc:L59</summary>
     /// <param name="data">Input data</param>
     /// <param name="label">Input label</param>
     static member SoftmaxCrossEntropy([<Optional>] ?data : Symbol, [<Optional>] ?label : Symbol) =
@@ -8146,7 +8109,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\activation.cc:L168</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L168</summary>
     /// <param name="data">The input array.</param>
     /// <param name="actType">Activation function to be applied.</param>
     static member Activation(data : NDArray, actType : ActType) =
@@ -8168,7 +8131,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\activation.cc:L168</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L168</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     /// <param name="actType">Activation function to be applied.</param>
@@ -8195,7 +8158,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\activation.cc:L168</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L168</summary>
     /// <param name="data">The input array.</param>
     /// <param name="actType">Activation function to be applied.</param>
     static member Activation(data : Symbol, actType : ActType) =
@@ -8212,7 +8175,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\activation.cc:L168</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L168</summary>
     /// <param name="actType">Activation function to be applied.</param>
     /// <param name="data">The input array.</param>
     static member Activation(actType : ActType, [<Optional>] ?data : Symbol) =
@@ -8270,7 +8233,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\batch_norm.cc:L571</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\batch_norm.cc:L571</summary>
     /// <param name="data">Input data to batch normalization</param>
     /// <param name="gamma">gamma array</param>
     /// <param name="beta">beta array</param>
@@ -8356,7 +8319,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\batch_norm.cc:L571</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\batch_norm.cc:L571</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to batch normalization</param>
     /// <param name="gamma">gamma array</param>
@@ -8448,7 +8411,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\batch_norm.cc:L571</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\batch_norm.cc:L571</summary>
     /// <param name="data">Input data to batch normalization</param>
     /// <param name="gamma">gamma array</param>
     /// <param name="beta">beta array</param>
@@ -8505,7 +8468,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\concat.cc:L383</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\concat.cc:L383</summary>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
     /// <param name="dim">the dimension to be concated.</param>
@@ -8554,7 +8517,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\concat.cc:L383</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\concat.cc:L383</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
@@ -8608,7 +8571,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\concat.cc:L383</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\concat.cc:L383</summary>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="dim">the dimension to be concated.</param>
     static member Concat([<Optional>] ?data : Symbol seq, [<Optional>] ?dim : int) =
@@ -8719,7 +8682,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\convolution.cc:L473</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L473</summary>
     /// <param name="data">Input data to the ConvolutionOp.</param>
     /// <param name="weight">Weight matrix.</param>
     /// <param name="bias">Bias parameter.</param>
@@ -8829,7 +8792,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\convolution.cc:L473</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L473</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the ConvolutionOp.</param>
     /// <param name="weight">Weight matrix.</param>
@@ -8945,7 +8908,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\convolution.cc:L473</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L473</summary>
     /// <param name="data">Input data to the ConvolutionOp.</param>
     /// <param name="weight">Weight matrix.</param>
     /// <param name="bias">Bias parameter.</param>
@@ -9037,7 +9000,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\convolution.cc:L473</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L473</summary>
     /// <param name="kernel">Convolution kernel size: (w,), (h, w) or (d, h, w)</param>
     /// <param name="numFilter">Convolution filter(channel) number</param>
     /// <param name="data">Input data to the ConvolutionOp.</param>
@@ -9104,7 +9067,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\ctc_loss.cc:L100</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\ctc_loss.cc:L100</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="label">Ground-truth labels for the loss.</param>
     /// <param name="dataLengths">Lengths of data for each of the samples. Only required when use_data_lengths is true.</param>
@@ -9172,7 +9135,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\ctc_loss.cc:L100</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\ctc_loss.cc:L100</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     /// <param name="label">Ground-truth labels for the loss.</param>
@@ -9246,7 +9209,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\ctc_loss.cc:L100</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\ctc_loss.cc:L100</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="label">Ground-truth labels for the loss.</param>
     /// <param name="dataLengths">Lengths of data for each of the samples. Only required when use_data_lengths is true.</param>
@@ -9508,7 +9471,7 @@ type MX() =
     ///    [ 2.    -0.4    7.     3.     0.2  ]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\dropout.cc:L96</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\dropout.cc:L96</summary>
     /// <param name="data">Input array to which dropout will be applied.</param>
     /// <param name="p">Fraction of the input that gets dropped out during training time.</param>
     /// <param name="mode">Whether to only turn on dropout during training or to also turn on for inference.</param>
@@ -9556,7 +9519,7 @@ type MX() =
     ///    [ 2.    -0.4    7.     3.     0.2  ]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\dropout.cc:L96</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\dropout.cc:L96</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input array to which dropout will be applied.</param>
     /// <param name="p">Fraction of the input that gets dropped out during training time.</param>
@@ -9610,7 +9573,7 @@ type MX() =
     ///    [ 2.    -0.4    7.     3.     0.2  ]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\dropout.cc:L96</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\dropout.cc:L96</summary>
     /// <param name="data">Input array to which dropout will be applied.</param>
     /// <param name="p">Fraction of the input that gets dropped out during training time.</param>
     /// <param name="mode">Whether to only turn on dropout during training or to also turn on for inference.</param>
@@ -9652,7 +9615,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
     /// <param name="data">Input data.</param>
     /// <param name="weight">Weight matrix.</param>
     /// <param name="bias">Bias parameter.</param>
@@ -9703,7 +9666,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data.</param>
     /// <param name="weight">Weight matrix.</param>
@@ -9760,7 +9723,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
     /// <param name="data">Input data.</param>
     /// <param name="weight">Weight matrix.</param>
     /// <param name="bias">Bias parameter.</param>
@@ -9801,7 +9764,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
     /// <param name="numHidden">Number of hidden nodes of the output.</param>
     /// <param name="data">Input data.</param>
     /// <param name="weight">Weight matrix.</param>
@@ -9827,7 +9790,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\group_norm.cc:L77</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\group_norm.cc:L77</summary>
     /// <param name="data">Input data</param>
     /// <param name="gamma">gamma array</param>
     /// <param name="beta">beta array</param>
@@ -9860,7 +9823,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\group_norm.cc:L77</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\group_norm.cc:L77</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data</param>
     /// <param name="gamma">gamma array</param>
@@ -9899,7 +9862,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\group_norm.cc:L77</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\group_norm.cc:L77</summary>
     /// <param name="data">Input data</param>
     /// <param name="gamma">gamma array</param>
     /// <param name="beta">beta array</param>
@@ -9937,7 +9900,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\layer_norm.cc:L156</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\layer_norm.cc:L156</summary>
     /// <param name="data">Input data to layer normalization</param>
     /// <param name="gamma">gamma array</param>
     /// <param name="beta">beta array</param>
@@ -9983,7 +9946,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\layer_norm.cc:L156</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\layer_norm.cc:L156</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to layer normalization</param>
     /// <param name="gamma">gamma array</param>
@@ -10035,7 +9998,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\layer_norm.cc:L156</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\layer_norm.cc:L156</summary>
     /// <param name="data">Input data to layer normalization</param>
     /// <param name="gamma">gamma array</param>
     /// <param name="beta">beta array</param>
@@ -10158,7 +10121,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\lrn.cc:L164</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L164</summary>
     /// <param name="data">Input data to LRN</param>
     /// <param name="nsize">normalization window width in elements.</param>
     /// <param name="alpha">The variance scaling parameter :math:`lpha` in the LRN expression.</param>
@@ -10192,7 +10155,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\lrn.cc:L164</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L164</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to LRN</param>
     /// <param name="nsize">normalization window width in elements.</param>
@@ -10232,7 +10195,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\lrn.cc:L164</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L164</summary>
     /// <param name="data">Input data to LRN</param>
     /// <param name="nsize">normalization window width in elements.</param>
     /// <param name="alpha">The variance scaling parameter :math:`lpha` in the LRN expression.</param>
@@ -10257,7 +10220,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\lrn.cc:L164</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L164</summary>
     /// <param name="nsize">normalization window width in elements.</param>
     /// <param name="data">Input data to LRN</param>
     /// <param name="alpha">The variance scaling parameter :math:`lpha` in the LRN expression.</param>
@@ -10288,7 +10251,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\moments.cc:L54</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\moments.cc:L54</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="axes">Array of ints. Axes along which to compute mean and variance.</param>
     /// <param name="keepdims">produce moments with the same dimensionality as the input.</param>
@@ -10320,7 +10283,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\moments.cc:L54</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\moments.cc:L54</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     /// <param name="axes">Array of ints. Axes along which to compute mean and variance.</param>
@@ -10357,7 +10320,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\moments.cc:L54</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\moments.cc:L54</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="axes">Array of ints. Axes along which to compute mean and variance.</param>
     /// <param name="keepdims">produce moments with the same dimensionality as the input.</param>
@@ -10416,7 +10379,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\pooling.cc:L417</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\pooling.cc:L417</summary>
     /// <param name="data">Input data to the pooling operator.</param>
     /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
     /// <param name="poolType">Pooling type to be applied.</param>
@@ -10497,7 +10460,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\pooling.cc:L417</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\pooling.cc:L417</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the pooling operator.</param>
     /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
@@ -10584,7 +10547,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\pooling.cc:L417</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\pooling.cc:L417</summary>
     /// <param name="data">Input data to the pooling operator.</param>
     /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
     /// <param name="poolType">Pooling type to be applied.</param>
@@ -10625,7 +10588,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\softmax.cc:L103</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L103</summary>
     /// <param name="data">The input array.</param>
     /// <param name="length">The length array.</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
@@ -10668,7 +10631,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\softmax.cc:L103</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L103</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     /// <param name="length">The length array.</param>
@@ -10717,7 +10680,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\softmax.cc:L103</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L103</summary>
     /// <param name="data">The input array.</param>
     /// <param name="length">The length array.</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
@@ -10753,7 +10716,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\softmax_activation.cc:L59</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax_activation.cc:L59</summary>
     /// <param name="data">The input array.</param>
     /// <param name="mode">Specifies how to compute the softmax. If set to ``instance``, it computes softmax for each instance. If set to ``channel``, It computes cross channel softmax for each position of each instance.</param>
     static member SoftmaxActivation(data : NDArray, [<Optional>] mode : SoftmaxActivationMode) =
@@ -10788,7 +10751,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\softmax_activation.cc:L59</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax_activation.cc:L59</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     /// <param name="mode">Specifies how to compute the softmax. If set to ``instance``, it computes softmax for each instance. If set to ``channel``, It computes cross channel softmax for each position of each instance.</param>
@@ -10828,7 +10791,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\softmax_activation.cc:L59</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax_activation.cc:L59</summary>
     /// <param name="data">The input array.</param>
     /// <param name="mode">Specifies how to compute the softmax. If set to ``instance``, it computes softmax for each instance. If set to ``channel``, It computes cross channel softmax for each position of each instance.</param>
     static member SoftmaxActivation([<Optional>] ?data : Symbol, [<Optional>] ?mode : SoftmaxActivationMode) =
@@ -10860,7 +10823,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\softmin.cc:L57</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmin.cc:L57</summary>
     /// <param name="data">The input array.</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="temperature">Temperature parameter in softmax</param>
@@ -10902,7 +10865,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\softmin.cc:L57</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmin.cc:L57</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
@@ -10950,7 +10913,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\softmin.cc:L57</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmin.cc:L57</summary>
     /// <param name="data">The input array.</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
     /// <param name="temperature">Temperature parameter in softmax</param>
@@ -11011,7 +10974,7 @@ type MX() =
     ///                                                                        [1. 2. 2. 2. 2. 1.]]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\upsampling.cc:L173</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\upsampling.cc:L173</summary>
     /// <param name="data">Array of tensors to upsample. For bilinear upsampling, there should be 2 inputs - 1 data and 1 weight.</param>
     /// <param name="scale">Up sampling scale</param>
     /// <param name="sampleType">upsampling method</param>
@@ -11082,7 +11045,7 @@ type MX() =
     ///                                                                        [1. 2. 2. 2. 2. 1.]]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\upsampling.cc:L173</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\upsampling.cc:L173</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Array of tensors to upsample. For bilinear upsampling, there should be 2 inputs - 1 data and 1 weight.</param>
     /// <param name="scale">Up sampling scale</param>
@@ -11159,7 +11122,7 @@ type MX() =
     ///                                                                        [1. 2. 2. 2. 2. 1.]]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\upsampling.cc:L173</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\upsampling.cc:L173</summary>
     /// <param name="data">Array of tensors to upsample. For bilinear upsampling, there should be 2 inputs - 1 data and 1 weight.</param>
     /// <param name="scale">Up sampling scale</param>
     /// <param name="sampleType">upsampling method</param>
@@ -11219,7 +11182,7 @@ type MX() =
     ///                                                                        [1. 2. 2. 2. 2. 1.]]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\nn\upsampling.cc:L173</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\upsampling.cc:L173</summary>
     /// <param name="scale">Up sampling scale</param>
     /// <param name="sampleType">upsampling method</param>
     /// <param name="data">Array of tensors to upsample. For bilinear upsampling, there should be 2 inputs - 1 data and 1 weight.</param>
@@ -11232,7 +11195,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\linalg\np_gesvd.cc:L93</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_gesvd.cc:L93</summary>
     /// <param name="A">Input matrices to be factorized</param>
     static member NpiSvd(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_svd"
@@ -11243,7 +11206,7 @@ type MX() =
         (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\linalg\np_gesvd.cc:L93</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_gesvd.cc:L93</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Input matrices to be factorized</param>
     static member NpiSvd(outputArray : NDArray seq, A : NDArray) =
@@ -11259,49 +11222,15 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\linalg\np_gesvd.cc:L93</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_gesvd.cc:L93</summary>
     /// <param name="A">Input matrices to be factorized</param>
     static member NpiSvd([<Optional>] ?A : Symbol) =
         NpiSvd(?A = A)
 
 
-    /// <summary>
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\linalg\np_potrf.cc:L47</summary>
-    /// <param name="A">Tensor of input matrices to be decomposed</param>
-    static member NpiCholesky(A : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "_npi_cholesky"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
-                                                 Array.empty
-                                                 Array.empty
-        (new NDArray(outputs.[0]))
-    /// <summary>
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\linalg\np_potrf.cc:L47</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="A">Tensor of input matrices to be decomposed</param>
-    static member NpiCholesky(outputArray : NDArray seq, A : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "_npi_cholesky"
-        let names = Array.empty
-        let vals = Array.empty
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\linalg\np_potrf.cc:L47</summary>
-    /// <param name="A">Tensor of input matrices to be decomposed</param>
-    static member NpiCholesky([<Optional>] ?A : Symbol) =
-        NpiCholesky(?A = A)
-
     /// <summary>Scalar version of boolean assign
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
     /// <param name="data">input</param>
     /// <param name="mask">mask</param>
     /// <param name="value">value to be assigned to masked positions</param>
@@ -11314,7 +11243,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Scalar version of boolean assign
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">input</param>
     /// <param name="mask">mask</param>
@@ -11332,7 +11261,7 @@ type MX() =
         ()
     /// <summary>Scalar version of boolean assign
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
     /// <param name="data">input</param>
     /// <param name="mask">mask</param>
     /// <param name="value">value to be assigned to masked positions</param>
@@ -11340,7 +11269,7 @@ type MX() =
         NpiBooleanMaskAssignScalar(data, mask, value)
     /// <summary>Scalar version of boolean assign
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
     /// <param name="value">value to be assigned to masked positions</param>
     /// <param name="data">input</param>
     /// <param name="mask">mask</param>
@@ -11349,7 +11278,7 @@ type MX() =
 
     /// <summary>Tensor version of boolean assign
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L246</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L246</summary>
     /// <param name="data">input</param>
     /// <param name="mask">mask</param>
     /// <param name="value">assignment</param>
@@ -11362,7 +11291,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Tensor version of boolean assign
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L246</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L246</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">input</param>
     /// <param name="mask">mask</param>
@@ -11380,7 +11309,7 @@ type MX() =
         ()
     /// <summary>Tensor version of boolean assign
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L246</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L246</summary>
     /// <param name="data">input</param>
     /// <param name="mask">mask</param>
     /// <param name="value">assignment</param>
@@ -11451,7 +11380,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L124</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L124</summary>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
@@ -11470,7 +11399,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L124</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L124</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
@@ -11495,7 +11424,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L124</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L124</summary>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
@@ -11507,7 +11436,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L163</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L163</summary>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
@@ -11521,7 +11450,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L163</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L163</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
@@ -11540,7 +11469,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L163</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L163</summary>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
@@ -11551,7 +11480,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L191</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L191</summary>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
@@ -11565,7 +11494,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L191</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L191</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
@@ -11584,7 +11513,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L191</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L191</summary>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
@@ -11810,7 +11739,7 @@ type MX() =
 
     /// <summary>Return the cumulative sum of the elements along a given axis.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_cumsum.cc:L70</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_cumsum.cc:L70</summary>
     /// <param name="a">Input ndarray</param>
     /// <param name="axis">Axis along which the cumulative sum is computed. The default (None) is to compute the cumsum over the flattened array.</param>
     /// <param name="dtype">Type of the returned array and of the accumulator in which the elements are summed. If dtype is not specified, it defaults to the dtype of a, unless a has an integer dtype with a precision less than that of the default platform integer. In that case, the default platform integer is used.</param>
@@ -11823,7 +11752,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Return the cumulative sum of the elements along a given axis.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_cumsum.cc:L70</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_cumsum.cc:L70</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">Input ndarray</param>
     /// <param name="axis">Axis along which the cumulative sum is computed. The default (None) is to compute the cumsum over the flattened array.</param>
@@ -11841,7 +11770,7 @@ type MX() =
         ()
     /// <summary>Return the cumulative sum of the elements along a given axis.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_cumsum.cc:L70</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_cumsum.cc:L70</summary>
     /// <param name="a">Input ndarray</param>
     /// <param name="axis">Axis along which the cumulative sum is computed. The default (None) is to compute the cumsum over the flattened array.</param>
     /// <param name="dtype">Type of the returned array and of the accumulator in which the elements are summed. If dtype is not specified, it defaults to the dtype of a, unless a has an integer dtype with a precision less than that of the default platform integer. In that case, the default platform integer is used.</param>
@@ -11899,7 +11828,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_dot.cc:L121</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_dot.cc:L121</summary>
     /// <param name="a">First input</param>
     /// <param name="b">Second input</param>
     static member NpDot(a : NDArray, b : NDArray) =
@@ -11927,7 +11856,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_dot.cc:L121</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_dot.cc:L121</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">First input</param>
     /// <param name="b">Second input</param>
@@ -11960,7 +11889,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_dot.cc:L121</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_dot.cc:L121</summary>
     /// <param name="a">First input</param>
     /// <param name="b">Second input</param>
     static member NpDot([<Optional>] ?a : Symbol, [<Optional>] ?b : Symbol) =
@@ -11969,7 +11898,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_einsum_op.cc:L333</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_einsum_op.cc:L333</summary>
     /// <param name="data">List of eimsum operands</param>
     /// <param name="numArgs">Number of input arrays.</param>
     /// <param name="subscripts">Specifies the subscripts for summation as comma separated list of subscript labels. An implicit (classical Einstein summation) calculation is performed unless the explicit indicator &#39;-&gt;&#39; is included as well as subscript labels of the precise output form.</param>
@@ -11983,7 +11912,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_einsum_op.cc:L333</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_einsum_op.cc:L333</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">List of eimsum operands</param>
     /// <param name="numArgs">Number of input arrays.</param>
@@ -12002,7 +11931,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_einsum_op.cc:L333</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_einsum_op.cc:L333</summary>
     /// <param name="data">List of eimsum operands</param>
     /// <param name="subscripts">Specifies the subscripts for summation as comma separated list of subscript labels. An implicit (classical Einstein summation) calculation is performed unless the explicit indicator &#39;-&gt;&#39; is included as well as subscript labels of the precise output form.</param>
     /// <param name="optimize"></param>
@@ -12769,7 +12698,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_broadcast_op_extended.cc:L49</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_broadcast_op_extended.cc:L49</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member NpiCopysign(lhs : NDArray, rhs : NDArray) =
@@ -12781,7 +12710,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_broadcast_op_extended.cc:L49</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_broadcast_op_extended.cc:L49</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -12798,7 +12727,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_broadcast_op_extended.cc:L49</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_broadcast_op_extended.cc:L49</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member NpiCopysign([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -12893,34 +12822,6 @@ type MX() =
     static member NpiBitwiseXor([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
         NpiBitwiseXor(?lhs = lhs, ?rhs = rhs)
 
-    /// <param name="lhs">First input to the function</param>
-    /// <param name="rhs">Second input to the function</param>
-    static member NpiBitwiseOr(lhs : NDArray, rhs : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "_npi_bitwise_or"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
-                                                 Array.empty
-                                                 Array.empty
-        (new NDArray(outputs.[0]))
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="lhs">First input to the function</param>
-    /// <param name="rhs">Second input to the function</param>
-    static member NpiBitwiseOr(outputArray : NDArray seq, lhs : NDArray, rhs : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "_npi_bitwise_or"
-        let names = Array.empty
-        let vals = Array.empty
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <param name="lhs">First input to the function</param>
-    /// <param name="rhs">Second input to the function</param>
-    static member NpiBitwiseOr([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
-        NpiBitwiseOr(?lhs = lhs, ?rhs = rhs)
-
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     static member NpiBitwiseXorScalar(data : NDArray, scalar : int) =
@@ -12952,38 +12853,6 @@ type MX() =
     /// <param name="data">source input</param>
     static member NpiBitwiseXorScalar(scalar : int, [<Optional>] ?data : Symbol) =
         NpiBitwiseXorScalar(scalar, ?data = data)
-
-    /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiBitwiseOrScalar(data : NDArray, scalar : int) =
-        let creator = AtomicSymbolCreator.FromName "_npi_bitwise_or_scalar"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
-        (new NDArray(outputs.[0]))
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiBitwiseOrScalar(outputArray : NDArray seq, data : NDArray, scalar : int) =
-        let creator = AtomicSymbolCreator.FromName "_npi_bitwise_or_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiBitwiseOrScalar(data : Symbol, scalar : int) =
-        NpiBitwiseOrScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiBitwiseOrScalar(scalar : int, [<Optional>] ?data : Symbol) =
-        NpiBitwiseOrScalar(scalar, ?data = data)
 
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -13275,7 +13144,7 @@ type MX() =
     ///    max(features, 0)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L34</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L34</summary>
     /// <param name="data">The input array.</param>
     static member NpxRelu(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npx_relu"
@@ -13289,7 +13158,7 @@ type MX() =
     ///    max(features, 0)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L34</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L34</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member NpxRelu(outputArray : NDArray seq, data : NDArray) =
@@ -13308,7 +13177,7 @@ type MX() =
     ///    max(features, 0)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L34</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L34</summary>
     /// <param name="data">The input array.</param>
     static member NpxRelu([<Optional>] ?data : Symbol) =
         NpxRelu(?data = data)
@@ -13318,7 +13187,7 @@ type MX() =
     ///    y = 1 / (1 + exp(-x))
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L42</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L42</summary>
     /// <param name="data">The input array.</param>
     static member NpxSigmoid(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npx_sigmoid"
@@ -13332,7 +13201,7 @@ type MX() =
     ///    y = 1 / (1 + exp(-x))
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L42</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L42</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member NpxSigmoid(outputArray : NDArray seq, data : NDArray) =
@@ -13351,14 +13220,14 @@ type MX() =
     ///    y = 1 / (1 + exp(-x))
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L42</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L42</summary>
     /// <param name="data">The input array.</param>
     static member NpxSigmoid([<Optional>] ?data : Symbol) =
         NpxSigmoid(?data = data)
 
     /// <summary>Return an array copy of the given object.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L47</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L47</summary>
     /// <param name="a">The input</param>
     static member NpCopy(a : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_np_copy"
@@ -13369,7 +13238,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Return an array copy of the given object.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L47</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L47</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input</param>
     static member NpCopy(outputArray : NDArray seq, a : NDArray) =
@@ -13385,7 +13254,7 @@ type MX() =
         ()
     /// <summary>Return an array copy of the given object.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L47</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L47</summary>
     /// <param name="a">The input</param>
     static member NpCopy([<Optional>] ?a : Symbol) =
         NpCopy(?a = a)
@@ -13469,7 +13338,7 @@ type MX() =
     ///    absolute([-2, 0, 3]) = [2, 0, 3]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L134</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L134</summary>
     /// <param name="x">The input array.</param>
     static member NpiAbsolute(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_absolute"
@@ -13483,7 +13352,7 @@ type MX() =
     ///    absolute([-2, 0, 3]) = [2, 0, 3]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L134</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L134</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiAbsolute(outputArray : NDArray seq, x : NDArray) =
@@ -13502,7 +13371,7 @@ type MX() =
     ///    absolute([-2, 0, 3]) = [2, 0, 3]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L134</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L134</summary>
     /// <param name="x">The input array.</param>
     static member NpiAbsolute([<Optional>] ?x : Symbol) =
         NpiAbsolute(?x = x)
@@ -13513,7 +13382,7 @@ type MX() =
     ///    sign([-2, 0, 3]) = [-1, 0, 1]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L143</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L143</summary>
     /// <param name="x">The input array.</param>
     static member NpiSign(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_sign"
@@ -13528,7 +13397,7 @@ type MX() =
     ///    sign([-2, 0, 3]) = [-1, 0, 1]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L143</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L143</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiSign(outputArray : NDArray seq, x : NDArray) =
@@ -13548,7 +13417,7 @@ type MX() =
     ///    sign([-2, 0, 3]) = [-1, 0, 1]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L143</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L143</summary>
     /// <param name="x">The input array.</param>
     static member NpiSign([<Optional>] ?x : Symbol) =
         NpiSign(?x = x)
@@ -13558,7 +13427,7 @@ type MX() =
     ///    rint([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -0.,  0.,  2.,  2.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L151</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L151</summary>
     /// <param name="x">The input array.</param>
     static member NpiRint(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_rint"
@@ -13572,7 +13441,7 @@ type MX() =
     ///    rint([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -0.,  0.,  2.,  2.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L151</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L151</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiRint(outputArray : NDArray seq, x : NDArray) =
@@ -13591,7 +13460,7 @@ type MX() =
     ///    rint([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -0.,  0.,  2.,  2.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L151</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L151</summary>
     /// <param name="x">The input array.</param>
     static member NpiRint([<Optional>] ?x : Symbol) =
         NpiRint(?x = x)
@@ -13602,7 +13471,7 @@ type MX() =
     ///    ceil([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  1.,  2.,  2.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L160</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L160</summary>
     /// <param name="x">The input array.</param>
     static member NpiCeil(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_ceil"
@@ -13617,7 +13486,7 @@ type MX() =
     ///    ceil([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  1.,  2.,  2.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L160</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L160</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiCeil(outputArray : NDArray seq, x : NDArray) =
@@ -13637,7 +13506,7 @@ type MX() =
     ///    ceil([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  1.,  2.,  2.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L160</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L160</summary>
     /// <param name="x">The input array.</param>
     static member NpiCeil([<Optional>] ?x : Symbol) =
         NpiCeil(?x = x)
@@ -13648,7 +13517,7 @@ type MX() =
     ///    floor([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -1.,  0.,  1.,  1.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L169</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L169</summary>
     /// <param name="x">The input array.</param>
     static member NpiFloor(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_floor"
@@ -13663,7 +13532,7 @@ type MX() =
     ///    floor([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -1.,  0.,  1.,  1.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L169</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L169</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiFloor(outputArray : NDArray seq, x : NDArray) =
@@ -13683,7 +13552,7 @@ type MX() =
     ///    floor([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -1.,  0.,  1.,  1.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L169</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L169</summary>
     /// <param name="x">The input array.</param>
     static member NpiFloor([<Optional>] ?x : Symbol) =
         NpiFloor(?x = x)
@@ -13695,7 +13564,7 @@ type MX() =
     ///    trunc([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  0.,  1.,  1.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L179</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L179</summary>
     /// <param name="x">The input array.</param>
     static member NpiTrunc(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_trunc"
@@ -13711,7 +13580,7 @@ type MX() =
     ///    trunc([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  0.,  1.,  1.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L179</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L179</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiTrunc(outputArray : NDArray seq, x : NDArray) =
@@ -13732,7 +13601,7 @@ type MX() =
     ///    trunc([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  0.,  1.,  1.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L179</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L179</summary>
     /// <param name="x">The input array.</param>
     static member NpiTrunc([<Optional>] ?x : Symbol) =
         NpiTrunc(?x = x)
@@ -13744,7 +13613,7 @@ type MX() =
     ///    fix([-2.1, -1.9, 1.9, 2.1]) = [-2., -1.,  1., 2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L189</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L189</summary>
     /// <param name="x">The input array.</param>
     static member NpiFix(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_fix"
@@ -13760,7 +13629,7 @@ type MX() =
     ///    fix([-2.1, -1.9, 1.9, 2.1]) = [-2., -1.,  1., 2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L189</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L189</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiFix(outputArray : NDArray seq, x : NDArray) =
@@ -13781,7 +13650,7 @@ type MX() =
     ///    fix([-2.1, -1.9, 1.9, 2.1]) = [-2., -1.,  1., 2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L189</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L189</summary>
     /// <param name="x">The input array.</param>
     static member NpiFix([<Optional>] ?x : Symbol) =
         NpiFix(?x = x)
@@ -13791,7 +13660,7 @@ type MX() =
     ///    square([2, 3, 4]) = [4, 9, 16]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L197</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L197</summary>
     /// <param name="x">The input array.</param>
     static member NpiSquare(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_square"
@@ -13805,7 +13674,7 @@ type MX() =
     ///    square([2, 3, 4]) = [4, 9, 16]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L197</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L197</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiSquare(outputArray : NDArray seq, x : NDArray) =
@@ -13824,7 +13693,7 @@ type MX() =
     ///    square([2, 3, 4]) = [4, 9, 16]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L197</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L197</summary>
     /// <param name="x">The input array.</param>
     static member NpiSquare([<Optional>] ?x : Symbol) =
         NpiSquare(?x = x)
@@ -13834,7 +13703,7 @@ type MX() =
     ///    sqrt([4, 9, 16]) = [2, 3, 4]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L205</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L205</summary>
     /// <param name="x">The input array.</param>
     static member NpiSqrt(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_sqrt"
@@ -13848,7 +13717,7 @@ type MX() =
     ///    sqrt([4, 9, 16]) = [2, 3, 4]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L205</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L205</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiSqrt(outputArray : NDArray seq, x : NDArray) =
@@ -13867,7 +13736,7 @@ type MX() =
     ///    sqrt([4, 9, 16]) = [2, 3, 4]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L205</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L205</summary>
     /// <param name="x">The input array.</param>
     static member NpiSqrt([<Optional>] ?x : Symbol) =
         NpiSqrt(?x = x)
@@ -13877,7 +13746,7 @@ type MX() =
     ///    cbrt([1, 8, -125]) = [1, 2, -5]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L213</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L213</summary>
     /// <param name="x">The input array.</param>
     static member NpiCbrt(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_cbrt"
@@ -13891,7 +13760,7 @@ type MX() =
     ///    cbrt([1, 8, -125]) = [1, 2, -5]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L213</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L213</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiCbrt(outputArray : NDArray seq, x : NDArray) =
@@ -13910,7 +13779,7 @@ type MX() =
     ///    cbrt([1, 8, -125]) = [1, 2, -5]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L213</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L213</summary>
     /// <param name="x">The input array.</param>
     static member NpiCbrt([<Optional>] ?x : Symbol) =
         NpiCbrt(?x = x)
@@ -13920,7 +13789,7 @@ type MX() =
     ///    exp([0, 1, 2]) = [1., 2.71828175, 7.38905621]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L221</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L221</summary>
     /// <param name="x">The input array.</param>
     static member NpiExp(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_exp"
@@ -13934,7 +13803,7 @@ type MX() =
     ///    exp([0, 1, 2]) = [1., 2.71828175, 7.38905621]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L221</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L221</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiExp(outputArray : NDArray seq, x : NDArray) =
@@ -13953,7 +13822,7 @@ type MX() =
     ///    exp([0, 1, 2]) = [1., 2.71828175, 7.38905621]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L221</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L221</summary>
     /// <param name="x">The input array.</param>
     static member NpiExp([<Optional>] ?x : Symbol) =
         NpiExp(?x = x)
@@ -13962,7 +13831,7 @@ type MX() =
     /// The natural logarithm is logarithm in base *e*, so that ``log(exp(x)) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L228</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L228</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_log"
@@ -13975,7 +13844,7 @@ type MX() =
     /// The natural logarithm is logarithm in base *e*, so that ``log(exp(x)) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L228</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L228</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiLog(outputArray : NDArray seq, x : NDArray) =
@@ -13993,7 +13862,7 @@ type MX() =
     /// The natural logarithm is logarithm in base *e*, so that ``log(exp(x)) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L228</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L228</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog([<Optional>] ?x : Symbol) =
         NpiLog(?x = x)
@@ -14002,7 +13871,7 @@ type MX() =
     /// ``10**log10(x) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L249</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L249</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog10(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_log10"
@@ -14015,7 +13884,7 @@ type MX() =
     /// ``10**log10(x) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L249</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L249</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiLog10(outputArray : NDArray seq, x : NDArray) =
@@ -14033,7 +13902,7 @@ type MX() =
     /// ``10**log10(x) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L249</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L249</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog10([<Optional>] ?x : Symbol) =
         NpiLog10(?x = x)
@@ -14042,7 +13911,7 @@ type MX() =
     /// ``2**log2(x) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L256</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L256</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog2(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_log2"
@@ -14055,7 +13924,7 @@ type MX() =
     /// ``2**log2(x) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L256</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L256</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiLog2(outputArray : NDArray seq, x : NDArray) =
@@ -14073,7 +13942,7 @@ type MX() =
     /// ``2**log2(x) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L256</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L256</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog2([<Optional>] ?x : Symbol) =
         NpiLog2(?x = x)
@@ -14082,7 +13951,7 @@ type MX() =
     /// Calculates ``log(1 + x)``.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L263</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L263</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog1p(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_log1p"
@@ -14095,7 +13964,7 @@ type MX() =
     /// Calculates ``log(1 + x)``.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L263</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L263</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiLog1p(outputArray : NDArray seq, x : NDArray) =
@@ -14113,14 +13982,14 @@ type MX() =
     /// Calculates ``log(1 + x)``.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L263</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L263</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog1p([<Optional>] ?x : Symbol) =
         NpiLog1p(?x = x)
 
     /// <summary>Calculate ``exp(x) - 1`` for all elements in the array.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L268</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L268</summary>
     /// <param name="x">The input array.</param>
     static member NpiExpm1(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_expm1"
@@ -14131,7 +14000,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Calculate ``exp(x) - 1`` for all elements in the array.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L268</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L268</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiExpm1(outputArray : NDArray seq, x : NDArray) =
@@ -14147,7 +14016,7 @@ type MX() =
         ()
     /// <summary>Calculate ``exp(x) - 1`` for all elements in the array.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L268</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L268</summary>
     /// <param name="x">The input array.</param>
     static member NpiExpm1([<Optional>] ?x : Symbol) =
         NpiExpm1(?x = x)
@@ -14182,7 +14051,7 @@ type MX() =
     ///    sin([0, \pi/4, \pi/2]) = [0, 0.707, 1]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L281</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L281</summary>
     /// <param name="x">The input array.</param>
     static member NpiSin(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_sin"
@@ -14196,7 +14065,7 @@ type MX() =
     ///    sin([0, \pi/4, \pi/2]) = [0, 0.707, 1]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L281</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L281</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiSin(outputArray : NDArray seq, x : NDArray) =
@@ -14215,7 +14084,7 @@ type MX() =
     ///    sin([0, \pi/4, \pi/2]) = [0, 0.707, 1]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L281</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L281</summary>
     /// <param name="x">The input array.</param>
     static member NpiSin([<Optional>] ?x : Symbol) =
         NpiSin(?x = x)
@@ -14225,7 +14094,7 @@ type MX() =
     ///    cos([0, \pi/4, \pi/2]) = [1, 0.707, 0]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L289</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L289</summary>
     /// <param name="x">The input array.</param>
     static member NpiCos(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_cos"
@@ -14239,7 +14108,7 @@ type MX() =
     ///    cos([0, \pi/4, \pi/2]) = [1, 0.707, 0]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L289</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L289</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiCos(outputArray : NDArray seq, x : NDArray) =
@@ -14258,7 +14127,7 @@ type MX() =
     ///    cos([0, \pi/4, \pi/2]) = [1, 0.707, 0]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L289</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L289</summary>
     /// <param name="x">The input array.</param>
     static member NpiCos([<Optional>] ?x : Symbol) =
         NpiCos(?x = x)
@@ -14268,7 +14137,7 @@ type MX() =
     ///    tan([0, \pi/4, \pi/2]) = [0, 1, -inf]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L297</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L297</summary>
     /// <param name="x">The input array.</param>
     static member NpiTan(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_tan"
@@ -14282,7 +14151,7 @@ type MX() =
     ///    tan([0, \pi/4, \pi/2]) = [0, 1, -inf]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L297</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L297</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiTan(outputArray : NDArray seq, x : NDArray) =
@@ -14301,7 +14170,7 @@ type MX() =
     ///    tan([0, \pi/4, \pi/2]) = [0, 1, -inf]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L297</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L297</summary>
     /// <param name="x">The input array.</param>
     static member NpiTan([<Optional>] ?x : Symbol) =
         NpiTan(?x = x)
@@ -14311,7 +14180,7 @@ type MX() =
     ///    arcsin([-1, -.707, 0, .707, 1]) = [-\pi/2, -\pi/4, 0, \pi/4, \pi/2]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L305</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L305</summary>
     /// <param name="x">The input array.</param>
     static member NpiArcsin(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_arcsin"
@@ -14325,7 +14194,7 @@ type MX() =
     ///    arcsin([-1, -.707, 0, .707, 1]) = [-\pi/2, -\pi/4, 0, \pi/4, \pi/2]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L305</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L305</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiArcsin(outputArray : NDArray seq, x : NDArray) =
@@ -14344,7 +14213,7 @@ type MX() =
     ///    arcsin([-1, -.707, 0, .707, 1]) = [-\pi/2, -\pi/4, 0, \pi/4, \pi/2]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L305</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L305</summary>
     /// <param name="x">The input array.</param>
     static member NpiArcsin([<Optional>] ?x : Symbol) =
         NpiArcsin(?x = x)
@@ -14357,7 +14226,7 @@ type MX() =
     /// The storage type of ``arccos`` output is always dense
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L316</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L316</summary>
     /// <param name="x">The input array.</param>
     static member NpiArccos(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_arccos"
@@ -14374,7 +14243,7 @@ type MX() =
     /// The storage type of ``arccos`` output is always dense
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L316</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L316</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiArccos(outputArray : NDArray seq, x : NDArray) =
@@ -14396,7 +14265,7 @@ type MX() =
     /// The storage type of ``arccos`` output is always dense
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L316</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L316</summary>
     /// <param name="x">The input array.</param>
     static member NpiArccos([<Optional>] ?x : Symbol) =
         NpiArccos(?x = x)
@@ -14406,7 +14275,7 @@ type MX() =
     ///    arctan([-1, 0, 1]) = [-\pi/4, 0, \pi/4]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L324</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L324</summary>
     /// <param name="x">The input array.</param>
     static member NpiArctan(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_arctan"
@@ -14420,7 +14289,7 @@ type MX() =
     ///    arctan([-1, 0, 1]) = [-\pi/4, 0, \pi/4]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L324</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L324</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiArctan(outputArray : NDArray seq, x : NDArray) =
@@ -14439,7 +14308,7 @@ type MX() =
     ///    arctan([-1, 0, 1]) = [-\pi/4, 0, \pi/4]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L324</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L324</summary>
     /// <param name="x">The input array.</param>
     static member NpiArctan([<Optional>] ?x : Symbol) =
         NpiArctan(?x = x)
@@ -14449,7 +14318,7 @@ type MX() =
     ///    degrees([0, \pi/2, \pi, 3\pi/2, 2\pi]) = [0, 90, 180, 270, 360]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L332</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L332</summary>
     /// <param name="x">The input array.</param>
     static member NpiDegrees(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_degrees"
@@ -14463,7 +14332,7 @@ type MX() =
     ///    degrees([0, \pi/2, \pi, 3\pi/2, 2\pi]) = [0, 90, 180, 270, 360]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L332</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L332</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiDegrees(outputArray : NDArray seq, x : NDArray) =
@@ -14482,7 +14351,7 @@ type MX() =
     ///    degrees([0, \pi/2, \pi, 3\pi/2, 2\pi]) = [0, 90, 180, 270, 360]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L332</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L332</summary>
     /// <param name="x">The input array.</param>
     static member NpiDegrees([<Optional>] ?x : Symbol) =
         NpiDegrees(?x = x)
@@ -14492,7 +14361,7 @@ type MX() =
     ///    radians([0, 90, 180, 270, 360]) = [0, \pi/2, \pi, 3\pi/2, 2\pi]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L340</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L340</summary>
     /// <param name="x">The input array.</param>
     static member NpiRadians(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_radians"
@@ -14506,7 +14375,7 @@ type MX() =
     ///    radians([0, 90, 180, 270, 360]) = [0, \pi/2, \pi, 3\pi/2, 2\pi]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L340</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L340</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiRadians(outputArray : NDArray seq, x : NDArray) =
@@ -14525,7 +14394,7 @@ type MX() =
     ///    radians([0, 90, 180, 270, 360]) = [0, \pi/2, \pi, 3\pi/2, 2\pi]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L340</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L340</summary>
     /// <param name="x">The input array.</param>
     static member NpiRadians([<Optional>] ?x : Symbol) =
         NpiRadians(?x = x)
@@ -14535,7 +14404,7 @@ type MX() =
     ///    sinh(x) = 0.5\times(exp(x) - exp(-x))
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L348</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L348</summary>
     /// <param name="x">The input array.</param>
     static member NpiSinh(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_sinh"
@@ -14549,7 +14418,7 @@ type MX() =
     ///    sinh(x) = 0.5\times(exp(x) - exp(-x))
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L348</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L348</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiSinh(outputArray : NDArray seq, x : NDArray) =
@@ -14568,7 +14437,7 @@ type MX() =
     ///    sinh(x) = 0.5\times(exp(x) - exp(-x))
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L348</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L348</summary>
     /// <param name="x">The input array.</param>
     static member NpiSinh([<Optional>] ?x : Symbol) =
         NpiSinh(?x = x)
@@ -14578,7 +14447,7 @@ type MX() =
     ///    cosh(x) = 0.5\times(exp(x) + exp(-x))
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L356</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L356</summary>
     /// <param name="x">The input array.</param>
     static member NpiCosh(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_cosh"
@@ -14592,7 +14461,7 @@ type MX() =
     ///    cosh(x) = 0.5\times(exp(x) + exp(-x))
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L356</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L356</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiCosh(outputArray : NDArray seq, x : NDArray) =
@@ -14611,7 +14480,7 @@ type MX() =
     ///    cosh(x) = 0.5\times(exp(x) + exp(-x))
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L356</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L356</summary>
     /// <param name="x">The input array.</param>
     static member NpiCosh([<Optional>] ?x : Symbol) =
         NpiCosh(?x = x)
@@ -14621,7 +14490,7 @@ type MX() =
     ///    tanh(x) = sinh(x) / cosh(x)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L364</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L364</summary>
     /// <param name="x">The input array.</param>
     static member NpiTanh(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_tanh"
@@ -14635,7 +14504,7 @@ type MX() =
     ///    tanh(x) = sinh(x) / cosh(x)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L364</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L364</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiTanh(outputArray : NDArray seq, x : NDArray) =
@@ -14654,7 +14523,7 @@ type MX() =
     ///    tanh(x) = sinh(x) / cosh(x)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L364</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L364</summary>
     /// <param name="x">The input array.</param>
     static member NpiTanh([<Optional>] ?x : Symbol) =
         NpiTanh(?x = x)
@@ -14663,7 +14532,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L371</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L371</summary>
     /// <param name="x">The input array.</param>
     static member NpiArcsinh(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_arcsinh"
@@ -14676,7 +14545,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L371</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L371</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiArcsinh(outputArray : NDArray seq, x : NDArray) =
@@ -14694,7 +14563,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L371</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L371</summary>
     /// <param name="x">The input array.</param>
     static member NpiArcsinh([<Optional>] ?x : Symbol) =
         NpiArcsinh(?x = x)
@@ -14703,7 +14572,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L378</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L378</summary>
     /// <param name="x">The input array.</param>
     static member NpiArccosh(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_arccosh"
@@ -14716,7 +14585,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L378</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L378</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiArccosh(outputArray : NDArray seq, x : NDArray) =
@@ -14734,7 +14603,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L378</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L378</summary>
     /// <param name="x">The input array.</param>
     static member NpiArccosh([<Optional>] ?x : Symbol) =
         NpiArccosh(?x = x)
@@ -14743,7 +14612,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L385</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L385</summary>
     /// <param name="x">The input array.</param>
     static member NpiArctanh(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_arctanh"
@@ -14756,7 +14625,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L385</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L385</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiArctanh(outputArray : NDArray seq, x : NDArray) =
@@ -14774,7 +14643,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L385</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L385</summary>
     /// <param name="x">The input array.</param>
     static member NpiArctanh([<Optional>] ?x : Symbol) =
         NpiArctanh(?x = x)
@@ -14806,83 +14675,6 @@ type MX() =
     /// <param name="decimals">Number of decimal places to round to.</param>
     static member NpiAround([<Optional>] ?x : Symbol, [<Optional>] ?decimals : int) =
         NpiAround(?x = x, ?decimals = decimals)
-
-    /// <summary>
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L425</summary>
-    /// <param name="data">Input ndarray</param>
-    /// <param name="copy">Whether to create a copy of `x` (True) or to replace valuesin-place (False). The in-place operation only occurs ifcasting to an array does not require a copy.Default is True.</param>
-    /// <param name="nan">Value to be used to fill NaN values. If no value is passedthen NaN values will be replaced with 0.0.</param>
-    /// <param name="posinf">Value to be used to fill positive infinity values.If no value is passed then positive infinity values will bereplaced with a very large number.</param>
-    /// <param name="neginf">Value to be used to fill negative infinity values.If no value is passed then negative infinity valueswill be replaced with a very small (or negative) number.</param>
-    static member NpiNanToNum(data : NDArray, 
-                              [<Optional>] ?copy : bool, 
-                              [<Optional>] ?nan : double, 
-                              [<Optional>] ?posinf : float, 
-                              [<Optional>] ?neginf : float) =
-        let creator = AtomicSymbolCreator.FromName "_npi_nan_to_num"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"copy"; "nan"; "posinf"; "neginf"|]
-                                                 [|(match copy with None -> "true" | Some copy -> string copy); (match nan with None -> "0.0" | Some nan -> string nan); (match posinf with None -> "None" | Some posinf -> string posinf); (match neginf with None -> "None" | Some neginf -> string neginf)|]
-        (new NDArray(outputs.[0]))
-    /// <summary>
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L425</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input ndarray</param>
-    /// <param name="copy">Whether to create a copy of `x` (True) or to replace valuesin-place (False). The in-place operation only occurs ifcasting to an array does not require a copy.Default is True.</param>
-    /// <param name="nan">Value to be used to fill NaN values. If no value is passedthen NaN values will be replaced with 0.0.</param>
-    /// <param name="posinf">Value to be used to fill positive infinity values.If no value is passed then positive infinity values will bereplaced with a very large number.</param>
-    /// <param name="neginf">Value to be used to fill negative infinity values.If no value is passed then negative infinity valueswill be replaced with a very small (or negative) number.</param>
-    static member NpiNanToNum(outputArray : NDArray seq, 
-                              data : NDArray, 
-                              [<Optional>] ?copy : bool, 
-                              [<Optional>] ?nan : double, 
-                              [<Optional>] ?posinf : float, 
-                              [<Optional>] ?neginf : float) =
-        let creator = AtomicSymbolCreator.FromName "_npi_nan_to_num"
-        let names = [|"copy"; "nan"; "posinf"; "neginf"|]
-        let vals = [|(match copy with None -> "true" | Some copy -> string copy); (match nan with None -> "0.0" | Some nan -> string nan); (match posinf with None -> "None" | Some posinf -> string posinf); (match neginf with None -> "None" | Some neginf -> string neginf)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L425</summary>
-    /// <param name="data">Input ndarray</param>
-    /// <param name="copy">Whether to create a copy of `x` (True) or to replace valuesin-place (False). The in-place operation only occurs ifcasting to an array does not require a copy.Default is True.</param>
-    /// <param name="nan">Value to be used to fill NaN values. If no value is passedthen NaN values will be replaced with 0.0.</param>
-    /// <param name="posinf">Value to be used to fill positive infinity values.If no value is passed then positive infinity values will bereplaced with a very large number.</param>
-    /// <param name="neginf">Value to be used to fill negative infinity values.If no value is passed then negative infinity valueswill be replaced with a very small (or negative) number.</param>
-    static member NpiNanToNum([<Optional>] ?data : Symbol, [<Optional>] ?copy : bool, [<Optional>] ?nan : double, [<Optional>] ?posinf : float, [<Optional>] ?neginf : float) =
-        NpiNanToNum(?data = data, ?copy = copy, ?nan = nan, ?posinf = posinf, ?neginf = neginf)
-
-    static member NpiBackwardNanToNumNDArray() =
-        let creator = AtomicSymbolCreator.FromName "_npi_backward_nan_to_num"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 Array.empty
-                                                 Array.empty
-                                                 Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    static member NpiBackwardNanToNum(outputArray : NDArray seq) =
-        let creator = AtomicSymbolCreator.FromName "_npi_backward_nan_to_num"
-        let names = Array.empty
-        let vals = Array.empty
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    static member NpiBackwardNanToNum() =
-        NpiBackwardNanToNum()
 
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="shape">The shape of the output</param>
@@ -15254,7 +15046,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L349</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L353</summary>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions.</param>
     /// <param name="order">Read the elements of a using this index order, and place the elements into the reshaped array using this index order. &#39;C&#39; means to read/write the elements using C-like index order, with the last axis index changing fastest, back to the first axis index changing slowest. Note that currently only C-like order is supported</param>
@@ -15267,7 +15059,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L349</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L353</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions.</param>
@@ -15285,7 +15077,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L349</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L353</summary>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions.</param>
     /// <param name="order">Read the elements of a using this index order, and place the elements into the reshaped array using this index order. &#39;C&#39; means to read/write the elements using C-like index order, with the last axis index changing fastest, back to the first axis index changing slowest. Note that currently only C-like order is supported</param>
@@ -15293,7 +15085,7 @@ type MX() =
         NpReshape(a, newshape, ?order = order)
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L349</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L353</summary>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions.</param>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="order">Read the elements of a using this index order, and place the elements into the reshaped array using this index order. &#39;C&#39; means to read/write the elements using C-like index order, with the last axis index changing fastest, back to the first axis index changing slowest. Note that currently only C-like order is supported</param>
@@ -15302,7 +15094,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L375</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L379</summary>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions. -2 to -6 are used for data manipulation. -2 copy this dimension from the input to the output shape. -3 will skip current dimension if and only if the current dim size is one. -4 copy all remain of the input dimensions to the output shape. -5 use the product of two consecutive dimensions of the input shape as the output. -6 split one dimension of the input into two dimensions passed subsequent to -6 in the new shape.</param>
     /// <param name="reverse">If true then the special values are inferred from right to left</param>
@@ -15316,7 +15108,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L375</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L379</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions. -2 to -6 are used for data manipulation. -2 copy this dimension from the input to the output shape. -3 will skip current dimension if and only if the current dim size is one. -4 copy all remain of the input dimensions to the output shape. -5 use the product of two consecutive dimensions of the input shape as the output. -6 split one dimension of the input into two dimensions passed subsequent to -6 in the new shape.</param>
@@ -15335,7 +15127,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L375</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L379</summary>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions. -2 to -6 are used for data manipulation. -2 copy this dimension from the input to the output shape. -3 will skip current dimension if and only if the current dim size is one. -4 copy all remain of the input dimensions to the output shape. -5 use the product of two consecutive dimensions of the input shape as the output. -6 split one dimension of the input into two dimensions passed subsequent to -6 in the new shape.</param>
     /// <param name="reverse">If true then the special values are inferred from right to left</param>
@@ -15344,7 +15136,7 @@ type MX() =
         NpxReshape(a, newshape, ?reverse = reverse, ?order = order)
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L375</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L379</summary>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions. -2 to -6 are used for data manipulation. -2 copy this dimension from the input to the output shape. -3 will skip current dimension if and only if the current dim size is one. -4 copy all remain of the input dimensions to the output shape. -5 use the product of two consecutive dimensions of the input shape as the output. -6 split one dimension of the input into two dimensions passed subsequent to -6 in the new shape.</param>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="reverse">If true then the special values are inferred from right to left</param>
@@ -15382,7 +15174,7 @@ type MX() =
 
     /// <summary>Join a sequence of arrays along an existing axis.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L617</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L621</summary>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
     /// <param name="dim">the dimension to be concated.</param>
@@ -15395,7 +15187,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Join a sequence of arrays along an existing axis.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L617</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L621</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
@@ -15413,7 +15205,7 @@ type MX() =
         ()
     /// <summary>Join a sequence of arrays along an existing axis.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L617</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L621</summary>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="dim">the dimension to be concated.</param>
     static member NpiConcatenate([<Optional>] ?data : Symbol seq, [<Optional>] ?dim : int) =
@@ -15500,7 +15292,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L805</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L809</summary>
     /// <param name="data">List of arrays to column_stack</param>
     /// <param name="numArgs">Number of inputs to be column stacked</param>
     static member NpiColumnStack([<ParamArray>] data : NDArray[]) =
@@ -15512,7 +15304,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L805</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L809</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">List of arrays to column_stack</param>
     /// <param name="numArgs">Number of inputs to be column stacked</param>
@@ -15529,7 +15321,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L805</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L809</summary>
     /// <param name="data">List of arrays to column_stack</param>
     static member NpiColumnStack([<ParamArray>] data : Symbol[]) =
         NpiColumnStack(data)
@@ -15537,7 +15329,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L947</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L951</summary>
     /// <param name="data">List of arrays to vstack</param>
     /// <param name="numArgs">Number of inputs to be vstacked.</param>
     static member NpiVstack([<ParamArray>] data : NDArray[]) =
@@ -15549,7 +15341,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L947</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L951</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">List of arrays to vstack</param>
     /// <param name="numArgs">Number of inputs to be vstacked.</param>
@@ -15566,7 +15358,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L947</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L951</summary>
     /// <param name="data">List of arrays to vstack</param>
     static member NpiVstack([<ParamArray>] data : Symbol[]) =
         NpiVstack(data)
@@ -15574,7 +15366,7 @@ type MX() =
 
     /// <summary>Stack tensors in sequence depthwise (in third dimension)
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L982</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L986</summary>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
     /// <param name="dim">the dimension to be concated.</param>
@@ -15587,7 +15379,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Stack tensors in sequence depthwise (in third dimension)
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L982</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L986</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
@@ -15605,7 +15397,7 @@ type MX() =
         ()
     /// <summary>Stack tensors in sequence depthwise (in third dimension)
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L982</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L986</summary>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="dim">the dimension to be concated.</param>
     static member NpiDstack([<Optional>] ?data : Symbol seq, [<Optional>] ?dim : int) =
@@ -15680,7 +15472,7 @@ type MX() =
     /// Other axes remain in their original order.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L1165</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1169</summary>
     /// <param name="a">Source input</param>
     /// <param name="source">Original positions of the axes to move. These must be unique.</param>
     /// <param name="destination">Destination positions for each of the original axes. These must also be unique.</param>
@@ -15695,7 +15487,7 @@ type MX() =
     /// Other axes remain in their original order.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L1165</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1169</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">Source input</param>
     /// <param name="source">Original positions of the axes to move. These must be unique.</param>
@@ -15715,7 +15507,7 @@ type MX() =
     /// Other axes remain in their original order.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L1165</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1169</summary>
     /// <param name="a">Source input</param>
     /// <param name="source">Original positions of the axes to move. These must be unique.</param>
     /// <param name="destination">Destination positions for each of the original axes. These must also be unique.</param>
@@ -15725,7 +15517,7 @@ type MX() =
     /// Other axes remain in their original order.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_matrix_op.cc:L1165</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1169</summary>
     /// <param name="source">Original positions of the axes to move. These must be unique.</param>
     /// <param name="destination">Destination positions for each of the original axes. These must also be unique.</param>
     /// <param name="a">Source input</param>
@@ -15837,64 +15629,6 @@ type MX() =
         ()
     static member NpiHsplitBackward() =
         NpiHsplitBackward()
-
-    /// <param name="data">Input ndarray</param>
-    /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
-    static member NpDiag(data : NDArray, [<Optional; DefaultParameterValue(0)>] k : int) =
-        let creator = AtomicSymbolCreator.FromName "_np_diag"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"k"|]
-                                                 [|string k|]
-        (new NDArray(outputs.[0]))
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input ndarray</param>
-    /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
-    static member NpDiag(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(0)>] k : int) =
-        let creator = AtomicSymbolCreator.FromName "_np_diag"
-        let names = [|"k"|]
-        let vals = [|string k|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <param name="data">Input ndarray</param>
-    /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
-    static member NpDiag([<Optional>] ?data : Symbol, [<Optional>] ?k : int) =
-        NpDiag(?data = data, ?k = k)
-
-
-    /// <param name="data">Input ndarray</param>
-    /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
-    static member NpDiagflat(data : NDArray, [<Optional; DefaultParameterValue(0)>] k : int) =
-        let creator = AtomicSymbolCreator.FromName "_np_diagflat"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"k"|]
-                                                 [|string k|]
-        (new NDArray(outputs.[0]))
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input ndarray</param>
-    /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
-    static member NpDiagflat(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(0)>] k : int) =
-        let creator = AtomicSymbolCreator.FromName "_np_diagflat"
-        let names = [|"k"|]
-        let vals = [|string k|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <param name="data">Input ndarray</param>
-    /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
-    static member NpDiagflat([<Optional>] ?data : Symbol, [<Optional>] ?k : int) =
-        NpDiagflat(?data = data, ?k = k)
-
 
     /// <param name="a">First input</param>
     /// <param name="b">Second input</param>
@@ -16046,7 +15780,7 @@ type MX() =
     ///    trace(A) = [1.0, 18.0]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_trace_op.cc:L75</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_trace_op.cc:L75</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="offset">Offset of the diagonal from the main diagonal. Can be both positive and negative. Defaults to 0.</param>
     /// <param name="axis1">Axes to be used as the first axis of the 2-D sub-arrays from which the diagonals should be taken. Defaults to 0.</param>
@@ -16077,7 +15811,7 @@ type MX() =
     ///    trace(A) = [1.0, 18.0]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_trace_op.cc:L75</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_trace_op.cc:L75</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     /// <param name="offset">Offset of the diagonal from the main diagonal. Can be both positive and negative. Defaults to 0.</param>
@@ -16113,7 +15847,7 @@ type MX() =
     ///    trace(A) = [1.0, 18.0]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\numpy\np_trace_op.cc:L75</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_trace_op.cc:L75</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="offset">Offset of the diagonal from the main diagonal. Can be both positive and negative. Defaults to 0.</param>
     /// <param name="axis1">Axes to be used as the first axis of the 2-D sub-arrays from which the diagonals should be taken. Defaults to 0.</param>
@@ -16289,38 +16023,6 @@ type MX() =
     static member NpiUnique([<Optional>] ?data : Symbol, [<Optional>] ?returnIndex : bool, [<Optional>] ?returnInverse : bool, [<Optional>] ?returnCounts : bool, [<Optional>] ?axis : int) =
         NpiUnique(?data = data, ?returnIndex = returnIndex, ?returnInverse = returnInverse, ?returnCounts = returnCounts, ?axis = axis)
 
-    /// <param name="condition">condition array</param>
-    /// <param name="x">input x</param>
-    /// <param name="y">input y</param>
-    static member NpiWhere(condition : NDArray, x : NDArray, y : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "_npi_where"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg condition)) then condition.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg y)) then y.UnsafeHandle|]
-                                                 Array.empty
-                                                 Array.empty
-        (new NDArray(outputs.[0]))
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="condition">condition array</param>
-    /// <param name="x">input x</param>
-    /// <param name="y">input y</param>
-    static member NpiWhere(outputArray : NDArray seq, condition : NDArray, x : NDArray, y : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "_npi_where"
-        let names = Array.empty
-        let vals = Array.empty
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg condition)) then condition.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg y)) then y.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <param name="condition">condition array</param>
-    /// <param name="x">input x</param>
-    /// <param name="y">input y</param>
-    static member NpiWhere([<Optional>] ?condition : Symbol, [<Optional>] ?x : Symbol, [<Optional>] ?y : Symbol) =
-        NpiWhere(?condition = condition, ?x = x, ?y = y)
-
-
     /// <summary>Return the Hanning window.The Hanning window is a taper formed by using a weighted cosine.</summary>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
@@ -16419,69 +16121,6 @@ type MX() =
     /// <param name="dtype">Data-type of the returned array.</param>
     static member NpiBlackman(M : int, [<Optional>] ?dtype : DataType) =
         NpiBlackman(M, ?dtype = dtype)
-
-    /// <param name="input1">Source input</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
-    /// <param name="isLogit"></param>
-    /// <param name="prob"></param>
-    /// <param name="logit"></param>
-    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member NpiBernoulli(input1 : NDArray, 
-                               ctx : Context, 
-                               isLogit : bool, 
-                               [<Optional>] ?prob : float, 
-                               [<Optional>] ?logit : float, 
-                               [<Optional>] ?size : int seq, 
-                               [<Optional>] ?dtype : DataType) =
-        let creator = AtomicSymbolCreator.FromName "_npi_bernoulli"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle|]
-                                                 [|"ctx"; "is_logit"; "prob"; "logit"; "size"; "dtype"|]
-                                                 [|string ctx; string isLogit; (match prob with None -> "None" | Some prob -> string prob); (match logit with None -> "None" | Some logit -> string logit); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
-        (new NDArray(outputs.[0]))
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="input1">Source input</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
-    /// <param name="isLogit"></param>
-    /// <param name="prob"></param>
-    /// <param name="logit"></param>
-    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member NpiBernoulli(outputArray : NDArray seq, 
-                               input1 : NDArray, 
-                               ctx : Context, 
-                               isLogit : bool, 
-                               [<Optional>] ?prob : float, 
-                               [<Optional>] ?logit : float, 
-                               [<Optional>] ?size : int seq, 
-                               [<Optional>] ?dtype : DataType) =
-        let creator = AtomicSymbolCreator.FromName "_npi_bernoulli"
-        let names = [|"ctx"; "is_logit"; "prob"; "logit"; "size"; "dtype"|]
-        let vals = [|string ctx; string isLogit; (match prob with None -> "None" | Some prob -> string prob); (match logit with None -> "None" | Some logit -> string logit); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <param name="input1">Source input</param>
-    /// <param name="isLogit"></param>
-    /// <param name="prob"></param>
-    /// <param name="logit"></param>
-    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member NpiBernoulli(input1 : Symbol, isLogit : bool, [<Optional>] ?prob : float, [<Optional>] ?logit : float, [<Optional>] ?size : int seq, [<Optional>] ?dtype : DataType) =
-        NpiBernoulli(input1, isLogit, ?prob = prob, ?logit = logit, ?size = size, ?dtype = dtype)
-    /// <param name="isLogit"></param>
-    /// <param name="input1">Source input</param>
-    /// <param name="prob"></param>
-    /// <param name="logit"></param>
-    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member NpiBernoulli(isLogit : bool, [<Optional>] ?input1 : Symbol, [<Optional>] ?prob : float, [<Optional>] ?logit : float, [<Optional>] ?size : int seq, [<Optional>] ?dtype : DataType) =
-        NpiBernoulli(isLogit, ?input1 = input1, ?prob = prob, ?logit = logit, ?size = size, ?dtype = dtype)
 
     /// <summary>random choice</summary>
     /// <param name="input1">Source input</param>
@@ -16676,65 +16315,6 @@ type MX() =
     static member NpiNormal([<Optional>] ?input1 : Symbol, [<Optional>] ?input2 : Symbol, [<Optional>] ?loc : float, [<Optional>] ?scale : float, [<Optional>] ?size : int seq, [<Optional>] ?dtype : FloatDType) =
         NpiNormal(?input1 = input1, ?input2 = input2, ?loc = loc, ?scale = scale, ?size = size, ?dtype = dtype)
 
-    /// <summary>Ndarray behavior normal</summary>
-    /// <param name="input1">Source input</param>
-    /// <param name="input2">Source input</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
-    /// <param name="loc"></param>
-    /// <param name="scale"></param>
-    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member NpiNormalN(input1 : NDArray, 
-                             input2 : NDArray, 
-                             ctx : Context, 
-                             [<Optional>] ?loc : float, 
-                             [<Optional>] ?scale : float, 
-                             [<Optional>] ?size : int seq, 
-                             [<Optional>] ?dtype : FloatDType) =
-        let creator = AtomicSymbolCreator.FromName "_npi_normal_n"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
-                                                 [|"ctx"; "loc"; "scale"; "size"; "dtype"|]
-                                                 [|string ctx; (match loc with None -> "None" | Some loc -> string loc); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
-        (new NDArray(outputs.[0]))
-    /// <summary>Ndarray behavior normal</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="input1">Source input</param>
-    /// <param name="input2">Source input</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
-    /// <param name="loc"></param>
-    /// <param name="scale"></param>
-    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member NpiNormalN(outputArray : NDArray seq, 
-                             input1 : NDArray, 
-                             input2 : NDArray, 
-                             ctx : Context, 
-                             [<Optional>] ?loc : float, 
-                             [<Optional>] ?scale : float, 
-                             [<Optional>] ?size : int seq, 
-                             [<Optional>] ?dtype : FloatDType) =
-        let creator = AtomicSymbolCreator.FromName "_npi_normal_n"
-        let names = [|"ctx"; "loc"; "scale"; "size"; "dtype"|]
-        let vals = [|string ctx; (match loc with None -> "None" | Some loc -> string loc); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Ndarray behavior normal</summary>
-    /// <param name="input1">Source input</param>
-    /// <param name="input2">Source input</param>
-    /// <param name="loc"></param>
-    /// <param name="scale"></param>
-    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member NpiNormalN([<Optional>] ?input1 : Symbol, [<Optional>] ?input2 : Symbol, [<Optional>] ?loc : float, [<Optional>] ?scale : float, [<Optional>] ?size : int seq, [<Optional>] ?dtype : FloatDType) =
-        NpiNormalN(?input1 = input1, ?input2 = input2, ?loc = loc, ?scale = scale, ?size = size, ?dtype = dtype)
-
-
     /// <summary>numpy behavior uniform</summary>
     /// <param name="input1">Source input</param>
     /// <param name="input2">Source input</param>
@@ -16793,64 +16373,6 @@ type MX() =
     static member NpiUniform([<Optional>] ?input1 : Symbol, [<Optional>] ?input2 : Symbol, [<Optional>] ?low : float, [<Optional>] ?high : float, [<Optional>] ?size : int seq, [<Optional>] ?dtype : FloatDType) =
         NpiUniform(?input1 = input1, ?input2 = input2, ?low = low, ?high = high, ?size = size, ?dtype = dtype)
 
-    /// <summary>numpy behavior uniform</summary>
-    /// <param name="input1">Source input</param>
-    /// <param name="input2">Source input</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
-    /// <param name="low"></param>
-    /// <param name="high"></param>
-    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member NpiUniformN(input1 : NDArray, 
-                              input2 : NDArray, 
-                              ctx : Context, 
-                              [<Optional>] ?low : float, 
-                              [<Optional>] ?high : float, 
-                              [<Optional>] ?size : int seq, 
-                              [<Optional>] ?dtype : FloatDType) =
-        let creator = AtomicSymbolCreator.FromName "_npi_uniform_n"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
-                                                 [|"ctx"; "low"; "high"; "size"; "dtype"|]
-                                                 [|string ctx; (match low with None -> "None" | Some low -> string low); (match high with None -> "None" | Some high -> string high); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
-        (new NDArray(outputs.[0]))
-    /// <summary>numpy behavior uniform</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="input1">Source input</param>
-    /// <param name="input2">Source input</param>
-    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
-    /// <param name="low"></param>
-    /// <param name="high"></param>
-    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member NpiUniformN(outputArray : NDArray seq, 
-                              input1 : NDArray, 
-                              input2 : NDArray, 
-                              ctx : Context, 
-                              [<Optional>] ?low : float, 
-                              [<Optional>] ?high : float, 
-                              [<Optional>] ?size : int seq, 
-                              [<Optional>] ?dtype : FloatDType) =
-        let creator = AtomicSymbolCreator.FromName "_npi_uniform_n"
-        let names = [|"ctx"; "low"; "high"; "size"; "dtype"|]
-        let vals = [|string ctx; (match low with None -> "None" | Some low -> string low); (match high with None -> "None" | Some high -> string high); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>numpy behavior uniform</summary>
-    /// <param name="input1">Source input</param>
-    /// <param name="input2">Source input</param>
-    /// <param name="low"></param>
-    /// <param name="high"></param>
-    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
-    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
-    static member NpiUniformN([<Optional>] ?input1 : Symbol, [<Optional>] ?input2 : Symbol, [<Optional>] ?low : float, [<Optional>] ?high : float, [<Optional>] ?size : int seq, [<Optional>] ?dtype : FloatDType) =
-        NpiUniformN(?input1 = input1, ?input2 = input2, ?low = low, ?high = high, ?size = size, ?dtype = dtype)
-
     /// <summary>Update function for SignSGD optimizer.
     /// 
     /// .. math::
@@ -16866,7 +16388,7 @@ type MX() =
     ///    - sparse ndarray not supported for this optimizer yet.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L63</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L63</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="lr">Learning rate</param>
@@ -16900,7 +16422,7 @@ type MX() =
     ///    - sparse ndarray not supported for this optimizer yet.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L63</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L63</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -16940,7 +16462,7 @@ type MX() =
     ///    - sparse ndarray not supported for this optimizer yet.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L63</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L63</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="lr">Learning rate</param>
@@ -16964,7 +16486,7 @@ type MX() =
     ///    - sparse ndarray not supported for this optimizer yet.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L63</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L63</summary>
     /// <param name="lr">Learning rate</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -16992,7 +16514,7 @@ type MX() =
     ///    - sparse ndarray not supported for this optimizer yet.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L92</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L92</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mom">Momentum</param>
@@ -17035,7 +16557,7 @@ type MX() =
     ///    - sparse ndarray not supported for this optimizer yet.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L92</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L92</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -17084,7 +16606,7 @@ type MX() =
     ///    - sparse ndarray not supported for this optimizer yet.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L92</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L92</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mom">Momentum</param>
@@ -17114,7 +16636,7 @@ type MX() =
     ///    - sparse ndarray not supported for this optimizer yet.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L92</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L92</summary>
     /// <param name="lr">Learning rate</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -17135,7 +16657,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L329</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L329</summary>
     /// <param name="data">Weights</param>
     /// <param name="lrs">Learning rates.</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -17162,7 +16684,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L329</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L329</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Weights</param>
     /// <param name="lrs">Learning rates.</param>
@@ -17195,7 +16717,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L329</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L329</summary>
     /// <param name="data">Weights</param>
     /// <param name="lrs">Learning rates.</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -17212,7 +16734,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L329</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L329</summary>
     /// <param name="lrs">Learning rates.</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
     /// <param name="data">Weights</param>
@@ -17242,7 +16764,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L374</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L374</summary>
     /// <param name="data">Weights, gradients and momentum</param>
     /// <param name="lrs">Learning rates.</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -17283,7 +16805,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L374</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L374</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Weights, gradients and momentum</param>
     /// <param name="lrs">Learning rates.</param>
@@ -17330,7 +16852,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L374</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L374</summary>
     /// <param name="data">Weights, gradients and momentum</param>
     /// <param name="lrs">Learning rates.</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -17360,7 +16882,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L374</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L374</summary>
     /// <param name="lrs">Learning rates.</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
     /// <param name="data">Weights, gradients and momentum</param>
@@ -17379,7 +16901,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L417</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L417</summary>
     /// <param name="data">Weights</param>
     /// <param name="lrs">Learning rates.</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -17406,7 +16928,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L417</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L417</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Weights</param>
     /// <param name="lrs">Learning rates.</param>
@@ -17439,7 +16961,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L417</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L417</summary>
     /// <param name="data">Weights</param>
     /// <param name="lrs">Learning rates.</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -17456,7 +16978,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L417</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L417</summary>
     /// <param name="lrs">Learning rates.</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
     /// <param name="data">Weights</param>
@@ -17486,7 +17008,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L472</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L472</summary>
     /// <param name="data">Weights</param>
     /// <param name="lrs">Learning rates.</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -17527,7 +17049,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L472</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L472</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Weights</param>
     /// <param name="lrs">Learning rates.</param>
@@ -17574,7 +17096,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L472</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L472</summary>
     /// <param name="data">Weights</param>
     /// <param name="lrs">Learning rates.</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
@@ -17604,7 +17126,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L472</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L472</summary>
     /// <param name="lrs">Learning rates.</param>
     /// <param name="wds">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
     /// <param name="data">Weights</param>
@@ -17629,7 +17151,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L524</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L524</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="lr">Learning rate</param>
@@ -17664,7 +17186,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L524</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L524</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -17705,7 +17227,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L524</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L524</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="lr">Learning rate</param>
@@ -17729,7 +17251,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L524</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L524</summary>
     /// <param name="lr">Learning rate</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -17768,7 +17290,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L565</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L565</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mom">Momentum</param>
@@ -17821,7 +17343,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L565</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L565</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -17880,7 +17402,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L565</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L565</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mom">Momentum</param>
@@ -17920,7 +17442,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L565</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L565</summary>
     /// <param name="lr">Learning rate</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -18110,7 +17632,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L640</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L640</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="d">Internal state ``d_t``</param>
@@ -18158,7 +17680,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L640</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L640</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -18212,7 +17734,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L640</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L640</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="d">Internal state ``d_t``</param>
@@ -18243,7 +17765,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L640</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L640</summary>
     /// <param name="lr">Learning rate.</param>
     /// <param name="t">Number of update.</param>
     /// <param name="weight">Weight</param>
@@ -18290,7 +17812,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L688</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L688</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mean">Moving mean</param>
@@ -18351,7 +17873,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L688</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L688</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -18418,7 +17940,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L688</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L688</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mean">Moving mean</param>
@@ -18463,7 +17985,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L688</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L688</summary>
     /// <param name="lr">Learning rate</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -18494,7 +18016,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L726</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L726</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mom">Momentum</param>
@@ -18532,7 +18054,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L726</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L726</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -18576,7 +18098,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L726</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L726</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mom">Momentum</param>
@@ -18602,7 +18124,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L726</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L726</summary>
     /// <param name="lr">Learning rate</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -18617,7 +18139,7 @@ type MX() =
     /// <summary>Update function for multi-precision Nesterov Accelerated Gradient( NAG) optimizer.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L745</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L745</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mom">Momentum</param>
@@ -18645,7 +18167,7 @@ type MX() =
     /// <summary>Update function for multi-precision Nesterov Accelerated Gradient( NAG) optimizer.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L745</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L745</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -18679,7 +18201,7 @@ type MX() =
     /// <summary>Update function for multi-precision Nesterov Accelerated Gradient( NAG) optimizer.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L745</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L745</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mom">Momentum</param>
@@ -18694,7 +18216,7 @@ type MX() =
     /// <summary>Update function for multi-precision Nesterov Accelerated Gradient( NAG) optimizer.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L745</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L745</summary>
     /// <param name="lr">Learning rate</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -18742,7 +18264,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L797</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L797</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="n">n</param>
@@ -18804,7 +18326,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L797</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L797</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -18872,7 +18394,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L797</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L797</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="n">n</param>
@@ -18920,7 +18442,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L797</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L797</summary>
     /// <param name="lr">Learning rate</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -18958,7 +18480,7 @@ type MX() =
     /// to be 0.9 and the learning rate :math:`\eta` to be 0.0001.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L836</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L836</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="n">n</param>
@@ -19015,7 +18537,7 @@ type MX() =
     /// to be 0.9 and the learning rate :math:`\eta` to be 0.0001.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L836</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L836</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -19078,7 +18600,7 @@ type MX() =
     /// to be 0.9 and the learning rate :math:`\eta` to be 0.0001.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L836</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L836</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="n">n</param>
@@ -19118,7 +18640,7 @@ type MX() =
     /// to be 0.9 and the learning rate :math:`\eta` to be 0.0001.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L836</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L836</summary>
     /// <param name="lr">Learning rate</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -19157,7 +18679,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L876</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L876</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="z">z</param>
@@ -19206,7 +18728,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L876</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L876</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -19261,7 +18783,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L876</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L876</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="z">z</param>
@@ -19296,7 +18818,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L876</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L876</summary>
     /// <param name="lr">Learning rate</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -19325,7 +18847,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L909</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L909</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="history">History</param>
@@ -19363,7 +18885,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L909</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L909</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -19407,7 +18929,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L909</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L909</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="history">History</param>
@@ -19433,7 +18955,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L909</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L909</summary>
     /// <param name="lr">Learning rate</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -19468,12 +18990,12 @@ type MX() =
     ///          var_hat = var / (1 - beta2^t);
     ///          g = mean_hat / (var_hat^(1/2) + epsilon) + wd * weight;
     ///     else
-    ///          g = mean / (var_data^(1/2) + epsilon) + wd * weight_data[i];
+    ///          g = mean / (var_data^(1/2) + epsilon) + wd * weight;
     ///     \end{gather*}
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L953</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L953</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mean">Moving mean</param>
@@ -19490,7 +19012,7 @@ type MX() =
                                    grad : NDArray, 
                                    mean : NDArray, 
                                    var : NDArray, 
-                                   t : float, 
+                                   t : int, 
                                    wd : float, 
                                    [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
                                    [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
@@ -19527,12 +19049,12 @@ type MX() =
     ///          var_hat = var / (1 - beta2^t);
     ///          g = mean_hat / (var_hat^(1/2) + epsilon) + wd * weight;
     ///     else
-    ///          g = mean / (var_data^(1/2) + epsilon) + wd * weight_data[i];
+    ///          g = mean / (var_data^(1/2) + epsilon) + wd * weight;
     ///     \end{gather*}
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L953</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L953</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
@@ -19551,7 +19073,7 @@ type MX() =
                                    grad : NDArray, 
                                    mean : NDArray, 
                                    var : NDArray, 
-                                   t : float, 
+                                   t : int, 
                                    wd : float, 
                                    [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
                                    [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
@@ -19592,12 +19114,12 @@ type MX() =
     ///          var_hat = var / (1 - beta2^t);
     ///          g = mean_hat / (var_hat^(1/2) + epsilon) + wd * weight;
     ///     else
-    ///          g = mean / (var_data^(1/2) + epsilon) + wd * weight_data[i];
+    ///          g = mean / (var_data^(1/2) + epsilon) + wd * weight;
     ///     \end{gather*}
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L953</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L953</summary>
     /// <param name="weight">Weight</param>
     /// <param name="grad">Gradient</param>
     /// <param name="mean">Moving mean</param>
@@ -19610,7 +19132,7 @@ type MX() =
     /// <param name="biasCorrection">Whether to use bias correction.</param>
     /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
     /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
-    static member LambUpdatePhase1(weight : Symbol, grad : Symbol, mean : Symbol, var : Symbol, t : float, wd : float, [<Optional>] ?beta1 : float, [<Optional>] ?beta2 : float, [<Optional>] ?epsilon : float, [<Optional>] ?biasCorrection : bool, [<Optional>] ?rescaleGrad : float, [<Optional>] ?clipGradient : float) =
+    static member LambUpdatePhase1(weight : Symbol, grad : Symbol, mean : Symbol, var : Symbol, t : int, wd : float, [<Optional>] ?beta1 : float, [<Optional>] ?beta2 : float, [<Optional>] ?epsilon : float, [<Optional>] ?biasCorrection : bool, [<Optional>] ?rescaleGrad : float, [<Optional>] ?clipGradient : float) =
         LambUpdatePhase1(weight, grad, mean, var, t, wd, ?beta1 = beta1, ?beta2 = beta2, ?epsilon = epsilon, ?biasCorrection = biasCorrection, ?rescaleGrad = rescaleGrad, ?clipGradient = clipGradient)
     /// <summary>Phase I of lamb update it performs the following operations and returns g:.
     /// 
@@ -19635,12 +19157,12 @@ type MX() =
     ///          var_hat = var / (1 - beta2^t);
     ///          g = mean_hat / (var_hat^(1/2) + epsilon) + wd * weight;
     ///     else
-    ///          g = mean / (var_data^(1/2) + epsilon) + wd * weight_data[i];
+    ///          g = mean / (var_data^(1/2) + epsilon) + wd * weight;
     ///     \end{gather*}
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L953</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L953</summary>
     /// <param name="t">Index update count.</param>
     /// <param name="wd">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
     /// <param name="weight">Weight</param>
@@ -19653,7 +19175,7 @@ type MX() =
     /// <param name="biasCorrection">Whether to use bias correction.</param>
     /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
     /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
-    static member LambUpdatePhase1(t : float, wd : float, [<Optional>] ?weight : Symbol, [<Optional>] ?grad : Symbol, [<Optional>] ?mean : Symbol, [<Optional>] ?var : Symbol, [<Optional>] ?beta1 : float, [<Optional>] ?beta2 : float, [<Optional>] ?epsilon : float, [<Optional>] ?biasCorrection : bool, [<Optional>] ?rescaleGrad : float, [<Optional>] ?clipGradient : float) =
+    static member LambUpdatePhase1(t : int, wd : float, [<Optional>] ?weight : Symbol, [<Optional>] ?grad : Symbol, [<Optional>] ?mean : Symbol, [<Optional>] ?var : Symbol, [<Optional>] ?beta1 : float, [<Optional>] ?beta2 : float, [<Optional>] ?epsilon : float, [<Optional>] ?biasCorrection : bool, [<Optional>] ?rescaleGrad : float, [<Optional>] ?clipGradient : float) =
         LambUpdatePhase1(t, wd, ?weight = weight, ?grad = grad, ?mean = mean, ?var = var, ?beta1 = beta1, ?beta2 = beta2, ?epsilon = epsilon, ?biasCorrection = biasCorrection, ?rescaleGrad = rescaleGrad, ?clipGradient = clipGradient)
 
     /// <summary>Phase II of lamb update it performs the following operations and updates grad.
@@ -19679,7 +19201,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L992</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L992</summary>
     /// <param name="weight">Weight</param>
     /// <param name="g">Output of lamb_update_phase 1</param>
     /// <param name="r1">r1</param>
@@ -19723,7 +19245,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L992</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L992</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="weight">Weight</param>
     /// <param name="g">Output of lamb_update_phase 1</param>
@@ -19773,7 +19295,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L992</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L992</summary>
     /// <param name="weight">Weight</param>
     /// <param name="g">Output of lamb_update_phase 1</param>
     /// <param name="r1">r1</param>
@@ -19806,7 +19328,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\optimizer_op.cc:L992</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L992</summary>
     /// <param name="lr">Learning rate</param>
     /// <param name="weight">Weight</param>
     /// <param name="g">Output of lamb_update_phase 1</param>
@@ -19816,6 +19338,402 @@ type MX() =
     /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
     static member LambUpdatePhase2(lr : float, [<Optional>] ?weight : Symbol, [<Optional>] ?g : Symbol, [<Optional>] ?r1 : Symbol, [<Optional>] ?r2 : Symbol, [<Optional>] ?lowerBound : float, [<Optional>] ?upperBound : float) =
         LambUpdatePhase2(lr, ?weight = weight, ?g = g, ?r1 = r1, ?r2 = r2, ?lowerBound = lowerBound, ?upperBound = upperBound)
+
+    /// <summary>Mixed Precision version of Phase I of lamb update 
+    /// it performs the following operations and returns g:.
+    /// 
+    ///           Link to paper: https://arxiv.org/pdf/1904.00962.pdf
+    /// 
+    ///           .. math::
+    ///               \begin{gather*}
+    ///               grad32 = grad(float16) * rescale_grad
+    ///               if (grad &lt; -clip_gradient)
+    ///               then
+    ///                    grad = -clip_gradient
+    ///               if (grad &gt; clip_gradient)
+    ///               then
+    ///                    grad = clip_gradient
+    /// 
+    ///               mean = beta1 * mean + (1 - beta1) * grad;
+    ///               variance = beta2 * variance + (1. - beta2) * grad ^ 2;
+    /// 
+    ///               if (bias_correction)
+    ///               then
+    ///                    mean_hat = mean / (1. - beta1^t);
+    ///                    var_hat = var / (1 - beta2^t);
+    ///                    g = mean_hat / (var_hat^(1/2) + epsilon) + wd * weight32;
+    ///               else
+    ///                    g = mean / (var_data^(1/2) + epsilon) + wd * weight32;
+    ///               \end{gather*}
+    /// 
+    ///           
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L1033</summary>
+    /// <param name="weight">Weight</param>
+    /// <param name="grad">Gradient</param>
+    /// <param name="mean">Moving mean</param>
+    /// <param name="var">Moving variance</param>
+    /// <param name="weight32">Weight32</param>
+    /// <param name="t">Index update count.</param>
+    /// <param name="wd">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+    /// <param name="beta1">The decay rate for the 1st moment estimates.</param>
+    /// <param name="beta2">The decay rate for the 2nd moment estimates.</param>
+    /// <param name="epsilon">A small constant for numerical stability.</param>
+    /// <param name="biasCorrection">Whether to use bias correction.</param>
+    /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
+    /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+    static member MpLambUpdatePhase1(weight : NDArray, 
+                                     grad : NDArray, 
+                                     mean : NDArray, 
+                                     var : NDArray, 
+                                     weight32 : NDArray, 
+                                     t : int, 
+                                     wd : float, 
+                                     [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                                     [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                                     [<Optional; DefaultParameterValue(0.000001)>] epsilon : float, 
+                                     [<Optional; DefaultParameterValue(true)>] biasCorrection : bool, 
+                                     [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
+                                     [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
+        let creator = AtomicSymbolCreator.FromName "mp_lamb_update_phase1"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg grad)) then grad.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mean)) then mean.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg var)) then var.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight32)) then weight32.UnsafeHandle|]
+                                                 [|"t"; "wd"; "beta1"; "beta2"; "epsilon"; "bias_correction"; "rescale_grad"; "clip_gradient"|]
+                                                 [|string t; string wd; string beta1; string beta2; string epsilon; string biasCorrection; string rescaleGrad; string clipGradient|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Mixed Precision version of Phase I of lamb update 
+    /// it performs the following operations and returns g:.
+    /// 
+    ///           Link to paper: https://arxiv.org/pdf/1904.00962.pdf
+    /// 
+    ///           .. math::
+    ///               \begin{gather*}
+    ///               grad32 = grad(float16) * rescale_grad
+    ///               if (grad &lt; -clip_gradient)
+    ///               then
+    ///                    grad = -clip_gradient
+    ///               if (grad &gt; clip_gradient)
+    ///               then
+    ///                    grad = clip_gradient
+    /// 
+    ///               mean = beta1 * mean + (1 - beta1) * grad;
+    ///               variance = beta2 * variance + (1. - beta2) * grad ^ 2;
+    /// 
+    ///               if (bias_correction)
+    ///               then
+    ///                    mean_hat = mean / (1. - beta1^t);
+    ///                    var_hat = var / (1 - beta2^t);
+    ///                    g = mean_hat / (var_hat^(1/2) + epsilon) + wd * weight32;
+    ///               else
+    ///                    g = mean / (var_data^(1/2) + epsilon) + wd * weight32;
+    ///               \end{gather*}
+    /// 
+    ///           
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L1033</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="weight">Weight</param>
+    /// <param name="grad">Gradient</param>
+    /// <param name="mean">Moving mean</param>
+    /// <param name="var">Moving variance</param>
+    /// <param name="weight32">Weight32</param>
+    /// <param name="t">Index update count.</param>
+    /// <param name="wd">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+    /// <param name="beta1">The decay rate for the 1st moment estimates.</param>
+    /// <param name="beta2">The decay rate for the 2nd moment estimates.</param>
+    /// <param name="epsilon">A small constant for numerical stability.</param>
+    /// <param name="biasCorrection">Whether to use bias correction.</param>
+    /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
+    /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+    static member MpLambUpdatePhase1(outputArray : NDArray seq, 
+                                     weight : NDArray, 
+                                     grad : NDArray, 
+                                     mean : NDArray, 
+                                     var : NDArray, 
+                                     weight32 : NDArray, 
+                                     t : int, 
+                                     wd : float, 
+                                     [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                                     [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                                     [<Optional; DefaultParameterValue(0.000001)>] epsilon : float, 
+                                     [<Optional; DefaultParameterValue(true)>] biasCorrection : bool, 
+                                     [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
+                                     [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float) =
+        let creator = AtomicSymbolCreator.FromName "mp_lamb_update_phase1"
+        let names = [|"t"; "wd"; "beta1"; "beta2"; "epsilon"; "bias_correction"; "rescale_grad"; "clip_gradient"|]
+        let vals = [|string t; string wd; string beta1; string beta2; string epsilon; string biasCorrection; string rescaleGrad; string clipGradient|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg grad)) then grad.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mean)) then mean.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg var)) then var.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight32)) then weight32.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Mixed Precision version of Phase I of lamb update 
+    /// it performs the following operations and returns g:.
+    /// 
+    ///           Link to paper: https://arxiv.org/pdf/1904.00962.pdf
+    /// 
+    ///           .. math::
+    ///               \begin{gather*}
+    ///               grad32 = grad(float16) * rescale_grad
+    ///               if (grad &lt; -clip_gradient)
+    ///               then
+    ///                    grad = -clip_gradient
+    ///               if (grad &gt; clip_gradient)
+    ///               then
+    ///                    grad = clip_gradient
+    /// 
+    ///               mean = beta1 * mean + (1 - beta1) * grad;
+    ///               variance = beta2 * variance + (1. - beta2) * grad ^ 2;
+    /// 
+    ///               if (bias_correction)
+    ///               then
+    ///                    mean_hat = mean / (1. - beta1^t);
+    ///                    var_hat = var / (1 - beta2^t);
+    ///                    g = mean_hat / (var_hat^(1/2) + epsilon) + wd * weight32;
+    ///               else
+    ///                    g = mean / (var_data^(1/2) + epsilon) + wd * weight32;
+    ///               \end{gather*}
+    /// 
+    ///           
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L1033</summary>
+    /// <param name="weight">Weight</param>
+    /// <param name="grad">Gradient</param>
+    /// <param name="mean">Moving mean</param>
+    /// <param name="var">Moving variance</param>
+    /// <param name="weight32">Weight32</param>
+    /// <param name="t">Index update count.</param>
+    /// <param name="wd">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+    /// <param name="beta1">The decay rate for the 1st moment estimates.</param>
+    /// <param name="beta2">The decay rate for the 2nd moment estimates.</param>
+    /// <param name="epsilon">A small constant for numerical stability.</param>
+    /// <param name="biasCorrection">Whether to use bias correction.</param>
+    /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
+    /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+    static member MpLambUpdatePhase1(weight : Symbol, grad : Symbol, mean : Symbol, var : Symbol, weight32 : Symbol, t : int, wd : float, [<Optional>] ?beta1 : float, [<Optional>] ?beta2 : float, [<Optional>] ?epsilon : float, [<Optional>] ?biasCorrection : bool, [<Optional>] ?rescaleGrad : float, [<Optional>] ?clipGradient : float) =
+        MpLambUpdatePhase1(weight, grad, mean, var, weight32, t, wd, ?beta1 = beta1, ?beta2 = beta2, ?epsilon = epsilon, ?biasCorrection = biasCorrection, ?rescaleGrad = rescaleGrad, ?clipGradient = clipGradient)
+    /// <summary>Mixed Precision version of Phase I of lamb update 
+    /// it performs the following operations and returns g:.
+    /// 
+    ///           Link to paper: https://arxiv.org/pdf/1904.00962.pdf
+    /// 
+    ///           .. math::
+    ///               \begin{gather*}
+    ///               grad32 = grad(float16) * rescale_grad
+    ///               if (grad &lt; -clip_gradient)
+    ///               then
+    ///                    grad = -clip_gradient
+    ///               if (grad &gt; clip_gradient)
+    ///               then
+    ///                    grad = clip_gradient
+    /// 
+    ///               mean = beta1 * mean + (1 - beta1) * grad;
+    ///               variance = beta2 * variance + (1. - beta2) * grad ^ 2;
+    /// 
+    ///               if (bias_correction)
+    ///               then
+    ///                    mean_hat = mean / (1. - beta1^t);
+    ///                    var_hat = var / (1 - beta2^t);
+    ///                    g = mean_hat / (var_hat^(1/2) + epsilon) + wd * weight32;
+    ///               else
+    ///                    g = mean / (var_data^(1/2) + epsilon) + wd * weight32;
+    ///               \end{gather*}
+    /// 
+    ///           
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L1033</summary>
+    /// <param name="t">Index update count.</param>
+    /// <param name="wd">Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+    /// <param name="weight">Weight</param>
+    /// <param name="grad">Gradient</param>
+    /// <param name="mean">Moving mean</param>
+    /// <param name="var">Moving variance</param>
+    /// <param name="weight32">Weight32</param>
+    /// <param name="beta1">The decay rate for the 1st moment estimates.</param>
+    /// <param name="beta2">The decay rate for the 2nd moment estimates.</param>
+    /// <param name="epsilon">A small constant for numerical stability.</param>
+    /// <param name="biasCorrection">Whether to use bias correction.</param>
+    /// <param name="rescaleGrad">Rescale gradient to grad = rescale_grad*grad.</param>
+    /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+    static member MpLambUpdatePhase1(t : int, wd : float, [<Optional>] ?weight : Symbol, [<Optional>] ?grad : Symbol, [<Optional>] ?mean : Symbol, [<Optional>] ?var : Symbol, [<Optional>] ?weight32 : Symbol, [<Optional>] ?beta1 : float, [<Optional>] ?beta2 : float, [<Optional>] ?epsilon : float, [<Optional>] ?biasCorrection : bool, [<Optional>] ?rescaleGrad : float, [<Optional>] ?clipGradient : float) =
+        MpLambUpdatePhase1(t, wd, ?weight = weight, ?grad = grad, ?mean = mean, ?var = var, ?weight32 = weight32, ?beta1 = beta1, ?beta2 = beta2, ?epsilon = epsilon, ?biasCorrection = biasCorrection, ?rescaleGrad = rescaleGrad, ?clipGradient = clipGradient)
+
+    /// <summary>Mixed Precision version Phase II of lamb update 
+    /// it performs the following operations and updates grad.
+    /// 
+    ///           Link to paper: https://arxiv.org/pdf/1904.00962.pdf
+    /// 
+    ///           .. math::
+    ///               \begin{gather*}
+    ///               if (lower_bound &gt;= 0)
+    ///               then
+    ///                    r1 = max(r1, lower_bound)
+    ///               if (upper_bound &gt;= 0)
+    ///               then
+    ///                    r1 = max(r1, upper_bound)
+    /// 
+    ///               if (r1 == 0 or r2 == 0)
+    ///               then
+    ///                    lr = lr
+    ///               else
+    ///                    lr = lr * (r1/r2)
+    ///               weight32 = weight32 - lr * g
+    ///               weight(float16) = weight32
+    ///               \end{gather*}
+    /// 
+    ///           
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L1075</summary>
+    /// <param name="weight">Weight</param>
+    /// <param name="g">Output of mp_lamb_update_phase 1</param>
+    /// <param name="r1">r1</param>
+    /// <param name="r2">r2</param>
+    /// <param name="weight32">Weight32</param>
+    /// <param name="lr">Learning rate</param>
+    /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+    /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+    static member MpLambUpdatePhase2(weight : NDArray, 
+                                     g : NDArray, 
+                                     r1 : NDArray, 
+                                     r2 : NDArray, 
+                                     weight32 : NDArray, 
+                                     lr : float, 
+                                     [<Optional; DefaultParameterValue(-1.0)>] lowerBound : float, 
+                                     [<Optional; DefaultParameterValue(-1.0)>] upperBound : float) =
+        let creator = AtomicSymbolCreator.FromName "mp_lamb_update_phase2"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg g)) then g.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg r1)) then r1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg r2)) then r2.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight32)) then weight32.UnsafeHandle|]
+                                                 [|"lr"; "lower_bound"; "upper_bound"|]
+                                                 [|string lr; string lowerBound; string upperBound|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Mixed Precision version Phase II of lamb update 
+    /// it performs the following operations and updates grad.
+    /// 
+    ///           Link to paper: https://arxiv.org/pdf/1904.00962.pdf
+    /// 
+    ///           .. math::
+    ///               \begin{gather*}
+    ///               if (lower_bound &gt;= 0)
+    ///               then
+    ///                    r1 = max(r1, lower_bound)
+    ///               if (upper_bound &gt;= 0)
+    ///               then
+    ///                    r1 = max(r1, upper_bound)
+    /// 
+    ///               if (r1 == 0 or r2 == 0)
+    ///               then
+    ///                    lr = lr
+    ///               else
+    ///                    lr = lr * (r1/r2)
+    ///               weight32 = weight32 - lr * g
+    ///               weight(float16) = weight32
+    ///               \end{gather*}
+    /// 
+    ///           
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L1075</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="weight">Weight</param>
+    /// <param name="g">Output of mp_lamb_update_phase 1</param>
+    /// <param name="r1">r1</param>
+    /// <param name="r2">r2</param>
+    /// <param name="weight32">Weight32</param>
+    /// <param name="lr">Learning rate</param>
+    /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+    /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+    static member MpLambUpdatePhase2(outputArray : NDArray seq, 
+                                     weight : NDArray, 
+                                     g : NDArray, 
+                                     r1 : NDArray, 
+                                     r2 : NDArray, 
+                                     weight32 : NDArray, 
+                                     lr : float, 
+                                     [<Optional; DefaultParameterValue(-1.0)>] lowerBound : float, 
+                                     [<Optional; DefaultParameterValue(-1.0)>] upperBound : float) =
+        let creator = AtomicSymbolCreator.FromName "mp_lamb_update_phase2"
+        let names = [|"lr"; "lower_bound"; "upper_bound"|]
+        let vals = [|string lr; string lowerBound; string upperBound|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg g)) then g.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg r1)) then r1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg r2)) then r2.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight32)) then weight32.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Mixed Precision version Phase II of lamb update 
+    /// it performs the following operations and updates grad.
+    /// 
+    ///           Link to paper: https://arxiv.org/pdf/1904.00962.pdf
+    /// 
+    ///           .. math::
+    ///               \begin{gather*}
+    ///               if (lower_bound &gt;= 0)
+    ///               then
+    ///                    r1 = max(r1, lower_bound)
+    ///               if (upper_bound &gt;= 0)
+    ///               then
+    ///                    r1 = max(r1, upper_bound)
+    /// 
+    ///               if (r1 == 0 or r2 == 0)
+    ///               then
+    ///                    lr = lr
+    ///               else
+    ///                    lr = lr * (r1/r2)
+    ///               weight32 = weight32 - lr * g
+    ///               weight(float16) = weight32
+    ///               \end{gather*}
+    /// 
+    ///           
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L1075</summary>
+    /// <param name="weight">Weight</param>
+    /// <param name="g">Output of mp_lamb_update_phase 1</param>
+    /// <param name="r1">r1</param>
+    /// <param name="r2">r2</param>
+    /// <param name="weight32">Weight32</param>
+    /// <param name="lr">Learning rate</param>
+    /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+    /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+    static member MpLambUpdatePhase2(weight : Symbol, g : Symbol, r1 : Symbol, r2 : Symbol, weight32 : Symbol, lr : float, [<Optional>] ?lowerBound : float, [<Optional>] ?upperBound : float) =
+        MpLambUpdatePhase2(weight, g, r1, r2, weight32, lr, ?lowerBound = lowerBound, ?upperBound = upperBound)
+    /// <summary>Mixed Precision version Phase II of lamb update 
+    /// it performs the following operations and updates grad.
+    /// 
+    ///           Link to paper: https://arxiv.org/pdf/1904.00962.pdf
+    /// 
+    ///           .. math::
+    ///               \begin{gather*}
+    ///               if (lower_bound &gt;= 0)
+    ///               then
+    ///                    r1 = max(r1, lower_bound)
+    ///               if (upper_bound &gt;= 0)
+    ///               then
+    ///                    r1 = max(r1, upper_bound)
+    /// 
+    ///               if (r1 == 0 or r2 == 0)
+    ///               then
+    ///                    lr = lr
+    ///               else
+    ///                    lr = lr * (r1/r2)
+    ///               weight32 = weight32 - lr * g
+    ///               weight(float16) = weight32
+    ///               \end{gather*}
+    /// 
+    ///           
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\optimizer_op.cc:L1075</summary>
+    /// <param name="lr">Learning rate</param>
+    /// <param name="weight">Weight</param>
+    /// <param name="g">Output of mp_lamb_update_phase 1</param>
+    /// <param name="r1">r1</param>
+    /// <param name="r2">r2</param>
+    /// <param name="weight32">Weight32</param>
+    /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+    /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+    static member MpLambUpdatePhase2(lr : float, [<Optional>] ?weight : Symbol, [<Optional>] ?g : Symbol, [<Optional>] ?r1 : Symbol, [<Optional>] ?r2 : Symbol, [<Optional>] ?weight32 : Symbol, [<Optional>] ?lowerBound : float, [<Optional>] ?upperBound : float) =
+        MpLambUpdatePhase2(lr, ?weight = weight, ?g = g, ?r1 = r1, ?r2 = r2, ?weight32 = weight32, ?lowerBound = lowerBound, ?upperBound = upperBound)
 
     /// <summary>Pads an input array with a constant or edge values of the array.
     /// 
@@ -19900,7 +19818,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\pad.cc:L766</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\pad.cc:L766</summary>
     /// <param name="data">An n-dimensional input array.</param>
     /// <param name="mode">Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; pads by reflecting values with respect to the edges.</param>
     /// <param name="padWidth">Widths of the padding regions applied to the edges of each axis. It is a tuple of integer padding widths for each axis of the format ``(before_1, after_1, ... , before_N, after_N)``. It should be of length ``2*N`` where ``N`` is the number of dimensions of the array.This is equivalent to pad_width in numpy.pad, but flattened.</param>
@@ -19995,7 +19913,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\pad.cc:L766</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\pad.cc:L766</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">An n-dimensional input array.</param>
     /// <param name="mode">Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; pads by reflecting values with respect to the edges.</param>
@@ -20095,7 +20013,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\pad.cc:L766</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\pad.cc:L766</summary>
     /// <param name="data">An n-dimensional input array.</param>
     /// <param name="mode">Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; pads by reflecting values with respect to the edges.</param>
     /// <param name="padWidth">Widths of the padding regions applied to the edges of each axis. It is a tuple of integer padding widths for each axis of the format ``(before_1, after_1, ... , before_N, after_N)``. It should be of length ``2*N`` where ``N`` is the number of dimensions of the array.This is equivalent to pad_width in numpy.pad, but flattened.</param>
@@ -20185,7 +20103,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\pad.cc:L766</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\pad.cc:L766</summary>
     /// <param name="mode">Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; pads by reflecting values with respect to the edges.</param>
     /// <param name="padWidth">Widths of the padding regions applied to the edges of each axis. It is a tuple of integer padding widths for each axis of the format ``(before_1, after_1, ... , before_N, after_N)``. It should be of length ``2*N`` where ``N`` is the number of dimensions of the array.This is equivalent to pad_width in numpy.pad, but flattened.</param>
     /// <param name="data">An n-dimensional input array.</param>
@@ -20198,7 +20116,7 @@ type MX() =
     /// .. Note::
     ///     This operator only supports forward propagation. DO NOT use it in training.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\calibrate.cc:L197</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\calibrate.cc:L197</summary>
     /// <param name="hist">A ndarray/symbol of type `float32`</param>
     /// <param name="histEdges">A ndarray/symbol of type `float32`</param>
     /// <param name="numQuantizedBins">The number of quantized bins.</param>
@@ -20214,7 +20132,7 @@ type MX() =
     /// .. Note::
     ///     This operator only supports forward propagation. DO NOT use it in training.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\calibrate.cc:L197</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\calibrate.cc:L197</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="hist">A ndarray/symbol of type `float32`</param>
     /// <param name="histEdges">A ndarray/symbol of type `float32`</param>
@@ -20235,7 +20153,7 @@ type MX() =
     /// .. Note::
     ///     This operator only supports forward propagation. DO NOT use it in training.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\calibrate.cc:L197</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\calibrate.cc:L197</summary>
     /// <param name="hist">A ndarray/symbol of type `float32`</param>
     /// <param name="histEdges">A ndarray/symbol of type `float32`</param>
     /// <param name="numQuantizedBins">The number of quantized bins.</param>
@@ -20259,7 +20177,7 @@ type MX() =
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\dequantize.cc:L81</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\dequantize.cc:L81</summary>
     /// <param name="data">A ndarray/symbol of type `uint8`</param>
     /// <param name="minRange">The minimum scalar value possibly produced for the input in float32</param>
     /// <param name="maxRange">The maximum scalar value possibly produced for the input in float32</param>
@@ -20288,7 +20206,7 @@ type MX() =
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\dequantize.cc:L81</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\dequantize.cc:L81</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">A ndarray/symbol of type `uint8`</param>
     /// <param name="minRange">The minimum scalar value possibly produced for the input in float32</param>
@@ -20322,13 +20240,240 @@ type MX() =
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\dequantize.cc:L81</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\dequantize.cc:L81</summary>
     /// <param name="data">A ndarray/symbol of type `uint8`</param>
     /// <param name="minRange">The minimum scalar value possibly produced for the input in float32</param>
     /// <param name="maxRange">The maximum scalar value possibly produced for the input in float32</param>
     /// <param name="outType">Output data type.</param>
     static member ContribDequantize([<Optional>] ?data : Symbol, [<Optional>] ?minRange : Symbol, [<Optional>] ?maxRange : Symbol, [<Optional>] ?outType : ContribDequantizeOutType) =
         ContribDequantize(?data = data, ?minRange = minRange, ?maxRange = maxRange, ?outType = outType)
+
+    /// <summary>Quantize a input tensor from float to `out_type`,
+    /// with user-specified `min_range` and `max_range`.
+    /// 
+    /// min_range and max_range are scalar floats that specify the range for
+    /// the input data.
+    /// 
+    /// When out_type is `uint8`, the output is calculated using the following equation:
+    /// 
+    /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
+    /// 
+    /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
+    /// 
+    /// When out_type is `int8`, the output is calculate using the following equation
+    /// by keep zero centered for the quantized value:
+    /// 
+    /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
+    /// 
+    /// where
+    /// `quantized_range = MinAbs(max(int8), min(int8))` and
+    /// `scale = quantized_range / MaxAbs(min_range, max_range).`
+    /// 
+    /// .. Note::
+    ///     This operator only supports forward propagation. DO NOT use it in training.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantize.cc:L74</summary>
+    /// <param name="data">A ndarray/symbol of type `float32`</param>
+    /// <param name="minRange">The minimum scalar value possibly produced for the input</param>
+    /// <param name="maxRange">The maximum scalar value possibly produced for the input</param>
+    /// <param name="outType">Output data type.</param>
+    static member ContribQuantize(data : NDArray, minRange : NDArray, maxRange : NDArray, [<Optional>] outType : ContribQuantizeOutType) =
+        let creator = AtomicSymbolCreator.FromName "_contrib_quantize"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minRange)) then minRange.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxRange)) then maxRange.UnsafeHandle|]
+                                                 [|"out_type"|]
+                                                 [|(if isNull (outType :> obj) then "uint8" else string outType)|]
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
+    /// <summary>Quantize a input tensor from float to `out_type`,
+    /// with user-specified `min_range` and `max_range`.
+    /// 
+    /// min_range and max_range are scalar floats that specify the range for
+    /// the input data.
+    /// 
+    /// When out_type is `uint8`, the output is calculated using the following equation:
+    /// 
+    /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
+    /// 
+    /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
+    /// 
+    /// When out_type is `int8`, the output is calculate using the following equation
+    /// by keep zero centered for the quantized value:
+    /// 
+    /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
+    /// 
+    /// where
+    /// `quantized_range = MinAbs(max(int8), min(int8))` and
+    /// `scale = quantized_range / MaxAbs(min_range, max_range).`
+    /// 
+    /// .. Note::
+    ///     This operator only supports forward propagation. DO NOT use it in training.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantize.cc:L74</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">A ndarray/symbol of type `float32`</param>
+    /// <param name="minRange">The minimum scalar value possibly produced for the input</param>
+    /// <param name="maxRange">The maximum scalar value possibly produced for the input</param>
+    /// <param name="outType">Output data type.</param>
+    static member ContribQuantize(outputArray : NDArray seq, data : NDArray, minRange : NDArray, maxRange : NDArray, [<Optional>] outType : ContribQuantizeOutType) =
+        let creator = AtomicSymbolCreator.FromName "_contrib_quantize"
+        let names = [|"out_type"|]
+        let vals = [|(if isNull (outType :> obj) then "uint8" else string outType)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minRange)) then minRange.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxRange)) then maxRange.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Quantize a input tensor from float to `out_type`,
+    /// with user-specified `min_range` and `max_range`.
+    /// 
+    /// min_range and max_range are scalar floats that specify the range for
+    /// the input data.
+    /// 
+    /// When out_type is `uint8`, the output is calculated using the following equation:
+    /// 
+    /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
+    /// 
+    /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
+    /// 
+    /// When out_type is `int8`, the output is calculate using the following equation
+    /// by keep zero centered for the quantized value:
+    /// 
+    /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
+    /// 
+    /// where
+    /// `quantized_range = MinAbs(max(int8), min(int8))` and
+    /// `scale = quantized_range / MaxAbs(min_range, max_range).`
+    /// 
+    /// .. Note::
+    ///     This operator only supports forward propagation. DO NOT use it in training.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantize.cc:L74</summary>
+    /// <param name="data">A ndarray/symbol of type `float32`</param>
+    /// <param name="minRange">The minimum scalar value possibly produced for the input</param>
+    /// <param name="maxRange">The maximum scalar value possibly produced for the input</param>
+    /// <param name="outType">Output data type.</param>
+    static member ContribQuantize([<Optional>] ?data : Symbol, [<Optional>] ?minRange : Symbol, [<Optional>] ?maxRange : Symbol, [<Optional>] ?outType : ContribQuantizeOutType) =
+        ContribQuantize(?data = data, ?minRange = minRange, ?maxRange = maxRange, ?outType = outType)
+
+    /// <summary>Quantize a input tensor from float to `out_type`,
+    /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
+    /// 
+    /// Output `min_range` and `max_range` are scalar floats that specify the range for the input data.
+    /// 
+    /// When out_type is `uint8`, the output is calculated using the following equation:
+    /// 
+    /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
+    /// 
+    /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
+    /// 
+    /// When out_type is `int8`, the output is calculate using the following equation
+    /// by keep zero centered for the quantized value:
+    /// 
+    /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
+    /// 
+    /// where
+    /// `quantized_range = MinAbs(max(int8), min(int8))` and
+    /// `scale = quantized_range / MaxAbs(min_range, max_range).`
+    /// 
+    /// When out_type is `auto`, the output type is automatically determined by min_calib_range if presented.
+    /// If min_calib_range &lt; 0.0f, the output type will be int8, otherwise will be uint8.
+    /// If min_calib_range isn&#39;t presented, the output type will be int8.
+    /// 
+    /// .. Note::
+    ///     This operator only supports forward propagation. DO NOT use it in training.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantize_v2.cc:L92</summary>
+    /// <param name="data">A ndarray/symbol of type `float32`</param>
+    /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
+    /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
+    /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
+    static member ContribQuantizeV2(data : NDArray, [<Optional>] ?outType : ContribQuantizeV2OutType, [<Optional>] ?minCalibRange : float, [<Optional>] ?maxCalibRange : float) =
+        let creator = AtomicSymbolCreator.FromName "_contrib_quantize_v2"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 [|"out_type"; "min_calib_range"; "max_calib_range"|]
+                                                 [|(match outType with None -> "int8" | Some outType -> string outType); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
+    /// <summary>Quantize a input tensor from float to `out_type`,
+    /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
+    /// 
+    /// Output `min_range` and `max_range` are scalar floats that specify the range for the input data.
+    /// 
+    /// When out_type is `uint8`, the output is calculated using the following equation:
+    /// 
+    /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
+    /// 
+    /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
+    /// 
+    /// When out_type is `int8`, the output is calculate using the following equation
+    /// by keep zero centered for the quantized value:
+    /// 
+    /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
+    /// 
+    /// where
+    /// `quantized_range = MinAbs(max(int8), min(int8))` and
+    /// `scale = quantized_range / MaxAbs(min_range, max_range).`
+    /// 
+    /// When out_type is `auto`, the output type is automatically determined by min_calib_range if presented.
+    /// If min_calib_range &lt; 0.0f, the output type will be int8, otherwise will be uint8.
+    /// If min_calib_range isn&#39;t presented, the output type will be int8.
+    /// 
+    /// .. Note::
+    ///     This operator only supports forward propagation. DO NOT use it in training.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantize_v2.cc:L92</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">A ndarray/symbol of type `float32`</param>
+    /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
+    /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
+    /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
+    static member ContribQuantizeV2(outputArray : NDArray seq, data : NDArray, [<Optional>] ?outType : ContribQuantizeV2OutType, [<Optional>] ?minCalibRange : float, [<Optional>] ?maxCalibRange : float) =
+        let creator = AtomicSymbolCreator.FromName "_contrib_quantize_v2"
+        let names = [|"out_type"; "min_calib_range"; "max_calib_range"|]
+        let vals = [|(match outType with None -> "int8" | Some outType -> string outType); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Quantize a input tensor from float to `out_type`,
+    /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
+    /// 
+    /// Output `min_range` and `max_range` are scalar floats that specify the range for the input data.
+    /// 
+    /// When out_type is `uint8`, the output is calculated using the following equation:
+    /// 
+    /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
+    /// 
+    /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
+    /// 
+    /// When out_type is `int8`, the output is calculate using the following equation
+    /// by keep zero centered for the quantized value:
+    /// 
+    /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
+    /// 
+    /// where
+    /// `quantized_range = MinAbs(max(int8), min(int8))` and
+    /// `scale = quantized_range / MaxAbs(min_range, max_range).`
+    /// 
+    /// When out_type is `auto`, the output type is automatically determined by min_calib_range if presented.
+    /// If min_calib_range &lt; 0.0f, the output type will be int8, otherwise will be uint8.
+    /// If min_calib_range isn&#39;t presented, the output type will be int8.
+    /// 
+    /// .. Note::
+    ///     This operator only supports forward propagation. DO NOT use it in training.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantize_v2.cc:L92</summary>
+    /// <param name="data">A ndarray/symbol of type `float32`</param>
+    /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
+    /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
+    /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
+    static member ContribQuantizeV2([<Optional>] ?data : Symbol, [<Optional>] ?outType : ContribQuantizeV2OutType, [<Optional>] ?minCalibRange : float, [<Optional>] ?maxCalibRange : float) =
+        ContribQuantizeV2(?data = data, ?outType = outType, ?minCalibRange = minCalibRange, ?maxCalibRange = maxCalibRange)
 
     /// <summary>Activation operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
@@ -20338,7 +20483,7 @@ type MX() =
     ///      This operator only supports forward propogation. DO NOT use it in training.
     ///      This operator only supports `relu`
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_activation.cc:L91</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_activation.cc:L91</summary>
     /// <param name="data">Input data.</param>
     /// <param name="minData">Minimum value of data.</param>
     /// <param name="maxData">Maximum value of data.</param>
@@ -20358,7 +20503,7 @@ type MX() =
     ///      This operator only supports forward propogation. DO NOT use it in training.
     ///      This operator only supports `relu`
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_activation.cc:L91</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_activation.cc:L91</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data.</param>
     /// <param name="minData">Minimum value of data.</param>
@@ -20383,7 +20528,7 @@ type MX() =
     ///      This operator only supports forward propogation. DO NOT use it in training.
     ///      This operator only supports `relu`
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_activation.cc:L91</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_activation.cc:L91</summary>
     /// <param name="data">Input data.</param>
     /// <param name="minData">Minimum value of data.</param>
     /// <param name="maxData">Maximum value of data.</param>
@@ -20398,7 +20543,7 @@ type MX() =
     ///      This operator only supports forward propogation. DO NOT use it in training.
     ///      This operator only supports `relu`
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_activation.cc:L91</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_activation.cc:L91</summary>
     /// <param name="actType">Activation function to be applied.</param>
     /// <param name="data">Input data.</param>
     /// <param name="minData">Minimum value of data.</param>
@@ -20414,7 +20559,7 @@ type MX() =
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_batch_norm.cc:L95</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_batch_norm.cc:L95</summary>
     /// <param name="data">Input data.</param>
     /// <param name="gamma">gamma.</param>
     /// <param name="beta">beta.</param>
@@ -20461,7 +20606,7 @@ type MX() =
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_batch_norm.cc:L95</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_batch_norm.cc:L95</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data.</param>
     /// <param name="gamma">gamma.</param>
@@ -20514,7 +20659,7 @@ type MX() =
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_batch_norm.cc:L95</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_batch_norm.cc:L95</summary>
     /// <param name="data">Input data.</param>
     /// <param name="gamma">gamma.</param>
     /// <param name="beta">beta.</param>
@@ -20545,7 +20690,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_concat.cc:L108</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_concat.cc:L108</summary>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
     /// <param name="dim">the dimension to be concated.</param>
@@ -20567,7 +20712,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_concat.cc:L108</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_concat.cc:L108</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
@@ -20594,7 +20739,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_concat.cc:L108</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_concat.cc:L108</summary>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="dim">the dimension to be concated.</param>
     static member ContribQuantizedConcat([<Optional>] ?data : Symbol seq, [<Optional>] ?dim : int) =
@@ -20609,7 +20754,7 @@ type MX() =
     /// .. Note::
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_conv.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L137</summary>
     /// <param name="data">Input data.</param>
     /// <param name="weight">weight.</param>
     /// <param name="bias">bias.</param>
@@ -20666,7 +20811,7 @@ type MX() =
     /// .. Note::
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_conv.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L137</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data.</param>
     /// <param name="weight">weight.</param>
@@ -20729,7 +20874,7 @@ type MX() =
     /// .. Note::
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_conv.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L137</summary>
     /// <param name="data">Input data.</param>
     /// <param name="weight">weight.</param>
     /// <param name="bias">bias.</param>
@@ -20762,7 +20907,7 @@ type MX() =
     /// .. Note::
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_conv.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L137</summary>
     /// <param name="kernel">Convolution kernel size: (w,), (h, w) or (d, h, w)</param>
     /// <param name="numFilter">Convolution filter(channel) number</param>
     /// <param name="data">Input data.</param>
@@ -20803,21 +20948,17 @@ type MX() =
     /// <param name="lhsMax">4th input</param>
     /// <param name="rhsMin">5th input</param>
     /// <param name="rhsMax">6th input</param>
-    /// <param name="minCalibRange">The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
-    /// <param name="maxCalibRange">The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
     static member ContribQuantizedElemwiseAdd(lhs : NDArray, 
                                               rhs : NDArray, 
                                               lhsMin : NDArray, 
                                               lhsMax : NDArray, 
                                               rhsMin : NDArray, 
-                                              rhsMax : NDArray, 
-                                              [<Optional>] ?minCalibRange : float, 
-                                              [<Optional>] ?maxCalibRange : float) =
+                                              rhsMax : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_elemwise_add"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhsMin)) then lhsMin.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhsMax)) then lhsMax.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhsMin)) then rhsMin.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhsMax)) then rhsMax.UnsafeHandle|]
-                                                 [|"min_calib_range"; "max_calib_range"|]
-                                                 [|(match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
+                                                 Array.empty
+                                                 Array.empty
         (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
     /// <summary>elemwise_add operator for input dataA and input dataB data type of int8,
     /// and accumulates in type int32 for the output. For each argument, two more arguments of type
@@ -20836,20 +20977,16 @@ type MX() =
     /// <param name="lhsMax">4th input</param>
     /// <param name="rhsMin">5th input</param>
     /// <param name="rhsMax">6th input</param>
-    /// <param name="minCalibRange">The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
-    /// <param name="maxCalibRange">The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
     static member ContribQuantizedElemwiseAdd(outputArray : NDArray seq, 
                                               lhs : NDArray, 
                                               rhs : NDArray, 
                                               lhsMin : NDArray, 
                                               lhsMax : NDArray, 
                                               rhsMin : NDArray, 
-                                              rhsMax : NDArray, 
-                                              [<Optional>] ?minCalibRange : float, 
-                                              [<Optional>] ?maxCalibRange : float) =
+                                              rhsMax : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_contrib_quantized_elemwise_add"
-        let names = [|"min_calib_range"; "max_calib_range"|]
-        let vals = [|(match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
+        let names = Array.empty
+        let vals = Array.empty
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhsMin)) then lhsMin.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhsMax)) then lhsMax.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhsMin)) then rhsMin.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhsMax)) then rhsMax.UnsafeHandle|]
@@ -20873,10 +21010,8 @@ type MX() =
     /// <param name="lhsMax">4th input</param>
     /// <param name="rhsMin">5th input</param>
     /// <param name="rhsMax">6th input</param>
-    /// <param name="minCalibRange">The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
-    /// <param name="maxCalibRange">The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
-    static member ContribQuantizedElemwiseAdd([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol, [<Optional>] ?lhsMin : Symbol, [<Optional>] ?lhsMax : Symbol, [<Optional>] ?rhsMin : Symbol, [<Optional>] ?rhsMax : Symbol, [<Optional>] ?minCalibRange : float, [<Optional>] ?maxCalibRange : float) =
-        ContribQuantizedElemwiseAdd(?lhs = lhs, ?rhs = rhs, ?lhsMin = lhsMin, ?lhsMax = lhsMax, ?rhsMin = rhsMin, ?rhsMax = rhsMax, ?minCalibRange = minCalibRange, ?maxCalibRange = maxCalibRange)
+    static member ContribQuantizedElemwiseAdd([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol, [<Optional>] ?lhsMin : Symbol, [<Optional>] ?lhsMax : Symbol, [<Optional>] ?rhsMin : Symbol, [<Optional>] ?rhsMax : Symbol) =
+        ContribQuantizedElemwiseAdd(?lhs = lhs, ?rhs = rhs, ?lhsMin = lhsMin, ?lhsMax = lhsMax, ?rhsMin = rhsMin, ?rhsMax = rhsMax)
 
     /// <param name="data">A ndarray/symbol of type `float32`</param>
     /// <param name="minData">The minimum scalar value possibly produced for the data</param>
@@ -20909,6 +21044,229 @@ type MX() =
     static member ContribQuantizedFlatten([<Optional>] ?data : Symbol, [<Optional>] ?minData : Symbol, [<Optional>] ?maxData : Symbol) =
         ContribQuantizedFlatten(?data = data, ?minData = minData, ?maxData = maxData)
 
+    /// <summary>Flattens the input array into a 2-D array by collapsing the higher dimensions.
+    /// .. note:: `Flatten` is deprecated. Use `flatten` instead.
+    /// For an input array with shape ``(d1, d2, ..., dk)``, `flatten` operation reshapes
+    /// the input array into an output array of shape ``(d1, d2*...*dk)``.
+    /// Note that the behavior of this function is different from numpy.ndarray.flatten,
+    /// which behaves similar to mxnet.ndarray.reshape((-1,)).
+    /// Example::
+    ///     x = [[
+    ///         [1,2,3],
+    ///         [4,5,6],
+    ///         [7,8,9]
+    ///     ],
+    ///     [    [1,2,3],
+    ///         [4,5,6],
+    ///         [7,8,9]
+    ///     ]],
+    ///     flatten(x) = [[ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.],
+    ///        [ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.]]
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L250</summary>
+    /// <param name="data">Input array.</param>
+    static member Flatten(data : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "Flatten"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        (new NDArray(outputs.[0]))
+    /// <summary>Flattens the input array into a 2-D array by collapsing the higher dimensions.
+    /// .. note:: `Flatten` is deprecated. Use `flatten` instead.
+    /// For an input array with shape ``(d1, d2, ..., dk)``, `flatten` operation reshapes
+    /// the input array into an output array of shape ``(d1, d2*...*dk)``.
+    /// Note that the behavior of this function is different from numpy.ndarray.flatten,
+    /// which behaves similar to mxnet.ndarray.reshape((-1,)).
+    /// Example::
+    ///     x = [[
+    ///         [1,2,3],
+    ///         [4,5,6],
+    ///         [7,8,9]
+    ///     ],
+    ///     [    [1,2,3],
+    ///         [4,5,6],
+    ///         [7,8,9]
+    ///     ]],
+    ///     flatten(x) = [[ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.],
+    ///        [ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.]]
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L250</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">Input array.</param>
+    static member Flatten(outputArray : NDArray seq, data : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "Flatten"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Flattens the input array into a 2-D array by collapsing the higher dimensions.
+    /// .. note:: `Flatten` is deprecated. Use `flatten` instead.
+    /// For an input array with shape ``(d1, d2, ..., dk)``, `flatten` operation reshapes
+    /// the input array into an output array of shape ``(d1, d2*...*dk)``.
+    /// Note that the behavior of this function is different from numpy.ndarray.flatten,
+    /// which behaves similar to mxnet.ndarray.reshape((-1,)).
+    /// Example::
+    ///     x = [[
+    ///         [1,2,3],
+    ///         [4,5,6],
+    ///         [7,8,9]
+    ///     ],
+    ///     [    [1,2,3],
+    ///         [4,5,6],
+    ///         [7,8,9]
+    ///     ]],
+    ///     flatten(x) = [[ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.],
+    ///        [ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.]]
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L250</summary>
+    /// <param name="data">Input array.</param>
+    static member Flatten([<Optional>] ?data : Symbol) =
+        Flatten(?data = data)
+
+    /// <summary>Fully Connected operator for input, weight and bias data type of int8,
+    /// and accumulates in type int32 for the output. For each argument, two more arguments of type
+    /// float32 must be provided representing the thresholds of quantizing argument from data
+    /// type float32 to int8. The final outputs contain the convolution result in int32, and min
+    /// and max thresholds representing the threholds for quantizing the float32 output into int32.
+    /// 
+    /// .. Note::
+    ///     This operator only supports forward propogation. DO NOT use it in training.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_fully_connected.cc:L313</summary>
+    /// <param name="data">Input data.</param>
+    /// <param name="weight">weight.</param>
+    /// <param name="bias">bias.</param>
+    /// <param name="minData">Minimum value of data.</param>
+    /// <param name="maxData">Maximum value of data.</param>
+    /// <param name="minWeight">Minimum value of weight.</param>
+    /// <param name="maxWeight">Maximum value of weight.</param>
+    /// <param name="minBias">Minimum value of bias.</param>
+    /// <param name="maxBias">Maximum value of bias.</param>
+    /// <param name="numHidden">Number of hidden nodes of the output.</param>
+    /// <param name="noBias">Whether to disable bias parameter.</param>
+    /// <param name="flatten">Whether to collapse all but the first axis of the input data tensor.</param>
+    static member ContribQuantizedFullyConnected(data : NDArray, 
+                                                 weight : NDArray, 
+                                                 bias : NDArray, 
+                                                 minData : NDArray, 
+                                                 maxData : NDArray, 
+                                                 minWeight : NDArray, 
+                                                 maxWeight : NDArray, 
+                                                 minBias : NDArray, 
+                                                 maxBias : NDArray, 
+                                                 numHidden : int, 
+                                                 [<Optional; DefaultParameterValue(false)>] noBias : bool, 
+                                                 [<Optional; DefaultParameterValue(true)>] flatten : bool) =
+        let creator = AtomicSymbolCreator.FromName "_contrib_quantized_fully_connected"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg bias)) then bias.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minData)) then minData.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxData)) then maxData.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minWeight)) then minWeight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxWeight)) then maxWeight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minBias)) then minBias.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxBias)) then maxBias.UnsafeHandle|]
+                                                 [|"num_hidden"; "no_bias"; "flatten"|]
+                                                 [|string numHidden; string noBias; string flatten|]
+        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
+    /// <summary>Fully Connected operator for input, weight and bias data type of int8,
+    /// and accumulates in type int32 for the output. For each argument, two more arguments of type
+    /// float32 must be provided representing the thresholds of quantizing argument from data
+    /// type float32 to int8. The final outputs contain the convolution result in int32, and min
+    /// and max thresholds representing the threholds for quantizing the float32 output into int32.
+    /// 
+    /// .. Note::
+    ///     This operator only supports forward propogation. DO NOT use it in training.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_fully_connected.cc:L313</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">Input data.</param>
+    /// <param name="weight">weight.</param>
+    /// <param name="bias">bias.</param>
+    /// <param name="minData">Minimum value of data.</param>
+    /// <param name="maxData">Maximum value of data.</param>
+    /// <param name="minWeight">Minimum value of weight.</param>
+    /// <param name="maxWeight">Maximum value of weight.</param>
+    /// <param name="minBias">Minimum value of bias.</param>
+    /// <param name="maxBias">Maximum value of bias.</param>
+    /// <param name="numHidden">Number of hidden nodes of the output.</param>
+    /// <param name="noBias">Whether to disable bias parameter.</param>
+    /// <param name="flatten">Whether to collapse all but the first axis of the input data tensor.</param>
+    static member ContribQuantizedFullyConnected(outputArray : NDArray seq, 
+                                                 data : NDArray, 
+                                                 weight : NDArray, 
+                                                 bias : NDArray, 
+                                                 minData : NDArray, 
+                                                 maxData : NDArray, 
+                                                 minWeight : NDArray, 
+                                                 maxWeight : NDArray, 
+                                                 minBias : NDArray, 
+                                                 maxBias : NDArray, 
+                                                 numHidden : int, 
+                                                 [<Optional; DefaultParameterValue(false)>] noBias : bool, 
+                                                 [<Optional; DefaultParameterValue(true)>] flatten : bool) =
+        let creator = AtomicSymbolCreator.FromName "_contrib_quantized_fully_connected"
+        let names = [|"num_hidden"; "no_bias"; "flatten"|]
+        let vals = [|string numHidden; string noBias; string flatten|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg bias)) then bias.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minData)) then minData.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxData)) then maxData.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minWeight)) then minWeight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxWeight)) then maxWeight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minBias)) then minBias.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxBias)) then maxBias.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Fully Connected operator for input, weight and bias data type of int8,
+    /// and accumulates in type int32 for the output. For each argument, two more arguments of type
+    /// float32 must be provided representing the thresholds of quantizing argument from data
+    /// type float32 to int8. The final outputs contain the convolution result in int32, and min
+    /// and max thresholds representing the threholds for quantizing the float32 output into int32.
+    /// 
+    /// .. Note::
+    ///     This operator only supports forward propogation. DO NOT use it in training.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_fully_connected.cc:L313</summary>
+    /// <param name="data">Input data.</param>
+    /// <param name="weight">weight.</param>
+    /// <param name="bias">bias.</param>
+    /// <param name="minData">Minimum value of data.</param>
+    /// <param name="maxData">Maximum value of data.</param>
+    /// <param name="minWeight">Minimum value of weight.</param>
+    /// <param name="maxWeight">Maximum value of weight.</param>
+    /// <param name="minBias">Minimum value of bias.</param>
+    /// <param name="maxBias">Maximum value of bias.</param>
+    /// <param name="numHidden">Number of hidden nodes of the output.</param>
+    /// <param name="noBias">Whether to disable bias parameter.</param>
+    /// <param name="flatten">Whether to collapse all but the first axis of the input data tensor.</param>
+    static member ContribQuantizedFullyConnected(data : Symbol, weight : Symbol, bias : Symbol, minData : Symbol, maxData : Symbol, minWeight : Symbol, maxWeight : Symbol, minBias : Symbol, maxBias : Symbol, numHidden : int, [<Optional>] ?noBias : bool, [<Optional>] ?flatten : bool) =
+        ContribQuantizedFullyConnected(data, weight, bias, minData, maxData, minWeight, maxWeight, minBias, maxBias, numHidden, ?noBias = noBias, ?flatten = flatten)
+    /// <summary>Fully Connected operator for input, weight and bias data type of int8,
+    /// and accumulates in type int32 for the output. For each argument, two more arguments of type
+    /// float32 must be provided representing the thresholds of quantizing argument from data
+    /// type float32 to int8. The final outputs contain the convolution result in int32, and min
+    /// and max thresholds representing the threholds for quantizing the float32 output into int32.
+    /// 
+    /// .. Note::
+    ///     This operator only supports forward propogation. DO NOT use it in training.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_fully_connected.cc:L313</summary>
+    /// <param name="numHidden">Number of hidden nodes of the output.</param>
+    /// <param name="data">Input data.</param>
+    /// <param name="weight">weight.</param>
+    /// <param name="bias">bias.</param>
+    /// <param name="minData">Minimum value of data.</param>
+    /// <param name="maxData">Maximum value of data.</param>
+    /// <param name="minWeight">Minimum value of weight.</param>
+    /// <param name="maxWeight">Maximum value of weight.</param>
+    /// <param name="minBias">Minimum value of bias.</param>
+    /// <param name="maxBias">Maximum value of bias.</param>
+    /// <param name="noBias">Whether to disable bias parameter.</param>
+    /// <param name="flatten">Whether to collapse all but the first axis of the input data tensor.</param>
+    static member ContribQuantizedFullyConnected(numHidden : int, [<Optional>] ?data : Symbol, [<Optional>] ?weight : Symbol, [<Optional>] ?bias : Symbol, [<Optional>] ?minData : Symbol, [<Optional>] ?maxData : Symbol, [<Optional>] ?minWeight : Symbol, [<Optional>] ?maxWeight : Symbol, [<Optional>] ?minBias : Symbol, [<Optional>] ?maxBias : Symbol, [<Optional>] ?noBias : bool, [<Optional>] ?flatten : bool) =
+        ContribQuantizedFullyConnected(numHidden, ?data = data, ?weight = weight, ?bias = bias, ?minData = minData, ?maxData = maxData, ?minWeight = minWeight, ?maxWeight = maxWeight, ?minBias = minBias, ?maxBias = maxBias, ?noBias = noBias, ?flatten = flatten)
+
     /// <summary>Pooling operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
     /// the float32 data into int8.
@@ -20917,7 +21275,7 @@ type MX() =
     ///     This operator only supports forward propogation. DO NOT use it in training.
     ///     This operator only supports `pool_type` of `avg` or `max`.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_pooling.cc:L145</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_pooling.cc:L145</summary>
     /// <param name="data">Input data.</param>
     /// <param name="minData">Minimum value of data.</param>
     /// <param name="maxData">Maximum value of data.</param>
@@ -20959,7 +21317,7 @@ type MX() =
     ///     This operator only supports forward propogation. DO NOT use it in training.
     ///     This operator only supports `pool_type` of `avg` or `max`.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_pooling.cc:L145</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_pooling.cc:L145</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data.</param>
     /// <param name="minData">Minimum value of data.</param>
@@ -21007,7 +21365,7 @@ type MX() =
     ///     This operator only supports forward propogation. DO NOT use it in training.
     ///     This operator only supports `pool_type` of `avg` or `max`.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_pooling.cc:L145</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_pooling.cc:L145</summary>
     /// <param name="data">Input data.</param>
     /// <param name="minData">Minimum value of data.</param>
     /// <param name="maxData">Maximum value of data.</param>
@@ -21025,456 +21383,6 @@ type MX() =
     static member ContribQuantizedPooling([<Optional>] ?data : Symbol, [<Optional>] ?minData : Symbol, [<Optional>] ?maxData : Symbol, [<Optional>] ?kernel : int seq, [<Optional>] ?poolType : PoolType, [<Optional>] ?globalPool : bool, [<Optional>] ?cudnnOff : bool, [<Optional>] ?poolingConvention : PoolingConvention, [<Optional>] ?stride : int seq, [<Optional>] ?pad : int seq, [<Optional>] ?pValue : int, [<Optional>] ?countIncludePad : bool, [<Optional>] ?layout : ContribQuantizedPoolingLayout) =
         ContribQuantizedPooling(?data = data, ?minData = minData, ?maxData = maxData, ?kernel = kernel, ?poolType = poolType, ?globalPool = globalPool, ?cudnnOff = cudnnOff, ?poolingConvention = poolingConvention, ?stride = stride, ?pad = pad, ?pValue = pValue, ?countIncludePad = countIncludePad, ?layout = layout)
 
-    /// <summary>Quantize a input tensor from float to `out_type`,
-    /// with user-specified `min_range` and `max_range`.
-    /// 
-    /// min_range and max_range are scalar floats that specify the range for
-    /// the input data.
-    /// 
-    /// When out_type is `uint8`, the output is calculated using the following equation:
-    /// 
-    /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
-    /// 
-    /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
-    /// 
-    /// When out_type is `int8`, the output is calculate using the following equation
-    /// by keep zero centered for the quantized value:
-    /// 
-    /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
-    /// 
-    /// where
-    /// `quantized_range = MinAbs(max(int8), min(int8))` and
-    /// `scale = quantized_range / MaxAbs(min_range, max_range).`
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propagation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantize.cc:L74</summary>
-    /// <param name="data">A ndarray/symbol of type `float32`</param>
-    /// <param name="minRange">The minimum scalar value possibly produced for the input</param>
-    /// <param name="maxRange">The maximum scalar value possibly produced for the input</param>
-    /// <param name="outType">Output data type.</param>
-    static member ContribQuantize(data : NDArray, minRange : NDArray, maxRange : NDArray, [<Optional>] outType : ContribQuantizeOutType) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_quantize"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minRange)) then minRange.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxRange)) then maxRange.UnsafeHandle|]
-                                                 [|"out_type"|]
-                                                 [|(if isNull (outType :> obj) then "uint8" else string outType)|]
-        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
-    /// <summary>Quantize a input tensor from float to `out_type`,
-    /// with user-specified `min_range` and `max_range`.
-    /// 
-    /// min_range and max_range are scalar floats that specify the range for
-    /// the input data.
-    /// 
-    /// When out_type is `uint8`, the output is calculated using the following equation:
-    /// 
-    /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
-    /// 
-    /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
-    /// 
-    /// When out_type is `int8`, the output is calculate using the following equation
-    /// by keep zero centered for the quantized value:
-    /// 
-    /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
-    /// 
-    /// where
-    /// `quantized_range = MinAbs(max(int8), min(int8))` and
-    /// `scale = quantized_range / MaxAbs(min_range, max_range).`
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propagation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantize.cc:L74</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">A ndarray/symbol of type `float32`</param>
-    /// <param name="minRange">The minimum scalar value possibly produced for the input</param>
-    /// <param name="maxRange">The maximum scalar value possibly produced for the input</param>
-    /// <param name="outType">Output data type.</param>
-    static member ContribQuantize(outputArray : NDArray seq, data : NDArray, minRange : NDArray, maxRange : NDArray, [<Optional>] outType : ContribQuantizeOutType) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_quantize"
-        let names = [|"out_type"|]
-        let vals = [|(if isNull (outType :> obj) then "uint8" else string outType)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minRange)) then minRange.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxRange)) then maxRange.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Quantize a input tensor from float to `out_type`,
-    /// with user-specified `min_range` and `max_range`.
-    /// 
-    /// min_range and max_range are scalar floats that specify the range for
-    /// the input data.
-    /// 
-    /// When out_type is `uint8`, the output is calculated using the following equation:
-    /// 
-    /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
-    /// 
-    /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
-    /// 
-    /// When out_type is `int8`, the output is calculate using the following equation
-    /// by keep zero centered for the quantized value:
-    /// 
-    /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
-    /// 
-    /// where
-    /// `quantized_range = MinAbs(max(int8), min(int8))` and
-    /// `scale = quantized_range / MaxAbs(min_range, max_range).`
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propagation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantize.cc:L74</summary>
-    /// <param name="data">A ndarray/symbol of type `float32`</param>
-    /// <param name="minRange">The minimum scalar value possibly produced for the input</param>
-    /// <param name="maxRange">The maximum scalar value possibly produced for the input</param>
-    /// <param name="outType">Output data type.</param>
-    static member ContribQuantize([<Optional>] ?data : Symbol, [<Optional>] ?minRange : Symbol, [<Optional>] ?maxRange : Symbol, [<Optional>] ?outType : ContribQuantizeOutType) =
-        ContribQuantize(?data = data, ?minRange = minRange, ?maxRange = maxRange, ?outType = outType)
-
-    /// <summary>Quantize a input tensor from float to `out_type`,
-    /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
-    /// 
-    /// Output `min_range` and `max_range` are scalar floats that specify the range for the input data.
-    /// 
-    /// When out_type is `uint8`, the output is calculated using the following equation:
-    /// 
-    /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
-    /// 
-    /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
-    /// 
-    /// When out_type is `int8`, the output is calculate using the following equation
-    /// by keep zero centered for the quantized value:
-    /// 
-    /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
-    /// 
-    /// where
-    /// `quantized_range = MinAbs(max(int8), min(int8))` and
-    /// `scale = quantized_range / MaxAbs(min_range, max_range).`
-    /// 
-    /// When out_type is `auto`, the output type is automatically determined by min_calib_range if presented.
-    /// If min_calib_range &lt; 0.0f, the output type will be int8, otherwise will be uint8.
-    /// If min_calib_range isn&#39;t presented, the output type will be int8.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propagation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantize_v2.cc:L92</summary>
-    /// <param name="data">A ndarray/symbol of type `float32`</param>
-    /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
-    /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-    /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-    static member ContribQuantizeV2(data : NDArray, [<Optional>] ?outType : ContribQuantizeV2OutType, [<Optional>] ?minCalibRange : float, [<Optional>] ?maxCalibRange : float) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_quantize_v2"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"out_type"; "min_calib_range"; "max_calib_range"|]
-                                                 [|(match outType with None -> "int8" | Some outType -> string outType); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
-        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
-    /// <summary>Quantize a input tensor from float to `out_type`,
-    /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
-    /// 
-    /// Output `min_range` and `max_range` are scalar floats that specify the range for the input data.
-    /// 
-    /// When out_type is `uint8`, the output is calculated using the following equation:
-    /// 
-    /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
-    /// 
-    /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
-    /// 
-    /// When out_type is `int8`, the output is calculate using the following equation
-    /// by keep zero centered for the quantized value:
-    /// 
-    /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
-    /// 
-    /// where
-    /// `quantized_range = MinAbs(max(int8), min(int8))` and
-    /// `scale = quantized_range / MaxAbs(min_range, max_range).`
-    /// 
-    /// When out_type is `auto`, the output type is automatically determined by min_calib_range if presented.
-    /// If min_calib_range &lt; 0.0f, the output type will be int8, otherwise will be uint8.
-    /// If min_calib_range isn&#39;t presented, the output type will be int8.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propagation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantize_v2.cc:L92</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">A ndarray/symbol of type `float32`</param>
-    /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
-    /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-    /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-    static member ContribQuantizeV2(outputArray : NDArray seq, data : NDArray, [<Optional>] ?outType : ContribQuantizeV2OutType, [<Optional>] ?minCalibRange : float, [<Optional>] ?maxCalibRange : float) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_quantize_v2"
-        let names = [|"out_type"; "min_calib_range"; "max_calib_range"|]
-        let vals = [|(match outType with None -> "int8" | Some outType -> string outType); (match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Quantize a input tensor from float to `out_type`,
-    /// with user-specified `min_calib_range` and `max_calib_range` or the input range collected at runtime.
-    /// 
-    /// Output `min_range` and `max_range` are scalar floats that specify the range for the input data.
-    /// 
-    /// When out_type is `uint8`, the output is calculated using the following equation:
-    /// 
-    /// `out[i] = (in[i] - min_range) * range(OUTPUT_TYPE) / (max_range - min_range) + 0.5`,
-    /// 
-    /// where `range(T) = numeric_limits&lt;T&gt;::max() - numeric_limits&lt;T&gt;::min()`.
-    /// 
-    /// When out_type is `int8`, the output is calculate using the following equation
-    /// by keep zero centered for the quantized value:
-    /// 
-    /// `out[i] = sign(in[i]) * min(abs(in[i] * scale + 0.5f, quantized_range)`,
-    /// 
-    /// where
-    /// `quantized_range = MinAbs(max(int8), min(int8))` and
-    /// `scale = quantized_range / MaxAbs(min_range, max_range).`
-    /// 
-    /// When out_type is `auto`, the output type is automatically determined by min_calib_range if presented.
-    /// If min_calib_range &lt; 0.0f, the output type will be int8, otherwise will be uint8.
-    /// If min_calib_range isn&#39;t presented, the output type will be int8.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propagation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantize_v2.cc:L92</summary>
-    /// <param name="data">A ndarray/symbol of type `float32`</param>
-    /// <param name="outType">Output data type. `auto` can be specified to automatically determine output type according to min_calib_range.</param>
-    /// <param name="minCalibRange">The minimum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-    /// <param name="maxCalibRange">The maximum scalar value in the form of float32. If present, it will be used to quantize the fp32 data into int8 or uint8.</param>
-    static member ContribQuantizeV2([<Optional>] ?data : Symbol, [<Optional>] ?outType : ContribQuantizeV2OutType, [<Optional>] ?minCalibRange : float, [<Optional>] ?maxCalibRange : float) =
-        ContribQuantizeV2(?data = data, ?outType = outType, ?minCalibRange = minCalibRange, ?maxCalibRange = maxCalibRange)
-
-    /// <summary>Flattens the input array into a 2-D array by collapsing the higher dimensions.
-    /// .. note:: `Flatten` is deprecated. Use `flatten` instead.
-    /// For an input array with shape ``(d1, d2, ..., dk)``, `flatten` operation reshapes
-    /// the input array into an output array of shape ``(d1, d2*...*dk)``.
-    /// Note that the behavior of this function is different from numpy.ndarray.flatten,
-    /// which behaves similar to mxnet.ndarray.reshape((-1,)).
-    /// Example::
-    ///     x = [[
-    ///         [1,2,3],
-    ///         [4,5,6],
-    ///         [7,8,9]
-    ///     ],
-    ///     [    [1,2,3],
-    ///         [4,5,6],
-    ///         [7,8,9]
-    ///     ]],
-    ///     flatten(x) = [[ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.],
-    ///        [ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.]]
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L250</summary>
-    /// <param name="data">Input array.</param>
-    static member Flatten(data : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "Flatten"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 Array.empty
-                                                 Array.empty
-        (new NDArray(outputs.[0]))
-    /// <summary>Flattens the input array into a 2-D array by collapsing the higher dimensions.
-    /// .. note:: `Flatten` is deprecated. Use `flatten` instead.
-    /// For an input array with shape ``(d1, d2, ..., dk)``, `flatten` operation reshapes
-    /// the input array into an output array of shape ``(d1, d2*...*dk)``.
-    /// Note that the behavior of this function is different from numpy.ndarray.flatten,
-    /// which behaves similar to mxnet.ndarray.reshape((-1,)).
-    /// Example::
-    ///     x = [[
-    ///         [1,2,3],
-    ///         [4,5,6],
-    ///         [7,8,9]
-    ///     ],
-    ///     [    [1,2,3],
-    ///         [4,5,6],
-    ///         [7,8,9]
-    ///     ]],
-    ///     flatten(x) = [[ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.],
-    ///        [ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.]]
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L250</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input array.</param>
-    static member Flatten(outputArray : NDArray seq, data : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "Flatten"
-        let names = Array.empty
-        let vals = Array.empty
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Flattens the input array into a 2-D array by collapsing the higher dimensions.
-    /// .. note:: `Flatten` is deprecated. Use `flatten` instead.
-    /// For an input array with shape ``(d1, d2, ..., dk)``, `flatten` operation reshapes
-    /// the input array into an output array of shape ``(d1, d2*...*dk)``.
-    /// Note that the behavior of this function is different from numpy.ndarray.flatten,
-    /// which behaves similar to mxnet.ndarray.reshape((-1,)).
-    /// Example::
-    ///     x = [[
-    ///         [1,2,3],
-    ///         [4,5,6],
-    ///         [7,8,9]
-    ///     ],
-    ///     [    [1,2,3],
-    ///         [4,5,6],
-    ///         [7,8,9]
-    ///     ]],
-    ///     flatten(x) = [[ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.],
-    ///        [ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.]]
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L250</summary>
-    /// <param name="data">Input array.</param>
-    static member Flatten([<Optional>] ?data : Symbol) =
-        Flatten(?data = data)
-
-    /// <summary>Fully Connected operator for input, weight and bias data type of int8,
-    /// and accumulates in type int32 for the output. For each argument, two more arguments of type
-    /// float32 must be provided representing the thresholds of quantizing argument from data
-    /// type float32 to int8. The final outputs contain the convolution result in int32, and min
-    /// and max thresholds representing the threholds for quantizing the float32 output into int32.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propogation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_fully_connected.cc:L313</summary>
-    /// <param name="data">Input data.</param>
-    /// <param name="weight">weight.</param>
-    /// <param name="bias">bias.</param>
-    /// <param name="minData">Minimum value of data.</param>
-    /// <param name="maxData">Maximum value of data.</param>
-    /// <param name="minWeight">Minimum value of weight.</param>
-    /// <param name="maxWeight">Maximum value of weight.</param>
-    /// <param name="minBias">Minimum value of bias.</param>
-    /// <param name="maxBias">Maximum value of bias.</param>
-    /// <param name="numHidden">Number of hidden nodes of the output.</param>
-    /// <param name="noBias">Whether to disable bias parameter.</param>
-    /// <param name="flatten">Whether to collapse all but the first axis of the input data tensor.</param>
-    static member ContribQuantizedFullyConnected(data : NDArray, 
-                                                 weight : NDArray, 
-                                                 bias : NDArray, 
-                                                 minData : NDArray, 
-                                                 maxData : NDArray, 
-                                                 minWeight : NDArray, 
-                                                 maxWeight : NDArray, 
-                                                 minBias : NDArray, 
-                                                 maxBias : NDArray, 
-                                                 numHidden : int, 
-                                                 [<Optional; DefaultParameterValue(false)>] noBias : bool, 
-                                                 [<Optional; DefaultParameterValue(true)>] flatten : bool) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_quantized_fully_connected"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg bias)) then bias.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minData)) then minData.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxData)) then maxData.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minWeight)) then minWeight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxWeight)) then maxWeight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minBias)) then minBias.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxBias)) then maxBias.UnsafeHandle|]
-                                                 [|"num_hidden"; "no_bias"; "flatten"|]
-                                                 [|string numHidden; string noBias; string flatten|]
-        (new NDArray(outputs.[0])), (new NDArray(outputs.[1])), (new NDArray(outputs.[2]))
-    /// <summary>Fully Connected operator for input, weight and bias data type of int8,
-    /// and accumulates in type int32 for the output. For each argument, two more arguments of type
-    /// float32 must be provided representing the thresholds of quantizing argument from data
-    /// type float32 to int8. The final outputs contain the convolution result in int32, and min
-    /// and max thresholds representing the threholds for quantizing the float32 output into int32.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propogation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_fully_connected.cc:L313</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input data.</param>
-    /// <param name="weight">weight.</param>
-    /// <param name="bias">bias.</param>
-    /// <param name="minData">Minimum value of data.</param>
-    /// <param name="maxData">Maximum value of data.</param>
-    /// <param name="minWeight">Minimum value of weight.</param>
-    /// <param name="maxWeight">Maximum value of weight.</param>
-    /// <param name="minBias">Minimum value of bias.</param>
-    /// <param name="maxBias">Maximum value of bias.</param>
-    /// <param name="numHidden">Number of hidden nodes of the output.</param>
-    /// <param name="noBias">Whether to disable bias parameter.</param>
-    /// <param name="flatten">Whether to collapse all but the first axis of the input data tensor.</param>
-    static member ContribQuantizedFullyConnected(outputArray : NDArray seq, 
-                                                 data : NDArray, 
-                                                 weight : NDArray, 
-                                                 bias : NDArray, 
-                                                 minData : NDArray, 
-                                                 maxData : NDArray, 
-                                                 minWeight : NDArray, 
-                                                 maxWeight : NDArray, 
-                                                 minBias : NDArray, 
-                                                 maxBias : NDArray, 
-                                                 numHidden : int, 
-                                                 [<Optional; DefaultParameterValue(false)>] noBias : bool, 
-                                                 [<Optional; DefaultParameterValue(true)>] flatten : bool) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_quantized_fully_connected"
-        let names = [|"num_hidden"; "no_bias"; "flatten"|]
-        let vals = [|string numHidden; string noBias; string flatten|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg bias)) then bias.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minData)) then minData.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxData)) then maxData.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minWeight)) then minWeight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxWeight)) then maxWeight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minBias)) then minBias.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxBias)) then maxBias.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Fully Connected operator for input, weight and bias data type of int8,
-    /// and accumulates in type int32 for the output. For each argument, two more arguments of type
-    /// float32 must be provided representing the thresholds of quantizing argument from data
-    /// type float32 to int8. The final outputs contain the convolution result in int32, and min
-    /// and max thresholds representing the threholds for quantizing the float32 output into int32.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propogation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_fully_connected.cc:L313</summary>
-    /// <param name="data">Input data.</param>
-    /// <param name="weight">weight.</param>
-    /// <param name="bias">bias.</param>
-    /// <param name="minData">Minimum value of data.</param>
-    /// <param name="maxData">Maximum value of data.</param>
-    /// <param name="minWeight">Minimum value of weight.</param>
-    /// <param name="maxWeight">Maximum value of weight.</param>
-    /// <param name="minBias">Minimum value of bias.</param>
-    /// <param name="maxBias">Maximum value of bias.</param>
-    /// <param name="numHidden">Number of hidden nodes of the output.</param>
-    /// <param name="noBias">Whether to disable bias parameter.</param>
-    /// <param name="flatten">Whether to collapse all but the first axis of the input data tensor.</param>
-    static member ContribQuantizedFullyConnected(data : Symbol, weight : Symbol, bias : Symbol, minData : Symbol, maxData : Symbol, minWeight : Symbol, maxWeight : Symbol, minBias : Symbol, maxBias : Symbol, numHidden : int, [<Optional>] ?noBias : bool, [<Optional>] ?flatten : bool) =
-        ContribQuantizedFullyConnected(data, weight, bias, minData, maxData, minWeight, maxWeight, minBias, maxBias, numHidden, ?noBias = noBias, ?flatten = flatten)
-    /// <summary>Fully Connected operator for input, weight and bias data type of int8,
-    /// and accumulates in type int32 for the output. For each argument, two more arguments of type
-    /// float32 must be provided representing the thresholds of quantizing argument from data
-    /// type float32 to int8. The final outputs contain the convolution result in int32, and min
-    /// and max thresholds representing the threholds for quantizing the float32 output into int32.
-    /// 
-    /// .. Note::
-    ///     This operator only supports forward propogation. DO NOT use it in training.
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\quantized_fully_connected.cc:L313</summary>
-    /// <param name="numHidden">Number of hidden nodes of the output.</param>
-    /// <param name="data">Input data.</param>
-    /// <param name="weight">weight.</param>
-    /// <param name="bias">bias.</param>
-    /// <param name="minData">Minimum value of data.</param>
-    /// <param name="maxData">Maximum value of data.</param>
-    /// <param name="minWeight">Minimum value of weight.</param>
-    /// <param name="maxWeight">Maximum value of weight.</param>
-    /// <param name="minBias">Minimum value of bias.</param>
-    /// <param name="maxBias">Maximum value of bias.</param>
-    /// <param name="noBias">Whether to disable bias parameter.</param>
-    /// <param name="flatten">Whether to collapse all but the first axis of the input data tensor.</param>
-    static member ContribQuantizedFullyConnected(numHidden : int, [<Optional>] ?data : Symbol, [<Optional>] ?weight : Symbol, [<Optional>] ?bias : Symbol, [<Optional>] ?minData : Symbol, [<Optional>] ?maxData : Symbol, [<Optional>] ?minWeight : Symbol, [<Optional>] ?maxWeight : Symbol, [<Optional>] ?minBias : Symbol, [<Optional>] ?maxBias : Symbol, [<Optional>] ?noBias : bool, [<Optional>] ?flatten : bool) =
-        ContribQuantizedFullyConnected(numHidden, ?data = data, ?weight = weight, ?bias = bias, ?minData = minData, ?maxData = maxData, ?minWeight = minWeight, ?maxWeight = maxWeight, ?minBias = minBias, ?maxBias = maxBias, ?noBias = noBias, ?flatten = flatten)
-
     /// <summary>Given data that is quantized in int32 and the corresponding thresholds,
     /// requantize the data into int8 using min and max thresholds either calculated at runtime
     /// or from calibration. It&#39;s highly recommended to pre-calucate the min and max thresholds
@@ -21484,7 +21392,7 @@ type MX() =
     /// .. Note::
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\requantize.cc:L60</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\requantize.cc:L60</summary>
     /// <param name="data">A ndarray/symbol of type `int32`</param>
     /// <param name="minRange">The original minimum scalar value in the form of float32 used for quantizing data into int32.</param>
     /// <param name="maxRange">The original maximum scalar value in the form of float32 used for quantizing data into int32.</param>
@@ -21512,7 +21420,7 @@ type MX() =
     /// .. Note::
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\requantize.cc:L60</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\requantize.cc:L60</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">A ndarray/symbol of type `int32`</param>
     /// <param name="minRange">The original minimum scalar value in the form of float32 used for quantizing data into int32.</param>
@@ -21546,7 +21454,7 @@ type MX() =
     /// .. Note::
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\quantization\requantize.cc:L60</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\requantize.cc:L60</summary>
     /// <param name="data">A ndarray/symbol of type `int32`</param>
     /// <param name="minRange">The original minimum scalar value in the form of float32 used for quantizing data into int32.</param>
     /// <param name="maxRange">The original maximum scalar value in the form of float32 used for quantizing data into int32.</param>
@@ -21583,7 +21491,7 @@ type MX() =
     ///                                            [ 3.18687344,  3.68352246]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L277</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L277</summary>
     /// <param name="low">Lower bounds of the distributions.</param>
     /// <param name="high">Upper bounds of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
@@ -21622,7 +21530,7 @@ type MX() =
     ///                                            [ 3.18687344,  3.68352246]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L277</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L277</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="low">Lower bounds of the distributions.</param>
     /// <param name="high">Upper bounds of the distributions.</param>
@@ -21666,7 +21574,7 @@ type MX() =
     ///                                            [ 3.18687344,  3.68352246]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L277</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L277</summary>
     /// <param name="low">Lower bounds of the distributions.</param>
     /// <param name="high">Upper bounds of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
@@ -21701,7 +21609,7 @@ type MX() =
     ///                                           [ 0.95934606,  4.48287058]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L279</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L279</summary>
     /// <param name="mu">Means of the distributions.</param>
     /// <param name="sigma">Standard deviations of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
@@ -21740,7 +21648,7 @@ type MX() =
     ///                                           [ 0.95934606,  4.48287058]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L279</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L279</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="mu">Means of the distributions.</param>
     /// <param name="sigma">Standard deviations of the distributions.</param>
@@ -21784,7 +21692,7 @@ type MX() =
     ///                                           [ 0.95934606,  4.48287058]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L279</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L279</summary>
     /// <param name="mu">Means of the distributions.</param>
     /// <param name="sigma">Standard deviations of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
@@ -21819,7 +21727,7 @@ type MX() =
     ///                                            [ 2.25797319,  1.70734084]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L282</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L282</summary>
     /// <param name="alpha">Alpha (shape) parameters of the distributions.</param>
     /// <param name="beta">Beta (scale) parameters of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
@@ -21858,7 +21766,7 @@ type MX() =
     ///                                            [ 2.25797319,  1.70734084]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L282</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L282</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="alpha">Alpha (shape) parameters of the distributions.</param>
     /// <param name="beta">Beta (scale) parameters of the distributions.</param>
@@ -21902,7 +21810,7 @@ type MX() =
     ///                                            [ 2.25797319,  1.70734084]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L282</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L282</summary>
     /// <param name="alpha">Alpha (shape) parameters of the distributions.</param>
     /// <param name="beta">Beta (scale) parameters of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
@@ -21936,7 +21844,7 @@ type MX() =
     ///                                          [ 0.09994757,  0.50447971]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L284</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L284</summary>
     /// <param name="lam">Lambda (rate) parameters of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
@@ -21973,7 +21881,7 @@ type MX() =
     ///                                          [ 0.09994757,  0.50447971]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L284</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L284</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lam">Lambda (rate) parameters of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
@@ -22015,7 +21923,7 @@ type MX() =
     ///                                          [ 0.09994757,  0.50447971]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L284</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L284</summary>
     /// <param name="lam">Lambda (rate) parameters of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
@@ -22050,7 +21958,7 @@ type MX() =
     ///                                      [ 13.,   8.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L286</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L286</summary>
     /// <param name="lam">Lambda (rate) parameters of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
@@ -22089,7 +21997,7 @@ type MX() =
     ///                                      [ 13.,   8.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L286</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L286</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lam">Lambda (rate) parameters of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
@@ -22133,7 +22041,7 @@ type MX() =
     ///                                      [ 13.,   8.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L286</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L286</summary>
     /// <param name="lam">Lambda (rate) parameters of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
@@ -22169,7 +22077,7 @@ type MX() =
     ///                                                 [ 16.,  12.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L289</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L289</summary>
     /// <param name="k">Limits of unsuccessful experiments.</param>
     /// <param name="p">Failure probabilities in each experiment.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
@@ -22210,7 +22118,7 @@ type MX() =
     ///                                                 [ 16.,  12.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L289</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L289</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="k">Limits of unsuccessful experiments.</param>
     /// <param name="p">Failure probabilities in each experiment.</param>
@@ -22256,7 +22164,7 @@ type MX() =
     ///                                                 [ 16.,  12.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L289</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L289</summary>
     /// <param name="k">Limits of unsuccessful experiments.</param>
     /// <param name="p">Failure probabilities in each experiment.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
@@ -22293,7 +22201,7 @@ type MX() =
     ///                                                                  [ 3.,  1.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L293</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L293</summary>
     /// <param name="mu">Means of the distributions.</param>
     /// <param name="alpha">Alpha (dispersion) parameters of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
@@ -22334,7 +22242,7 @@ type MX() =
     ///                                                                  [ 3.,  1.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L293</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L293</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="mu">Means of the distributions.</param>
     /// <param name="alpha">Alpha (dispersion) parameters of the distributions.</param>
@@ -22380,7 +22288,7 @@ type MX() =
     ///                                                                  [ 3.,  1.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\multisample_op.cc:L293</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\multisample_op.cc:L293</summary>
     /// <param name="mu">Means of the distributions.</param>
     /// <param name="alpha">Alpha (dispersion) parameters of the distributions.</param>
     /// <param name="shape">Shape to be sampled from each random distribution.</param>
@@ -22418,7 +22326,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L298</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L298</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="low">Lower bounds of the distributions.</param>
     /// <param name="high">Upper bounds of the distributions.</param>
@@ -22460,7 +22368,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L298</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L298</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="low">Lower bounds of the distributions.</param>
@@ -22507,7 +22415,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L298</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L298</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="low">Lower bounds of the distributions.</param>
     /// <param name="high">Upper bounds of the distributions.</param>
@@ -22537,7 +22445,7 @@ type MX() =
     ///          [0.12098537, 0.17603266, 0.19947115, 0.17603266, 0.12098537]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L300</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L300</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="mu">Means of the distributions.</param>
     /// <param name="sigma">Standard deviations of the distributions.</param>
@@ -22570,7 +22478,7 @@ type MX() =
     ///          [0.12098537, 0.17603266, 0.19947115, 0.17603266, 0.12098537]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L300</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L300</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="mu">Means of the distributions.</param>
@@ -22608,7 +22516,7 @@ type MX() =
     ///          [0.12098537, 0.17603266, 0.19947115, 0.17603266, 0.12098537]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L300</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L300</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="mu">Means of the distributions.</param>
     /// <param name="sigma">Standard deviations of the distributions.</param>
@@ -22642,7 +22550,7 @@ type MX() =
     ///        [0.05040941, 0.10419563, 0.14622283, 0.16062315, 0.14900276]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L303</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L303</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="alpha">Alpha (shape) parameters of the distributions.</param>
     /// <param name="beta">Beta (scale) parameters of the distributions.</param>
@@ -22679,7 +22587,7 @@ type MX() =
     ///        [0.05040941, 0.10419563, 0.14622283, 0.16062315, 0.14900276]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L303</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L303</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="alpha">Alpha (shape) parameters of the distributions.</param>
@@ -22721,7 +22629,7 @@ type MX() =
     ///        [0.05040941, 0.10419563, 0.14622283, 0.16062315, 0.14900276]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L303</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L303</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="alpha">Alpha (shape) parameters of the distributions.</param>
     /// <param name="beta">Beta (scale) parameters of the distributions.</param>
@@ -22755,7 +22663,7 @@ type MX() =
     ///        [0.1947002,  0.15163267, 0.11809164]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L305</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L305</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="lam">Lambda (rate) parameters of the distributions.</param>
     /// <param name="isLog">If set, compute the density of the log-probability instead of the probability.</param>
@@ -22791,7 +22699,7 @@ type MX() =
     ///        [0.1947002,  0.15163267, 0.11809164]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L305</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L305</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="lam">Lambda (rate) parameters of the distributions.</param>
@@ -22832,7 +22740,7 @@ type MX() =
     ///        [0.1947002,  0.15163267, 0.11809164]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L305</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L305</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="lam">Lambda (rate) parameters of the distributions.</param>
     /// <param name="isLog">If set, compute the density of the log-probability instead of the probability.</param>
@@ -22865,7 +22773,7 @@ type MX() =
     ///          [0.04978707, 0.14936121, 0.22404182, 0.22404182]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L307</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L307</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="lam">Lambda (rate) parameters of the distributions.</param>
     /// <param name="isLog">If set, compute the density of the log-probability instead of the probability.</param>
@@ -22901,7 +22809,7 @@ type MX() =
     ///          [0.04978707, 0.14936121, 0.22404182, 0.22404182]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L307</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L307</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="lam">Lambda (rate) parameters of the distributions.</param>
@@ -22942,7 +22850,7 @@ type MX() =
     ///          [0.04978707, 0.14936121, 0.22404182, 0.22404182]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L307</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L307</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="lam">Lambda (rate) parameters of the distributions.</param>
     /// <param name="isLog">If set, compute the density of the log-probability instead of the probability.</param>
@@ -22973,7 +22881,7 @@ type MX() =
     ///          [0.26516506, 0.16572815, 0.09667476, 0.05437956]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L310</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L310</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="k">Limits of unsuccessful experiments.</param>
     /// <param name="p">Failure probabilities in each experiment.</param>
@@ -23008,7 +22916,7 @@ type MX() =
     ///          [0.26516506, 0.16572815, 0.09667476, 0.05437956]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L310</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L310</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="k">Limits of unsuccessful experiments.</param>
@@ -23048,7 +22956,7 @@ type MX() =
     ///          [0.26516506, 0.16572815, 0.09667476, 0.05437956]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L310</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L310</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="k">Limits of unsuccessful experiments.</param>
     /// <param name="p">Failure probabilities in each experiment.</param>
@@ -23081,7 +22989,7 @@ type MX() =
     ///          [0.26517063, 0.16573331, 0.09667706, 0.05437994]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L314</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L314</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="mu">Means of the distributions.</param>
     /// <param name="alpha">Alpha (dispersion) parameters of the distributions.</param>
@@ -23117,7 +23025,7 @@ type MX() =
     ///          [0.26517063, 0.16573331, 0.09667706, 0.05437994]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L314</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L314</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="mu">Means of the distributions.</param>
@@ -23158,7 +23066,7 @@ type MX() =
     ///          [0.26517063, 0.16573331, 0.09667706, 0.05437994]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L314</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L314</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="mu">Means of the distributions.</param>
     /// <param name="alpha">Alpha (dispersion) parameters of the distributions.</param>
@@ -23190,7 +23098,7 @@ type MX() =
     ///          [9.2589635e-01, 3.6860607e+01, 1.4674468e+03]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L316</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L316</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="alpha">Concentration parameters of the distributions.</param>
     /// <param name="isLog">If set, compute the density of the log-probability instead of the probability.</param>
@@ -23224,7 +23132,7 @@ type MX() =
     ///          [9.2589635e-01, 3.6860607e+01, 1.4674468e+03]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L316</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L316</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="alpha">Concentration parameters of the distributions.</param>
@@ -23263,7 +23171,7 @@ type MX() =
     ///          [9.2589635e-01, 3.6860607e+01, 1.4674468e+03]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\pdf_op.cc:L316</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\pdf_op.cc:L316</summary>
     /// <param name="sample">Samples from the distributions.</param>
     /// <param name="alpha">Concentration parameters of the distributions.</param>
     /// <param name="isLog">If set, compute the density of the log-probability instead of the probability.</param>
@@ -23407,7 +23315,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L96</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L96</summary>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="low">Lower bound of the distribution.</param>
     /// <param name="high">Upper bound of the distribution.</param>
@@ -23438,7 +23346,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L96</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L96</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="low">Lower bound of the distribution.</param>
@@ -23475,7 +23383,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L96</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L96</summary>
     /// <param name="low">Lower bound of the distribution.</param>
     /// <param name="high">Upper bound of the distribution.</param>
     /// <param name="shape">Shape of the output.</param>
@@ -23496,7 +23404,7 @@ type MX() =
     ///                                           [-1.23474145,  1.55807114]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L113</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L113</summary>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="loc">Mean of the distribution.</param>
     /// <param name="scale">Standard deviation of the distribution.</param>
@@ -23526,7 +23434,7 @@ type MX() =
     ///                                           [-1.23474145,  1.55807114]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L113</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L113</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="loc">Mean of the distribution.</param>
@@ -23562,7 +23470,7 @@ type MX() =
     ///                                           [-1.23474145,  1.55807114]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L113</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L113</summary>
     /// <param name="loc">Mean of the distribution.</param>
     /// <param name="scale">Standard deviation of the distribution.</param>
     /// <param name="shape">Shape of the output.</param>
@@ -23580,7 +23488,7 @@ type MX() =
     ///                                             [ 3.91697288,  3.65933681]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L125</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L125</summary>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="alpha">Alpha parameter (shape) of the gamma distribution.</param>
     /// <param name="beta">Beta parameter (scale) of the gamma distribution.</param>
@@ -23607,7 +23515,7 @@ type MX() =
     ///                                             [ 3.91697288,  3.65933681]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L125</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L125</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="alpha">Alpha parameter (shape) of the gamma distribution.</param>
@@ -23640,7 +23548,7 @@ type MX() =
     ///                                             [ 3.91697288,  3.65933681]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L125</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L125</summary>
     /// <param name="alpha">Alpha parameter (shape) of the gamma distribution.</param>
     /// <param name="beta">Beta parameter (scale) of the gamma distribution.</param>
     /// <param name="shape">Shape of the output.</param>
@@ -23658,7 +23566,7 @@ type MX() =
     ///                                       [ 0.04146638,  0.31715935]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L137</summary>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
     /// <param name="shape">Shape of the output.</param>
@@ -23680,7 +23588,7 @@ type MX() =
     ///                                       [ 0.04146638,  0.31715935]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L137</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
@@ -23707,7 +23615,7 @@ type MX() =
     ///                                       [ 0.04146638,  0.31715935]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L137</summary>
     /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
     /// <param name="shape">Shape of the output.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
@@ -23725,7 +23633,7 @@ type MX() =
     ///                                   [ 4.,  6.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L150</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L150</summary>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
     /// <param name="shape">Shape of the output.</param>
@@ -23748,7 +23656,7 @@ type MX() =
     ///                                   [ 4.,  6.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L150</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L150</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
@@ -23776,7 +23684,7 @@ type MX() =
     ///                                   [ 4.,  6.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L150</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L150</summary>
     /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
     /// <param name="shape">Shape of the output.</param>
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
@@ -23795,7 +23703,7 @@ type MX() =
     ///                                                  [ 2.,  5.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L164</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L164</summary>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="k">Limit of unsuccessful experiments.</param>
     /// <param name="p">Failure probability in each experiment.</param>
@@ -23824,7 +23732,7 @@ type MX() =
     ///                                                  [ 2.,  5.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L164</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L164</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="k">Limit of unsuccessful experiments.</param>
@@ -23859,7 +23767,7 @@ type MX() =
     ///                                                  [ 2.,  5.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L164</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L164</summary>
     /// <param name="k">Limit of unsuccessful experiments.</param>
     /// <param name="p">Failure probability in each experiment.</param>
     /// <param name="shape">Shape of the output.</param>
@@ -23880,7 +23788,7 @@ type MX() =
     ///                                                                     [ 6.,  4.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L179</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L179</summary>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="mu">Mean of the negative binomial distribution.</param>
     /// <param name="alpha">Alpha (dispersion) parameter of the negative binomial distribution.</param>
@@ -23910,7 +23818,7 @@ type MX() =
     ///                                                                     [ 6.,  4.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L179</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L179</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
     /// <param name="mu">Mean of the negative binomial distribution.</param>
@@ -23946,7 +23854,7 @@ type MX() =
     ///                                                                     [ 6.,  4.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L179</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L179</summary>
     /// <param name="mu">Mean of the negative binomial distribution.</param>
     /// <param name="alpha">Alpha (dispersion) parameter of the negative binomial distribution.</param>
     /// <param name="shape">Shape of the output.</param>
@@ -23966,7 +23874,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L194</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L194</summary>
     /// <param name="low">Lower bound of the distribution.</param>
     /// <param name="high">Upper bound of the distribution.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
@@ -23995,7 +23903,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L194</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L194</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="low">Lower bound of the distribution.</param>
     /// <param name="high">Upper bound of the distribution.</param>
@@ -24030,7 +23938,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L194</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L194</summary>
     /// <param name="low">Lower bound of the distribution.</param>
     /// <param name="high">Upper bound of the distribution.</param>
     /// <param name="shape">Shape of the output.</param>
@@ -24050,7 +23958,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L209</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L209</summary>
     /// <param name="data">The input</param>
     /// <param name="low">Lower bound of the distribution.</param>
     /// <param name="high">Upper bound of the distribution.</param>
@@ -24073,7 +23981,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L209</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L209</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="low">Lower bound of the distribution.</param>
@@ -24101,7 +24009,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L209</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L209</summary>
     /// <param name="data">The input</param>
     /// <param name="low">Lower bound of the distribution.</param>
     /// <param name="high">Upper bound of the distribution.</param>
@@ -24119,7 +24027,7 @@ type MX() =
     ///                                              [-1.23474145,  1.55807114]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L221</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L221</summary>
     /// <param name="data">The input</param>
     /// <param name="loc">Mean of the distribution.</param>
     /// <param name="scale">Standard deviation of the distribution.</param>
@@ -24141,7 +24049,7 @@ type MX() =
     ///                                              [-1.23474145,  1.55807114]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L221</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L221</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="loc">Mean of the distribution.</param>
@@ -24168,7 +24076,7 @@ type MX() =
     ///                                              [-1.23474145,  1.55807114]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L221</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L221</summary>
     /// <param name="data">The input</param>
     /// <param name="loc">Mean of the distribution.</param>
     /// <param name="scale">Standard deviation of the distribution.</param>
@@ -24185,7 +24093,7 @@ type MX() =
     ///                                                [ 3.91697288,  3.65933681]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L232</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L232</summary>
     /// <param name="data">The input</param>
     /// <param name="alpha">Alpha parameter (shape) of the gamma distribution.</param>
     /// <param name="beta">Beta parameter (scale) of the gamma distribution.</param>
@@ -24206,7 +24114,7 @@ type MX() =
     ///                                                [ 3.91697288,  3.65933681]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L232</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L232</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="alpha">Alpha parameter (shape) of the gamma distribution.</param>
@@ -24232,7 +24140,7 @@ type MX() =
     ///                                                [ 3.91697288,  3.65933681]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L232</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L232</summary>
     /// <param name="data">The input</param>
     /// <param name="alpha">Alpha parameter (shape) of the gamma distribution.</param>
     /// <param name="beta">Beta parameter (scale) of the gamma distribution.</param>
@@ -24249,7 +24157,7 @@ type MX() =
     ///                                          [ 0.04146638,  0.31715935]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L243</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L243</summary>
     /// <param name="data">The input</param>
     /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
     static member RandomExponentialLike(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] lam : float) =
@@ -24269,7 +24177,7 @@ type MX() =
     ///                                          [ 0.04146638,  0.31715935]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L243</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L243</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
@@ -24294,7 +24202,7 @@ type MX() =
     ///                                          [ 0.04146638,  0.31715935]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L243</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L243</summary>
     /// <param name="data">The input</param>
     /// <param name="lam">Lambda parameter (rate) of the exponential distribution.</param>
     static member RandomExponentialLike([<Optional>] ?data : Symbol, [<Optional>] ?lam : float) =
@@ -24311,7 +24219,7 @@ type MX() =
     ///                                      [ 4.,  6.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L255</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L255</summary>
     /// <param name="data">The input</param>
     /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
     static member RandomPoissonLike(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] lam : float) =
@@ -24332,7 +24240,7 @@ type MX() =
     ///                                      [ 4.,  6.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L255</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L255</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
@@ -24358,7 +24266,7 @@ type MX() =
     ///                                      [ 4.,  6.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L255</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L255</summary>
     /// <param name="data">The input</param>
     /// <param name="lam">Lambda parameter (rate) of the Poisson distribution.</param>
     static member RandomPoissonLike([<Optional>] ?data : Symbol, [<Optional>] ?lam : float) =
@@ -24376,7 +24284,7 @@ type MX() =
     ///                                                     [ 2.,  5.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L268</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L268</summary>
     /// <param name="data">The input</param>
     /// <param name="k">Limit of unsuccessful experiments.</param>
     /// <param name="p">Failure probability in each experiment.</param>
@@ -24399,7 +24307,7 @@ type MX() =
     ///                                                     [ 2.,  5.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L268</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L268</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="k">Limit of unsuccessful experiments.</param>
@@ -24427,7 +24335,7 @@ type MX() =
     ///                                                     [ 2.,  5.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L268</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L268</summary>
     /// <param name="data">The input</param>
     /// <param name="k">Limit of unsuccessful experiments.</param>
     /// <param name="p">Failure probability in each experiment.</param>
@@ -24448,7 +24356,7 @@ type MX() =
     ///                                                                        [ 6.,  4.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L284</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L284</summary>
     /// <param name="data">The input</param>
     /// <param name="mu">Mean of the negative binomial distribution.</param>
     /// <param name="alpha">Alpha (dispersion) parameter of the negative binomial distribution.</param>
@@ -24473,7 +24381,7 @@ type MX() =
     ///                                                                        [ 6.,  4.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L284</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L284</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="mu">Mean of the negative binomial distribution.</param>
@@ -24503,7 +24411,7 @@ type MX() =
     ///                                                                        [ 6.,  4.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\sample_op.cc:L284</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\sample_op.cc:L284</summary>
     /// <param name="data">The input</param>
     /// <param name="mu">Mean of the negative binomial distribution.</param>
     /// <param name="alpha">Alpha (dispersion) parameter of the negative binomial distribution.</param>
@@ -24580,7 +24488,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\unique_sample_op.cc:L66</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\unique_sample_op.cc:L66</summary>
     /// <param name="rangeMax">The number of possible classes.</param>
     /// <param name="shape">2-D shape of the output, where shape[0] is the batch size, and shape[1] is the number of candidates to sample for each batch.</param>
     static member SampleUniqueZipfianNDArray(rangeMax : int, [<Optional>] shape : int seq) =
@@ -24614,7 +24522,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\unique_sample_op.cc:L66</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\unique_sample_op.cc:L66</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="rangeMax">The number of possible classes.</param>
     /// <param name="shape">2-D shape of the output, where shape[0] is the batch size, and shape[1] is the number of candidates to sample for each batch.</param>
@@ -24653,7 +24561,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\random\unique_sample_op.cc:L66</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\random\unique_sample_op.cc:L66</summary>
     /// <param name="rangeMax">The number of possible classes.</param>
     /// <param name="shape">2-D shape of the output, where shape[0] is the batch size, and shape[1] is the number of candidates to sample for each batch.</param>
     static member SampleUniqueZipfian(rangeMax : int, [<Optional>] ?shape : int seq) =
@@ -24680,7 +24588,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\regression_output.cc:L92</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\regression_output.cc:L92</summary>
     /// <param name="data">Input data to the function.</param>
     /// <param name="label">Input label to the function.</param>
     /// <param name="gradScale">Scale the gradient by a float factor</param>
@@ -24712,7 +24620,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\regression_output.cc:L92</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\regression_output.cc:L92</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the function.</param>
     /// <param name="label">Input label to the function.</param>
@@ -24749,7 +24657,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\regression_output.cc:L92</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\regression_output.cc:L92</summary>
     /// <param name="data">Input data to the function.</param>
     /// <param name="label">Input label to the function.</param>
     /// <param name="gradScale">Scale the gradient by a float factor</param>
@@ -24779,7 +24687,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\regression_output.cc:L120</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\regression_output.cc:L120</summary>
     /// <param name="data">Input data to the function.</param>
     /// <param name="label">Input label to the function.</param>
     /// <param name="gradScale">Scale the gradient by a float factor</param>
@@ -24812,7 +24720,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\regression_output.cc:L120</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\regression_output.cc:L120</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the function.</param>
     /// <param name="label">Input label to the function.</param>
@@ -24850,7 +24758,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\regression_output.cc:L120</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\regression_output.cc:L120</summary>
     /// <param name="data">Input data to the function.</param>
     /// <param name="label">Input label to the function.</param>
     /// <param name="gradScale">Scale the gradient by a float factor</param>
@@ -24884,7 +24792,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\regression_output.cc:L152</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\regression_output.cc:L152</summary>
     /// <param name="data">Input data to the function.</param>
     /// <param name="label">Input label to the function.</param>
     /// <param name="gradScale">Scale the gradient by a float factor</param>
@@ -24921,7 +24829,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\regression_output.cc:L152</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\regression_output.cc:L152</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the function.</param>
     /// <param name="label">Input label to the function.</param>
@@ -24963,7 +24871,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\regression_output.cc:L152</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\regression_output.cc:L152</summary>
     /// <param name="data">Input data to the function.</param>
     /// <param name="label">Input label to the function.</param>
     /// <param name="gradScale">Scale the gradient by a float factor</param>
@@ -25026,7 +24934,7 @@ type MX() =
     ///             \end{array}
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\rnn.cc:L351</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L354</summary>
     /// <param name="data">Input data to RNN</param>
     /// <param name="parameters">Vector of all RNN trainable parameters concatenated</param>
     /// <param name="state">initial hidden state of the RNN</param>
@@ -25120,7 +25028,7 @@ type MX() =
     ///             \end{array}
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\rnn.cc:L351</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L354</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to RNN</param>
     /// <param name="parameters">Vector of all RNN trainable parameters concatenated</param>
@@ -25220,7 +25128,7 @@ type MX() =
     ///             \end{array}
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\rnn.cc:L351</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L354</summary>
     /// <param name="data">Input data to RNN</param>
     /// <param name="parameters">Vector of all RNN trainable parameters concatenated</param>
     /// <param name="state">initial hidden state of the RNN</param>
@@ -25294,7 +25202,7 @@ type MX() =
     ///             \end{array}
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\rnn.cc:L351</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L354</summary>
     /// <param name="stateSize">size of the state for each layer</param>
     /// <param name="numLayers">number of stacked layers</param>
     /// <param name="mode">the type of RNN to compute</param>
@@ -25360,7 +25268,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\roi_pooling.cc:L225</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\roi_pooling.cc:L225</summary>
     /// <param name="data">The input array to the pooling operator,  a 4D Feature maps </param>
     /// <param name="rois">Bounding box coordinates, a 2D array of [[batch_index, x1, y1, x2, y2]], where (x1, y1) and (x2, y2) are top left and bottom right corners of designated region of interest. `batch_index` indicates the index of corresponding image in the input array</param>
     /// <param name="pooledSize">ROI pooling output shape (h,w) </param>
@@ -25417,7 +25325,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\roi_pooling.cc:L225</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\roi_pooling.cc:L225</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array to the pooling operator,  a 4D Feature maps </param>
     /// <param name="rois">Bounding box coordinates, a 2D array of [[batch_index, x1, y1, x2, y2]], where (x1, y1) and (x2, y2) are top left and bottom right corners of designated region of interest. `batch_index` indicates the index of corresponding image in the input array</param>
@@ -25479,7 +25387,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\roi_pooling.cc:L225</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\roi_pooling.cc:L225</summary>
     /// <param name="data">The input array to the pooling operator,  a 4D Feature maps </param>
     /// <param name="rois">Bounding box coordinates, a 2D array of [[batch_index, x1, y1, x2, y2]], where (x1, y1) and (x2, y2) are top left and bottom right corners of designated region of interest. `batch_index` indicates the index of corresponding image in the input array</param>
     /// <param name="pooledSize">ROI pooling output shape (h,w) </param>
@@ -25531,7 +25439,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\roi_pooling.cc:L225</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\roi_pooling.cc:L225</summary>
     /// <param name="pooledSize">ROI pooling output shape (h,w) </param>
     /// <param name="spatialScale">Ratio of input feature map height (or w) to raw image height (or w). Equals the reciprocal of total stride in convolutional layers</param>
     /// <param name="data">The input array to the pooling operator,  a 4D Feature maps </param>
@@ -25607,7 +25515,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\sequence_mask.cc:L186</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\sequence_mask.cc:L186</summary>
     /// <param name="data">n-dimensional input array of the form [max_sequence_length, batch_size, other_feature_dims] where n&gt;2</param>
     /// <param name="sequenceLength">vector of sequence lengths of the form [batch_size]</param>
     /// <param name="useSequenceLength">If set to true, this layer takes in an extra input parameter `sequence_length` to specify variable length sequence</param>
@@ -25692,7 +25600,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\sequence_mask.cc:L186</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\sequence_mask.cc:L186</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">n-dimensional input array of the form [max_sequence_length, batch_size, other_feature_dims] where n&gt;2</param>
     /// <param name="sequenceLength">vector of sequence lengths of the form [batch_size]</param>
@@ -25783,7 +25691,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\sequence_mask.cc:L186</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\sequence_mask.cc:L186</summary>
     /// <param name="data">n-dimensional input array of the form [max_sequence_length, batch_size, other_feature_dims] where n&gt;2</param>
     /// <param name="sequenceLength">vector of sequence lengths of the form [batch_size]</param>
     /// <param name="useSequenceLength">If set to true, this layer takes in an extra input parameter `sequence_length` to specify variable length sequence</param>
@@ -25852,7 +25760,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\slice_channel.cc:L107</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\slice_channel.cc:L107</summary>
     /// <param name="data">The input</param>
     /// <param name="numOutputs">Number of splits. Note that this should evenly divide the length of the `axis`.</param>
     /// <param name="axis">Axis along which to split.</param>
@@ -25924,7 +25832,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\slice_channel.cc:L107</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\slice_channel.cc:L107</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="numOutputs">Number of splits. Note that this should evenly divide the length of the `axis`.</param>
@@ -26001,7 +25909,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\slice_channel.cc:L107</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\slice_channel.cc:L107</summary>
     /// <param name="data">The input</param>
     /// <param name="numOutputs">Number of splits. Note that this should evenly divide the length of the `axis`.</param>
     /// <param name="axis">Axis along which to split.</param>
@@ -26068,7 +25976,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\slice_channel.cc:L107</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\slice_channel.cc:L107</summary>
     /// <param name="numOutputs">Number of splits. Note that this should evenly divide the length of the `axis`.</param>
     /// <param name="data">The input</param>
     /// <param name="axis">Axis along which to split.</param>
@@ -26153,7 +26061,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\softmax_output.cc:L231</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\softmax_output.cc:L231</summary>
     /// <param name="data">Input array.</param>
     /// <param name="label">Ground truth label.</param>
     /// <param name="gradScale">Scales the gradient by a float factor.</param>
@@ -26257,7 +26165,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\softmax_output.cc:L231</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\softmax_output.cc:L231</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input array.</param>
     /// <param name="label">Ground truth label.</param>
@@ -26367,7 +26275,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\softmax_output.cc:L231</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\softmax_output.cc:L231</summary>
     /// <param name="data">Input array.</param>
     /// <param name="label">Ground truth label.</param>
     /// <param name="gradScale">Scales the gradient by a float factor.</param>
@@ -26381,68 +26289,6 @@ type MX() =
     static member SoftmaxOutput([<Optional>] ?data : Symbol, [<Optional>] ?label : Symbol, [<Optional>] ?gradScale : float, [<Optional>] ?ignoreLabel : float, [<Optional>] ?multiOutput : bool, [<Optional>] ?useIgnore : bool, [<Optional>] ?preserveShape : bool, [<Optional>] ?normalization : Normalization, [<Optional>] ?outGrad : bool, [<Optional>] ?smoothAlpha : float) =
         SoftmaxOutput(?data = data, ?label = label, ?gradScale = gradScale, ?ignoreLabel = ignoreLabel, ?multiOutput = multiOutput, ?useIgnore = useIgnore, ?preserveShape = preserveShape, ?normalization = normalization, ?outGrad = outGrad, ?smoothAlpha = smoothAlpha)
 
-
-    /// <summary>_sg_mkldnn_conv
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\subgraph\mkldnn\mkldnn_conv.cc:L773</summary>
-    static member SgMkldnnConvNDArray() =
-        let creator = AtomicSymbolCreator.FromName "_sg_mkldnn_conv"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 Array.empty
-                                                 Array.empty
-                                                 Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>_sg_mkldnn_conv
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\subgraph\mkldnn\mkldnn_conv.cc:L773</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    static member SgMkldnnConv(outputArray : NDArray seq) =
-        let creator = AtomicSymbolCreator.FromName "_sg_mkldnn_conv"
-        let names = Array.empty
-        let vals = Array.empty
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>_sg_mkldnn_conv
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\subgraph\mkldnn\mkldnn_conv.cc:L773</summary>
-    static member SgMkldnnConv() =
-        SgMkldnnConv()
-
-    /// <summary>_sg_mkldnn_fully_connected
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\subgraph\mkldnn\mkldnn_fc.cc:L452</summary>
-    static member SgMkldnnFullyConnectedNDArray() =
-        let creator = AtomicSymbolCreator.FromName "_sg_mkldnn_fully_connected"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 Array.empty
-                                                 Array.empty
-                                                 Array.empty
-        outputs |> Array.map (fun h -> new NDArray(h))
-    /// <summary>_sg_mkldnn_fully_connected
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\subgraph\mkldnn\mkldnn_fc.cc:L452</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    static member SgMkldnnFullyConnected(outputArray : NDArray seq) =
-        let creator = AtomicSymbolCreator.FromName "_sg_mkldnn_fully_connected"
-        let names = Array.empty
-        let vals = Array.empty
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     Array.empty
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>_sg_mkldnn_fully_connected
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\subgraph\mkldnn\mkldnn_fc.cc:L452</summary>
-    static member SgMkldnnFullyConnected() =
-        SgMkldnnFullyConnected()
 
     /// <summary>Interchanges two axes of an array.
     /// 
@@ -26464,7 +26310,7 @@ type MX() =
     ///                        [ 3, 7]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\swapaxis.cc:L70</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\swapaxis.cc:L70</summary>
     /// <param name="data">Input array.</param>
     /// <param name="dim1">the first axis to be swapped.</param>
     /// <param name="dim2">the second axis to be swapped.</param>
@@ -26495,7 +26341,7 @@ type MX() =
     ///                        [ 3, 7]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\swapaxis.cc:L70</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\swapaxis.cc:L70</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input array.</param>
     /// <param name="dim1">the first axis to be swapped.</param>
@@ -26531,7 +26377,7 @@ type MX() =
     ///                        [ 3, 7]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\swapaxis.cc:L70</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\swapaxis.cc:L70</summary>
     /// <param name="data">Input array.</param>
     /// <param name="dim1">the first axis to be swapped.</param>
     /// <param name="dim2">the second axis to be swapped.</param>
@@ -26543,7 +26389,7 @@ type MX() =
     /// It casts only between low precision float/FP32 and does not do anything for other types.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
     static member AmpCast(data : NDArray, dtype : DataType) =
@@ -26558,7 +26404,7 @@ type MX() =
     /// It casts only between low precision float/FP32 and does not do anything for other types.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
@@ -26578,7 +26424,7 @@ type MX() =
     /// It casts only between low precision float/FP32 and does not do anything for other types.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
     static member AmpCast(data : Symbol, dtype : DataType) =
@@ -26588,7 +26434,7 @@ type MX() =
     /// It casts only between low precision float/FP32 and does not do anything for other types.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
     /// <param name="dtype">Output data type.</param>
     /// <param name="data">The input.</param>
     static member AmpCast(dtype : DataType, [<Optional>] ?data : Symbol) =
@@ -26601,7 +26447,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
     /// <param name="data">Weights</param>
     /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
     /// <param name="castNarrow">Whether to cast to the narrowest type</param>
@@ -26618,7 +26464,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Weights</param>
     /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
@@ -26640,7 +26486,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
     /// <param name="data">Weights</param>
     /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
     /// <param name="castNarrow">Whether to cast to the narrowest type</param>
@@ -26652,7 +26498,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
     /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
     /// <param name="data">Weights</param>
     /// <param name="castNarrow">Whether to cast to the narrowest type</param>
@@ -26662,7 +26508,7 @@ type MX() =
 
     /// <summary>Computes the max of array elements over given axes.
     /// 
-    /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L32</summary>
+    /// Defined in c:\jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L32</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -26689,7 +26535,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Computes the max of array elements over given axes.
     /// 
-    /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L32</summary>
+    /// Defined in c:\jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L32</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
@@ -26721,7 +26567,7 @@ type MX() =
         ()
     /// <summary>Computes the max of array elements over given axes.
     /// 
-    /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L32</summary>
+    /// Defined in c:\jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L32</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -26745,7 +26591,7 @@ type MX() =
 
     /// <summary>Computes the min of array elements over given axes.
     /// 
-    /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L47</summary>
+    /// Defined in c:\jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L47</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -26772,7 +26618,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Computes the min of array elements over given axes.
     /// 
-    /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L47</summary>
+    /// Defined in c:\jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L47</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
@@ -26804,7 +26650,7 @@ type MX() =
         ()
     /// <summary>Computes the min of array elements over given axes.
     /// 
-    /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L47</summary>
+    /// Defined in c:\jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L47</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -26855,7 +26701,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_norm_value.cc:L89</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_norm_value.cc:L89</summary>
     /// <param name="data">The input</param>
     /// <param name="ord">Order of the norm. Currently ord=1 and ord=2 is supported.</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
@@ -26906,7 +26752,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_norm_value.cc:L89</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_norm_value.cc:L89</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="ord">Order of the norm. Currently ord=1 and ord=2 is supported.</param>
@@ -26963,7 +26809,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_norm_value.cc:L89</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_norm_value.cc:L89</summary>
     /// <param name="data">The input</param>
     /// <param name="ord">Order of the norm. Currently ord=1 and ord=2 is supported.</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
@@ -27000,7 +26846,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L52</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L52</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
@@ -27033,7 +26879,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L52</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L52</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
@@ -27071,7 +26917,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L52</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L52</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
@@ -27100,7 +26946,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L77</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L77</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
@@ -27133,7 +26979,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L77</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L77</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
@@ -27171,7 +27017,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L77</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L77</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axis is left in the result as dimension with size one.</param>
@@ -27194,7 +27040,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L97</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L97</summary>
     /// <param name="data">The input array</param>
     static member ArgmaxChannel(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "argmax_channel"
@@ -27219,7 +27065,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L97</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L97</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array</param>
     static member ArgmaxChannel(outputArray : NDArray seq, data : NDArray) =
@@ -27249,7 +27095,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L97</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L97</summary>
     /// <param name="data">The input array</param>
     static member ArgmaxChannel([<Optional>] ?data : Symbol) =
         ArgmaxChannel(?data = data)
@@ -27297,7 +27143,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L155</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L155</summary>
     /// <param name="data">The input array</param>
     /// <param name="index">The index array</param>
     /// <param name="axis">int or None. The axis to picking the elements. Negative values means indexing from right to left. If is `None`, the elements in the index w.r.t the flattened input will be picked.</param>
@@ -27357,7 +27203,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L155</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L155</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array</param>
     /// <param name="index">The index array</param>
@@ -27423,7 +27269,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L155</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L155</summary>
     /// <param name="data">The input array</param>
     /// <param name="index">The index array</param>
     /// <param name="axis">int or None. The axis to picking the elements. Negative values means indexing from right to left. If is `None`, the elements in the index w.r.t the flattened input will be picked.</param>
@@ -27456,7 +27302,7 @@ type MX() =
     ///                                                  [ 2.,  2.,  2.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L58</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axes to perform the broadcasting.</param>
     /// <param name="size">Target sizes of the broadcasting axes.</param>
@@ -27490,7 +27336,7 @@ type MX() =
     ///                                                  [ 2.,  2.,  2.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L58</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="axis">The axes to perform the broadcasting.</param>
@@ -27529,7 +27375,7 @@ type MX() =
     ///                                                  [ 2.,  2.,  2.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L58</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axes to perform the broadcasting.</param>
     /// <param name="size">Target sizes of the broadcasting axes.</param>
@@ -27555,7 +27401,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L82</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L82</summary>
     /// <param name="data">The input</param>
     /// <param name="shape">The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.</param>
     static member BroadcastTo(data : NDArray, [<Optional>] shape : int seq) =
@@ -27584,7 +27430,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L82</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L82</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="shape">The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.</param>
@@ -27618,7 +27464,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L82</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L82</summary>
     /// <param name="data">The input</param>
     /// <param name="shape">The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.</param>
     static member BroadcastTo([<Optional>] ?data : Symbol, [<Optional>] ?shape : int seq) =
@@ -27664,7 +27510,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L135</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L135</summary>
     /// <param name="lhs">First input.</param>
     /// <param name="rhs">Second input.</param>
     /// <param name="lhsAxes">Axes to perform broadcast on in the first input array</param>
@@ -27694,7 +27540,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L135</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L135</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input.</param>
     /// <param name="rhs">Second input.</param>
@@ -27729,7 +27575,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L135</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L135</summary>
     /// <param name="lhs">First input.</param>
     /// <param name="rhs">Second input.</param>
     /// <param name="lhsAxes">Axes to perform broadcast on in the first input array</param>
@@ -27739,7 +27585,7 @@ type MX() =
 
     /// <summary>Computes the product of array elements over given axes.
     /// 
-    /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L31</summary>
+    /// Defined in c:\jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L31</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -27766,7 +27612,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Computes the product of array elements over given axes.
     /// 
-    /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L31</summary>
+    /// Defined in c:\jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L31</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
@@ -27798,7 +27644,7 @@ type MX() =
         ()
     /// <summary>Computes the product of array elements over given axes.
     /// 
-    /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L31</summary>
+    /// Defined in c:\jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L31</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -27824,7 +27670,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_prod_value.cc:L47</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_prod_value.cc:L47</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -27853,7 +27699,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_prod_value.cc:L47</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_prod_value.cc:L47</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
@@ -27887,7 +27733,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_prod_value.cc:L47</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_prod_value.cc:L47</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -27945,7 +27791,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_sum_value.cc:L67</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_sum_value.cc:L67</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -28006,7 +27852,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_sum_value.cc:L67</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_sum_value.cc:L67</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
@@ -28072,7 +27918,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_sum_value.cc:L67</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_sum_value.cc:L67</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -28096,7 +27942,7 @@ type MX() =
 
     /// <summary>Computes the mean of array elements over given axes.
     /// 
-    /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L84</summary>
+    /// Defined in c:\jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L84</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -28123,7 +27969,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Computes the mean of array elements over given axes.
     /// 
-    /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L84</summary>
+    /// Defined in c:\jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L84</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
@@ -28155,7 +28001,7 @@ type MX() =
         ()
     /// <summary>Computes the mean of array elements over given axes.
     /// 
-    /// Defined in c:\jenkins\workspace\mxnet\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L84</summary>
+    /// Defined in c:\jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\./broadcast_reduce_op.h:L84</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -28181,7 +28027,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_sum_value.cc:L102</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_sum_value.cc:L102</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -28210,7 +28056,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_sum_value.cc:L102</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_sum_value.cc:L102</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
@@ -28244,7 +28090,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\broadcast_reduce_sum_value.cc:L102</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_sum_value.cc:L102</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -28304,7 +28150,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\cast_storage.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\cast_storage.cc:L71</summary>
     /// <param name="data">The input.</param>
     /// <param name="stype">Output storage type.</param>
     static member CastStorage(data : NDArray, stype : StorageType) =
@@ -28352,7 +28198,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\cast_storage.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\cast_storage.cc:L71</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="stype">Output storage type.</param>
@@ -28405,7 +28251,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\cast_storage.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\cast_storage.cc:L71</summary>
     /// <param name="data">The input.</param>
     /// <param name="stype">Output storage type.</param>
     static member CastStorage(data : Symbol, stype : StorageType) =
@@ -28448,7 +28294,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\cast_storage.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\cast_storage.cc:L71</summary>
     /// <param name="stype">Output storage type.</param>
     /// <param name="data">The input.</param>
     static member CastStorage(stype : StorageType, [<Optional>] ?data : Symbol) =
@@ -28481,7 +28327,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\control_flow_op.cc:L57</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\control_flow_op.cc:L57</summary>
     /// <param name="condition">condition array</param>
     /// <param name="x"></param>
     /// <param name="y"></param>
@@ -28519,7 +28365,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\control_flow_op.cc:L57</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\control_flow_op.cc:L57</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="condition">condition array</param>
     /// <param name="x"></param>
@@ -28562,7 +28408,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\control_flow_op.cc:L57</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\control_flow_op.cc:L57</summary>
     /// <param name="condition">condition array</param>
     /// <param name="x"></param>
     /// <param name="y"></param>
@@ -28624,7 +28470,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\diag_op.cc:L87</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\diag_op.cc:L87</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. If input has shape (S0 S1) k must be between -S0 and S1</param>
     /// <param name="axis1">The first axis of the sub-arrays of interest. Ignored when the input is a 1-D array.</param>
@@ -28690,7 +28536,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\diag_op.cc:L87</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\diag_op.cc:L87</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. If input has shape (S0 S1) k must be between -S0 and S1</param>
@@ -28761,7 +28607,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\diag_op.cc:L87</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\diag_op.cc:L87</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. If input has shape (S0 S1) k must be between -S0 and S1</param>
     /// <param name="axis1">The first axis of the sub-arrays of interest. Ignored when the input is a 1-D array.</param>
@@ -28816,7 +28662,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\dot.cc:L77</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\dot.cc:L77</summary>
     /// <param name="lhs">The first input</param>
     /// <param name="rhs">The second input</param>
     /// <param name="transposeA">If true then transpose the first input before dot.</param>
@@ -28879,7 +28725,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\dot.cc:L77</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\dot.cc:L77</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">The first input</param>
     /// <param name="rhs">The second input</param>
@@ -28948,7 +28794,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\dot.cc:L77</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\dot.cc:L77</summary>
     /// <param name="lhs">The first input</param>
     /// <param name="rhs">The second input</param>
     /// <param name="transposeA">If true then transpose the first input before dot.</param>
@@ -28971,7 +28817,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\dot.cc:L127</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\dot.cc:L127</summary>
     /// <param name="lhs">The first input</param>
     /// <param name="rhs">The second input</param>
     /// <param name="transposeA">If true then transpose the first input before dot.</param>
@@ -29001,7 +28847,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\dot.cc:L127</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\dot.cc:L127</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">The first input</param>
     /// <param name="rhs">The second input</param>
@@ -29037,7 +28883,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\dot.cc:L127</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\dot.cc:L127</summary>
     /// <param name="lhs">The first input</param>
     /// <param name="rhs">The second input</param>
     /// <param name="transposeA">If true then transpose the first input before dot.</param>
@@ -29071,7 +28917,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L58</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastAdd(lhs : NDArray, rhs : NDArray) =
@@ -29106,7 +28952,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L58</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -29146,7 +28992,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L58</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastAdd([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -29178,7 +29024,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L106</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L106</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastSub(lhs : NDArray, rhs : NDArray) =
@@ -29213,7 +29059,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L106</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L106</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -29253,7 +29099,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L106</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L106</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastSub([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -29279,7 +29125,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L146</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L146</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastMul(lhs : NDArray, rhs : NDArray) =
@@ -29308,7 +29154,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L146</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L146</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -29342,7 +29188,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L146</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L146</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastMul([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -29368,7 +29214,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L187</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L187</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastDiv(lhs : NDArray, rhs : NDArray) =
@@ -29397,7 +29243,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L187</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L187</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -29431,7 +29277,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L187</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L187</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastDiv([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -29453,7 +29299,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L222</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L222</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastMod(lhs : NDArray, rhs : NDArray) =
@@ -29478,7 +29324,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L222</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L222</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -29508,7 +29354,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L222</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_basic.cc:L222</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastMod([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -29530,7 +29376,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L45</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L45</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastPower(lhs : NDArray, rhs : NDArray) =
@@ -29555,7 +29401,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L45</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L45</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -29585,7 +29431,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L45</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L45</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastPower([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -29609,7 +29455,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L81</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L81</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastMaximum(lhs : NDArray, rhs : NDArray) =
@@ -29636,7 +29482,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L81</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L81</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -29668,7 +29514,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L81</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L81</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastMaximum([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -29692,7 +29538,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L117</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L117</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastMinimum(lhs : NDArray, rhs : NDArray) =
@@ -29719,7 +29565,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L117</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L117</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -29751,7 +29597,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L117</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L117</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastMinimum([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -29781,7 +29627,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L158</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L158</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastHypot(lhs : NDArray, rhs : NDArray) =
@@ -29814,7 +29660,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L158</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L158</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -29852,7 +29698,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L158</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_extended.cc:L158</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastHypot([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -29874,7 +29720,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L46</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L46</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastEqual(lhs : NDArray, rhs : NDArray) =
@@ -29899,7 +29745,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L46</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L46</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -29929,7 +29775,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L46</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L46</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastEqual([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -29950,7 +29796,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L64</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L64</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastNotEqual(lhs : NDArray, rhs : NDArray) =
@@ -29975,7 +29821,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L64</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L64</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -30005,7 +29851,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L64</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L64</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastNotEqual([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -30026,7 +29872,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L82</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L82</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastGreater(lhs : NDArray, rhs : NDArray) =
@@ -30051,7 +29897,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L82</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L82</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -30081,7 +29927,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L82</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L82</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastGreater([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -30102,7 +29948,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L100</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L100</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastGreaterEqual(lhs : NDArray, rhs : NDArray) =
@@ -30127,7 +29973,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L100</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L100</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -30157,7 +30003,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L100</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L100</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastGreaterEqual([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -30178,7 +30024,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L118</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L118</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastLesser(lhs : NDArray, rhs : NDArray) =
@@ -30203,7 +30049,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L118</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L118</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -30233,7 +30079,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L118</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L118</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastLesser([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -30254,7 +30100,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L136</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L136</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastLesserEqual(lhs : NDArray, rhs : NDArray) =
@@ -30279,7 +30125,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L136</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L136</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -30309,7 +30155,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L136</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L136</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastLesserEqual([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -30330,7 +30176,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L154</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L154</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastLogicalAnd(lhs : NDArray, rhs : NDArray) =
@@ -30355,7 +30201,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L154</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L154</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -30385,7 +30231,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L154</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L154</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastLogicalAnd([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -30406,7 +30252,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L172</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L172</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastLogicalOr(lhs : NDArray, rhs : NDArray) =
@@ -30431,7 +30277,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L172</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L172</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -30461,7 +30307,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L172</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L172</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastLogicalOr([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -30482,7 +30328,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L190</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L190</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastLogicalXor(lhs : NDArray, rhs : NDArray) =
@@ -30507,7 +30353,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L190</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L190</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -30537,7 +30383,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L190</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_broadcast_op_logic.cc:L190</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member BroadcastLogicalXor([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -30936,7 +30782,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_op_extended.cc:L79</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_op_extended.cc:L79</summary>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     static member Hypot(lhs : NDArray, rhs : NDArray) =
@@ -30950,7 +30796,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_op_extended.cc:L79</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_op_extended.cc:L79</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
@@ -30969,7 +30815,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_op_extended.cc:L79</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_op_extended.cc:L79</summary>
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     static member Hypot([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -31334,7 +31180,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L149</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L149</summary>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     static member MulScalar(data : NDArray, scalar : float) =
@@ -31354,7 +31200,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L149</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L149</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -31379,7 +31225,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L149</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L149</summary>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     static member MulScalar(data : Symbol, scalar : float) =
@@ -31394,7 +31240,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L149</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L149</summary>
     /// <param name="scalar">scalar input</param>
     /// <param name="data">source input</param>
     static member MulScalar(scalar : float, [<Optional>] ?data : Symbol) =
@@ -31411,7 +31257,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L171</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L171</summary>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     static member DivScalar(data : NDArray, scalar : float) =
@@ -31431,7 +31277,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L171</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L171</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -31456,7 +31302,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L171</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L171</summary>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     static member DivScalar(data : Symbol, scalar : float) =
@@ -31471,7 +31317,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L171</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L171</summary>
     /// <param name="scalar">scalar input</param>
     /// <param name="data">source input</param>
     static member DivScalar(scalar : float, [<Optional>] ?data : Symbol) =
@@ -31761,7 +31607,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L108</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L108</summary>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     static member SmoothL1(data : NDArray, scalar : float) =
@@ -31790,7 +31636,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L108</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L108</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -31824,7 +31670,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L108</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L108</summary>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     static member SmoothL1(data : Symbol, scalar : float) =
@@ -31848,7 +31694,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L108</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L108</summary>
     /// <param name="scalar">scalar input</param>
     /// <param name="data">source input</param>
     static member SmoothL1(scalar : float, [<Optional>] ?data : Symbol) =
@@ -32386,7 +32232,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_sum.cc:L155</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_sum.cc:L155</summary>
     /// <param name="args">Positional input arguments</param>
     static member AddN([<ParamArray>] args : NDArray[]) =
         let creator = AtomicSymbolCreator.FromName "add_n"
@@ -32411,7 +32257,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_sum.cc:L155</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_sum.cc:L155</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="args">Positional input arguments</param>
     static member AddN(outputArray : NDArray seq, [<ParamArray>] args : NDArray[]) =
@@ -32441,7 +32287,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_sum.cc:L155</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_sum.cc:L155</summary>
     /// <param name="args">Positional input arguments</param>
     static member AddN([<ParamArray>] args : Symbol[]) =
         AddN(args)
@@ -32459,7 +32305,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L85</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L85</summary>
     /// <param name="data">The input array.</param>
     static member Relu(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "relu"
@@ -32481,7 +32327,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L85</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L85</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Relu(outputArray : NDArray seq, data : NDArray) =
@@ -32508,7 +32354,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L85</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L85</summary>
     /// <param name="data">The input array.</param>
     static member Relu([<Optional>] ?data : Symbol) =
         Relu(?data = data)
@@ -32523,7 +32369,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L119</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L119</summary>
     /// <param name="data">The input array.</param>
     static member Sigmoid(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "sigmoid"
@@ -32541,7 +32387,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L119</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L119</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Sigmoid(outputArray : NDArray seq, data : NDArray) =
@@ -32564,7 +32410,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L119</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L119</summary>
     /// <param name="data">The input array.</param>
     static member Sigmoid([<Optional>] ?data : Symbol) =
         Sigmoid(?data = data)
@@ -32577,7 +32423,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L161</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L161</summary>
     /// <param name="data">The input array.</param>
     /// <param name="alpha">Slope of hard sigmoid</param>
     /// <param name="beta">Bias of hard sigmoid.</param>
@@ -32595,7 +32441,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L161</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L161</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     /// <param name="alpha">Slope of hard sigmoid</param>
@@ -32618,7 +32464,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L161</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L161</summary>
     /// <param name="data">The input array.</param>
     /// <param name="alpha">Slope of hard sigmoid</param>
     /// <param name="beta">Bias of hard sigmoid.</param>
@@ -32635,7 +32481,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L191</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L191</summary>
     /// <param name="data">The input array.</param>
     static member Softsign(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "softsign"
@@ -32653,7 +32499,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L191</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L191</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Softsign(outputArray : NDArray seq, data : NDArray) =
@@ -32676,7 +32522,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L191</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L191</summary>
     /// <param name="data">The input array.</param>
     static member Softsign([<Optional>] ?data : Symbol) =
         Softsign(?data = data)
@@ -32684,7 +32530,7 @@ type MX() =
 
     /// <summary>Returns a copy of the input.
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:246</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:246</summary>
     /// <param name="data">The input array.</param>
     static member Copy(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_copy"
@@ -32695,7 +32541,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Returns a copy of the input.
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:246</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:246</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Copy(outputArray : NDArray seq, data : NDArray) =
@@ -32711,7 +32557,7 @@ type MX() =
         ()
     /// <summary>Returns a copy of the input.
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:246</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:246</summary>
     /// <param name="data">The input array.</param>
     static member Copy([<Optional>] ?data : Symbol) =
         Copy(?data = data)
@@ -32745,7 +32591,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L327</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L327</summary>
     /// <param name="data">The input array.</param>
     static member BlockGrad(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "BlockGrad"
@@ -32781,7 +32627,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L327</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L327</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member BlockGrad(outputArray : NDArray seq, data : NDArray) =
@@ -32822,7 +32668,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L327</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L327</summary>
     /// <param name="data">The input array.</param>
     static member BlockGrad([<Optional>] ?data : Symbol) =
         BlockGrad(?data = data)
@@ -32850,7 +32696,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L360</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L360</summary>
     /// <param name="data">The input array.</param>
     static member MakeLoss(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "make_loss"
@@ -32882,7 +32728,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L360</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L360</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member MakeLoss(outputArray : NDArray seq, data : NDArray) =
@@ -32919,7 +32765,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L360</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L360</summary>
     /// <param name="data">The input array.</param>
     static member MakeLoss([<Optional>] ?data : Symbol) =
         MakeLoss(?data = data)
@@ -32979,7 +32825,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L513</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L513</summary>
     /// <param name="lhs">First input.</param>
     /// <param name="rhs">Second input.</param>
     /// <param name="lhsBegin">Defaults to 0. The beginning index along which the lhs dimensions are to be reshaped. Supports negative indices.</param>
@@ -33025,7 +32871,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L513</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L513</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input.</param>
     /// <param name="rhs">Second input.</param>
@@ -33077,7 +32923,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L513</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L513</summary>
     /// <param name="lhs">First input.</param>
     /// <param name="rhs">Second input.</param>
     /// <param name="lhsBegin">Defaults to 0. The beginning index along which the lhs dimensions are to be reshaped. Supports negative indices.</param>
@@ -33095,7 +32941,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L574</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L574</summary>
     /// <param name="data">Input Array.</param>
     static member ShapeArray(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "shape_array"
@@ -33112,7 +32958,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L574</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L574</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input Array.</param>
     static member ShapeArray(outputArray : NDArray seq, data : NDArray) =
@@ -33134,7 +32980,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L574</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L574</summary>
     /// <param name="data">Input Array.</param>
     static member ShapeArray([<Optional>] ?data : Symbol) =
         ShapeArray(?data = data)
@@ -33147,7 +32993,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L625</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L625</summary>
     /// <param name="data">Input Array.</param>
     static member SizeArray(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "size_array"
@@ -33164,7 +33010,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L625</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L625</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input Array.</param>
     static member SizeArray(outputArray : NDArray seq, data : NDArray) =
@@ -33186,7 +33032,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L625</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L625</summary>
     /// <param name="data">Input Array.</param>
     static member SizeArray([<Optional>] ?data : Symbol) =
         SizeArray(?data = data)
@@ -33203,7 +33049,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
     static member Cast(data : NDArray, dtype : DataType) =
@@ -33225,7 +33071,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
@@ -33252,7 +33098,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
     static member Cast(data : Symbol, dtype : DataType) =
@@ -33269,7 +33115,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
     /// <param name="dtype">Output data type.</param>
     /// <param name="data">The input.</param>
     static member Cast(dtype : DataType, [<Optional>] ?data : Symbol) =
@@ -33342,7 +33188,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L721</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L721</summary>
     /// <param name="data">The input array.</param>
     static member Abs(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "abs"
@@ -33365,7 +33211,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L721</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L721</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Abs(outputArray : NDArray seq, data : NDArray) =
@@ -33393,7 +33239,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L721</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L721</summary>
     /// <param name="data">The input array.</param>
     static member Abs([<Optional>] ?data : Symbol) =
         Abs(?data = data)
@@ -33413,7 +33259,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L759</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L759</summary>
     /// <param name="data">The input array.</param>
     static member Sign(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "sign"
@@ -33436,7 +33282,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L759</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L759</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Sign(outputArray : NDArray seq, data : NDArray) =
@@ -33464,7 +33310,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L759</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L759</summary>
     /// <param name="data">The input array.</param>
     static member Sign([<Optional>] ?data : Symbol) =
         Sign(?data = data)
@@ -33484,7 +33330,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L778</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L778</summary>
     /// <param name="data">The input array.</param>
     static member Round(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "round"
@@ -33507,7 +33353,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L778</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L778</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Round(outputArray : NDArray seq, data : NDArray) =
@@ -33535,7 +33381,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L778</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L778</summary>
     /// <param name="data">The input array.</param>
     static member Round([<Optional>] ?data : Symbol) =
         Round(?data = data)
@@ -33558,7 +33404,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L799</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L799</summary>
     /// <param name="data">The input array.</param>
     static member Rint(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "rint"
@@ -33585,7 +33431,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L799</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L799</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Rint(outputArray : NDArray seq, data : NDArray) =
@@ -33617,7 +33463,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L799</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L799</summary>
     /// <param name="data">The input array.</param>
     static member Rint([<Optional>] ?data : Symbol) =
         Rint(?data = data)
@@ -33638,7 +33484,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L818</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L818</summary>
     /// <param name="data">The input array.</param>
     static member Ceil(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "ceil"
@@ -33663,7 +33509,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L818</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L818</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Ceil(outputArray : NDArray seq, data : NDArray) =
@@ -33693,7 +33539,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L818</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L818</summary>
     /// <param name="data">The input array.</param>
     static member Ceil([<Optional>] ?data : Symbol) =
         Ceil(?data = data)
@@ -33714,7 +33560,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L837</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L837</summary>
     /// <param name="data">The input array.</param>
     static member Floor(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "floor"
@@ -33739,7 +33585,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L837</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L837</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Floor(outputArray : NDArray seq, data : NDArray) =
@@ -33769,7 +33615,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L837</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L837</summary>
     /// <param name="data">The input array.</param>
     static member Floor([<Optional>] ?data : Symbol) =
         Floor(?data = data)
@@ -33791,7 +33637,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L857</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L857</summary>
     /// <param name="data">The input array.</param>
     static member Trunc(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "trunc"
@@ -33817,7 +33663,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L857</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L857</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Trunc(outputArray : NDArray seq, data : NDArray) =
@@ -33848,7 +33694,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L857</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L857</summary>
     /// <param name="data">The input array.</param>
     static member Trunc([<Optional>] ?data : Symbol) =
         Trunc(?data = data)
@@ -33868,7 +33714,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L875</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L875</summary>
     /// <param name="data">The input array.</param>
     static member Fix(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "fix"
@@ -33892,7 +33738,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L875</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L875</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Fix(outputArray : NDArray seq, data : NDArray) =
@@ -33921,7 +33767,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L875</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L875</summary>
     /// <param name="data">The input array.</param>
     static member Fix([<Optional>] ?data : Symbol) =
         Fix(?data = data)
@@ -33934,7 +33780,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L887</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L886</summary>
     /// <param name="data">The input array.</param>
     static member Erf(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "erf"
@@ -33951,7 +33797,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L887</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L886</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Erf(outputArray : NDArray seq, data : NDArray) =
@@ -33973,7 +33819,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L887</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L886</summary>
     /// <param name="data">The input array.</param>
     static member Erf([<Optional>] ?data : Symbol) =
         Erf(?data = data)
@@ -33987,7 +33833,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L909</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L907</summary>
     /// <param name="data">The input array.</param>
     static member Erfinv(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "erfinv"
@@ -34004,7 +33850,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L909</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L907</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Erfinv(outputArray : NDArray seq, data : NDArray) =
@@ -34026,7 +33872,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L909</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L907</summary>
     /// <param name="data">The input array.</param>
     static member Erfinv([<Optional>] ?data : Symbol) =
         Erfinv(?data = data)
@@ -34176,7 +34022,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L64</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L63</summary>
     /// <param name="data">The input array.</param>
     static member Exp(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "exp"
@@ -34198,7 +34044,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L64</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L63</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Exp(outputArray : NDArray seq, data : NDArray) =
@@ -34225,7 +34071,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L64</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L63</summary>
     /// <param name="data">The input array.</param>
     static member Exp([<Optional>] ?data : Symbol) =
         Exp(?data = data)
@@ -34238,7 +34084,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L77</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L76</summary>
     /// <param name="data">The input array.</param>
     static member Log(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "log"
@@ -34255,7 +34101,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L77</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L76</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Log(outputArray : NDArray seq, data : NDArray) =
@@ -34277,7 +34123,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L77</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L76</summary>
     /// <param name="data">The input array.</param>
     static member Log([<Optional>] ?data : Symbol) =
         Log(?data = data)
@@ -34290,7 +34136,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L94</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L93</summary>
     /// <param name="data">The input array.</param>
     static member Log10(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "log10"
@@ -34307,7 +34153,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L94</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L93</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Log10(outputArray : NDArray seq, data : NDArray) =
@@ -34329,7 +34175,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L94</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L93</summary>
     /// <param name="data">The input array.</param>
     static member Log10([<Optional>] ?data : Symbol) =
         Log10(?data = data)
@@ -34342,7 +34188,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L106</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L105</summary>
     /// <param name="data">The input array.</param>
     static member Log2(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "log2"
@@ -34359,7 +34205,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L106</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L105</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Log2(outputArray : NDArray seq, data : NDArray) =
@@ -34381,7 +34227,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L106</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L105</summary>
     /// <param name="data">The input array.</param>
     static member Log2([<Optional>] ?data : Symbol) =
         Log2(?data = data)
@@ -34402,7 +34248,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L199</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L206</summary>
     /// <param name="data">The input array.</param>
     static member Log1p(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "log1p"
@@ -34424,7 +34270,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L199</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L206</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Log1p(outputArray : NDArray seq, data : NDArray) =
@@ -34451,7 +34297,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L199</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L206</summary>
     /// <param name="data">The input array.</param>
     static member Log1p([<Optional>] ?data : Symbol) =
         Log1p(?data = data)
@@ -34469,7 +34315,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L217</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L224</summary>
     /// <param name="data">The input array.</param>
     static member Expm1(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "expm1"
@@ -34490,7 +34336,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L217</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L224</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Expm1(outputArray : NDArray seq, data : NDArray) =
@@ -34516,7 +34362,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L217</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L224</summary>
     /// <param name="data">The input array.</param>
     static member Expm1([<Optional>] ?data : Symbol) =
         Expm1(?data = data)
@@ -34532,7 +34378,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L42</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L42</summary>
     /// <param name="data">The input array.</param>
     static member Reciprocal(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "reciprocal"
@@ -34551,7 +34397,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L42</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L42</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Reciprocal(outputArray : NDArray seq, data : NDArray) =
@@ -34575,7 +34421,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L42</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L42</summary>
     /// <param name="data">The input array.</param>
     static member Reciprocal([<Optional>] ?data : Symbol) =
         Reciprocal(?data = data)
@@ -34598,7 +34444,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L118</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L118</summary>
     /// <param name="data">The input array.</param>
     static member Square(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "square"
@@ -34624,7 +34470,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L118</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L118</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Square(outputArray : NDArray seq, data : NDArray) =
@@ -34655,7 +34501,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L118</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L118</summary>
     /// <param name="data">The input array.</param>
     static member Square([<Optional>] ?data : Symbol) =
         Square(?data = data)
@@ -34678,7 +34524,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L142</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L142</summary>
     /// <param name="data">The input array.</param>
     static member Sqrt(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "sqrt"
@@ -34704,7 +34550,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L142</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L142</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Sqrt(outputArray : NDArray seq, data : NDArray) =
@@ -34735,7 +34581,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L142</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L142</summary>
     /// <param name="data">The input array.</param>
     static member Sqrt([<Optional>] ?data : Symbol) =
         Sqrt(?data = data)
@@ -34754,7 +34600,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L193</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L193</summary>
     /// <param name="data">The input array.</param>
     static member Rsqrt(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "rsqrt"
@@ -34776,7 +34622,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L193</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L193</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Rsqrt(outputArray : NDArray seq, data : NDArray) =
@@ -34803,7 +34649,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L193</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L193</summary>
     /// <param name="data">The input array.</param>
     static member Rsqrt([<Optional>] ?data : Symbol) =
         Rsqrt(?data = data)
@@ -34826,7 +34672,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L216</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L216</summary>
     /// <param name="data">The input array.</param>
     static member Cbrt(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "cbrt"
@@ -34852,7 +34698,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L216</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L216</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Cbrt(outputArray : NDArray seq, data : NDArray) =
@@ -34883,7 +34729,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L216</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L216</summary>
     /// <param name="data">The input array.</param>
     static member Cbrt([<Optional>] ?data : Symbol) =
         Cbrt(?data = data)
@@ -34900,7 +34746,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L269</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L269</summary>
     /// <param name="data">The input array.</param>
     static member Rcbrt(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "rcbrt"
@@ -34920,7 +34766,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L269</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L269</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Rcbrt(outputArray : NDArray seq, data : NDArray) =
@@ -34945,7 +34791,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L269</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L269</summary>
     /// <param name="data">The input array.</param>
     static member Rcbrt([<Optional>] ?data : Symbol) =
         Rcbrt(?data = data)
@@ -34966,7 +34812,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L47</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L47</summary>
     /// <param name="data">The input array.</param>
     static member Sin(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "sin"
@@ -34990,7 +34836,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L47</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L47</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Sin(outputArray : NDArray seq, data : NDArray) =
@@ -35019,7 +34865,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L47</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L47</summary>
     /// <param name="data">The input array.</param>
     static member Sin([<Optional>] ?data : Symbol) =
         Sin(?data = data)
@@ -35036,7 +34882,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L90</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L90</summary>
     /// <param name="data">The input array.</param>
     static member Cos(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "cos"
@@ -35056,7 +34902,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L90</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L90</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Cos(outputArray : NDArray seq, data : NDArray) =
@@ -35081,7 +34927,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L90</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L90</summary>
     /// <param name="data">The input array.</param>
     static member Cos([<Optional>] ?data : Symbol) =
         Cos(?data = data)
@@ -35102,7 +34948,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L140</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L140</summary>
     /// <param name="data">The input array.</param>
     static member Tan(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "tan"
@@ -35126,7 +34972,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L140</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L140</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Tan(outputArray : NDArray seq, data : NDArray) =
@@ -35155,7 +35001,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L140</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L140</summary>
     /// <param name="data">The input array.</param>
     static member Tan([<Optional>] ?data : Symbol) =
         Tan(?data = data)
@@ -35177,7 +35023,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L187</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L187</summary>
     /// <param name="data">The input array.</param>
     static member Arcsin(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arcsin"
@@ -35202,7 +35048,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L187</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L187</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Arcsin(outputArray : NDArray seq, data : NDArray) =
@@ -35232,7 +35078,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L187</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L187</summary>
     /// <param name="data">The input array.</param>
     static member Arcsin([<Optional>] ?data : Symbol) =
         Arcsin(?data = data)
@@ -35250,7 +35096,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L206</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L206</summary>
     /// <param name="data">The input array.</param>
     static member Arccos(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arccos"
@@ -35271,7 +35117,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L206</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L206</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Arccos(outputArray : NDArray seq, data : NDArray) =
@@ -35297,7 +35143,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L206</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L206</summary>
     /// <param name="data">The input array.</param>
     static member Arccos([<Optional>] ?data : Symbol) =
         Arccos(?data = data)
@@ -35318,7 +35164,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L227</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L227</summary>
     /// <param name="data">The input array.</param>
     static member Arctan(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arctan"
@@ -35342,7 +35188,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L227</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L227</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Arctan(outputArray : NDArray seq, data : NDArray) =
@@ -35371,7 +35217,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L227</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L227</summary>
     /// <param name="data">The input array.</param>
     static member Arctan([<Optional>] ?data : Symbol) =
         Arctan(?data = data)
@@ -35390,7 +35236,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L274</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L274</summary>
     /// <param name="data">The input array.</param>
     static member Degrees(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "degrees"
@@ -35412,7 +35258,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L274</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L274</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Degrees(outputArray : NDArray seq, data : NDArray) =
@@ -35439,7 +35285,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L274</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L274</summary>
     /// <param name="data">The input array.</param>
     static member Degrees([<Optional>] ?data : Symbol) =
         Degrees(?data = data)
@@ -35458,7 +35304,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L293</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L293</summary>
     /// <param name="data">The input array.</param>
     static member Radians(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "radians"
@@ -35480,7 +35326,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L293</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L293</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Radians(outputArray : NDArray seq, data : NDArray) =
@@ -35507,7 +35353,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L293</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L293</summary>
     /// <param name="data">The input array.</param>
     static member Radians([<Optional>] ?data : Symbol) =
         Radians(?data = data)
@@ -35526,7 +35372,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L313</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L313</summary>
     /// <param name="data">The input array.</param>
     static member Sinh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "sinh"
@@ -35548,7 +35394,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L313</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L313</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Sinh(outputArray : NDArray seq, data : NDArray) =
@@ -35575,7 +35421,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L313</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L313</summary>
     /// <param name="data">The input array.</param>
     static member Sinh([<Optional>] ?data : Symbol) =
         Sinh(?data = data)
@@ -35590,7 +35436,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L351</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L351</summary>
     /// <param name="data">The input array.</param>
     static member Cosh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "cosh"
@@ -35608,7 +35454,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L351</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L351</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Cosh(outputArray : NDArray seq, data : NDArray) =
@@ -35631,7 +35477,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L351</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L351</summary>
     /// <param name="data">The input array.</param>
     static member Cosh([<Optional>] ?data : Symbol) =
         Cosh(?data = data)
@@ -35650,7 +35496,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L393</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L393</summary>
     /// <param name="data">The input array.</param>
     static member Tanh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "tanh"
@@ -35672,7 +35518,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L393</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L393</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Tanh(outputArray : NDArray seq, data : NDArray) =
@@ -35699,7 +35545,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L393</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L393</summary>
     /// <param name="data">The input array.</param>
     static member Tanh([<Optional>] ?data : Symbol) =
         Tanh(?data = data)
@@ -35716,7 +35562,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L436</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L436</summary>
     /// <param name="data">The input array.</param>
     static member Arcsinh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arcsinh"
@@ -35736,7 +35582,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L436</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L436</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Arcsinh(outputArray : NDArray seq, data : NDArray) =
@@ -35761,7 +35607,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L436</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L436</summary>
     /// <param name="data">The input array.</param>
     static member Arcsinh([<Optional>] ?data : Symbol) =
         Arcsinh(?data = data)
@@ -35774,7 +35620,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L474</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L474</summary>
     /// <param name="data">The input array.</param>
     static member Arccosh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arccosh"
@@ -35790,7 +35636,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L474</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L474</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Arccosh(outputArray : NDArray seq, data : NDArray) =
@@ -35811,7 +35657,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L474</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L474</summary>
     /// <param name="data">The input array.</param>
     static member Arccosh([<Optional>] ?data : Symbol) =
         Arccosh(?data = data)
@@ -35828,7 +35674,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L515</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L515</summary>
     /// <param name="data">The input array.</param>
     static member Arctanh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arctanh"
@@ -35848,7 +35694,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L515</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L515</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Arctanh(outputArray : NDArray seq, data : NDArray) =
@@ -35873,7 +35719,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L515</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L515</summary>
     /// <param name="data">The input array.</param>
     static member Arctanh([<Optional>] ?data : Symbol) =
         Arctanh(?data = data)
@@ -35891,7 +35737,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\histogram.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\histogram.cc:L137</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="bins">Input ndarray</param>
     /// <param name="binCnt">Number of bins for uniform case</param>
@@ -35915,7 +35761,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\histogram.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\histogram.cc:L137</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     /// <param name="bins">Input ndarray</param>
@@ -35944,7 +35790,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\histogram.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\histogram.cc:L137</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="bins">Input ndarray</param>
     /// <param name="binCnt">Number of bins for uniform case</param>
@@ -36005,7 +35851,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
     /// <param name="data">The input array to the embedding operator.</param>
     /// <param name="weight">The embedding weight matrix.</param>
     /// <param name="inputDim">Vocabulary size of the input indices.</param>
@@ -36077,7 +35923,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array to the embedding operator.</param>
     /// <param name="weight">The embedding weight matrix.</param>
@@ -36155,7 +36001,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
     /// <param name="data">The input array to the embedding operator.</param>
     /// <param name="weight">The embedding weight matrix.</param>
     /// <param name="inputDim">Vocabulary size of the input indices.</param>
@@ -36217,7 +36063,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
     /// <param name="inputDim">Vocabulary size of the input indices.</param>
     /// <param name="outputDim">Dimension of the embedding vectors.</param>
     /// <param name="data">The input array to the embedding operator.</param>
@@ -36278,7 +36124,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
     /// <param name="data">The input array to the embedding operator.</param>
     /// <param name="weight">The embedding weight matrix.</param>
     /// <param name="inputDim">Vocabulary size of the input indices.</param>
@@ -36348,7 +36194,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array to the embedding operator.</param>
     /// <param name="weight">The embedding weight matrix.</param>
@@ -36424,7 +36270,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
     /// <param name="data">The input array to the embedding operator.</param>
     /// <param name="weight">The embedding weight matrix.</param>
     /// <param name="inputDim">Vocabulary size of the input indices.</param>
@@ -36484,7 +36330,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
     /// <param name="inputDim">Vocabulary size of the input indices.</param>
     /// <param name="outputDim">Dimension of the embedding vectors.</param>
     /// <param name="data">The input array to the embedding operator.</param>
@@ -36547,7 +36393,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L718</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L718</summary>
     /// <param name="a">The input array.</param>
     /// <param name="indices">The indices of the values to be extracted.</param>
     /// <param name="axis">The axis of input array to be taken.For input tensor of rank r, it could be in the range of [-r, r-1]</param>
@@ -36610,7 +36456,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L718</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L718</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input array.</param>
     /// <param name="indices">The indices of the values to be extracted.</param>
@@ -36678,7 +36524,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L718</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L718</summary>
     /// <param name="a">The input array.</param>
     /// <param name="indices">The indices of the values to be extracted.</param>
     /// <param name="axis">The axis of input array to be taken.For input tensor of rank r, it could be in the range of [-r, r-1]</param>
@@ -36708,7 +36554,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L777</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L777</summary>
     /// <param name="a">The input array</param>
     /// <param name="indices">The index array</param>
     static member BatchTake(a : NDArray, indices : NDArray) =
@@ -36739,7 +36585,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L777</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L777</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input array</param>
     /// <param name="indices">The index array</param>
@@ -36775,7 +36621,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L777</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L777</summary>
     /// <param name="a">The input array</param>
     /// <param name="indices">The index array</param>
     static member BatchTake([<Optional>] ?a : Symbol, [<Optional>] ?indices : Symbol) =
@@ -36815,7 +36661,7 @@ type MX() =
     ///                                       [ 1.  0.  0.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
     /// <param name="indices">array of locations where to set on_value</param>
     /// <param name="depth">Depth of the one hot dimension.</param>
     /// <param name="onValue">The value assigned to the locations represented by indices.</param>
@@ -36866,7 +36712,7 @@ type MX() =
     ///                                       [ 1.  0.  0.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="indices">array of locations where to set on_value</param>
     /// <param name="depth">Depth of the one hot dimension.</param>
@@ -36923,7 +36769,7 @@ type MX() =
     ///                                       [ 1.  0.  0.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
     /// <param name="indices">array of locations where to set on_value</param>
     /// <param name="depth">Depth of the one hot dimension.</param>
     /// <param name="onValue">The value assigned to the locations represented by indices.</param>
@@ -36965,7 +36811,7 @@ type MX() =
     ///                                       [ 1.  0.  0.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
     /// <param name="depth">Depth of the one hot dimension.</param>
     /// <param name="indices">array of locations where to set on_value</param>
     /// <param name="onValue">The value assigned to the locations represented by indices.</param>
@@ -38001,7 +37847,7 @@ type MX() =
     ///            = [[[104.0]], [[0.14]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L89</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L89</summary>
     /// <param name="A">Tensor of input matrices</param>
     /// <param name="B">Tensor of input matrices</param>
     /// <param name="C">Tensor of input matrices</param>
@@ -38073,7 +37919,7 @@ type MX() =
     ///            = [[[104.0]], [[0.14]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L89</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L89</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of input matrices</param>
     /// <param name="B">Tensor of input matrices</param>
@@ -38151,7 +37997,7 @@ type MX() =
     ///            = [[[104.0]], [[0.14]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L89</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L89</summary>
     /// <param name="A">Tensor of input matrices</param>
     /// <param name="B">Tensor of input matrices</param>
     /// <param name="C">Tensor of input matrices</param>
@@ -38210,7 +38056,7 @@ type MX() =
     ///            = [[[4.0]], [[0.04 ]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L163</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L163</summary>
     /// <param name="A">Tensor of input matrices</param>
     /// <param name="B">Tensor of input matrices</param>
     /// <param name="transposeA">Multiply with transposed of first input (A).</param>
@@ -38275,7 +38121,7 @@ type MX() =
     ///            = [[[4.0]], [[0.04 ]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L163</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L163</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of input matrices</param>
     /// <param name="B">Tensor of input matrices</param>
@@ -38346,7 +38192,7 @@ type MX() =
     ///            = [[[4.0]], [[0.04 ]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L163</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L163</summary>
     /// <param name="A">Tensor of input matrices</param>
     /// <param name="B">Tensor of input matrices</param>
     /// <param name="transposeA">Multiply with transposed of first input (A).</param>
@@ -38383,7 +38229,7 @@ type MX() =
     ///    potrf(A) = [[[2.0, 0], [0.5, 2.0]], [[4.0, 0], [1.0, 4.0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L214</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L214</summary>
     /// <param name="A">Tensor of input matrices to be decomposed</param>
     static member LinalgPotrf(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_potrf"
@@ -38418,7 +38264,7 @@ type MX() =
     ///    potrf(A) = [[[2.0, 0], [0.5, 2.0]], [[4.0, 0], [1.0, 4.0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L214</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L214</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of input matrices to be decomposed</param>
     static member LinalgPotrf(outputArray : NDArray seq, A : NDArray) =
@@ -38458,7 +38304,7 @@ type MX() =
     ///    potrf(A) = [[[2.0, 0], [0.5, 2.0]], [[4.0, 0], [1.0, 4.0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L214</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L214</summary>
     /// <param name="A">Tensor of input matrices to be decomposed</param>
     static member LinalgPotrf([<Optional>] ?A : Symbol) =
         LinalgPotrf(?A = A)
@@ -38499,7 +38345,7 @@ type MX() =
     ///                [[0.06641, -0.01562], [-0.01562, 0,0625]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L275</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L275</summary>
     /// <param name="A">Tensor of lower triangular matrices</param>
     static member LinalgPotri(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_potri"
@@ -38543,7 +38389,7 @@ type MX() =
     ///                [[0.06641, -0.01562], [-0.01562, 0,0625]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L275</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L275</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of lower triangular matrices</param>
     static member LinalgPotri(outputArray : NDArray seq, A : NDArray) =
@@ -38592,7 +38438,7 @@ type MX() =
     ///                [[0.06641, -0.01562], [-0.01562, 0,0625]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L275</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L275</summary>
     /// <param name="A">Tensor of lower triangular matrices</param>
     static member LinalgPotri([<Optional>] ?A : Symbol) =
         LinalgPotri(?A = A)
@@ -38633,7 +38479,7 @@ type MX() =
     ///                             [[1.0, 1.0, 1.0], [2.0, 2.0, 2.0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L333</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L333</summary>
     /// <param name="A">Tensor of lower triangular matrices</param>
     /// <param name="B">Tensor of matrices</param>
     /// <param name="transpose">Use transposed of the triangular matrix</param>
@@ -38687,7 +38533,7 @@ type MX() =
     ///                             [[1.0, 1.0, 1.0], [2.0, 2.0, 2.0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L333</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L333</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of lower triangular matrices</param>
     /// <param name="B">Tensor of matrices</param>
@@ -38747,7 +38593,7 @@ type MX() =
     ///                             [[1.0, 1.0, 1.0], [2.0, 2.0, 2.0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L333</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L333</summary>
     /// <param name="A">Tensor of lower triangular matrices</param>
     /// <param name="B">Tensor of matrices</param>
     /// <param name="transpose">Use transposed of the triangular matrix</param>
@@ -38794,7 +38640,7 @@ type MX() =
     ///                             [[2.0, 2.0, 2.0], [2.0, 2.0, 2.0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L396</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L396</summary>
     /// <param name="A">Tensor of lower triangular matrices</param>
     /// <param name="B">Tensor of matrices</param>
     /// <param name="transpose">Use transposed of the triangular matrix</param>
@@ -38849,7 +38695,7 @@ type MX() =
     ///                             [[2.0, 2.0, 2.0], [2.0, 2.0, 2.0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L396</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L396</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of lower triangular matrices</param>
     /// <param name="B">Tensor of matrices</param>
@@ -38910,7 +38756,7 @@ type MX() =
     ///                             [[2.0, 2.0, 2.0], [2.0, 2.0, 2.0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L396</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L396</summary>
     /// <param name="A">Tensor of lower triangular matrices</param>
     /// <param name="B">Tensor of matrices</param>
     /// <param name="transpose">Use transposed of the triangular matrix</param>
@@ -38943,7 +38789,7 @@ type MX() =
     ///    sumlogdiag(A) = [1.9459, 3.9318]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L445</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L445</summary>
     /// <param name="A">Tensor of square matrices</param>
     static member LinalgSumlogdiag(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_sumlogdiag"
@@ -38974,7 +38820,7 @@ type MX() =
     ///    sumlogdiag(A) = [1.9459, 3.9318]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L445</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L445</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of square matrices</param>
     static member LinalgSumlogdiag(outputArray : NDArray seq, A : NDArray) =
@@ -39010,7 +38856,7 @@ type MX() =
     ///    sumlogdiag(A) = [1.9459, 3.9318]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L445</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L445</summary>
     /// <param name="A">Tensor of square matrices</param>
     static member LinalgSumlogdiag([<Optional>] ?A : Symbol) =
         LinalgSumlogdiag(?A = A)
@@ -39045,7 +38891,7 @@ type MX() =
     ///                       [5.0, 8.0]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L495</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L495</summary>
     /// <param name="A">Tensor of square matrices</param>
     /// <param name="offset">Offset of the diagonal versus the main diagonal. 0 corresponds to the main diagonal, a negative/positive value to diagonals below/above the main diagonal.</param>
     static member LinalgExtractdiag(A : NDArray, [<Optional; DefaultParameterValue(0)>] offset : int) =
@@ -39084,7 +38930,7 @@ type MX() =
     ///                       [5.0, 8.0]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L495</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L495</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of square matrices</param>
     /// <param name="offset">Offset of the diagonal versus the main diagonal. 0 corresponds to the main diagonal, a negative/positive value to diagonals below/above the main diagonal.</param>
@@ -39128,7 +38974,7 @@ type MX() =
     ///                       [5.0, 8.0]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L495</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L495</summary>
     /// <param name="A">Tensor of square matrices</param>
     /// <param name="offset">Offset of the diagonal versus the main diagonal. 0 corresponds to the main diagonal, a negative/positive value to diagonals below/above the main diagonal.</param>
     static member LinalgExtractdiag([<Optional>] ?A : Symbol, [<Optional>] ?offset : int) =
@@ -39165,7 +39011,7 @@ type MX() =
     ///                     [0.0, 4.0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L547</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L547</summary>
     /// <param name="A">Tensor of diagonal entries</param>
     /// <param name="offset">Offset of the diagonal versus the main diagonal. 0 corresponds to the main diagonal, a negative/positive value to diagonals below/above the main diagonal.</param>
     static member LinalgMakediag(A : NDArray, [<Optional; DefaultParameterValue(0)>] offset : int) =
@@ -39205,7 +39051,7 @@ type MX() =
     ///                     [0.0, 4.0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L547</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L547</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of diagonal entries</param>
     /// <param name="offset">Offset of the diagonal versus the main diagonal. 0 corresponds to the main diagonal, a negative/positive value to diagonals below/above the main diagonal.</param>
@@ -39250,7 +39096,7 @@ type MX() =
     ///                     [0.0, 4.0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L547</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L547</summary>
     /// <param name="A">Tensor of diagonal entries</param>
     /// <param name="offset">Offset of the diagonal versus the main diagonal. 0 corresponds to the main diagonal, a negative/positive value to diagonals below/above the main diagonal.</param>
     static member LinalgMakediag([<Optional>] ?A : Symbol, [<Optional>] ?offset : int) =
@@ -39293,7 +39139,7 @@ type MX() =
     ///                        [5.0, 7.0, 8.0]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L605</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L605</summary>
     /// <param name="A">Tensor of square matrices</param>
     /// <param name="offset">Offset of the diagonal versus the main diagonal. 0 corresponds to the main diagonal, a negative/positive value to diagonals below/above the main diagonal.</param>
     /// <param name="lower">Refer to the lower triangular matrix if lower=true, refer to the upper otherwise. Only relevant when offset=0</param>
@@ -39340,7 +39186,7 @@ type MX() =
     ///                        [5.0, 7.0, 8.0]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L605</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L605</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of square matrices</param>
     /// <param name="offset">Offset of the diagonal versus the main diagonal. 0 corresponds to the main diagonal, a negative/positive value to diagonals below/above the main diagonal.</param>
@@ -39392,7 +39238,7 @@ type MX() =
     ///                        [5.0, 7.0, 8.0]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L605</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L605</summary>
     /// <param name="A">Tensor of square matrices</param>
     /// <param name="offset">Offset of the diagonal versus the main diagonal. 0 corresponds to the main diagonal, a negative/positive value to diagonals below/above the main diagonal.</param>
     /// <param name="lower">Refer to the lower triangular matrix if lower=true, refer to the upper otherwise. Only relevant when offset=0</param>
@@ -39446,7 +39292,7 @@ type MX() =
     ///                                [0.0, 0.0, 0.0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L673</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L673</summary>
     /// <param name="A">Tensor of triangular matrices stored as vectors</param>
     /// <param name="offset">Offset of the diagonal versus the main diagonal. 0 corresponds to the main diagonal, a negative/positive value to diagonals below/above the main diagonal.</param>
     /// <param name="lower">Refer to the lower triangular matrix if lower=true, refer to the upper otherwise. Only relevant when offset=0</param>
@@ -39503,7 +39349,7 @@ type MX() =
     ///                                [0.0, 0.0, 0.0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L673</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L673</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of triangular matrices stored as vectors</param>
     /// <param name="offset">Offset of the diagonal versus the main diagonal. 0 corresponds to the main diagonal, a negative/positive value to diagonals below/above the main diagonal.</param>
@@ -39565,7 +39411,7 @@ type MX() =
     ///                                [0.0, 0.0, 0.0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L673</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L673</summary>
     /// <param name="A">Tensor of triangular matrices stored as vectors</param>
     /// <param name="offset">Offset of the diagonal versus the main diagonal. 0 corresponds to the main diagonal, a negative/positive value to diagonals below/above the main diagonal.</param>
     /// <param name="lower">Refer to the lower triangular matrix if lower=true, refer to the upper otherwise. Only relevant when offset=0</param>
@@ -39608,7 +39454,7 @@ type MX() =
     ///    syrk(A, alpha=2., transpose=False) = [[[4.]], [[0.04]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L730</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L730</summary>
     /// <param name="A">Tensor of input matrices</param>
     /// <param name="transpose">Use transpose of input matrix.</param>
     /// <param name="alpha">Scalar factor to be applied to the result.</param>
@@ -39654,7 +39500,7 @@ type MX() =
     ///    syrk(A, alpha=2., transpose=False) = [[[4.]], [[0.04]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L730</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L730</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of input matrices</param>
     /// <param name="transpose">Use transpose of input matrix.</param>
@@ -39705,7 +39551,7 @@ type MX() =
     ///    syrk(A, alpha=2., transpose=False) = [[[4.]], [[0.04]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L730</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L730</summary>
     /// <param name="A">Tensor of input matrices</param>
     /// <param name="transpose">Use transpose of input matrix.</param>
     /// <param name="alpha">Scalar factor to be applied to the result.</param>
@@ -39759,7 +39605,7 @@ type MX() =
     ///          [-19.09768702, 0.52758934]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L798</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L798</summary>
     /// <param name="A">Tensor of input matrices to be factorized</param>
     static member LinalgGelqf(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_gelqf"
@@ -39814,7 +39660,7 @@ type MX() =
     ///          [-19.09768702, 0.52758934]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L798</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L798</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of input matrices to be factorized</param>
     static member LinalgGelqf(outputArray : NDArray seq, A : NDArray) =
@@ -39874,7 +39720,7 @@ type MX() =
     ///          [-19.09768702, 0.52758934]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L798</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L798</summary>
     /// <param name="A">Tensor of input matrices to be factorized</param>
     static member LinalgGelqf([<Optional>] ?A : Symbol) =
         LinalgGelqf(?A = A)
@@ -39925,7 +39771,7 @@ type MX() =
     ///         [0.17157288, 5.82842712]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L868</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L868</summary>
     /// <param name="A">Tensor of input matrices to be factorized</param>
     static member LinalgSyevd(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_syevd"
@@ -39979,7 +39825,7 @@ type MX() =
     ///         [0.17157288, 5.82842712]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L868</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L868</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of input matrices to be factorized</param>
     static member LinalgSyevd(outputArray : NDArray seq, A : NDArray) =
@@ -40038,7 +39884,7 @@ type MX() =
     ///         [0.17157288, 5.82842712]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L868</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L868</summary>
     /// <param name="A">Tensor of input matrices to be factorized</param>
     static member LinalgSyevd([<Optional>] ?A : Symbol) =
         LinalgSyevd(?A = A)
@@ -40069,7 +39915,7 @@ type MX() =
     ///                  [[-2., 1.5], [1., -0.5]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L920</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L919</summary>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgInverse(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_inverse"
@@ -40103,7 +39949,7 @@ type MX() =
     ///                  [[-2., 1.5], [1., -0.5]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L920</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L919</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgInverse(outputArray : NDArray seq, A : NDArray) =
@@ -40142,7 +39988,7 @@ type MX() =
     ///                  [[-2., 1.5], [1., -0.5]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L920</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L919</summary>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgInverse([<Optional>] ?A : Symbol) =
         LinalgInverse(?A = A)
@@ -40176,7 +40022,7 @@ type MX() =
     ///    det(A) = [-5., 5.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L974</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L973</summary>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgDet(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_det"
@@ -40213,7 +40059,7 @@ type MX() =
     ///    det(A) = [-5., 5.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L974</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L973</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgDet(outputArray : NDArray seq, A : NDArray) =
@@ -40255,7 +40101,7 @@ type MX() =
     ///    det(A) = [-5., 5.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L974</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L973</summary>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgDet([<Optional>] ?A : Symbol) =
         LinalgDet(?A = A)
@@ -40295,7 +40141,7 @@ type MX() =
     ///    logabsdet = [1.609438, -inf, 1.609438]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L1032</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L1031</summary>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgSlogdet(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_slogdet"
@@ -40338,7 +40184,7 @@ type MX() =
     ///    logabsdet = [1.609438, -inf, 1.609438]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L1032</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L1031</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgSlogdet(outputArray : NDArray seq, A : NDArray) =
@@ -40386,7 +40232,7 @@ type MX() =
     ///    logabsdet = [1.609438, -inf, 1.609438]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\la_op.cc:L1032</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L1031</summary>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgSlogdet([<Optional>] ?A : Symbol) =
         LinalgSlogdet(?A = A)
@@ -40431,7 +40277,7 @@ type MX() =
     ///   - with reverse=1, output shape will be (50,4).
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L175</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L175</summary>
     /// <param name="data">Input data to reshape.</param>
     /// <param name="shape">The target shape</param>
     /// <param name="reverse">If true then the special values are inferred from right to left</param>
@@ -40487,7 +40333,7 @@ type MX() =
     ///   - with reverse=1, output shape will be (50,4).
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L175</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L175</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to reshape.</param>
     /// <param name="shape">The target shape</param>
@@ -40549,7 +40395,7 @@ type MX() =
     ///   - with reverse=1, output shape will be (50,4).
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L175</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L175</summary>
     /// <param name="data">Input data to reshape.</param>
     /// <param name="shape">The target shape</param>
     /// <param name="reverse">If true then the special values are inferred from right to left</param>
@@ -40578,7 +40424,7 @@ type MX() =
     ///                                  [ 7.,  8.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L327</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L328</summary>
     /// <param name="data">Source input</param>
     /// <param name="axes">Target axis order. By default the axes will be inverted.</param>
     static member Transpose(data : NDArray, [<Optional>] axes : int seq) =
@@ -40608,7 +40454,7 @@ type MX() =
     ///                                  [ 7.,  8.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L327</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L328</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Source input</param>
     /// <param name="axes">Target axis order. By default the axes will be inverted.</param>
@@ -40643,7 +40489,7 @@ type MX() =
     ///                                  [ 7.,  8.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L327</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L328</summary>
     /// <param name="data">Source input</param>
     /// <param name="axes">Target axis order. By default the axes will be inverted.</param>
     static member Transpose([<Optional>] ?data : Symbol, [<Optional>] ?axes : int seq) =
@@ -40654,7 +40500,7 @@ type MX() =
     /// will return a new array with shape ``(2,1,3,4)``.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L394</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L395</summary>
     /// <param name="data">Source input</param>
     /// <param name="axis">Position where new axis is to be inserted. Suppose that the input `NDArray`&#39;s dimension is `ndim`, the range of the inserted axis is `[-ndim, ndim]`</param>
     static member ExpandDims(data : NDArray, axis : int) =
@@ -40669,7 +40515,7 @@ type MX() =
     /// will return a new array with shape ``(2,1,3,4)``.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L394</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L395</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Source input</param>
     /// <param name="axis">Position where new axis is to be inserted. Suppose that the input `NDArray`&#39;s dimension is `ndim`, the range of the inserted axis is `[-ndim, ndim]`</param>
@@ -40689,7 +40535,7 @@ type MX() =
     /// will return a new array with shape ``(2,1,3,4)``.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L394</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L395</summary>
     /// <param name="data">Source input</param>
     /// <param name="axis">Position where new axis is to be inserted. Suppose that the input `NDArray`&#39;s dimension is `ndim`, the range of the inserted axis is `[-ndim, ndim]`</param>
     static member ExpandDims(data : Symbol, axis : int) =
@@ -40699,7 +40545,7 @@ type MX() =
     /// will return a new array with shape ``(2,1,3,4)``.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L394</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L395</summary>
     /// <param name="axis">Position where new axis is to be inserted. Suppose that the input `NDArray`&#39;s dimension is `ndim`, the range of the inserted axis is `[-ndim, ndim]`</param>
     /// <param name="data">Source input</param>
     static member ExpandDims(axis : int, [<Optional>] ?data : Symbol) =
@@ -40740,7 +40586,7 @@ type MX() =
     ///                                                             [1.,  3.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L481</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L482</summary>
     /// <param name="data">Source input</param>
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
@@ -40787,7 +40633,7 @@ type MX() =
     ///                                                             [1.,  3.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L481</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L482</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Source input</param>
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
@@ -40839,7 +40685,7 @@ type MX() =
     ///                                                             [1.,  3.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L481</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L482</summary>
     /// <param name="data">Source input</param>
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
@@ -40881,7 +40727,7 @@ type MX() =
     ///                                                             [1.,  3.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L481</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L482</summary>
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
     /// <param name="data">Source input</param>
@@ -40898,7 +40744,7 @@ type MX() =
     /// - lhs and rhs are of the same data type, and on the same device.
     /// 
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:514</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:515</summary>
     /// <param name="lhs">Source input</param>
     /// <param name="rhs">value to assign</param>
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
@@ -40923,7 +40769,7 @@ type MX() =
     /// - lhs and rhs are of the same data type, and on the same device.
     /// 
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:514</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:515</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">Source input</param>
     /// <param name="rhs">value to assign</param>
@@ -40954,7 +40800,7 @@ type MX() =
     /// - lhs and rhs are of the same data type, and on the same device.
     /// 
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:514</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:515</summary>
     /// <param name="lhs">Source input</param>
     /// <param name="rhs">value to assign</param>
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
@@ -40970,7 +40816,7 @@ type MX() =
     /// - lhs and rhs are of the same data type, and on the same device.
     /// 
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:514</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:515</summary>
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
     /// <param name="lhs">Source input</param>
@@ -40986,7 +40832,7 @@ type MX() =
     /// - output should be explicitly given and be the same as input
     /// )
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:540</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:541</summary>
     /// <param name="data">Source input</param>
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
@@ -41010,7 +40856,7 @@ type MX() =
     /// - output should be explicitly given and be the same as input
     /// )
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:540</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:541</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Source input</param>
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
@@ -41040,7 +40886,7 @@ type MX() =
     /// - output should be explicitly given and be the same as input
     /// )
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:540</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:541</summary>
     /// <param name="data">Source input</param>
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
@@ -41055,7 +40901,7 @@ type MX() =
     /// - output should be explicitly given and be the same as input
     /// )
     /// 
-    /// From:C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:540</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:541</summary>
     /// <param name="sliceBegin">starting indices for the slice operation, supports negative indices.</param>
     /// <param name="sliceEnd">ending indices for the slice operation, supports negative indices.</param>
     /// <param name="data">Source input</param>
@@ -41081,7 +40927,7 @@ type MX() =
     ///                                              [ 10.,  11.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L570</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L571</summary>
     /// <param name="data">Source input</param>
     /// <param name="axis">Axis along which to be sliced, supports negative indexes.</param>
     /// <param name="sliceBegin">The beginning index along the axis to be sliced,  supports negative indexes.</param>
@@ -41110,7 +40956,7 @@ type MX() =
     ///                                              [ 10.,  11.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L570</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L571</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Source input</param>
     /// <param name="axis">Axis along which to be sliced, supports negative indexes.</param>
@@ -41144,7 +40990,7 @@ type MX() =
     ///                                              [ 10.,  11.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L570</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L571</summary>
     /// <param name="data">Source input</param>
     /// <param name="axis">Axis along which to be sliced, supports negative indexes.</param>
     /// <param name="sliceBegin">The beginning index along the axis to be sliced,  supports negative indexes.</param>
@@ -41168,7 +41014,7 @@ type MX() =
     ///                                              [ 10.,  11.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L570</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L571</summary>
     /// <param name="axis">Axis along which to be sliced, supports negative indexes.</param>
     /// <param name="sliceBegin">The beginning index along the axis to be sliced,  supports negative indexes.</param>
     /// <param name="data">Source input</param>
@@ -41214,7 +41060,7 @@ type MX() =
     ///                                  [  9.,  10.,  11.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L624</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L625</summary>
     /// <param name="data">Source input</param>
     /// <param name="shapeLike">Shape like input</param>
     /// <param name="axes">List of axes on which input data will be sliced according to the corresponding size of the second input. By default will slice on all axes. Negative axes are supported.</param>
@@ -41262,7 +41108,7 @@ type MX() =
     ///                                  [  9.,  10.,  11.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L624</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L625</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Source input</param>
     /// <param name="shapeLike">Shape like input</param>
@@ -41315,7 +41161,7 @@ type MX() =
     ///                                  [  9.,  10.,  11.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L624</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L625</summary>
     /// <param name="data">Source input</param>
     /// <param name="shapeLike">Shape like input</param>
     /// <param name="axes">List of axes on which input data will be sliced according to the corresponding size of the second input. By default will slice on all axes. Negative axes are supported.</param>
@@ -41342,7 +41188,7 @@ type MX() =
     ///    - clip(csr, a_min &gt; 0, a_max &gt; 0) = csr
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L676</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L677</summary>
     /// <param name="data">Input array.</param>
     /// <param name="aMin">Minimum value</param>
     /// <param name="aMax">Maximum value</param>
@@ -41372,7 +41218,7 @@ type MX() =
     ///    - clip(csr, a_min &gt; 0, a_max &gt; 0) = csr
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L676</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L677</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input array.</param>
     /// <param name="aMin">Minimum value</param>
@@ -41407,7 +41253,7 @@ type MX() =
     ///    - clip(csr, a_min &gt; 0, a_max &gt; 0) = csr
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L676</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L677</summary>
     /// <param name="data">Input array.</param>
     /// <param name="aMin">Minimum value</param>
     /// <param name="aMax">Maximum value</param>
@@ -41432,7 +41278,7 @@ type MX() =
     ///    - clip(csr, a_min &gt; 0, a_max &gt; 0) = csr
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L676</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L677</summary>
     /// <param name="aMin">Minimum value</param>
     /// <param name="aMax">Maximum value</param>
     /// <param name="data">Input array.</param>
@@ -41457,7 +41303,7 @@ type MX() =
     ///                                    [ 3.,  3.,  4.,  4.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L743</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L744</summary>
     /// <param name="data">Input data array</param>
     /// <param name="repeats">The number of repetitions for each element.</param>
     /// <param name="axis">The axis along which to repeat values. The negative numbers are interpreted counting from the backward. By default, use the flattened input array, and return a flat output array.</param>
@@ -41485,7 +41331,7 @@ type MX() =
     ///                                    [ 3.,  3.,  4.,  4.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L743</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L744</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data array</param>
     /// <param name="repeats">The number of repetitions for each element.</param>
@@ -41518,7 +41364,7 @@ type MX() =
     ///                                    [ 3.,  3.,  4.,  4.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L743</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L744</summary>
     /// <param name="data">Input data array</param>
     /// <param name="repeats">The number of repetitions for each element.</param>
     /// <param name="axis">The axis along which to repeat values. The negative numbers are interpreted counting from the backward. By default, use the flattened input array, and return a flat output array.</param>
@@ -41541,7 +41387,7 @@ type MX() =
     ///                                    [ 3.,  3.,  4.,  4.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L743</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L744</summary>
     /// <param name="repeats">The number of repetitions for each element.</param>
     /// <param name="data">Input data array</param>
     /// <param name="axis">The axis along which to repeat values. The negative numbers are interpreted counting from the backward. By default, use the flattened input array, and return a flat output array.</param>
@@ -41575,7 +41421,7 @@ type MX() =
     ///                               [ 3.,  4.,  3.,  4.,  3.,  4.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L795</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L796</summary>
     /// <param name="data">Input data array</param>
     /// <param name="reps">The number of times for repeating the tensor a. Each dim size of reps must be a positive integer. If reps has length d, the result will have dimension of max(d, a.ndim); If a.ndim &lt; d, a is promoted to be d-dimensional by prepending new axes. If a.ndim &gt; d, reps is promoted to a.ndim by pre-pending 1&#39;s to it.</param>
     static member Tile(data : NDArray, reps : int seq) =
@@ -41611,7 +41457,7 @@ type MX() =
     ///                               [ 3.,  4.,  3.,  4.,  3.,  4.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L795</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L796</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data array</param>
     /// <param name="reps">The number of times for repeating the tensor a. Each dim size of reps must be a positive integer. If reps has length d, the result will have dimension of max(d, a.ndim); If a.ndim &lt; d, a is promoted to be d-dimensional by prepending new axes. If a.ndim &gt; d, reps is promoted to a.ndim by pre-pending 1&#39;s to it.</param>
@@ -41652,7 +41498,7 @@ type MX() =
     ///                               [ 3.,  4.,  3.,  4.,  3.,  4.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L795</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L796</summary>
     /// <param name="data">Input data array</param>
     /// <param name="reps">The number of times for repeating the tensor a. Each dim size of reps must be a positive integer. If reps has length d, the result will have dimension of max(d, a.ndim); If a.ndim &lt; d, a is promoted to be d-dimensional by prepending new axes. If a.ndim &gt; d, reps is promoted to a.ndim by pre-pending 1&#39;s to it.</param>
     static member Tile(data : Symbol, reps : int seq) =
@@ -41683,7 +41529,7 @@ type MX() =
     ///                               [ 3.,  4.,  3.,  4.,  3.,  4.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L795</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L796</summary>
     /// <param name="reps">The number of times for repeating the tensor a. Each dim size of reps must be a positive integer. If reps has length d, the result will have dimension of max(d, a.ndim); If a.ndim &lt; d, a is promoted to be d-dimensional by prepending new axes. If a.ndim &gt; d, reps is promoted to a.ndim by pre-pending 1&#39;s to it.</param>
     /// <param name="data">Input data array</param>
     static member Tile(reps : int seq, [<Optional>] ?data : Symbol) =
@@ -41701,7 +41547,7 @@ type MX() =
     ///                         [ 9.,  8.,  7.,  6.,  5.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L831</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L832</summary>
     /// <param name="data">Input data array</param>
     /// <param name="axis">The axis which to reverse elements.</param>
     static member Reverse(data : NDArray, axis : int seq) =
@@ -41722,7 +41568,7 @@ type MX() =
     ///                         [ 9.,  8.,  7.,  6.,  5.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L831</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L832</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data array</param>
     /// <param name="axis">The axis which to reverse elements.</param>
@@ -41748,7 +41594,7 @@ type MX() =
     ///                         [ 9.,  8.,  7.,  6.,  5.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L831</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L832</summary>
     /// <param name="data">Input data array</param>
     /// <param name="axis">The axis which to reverse elements.</param>
     static member Reverse(data : Symbol, axis : int seq) =
@@ -41764,7 +41610,7 @@ type MX() =
     ///                         [ 9.,  8.,  7.,  6.,  5.]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L831</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L832</summary>
     /// <param name="axis">The axis which to reverse elements.</param>
     /// <param name="data">Input data array</param>
     static member Reverse(axis : int seq, [<Optional>] ?data : Symbol) =
@@ -41934,7 +41780,7 @@ type MX() =
     ///                             [15, 21, 16, 22, 17, 23]]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L971</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L972</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="blockSize">Blocks of [block_size. block_size] are moved</param>
     static member DepthToSpace(data : NDArray, blockSize : int) =
@@ -41972,7 +41818,7 @@ type MX() =
     ///                             [15, 21, 16, 22, 17, 23]]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L971</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L972</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     /// <param name="blockSize">Blocks of [block_size. block_size] are moved</param>
@@ -42015,7 +41861,7 @@ type MX() =
     ///                             [15, 21, 16, 22, 17, 23]]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L971</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L972</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="blockSize">Blocks of [block_size. block_size] are moved</param>
     static member DepthToSpace(data : Symbol, blockSize : int) =
@@ -42048,7 +41894,7 @@ type MX() =
     ///                             [15, 21, 16, 22, 17, 23]]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L971</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L972</summary>
     /// <param name="blockSize">Blocks of [block_size. block_size] are moved</param>
     /// <param name="data">Input ndarray</param>
     static member DepthToSpace(blockSize : int, [<Optional>] ?data : Symbol) =
@@ -42082,7 +41928,7 @@ type MX() =
     ///                             [21, 22, 23]]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1018</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L1019</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="blockSize">Blocks of [block_size. block_size] are moved</param>
     static member SpaceToDepth(data : NDArray, blockSize : int) =
@@ -42120,7 +41966,7 @@ type MX() =
     ///                             [21, 22, 23]]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1018</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L1019</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input ndarray</param>
     /// <param name="blockSize">Blocks of [block_size. block_size] are moved</param>
@@ -42163,7 +42009,7 @@ type MX() =
     ///                             [21, 22, 23]]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1018</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L1019</summary>
     /// <param name="data">Input ndarray</param>
     /// <param name="blockSize">Blocks of [block_size. block_size] are moved</param>
     static member SpaceToDepth(data : Symbol, blockSize : int) =
@@ -42196,7 +42042,7 @@ type MX() =
     ///                             [21, 22, 23]]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1018</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L1019</summary>
     /// <param name="blockSize">Blocks of [block_size. block_size] are moved</param>
     /// <param name="data">Input ndarray</param>
     static member SpaceToDepth(blockSize : int, [<Optional>] ?data : Symbol) =
@@ -42251,7 +42097,7 @@ type MX() =
     ///    z[0].shape = (2, 1)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1087</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L1088</summary>
     /// <param name="data">The input</param>
     /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
     /// <param name="axis">Axis along which to split.</param>
@@ -42317,7 +42163,7 @@ type MX() =
     ///    z[0].shape = (2, 1)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1087</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L1088</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
@@ -42389,7 +42235,7 @@ type MX() =
     ///    z[0].shape = (2, 1)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1087</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L1088</summary>
     /// <param name="data">The input</param>
     /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
     /// <param name="axis">Axis along which to split.</param>
@@ -42446,7 +42292,7 @@ type MX() =
     ///    z[0].shape = (2, 1)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\matrix_op.cc:L1087</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\matrix_op.cc:L1088</summary>
     /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
     /// <param name="data">The input</param>
     /// <param name="axis">Axis along which to split.</param>
@@ -42509,7 +42355,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ordering_op.cc:L68</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L68</summary>
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to choose the top k indices. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="k">Number of top elements to select, should be always smaller than or equal to the element number in the given axis. A global sort is performed if set k &lt; 1.</param>
@@ -42561,7 +42407,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ordering_op.cc:L68</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L68</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to choose the top k indices. If not given, the flattened array is used. Default is -1.</param>
@@ -42619,7 +42465,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ordering_op.cc:L68</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L68</summary>
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to choose the top k indices. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="k">Number of top elements to select, should be always smaller than or equal to the element number in the given axis. A global sort is performed if set k &lt; 1.</param>
@@ -42655,7 +42501,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ordering_op.cc:L132</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L132</summary>
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to choose sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
@@ -42690,7 +42536,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ordering_op.cc:L132</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L132</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to choose sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
@@ -42730,7 +42576,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ordering_op.cc:L132</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L132</summary>
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to choose sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
@@ -42759,7 +42605,7 @@ type MX() =
     ///   argsort(x, axis=None) = [ 3.,  1.,  5.,  0.,  4.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ordering_op.cc:L183</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L183</summary>
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
@@ -42793,7 +42639,7 @@ type MX() =
     ///   argsort(x, axis=None) = [ 3.,  1.,  5.,  0.,  4.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ordering_op.cc:L183</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L183</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
@@ -42832,7 +42678,7 @@ type MX() =
     ///   argsort(x, axis=None) = [ 3.,  1.,  5.,  0.,  4.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ordering_op.cc:L183</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L183</summary>
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
@@ -42850,7 +42696,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ravel.cc:L42</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ravel.cc:L42</summary>
     /// <param name="data">Batch of multi-indices</param>
     /// <param name="shape">Shape of the array into which the multi-indices apply.</param>
     static member RavelMultiIndex(data : NDArray, [<Optional>] shape : int seq) =
@@ -42870,7 +42716,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ravel.cc:L42</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ravel.cc:L42</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Batch of multi-indices</param>
     /// <param name="shape">Shape of the array into which the multi-indices apply.</param>
@@ -42895,7 +42741,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ravel.cc:L42</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ravel.cc:L42</summary>
     /// <param name="data">Batch of multi-indices</param>
     /// <param name="shape">Shape of the array into which the multi-indices apply.</param>
     static member RavelMultiIndex([<Optional>] ?data : Symbol, [<Optional>] ?shape : int seq) =
@@ -42911,7 +42757,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ravel.cc:L68</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ravel.cc:L68</summary>
     /// <param name="data">Array of flat indices</param>
     /// <param name="shape">Shape of the array into which the multi-indices apply.</param>
     static member UnravelIndex(data : NDArray, [<Optional>] shape : int seq) =
@@ -42931,7 +42777,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ravel.cc:L68</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ravel.cc:L68</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Array of flat indices</param>
     /// <param name="shape">Shape of the array into which the multi-indices apply.</param>
@@ -42956,7 +42802,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\ravel.cc:L68</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ravel.cc:L68</summary>
     /// <param name="data">Array of flat indices</param>
     /// <param name="shape">Shape of the array into which the multi-indices apply.</param>
     static member UnravelIndex([<Optional>] ?data : Symbol, [<Optional>] ?shape : int seq) =
@@ -42983,7 +42829,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\sparse_retain.cc:L53</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\sparse_retain.cc:L53</summary>
     /// <param name="data">The input array for sparse_retain operator.</param>
     /// <param name="indices">The index array of rows ids that will be retained.</param>
     static member SparseRetain(data : NDArray, indices : NDArray) =
@@ -43014,7 +42860,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\sparse_retain.cc:L53</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\sparse_retain.cc:L53</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array for sparse_retain operator.</param>
     /// <param name="indices">The index array of rows ids that will be retained.</param>
@@ -43050,7 +42896,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\sparse_retain.cc:L53</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\sparse_retain.cc:L53</summary>
     /// <param name="data">The input array for sparse_retain operator.</param>
     /// <param name="indices">The index array of rows ids that will be retained.</param>
     static member SparseRetain([<Optional>] ?data : Symbol, [<Optional>] ?indices : Symbol) =
@@ -43071,7 +42917,7 @@ type MX() =
     ///   sum = [0, 5, 0, 25, 0]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\square_sum.cc:L63</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\square_sum.cc:L63</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -43110,7 +42956,7 @@ type MX() =
     ///   sum = [0, 5, 0, 25, 0]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\square_sum.cc:L63</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\square_sum.cc:L63</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
@@ -43154,7 +43000,7 @@ type MX() =
     ///   sum = [0, 5, 0, 25, 0]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\tensor\square_sum.cc:L63</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\square_sum.cc:L63</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axis or axes along which to perform the reduction.
     /// 
@@ -43325,7 +43171,7 @@ type MX() =
     ///      [ 0,  1,  3,  0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\bilinear_sampler.cc:L256</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\bilinear_sampler.cc:L256</summary>
     /// <param name="data">Input data to the BilinearsamplerOp.</param>
     /// <param name="grid">Input grid to the BilinearsamplerOp.grid has two channels: x_src, y_src</param>
     /// <param name="cudnnOff">whether to turn cudnn off</param>
@@ -43409,7 +43255,7 @@ type MX() =
     ///      [ 0,  1,  3,  0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\bilinear_sampler.cc:L256</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\bilinear_sampler.cc:L256</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the BilinearsamplerOp.</param>
     /// <param name="grid">Input grid to the BilinearsamplerOp.grid has two channels: x_src, y_src</param>
@@ -43498,7 +43344,7 @@ type MX() =
     ///      [ 0,  1,  3,  0]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\bilinear_sampler.cc:L256</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\bilinear_sampler.cc:L256</summary>
     /// <param name="data">Input data to the BilinearsamplerOp.</param>
     /// <param name="grid">Input grid to the BilinearsamplerOp.grid has two channels: x_src, y_src</param>
     /// <param name="cudnnOff">whether to turn cudnn off</param>
@@ -43529,7 +43375,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\count_sketch.cc:L67</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\count_sketch.cc:L67</summary>
     /// <param name="data">Input data to the CountSketchOp.</param>
     /// <param name="h">The index vector</param>
     /// <param name="s">The sign vector</param>
@@ -43569,7 +43415,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\count_sketch.cc:L67</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\count_sketch.cc:L67</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the CountSketchOp.</param>
     /// <param name="h">The index vector</param>
@@ -43615,7 +43461,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\count_sketch.cc:L67</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\count_sketch.cc:L67</summary>
     /// <param name="data">Input data to the CountSketchOp.</param>
     /// <param name="h">The index vector</param>
     /// <param name="s">The sign vector</param>
@@ -43646,7 +43492,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\count_sketch.cc:L67</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\count_sketch.cc:L67</summary>
     /// <param name="outDim">The output dimension.</param>
     /// <param name="data">Input data to the CountSketchOp.</param>
     /// <param name="h">The index vector</param>
@@ -43700,7 +43546,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\deformable_convolution.cc:L100</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\deformable_convolution.cc:L100</summary>
     /// <param name="data">Input data to the DeformableConvolutionOp.</param>
     /// <param name="offset">Input offset to the DeformableConvolutionOp.</param>
     /// <param name="weight">Weight matrix.</param>
@@ -43780,7 +43626,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\deformable_convolution.cc:L100</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\deformable_convolution.cc:L100</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the DeformableConvolutionOp.</param>
     /// <param name="offset">Input offset to the DeformableConvolutionOp.</param>
@@ -43866,7 +43712,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\deformable_convolution.cc:L100</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\deformable_convolution.cc:L100</summary>
     /// <param name="data">Input data to the DeformableConvolutionOp.</param>
     /// <param name="offset">Input offset to the DeformableConvolutionOp.</param>
     /// <param name="weight">Weight matrix.</param>
@@ -43928,7 +43774,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\deformable_convolution.cc:L100</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\deformable_convolution.cc:L100</summary>
     /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
     /// <param name="numFilter">Convolution filter(channel) number</param>
     /// <param name="data">Input data to the DeformableConvolutionOp.</param>
@@ -43994,7 +43840,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\fft.cc:L56</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\fft.cc:L56</summary>
     /// <param name="data">Input data to the FFTOp.</param>
     /// <param name="computeSize">Maximum size of sub-batch to be forwarded at one time</param>
     static member ContribFft(data : NDArray, [<Optional; DefaultParameterValue(128)>] computeSize : int) =
@@ -44018,7 +43864,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\fft.cc:L56</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\fft.cc:L56</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the FFTOp.</param>
     /// <param name="computeSize">Maximum size of sub-batch to be forwarded at one time</param>
@@ -44047,7 +43893,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\fft.cc:L56</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\fft.cc:L56</summary>
     /// <param name="data">Input data to the FFTOp.</param>
     /// <param name="computeSize">Maximum size of sub-batch to be forwarded at one time</param>
     static member ContribFft([<Optional>] ?data : Symbol, [<Optional>] ?computeSize : int) =
@@ -44069,7 +43915,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\ifft.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\ifft.cc:L58</summary>
     /// <param name="data">Input data to the IFFTOp.</param>
     /// <param name="computeSize">Maximum size of sub-batch to be forwarded at one time</param>
     static member ContribIfft(data : NDArray, [<Optional; DefaultParameterValue(128)>] computeSize : int) =
@@ -44094,7 +43940,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\ifft.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\ifft.cc:L58</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the IFFTOp.</param>
     /// <param name="computeSize">Maximum size of sub-batch to be forwarded at one time</param>
@@ -44124,319 +43970,11 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\ifft.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\ifft.cc:L58</summary>
     /// <param name="data">Input data to the IFFTOp.</param>
     /// <param name="computeSize">Maximum size of sub-batch to be forwarded at one time</param>
     static member ContribIfft([<Optional>] ?data : Symbol, [<Optional>] ?computeSize : int) =
         ContribIfft(?data = data, ?computeSize = computeSize)
-
-
-    /// <summary>Compute 2-D modulated deformable convolution on 4-D input.
-    /// 
-    /// The modulated deformable convolution operation is described in https://arxiv.org/abs/1811.11168
-    /// 
-    /// For 2-D modulated deformable convolution, the shapes are
-    /// 
-    /// - **data**: *(batch_size, channel, height, width)*
-    /// - **offset**: *(batch_size, num_deformable_group * kernel[0] * kernel[1] * 2, height, width)*
-    /// - **mask**: *(batch_size, num_deformable_group * kernel[0] * kernel[1], height, width)*
-    /// - **weight**: *(num_filter, channel, kernel[0], kernel[1])*
-    /// - **bias**: *(num_filter,)*
-    /// - **out**: *(batch_size, num_filter, out_height, out_width)*.
-    /// 
-    /// Define::
-    /// 
-    ///   f(x,k,p,s,d) = floor((x+2*p-d*(k-1)-1)/s)+1
-    /// 
-    /// then we have::
-    /// 
-    ///   out_height=f(height, kernel[0], pad[0], stride[0], dilate[0])
-    ///   out_width=f(width, kernel[1], pad[1], stride[1], dilate[1])
-    /// 
-    /// If ``no_bias`` is set to be true, then the ``bias`` term is ignored.
-    /// 
-    /// The default data ``layout`` is *NCHW*, namely *(batch_size, channle, height,
-    /// width)*.
-    /// 
-    /// If ``num_group`` is larger than 1, denoted by *g*, then split the input ``data``
-    /// evenly into *g* parts along the channel axis, and also evenly split ``weight``
-    /// along the first dimension. Next compute the convolution on the *i*-th part of
-    /// the data with the *i*-th weight part. The output is obtained by concating all
-    /// the *g* results.
-    /// 
-    /// If ``num_deformable_group`` is larger than 1, denoted by *dg*, then split the
-    /// input ``offset`` evenly into *dg* parts along the channel axis, and also evenly
-    /// split ``out`` evenly into *dg* parts along the channel axis. Next compute the
-    /// deformable convolution, apply the *i*-th part of the offset part on the *i*-th
-    /// out.
-    /// 
-    /// 
-    /// Both ``weight`` and ``bias`` are learnable parameters.
-    /// 
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\modulated_deformable_convolution.cc:L102</summary>
-    /// <param name="data">Input data to the ModulatedDeformableConvolutionOp.</param>
-    /// <param name="offset">Input offset to ModulatedDeformableConvolutionOp.</param>
-    /// <param name="mask">Input mask to the ModulatedDeformableConvolutionOp.</param>
-    /// <param name="weight">Weight matrix.</param>
-    /// <param name="bias">Bias parameter.</param>
-    /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
-    /// <param name="numFilter">Convolution filter(channel) number</param>
-    /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
-    /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
-    /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
-    /// <param name="numGroup">Number of group partitions.</param>
-    /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
-    /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
-    /// <param name="noBias">Whether to disable bias parameter.</param>
-    /// <param name="im2colStep">Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.</param>
-    /// <param name="layout">Set layout for input, output and weight. Empty for
-    ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
-    static member ContribModulatedDeformableConvolution(data : NDArray, 
-                                                        offset : NDArray, 
-                                                        mask : NDArray, 
-                                                        weight : NDArray, 
-                                                        bias : NDArray, 
-                                                        kernel : int seq, 
-                                                        numFilter : int, 
-                                                        [<Optional>] stride : int seq, 
-                                                        [<Optional>] dilate : int seq, 
-                                                        [<Optional>] pad : int seq, 
-                                                        [<Optional; DefaultParameterValue(1)>] numGroup : int, 
-                                                        [<Optional; DefaultParameterValue(1)>] numDeformableGroup : int, 
-                                                        [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
-                                                        [<Optional; DefaultParameterValue(false)>] noBias : bool, 
-                                                        [<Optional; DefaultParameterValue(64)>] im2colStep : int, 
-                                                        [<Optional>] layout : ContribModulatedDeformableConvolutionLayout) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_ModulatedDeformableConvolution"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg offset)) then offset.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mask)) then mask.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg bias)) then bias.UnsafeHandle|]
-                                                 [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "im2col_step"; "layout"|]
-                                                 [|(kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string numDeformableGroup; string workspace; string noBias; string im2colStep; (if isNull (layout :> obj) then "None" else string layout)|]
-        (new NDArray(outputs.[0]))
-    /// <summary>Compute 2-D modulated deformable convolution on 4-D input.
-    /// 
-    /// The modulated deformable convolution operation is described in https://arxiv.org/abs/1811.11168
-    /// 
-    /// For 2-D modulated deformable convolution, the shapes are
-    /// 
-    /// - **data**: *(batch_size, channel, height, width)*
-    /// - **offset**: *(batch_size, num_deformable_group * kernel[0] * kernel[1] * 2, height, width)*
-    /// - **mask**: *(batch_size, num_deformable_group * kernel[0] * kernel[1], height, width)*
-    /// - **weight**: *(num_filter, channel, kernel[0], kernel[1])*
-    /// - **bias**: *(num_filter,)*
-    /// - **out**: *(batch_size, num_filter, out_height, out_width)*.
-    /// 
-    /// Define::
-    /// 
-    ///   f(x,k,p,s,d) = floor((x+2*p-d*(k-1)-1)/s)+1
-    /// 
-    /// then we have::
-    /// 
-    ///   out_height=f(height, kernel[0], pad[0], stride[0], dilate[0])
-    ///   out_width=f(width, kernel[1], pad[1], stride[1], dilate[1])
-    /// 
-    /// If ``no_bias`` is set to be true, then the ``bias`` term is ignored.
-    /// 
-    /// The default data ``layout`` is *NCHW*, namely *(batch_size, channle, height,
-    /// width)*.
-    /// 
-    /// If ``num_group`` is larger than 1, denoted by *g*, then split the input ``data``
-    /// evenly into *g* parts along the channel axis, and also evenly split ``weight``
-    /// along the first dimension. Next compute the convolution on the *i*-th part of
-    /// the data with the *i*-th weight part. The output is obtained by concating all
-    /// the *g* results.
-    /// 
-    /// If ``num_deformable_group`` is larger than 1, denoted by *dg*, then split the
-    /// input ``offset`` evenly into *dg* parts along the channel axis, and also evenly
-    /// split ``out`` evenly into *dg* parts along the channel axis. Next compute the
-    /// deformable convolution, apply the *i*-th part of the offset part on the *i*-th
-    /// out.
-    /// 
-    /// 
-    /// Both ``weight`` and ``bias`` are learnable parameters.
-    /// 
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\modulated_deformable_convolution.cc:L102</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">Input data to the ModulatedDeformableConvolutionOp.</param>
-    /// <param name="offset">Input offset to ModulatedDeformableConvolutionOp.</param>
-    /// <param name="mask">Input mask to the ModulatedDeformableConvolutionOp.</param>
-    /// <param name="weight">Weight matrix.</param>
-    /// <param name="bias">Bias parameter.</param>
-    /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
-    /// <param name="numFilter">Convolution filter(channel) number</param>
-    /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
-    /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
-    /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
-    /// <param name="numGroup">Number of group partitions.</param>
-    /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
-    /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
-    /// <param name="noBias">Whether to disable bias parameter.</param>
-    /// <param name="im2colStep">Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.</param>
-    /// <param name="layout">Set layout for input, output and weight. Empty for
-    ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
-    static member ContribModulatedDeformableConvolution(outputArray : NDArray seq, 
-                                                        data : NDArray, 
-                                                        offset : NDArray, 
-                                                        mask : NDArray, 
-                                                        weight : NDArray, 
-                                                        bias : NDArray, 
-                                                        kernel : int seq, 
-                                                        numFilter : int, 
-                                                        [<Optional>] stride : int seq, 
-                                                        [<Optional>] dilate : int seq, 
-                                                        [<Optional>] pad : int seq, 
-                                                        [<Optional; DefaultParameterValue(1)>] numGroup : int, 
-                                                        [<Optional; DefaultParameterValue(1)>] numDeformableGroup : int, 
-                                                        [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
-                                                        [<Optional; DefaultParameterValue(false)>] noBias : bool, 
-                                                        [<Optional; DefaultParameterValue(64)>] im2colStep : int, 
-                                                        [<Optional>] layout : ContribModulatedDeformableConvolutionLayout) =
-        let creator = AtomicSymbolCreator.FromName "_contrib_ModulatedDeformableConvolution"
-        let names = [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "im2col_step"; "layout"|]
-        let vals = [|(kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string numDeformableGroup; string workspace; string noBias; string im2colStep; (if isNull (layout :> obj) then "None" else string layout)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg offset)) then offset.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mask)) then mask.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg bias)) then bias.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Compute 2-D modulated deformable convolution on 4-D input.
-    /// 
-    /// The modulated deformable convolution operation is described in https://arxiv.org/abs/1811.11168
-    /// 
-    /// For 2-D modulated deformable convolution, the shapes are
-    /// 
-    /// - **data**: *(batch_size, channel, height, width)*
-    /// - **offset**: *(batch_size, num_deformable_group * kernel[0] * kernel[1] * 2, height, width)*
-    /// - **mask**: *(batch_size, num_deformable_group * kernel[0] * kernel[1], height, width)*
-    /// - **weight**: *(num_filter, channel, kernel[0], kernel[1])*
-    /// - **bias**: *(num_filter,)*
-    /// - **out**: *(batch_size, num_filter, out_height, out_width)*.
-    /// 
-    /// Define::
-    /// 
-    ///   f(x,k,p,s,d) = floor((x+2*p-d*(k-1)-1)/s)+1
-    /// 
-    /// then we have::
-    /// 
-    ///   out_height=f(height, kernel[0], pad[0], stride[0], dilate[0])
-    ///   out_width=f(width, kernel[1], pad[1], stride[1], dilate[1])
-    /// 
-    /// If ``no_bias`` is set to be true, then the ``bias`` term is ignored.
-    /// 
-    /// The default data ``layout`` is *NCHW*, namely *(batch_size, channle, height,
-    /// width)*.
-    /// 
-    /// If ``num_group`` is larger than 1, denoted by *g*, then split the input ``data``
-    /// evenly into *g* parts along the channel axis, and also evenly split ``weight``
-    /// along the first dimension. Next compute the convolution on the *i*-th part of
-    /// the data with the *i*-th weight part. The output is obtained by concating all
-    /// the *g* results.
-    /// 
-    /// If ``num_deformable_group`` is larger than 1, denoted by *dg*, then split the
-    /// input ``offset`` evenly into *dg* parts along the channel axis, and also evenly
-    /// split ``out`` evenly into *dg* parts along the channel axis. Next compute the
-    /// deformable convolution, apply the *i*-th part of the offset part on the *i*-th
-    /// out.
-    /// 
-    /// 
-    /// Both ``weight`` and ``bias`` are learnable parameters.
-    /// 
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\modulated_deformable_convolution.cc:L102</summary>
-    /// <param name="data">Input data to the ModulatedDeformableConvolutionOp.</param>
-    /// <param name="offset">Input offset to ModulatedDeformableConvolutionOp.</param>
-    /// <param name="mask">Input mask to the ModulatedDeformableConvolutionOp.</param>
-    /// <param name="weight">Weight matrix.</param>
-    /// <param name="bias">Bias parameter.</param>
-    /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
-    /// <param name="numFilter">Convolution filter(channel) number</param>
-    /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
-    /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
-    /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
-    /// <param name="numGroup">Number of group partitions.</param>
-    /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
-    /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
-    /// <param name="noBias">Whether to disable bias parameter.</param>
-    /// <param name="im2colStep">Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.</param>
-    /// <param name="layout">Set layout for input, output and weight. Empty for
-    ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
-    static member ContribModulatedDeformableConvolution(data : Symbol, offset : Symbol, mask : Symbol, weight : Symbol, bias : Symbol, kernel : int seq, numFilter : int, [<Optional>] ?stride : int seq, [<Optional>] ?dilate : int seq, [<Optional>] ?pad : int seq, [<Optional>] ?numGroup : int, [<Optional>] ?numDeformableGroup : int, [<Optional>] ?workspace : int64, [<Optional>] ?noBias : bool, [<Optional>] ?im2colStep : int, [<Optional>] ?layout : ContribModulatedDeformableConvolutionLayout) =
-        ContribModulatedDeformableConvolution(data, offset, mask, weight, bias, kernel, numFilter, ?stride = stride, ?dilate = dilate, ?pad = pad, ?numGroup = numGroup, ?numDeformableGroup = numDeformableGroup, ?workspace = workspace, ?noBias = noBias, ?im2colStep = im2colStep, ?layout = layout)
-    /// <summary>Compute 2-D modulated deformable convolution on 4-D input.
-    /// 
-    /// The modulated deformable convolution operation is described in https://arxiv.org/abs/1811.11168
-    /// 
-    /// For 2-D modulated deformable convolution, the shapes are
-    /// 
-    /// - **data**: *(batch_size, channel, height, width)*
-    /// - **offset**: *(batch_size, num_deformable_group * kernel[0] * kernel[1] * 2, height, width)*
-    /// - **mask**: *(batch_size, num_deformable_group * kernel[0] * kernel[1], height, width)*
-    /// - **weight**: *(num_filter, channel, kernel[0], kernel[1])*
-    /// - **bias**: *(num_filter,)*
-    /// - **out**: *(batch_size, num_filter, out_height, out_width)*.
-    /// 
-    /// Define::
-    /// 
-    ///   f(x,k,p,s,d) = floor((x+2*p-d*(k-1)-1)/s)+1
-    /// 
-    /// then we have::
-    /// 
-    ///   out_height=f(height, kernel[0], pad[0], stride[0], dilate[0])
-    ///   out_width=f(width, kernel[1], pad[1], stride[1], dilate[1])
-    /// 
-    /// If ``no_bias`` is set to be true, then the ``bias`` term is ignored.
-    /// 
-    /// The default data ``layout`` is *NCHW*, namely *(batch_size, channle, height,
-    /// width)*.
-    /// 
-    /// If ``num_group`` is larger than 1, denoted by *g*, then split the input ``data``
-    /// evenly into *g* parts along the channel axis, and also evenly split ``weight``
-    /// along the first dimension. Next compute the convolution on the *i*-th part of
-    /// the data with the *i*-th weight part. The output is obtained by concating all
-    /// the *g* results.
-    /// 
-    /// If ``num_deformable_group`` is larger than 1, denoted by *dg*, then split the
-    /// input ``offset`` evenly into *dg* parts along the channel axis, and also evenly
-    /// split ``out`` evenly into *dg* parts along the channel axis. Next compute the
-    /// deformable convolution, apply the *i*-th part of the offset part on the *i*-th
-    /// out.
-    /// 
-    /// 
-    /// Both ``weight`` and ``bias`` are learnable parameters.
-    /// 
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\contrib\modulated_deformable_convolution.cc:L102</summary>
-    /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
-    /// <param name="numFilter">Convolution filter(channel) number</param>
-    /// <param name="data">Input data to the ModulatedDeformableConvolutionOp.</param>
-    /// <param name="offset">Input offset to ModulatedDeformableConvolutionOp.</param>
-    /// <param name="mask">Input mask to the ModulatedDeformableConvolutionOp.</param>
-    /// <param name="weight">Weight matrix.</param>
-    /// <param name="bias">Bias parameter.</param>
-    /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
-    /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
-    /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
-    /// <param name="numGroup">Number of group partitions.</param>
-    /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
-    /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
-    /// <param name="noBias">Whether to disable bias parameter.</param>
-    /// <param name="im2colStep">Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.</param>
-    /// <param name="layout">Set layout for input, output and weight. Empty for
-    ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
-    static member ContribModulatedDeformableConvolution(kernel : int seq, numFilter : int, [<Optional>] ?data : Symbol, [<Optional>] ?offset : Symbol, [<Optional>] ?mask : Symbol, [<Optional>] ?weight : Symbol, [<Optional>] ?bias : Symbol, [<Optional>] ?stride : int seq, [<Optional>] ?dilate : int seq, [<Optional>] ?pad : int seq, [<Optional>] ?numGroup : int, [<Optional>] ?numDeformableGroup : int, [<Optional>] ?workspace : int64, [<Optional>] ?noBias : bool, [<Optional>] ?im2colStep : int, [<Optional>] ?layout : ContribModulatedDeformableConvolutionLayout) =
-        ContribModulatedDeformableConvolution(kernel, numFilter, ?data = data, ?offset = offset, ?mask = mask, ?weight = weight, ?bias = bias, ?stride = stride, ?dilate = dilate, ?pad = pad, ?numGroup = numGroup, ?numDeformableGroup = numDeformableGroup, ?workspace = workspace, ?noBias = noBias, ?im2colStep = im2colStep, ?layout = layout)
 
 
     /// <summary>Generate region proposals via RPN</summary>
@@ -44814,7 +44352,7 @@ type MX() =
     /// where :math:`i` and :math:`j` enumerate spatial locations in :math:`f_{1}`, and :math:`q` denotes the :math:`q^{th}` neighborhood of :math:`x_{i,j}`.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\correlation.cc:L198</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\correlation.cc:L198</summary>
     /// <param name="data1">Input data1 to the correlation.</param>
     /// <param name="data2">Input data2 to the correlation.</param>
     /// <param name="kernelSize">kernel size for Correlation must be an odd number</param>
@@ -44870,7 +44408,7 @@ type MX() =
     /// where :math:`i` and :math:`j` enumerate spatial locations in :math:`f_{1}`, and :math:`q` denotes the :math:`q^{th}` neighborhood of :math:`x_{i,j}`.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\correlation.cc:L198</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\correlation.cc:L198</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data1">Input data1 to the correlation.</param>
     /// <param name="data2">Input data2 to the correlation.</param>
@@ -44932,7 +44470,7 @@ type MX() =
     /// where :math:`i` and :math:`j` enumerate spatial locations in :math:`f_{1}`, and :math:`q` denotes the :math:`q^{th}` neighborhood of :math:`x_{i,j}`.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\correlation.cc:L198</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\correlation.cc:L198</summary>
     /// <param name="data1">Input data1 to the correlation.</param>
     /// <param name="data2">Input data2 to the correlation.</param>
     /// <param name="kernelSize">kernel size for Correlation must be an odd number</param>
@@ -45057,7 +44595,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\instance_norm.cc:L95</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\instance_norm.cc:L95</summary>
     /// <param name="data">An n-dimensional input array (n &gt; 2) of the form [batch, channel, spatial_dim1, spatial_dim2, ...].</param>
     /// <param name="gamma">A vector of length &#39;channel&#39;, which multiplies the normalized input.</param>
     /// <param name="beta">A vector of length &#39;channel&#39;, which is added to the product of the normalized input and the weight.</param>
@@ -45110,7 +44648,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\instance_norm.cc:L95</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\instance_norm.cc:L95</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">An n-dimensional input array (n &gt; 2) of the form [batch, channel, spatial_dim1, spatial_dim2, ...].</param>
     /// <param name="gamma">A vector of length &#39;channel&#39;, which multiplies the normalized input.</param>
@@ -45168,7 +44706,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\instance_norm.cc:L95</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\instance_norm.cc:L95</summary>
     /// <param name="data">An n-dimensional input array (n &gt; 2) of the form [batch, channel, spatial_dim1, spatial_dim2, ...].</param>
     /// <param name="gamma">A vector of length &#39;channel&#39;, which multiplies the normalized input.</param>
     /// <param name="beta">A vector of length &#39;channel&#39;, which is added to the product of the normalized input and the weight.</param>
@@ -45231,7 +44769,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\l2_normalization.cc:L196</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\l2_normalization.cc:L196</summary>
     /// <param name="data">Input array to normalize.</param>
     /// <param name="eps">A small constant for numerical stability.</param>
     /// <param name="mode">Specify the dimension along which to compute L2 norm.</param>
@@ -45296,7 +44834,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\l2_normalization.cc:L196</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\l2_normalization.cc:L196</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input array to normalize.</param>
     /// <param name="eps">A small constant for numerical stability.</param>
@@ -45366,7 +44904,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\l2_normalization.cc:L196</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\l2_normalization.cc:L196</summary>
     /// <param name="data">Input array to normalize.</param>
     /// <param name="eps">A small constant for numerical stability.</param>
     /// <param name="mode">Specify the dimension along which to compute L2 norm.</param>
@@ -45397,7 +44935,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\make_loss.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\make_loss.cc:L71</summary>
     /// <param name="data">Input array.</param>
     /// <param name="gradScale">Gradient scale as a supplement to unary and binary operators</param>
     /// <param name="validThresh">clip each element in the array to 0 when it is less than ``valid_thresh``. This is used when ``normalization`` is set to ``&#39;valid&#39;``.</param>
@@ -45432,7 +44970,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\make_loss.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\make_loss.cc:L71</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input array.</param>
     /// <param name="gradScale">Gradient scale as a supplement to unary and binary operators</param>
@@ -45472,7 +45010,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\make_loss.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\make_loss.cc:L71</summary>
     /// <param name="data">Input array.</param>
     /// <param name="gradScale">Gradient scale as a supplement to unary and binary operators</param>
     /// <param name="validThresh">clip each element in the array to 0 when it is less than ``valid_thresh``. This is used when ``normalization`` is set to ``&#39;valid&#39;``.</param>
@@ -45530,7 +45068,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\sequence_last.cc:L106</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\sequence_last.cc:L106</summary>
     /// <param name="data">n-dimensional input array of the form [max_sequence_length, batch_size, other_feature_dims] where n&gt;2</param>
     /// <param name="sequenceLength">vector of sequence lengths of the form [batch_size]</param>
     /// <param name="useSequenceLength">If set to true, this layer takes in an extra input parameter `sequence_length` to specify variable length sequence</param>
@@ -45588,7 +45126,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\sequence_last.cc:L106</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\sequence_last.cc:L106</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">n-dimensional input array of the form [max_sequence_length, batch_size, other_feature_dims] where n&gt;2</param>
     /// <param name="sequenceLength">vector of sequence lengths of the form [batch_size]</param>
@@ -45651,7 +45189,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\sequence_last.cc:L106</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\sequence_last.cc:L106</summary>
     /// <param name="data">n-dimensional input array of the form [max_sequence_length, batch_size, other_feature_dims] where n&gt;2</param>
     /// <param name="sequenceLength">vector of sequence lengths of the form [batch_size]</param>
     /// <param name="useSequenceLength">If set to true, this layer takes in an extra input parameter `sequence_length` to specify variable length sequence</param>
@@ -45728,7 +45266,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\sequence_reverse.cc:L122</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\sequence_reverse.cc:L122</summary>
     /// <param name="data">n-dimensional input array of the form [max_sequence_length, batch_size, other dims] where n&gt;2 </param>
     /// <param name="sequenceLength">vector of sequence lengths of the form [batch_size]</param>
     /// <param name="useSequenceLength">If set to true, this layer takes in an extra input parameter `sequence_length` to specify variable length sequence</param>
@@ -45807,7 +45345,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\sequence_reverse.cc:L122</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\sequence_reverse.cc:L122</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">n-dimensional input array of the form [max_sequence_length, batch_size, other dims] where n&gt;2 </param>
     /// <param name="sequenceLength">vector of sequence lengths of the form [batch_size]</param>
@@ -45891,7 +45429,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\sequence_reverse.cc:L122</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\sequence_reverse.cc:L122</summary>
     /// <param name="data">n-dimensional input array of the form [max_sequence_length, batch_size, other dims] where n&gt;2 </param>
     /// <param name="sequenceLength">vector of sequence lengths of the form [batch_size]</param>
     /// <param name="useSequenceLength">If set to true, this layer takes in an extra input parameter `sequence_length` to specify variable length sequence</param>
@@ -46179,7 +45717,7 @@ type MX() =
 //     /// 
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\custom\custom.cc:L546</summary>
 //     /// <param name="data">Input data for the custom operator.</param>
 //     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
 //     static member Custom([<ParamArray>] data : NDArray[], opType : string) =
@@ -46197,7 +45735,7 @@ type MX() =
 //     /// 
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\custom\custom.cc:L546</summary>
 //     /// <param name = "outputArray">Array of NDArray for outputs</param>
 //     /// <param name="data">Input data for the custom operator.</param>
 //     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
@@ -46220,7 +45758,7 @@ type MX() =
 //     /// 
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\custom\custom.cc:L546</summary>
 //     /// <param name="data">Input data for the custom operator.</param>
 //     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
 //     static member Custom(data : Symbol seq, opType : string) =
@@ -46233,7 +45771,7 @@ type MX() =
 //     /// 
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\custom\custom.cc:L546</summary>
 //     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
 //     /// <param name="data">Input data for the custom operator.</param>
 //     static member Custom(opType : string, [<Optional>] ?data : Symbol seq) =
@@ -46246,7 +45784,7 @@ type MX() =
 //     /// 
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\custom\custom.cc:L547</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\custom\custom.cc:L546</summary>
 //     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
 //     /// <param name="data">Input data for the custom operator.</param>
 //     static member Custom(opType : string, [<ParamArray>] data : Symbol[]) =
@@ -46261,7 +45799,7 @@ type MX() =
 //     /// specify the crop height and width, otherwise the second input symbol&#39;s size will be used
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\crop.cc:L50</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\crop.cc:L50</summary>
 //     /// <param name="data">Tensor or List of Tensors, the second input will be used as crop_like shape reference</param>
 //     /// <param name="numArgs">Number of inputs for crop, if equals one, then we will use the h_wfor crop height and width, else if equals two, then we will use the heightand width of the second input symbol, we name crop_like here</param>
 //     /// <param name="offset">crop offset coordinate: (y, x)</param>
@@ -46283,7 +45821,7 @@ type MX() =
 //     /// specify the crop height and width, otherwise the second input symbol&#39;s size will be used
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\crop.cc:L50</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\crop.cc:L50</summary>
 //     /// <param name = "outputArray">Array of NDArray for outputs</param>
 //     /// <param name="data">Tensor or List of Tensors, the second input will be used as crop_like shape reference</param>
 //     /// <param name="numArgs">Number of inputs for crop, if equals one, then we will use the h_wfor crop height and width, else if equals two, then we will use the heightand width of the second input symbol, we name crop_like here</param>
@@ -46310,7 +45848,7 @@ type MX() =
 //     /// specify the crop height and width, otherwise the second input symbol&#39;s size will be used
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\crop.cc:L50</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\crop.cc:L50</summary>
 //     /// <param name="data">Tensor or List of Tensors, the second input will be used as crop_like shape reference</param>
 //     /// <param name="offset">crop offset coordinate: (y, x)</param>
 //     /// <param name="hW">crop height and width: (h, w)</param>
@@ -46456,7 +45994,7 @@ type MX() =
 //     /// 
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\pooling_v1.cc:L104</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\pooling_v1.cc:L104</summary>
 //     /// <param name="data">Input data to the pooling operator.</param>
 //     /// <param name="kernel">pooling kernel size: (y, x) or (d, y, x)</param>
 //     /// <param name="poolType">Pooling type to be applied.</param>
@@ -46516,7 +46054,7 @@ type MX() =
 //     /// 
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\pooling_v1.cc:L104</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\pooling_v1.cc:L104</summary>
 //     /// <param name = "outputArray">Array of NDArray for outputs</param>
 //     /// <param name="data">Input data to the pooling operator.</param>
 //     /// <param name="kernel">pooling kernel size: (y, x) or (d, y, x)</param>
@@ -46582,7 +46120,7 @@ type MX() =
 //     /// 
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet\mxnet\src\operator\pooling_v1.cc:L104</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\pooling_v1.cc:L104</summary>
 //     /// <param name="data">Input data to the pooling operator.</param>
 //     /// <param name="kernel">pooling kernel size: (y, x) or (d, y, x)</param>
 //     /// <param name="poolType">Pooling type to be applied.</param>

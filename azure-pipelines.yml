@@ -1,3 +1,6 @@
+variables:
+  mxv: '1.6.0'
+
 trigger:
 - master
 
@@ -29,8 +32,8 @@ stages:
             arguments: '-f netstandard2.0 -c Release'
             requestedMajorVersion: 3
           displayName: 'dotnet build Release'
-        - script: pip install --target=$(Agent.TempDirectory) mxnet
-          displayName: 'Install MXNet $(mxver)'
+        - script: pip install --target=$(Agent.TempDirectory) mxnet -f https://dist.mxnet.io/python
+          displayName: 'Install MXNet $(mxv)'
         - task: DotNetCoreCLI@2
           env: 
             LD_LIBRARY_PATH: '$(Agent.TempDirectory)/mxnet:$(LD_LIBRARY_PATH)'
@@ -71,8 +74,8 @@ stages:
             arguments: '-c Release'
             requestedMajorVersion: 3
           displayName: 'dotnet build Release'
-        - script: pip install --target=$(Agent.TempDirectory) mxnet
-          displayName: 'Install MXNet $(mxver)'
+        - script: pip install --target=$(Agent.TempDirectory) mxnet -f https://dist.mxnet.io/python
+          displayName: 'Install MXNet $(mxv)'
         - task: DotNetCoreCLI@2
           env: 
             PATH: '$(Agent.TempDirectory)\mxnet\;$(PATH)'
