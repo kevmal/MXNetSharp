@@ -33,7 +33,7 @@ stages:
             arguments: '-f netstandard2.0 -c Release'
             requestedMajorVersion: 5
           displayName: 'dotnet build Release'
-        - script: pip install --target=$(Agent.TempDirectory) mxnet==$(mxv) -f https://dist.mxnet.io/python
+        - script: pip install --target=$(Agent.TempDirectory) mxnet==1.7.0b20200903 -f https://dist.mxnet.io/python
           displayName: 'Install MXNet $(mxv)'
         - task: DotNetCoreCLI@2
           env: 
