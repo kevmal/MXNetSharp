@@ -12,10 +12,10 @@ stages:
         pool:
           vmImage: 'ubuntu-latest'
         steps:
-	- task: UseDotNet@2
-	  inputs:
-	    packageType: 'sdk'
-	    version: '5.0.x'
+        - task: UseDotNet@2
+          inputs:
+            packageType: 'sdk'
+            version: '5.0.x'
         - task: UsePythonVersion@0
         - checkout: self
           clean: true
@@ -57,10 +57,10 @@ stages:
         pool:
           vmImage: 'windows-2019'
         steps:
-	- task: UseDotNet@2
-	  inputs:
-	    packageType: 'sdk'
-	    version: '5.0.x'
+        - task: UseDotNet@2
+          inputs:
+            packageType: 'sdk'
+            version: '5.0.x'
         - task: UsePythonVersion@0
         - checkout: self
           clean: true
