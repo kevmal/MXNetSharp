@@ -1,5 +1,5 @@
 variables:
-  mxv: '1.6.0'
+  mxv: '1.7.0'
 
 trigger:
 - master
