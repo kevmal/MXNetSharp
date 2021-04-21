@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <TargetFrameworks>netstandard2.0;netcoreapp3.0;net48</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net5.0;net48</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">

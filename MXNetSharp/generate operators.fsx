@@ -171,6 +171,10 @@ let registeredTypes =
         "_npi_choice", "a", "int64"
         "_npi_choice", "size", "Shape(tuple)"
         "_histogram", "range", "Shape(tuple)" //TODO: not technically correct
+        "_npi_eigh", "UPLO", "{L,U}"
+        "_npi_eig", "UPLO", "{L,U}"
+        "_npi_eigvals", "UPLO", "{L,U}"
+        "_npi_eigvalsh", "UPLO", "{L,U}"
     ]
     |> List.map (fun (n,p,t) -> (n,p), t)
     |> dict
@@ -1254,7 +1258,44 @@ Mappings.Modify(fun (x : ProcessedAtomicSymbol list) ->
     )
 
 
+// **************************** UPLO *******************************
 
+Mappings.Modify(fun (x : ProcessedArg) -> 
+    match x.Name with 
+    | "UPLO" -> 
+        let dmode = 
+            match x.DefaultMode with 
+            | None -> Some(DefaultMode.IgnoreNull)
+            | dm -> dm
+        {x with     
+            TypeString = "UpperLower"
+            DefaultMode = dmode
+            DefinedType = 
+                Some({  
+                    TypeString = x.TypeString
+                    Name = "UpperLower"
+                    Cases = [|"L", "L"; "U", "U"|]
+                    Generate = true
+                })}
+    | _ -> x
+    )
+       
+// **************************** val args *******************************
+Mappings.Modify(fun (x : ProcessedArg) -> 
+    match x.Name with 
+    | "val" -> {x with Name = "value"} |> argDoc
+    | _ -> x
+)
+
+// **************************** NpiPad *******************************
+Mappings.Modify(fun (x : ProcessedArg) -> 
+    if x.Arg.AtomicSymbolInfo.Name = "_npi_pad" then 
+        match x.Name with 
+        | "padWidth" -> {x with TypeString = "int []"} |> argDoc
+        | _ -> x
+    else 
+        x
+)
 
 // **************************** SpatialTransformer *******************************
 
@@ -1287,6 +1328,7 @@ Mappings.Modify(fun (x : ProcessedAtomicSymbol) ->
     else
         x
 )
+
 
 // **************************** _npi_logspace *******************************
 // 'base' parameter name
@@ -1517,6 +1559,9 @@ let processDefinedType (t : UnionType) (arg : ProcessedArg) =
                 TypeString = ""
                 Generate = true
             } 
+        | FName "ArangeDtype"
+        | FName "FullDtype"
+        | FName "LinspaceDtype"
         | FName "CastDtype"
         | FName "NpiBernoulliDtype"
         | FName "NpiIdentityDtype"
