@@ -23,14 +23,14 @@ stages:
             command: 'build'
             projects: 'MXNetSharp'
             arguments: '-f netstandard2.0 -c Debug'
-            requestedMajorVersion: 3
+            requestedMajorVersion: 5
           displayName: 'dotnet build Debug'
         - task: DotNetCoreCLI@2
           inputs:
             command: 'build'
             projects: 'MXNetSharp'
             arguments: '-f netstandard2.0 -c Release'
-            requestedMajorVersion: 3
+            requestedMajorVersion: 5
           displayName: 'dotnet build Release'
         - script: pip install --target=$(Agent.TempDirectory) mxnet -f https://dist.mxnet.io/python
           displayName: 'Install MXNet $(mxv)'
@@ -49,7 +49,7 @@ stages:
             command: 'test'
             projects: 'MXNETSharp.Tests'
             arguments: '-c Release'
-            requestedMajorVersion: 3
+            requestedMajorVersion: 5
           displayName: 'dotnet test Release'
 
       - job: Windows
@@ -66,13 +66,13 @@ stages:
           inputs:
             command: 'build'
             arguments: '-c Debug'
-            requestedMajorVersion: 3
+            requestedMajorVersion: 5
           displayName: 'dotnet build Debug'
         - task: DotNetCoreCLI@2
           inputs:
             command: 'build'
             arguments: '-c Release'
-            requestedMajorVersion: 3
+            requestedMajorVersion: 5
           displayName: 'dotnet build Release'
         - script: pip install --target=$(Agent.TempDirectory) mxnet -f https://dist.mxnet.io/python
           displayName: 'Install MXNet $(mxv)'
@@ -82,7 +82,7 @@ stages:
           inputs:
             command: 'test'
             arguments: '-c Debug'
-            requestedMajorVersion: 3
+            requestedMajorVersion: 5
           displayName: 'dotnet test Debug'
         - task: DotNetCoreCLI@2
           env: 
@@ -90,5 +90,5 @@ stages:
           inputs:
             command: 'test'
             arguments: '-c Release'
-            requestedMajorVersion: 3
+            requestedMajorVersion: 5
           displayName: 'dotnet test Release'
