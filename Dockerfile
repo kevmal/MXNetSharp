@@ -1,8 +1,6 @@
-FROM jupyter/scipy-notebook:latest
+ROM jupyter/base-notebook:latest
 
 # Install .NET CLI dependencies
-
-RUN pip install mxnet
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
@@ -15,6 +13,16 @@ WORKDIR ${HOME}
 USER root
 RUN apt-get update
 RUN apt-get install -y curl
+
+ENV \
+    # Enable detection of running in a container
+    DOTNET_RUNNING_IN_CONTAINER=true \
+    # Enable correct mode for dotnet watch (only mode supported in a container)
+    DOTNET_USE_POLLING_FILE_WATCHER=true \
+    # Skip extraction of XML docs - generally not useful within an image/container - helps performance
+    NUGET_XMLDOC_MODE=skip \
+    # Opt out of telemetry until after we install jupyter when building the image, this prevents caching of machine id
+    DOTNET_INTERACTIVE_CLI_TELEMETRY_OPTOUT=true
 
 # Install .NET CLI dependencies
 RUN apt-get update \
@@ -29,6 +37,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install .NET Core SDK
+
+# When updating the SDK version, the sha512 value a few lines down must also be updated.
 ENV DOTNET_SDK_VERSION 5.0.102
 
 RUN dotnet_sdk_version=5.0.102 \
@@ -42,32 +52,19 @@ RUN dotnet_sdk_version=5.0.102 \
     # Trigger first run experience by running arbitrary cmd
     && dotnet help
 
-# Enable detection of running in a container
-ENV DOTNET_RUNNING_IN_CONTAINER=true \
-    # Enable correct mode for dotnet watch (only mode supported in a container)
-    DOTNET_USE_POLLING_FILE_WATCHER=true \
-    # Skip extraction of XML docs - generally not useful within an image/container - helps performance
-    NUGET_XMLDOC_MODE=skip \
-    # Opt out of telemetry until after we install jupyter when building the image, this prevents caching of machine id
-    DOTNET_TRY_CLI_TELEMETRY_OPTOUT=true
-
-# Trigger first run experience by running arbitrary cmd
-RUN dotnet help
-
-COPY ./MXNetSharp/ ${HOME}/MXNetSharp/
-
 # Copy notebooks
-
 COPY ./notebooks/ ${HOME}/notebooks/
 
 # Copy package sources
-
 COPY ./NuGet.config ${HOME}/nuget.config
 
 RUN chown -R ${NB_UID} ${HOME}
 USER ${USER}
 
-# Install lastest build from master branch of Microsoft.DotNet.Interactive from myget
+#Install nteract 
+RUN pip install nteract_on_jupyter
+
+# Install lastest build from main branch of Microsoft.DotNet.Interactive
 RUN dotnet tool install -g Microsoft.dotnet-interactive --add-source "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json"
 
 ENV PATH="${PATH}:${HOME}/.dotnet/tools"
@@ -77,12 +74,15 @@ RUN echo "$PATH"
 RUN dotnet interactive jupyter install
 
 # Enable telemetry once we install jupyter for the image
-ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
+ENV DOTNET_INTERACTIVE_CLI_TELEMETRY_OPTOUT=false
+
+RUN pip install mxnet
+COPY ./MXNetSharp/ ${HOME}/MXNetSharp/
+
 
 RUN dotnet build MXNetSharp -c Release -f netstandard2.0
 RUN cp ./MXNetSharp/bin/Release/netstandard2.0/MXNetSharp.dll ${HOME}/MXNetSharp.dll
 ENV LD_LIBRARY_PATH "/opt/conda/lib/python3.7/site-packages/mxnet:$LD_LIBRARY_PATH"
-#RUN cp /opt/conda/lib/python3.7/site-packages/mxnet/libmxnet.so ${HOME}/libmxnet.so
 
 # Set root to notebooks
 WORKDIR ${HOME}/notebooks/
