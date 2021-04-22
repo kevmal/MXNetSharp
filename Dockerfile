@@ -83,7 +83,7 @@ RUN pip install mxnet
 
 RUN dotnet build MXNetSharp -c Release -f netstandard2.0
 RUN cp ./MXNetSharp/bin/Release/netstandard2.0/MXNetSharp.dll ${HOME}/MXNetSharp.dll
-ENV LD_LIBRARY_PATH "/opt/conda/lib/python3.7/site-packages/mxnet:$LD_LIBRARY_PATH"
+ENV LD_LIBRARY_PATH "/opt/conda/lib/python3.8/site-packages/mxnet:$LD_LIBRARY_PATH"
 
 # Set root to notebooks
 WORKDIR ${HOME}/notebooks/
