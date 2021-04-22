@@ -59,6 +59,8 @@ COPY ./notebooks/ ${HOME}/notebooks/
 COPY ./NuGet.config ${HOME}/nuget.config
 
 COPY ./MXNetSharp/ ${HOME}/MXNetSharp/
+COPY ./Examples/ ${HOME}/Examples/
+COPY ./MXNETSharp.Tests/ ${HOME}/MXNETSharp.Tests/
 
 RUN chown -R ${NB_UID} ${HOME}
 USER ${USER}
@@ -78,12 +80,12 @@ RUN dotnet interactive jupyter install
 # Enable telemetry once we install jupyter for the image
 ENV DOTNET_INTERACTIVE_CLI_TELEMETRY_OPTOUT=false
 
-RUN pip install mxnet==1.7.0b20200903 -f https://dist.mxnet.io/python
+RUN pip install --target=${HOME} mxnet==1.7.0b20200903 -f https://dist.mxnet.io/python
 
 
 RUN dotnet build MXNetSharp -c Release -f netstandard2.0
 RUN cp ./MXNetSharp/bin/Release/netstandard2.0/MXNetSharp.dll ${HOME}/MXNetSharp.dll
-ENV LD_LIBRARY_PATH "/opt/conda/lib/python3.8/site-packages/mxnet:$LD_LIBRARY_PATH"
+ENV LD_LIBRARY_PATH "${HOME}/mxnet:$LD_LIBRARY_PATH"
 
 # Set root to notebooks
 WORKDIR ${HOME}/notebooks/
