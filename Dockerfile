@@ -1,4 +1,4 @@
-ROM jupyter/base-notebook:latest
+FROM jupyter/base-notebook:latest
 
 # Install .NET CLI dependencies
 
