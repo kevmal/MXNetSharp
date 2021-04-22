@@ -78,7 +78,7 @@ RUN dotnet interactive jupyter install
 # Enable telemetry once we install jupyter for the image
 ENV DOTNET_INTERACTIVE_CLI_TELEMETRY_OPTOUT=false
 
-RUN pip install mxnet
+RUN pip install mxnet==1.7.0b20200903 -f https://dist.mxnet.io/python
 
 
 RUN dotnet build MXNetSharp -c Release -f netstandard2.0
