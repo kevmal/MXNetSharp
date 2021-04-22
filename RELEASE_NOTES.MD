@@ -6,7 +6,8 @@
 * Bindings.[name] and Executor.[name] indexers
 * Symbol.Save (save json to file) and Symbol.Json (json string) instance methods
 * Sparse NDArray ctor
-* Operators for MXNet 1.6.0
+* Operators for MXNet 1.7.0
+* Use net5.0 for examples
 
 #### 0.0.3 (2020-01-14)
 * Issue #20: Added Constant:>Variable type

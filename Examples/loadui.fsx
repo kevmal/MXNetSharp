@@ -1,23 +1,4 @@
-﻿// .NET core
-(*
-#I @"bin/Debug/netcoreapp3.0"
-// Libraries in bin/Debug/netcoreapp3.0/runtimes/RID/native (where RID is the appropriate runtime id) need to be accessible
-// The following works for windows however setting LD_LIBRARY_PATH at runtime in 'dotnet fsi' does not seem to work
-// on linux based systems. LD_LIBRARY_PATH can be set prior to running 'dotnet fsi' or the required native library
-// should be copied next to the Avalonia binaries.
-
-open System.IO
-let path = Environment.GetEnvironmentVariable("PATH")
-let libsearch = 
-    Directory.EnumerateDirectories(Path.Combine(__SOURCE_DIRECTORY__, "bin", "Debug", "netcoreapp3.0", "runtimes"))
-    |> Seq.map (fun d -> Path.Combine(d,"native"))
-    |> String.concat (string Path.PathSeparator)
-Environment.SetEnvironmentVariable("PATH", libsearch + string Path.PathSeparator + path)
-*)
-////
-// .NET Framework
-#I @"bin/Debug/net48"
-////
+﻿#I @"bin/Debug/net5.0"
 
 
 #r "System.Reactive.dll" 

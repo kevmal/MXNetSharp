@@ -783,6 +783,28 @@ module SymbolOperators =
                 ] |> List.choose id
             new CachedOp(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type CachedOpThreadSafe private (operatorArguments) = 
+        inherit SymbolOperator("_CachedOpThreadSafe", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new CachedOpThreadSafe(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new CachedOpThreadSafe(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">input data list</param>
+        new([<ParamArray>] data : Symbol[]) =
+            let operatorArguments = 
+                [
+                    "data", VarArg("", data)
+                ]
+            new CachedOpThreadSafe(Arguments<Symbol>(operatorArguments))
+        /// input data list
+        member __.Data = operatorArguments.GetVarArg "data"
+        /// <summary>Copy CachedOpThreadSafe instance with updated inputs/parameters.</summary>
+        /// <param name="data">input data list</param>
+        member this.With([<Optional>] ?data : Symbol seq) =
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                ] |> List.choose id
+            new CachedOpThreadSafe(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type Cvimread private (operatorArguments) = 
         inherit SymbolOperator("_cvimread", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new Cvimread(args)
@@ -2007,7 +2029,7 @@ module SymbolOperators =
         /// for more details.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bilinear_resize.cc:L215</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bilinear_resize.cc:L220</summary>
         /// <param name="data">Input data</param>
         /// <param name="like">Resize data to it&#39;s shape</param>
         /// <param name="height">output height (required, but ignored if scale_height is defined or mode is not &quot;size&quot;)</param>
@@ -2015,13 +2037,15 @@ module SymbolOperators =
         /// <param name="scaleHeight">sampling scale of the height (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
         /// <param name="scaleWidth">sampling scale of the width (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
         /// <param name="mode">resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);</param>
+        /// <param name="alignCorners">With align_corners = True, the interpolating doesn&#39;t proportionally align theoutput and input pixels, and thus the output values can depend on the input size.</param>
         new([<Optional>] ?data : Symbol,
             [<Optional>] ?like : Symbol,
             [<Optional>] ?height : int,
             [<Optional>] ?width : int,
             [<Optional>] ?scaleHeight : float,
             [<Optional>] ?scaleWidth : float,
-            [<Optional>] ?mode : ContribBilinearResize2DMode) = 
+            [<Optional>] ?mode : ContribBilinearResize2DMode,
+            [<Optional>] ?alignCorners : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let like = defaultArg like (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
@@ -2033,6 +2057,7 @@ module SymbolOperators =
                     "scale_height", scaleHeight |> Option.map box |> Parameter
                     "scale_width", scaleWidth |> Option.map box |> Parameter
                     "mode", mode |> Option.map box |> Parameter
+                    "align_corners", alignCorners |> Option.map box |> Parameter
                 ]
             new ContribBilinearResize2D(Arguments<Symbol>(operatorArguments))
         /// Default value for Height
@@ -2050,6 +2075,9 @@ module SymbolOperators =
         /// Default value for Mode
         /// resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);
         static member ModeDefault : ContribBilinearResize2DMode = ContribBilinearResize2DMode.Size
+        /// Default value for AlignCorners
+        /// With align_corners = True, the interpolating doesn&#39;t proportionally align theoutput and input pixels, and thus the output values can depend on the input size.
+        static member AlignCornersDefault : bool = true
         /// Input data
         member __.Data = operatorArguments.GetInput "data"
         /// Resize data to it&#39;s shape
@@ -2064,6 +2092,8 @@ module SymbolOperators =
         member __.ScaleWidth = operatorArguments.GetParameter("scale_width", ContribBilinearResize2D.ScaleWidthDefault)
         /// resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);
         member __.Mode = operatorArguments.GetParameter("mode", ContribBilinearResize2D.ModeDefault)
+        /// With align_corners = True, the interpolating doesn&#39;t proportionally align theoutput and input pixels, and thus the output values can depend on the input size.
+        member __.AlignCorners = operatorArguments.GetParameter("align_corners", ContribBilinearResize2D.AlignCornersDefault)
         /// <summary>Copy ContribBilinearResize2D instance with updated inputs/parameters.</summary>
         /// <param name="data">Input data</param>
         /// <param name="like">Resize data to it&#39;s shape</param>
@@ -2072,13 +2102,15 @@ module SymbolOperators =
         /// <param name="scaleHeight">sampling scale of the height (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
         /// <param name="scaleWidth">sampling scale of the width (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
         /// <param name="mode">resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);</param>
+        /// <param name="alignCorners">With align_corners = True, the interpolating doesn&#39;t proportionally align theoutput and input pixels, and thus the output values can depend on the input size.</param>
         member this.With([<Optional>] ?data : Symbol,
             [<Optional>] ?like : Symbol,
             [<Optional>] ?height : int,
             [<Optional>] ?width : int,
             [<Optional>] ?scaleHeight : float,
             [<Optional>] ?scaleWidth : float,
-            [<Optional>] ?mode : ContribBilinearResize2DMode) = 
+            [<Optional>] ?mode : ContribBilinearResize2DMode,
+            [<Optional>] ?alignCorners : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
@@ -2088,6 +2120,7 @@ module SymbolOperators =
                     scaleHeight |> Option.map (fun x -> "scale_height", Parameter(Some (box x)))
                     scaleWidth |> Option.map (fun x -> "scale_width", Parameter(Some (box x)))
                     mode |> Option.map (fun x -> "mode", Parameter(Some (box x)))
+                    alignCorners |> Option.map (fun x -> "align_corners", Parameter(Some (box x)))
                 ] |> List.choose id
             new ContribBilinearResize2D(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -2211,7 +2244,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L94</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L95</summary>
         /// <param name="data">The input</param>
         /// <param name="overlapThresh">Overlapping(IoU) threshold to suppress object with smaller score.</param>
         /// <param name="validThresh">Filter input boxes to those whose scores greater than valid_thresh.</param>
@@ -2371,7 +2404,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L136</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L137</summary>
         /// <param name="lhs">The first input</param>
         /// <param name="rhs">The second input</param>
         /// <param name="format">The box encoding type. 
@@ -2442,7 +2475,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L182</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L183</summary>
         /// <param name="data">The input</param>
         /// <param name="threshold">Ignore matching when score &lt; thresh, if is_ascend=false, or ignore score &gt; thresh, if is_ascend=true.</param>
         /// <param name="isAscend">Use ascend order for scores instead of descending. Please set threshold accordingly.</param>
@@ -2482,7 +2515,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L182</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L183</summary>
         /// <param name="threshold">Ignore matching when score &lt; thresh, if is_ascend=false, or ignore score &gt; thresh, if is_ascend=true.</param>
         /// <param name="data">The input</param>
         /// <param name="isAscend">Use ascend order for scores instead of descending. Please set threshold accordingly.</param>
@@ -2540,7 +2573,7 @@ module SymbolOperators =
         ///     Input bounding boxes are using corner type: `x_{min}, y_{min}, x_{max}, y_{max}`.) array
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L210</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L211</summary>
         /// <param name="samples">(B, N) value +1 (positive), -1 (negative), 0 (ignore)</param>
         /// <param name="matches">(B, N) value range [0, M)</param>
         /// <param name="anchors">(B, N, 4) encoded in corner</param>
@@ -2614,7 +2647,7 @@ module SymbolOperators =
         ///     or center type: `x, y, width, height.) array
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L233</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L234</summary>
         /// <param name="data">(B, N, 4) predicted bbox offset</param>
         /// <param name="anchors">(1, N, 4) encoded in corner or center</param>
         /// <param name="std0">value to be divided from the 1st encoded values</param>
@@ -3328,48 +3361,45 @@ module SymbolOperators =
         /// the preceding layer.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L78</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L79</summary>
         /// <param name="data">The input array.</param>
-        /// <param name="scalar">lambda multiplier</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new ContribGradientmultiplier(Arguments<Symbol>(operatorArguments))
-        /// <summary>This operator implements the gradient multiplier function.
-        /// In forward pass it acts as an identity transform. During backpropagation it
-        /// multiplies the gradient from the subsequent level by a scalar factor lambda and passes it to
-        /// the preceding layer.
-        /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L78</summary>
-        /// <param name="scalar">lambda multiplier</param>
-        /// <param name="data">The input array.</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new ContribGradientmultiplier(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// The input array.
         member __.Data = operatorArguments.GetInput "data"
-        /// lambda multiplier
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", ContribGradientmultiplier.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", ContribGradientmultiplier.IsIntDefault)
         /// <summary>Copy ContribGradientmultiplier instance with updated inputs/parameters.</summary>
         /// <param name="data">The input array.</param>
-        /// <param name="scalar">lambda multiplier</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new ContribGradientmultiplier(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -3378,39 +3408,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new ContribBackwardGradientmultiplier(args)
         override this.WithArguments(args : Arguments<Symbol>) = new ContribBackwardGradientmultiplier(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new ContribBackwardGradientmultiplier(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new ContribBackwardGradientmultiplier(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", ContribBackwardGradientmultiplier.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", ContribBackwardGradientmultiplier.IsIntDefault)
         /// <summary>Copy ContribBackwardGradientmultiplier instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new ContribBackwardGradientmultiplier(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -3783,6 +3817,400 @@ module SymbolOperators =
                     args |> Option.map (fun x -> "args", VarArg("num_args", Seq.toArray x))
                 ] |> List.choose id
             new KhatriRao(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type MultiLambUpdate private (operatorArguments) = 
+        inherit SymbolOperator("_multi_lamb_update", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new MultiLambUpdate(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new MultiLambUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Compute the LAMB coefficients of multiple weights and grads&quot;
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lamb.cc:L176</summary>
+        /// <param name="data">data</param>
+        /// <param name="learningRates">List of learning rates</param>
+        /// <param name="wds">List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+        /// <param name="stepCount">Step count for each tensor</param>
+        /// <param name="beta1">Exponential decay rate for the first moment estimates.</param>
+        /// <param name="beta2">Exponential decay rate for the second moment estimates.</param>
+        /// <param name="epsilon">Small value to avoid division by 0.</param>
+        /// <param name="rescaleGrad">Gradient rescaling factor</param>
+        /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+        /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+        /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+        /// <param name="biasCorrection">Whether to use bias correction.</param>
+        /// <param name="numTensors">Number of tensors</param>
+        new(data : Symbol seq,
+            learningRates : double seq,
+            wds : double seq,
+            stepCount : int seq,
+            [<Optional>] ?beta1 : float,
+            [<Optional>] ?beta2 : float,
+            [<Optional>] ?epsilon : float,
+            [<Optional>] ?rescaleGrad : float,
+            [<Optional>] ?lowerBound : float,
+            [<Optional>] ?upperBound : float,
+            [<Optional>] ?clipGradient : float,
+            [<Optional>] ?biasCorrection : bool,
+            [<Optional>] ?numTensors : int) = 
+            let operatorArguments = 
+                [
+                    "data", VarArg("", data |> Seq.toArray)
+                    "learning_rates", Parameter(Some(box learningRates))
+                    "wds", Parameter(Some(box wds))
+                    "step_count", Parameter(Some(box stepCount))
+                    "beta1", beta1 |> Option.map box |> Parameter
+                    "beta2", beta2 |> Option.map box |> Parameter
+                    "epsilon", epsilon |> Option.map box |> Parameter
+                    "rescale_grad", rescaleGrad |> Option.map box |> Parameter
+                    "lower_bound", lowerBound |> Option.map box |> Parameter
+                    "upper_bound", upperBound |> Option.map box |> Parameter
+                    "clip_gradient", clipGradient |> Option.map box |> Parameter
+                    "bias_correction", biasCorrection |> Option.map box |> Parameter
+                    "num_tensors", numTensors |> Option.map box |> Parameter
+                ]
+            new MultiLambUpdate(Arguments<Symbol>(operatorArguments))
+        /// <summary>Compute the LAMB coefficients of multiple weights and grads&quot;
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lamb.cc:L176</summary>
+        /// <param name="learningRates">List of learning rates</param>
+        /// <param name="wds">List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+        /// <param name="stepCount">Step count for each tensor</param>
+        /// <param name="data">data</param>
+        /// <param name="beta1">Exponential decay rate for the first moment estimates.</param>
+        /// <param name="beta2">Exponential decay rate for the second moment estimates.</param>
+        /// <param name="epsilon">Small value to avoid division by 0.</param>
+        /// <param name="rescaleGrad">Gradient rescaling factor</param>
+        /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+        /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+        /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+        /// <param name="biasCorrection">Whether to use bias correction.</param>
+        /// <param name="numTensors">Number of tensors</param>
+        new(learningRates : double seq,
+            wds : double seq,
+            stepCount : int seq,
+            [<Optional>] ?data : Symbol seq,
+            [<Optional>] ?beta1 : float,
+            [<Optional>] ?beta2 : float,
+            [<Optional>] ?epsilon : float,
+            [<Optional>] ?rescaleGrad : float,
+            [<Optional>] ?lowerBound : float,
+            [<Optional>] ?upperBound : float,
+            [<Optional>] ?clipGradient : float,
+            [<Optional>] ?biasCorrection : bool,
+            [<Optional>] ?numTensors : int) = 
+            let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
+            let operatorArguments = 
+                [
+                    "data", VarArg("", data)
+                    "learning_rates", Parameter(Some(box learningRates))
+                    "wds", Parameter(Some(box wds))
+                    "step_count", Parameter(Some(box stepCount))
+                    "beta1", beta1 |> Option.map box |> Parameter
+                    "beta2", beta2 |> Option.map box |> Parameter
+                    "epsilon", epsilon |> Option.map box |> Parameter
+                    "rescale_grad", rescaleGrad |> Option.map box |> Parameter
+                    "lower_bound", lowerBound |> Option.map box |> Parameter
+                    "upper_bound", upperBound |> Option.map box |> Parameter
+                    "clip_gradient", clipGradient |> Option.map box |> Parameter
+                    "bias_correction", biasCorrection |> Option.map box |> Parameter
+                    "num_tensors", numTensors |> Option.map box |> Parameter
+                ]
+            new MultiLambUpdate(Arguments<Symbol>(operatorArguments))
+        /// Default value for Beta1
+        /// Exponential decay rate for the first moment estimates.
+        static member Beta1Default : double = 0.9
+        /// Default value for Beta2
+        /// Exponential decay rate for the second moment estimates.
+        static member Beta2Default : double = 0.999
+        /// Default value for Epsilon
+        /// Small value to avoid division by 0.
+        static member EpsilonDefault : double = 0.000001
+        /// Default value for RescaleGrad
+        /// Gradient rescaling factor
+        static member RescaleGradDefault : double = 1.0
+        /// Default value for LowerBound
+        /// Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set
+        static member LowerBoundDefault : double = -1.0
+        /// Default value for UpperBound
+        /// Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set
+        static member UpperBoundDefault : double = -1.0
+        /// Default value for ClipGradient
+        /// Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).
+        static member ClipGradientDefault : double = -1.0
+        /// Default value for BiasCorrection
+        /// Whether to use bias correction.
+        static member BiasCorrectionDefault : bool = true
+        /// Default value for NumTensors
+        /// Number of tensors
+        static member NumTensorsDefault : int = 1
+        /// data
+        member __.Data = operatorArguments.GetVarArg "data"
+        /// List of learning rates
+        member __.LearningRates : double seq = match operatorArguments.GetParameter "learning_rates" with Some(v) -> unbox v | None -> failwithf "Required parameter learning_rates is missing"
+        /// List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.
+        member __.Wds : double seq = match operatorArguments.GetParameter "wds" with Some(v) -> unbox v | None -> failwithf "Required parameter wds is missing"
+        /// Step count for each tensor
+        member __.StepCount : int seq = match operatorArguments.GetParameter "step_count" with Some(v) -> unbox v | None -> failwithf "Required parameter step_count is missing"
+        /// Exponential decay rate for the first moment estimates.
+        member __.Beta1 = operatorArguments.GetParameter("beta1", MultiLambUpdate.Beta1Default)
+        /// Exponential decay rate for the second moment estimates.
+        member __.Beta2 = operatorArguments.GetParameter("beta2", MultiLambUpdate.Beta2Default)
+        /// Small value to avoid division by 0.
+        member __.Epsilon = operatorArguments.GetParameter("epsilon", MultiLambUpdate.EpsilonDefault)
+        /// Gradient rescaling factor
+        member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", MultiLambUpdate.RescaleGradDefault)
+        /// Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set
+        member __.LowerBound = operatorArguments.GetParameter("lower_bound", MultiLambUpdate.LowerBoundDefault)
+        /// Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set
+        member __.UpperBound = operatorArguments.GetParameter("upper_bound", MultiLambUpdate.UpperBoundDefault)
+        /// Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).
+        member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", MultiLambUpdate.ClipGradientDefault)
+        /// Whether to use bias correction.
+        member __.BiasCorrection = operatorArguments.GetParameter("bias_correction", MultiLambUpdate.BiasCorrectionDefault)
+        /// Number of tensors
+        member __.NumTensors = operatorArguments.GetParameter("num_tensors", MultiLambUpdate.NumTensorsDefault)
+        /// <summary>Copy MultiLambUpdate instance with updated inputs/parameters.</summary>
+        /// <param name="data">data</param>
+        /// <param name="learningRates">List of learning rates</param>
+        /// <param name="wds">List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+        /// <param name="stepCount">Step count for each tensor</param>
+        /// <param name="beta1">Exponential decay rate for the first moment estimates.</param>
+        /// <param name="beta2">Exponential decay rate for the second moment estimates.</param>
+        /// <param name="epsilon">Small value to avoid division by 0.</param>
+        /// <param name="rescaleGrad">Gradient rescaling factor</param>
+        /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+        /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+        /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+        /// <param name="biasCorrection">Whether to use bias correction.</param>
+        /// <param name="numTensors">Number of tensors</param>
+        member this.With([<Optional>] ?data : Symbol seq,
+            [<Optional>] ?learningRates : double seq,
+            [<Optional>] ?wds : double seq,
+            [<Optional>] ?stepCount : int seq,
+            [<Optional>] ?beta1 : float,
+            [<Optional>] ?beta2 : float,
+            [<Optional>] ?epsilon : float,
+            [<Optional>] ?rescaleGrad : float,
+            [<Optional>] ?lowerBound : float,
+            [<Optional>] ?upperBound : float,
+            [<Optional>] ?clipGradient : float,
+            [<Optional>] ?biasCorrection : bool,
+            [<Optional>] ?numTensors : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                    learningRates |> Option.map (fun x -> "learning_rates", Parameter(Some (box x)))
+                    wds |> Option.map (fun x -> "wds", Parameter(Some (box x)))
+                    stepCount |> Option.map (fun x -> "step_count", Parameter(Some (box x)))
+                    beta1 |> Option.map (fun x -> "beta1", Parameter(Some (box x)))
+                    beta2 |> Option.map (fun x -> "beta2", Parameter(Some (box x)))
+                    epsilon |> Option.map (fun x -> "epsilon", Parameter(Some (box x)))
+                    rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                    lowerBound |> Option.map (fun x -> "lower_bound", Parameter(Some (box x)))
+                    upperBound |> Option.map (fun x -> "upper_bound", Parameter(Some (box x)))
+                    clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                    biasCorrection |> Option.map (fun x -> "bias_correction", Parameter(Some (box x)))
+                    numTensors |> Option.map (fun x -> "num_tensors", Parameter(Some (box x)))
+                ] |> List.choose id
+            new MultiLambUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type MultiMpLambUpdate private (operatorArguments) = 
+        inherit SymbolOperator("_multi_mp_lamb_update", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new MultiMpLambUpdate(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new MultiMpLambUpdate(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Compute the LAMB coefficients of multiple weights and grads with Mix Precision&quot;
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lamb.cc:L214</summary>
+        /// <param name="data">data</param>
+        /// <param name="learningRates">List of learning rates</param>
+        /// <param name="wds">List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+        /// <param name="stepCount">Step count for each tensor</param>
+        /// <param name="beta1">Exponential decay rate for the first moment estimates.</param>
+        /// <param name="beta2">Exponential decay rate for the second moment estimates.</param>
+        /// <param name="epsilon">Small value to avoid division by 0.</param>
+        /// <param name="rescaleGrad">Gradient rescaling factor</param>
+        /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+        /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+        /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+        /// <param name="biasCorrection">Whether to use bias correction.</param>
+        /// <param name="numTensors">Number of tensors</param>
+        new(data : Symbol seq,
+            learningRates : double seq,
+            wds : double seq,
+            stepCount : int seq,
+            [<Optional>] ?beta1 : float,
+            [<Optional>] ?beta2 : float,
+            [<Optional>] ?epsilon : float,
+            [<Optional>] ?rescaleGrad : float,
+            [<Optional>] ?lowerBound : float,
+            [<Optional>] ?upperBound : float,
+            [<Optional>] ?clipGradient : float,
+            [<Optional>] ?biasCorrection : bool,
+            [<Optional>] ?numTensors : int) = 
+            let operatorArguments = 
+                [
+                    "data", VarArg("", data |> Seq.toArray)
+                    "learning_rates", Parameter(Some(box learningRates))
+                    "wds", Parameter(Some(box wds))
+                    "step_count", Parameter(Some(box stepCount))
+                    "beta1", beta1 |> Option.map box |> Parameter
+                    "beta2", beta2 |> Option.map box |> Parameter
+                    "epsilon", epsilon |> Option.map box |> Parameter
+                    "rescale_grad", rescaleGrad |> Option.map box |> Parameter
+                    "lower_bound", lowerBound |> Option.map box |> Parameter
+                    "upper_bound", upperBound |> Option.map box |> Parameter
+                    "clip_gradient", clipGradient |> Option.map box |> Parameter
+                    "bias_correction", biasCorrection |> Option.map box |> Parameter
+                    "num_tensors", numTensors |> Option.map box |> Parameter
+                ]
+            new MultiMpLambUpdate(Arguments<Symbol>(operatorArguments))
+        /// <summary>Compute the LAMB coefficients of multiple weights and grads with Mix Precision&quot;
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lamb.cc:L214</summary>
+        /// <param name="learningRates">List of learning rates</param>
+        /// <param name="wds">List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+        /// <param name="stepCount">Step count for each tensor</param>
+        /// <param name="data">data</param>
+        /// <param name="beta1">Exponential decay rate for the first moment estimates.</param>
+        /// <param name="beta2">Exponential decay rate for the second moment estimates.</param>
+        /// <param name="epsilon">Small value to avoid division by 0.</param>
+        /// <param name="rescaleGrad">Gradient rescaling factor</param>
+        /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+        /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+        /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+        /// <param name="biasCorrection">Whether to use bias correction.</param>
+        /// <param name="numTensors">Number of tensors</param>
+        new(learningRates : double seq,
+            wds : double seq,
+            stepCount : int seq,
+            [<Optional>] ?data : Symbol seq,
+            [<Optional>] ?beta1 : float,
+            [<Optional>] ?beta2 : float,
+            [<Optional>] ?epsilon : float,
+            [<Optional>] ?rescaleGrad : float,
+            [<Optional>] ?lowerBound : float,
+            [<Optional>] ?upperBound : float,
+            [<Optional>] ?clipGradient : float,
+            [<Optional>] ?biasCorrection : bool,
+            [<Optional>] ?numTensors : int) = 
+            let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
+            let operatorArguments = 
+                [
+                    "data", VarArg("", data)
+                    "learning_rates", Parameter(Some(box learningRates))
+                    "wds", Parameter(Some(box wds))
+                    "step_count", Parameter(Some(box stepCount))
+                    "beta1", beta1 |> Option.map box |> Parameter
+                    "beta2", beta2 |> Option.map box |> Parameter
+                    "epsilon", epsilon |> Option.map box |> Parameter
+                    "rescale_grad", rescaleGrad |> Option.map box |> Parameter
+                    "lower_bound", lowerBound |> Option.map box |> Parameter
+                    "upper_bound", upperBound |> Option.map box |> Parameter
+                    "clip_gradient", clipGradient |> Option.map box |> Parameter
+                    "bias_correction", biasCorrection |> Option.map box |> Parameter
+                    "num_tensors", numTensors |> Option.map box |> Parameter
+                ]
+            new MultiMpLambUpdate(Arguments<Symbol>(operatorArguments))
+        /// Default value for Beta1
+        /// Exponential decay rate for the first moment estimates.
+        static member Beta1Default : double = 0.9
+        /// Default value for Beta2
+        /// Exponential decay rate for the second moment estimates.
+        static member Beta2Default : double = 0.999
+        /// Default value for Epsilon
+        /// Small value to avoid division by 0.
+        static member EpsilonDefault : double = 0.000001
+        /// Default value for RescaleGrad
+        /// Gradient rescaling factor
+        static member RescaleGradDefault : double = 1.0
+        /// Default value for LowerBound
+        /// Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set
+        static member LowerBoundDefault : double = -1.0
+        /// Default value for UpperBound
+        /// Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set
+        static member UpperBoundDefault : double = -1.0
+        /// Default value for ClipGradient
+        /// Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).
+        static member ClipGradientDefault : double = -1.0
+        /// Default value for BiasCorrection
+        /// Whether to use bias correction.
+        static member BiasCorrectionDefault : bool = true
+        /// Default value for NumTensors
+        /// Number of tensors
+        static member NumTensorsDefault : int = 1
+        /// data
+        member __.Data = operatorArguments.GetVarArg "data"
+        /// List of learning rates
+        member __.LearningRates : double seq = match operatorArguments.GetParameter "learning_rates" with Some(v) -> unbox v | None -> failwithf "Required parameter learning_rates is missing"
+        /// List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.
+        member __.Wds : double seq = match operatorArguments.GetParameter "wds" with Some(v) -> unbox v | None -> failwithf "Required parameter wds is missing"
+        /// Step count for each tensor
+        member __.StepCount : int seq = match operatorArguments.GetParameter "step_count" with Some(v) -> unbox v | None -> failwithf "Required parameter step_count is missing"
+        /// Exponential decay rate for the first moment estimates.
+        member __.Beta1 = operatorArguments.GetParameter("beta1", MultiMpLambUpdate.Beta1Default)
+        /// Exponential decay rate for the second moment estimates.
+        member __.Beta2 = operatorArguments.GetParameter("beta2", MultiMpLambUpdate.Beta2Default)
+        /// Small value to avoid division by 0.
+        member __.Epsilon = operatorArguments.GetParameter("epsilon", MultiMpLambUpdate.EpsilonDefault)
+        /// Gradient rescaling factor
+        member __.RescaleGrad = operatorArguments.GetParameter("rescale_grad", MultiMpLambUpdate.RescaleGradDefault)
+        /// Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set
+        member __.LowerBound = operatorArguments.GetParameter("lower_bound", MultiMpLambUpdate.LowerBoundDefault)
+        /// Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set
+        member __.UpperBound = operatorArguments.GetParameter("upper_bound", MultiMpLambUpdate.UpperBoundDefault)
+        /// Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).
+        member __.ClipGradient = operatorArguments.GetParameter("clip_gradient", MultiMpLambUpdate.ClipGradientDefault)
+        /// Whether to use bias correction.
+        member __.BiasCorrection = operatorArguments.GetParameter("bias_correction", MultiMpLambUpdate.BiasCorrectionDefault)
+        /// Number of tensors
+        member __.NumTensors = operatorArguments.GetParameter("num_tensors", MultiMpLambUpdate.NumTensorsDefault)
+        /// <summary>Copy MultiMpLambUpdate instance with updated inputs/parameters.</summary>
+        /// <param name="data">data</param>
+        /// <param name="learningRates">List of learning rates</param>
+        /// <param name="wds">List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+        /// <param name="stepCount">Step count for each tensor</param>
+        /// <param name="beta1">Exponential decay rate for the first moment estimates.</param>
+        /// <param name="beta2">Exponential decay rate for the second moment estimates.</param>
+        /// <param name="epsilon">Small value to avoid division by 0.</param>
+        /// <param name="rescaleGrad">Gradient rescaling factor</param>
+        /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+        /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+        /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+        /// <param name="biasCorrection">Whether to use bias correction.</param>
+        /// <param name="numTensors">Number of tensors</param>
+        member this.With([<Optional>] ?data : Symbol seq,
+            [<Optional>] ?learningRates : double seq,
+            [<Optional>] ?wds : double seq,
+            [<Optional>] ?stepCount : int seq,
+            [<Optional>] ?beta1 : float,
+            [<Optional>] ?beta2 : float,
+            [<Optional>] ?epsilon : float,
+            [<Optional>] ?rescaleGrad : float,
+            [<Optional>] ?lowerBound : float,
+            [<Optional>] ?upperBound : float,
+            [<Optional>] ?clipGradient : float,
+            [<Optional>] ?biasCorrection : bool,
+            [<Optional>] ?numTensors : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", VarArg("", Seq.toArray x))
+                    learningRates |> Option.map (fun x -> "learning_rates", Parameter(Some (box x)))
+                    wds |> Option.map (fun x -> "wds", Parameter(Some (box x)))
+                    stepCount |> Option.map (fun x -> "step_count", Parameter(Some (box x)))
+                    beta1 |> Option.map (fun x -> "beta1", Parameter(Some (box x)))
+                    beta2 |> Option.map (fun x -> "beta2", Parameter(Some (box x)))
+                    epsilon |> Option.map (fun x -> "epsilon", Parameter(Some (box x)))
+                    rescaleGrad |> Option.map (fun x -> "rescale_grad", Parameter(Some (box x)))
+                    lowerBound |> Option.map (fun x -> "lower_bound", Parameter(Some (box x)))
+                    upperBound |> Option.map (fun x -> "upper_bound", Parameter(Some (box x)))
+                    clipGradient |> Option.map (fun x -> "clip_gradient", Parameter(Some (box x)))
+                    biasCorrection |> Option.map (fun x -> "bias_correction", Parameter(Some (box x)))
+                    numTensors |> Option.map (fun x -> "num_tensors", Parameter(Some (box x)))
+                ] |> List.choose id
+            new MultiMpLambUpdate(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type MultiLars private (operatorArguments) = 
         inherit SymbolOperator("multi_lars", operatorArguments)
@@ -4932,19 +5360,21 @@ module SymbolOperators =
         /// He, Kaiming, et al. &quot;Mask R-CNN.&quot; ICCV, 2017
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L559</summary>
         /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
         /// <param name="rois">Bounding box coordinates, a 2D array, if batchid is less than 0, it will be ignored.</param>
         /// <param name="pooledSize">ROI Align output roi feature map height and width: (h, w)</param>
         /// <param name="spatialScale">Ratio of input feature map height (or w) to raw image height (or w). Equals the reciprocal of total stride in convolutional layers</param>
         /// <param name="sampleRatio">Optional sampling ratio of ROI align, using adaptive size by default.</param>
         /// <param name="positionSensitive">Whether to perform position-sensitive RoI pooling. PSRoIPooling is first proposaled by R-FCN and it can reduce the input channels by ph*pw times, where (ph, pw) is the pooled_size</param>
+        /// <param name="aligned">Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.</param>
         new(data : Symbol,
             rois : Symbol,
             pooledSize : int seq,
             spatialScale : float,
             [<Optional>] ?sampleRatio : int,
-            [<Optional>] ?positionSensitive : bool) = 
+            [<Optional>] ?positionSensitive : bool,
+            [<Optional>] ?aligned : bool) = 
             let operatorArguments = 
                 [
                     "data", Input data
@@ -4953,6 +5383,7 @@ module SymbolOperators =
                     "spatial_scale", Parameter(Some(box spatialScale))
                     "sample_ratio", sampleRatio |> Option.map box |> Parameter
                     "position_sensitive", positionSensitive |> Option.map box |> Parameter
+                    "aligned", aligned |> Option.map box |> Parameter
                 ]
             new ContribROIAlign(Arguments<Symbol>(operatorArguments))
         /// <summary>
@@ -4976,19 +5407,21 @@ module SymbolOperators =
         /// He, Kaiming, et al. &quot;Mask R-CNN.&quot; ICCV, 2017
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L559</summary>
         /// <param name="pooledSize">ROI Align output roi feature map height and width: (h, w)</param>
         /// <param name="spatialScale">Ratio of input feature map height (or w) to raw image height (or w). Equals the reciprocal of total stride in convolutional layers</param>
         /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
         /// <param name="rois">Bounding box coordinates, a 2D array, if batchid is less than 0, it will be ignored.</param>
         /// <param name="sampleRatio">Optional sampling ratio of ROI align, using adaptive size by default.</param>
         /// <param name="positionSensitive">Whether to perform position-sensitive RoI pooling. PSRoIPooling is first proposaled by R-FCN and it can reduce the input channels by ph*pw times, where (ph, pw) is the pooled_size</param>
+        /// <param name="aligned">Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.</param>
         new(pooledSize : int seq,
             spatialScale : float,
             [<Optional>] ?data : Symbol,
             [<Optional>] ?rois : Symbol,
             [<Optional>] ?sampleRatio : int,
-            [<Optional>] ?positionSensitive : bool) = 
+            [<Optional>] ?positionSensitive : bool,
+            [<Optional>] ?aligned : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let rois = defaultArg rois (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
@@ -4999,6 +5432,7 @@ module SymbolOperators =
                     "spatial_scale", Parameter(Some(box spatialScale))
                     "sample_ratio", sampleRatio |> Option.map box |> Parameter
                     "position_sensitive", positionSensitive |> Option.map box |> Parameter
+                    "aligned", aligned |> Option.map box |> Parameter
                 ]
             new ContribROIAlign(Arguments<Symbol>(operatorArguments))
         /// Default value for SampleRatio
@@ -5007,6 +5441,9 @@ module SymbolOperators =
         /// Default value for PositionSensitive
         /// Whether to perform position-sensitive RoI pooling. PSRoIPooling is first proposaled by R-FCN and it can reduce the input channels by ph*pw times, where (ph, pw) is the pooled_size
         static member PositionSensitiveDefault : bool = false
+        /// Default value for Aligned
+        /// Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.
+        static member AlignedDefault : bool = false
         /// Input data to the pooling operator, a 4D Feature maps
         member __.Data = operatorArguments.GetInput "data"
         /// Bounding box coordinates, a 2D array, if batchid is less than 0, it will be ignored.
@@ -5019,6 +5456,8 @@ module SymbolOperators =
         member __.SampleRatio = operatorArguments.GetParameter("sample_ratio", ContribROIAlign.SampleRatioDefault)
         /// Whether to perform position-sensitive RoI pooling. PSRoIPooling is first proposaled by R-FCN and it can reduce the input channels by ph*pw times, where (ph, pw) is the pooled_size
         member __.PositionSensitive = operatorArguments.GetParameter("position_sensitive", ContribROIAlign.PositionSensitiveDefault)
+        /// Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.
+        member __.Aligned = operatorArguments.GetParameter("aligned", ContribROIAlign.AlignedDefault)
         /// <summary>Copy ContribROIAlign instance with updated inputs/parameters.</summary>
         /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
         /// <param name="rois">Bounding box coordinates, a 2D array, if batchid is less than 0, it will be ignored.</param>
@@ -5026,12 +5465,14 @@ module SymbolOperators =
         /// <param name="spatialScale">Ratio of input feature map height (or w) to raw image height (or w). Equals the reciprocal of total stride in convolutional layers</param>
         /// <param name="sampleRatio">Optional sampling ratio of ROI align, using adaptive size by default.</param>
         /// <param name="positionSensitive">Whether to perform position-sensitive RoI pooling. PSRoIPooling is first proposaled by R-FCN and it can reduce the input channels by ph*pw times, where (ph, pw) is the pooled_size</param>
+        /// <param name="aligned">Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.</param>
         member this.With([<Optional>] ?data : Symbol,
             [<Optional>] ?rois : Symbol,
             [<Optional>] ?pooledSize : int seq,
             [<Optional>] ?spatialScale : float,
             [<Optional>] ?sampleRatio : int,
-            [<Optional>] ?positionSensitive : bool) = 
+            [<Optional>] ?positionSensitive : bool,
+            [<Optional>] ?aligned : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
@@ -5040,6 +5481,7 @@ module SymbolOperators =
                     spatialScale |> Option.map (fun x -> "spatial_scale", Parameter(Some (box x)))
                     sampleRatio |> Option.map (fun x -> "sample_ratio", Parameter(Some (box x)))
                     positionSensitive |> Option.map (fun x -> "position_sensitive", Parameter(Some (box x)))
+                    aligned |> Option.map (fun x -> "aligned", Parameter(Some (box x)))
                 ] |> List.choose id
             new ContribROIAlign(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -7226,7 +7668,7 @@ module SymbolOperators =
         /// <param name="data">The input.</param>
         /// <param name="size">Size of new image. Could be (width, height) or (size)</param>
         /// <param name="keepRatio">Whether to resize the short edge or both edges to `size`, if size is give as an integer.</param>
-        /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu</param>
+        /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1)</param>
         new([<Optional>] ?data : Symbol,
             [<Optional>] ?size : int seq,
             [<Optional>] ?keepRatio : bool,
@@ -7247,7 +7689,7 @@ module SymbolOperators =
         /// Whether to resize the short edge or both edges to `size`, if size is give as an integer.
         static member KeepRatioDefault : bool = false
         /// Default value for Interp
-        /// Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu
+        /// Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1)
         static member InterpDefault : int = 1
         /// The input.
         member __.Data = operatorArguments.GetInput "data"
@@ -7255,13 +7697,13 @@ module SymbolOperators =
         member __.Size = operatorArguments.GetParameter("size", ImageResize.SizeDefault)
         /// Whether to resize the short edge or both edges to `size`, if size is give as an integer.
         member __.KeepRatio = operatorArguments.GetParameter("keep_ratio", ImageResize.KeepRatioDefault)
-        /// Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu
+        /// Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1)
         member __.Interp = operatorArguments.GetParameter("interp", ImageResize.InterpDefault)
         /// <summary>Copy ImageResize instance with updated inputs/parameters.</summary>
         /// <param name="data">The input.</param>
         /// <param name="size">Size of new image. Could be (width, height) or (size)</param>
         /// <param name="keepRatio">Whether to resize the short edge or both edges to `size`, if size is give as an integer.</param>
-        /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu</param>
+        /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1)</param>
         member this.With([<Optional>] ?data : Symbol,
             [<Optional>] ?size : int seq,
             [<Optional>] ?keepRatio : bool,
@@ -7449,7 +7891,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L168</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L165</summary>
         /// <param name="data">The input array.</param>
         /// <param name="actType">Activation function to be applied.</param>
         new(data : Symbol,
@@ -7472,7 +7914,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L168</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L165</summary>
         /// <param name="actType">Activation function to be applied.</param>
         /// <param name="data">The input array.</param>
         new(actType : ActType,
@@ -7555,7 +7997,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\batch_norm.cc:L571</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\batch_norm.cc:L587</summary>
         /// <param name="data">Input data to batch normalization</param>
         /// <param name="gamma">gamma array</param>
         /// <param name="beta">beta array</param>
@@ -7752,7 +8194,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\concat.cc:L383</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\concat.cc:L385</summary>
         /// <param name="data">List of arrays to concatenate</param>
         /// <param name="dim">the dimension to be concated.</param>
         new([<Optional>] ?data : Symbol seq,
@@ -7895,7 +8337,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L473</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L469</summary>
         /// <param name="data">Input data to the ConvolutionOp.</param>
         /// <param name="weight">Weight matrix.</param>
         /// <param name="bias">Bias parameter.</param>
@@ -8017,7 +8459,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L473</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L469</summary>
         /// <param name="kernel">Convolution kernel size: (w,), (h, w) or (d, h, w)</param>
         /// <param name="numFilter">Convolution filter(channel) number</param>
         /// <param name="data">Input data to the ConvolutionOp.</param>
@@ -8831,7 +9273,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L287</summary>
         /// <param name="data">Input data.</param>
         /// <param name="weight">Weight matrix.</param>
         /// <param name="bias">Bias parameter.</param>
@@ -8886,7 +9328,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L287</summary>
         /// <param name="numHidden">Number of hidden nodes of the output.</param>
         /// <param name="data">Input data.</param>
         /// <param name="weight">Weight matrix.</param>
@@ -9043,6 +9485,251 @@ module SymbolOperators =
                 ] |> List.choose id
             new GroupNorm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type Im2col private (operatorArguments) = 
+        inherit SymbolOperator("im2col", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new Im2col(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new Im2col(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Extract sliding blocks from input array.
+        /// 
+        /// This operator is used in vanilla convolution implementation to transform the sliding
+        /// blocks on image to column matrix, then the convolution operation can be computed
+        /// by matrix multiplication between column and convolution weight. Due to the close
+        /// relation between im2col and convolution, the concept of **kernel**, **stride**,
+        /// **dilate** and **pad** in this operator are inherited from convolution operation.
+        /// 
+        /// Given the input data of shape :math:`(N, C, *)`, where :math:`N` is the batch size,
+        /// :math:`C` is the channel size, and :math:`*` is the arbitrary spatial dimension,
+        /// the output column array is always with shape :math:`(N, C \times \prod(\text{kernel}), W)`,
+        /// where :math:`C \times \prod(\text{kernel})` is the block size, and :math:`W` is the
+        /// block number which is the spatial size of the convolution output with same input parameters.
+        /// Only 1-D, 2-D and 3-D of spatial dimension is supported in this operator.
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\im2col.cc:L100</summary>
+        /// <param name="data">Input array to extract sliding blocks.</param>
+        /// <param name="kernel">Sliding kernel size: (w,), (h, w) or (d, h, w).</param>
+        /// <param name="stride">The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="dilate">The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="pad">The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+        new(data : Symbol,
+            kernel : int seq,
+            [<Optional>] ?stride : int seq,
+            [<Optional>] ?dilate : int seq,
+            [<Optional>] ?pad : int seq) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "kernel", Parameter(Some(box kernel))
+                    "stride", stride |> Option.map box |> Parameter
+                    "dilate", dilate |> Option.map box |> Parameter
+                    "pad", pad |> Option.map box |> Parameter
+                ]
+            new Im2col(Arguments<Symbol>(operatorArguments))
+        /// <summary>Extract sliding blocks from input array.
+        /// 
+        /// This operator is used in vanilla convolution implementation to transform the sliding
+        /// blocks on image to column matrix, then the convolution operation can be computed
+        /// by matrix multiplication between column and convolution weight. Due to the close
+        /// relation between im2col and convolution, the concept of **kernel**, **stride**,
+        /// **dilate** and **pad** in this operator are inherited from convolution operation.
+        /// 
+        /// Given the input data of shape :math:`(N, C, *)`, where :math:`N` is the batch size,
+        /// :math:`C` is the channel size, and :math:`*` is the arbitrary spatial dimension,
+        /// the output column array is always with shape :math:`(N, C \times \prod(\text{kernel}), W)`,
+        /// where :math:`C \times \prod(\text{kernel})` is the block size, and :math:`W` is the
+        /// block number which is the spatial size of the convolution output with same input parameters.
+        /// Only 1-D, 2-D and 3-D of spatial dimension is supported in this operator.
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\im2col.cc:L100</summary>
+        /// <param name="kernel">Sliding kernel size: (w,), (h, w) or (d, h, w).</param>
+        /// <param name="data">Input array to extract sliding blocks.</param>
+        /// <param name="stride">The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="dilate">The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="pad">The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+        new(kernel : int seq,
+            [<Optional>] ?data : Symbol,
+            [<Optional>] ?stride : int seq,
+            [<Optional>] ?dilate : int seq,
+            [<Optional>] ?pad : int seq) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "kernel", Parameter(Some(box kernel))
+                    "stride", stride |> Option.map box |> Parameter
+                    "dilate", dilate |> Option.map box |> Parameter
+                    "pad", pad |> Option.map box |> Parameter
+                ]
+            new Im2col(Arguments<Symbol>(operatorArguments))
+        /// Default value for Stride
+        /// The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        static member StrideDefault : int [] = [||]
+        /// Default value for Dilate
+        /// The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        static member DilateDefault : int [] = [||]
+        /// Default value for Pad
+        /// The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.
+        static member PadDefault : int [] = [||]
+        /// Input array to extract sliding blocks.
+        member __.Data = operatorArguments.GetInput "data"
+        /// Sliding kernel size: (w,), (h, w) or (d, h, w).
+        member __.Kernel : int seq = match operatorArguments.GetParameter "kernel" with Some(v) -> unbox v | None -> failwithf "Required parameter kernel is missing"
+        /// The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        member __.Stride = operatorArguments.GetParameter("stride", Im2col.StrideDefault)
+        /// The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        member __.Dilate = operatorArguments.GetParameter("dilate", Im2col.DilateDefault)
+        /// The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.
+        member __.Pad = operatorArguments.GetParameter("pad", Im2col.PadDefault)
+        /// <summary>Copy Im2col instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input array to extract sliding blocks.</param>
+        /// <param name="kernel">Sliding kernel size: (w,), (h, w) or (d, h, w).</param>
+        /// <param name="stride">The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="dilate">The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="pad">The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?kernel : int seq,
+            [<Optional>] ?stride : int seq,
+            [<Optional>] ?dilate : int seq,
+            [<Optional>] ?pad : int seq) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    kernel |> Option.map (fun x -> "kernel", Parameter(Some (box x)))
+                    stride |> Option.map (fun x -> "stride", Parameter(Some (box x)))
+                    dilate |> Option.map (fun x -> "dilate", Parameter(Some (box x)))
+                    pad |> Option.map (fun x -> "pad", Parameter(Some (box x)))
+                ] |> List.choose id
+            new Im2col(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type Col2im private (operatorArguments) = 
+        inherit SymbolOperator("col2im", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new Col2im(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new Col2im(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Combining the output column matrix of im2col back to image array.
+        /// 
+        /// Like :class:`~mxnet.ndarray.im2col`, this operator is also used in the vanilla convolution
+        /// implementation. Despite the name, col2im is not the reverse operation of im2col. Since there
+        /// may be overlaps between neighbouring sliding blocks, the column elements cannot be directly
+        /// put back into image. Instead, they are accumulated (i.e., summed) in the input image
+        /// just like the gradient computation, so col2im is the gradient of im2col and vice versa.
+        /// 
+        /// Using the notation in im2col, given an input column array of shape
+        /// :math:`(N, C \times  \prod(\text{kernel}), W)`, this operator accumulates the column elements
+        /// into output array of shape :math:`(N, C, \text{output_size}[0], \text{output_size}[1], \dots)`.
+        /// Only 1-D, 2-D and 3-D of spatial dimension is supported in this operator.
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\im2col.cc:L182</summary>
+        /// <param name="data">Input array to combine sliding blocks.</param>
+        /// <param name="outputSize">The spatial dimension of image array: (w,), (h, w) or (d, h, w).</param>
+        /// <param name="kernel">Sliding kernel size: (w,), (h, w) or (d, h, w).</param>
+        /// <param name="stride">The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="dilate">The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="pad">The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+        new(data : Symbol,
+            outputSize : int seq,
+            kernel : int seq,
+            [<Optional>] ?stride : int seq,
+            [<Optional>] ?dilate : int seq,
+            [<Optional>] ?pad : int seq) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "output_size", Parameter(Some(box outputSize))
+                    "kernel", Parameter(Some(box kernel))
+                    "stride", stride |> Option.map box |> Parameter
+                    "dilate", dilate |> Option.map box |> Parameter
+                    "pad", pad |> Option.map box |> Parameter
+                ]
+            new Col2im(Arguments<Symbol>(operatorArguments))
+        /// <summary>Combining the output column matrix of im2col back to image array.
+        /// 
+        /// Like :class:`~mxnet.ndarray.im2col`, this operator is also used in the vanilla convolution
+        /// implementation. Despite the name, col2im is not the reverse operation of im2col. Since there
+        /// may be overlaps between neighbouring sliding blocks, the column elements cannot be directly
+        /// put back into image. Instead, they are accumulated (i.e., summed) in the input image
+        /// just like the gradient computation, so col2im is the gradient of im2col and vice versa.
+        /// 
+        /// Using the notation in im2col, given an input column array of shape
+        /// :math:`(N, C \times  \prod(\text{kernel}), W)`, this operator accumulates the column elements
+        /// into output array of shape :math:`(N, C, \text{output_size}[0], \text{output_size}[1], \dots)`.
+        /// Only 1-D, 2-D and 3-D of spatial dimension is supported in this operator.
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\im2col.cc:L182</summary>
+        /// <param name="outputSize">The spatial dimension of image array: (w,), (h, w) or (d, h, w).</param>
+        /// <param name="kernel">Sliding kernel size: (w,), (h, w) or (d, h, w).</param>
+        /// <param name="data">Input array to combine sliding blocks.</param>
+        /// <param name="stride">The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="dilate">The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="pad">The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+        new(outputSize : int seq,
+            kernel : int seq,
+            [<Optional>] ?data : Symbol,
+            [<Optional>] ?stride : int seq,
+            [<Optional>] ?dilate : int seq,
+            [<Optional>] ?pad : int seq) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "output_size", Parameter(Some(box outputSize))
+                    "kernel", Parameter(Some(box kernel))
+                    "stride", stride |> Option.map box |> Parameter
+                    "dilate", dilate |> Option.map box |> Parameter
+                    "pad", pad |> Option.map box |> Parameter
+                ]
+            new Col2im(Arguments<Symbol>(operatorArguments))
+        /// Default value for Stride
+        /// The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        static member StrideDefault : int [] = [||]
+        /// Default value for Dilate
+        /// The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        static member DilateDefault : int [] = [||]
+        /// Default value for Pad
+        /// The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.
+        static member PadDefault : int [] = [||]
+        /// Input array to combine sliding blocks.
+        member __.Data = operatorArguments.GetInput "data"
+        /// The spatial dimension of image array: (w,), (h, w) or (d, h, w).
+        member __.OutputSize : int seq = match operatorArguments.GetParameter "output_size" with Some(v) -> unbox v | None -> failwithf "Required parameter output_size is missing"
+        /// Sliding kernel size: (w,), (h, w) or (d, h, w).
+        member __.Kernel : int seq = match operatorArguments.GetParameter "kernel" with Some(v) -> unbox v | None -> failwithf "Required parameter kernel is missing"
+        /// The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        member __.Stride = operatorArguments.GetParameter("stride", Col2im.StrideDefault)
+        /// The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        member __.Dilate = operatorArguments.GetParameter("dilate", Col2im.DilateDefault)
+        /// The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.
+        member __.Pad = operatorArguments.GetParameter("pad", Col2im.PadDefault)
+        /// <summary>Copy Col2im instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input array to combine sliding blocks.</param>
+        /// <param name="outputSize">The spatial dimension of image array: (w,), (h, w) or (d, h, w).</param>
+        /// <param name="kernel">Sliding kernel size: (w,), (h, w) or (d, h, w).</param>
+        /// <param name="stride">The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="dilate">The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="pad">The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?outputSize : int seq,
+            [<Optional>] ?kernel : int seq,
+            [<Optional>] ?stride : int seq,
+            [<Optional>] ?dilate : int seq,
+            [<Optional>] ?pad : int seq) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    outputSize |> Option.map (fun x -> "output_size", Parameter(Some (box x)))
+                    kernel |> Option.map (fun x -> "kernel", Parameter(Some (box x)))
+                    stride |> Option.map (fun x -> "stride", Parameter(Some (box x)))
+                    dilate |> Option.map (fun x -> "dilate", Parameter(Some (box x)))
+                    pad |> Option.map (fun x -> "pad", Parameter(Some (box x)))
+                ] |> List.choose id
+            new Col2im(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type LayerNorm private (operatorArguments) = 
         inherit SymbolOperator("LayerNorm", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new LayerNorm(args)
@@ -9074,7 +9761,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\layer_norm.cc:L156</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\layer_norm.cc:L158</summary>
         /// <param name="data">Input data to layer normalization</param>
         /// <param name="gamma">gamma array</param>
         /// <param name="beta">beta array</param>
@@ -9249,7 +9936,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L164</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L158</summary>
         /// <param name="data">Input data to LRN</param>
         /// <param name="nsize">normalization window width in elements.</param>
         /// <param name="alpha">The variance scaling parameter :math:`lpha` in the LRN expression.</param>
@@ -9286,7 +9973,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L164</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L158</summary>
         /// <param name="nsize">normalization window width in elements.</param>
         /// <param name="data">Input data to LRN</param>
         /// <param name="alpha">The variance scaling parameter :math:`lpha` in the LRN expression.</param>
@@ -9469,7 +10156,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\pooling.cc:L417</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\pooling.cc:L414</summary>
         /// <param name="data">Input data to the pooling operator.</param>
         /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
         /// <param name="poolType">Pooling type to be applied.</param>
@@ -9631,7 +10318,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L103</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L134</summary>
         /// <param name="data">The input array.</param>
         /// <param name="length">The length array.</param>
         /// <param name="axis">The axis along which to compute softmax.</param>
@@ -10055,6 +10742,120 @@ module SymbolOperators =
                 ] |> List.choose id
             new UpSampling(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiEig private (operatorArguments) = 
+        inherit SymbolOperator("_npi_eig", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiEig(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiEig(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="A">Tensor of square matrix</param>
+        new([<Optional>] ?A : Symbol) =
+            let A = defaultArg A (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "A", Input A
+                ]
+            new NpiEig(Arguments<Symbol>(operatorArguments))
+        /// Tensor of square matrix
+        member __.A = operatorArguments.GetInput "A"
+        /// <summary>Copy NpiEig instance with updated inputs/parameters.</summary>
+        /// <param name="A">Tensor of square matrix</param>
+        member this.With([<Optional>] ?A : Symbol) =
+            let operatorArguments = 
+                [
+                    A |> Option.map (fun x -> "A", Input x)
+                ] |> List.choose id
+            new NpiEig(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiEigh private (operatorArguments) = 
+        inherit SymbolOperator("_npi_eigh", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiEigh(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiEigh(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="A">Tensor of real matrices</param>
+        /// <param name="UPLO">Specifies whether the calculation is done with the lower or upper triangular part.</param>
+        new([<Optional>] ?A : Symbol,
+            [<Optional>] ?UPLO : UpperLower) = 
+            let A = defaultArg A (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "A", Input A
+                    "UPLO", UPLO |> Option.map box |> Parameter
+                ]
+            new NpiEigh(Arguments<Symbol>(operatorArguments))
+        /// Default value for UPLO
+        /// Specifies whether the calculation is done with the lower or upper triangular part.
+        static member UPLODefault : UpperLower = UpperLower.L
+        /// Tensor of real matrices
+        member __.A = operatorArguments.GetInput "A"
+        /// Specifies whether the calculation is done with the lower or upper triangular part.
+        member __.UPLO = operatorArguments.GetParameter("UPLO", NpiEigh.UPLODefault)
+        /// <summary>Copy NpiEigh instance with updated inputs/parameters.</summary>
+        /// <param name="A">Tensor of real matrices</param>
+        /// <param name="UPLO">Specifies whether the calculation is done with the lower or upper triangular part.</param>
+        member this.With([<Optional>] ?A : Symbol,
+            [<Optional>] ?UPLO : UpperLower) = 
+            let operatorArguments = 
+                [
+                    A |> Option.map (fun x -> "A", Input x)
+                    UPLO |> Option.map (fun x -> "UPLO", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiEigh(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiEigvals private (operatorArguments) = 
+        inherit SymbolOperator("_npi_eigvals", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiEigvals(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiEigvals(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="A">Tensor of square matrix</param>
+        new([<Optional>] ?A : Symbol) =
+            let A = defaultArg A (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "A", Input A
+                ]
+            new NpiEigvals(Arguments<Symbol>(operatorArguments))
+        /// Tensor of square matrix
+        member __.A = operatorArguments.GetInput "A"
+        /// <summary>Copy NpiEigvals instance with updated inputs/parameters.</summary>
+        /// <param name="A">Tensor of square matrix</param>
+        member this.With([<Optional>] ?A : Symbol) =
+            let operatorArguments = 
+                [
+                    A |> Option.map (fun x -> "A", Input x)
+                ] |> List.choose id
+            new NpiEigvals(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiEigvalsh private (operatorArguments) = 
+        inherit SymbolOperator("_npi_eigvalsh", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiEigvalsh(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiEigvalsh(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="A">Tensor of square matrix</param>
+        /// <param name="UPLO">Specifies whether the calculation is done with the lower or upper triangular part.</param>
+        new([<Optional>] ?A : Symbol,
+            [<Optional>] ?UPLO : UpperLower) = 
+            let A = defaultArg A (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "A", Input A
+                    "UPLO", UPLO |> Option.map box |> Parameter
+                ]
+            new NpiEigvalsh(Arguments<Symbol>(operatorArguments))
+        /// Default value for UPLO
+        /// Specifies whether the calculation is done with the lower or upper triangular part.
+        static member UPLODefault : UpperLower = UpperLower.L
+        /// Tensor of square matrix
+        member __.A = operatorArguments.GetInput "A"
+        /// Specifies whether the calculation is done with the lower or upper triangular part.
+        member __.UPLO = operatorArguments.GetParameter("UPLO", NpiEigvalsh.UPLODefault)
+        /// <summary>Copy NpiEigvalsh instance with updated inputs/parameters.</summary>
+        /// <param name="A">Tensor of square matrix</param>
+        /// <param name="UPLO">Specifies whether the calculation is done with the lower or upper triangular part.</param>
+        member this.With([<Optional>] ?A : Symbol,
+            [<Optional>] ?UPLO : UpperLower) = 
+            let operatorArguments = 
+                [
+                    A |> Option.map (fun x -> "A", Input x)
+                    UPLO |> Option.map (fun x -> "UPLO", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiEigvalsh(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpiSvd private (operatorArguments) = 
         inherit SymbolOperator("_npi_svd", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSvd(args)
@@ -10081,33 +10882,353 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiSvd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiNorm private (operatorArguments) = 
+        inherit SymbolOperator("_npi_norm", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiNorm(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiNorm(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_norm_forward.cc:L32</summary>
+        /// <param name="data">The input</param>
+        new([<Optional>] ?data : Symbol) =
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                ]
+            new NpiNorm(Arguments<Symbol>(operatorArguments))
+        /// The input
+        member __.Data = operatorArguments.GetInput "data"
+        /// <summary>Copy NpiNorm instance with updated inputs/parameters.</summary>
+        /// <param name="data">The input</param>
+        member this.With([<Optional>] ?data : Symbol) =
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                ] |> List.choose id
+            new NpiNorm(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiPinv private (operatorArguments) = 
+        inherit SymbolOperator("_npi_pinv", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiPinv(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiPinv(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_pinv.cc:L99</summary>
+        /// <param name="A">Tensor of matrix</param>
+        /// <param name="rcond">Cutoff for small singular values.</param>
+        /// <param name="hermitian">If True, A is assumed to be Hermitian (symmetric if real-valued).</param>
+        new([<Optional>] ?A : Symbol,
+            [<Optional>] ?rcond : Symbol,
+            [<Optional>] ?hermitian : bool) = 
+            let A = defaultArg A (new ImplicitVariable() :> Symbol)
+            let rcond = defaultArg rcond (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "A", Input A
+                    "rcond", Input rcond
+                    "hermitian", hermitian |> Option.map box |> Parameter
+                ]
+            new NpiPinv(Arguments<Symbol>(operatorArguments))
+        /// Default value for Hermitian
+        /// If True, A is assumed to be Hermitian (symmetric if real-valued).
+        static member HermitianDefault : bool = false
+        /// Tensor of matrix
+        member __.A = operatorArguments.GetInput "A"
+        /// Cutoff for small singular values.
+        member __.Rcond = operatorArguments.GetInput "rcond"
+        /// If True, A is assumed to be Hermitian (symmetric if real-valued).
+        member __.Hermitian = operatorArguments.GetParameter("hermitian", NpiPinv.HermitianDefault)
+        /// <summary>Copy NpiPinv instance with updated inputs/parameters.</summary>
+        /// <param name="A">Tensor of matrix</param>
+        /// <param name="rcond">Cutoff for small singular values.</param>
+        /// <param name="hermitian">If True, A is assumed to be Hermitian (symmetric if real-valued).</param>
+        member this.With([<Optional>] ?A : Symbol,
+            [<Optional>] ?rcond : Symbol,
+            [<Optional>] ?hermitian : bool) = 
+            let operatorArguments = 
+                [
+                    A |> Option.map (fun x -> "A", Input x)
+                    rcond |> Option.map (fun x -> "rcond", Input x)
+                    hermitian |> Option.map (fun x -> "hermitian", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiPinv(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiPinvScalarRcond private (operatorArguments) = 
+        inherit SymbolOperator("_npi_pinv_scalar_rcond", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiPinvScalarRcond(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiPinvScalarRcond(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_pinv.cc:L177</summary>
+        /// <param name="A">Tensor of matrix</param>
+        /// <param name="rcond">Cutoff for small singular values.</param>
+        /// <param name="hermitian">If True, A is assumed to be Hermitian (symmetric if real-valued).</param>
+        new([<Optional>] ?A : Symbol,
+            [<Optional>] ?rcond : double,
+            [<Optional>] ?hermitian : bool) = 
+            let A = defaultArg A (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "A", Input A
+                    "rcond", rcond |> Option.map box |> Parameter
+                    "hermitian", hermitian |> Option.map box |> Parameter
+                ]
+            new NpiPinvScalarRcond(Arguments<Symbol>(operatorArguments))
+        /// Default value for Rcond
+        /// Cutoff for small singular values.
+        static member RcondDefault : double = 0.0
+        /// Default value for Hermitian
+        /// If True, A is assumed to be Hermitian (symmetric if real-valued).
+        static member HermitianDefault : bool = false
+        /// Tensor of matrix
+        member __.A = operatorArguments.GetInput "A"
+        /// Cutoff for small singular values.
+        member __.Rcond = operatorArguments.GetParameter("rcond", NpiPinvScalarRcond.RcondDefault)
+        /// If True, A is assumed to be Hermitian (symmetric if real-valued).
+        member __.Hermitian = operatorArguments.GetParameter("hermitian", NpiPinvScalarRcond.HermitianDefault)
+        /// <summary>Copy NpiPinvScalarRcond instance with updated inputs/parameters.</summary>
+        /// <param name="A">Tensor of matrix</param>
+        /// <param name="rcond">Cutoff for small singular values.</param>
+        /// <param name="hermitian">If True, A is assumed to be Hermitian (symmetric if real-valued).</param>
+        member this.With([<Optional>] ?A : Symbol,
+            [<Optional>] ?rcond : double,
+            [<Optional>] ?hermitian : bool) = 
+            let operatorArguments = 
+                [
+                    A |> Option.map (fun x -> "A", Input x)
+                    rcond |> Option.map (fun x -> "rcond", Parameter(Some (box x)))
+                    hermitian |> Option.map (fun x -> "hermitian", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiPinvScalarRcond(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiCholesky private (operatorArguments) = 
+        inherit SymbolOperator("_npi_cholesky", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCholesky(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiCholesky(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_potrf.cc:L47</summary>
+        /// <param name="A">Tensor of input matrices to be decomposed</param>
+        new([<Optional>] ?A : Symbol) =
+            let A = defaultArg A (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "A", Input A
+                ]
+            new NpiCholesky(Arguments<Symbol>(operatorArguments))
+        /// Tensor of input matrices to be decomposed
+        member __.A = operatorArguments.GetInput "A"
+        /// <summary>Copy NpiCholesky instance with updated inputs/parameters.</summary>
+        /// <param name="A">Tensor of input matrices to be decomposed</param>
+        member this.With([<Optional>] ?A : Symbol) =
+            let operatorArguments = 
+                [
+                    A |> Option.map (fun x -> "A", Input x)
+                ] |> List.choose id
+            new NpiCholesky(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiSolve private (operatorArguments) = 
+        inherit SymbolOperator("_npi_solve", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSolve(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiSolve(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_solve.cc:L89</summary>
+        /// <param name="A">Tensor of square matrix</param>
+        /// <param name="B">Tensor of right side vector</param>
+        new([<Optional>] ?A : Symbol,
+            [<Optional>] ?B : Symbol) = 
+            let A = defaultArg A (new ImplicitVariable() :> Symbol)
+            let B = defaultArg B (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "A", Input A
+                    "B", Input B
+                ]
+            new NpiSolve(Arguments<Symbol>(operatorArguments))
+        /// Tensor of square matrix
+        member __.A = operatorArguments.GetInput "A"
+        /// Tensor of right side vector
+        member __.B = operatorArguments.GetInput "B"
+        /// <summary>Copy NpiSolve instance with updated inputs/parameters.</summary>
+        /// <param name="A">Tensor of square matrix</param>
+        /// <param name="B">Tensor of right side vector</param>
+        member this.With([<Optional>] ?A : Symbol,
+            [<Optional>] ?B : Symbol) = 
+            let operatorArguments = 
+                [
+                    A |> Option.map (fun x -> "A", Input x)
+                    B |> Option.map (fun x -> "B", Input x)
+                ] |> List.choose id
+            new NpiSolve(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiTensorinv private (operatorArguments) = 
+        inherit SymbolOperator("_npi_tensorinv", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTensorinv(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiTensorinv(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_tensorinv.cc:L102</summary>
+        /// <param name="a">First input</param>
+        /// <param name="ind">Number of first indices that are involved in the inverse sum.</param>
+        new([<Optional>] ?a : Symbol,
+            [<Optional>] ?ind : int) = 
+            let a = defaultArg a (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "a", Input a
+                    "ind", ind |> Option.map box |> Parameter
+                ]
+            new NpiTensorinv(Arguments<Symbol>(operatorArguments))
+        /// Default value for Ind
+        /// Number of first indices that are involved in the inverse sum.
+        static member IndDefault : int = 2
+        /// First input
+        member __.A = operatorArguments.GetInput "a"
+        /// Number of first indices that are involved in the inverse sum.
+        member __.Ind = operatorArguments.GetParameter("ind", NpiTensorinv.IndDefault)
+        /// <summary>Copy NpiTensorinv instance with updated inputs/parameters.</summary>
+        /// <param name="a">First input</param>
+        /// <param name="ind">Number of first indices that are involved in the inverse sum.</param>
+        member this.With([<Optional>] ?a : Symbol,
+            [<Optional>] ?ind : int) = 
+            let operatorArguments = 
+                [
+                    a |> Option.map (fun x -> "a", Input x)
+                    ind |> Option.map (fun x -> "ind", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiTensorinv(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiTensorsolve private (operatorArguments) = 
+        inherit SymbolOperator("_npi_tensorsolve", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTensorsolve(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiTensorsolve(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="a">First input</param>
+        /// <param name="b">Second input</param>
+        /// <param name="aAxes">Tuple of ints, optional. Axes in a to reorder to the right, before inversion.</param>
+        new([<Optional>] ?a : Symbol,
+            [<Optional>] ?b : Symbol,
+            [<Optional>] ?aAxes : int seq) = 
+            let a = defaultArg a (new ImplicitVariable() :> Symbol)
+            let b = defaultArg b (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "a", Input a
+                    "b", Input b
+                    "a_axes", aAxes |> Option.map box |> Parameter
+                ]
+            new NpiTensorsolve(Arguments<Symbol>(operatorArguments))
+        /// Default value for AAxes
+        /// Tuple of ints, optional. Axes in a to reorder to the right, before inversion.
+        static member AAxesDefault : int [] = [||]
+        /// First input
+        member __.A = operatorArguments.GetInput "a"
+        /// Second input
+        member __.B = operatorArguments.GetInput "b"
+        /// Tuple of ints, optional. Axes in a to reorder to the right, before inversion.
+        member __.AAxes = operatorArguments.GetParameter("a_axes", NpiTensorsolve.AAxesDefault)
+        /// <summary>Copy NpiTensorsolve instance with updated inputs/parameters.</summary>
+        /// <param name="a">First input</param>
+        /// <param name="b">Second input</param>
+        /// <param name="aAxes">Tuple of ints, optional. Axes in a to reorder to the right, before inversion.</param>
+        member this.With([<Optional>] ?a : Symbol,
+            [<Optional>] ?b : Symbol,
+            [<Optional>] ?aAxes : int seq) = 
+            let operatorArguments = 
+                [
+                    a |> Option.map (fun x -> "a", Input x)
+                    b |> Option.map (fun x -> "b", Input x)
+                    aAxes |> Option.map (fun x -> "a_axes", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiTensorsolve(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBincount private (operatorArguments) = 
+        inherit SymbolOperator("_npi_bincount", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBincount(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBincount(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">Data</param>
+        /// <param name="weights">Weights</param>
+        /// <param name="minlength">A minimum number of bins for the output arrayIf minlength is specified, there will be at least thisnumber of bins in the output array</param>
+        /// <param name="hasWeights">Determine whether Bincount has weights.</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?weights : Symbol,
+            [<Optional>] ?minlength : int,
+            [<Optional>] ?hasWeights : bool) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let weights = defaultArg weights (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "weights", Input weights
+                    "minlength", minlength |> Option.map box |> Parameter
+                    "has_weights", hasWeights |> Option.map box |> Parameter
+                ]
+            new NpiBincount(Arguments<Symbol>(operatorArguments))
+        /// Default value for Minlength
+        /// A minimum number of bins for the output arrayIf minlength is specified, there will be at least thisnumber of bins in the output array
+        static member MinlengthDefault : int = 0
+        /// Default value for HasWeights
+        /// Determine whether Bincount has weights.
+        static member HasWeightsDefault : bool = false
+        /// Data
+        member __.Data = operatorArguments.GetInput "data"
+        /// Weights
+        member __.Weights = operatorArguments.GetInput "weights"
+        /// A minimum number of bins for the output arrayIf minlength is specified, there will be at least thisnumber of bins in the output array
+        member __.Minlength = operatorArguments.GetParameter("minlength", NpiBincount.MinlengthDefault)
+        /// Determine whether Bincount has weights.
+        member __.HasWeights = operatorArguments.GetParameter("has_weights", NpiBincount.HasWeightsDefault)
+        /// <summary>Copy NpiBincount instance with updated inputs/parameters.</summary>
+        /// <param name="data">Data</param>
+        /// <param name="weights">Weights</param>
+        /// <param name="minlength">A minimum number of bins for the output arrayIf minlength is specified, there will be at least thisnumber of bins in the output array</param>
+        /// <param name="hasWeights">Determine whether Bincount has weights.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?weights : Symbol,
+            [<Optional>] ?minlength : int,
+            [<Optional>] ?hasWeights : bool) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    weights |> Option.map (fun x -> "weights", Input x)
+                    minlength |> Option.map (fun x -> "minlength", Parameter(Some (box x)))
+                    hasWeights |> Option.map (fun x -> "has_weights", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiBincount(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpiBooleanMaskAssignScalar private (operatorArguments) = 
         inherit SymbolOperator("_npi_boolean_mask_assign_scalar", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBooleanMaskAssignScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiBooleanMaskAssignScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Scalar version of boolean assign
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L282</summary>
         /// <param name="data">input</param>
         /// <param name="mask">mask</param>
         /// <param name="value">value to be assigned to masked positions</param>
+        /// <param name="startAxis">starting axis of boolean mask</param>
         new(data : Symbol,
             mask : Symbol,
-            value : float) = 
+            value : float,
+            startAxis : int) = 
             let operatorArguments = 
                 [
                     "data", Input data
                     "mask", Input mask
                     "value", Parameter(Some(box value))
+                    "start_axis", Parameter(Some(box startAxis))
                 ]
             new NpiBooleanMaskAssignScalar(Arguments<Symbol>(operatorArguments))
         /// <summary>Scalar version of boolean assign
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L282</summary>
         /// <param name="value">value to be assigned to masked positions</param>
+        /// <param name="startAxis">starting axis of boolean mask</param>
         /// <param name="data">input</param>
         /// <param name="mask">mask</param>
         new(value : float,
+            startAxis : int,
             [<Optional>] ?data : Symbol,
             [<Optional>] ?mask : Symbol) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -10117,6 +11238,7 @@ module SymbolOperators =
                     "data", Input data
                     "mask", Input mask
                     "value", Parameter(Some(box value))
+                    "start_axis", Parameter(Some(box startAxis))
                 ]
             new NpiBooleanMaskAssignScalar(Arguments<Symbol>(operatorArguments))
         /// input
@@ -10125,18 +11247,23 @@ module SymbolOperators =
         member __.Mask = operatorArguments.GetInput "mask"
         /// value to be assigned to masked positions
         member __.Value : float = match operatorArguments.GetParameter "value" with Some(v) -> unbox v | None -> failwithf "Required parameter value is missing"
+        /// starting axis of boolean mask
+        member __.StartAxis : int = match operatorArguments.GetParameter "start_axis" with Some(v) -> unbox v | None -> failwithf "Required parameter start_axis is missing"
         /// <summary>Copy NpiBooleanMaskAssignScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">input</param>
         /// <param name="mask">mask</param>
         /// <param name="value">value to be assigned to masked positions</param>
+        /// <param name="startAxis">starting axis of boolean mask</param>
         member this.With([<Optional>] ?data : Symbol,
             [<Optional>] ?mask : Symbol,
-            [<Optional>] ?value : float) = 
+            [<Optional>] ?value : float,
+            [<Optional>] ?startAxis : int) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     mask |> Option.map (fun x -> "mask", Input x)
                     value |> Option.map (fun x -> "value", Parameter(Some (box x)))
+                    startAxis |> Option.map (fun x -> "start_axis", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiBooleanMaskAssignScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -10146,11 +11273,32 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpiBooleanMaskAssignTensor(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Tensor version of boolean assign
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L246</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L307</summary>
         /// <param name="data">input</param>
         /// <param name="mask">mask</param>
         /// <param name="value">assignment</param>
-        new([<Optional>] ?data : Symbol,
+        /// <param name="startAxis">starting axis of boolean mask</param>
+        new(data : Symbol,
+            mask : Symbol,
+            value : Symbol,
+            startAxis : int) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "mask", Input mask
+                    "value", Input value
+                    "start_axis", Parameter(Some(box startAxis))
+                ]
+            new NpiBooleanMaskAssignTensor(Arguments<Symbol>(operatorArguments))
+        /// <summary>Tensor version of boolean assign
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L307</summary>
+        /// <param name="startAxis">starting axis of boolean mask</param>
+        /// <param name="data">input</param>
+        /// <param name="mask">mask</param>
+        /// <param name="value">assignment</param>
+        new(startAxis : int,
+            [<Optional>] ?data : Symbol,
             [<Optional>] ?mask : Symbol,
             [<Optional>] ?value : Symbol) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -10161,6 +11309,7 @@ module SymbolOperators =
                     "data", Input data
                     "mask", Input mask
                     "value", Input value
+                    "start_axis", Parameter(Some(box startAxis))
                 ]
             new NpiBooleanMaskAssignTensor(Arguments<Symbol>(operatorArguments))
         /// input
@@ -10169,20 +11318,115 @@ module SymbolOperators =
         member __.Mask = operatorArguments.GetInput "mask"
         /// assignment
         member __.Value = operatorArguments.GetInput "value"
+        /// starting axis of boolean mask
+        member __.StartAxis : int = match operatorArguments.GetParameter "start_axis" with Some(v) -> unbox v | None -> failwithf "Required parameter start_axis is missing"
         /// <summary>Copy NpiBooleanMaskAssignTensor instance with updated inputs/parameters.</summary>
         /// <param name="data">input</param>
         /// <param name="mask">mask</param>
         /// <param name="value">assignment</param>
+        /// <param name="startAxis">starting axis of boolean mask</param>
         member this.With([<Optional>] ?data : Symbol,
             [<Optional>] ?mask : Symbol,
-            [<Optional>] ?value : Symbol) = 
+            [<Optional>] ?value : Symbol,
+            [<Optional>] ?startAxis : int) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     mask |> Option.map (fun x -> "mask", Input x)
                     value |> Option.map (fun x -> "value", Input x)
+                    startAxis |> Option.map (fun x -> "start_axis", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiBooleanMaskAssignTensor(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpAny private (operatorArguments) = 
+        inherit SymbolOperator("_np_any", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpAny(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpAny(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">Input ndarray</param>
+        /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+        /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?axis : int seq,
+            [<Optional>] ?keepdims : bool) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "axis", axis |> Option.map box |> Parameter
+                    "keepdims", keepdims |> Option.map box |> Parameter
+                ]
+            new NpAny(Arguments<Symbol>(operatorArguments))
+        /// Default value for Axis
+        /// Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.
+        static member AxisDefault : int [] option = None
+        /// Default value for Keepdims
+        /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
+        static member KeepdimsDefault : bool = false
+        /// Input ndarray
+        member __.Data = operatorArguments.GetInput "data"
+        /// Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.
+        member __.Axis = operatorArguments.GetParameter("axis", NpAny.AxisDefault)
+        /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
+        member __.Keepdims = operatorArguments.GetParameter("keepdims", NpAny.KeepdimsDefault)
+        /// <summary>Copy NpAny instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input ndarray</param>
+        /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+        /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?axis : int seq,
+            [<Optional>] ?keepdims : bool) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                    keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpAny(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpAll private (operatorArguments) = 
+        inherit SymbolOperator("_np_all", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpAll(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpAll(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">Input ndarray</param>
+        /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+        /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?axis : int seq,
+            [<Optional>] ?keepdims : bool) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "axis", axis |> Option.map box |> Parameter
+                    "keepdims", keepdims |> Option.map box |> Parameter
+                ]
+            new NpAll(Arguments<Symbol>(operatorArguments))
+        /// Default value for Axis
+        /// Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.
+        static member AxisDefault : int [] option = None
+        /// Default value for Keepdims
+        /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
+        static member KeepdimsDefault : bool = false
+        /// Input ndarray
+        member __.Data = operatorArguments.GetInput "data"
+        /// Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.
+        member __.Axis = operatorArguments.GetParameter("axis", NpAll.AxisDefault)
+        /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
+        member __.Keepdims = operatorArguments.GetParameter("keepdims", NpAll.KeepdimsDefault)
+        /// <summary>Copy NpAll instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input ndarray</param>
+        /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+        /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?axis : int seq,
+            [<Optional>] ?keepdims : bool) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                    keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpAll(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpiArgmax private (operatorArguments) = 
         inherit SymbolOperator("_npi_argmax", operatorArguments)
@@ -10280,7 +11524,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpSum(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L124</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L130</summary>
         /// <param name="a">The input</param>
         /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
         /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
@@ -10350,7 +11594,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpMax(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L163</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L170</summary>
         /// <param name="a">The input</param>
         /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
         /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
@@ -10409,7 +11653,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpMin(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L191</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L199</summary>
         /// <param name="a">The input</param>
         /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
         /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
@@ -10596,144 +11840,10 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiMean(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
-    type NpiStd private (operatorArguments) = 
-        inherit SymbolOperator("_npi_std", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiStd(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new NpiStd(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <param name="a">The input</param>
-        /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
-        /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
-        /// <param name="ddof">Starting value for the sum.</param>
-        /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
-        new([<Optional>] ?a : Symbol,
-            [<Optional>] ?axis : int seq,
-            [<Optional>] ?dtype : DataType,
-            [<Optional>] ?ddof : int,
-            [<Optional>] ?keepdims : bool) = 
-            let a = defaultArg a (new ImplicitVariable() :> Symbol)
-            let operatorArguments = 
-                [
-                    "a", Input a
-                    "axis", axis |> Option.map box |> Parameter
-                    "dtype", dtype |> Option.map box |> Parameter
-                    "ddof", ddof |> Option.map box |> Parameter
-                    "keepdims", keepdims |> Option.map box |> Parameter
-                ]
-            new NpiStd(Arguments<Symbol>(operatorArguments))
-        /// Default value for Axis
-        /// Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.
-        static member AxisDefault : int [] option = None
-        /// Default value for Dtype
-        /// The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.
-        static member DtypeDefault : DataType option = None
-        /// Default value for Ddof
-        /// Starting value for the sum.
-        static member DdofDefault : int = 0
-        /// Default value for Keepdims
-        /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
-        static member KeepdimsDefault : bool = false
-        /// The input
-        member __.A = operatorArguments.GetInput "a"
-        /// Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.
-        member __.Axis = operatorArguments.GetParameter("axis", NpiStd.AxisDefault)
-        /// The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.
-        member __.Dtype = operatorArguments.GetParameter("dtype", NpiStd.DtypeDefault)
-        /// Starting value for the sum.
-        member __.Ddof = operatorArguments.GetParameter("ddof", NpiStd.DdofDefault)
-        /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
-        member __.Keepdims = operatorArguments.GetParameter("keepdims", NpiStd.KeepdimsDefault)
-        /// <summary>Copy NpiStd instance with updated inputs/parameters.</summary>
-        /// <param name="a">The input</param>
-        /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
-        /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
-        /// <param name="ddof">Starting value for the sum.</param>
-        /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
-        member this.With([<Optional>] ?a : Symbol,
-            [<Optional>] ?axis : int seq,
-            [<Optional>] ?dtype : DataType,
-            [<Optional>] ?ddof : int,
-            [<Optional>] ?keepdims : bool) = 
-            let operatorArguments = 
-                [
-                    a |> Option.map (fun x -> "a", Input x)
-                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
-                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
-                    ddof |> Option.map (fun x -> "ddof", Parameter(Some (box x)))
-                    keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
-                ] |> List.choose id
-            new NpiStd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
-    
-    type NpiVar private (operatorArguments) = 
-        inherit SymbolOperator("_npi_var", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiVar(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new NpiVar(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <param name="a">The input</param>
-        /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
-        /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
-        /// <param name="ddof">Starting value for the sum.</param>
-        /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
-        new([<Optional>] ?a : Symbol,
-            [<Optional>] ?axis : int seq,
-            [<Optional>] ?dtype : DataType,
-            [<Optional>] ?ddof : int,
-            [<Optional>] ?keepdims : bool) = 
-            let a = defaultArg a (new ImplicitVariable() :> Symbol)
-            let operatorArguments = 
-                [
-                    "a", Input a
-                    "axis", axis |> Option.map box |> Parameter
-                    "dtype", dtype |> Option.map box |> Parameter
-                    "ddof", ddof |> Option.map box |> Parameter
-                    "keepdims", keepdims |> Option.map box |> Parameter
-                ]
-            new NpiVar(Arguments<Symbol>(operatorArguments))
-        /// Default value for Axis
-        /// Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.
-        static member AxisDefault : int [] option = None
-        /// Default value for Dtype
-        /// The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.
-        static member DtypeDefault : DataType option = None
-        /// Default value for Ddof
-        /// Starting value for the sum.
-        static member DdofDefault : int = 0
-        /// Default value for Keepdims
-        /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
-        static member KeepdimsDefault : bool = false
-        /// The input
-        member __.A = operatorArguments.GetInput "a"
-        /// Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.
-        member __.Axis = operatorArguments.GetParameter("axis", NpiVar.AxisDefault)
-        /// The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.
-        member __.Dtype = operatorArguments.GetParameter("dtype", NpiVar.DtypeDefault)
-        /// Starting value for the sum.
-        member __.Ddof = operatorArguments.GetParameter("ddof", NpiVar.DdofDefault)
-        /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
-        member __.Keepdims = operatorArguments.GetParameter("keepdims", NpiVar.KeepdimsDefault)
-        /// <summary>Copy NpiVar instance with updated inputs/parameters.</summary>
-        /// <param name="a">The input</param>
-        /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
-        /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
-        /// <param name="ddof">Starting value for the sum.</param>
-        /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
-        member this.With([<Optional>] ?a : Symbol,
-            [<Optional>] ?axis : int seq,
-            [<Optional>] ?dtype : DataType,
-            [<Optional>] ?ddof : int,
-            [<Optional>] ?keepdims : bool) = 
-            let operatorArguments = 
-                [
-                    a |> Option.map (fun x -> "a", Input x)
-                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
-                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
-                    ddof |> Option.map (fun x -> "ddof", Parameter(Some (box x)))
-                    keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
-                ] |> List.choose id
-            new NpiVar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
-    
-    type NpBroadcastTo private (operatorArguments) = 
-        inherit SymbolOperator("_np_broadcast_to", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new NpBroadcastTo(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new NpBroadcastTo(this.OperatorArguments.AddReplace(args)) :> Symbol
+    type NpiBroadcastTo private (operatorArguments) = 
+        inherit SymbolOperator("_npi_broadcast_to", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBroadcastTo(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBroadcastTo(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="array">The input</param>
         /// <param name="shape">The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.</param>
         new([<Optional>] ?array : Symbol,
@@ -10744,15 +11854,15 @@ module SymbolOperators =
                     "array", Input array
                     "shape", shape |> Option.map box |> Parameter
                 ]
-            new NpBroadcastTo(Arguments<Symbol>(operatorArguments))
+            new NpiBroadcastTo(Arguments<Symbol>(operatorArguments))
         /// Default value for Shape
         /// The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.
         static member ShapeDefault : int [] = [||]
         /// The input
         member __.Array = operatorArguments.GetInput "array"
         /// The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.
-        member __.Shape = operatorArguments.GetParameter("shape", NpBroadcastTo.ShapeDefault)
-        /// <summary>Copy NpBroadcastTo instance with updated inputs/parameters.</summary>
+        member __.Shape = operatorArguments.GetParameter("shape", NpiBroadcastTo.ShapeDefault)
+        /// <summary>Copy NpiBroadcastTo instance with updated inputs/parameters.</summary>
         /// <param name="array">The input</param>
         /// <param name="shape">The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.</param>
         member this.With([<Optional>] ?array : Symbol,
@@ -10762,7 +11872,63 @@ module SymbolOperators =
                     array |> Option.map (fun x -> "array", Input x)
                     shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
                 ] |> List.choose id
-            new NpBroadcastTo(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+            new NpiBroadcastTo(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpxConstraintCheck private (operatorArguments) = 
+        inherit SymbolOperator("_npx_constraint_check", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpxConstraintCheck(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpxConstraintCheck(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>This operator will check if all the elements in a boolean tensor is true.
+        /// If not, ValueError exception will be raised in the backend with given error message.
+        /// In order to evaluate this operator, one should multiply the origin tensor by the return value
+        /// of this operator to force this operator become part of the computation graph, otherwise the check
+        /// would not be working under symoblic mode.
+        /// 
+        /// Example:
+        /// 
+        /// loc = np.zeros((2,2))
+        /// scale = np.array(#some_value)
+        /// constraint = (scale &gt; 0)
+        /// np.random.normal(loc, scale * npx.constraint_check(constraint, &#39;Scale should be larger than zero&#39;))
+        /// 
+        /// If elements in the scale tensor are all bigger than zero, npx.constraint_check would return
+        /// `np.array(True)`, which will not change the value of `scale` when multiplied by.
+        /// If some of the elements in the scale tensor violate the constraint, i.e. there exists `False` in
+        /// the boolean tensor `constraint`, a `ValueError` exception with given message
+        /// &#39;Scale should be larger than zero&#39; would be raised.
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_constraint_check.cc:L79</summary>
+        /// <param name="input">Input boolean array</param>
+        /// <param name="msg">Error message raised when constraint violated</param>
+        new([<Optional>] ?input : Symbol,
+            [<Optional>] ?msg : string) = 
+            let input = defaultArg input (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input", Input input
+                    "msg", msg |> Option.map box |> Parameter
+                ]
+            new NpxConstraintCheck(Arguments<Symbol>(operatorArguments))
+        /// Default value for Msg
+        /// Error message raised when constraint violated
+        static member MsgDefault : string = "Constraint violated."
+        /// Input boolean array
+        member __.Input = operatorArguments.GetInput "input"
+        /// Error message raised when constraint violated
+        member __.Msg = operatorArguments.GetParameter("msg", NpxConstraintCheck.MsgDefault)
+        /// <summary>Copy NpxConstraintCheck instance with updated inputs/parameters.</summary>
+        /// <param name="input">Input boolean array</param>
+        /// <param name="msg">Error message raised when constraint violated</param>
+        member this.With([<Optional>] ?input : Symbol,
+            [<Optional>] ?msg : string) = 
+            let operatorArguments = 
+                [
+                    input |> Option.map (fun x -> "input", Input x)
+                    msg |> Option.map (fun x -> "msg", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpxConstraintCheck(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpCumsum private (operatorArguments) = 
         inherit SymbolOperator("_np_cumsum", operatorArguments)
@@ -10811,6 +11977,96 @@ module SymbolOperators =
                     dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpCumsum(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiDelete private (operatorArguments) = 
+        inherit SymbolOperator("_npi_delete", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiDelete(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiDelete(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Delete values along the given axis before the given indices.
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_delete_op.cc:L72</summary>
+        /// <param name="arr">Input ndarray</param>
+        /// <param name="obj">Input ndarray</param>
+        /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+        /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+        /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+        /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+        /// <param name="axis">Axis along which to insert `values`.</param>
+        new([<Optional>] ?arr : Symbol,
+            [<Optional>] ?obj : Symbol,
+            [<Optional>] ?start : int,
+            [<Optional>] ?stop : int,
+            [<Optional>] ?step : int,
+            [<Optional>] ?intInd : int,
+            [<Optional>] ?axis : int) = 
+            let arr = defaultArg arr (new ImplicitVariable() :> Symbol)
+            let obj = defaultArg obj (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "arr", Input arr
+                    "obj", Input obj
+                    "start", start |> Option.map box |> Parameter
+                    "stop", stop |> Option.map box |> Parameter
+                    "step", step |> Option.map box |> Parameter
+                    "int_ind", intInd |> Option.map box |> Parameter
+                    "axis", axis |> Option.map box |> Parameter
+                ]
+            new NpiDelete(Arguments<Symbol>(operatorArguments))
+        /// Default value for Start
+        /// If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.
+        static member StartDefault : int option = None
+        /// Default value for Stop
+        /// If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.
+        static member StopDefault : int option = None
+        /// Default value for Step
+        /// If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.
+        static member StepDefault : int option = None
+        /// Default value for IntInd
+        /// If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted
+        static member IntIndDefault : int option = None
+        /// Default value for Axis
+        /// Axis along which to insert `values`.
+        static member AxisDefault : int option = None
+        /// Input ndarray
+        member __.Arr = operatorArguments.GetInput "arr"
+        /// Input ndarray
+        member __.Obj = operatorArguments.GetInput "obj"
+        /// If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.
+        member __.Start = operatorArguments.GetParameter("start", NpiDelete.StartDefault)
+        /// If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.
+        member __.Stop = operatorArguments.GetParameter("stop", NpiDelete.StopDefault)
+        /// If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.
+        member __.Step = operatorArguments.GetParameter("step", NpiDelete.StepDefault)
+        /// If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted
+        member __.IntInd = operatorArguments.GetParameter("int_ind", NpiDelete.IntIndDefault)
+        /// Axis along which to insert `values`.
+        member __.Axis = operatorArguments.GetParameter("axis", NpiDelete.AxisDefault)
+        /// <summary>Copy NpiDelete instance with updated inputs/parameters.</summary>
+        /// <param name="arr">Input ndarray</param>
+        /// <param name="obj">Input ndarray</param>
+        /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+        /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+        /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+        /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+        /// <param name="axis">Axis along which to insert `values`.</param>
+        member this.With([<Optional>] ?arr : Symbol,
+            [<Optional>] ?obj : Symbol,
+            [<Optional>] ?start : int,
+            [<Optional>] ?stop : int,
+            [<Optional>] ?step : int,
+            [<Optional>] ?intInd : int,
+            [<Optional>] ?axis : int) = 
+            let operatorArguments = 
+                [
+                    arr |> Option.map (fun x -> "arr", Input x)
+                    obj |> Option.map (fun x -> "obj", Input x)
+                    start |> Option.map (fun x -> "start", Parameter(Some (box x)))
+                    stop |> Option.map (fun x -> "stop", Parameter(Some (box x)))
+                    step |> Option.map (fun x -> "step", Parameter(Some (box x)))
+                    intInd |> Option.map (fun x -> "int_ind", Parameter(Some (box x)))
+                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiDelete(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpiDiff private (operatorArguments) = 
         inherit SymbolOperator("_npi_diff", operatorArguments)
@@ -10907,6 +12163,101 @@ module SymbolOperators =
                     b |> Option.map (fun x -> "b", Input x)
                 ] |> List.choose id
             new NpDot(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiEdiff1d private (operatorArguments) = 
+        inherit SymbolOperator("_npi_ediff1d", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiEdiff1d(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiEdiff1d(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="input3">Source input</param>
+        /// <param name="toBeginArrGiven">To determine whether the `to_begin` parameter is an array.</param>
+        /// <param name="toEndArrGiven">To determine whether the `to_end` parameter is an array.</param>
+        /// <param name="toBeginScalar">If the `to_begin`is a scalar, the value of this parameter.</param>
+        /// <param name="toEndScalar">If the `to_end`is a scalar, the value of this parameter.</param>
+        new([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?input3 : Symbol,
+            [<Optional>] ?toBeginArrGiven : bool,
+            [<Optional>] ?toEndArrGiven : bool,
+            [<Optional>] ?toBeginScalar : float,
+            [<Optional>] ?toEndScalar : float) = 
+            let input1 = defaultArg input1 (new ImplicitVariable() :> Symbol)
+            let input2 = defaultArg input2 (new ImplicitVariable() :> Symbol)
+            let input3 = defaultArg input3 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "input2", Input input2
+                    "input3", Input input3
+                    "to_begin_arr_given", toBeginArrGiven |> Option.map box |> Parameter
+                    "to_end_arr_given", toEndArrGiven |> Option.map box |> Parameter
+                    "to_begin_scalar", toBeginScalar |> Option.map box |> Parameter
+                    "to_end_scalar", toEndScalar |> Option.map box |> Parameter
+                ]
+            new NpiEdiff1d(Arguments<Symbol>(operatorArguments))
+        /// Default value for ToBeginArrGiven
+        /// To determine whether the `to_begin` parameter is an array.
+        static member ToBeginArrGivenDefault : bool = false
+        /// Default value for ToEndArrGiven
+        /// To determine whether the `to_end` parameter is an array.
+        static member ToEndArrGivenDefault : bool = false
+        /// Default value for ToBeginScalar
+        /// If the `to_begin`is a scalar, the value of this parameter.
+        static member ToBeginScalarDefault : double option = None
+        /// Default value for ToEndScalar
+        /// If the `to_end`is a scalar, the value of this parameter.
+        static member ToEndScalarDefault : double option = None
+        /// Source input
+        member __.Input1 = operatorArguments.GetInput "input1"
+        /// Source input
+        member __.Input2 = operatorArguments.GetInput "input2"
+        /// Source input
+        member __.Input3 = operatorArguments.GetInput "input3"
+        /// To determine whether the `to_begin` parameter is an array.
+        member __.ToBeginArrGiven = operatorArguments.GetParameter("to_begin_arr_given", NpiEdiff1d.ToBeginArrGivenDefault)
+        /// To determine whether the `to_end` parameter is an array.
+        member __.ToEndArrGiven = operatorArguments.GetParameter("to_end_arr_given", NpiEdiff1d.ToEndArrGivenDefault)
+        /// If the `to_begin`is a scalar, the value of this parameter.
+        member __.ToBeginScalar = operatorArguments.GetParameter("to_begin_scalar", NpiEdiff1d.ToBeginScalarDefault)
+        /// If the `to_end`is a scalar, the value of this parameter.
+        member __.ToEndScalar = operatorArguments.GetParameter("to_end_scalar", NpiEdiff1d.ToEndScalarDefault)
+        /// <summary>Copy NpiEdiff1d instance with updated inputs/parameters.</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="input3">Source input</param>
+        /// <param name="toBeginArrGiven">To determine whether the `to_begin` parameter is an array.</param>
+        /// <param name="toEndArrGiven">To determine whether the `to_end` parameter is an array.</param>
+        /// <param name="toBeginScalar">If the `to_begin`is a scalar, the value of this parameter.</param>
+        /// <param name="toEndScalar">If the `to_end`is a scalar, the value of this parameter.</param>
+        member this.With([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?input3 : Symbol,
+            [<Optional>] ?toBeginArrGiven : bool,
+            [<Optional>] ?toEndArrGiven : bool,
+            [<Optional>] ?toBeginScalar : float,
+            [<Optional>] ?toEndScalar : float) = 
+            let operatorArguments = 
+                [
+                    input1 |> Option.map (fun x -> "input1", Input x)
+                    input2 |> Option.map (fun x -> "input2", Input x)
+                    input3 |> Option.map (fun x -> "input3", Input x)
+                    toBeginArrGiven |> Option.map (fun x -> "to_begin_arr_given", Parameter(Some (box x)))
+                    toEndArrGiven |> Option.map (fun x -> "to_end_arr_given", Parameter(Some (box x)))
+                    toBeginScalar |> Option.map (fun x -> "to_begin_scalar", Parameter(Some (box x)))
+                    toEndScalar |> Option.map (fun x -> "to_end_scalar", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiEdiff1d(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBackwardEdiff1d private (operatorArguments) = 
+        inherit SymbolOperator("_npi_backward_ediff1d", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBackwardEdiff1d(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBackwardEdiff1d(this.OperatorArguments.AddReplace(args)) :> Symbol
+        new() =
+            let operatorArguments = 
+                [
+                ]
+            new NpiBackwardEdiff1d(Arguments<Symbol>(operatorArguments))
     
     type NpiEinsum private (operatorArguments) = 
         inherit SymbolOperator("_npi_einsum", operatorArguments)
@@ -11153,39 +12504,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiEqualScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiEqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">First input to the function</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiEqualScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">First input to the function</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiEqualScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// First input to the function
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiEqualScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiEqualScalar.IsIntDefault)
         /// <summary>Copy NpiEqualScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">First input to the function</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiEqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -11194,39 +12549,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiNotEqualScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiNotEqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">First input to the function</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiNotEqualScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">First input to the function</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiNotEqualScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// First input to the function
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiNotEqualScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiNotEqualScalar.IsIntDefault)
         /// <summary>Copy NpiNotEqualScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">First input to the function</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiNotEqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -11235,39 +12594,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiGreaterScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiGreaterScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">First input to the function</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiGreaterScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">First input to the function</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiGreaterScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// First input to the function
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiGreaterScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiGreaterScalar.IsIntDefault)
         /// <summary>Copy NpiGreaterScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">First input to the function</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiGreaterScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -11276,39 +12639,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLessScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiLessScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">First input to the function</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiLessScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">First input to the function</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiLessScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// First input to the function
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiLessScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiLessScalar.IsIntDefault)
         /// <summary>Copy NpiLessScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">First input to the function</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiLessScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -11317,39 +12684,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiGreaterEqualScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiGreaterEqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">First input to the function</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiGreaterEqualScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">First input to the function</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiGreaterEqualScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// First input to the function
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiGreaterEqualScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiGreaterEqualScalar.IsIntDefault)
         /// <summary>Copy NpiGreaterEqualScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">First input to the function</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiGreaterEqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -11358,39 +12729,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLessEqualScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiLessEqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">First input to the function</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiLessEqualScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">First input to the function</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiLessEqualScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// First input to the function
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiLessEqualScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiLessEqualScalar.IsIntDefault)
         /// <summary>Copy NpiLessEqualScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">First input to the function</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiLessEqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -11559,39 +12934,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiAddScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiAddScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiAddScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiAddScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiAddScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiAddScalar.IsIntDefault)
         /// <summary>Copy NpiAddScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiAddScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -11600,39 +12979,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSubtractScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiSubtractScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiSubtractScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiSubtractScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiSubtractScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiSubtractScalar.IsIntDefault)
         /// <summary>Copy NpiSubtractScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiSubtractScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -11641,39 +13024,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRsubtractScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiRsubtractScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiRsubtractScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiRsubtractScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiRsubtractScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiRsubtractScalar.IsIntDefault)
         /// <summary>Copy NpiRsubtractScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiRsubtractScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -11682,39 +13069,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiMultiplyScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiMultiplyScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiMultiplyScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiMultiplyScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiMultiplyScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiMultiplyScalar.IsIntDefault)
         /// <summary>Copy NpiMultiplyScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiMultiplyScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -11723,39 +13114,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiModScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiModScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiModScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiModScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiModScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiModScalar.IsIntDefault)
         /// <summary>Copy NpiModScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiModScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -11764,39 +13159,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRmodScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiRmodScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiRmodScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiRmodScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiRmodScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiRmodScalar.IsIntDefault)
         /// <summary>Copy NpiRmodScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiRmodScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -11805,39 +13204,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiPowerScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiPowerScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiPowerScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiPowerScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiPowerScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiPowerScalar.IsIntDefault)
         /// <summary>Copy NpiPowerScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiPowerScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -11846,39 +13249,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRpowerScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiRpowerScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiRpowerScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiRpowerScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiRpowerScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiRpowerScalar.IsIntDefault)
         /// <summary>Copy NpiRpowerScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiRpowerScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -11888,7 +13295,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpiCopysign(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_broadcast_op_extended.cc:L49</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_broadcast_op_extended.cc:L48</summary>
         /// <param name="lhs">First input to the function</param>
         /// <param name="rhs">Second input to the function</param>
         new([<Optional>] ?lhs : Symbol,
@@ -11954,41 +13361,122 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLcmScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiLcmScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : int) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiLcmScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : int,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiLcmScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : int = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiLcmScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiLcmScalar.IsIntDefault)
         /// <summary>Copy NpiLcmScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : int) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiLcmScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBitwiseAnd private (operatorArguments) = 
+        inherit SymbolOperator("_npi_bitwise_and", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBitwiseAnd(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBitwiseAnd(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                ]
+            new NpiBitwiseAnd(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// Second input to the function
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// <summary>Copy NpiBitwiseAnd instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                ] |> List.choose id
+            new NpiBitwiseAnd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBitwiseAndScalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_bitwise_and_scalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBitwiseAndScalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBitwiseAndScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">source input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
+                ]
+            new NpiBitwiseAndScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
+        /// source input
+        member __.Data = operatorArguments.GetInput "data"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiBitwiseAndScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiBitwiseAndScalar.IsIntDefault)
+        /// <summary>Copy NpiBitwiseAndScalar instance with updated inputs/parameters.</summary>
+        /// <param name="data">source input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiBitwiseAndScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpiBitwiseXor private (operatorArguments) = 
         inherit SymbolOperator("_npi_bitwise_xor", operatorArguments)
@@ -12022,85 +13510,170 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiBitwiseXor(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiBitwiseOr private (operatorArguments) = 
+        inherit SymbolOperator("_npi_bitwise_or", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBitwiseOr(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBitwiseOr(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                ]
+            new NpiBitwiseOr(Arguments<Symbol>(operatorArguments))
+        /// First input to the function
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// Second input to the function
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// <summary>Copy NpiBitwiseOr instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">First input to the function</param>
+        /// <param name="rhs">Second input to the function</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                ] |> List.choose id
+            new NpiBitwiseOr(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpiBitwiseXorScalar private (operatorArguments) = 
         inherit SymbolOperator("_npi_bitwise_xor_scalar", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBitwiseXorScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiBitwiseXorScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : int) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiBitwiseXorScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : int,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiBitwiseXorScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : int = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiBitwiseXorScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiBitwiseXorScalar.IsIntDefault)
         /// <summary>Copy NpiBitwiseXorScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : int) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiBitwiseXorScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBitwiseOrScalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_bitwise_or_scalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBitwiseOrScalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBitwiseOrScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">source input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
+                ]
+            new NpiBitwiseOrScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
+        /// source input
+        member __.Data = operatorArguments.GetInput "data"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiBitwiseOrScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiBitwiseOrScalar.IsIntDefault)
+        /// <summary>Copy NpiBitwiseOrScalar instance with updated inputs/parameters.</summary>
+        /// <param name="data">source input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiBitwiseOrScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpiCopysignScalar private (operatorArguments) = 
         inherit SymbolOperator("_npi_copysign_scalar", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiCopysignScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiCopysignScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiCopysignScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiCopysignScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiCopysignScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiCopysignScalar.IsIntDefault)
         /// <summary>Copy NpiCopysignScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiCopysignScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -12109,39 +13682,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRcopysignScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiRcopysignScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiRcopysignScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiRcopysignScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiRcopysignScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiRcopysignScalar.IsIntDefault)
         /// <summary>Copy NpiRcopysignScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiRcopysignScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -12182,39 +13759,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiArctan2Scalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiArctan2Scalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiArctan2Scalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiArctan2Scalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiArctan2Scalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiArctan2Scalar.IsIntDefault)
         /// <summary>Copy NpiArctan2Scalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiArctan2Scalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -12223,39 +13804,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRarctan2Scalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiRarctan2Scalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiRarctan2Scalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiRarctan2Scalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiRarctan2Scalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiRarctan2Scalar.IsIntDefault)
         /// <summary>Copy NpiRarctan2Scalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiRarctan2Scalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -12328,39 +13913,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLdexpScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiLdexpScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiLdexpScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiLdexpScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiLdexpScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiLdexpScalar.IsIntDefault)
         /// <summary>Copy NpiLdexpScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiLdexpScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -12369,39 +13958,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRldexpScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiRldexpScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiRldexpScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiRldexpScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiRldexpScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiRldexpScalar.IsIntDefault)
         /// <summary>Copy NpiRldexpScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiRldexpScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -12552,7 +14145,7 @@ module SymbolOperators =
         ///    absolute([-2, 0, 3]) = [2, 0, 3]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L134</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L139</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -12582,7 +14175,7 @@ module SymbolOperators =
         ///    sign([-2, 0, 3]) = [-1, 0, 1]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L143</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L148</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -12611,7 +14204,7 @@ module SymbolOperators =
         ///    rint([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -0.,  0.,  2.,  2.,  2.]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L151</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L156</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -12641,7 +14234,7 @@ module SymbolOperators =
         ///    ceil([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  1.,  2.,  2.,  2.]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L160</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L165</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -12671,7 +14264,7 @@ module SymbolOperators =
         ///    floor([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -1.,  0.,  1.,  1.,  2.]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L169</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L174</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -12691,6 +14284,29 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiFloor(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiBitwiseNot private (operatorArguments) = 
+        inherit SymbolOperator("_npi_bitwise_not", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBitwiseNot(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBitwiseNot(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="x">The input array.</param>
+        new([<Optional>] ?x : Symbol) =
+            let x = defaultArg x (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "x", Input x
+                ]
+            new NpiBitwiseNot(Arguments<Symbol>(operatorArguments))
+        /// The input array.
+        member __.X = operatorArguments.GetInput "x"
+        /// <summary>Copy NpiBitwiseNot instance with updated inputs/parameters.</summary>
+        /// <param name="x">The input array.</param>
+        member this.With([<Optional>] ?x : Symbol) =
+            let operatorArguments = 
+                [
+                    x |> Option.map (fun x -> "x", Input x)
+                ] |> List.choose id
+            new NpiBitwiseNot(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpiTrunc private (operatorArguments) = 
         inherit SymbolOperator("_npi_trunc", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTrunc(args)
@@ -12702,7 +14318,7 @@ module SymbolOperators =
         ///    trunc([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  0.,  1.,  1.,  2.]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L179</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L198</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -12733,7 +14349,7 @@ module SymbolOperators =
         ///    fix([-2.1, -1.9, 1.9, 2.1]) = [-2., -1.,  1., 2.]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L189</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L208</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -12762,7 +14378,7 @@ module SymbolOperators =
         ///    square([2, 3, 4]) = [4, 9, 16]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L197</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L216</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -12791,7 +14407,7 @@ module SymbolOperators =
         ///    sqrt([4, 9, 16]) = [2, 3, 4]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L205</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L224</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -12820,7 +14436,7 @@ module SymbolOperators =
         ///    cbrt([1, 8, -125]) = [1, 2, -5]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L213</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L232</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -12849,7 +14465,7 @@ module SymbolOperators =
         ///    exp([0, 1, 2]) = [1., 2.71828175, 7.38905621]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L221</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L240</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -12877,7 +14493,7 @@ module SymbolOperators =
         /// The natural logarithm is logarithm in base *e*, so that ``log(exp(x)) = x``
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L228</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L247</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -12905,7 +14521,7 @@ module SymbolOperators =
         /// ``10**log10(x) = x``
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L249</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L268</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -12933,7 +14549,7 @@ module SymbolOperators =
         /// ``2**log2(x) = x``
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L256</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L275</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -12961,7 +14577,7 @@ module SymbolOperators =
         /// Calculates ``log(1 + x)``.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L263</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L282</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -12987,7 +14603,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpiExpm1(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Calculate ``exp(x) - 1`` for all elements in the array.
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L268</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L287</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -13030,6 +14646,121 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiLogicalNot(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiIsnan private (operatorArguments) = 
+        inherit SymbolOperator("_npi_isnan", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiIsnan(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiIsnan(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="x">The input array.</param>
+        new([<Optional>] ?x : Symbol) =
+            let x = defaultArg x (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "x", Input x
+                ]
+            new NpiIsnan(Arguments<Symbol>(operatorArguments))
+        /// The input array.
+        member __.X = operatorArguments.GetInput "x"
+        /// <summary>Copy NpiIsnan instance with updated inputs/parameters.</summary>
+        /// <param name="x">The input array.</param>
+        member this.With([<Optional>] ?x : Symbol) =
+            let operatorArguments = 
+                [
+                    x |> Option.map (fun x -> "x", Input x)
+                ] |> List.choose id
+            new NpiIsnan(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiIsinf private (operatorArguments) = 
+        inherit SymbolOperator("_npi_isinf", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiIsinf(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiIsinf(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="x">The input array.</param>
+        new([<Optional>] ?x : Symbol) =
+            let x = defaultArg x (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "x", Input x
+                ]
+            new NpiIsinf(Arguments<Symbol>(operatorArguments))
+        /// The input array.
+        member __.X = operatorArguments.GetInput "x"
+        /// <summary>Copy NpiIsinf instance with updated inputs/parameters.</summary>
+        /// <param name="x">The input array.</param>
+        member this.With([<Optional>] ?x : Symbol) =
+            let operatorArguments = 
+                [
+                    x |> Option.map (fun x -> "x", Input x)
+                ] |> List.choose id
+            new NpiIsinf(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiIsposinf private (operatorArguments) = 
+        inherit SymbolOperator("_npi_isposinf", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiIsposinf(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiIsposinf(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="x">The input array.</param>
+        new([<Optional>] ?x : Symbol) =
+            let x = defaultArg x (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "x", Input x
+                ]
+            new NpiIsposinf(Arguments<Symbol>(operatorArguments))
+        /// The input array.
+        member __.X = operatorArguments.GetInput "x"
+        /// <summary>Copy NpiIsposinf instance with updated inputs/parameters.</summary>
+        /// <param name="x">The input array.</param>
+        member this.With([<Optional>] ?x : Symbol) =
+            let operatorArguments = 
+                [
+                    x |> Option.map (fun x -> "x", Input x)
+                ] |> List.choose id
+            new NpiIsposinf(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiIsneginf private (operatorArguments) = 
+        inherit SymbolOperator("_npi_isneginf", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiIsneginf(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiIsneginf(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="x">The input array.</param>
+        new([<Optional>] ?x : Symbol) =
+            let x = defaultArg x (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "x", Input x
+                ]
+            new NpiIsneginf(Arguments<Symbol>(operatorArguments))
+        /// The input array.
+        member __.X = operatorArguments.GetInput "x"
+        /// <summary>Copy NpiIsneginf instance with updated inputs/parameters.</summary>
+        /// <param name="x">The input array.</param>
+        member this.With([<Optional>] ?x : Symbol) =
+            let operatorArguments = 
+                [
+                    x |> Option.map (fun x -> "x", Input x)
+                ] |> List.choose id
+            new NpiIsneginf(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiIsfinite private (operatorArguments) = 
+        inherit SymbolOperator("_npi_isfinite", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiIsfinite(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiIsfinite(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="x">The input array.</param>
+        new([<Optional>] ?x : Symbol) =
+            let x = defaultArg x (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "x", Input x
+                ]
+            new NpiIsfinite(Arguments<Symbol>(operatorArguments))
+        /// The input array.
+        member __.X = operatorArguments.GetInput "x"
+        /// <summary>Copy NpiIsfinite instance with updated inputs/parameters.</summary>
+        /// <param name="x">The input array.</param>
+        member this.With([<Optional>] ?x : Symbol) =
+            let operatorArguments = 
+                [
+                    x |> Option.map (fun x -> "x", Input x)
+                ] |> List.choose id
+            new NpiIsfinite(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpiSin private (operatorArguments) = 
         inherit SymbolOperator("_npi_sin", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiSin(args)
@@ -13039,7 +14770,7 @@ module SymbolOperators =
         ///    sin([0, \pi/4, \pi/2]) = [0, 0.707, 1]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L281</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L320</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -13068,7 +14799,7 @@ module SymbolOperators =
         ///    cos([0, \pi/4, \pi/2]) = [1, 0.707, 0]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L289</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L328</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -13097,7 +14828,7 @@ module SymbolOperators =
         ///    tan([0, \pi/4, \pi/2]) = [0, 1, -inf]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L297</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L336</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -13126,7 +14857,7 @@ module SymbolOperators =
         ///    arcsin([-1, -.707, 0, .707, 1]) = [-\pi/2, -\pi/4, 0, \pi/4, \pi/2]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L305</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L344</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -13158,7 +14889,7 @@ module SymbolOperators =
         /// The storage type of ``arccos`` output is always dense
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L316</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L355</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -13187,7 +14918,7 @@ module SymbolOperators =
         ///    arctan([-1, 0, 1]) = [-\pi/4, 0, \pi/4]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L324</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L363</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -13216,7 +14947,7 @@ module SymbolOperators =
         ///    degrees([0, \pi/2, \pi, 3\pi/2, 2\pi]) = [0, 90, 180, 270, 360]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L332</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L371</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -13245,7 +14976,7 @@ module SymbolOperators =
         ///    radians([0, 90, 180, 270, 360]) = [0, \pi/2, \pi, 3\pi/2, 2\pi]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L340</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L379</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -13274,7 +15005,7 @@ module SymbolOperators =
         ///    sinh(x) = 0.5\times(exp(x) - exp(-x))
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L348</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L387</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -13303,7 +15034,7 @@ module SymbolOperators =
         ///    cosh(x) = 0.5\times(exp(x) + exp(-x))
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L356</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L395</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -13332,7 +15063,7 @@ module SymbolOperators =
         ///    tanh(x) = sinh(x) / cosh(x)
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L364</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L403</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -13360,7 +15091,7 @@ module SymbolOperators =
         /// computed element-wise.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L371</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L410</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -13388,7 +15119,7 @@ module SymbolOperators =
         /// computed element-wise.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L378</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L417</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -13416,7 +15147,7 @@ module SymbolOperators =
         /// computed element-wise.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L385</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L424</summary>
         /// <param name="x">The input array.</param>
         new([<Optional>] ?x : Symbol) =
             let x = defaultArg x (new ImplicitVariable() :> Symbol)
@@ -13469,6 +15200,86 @@ module SymbolOperators =
                     decimals |> Option.map (fun x -> "decimals", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiAround(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiNanToNum private (operatorArguments) = 
+        inherit SymbolOperator("_npi_nan_to_num", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiNanToNum(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiNanToNum(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L464</summary>
+        /// <param name="data">Input ndarray</param>
+        /// <param name="copy">Whether to create a copy of `x` (True) or to replace valuesin-place (False). The in-place operation only occurs ifcasting to an array does not require a copy.Default is True.</param>
+        /// <param name="nan">Value to be used to fill NaN values. If no value is passedthen NaN values will be replaced with 0.0.</param>
+        /// <param name="posinf">Value to be used to fill positive infinity values.If no value is passed then positive infinity values will bereplaced with a very large number.</param>
+        /// <param name="neginf">Value to be used to fill negative infinity values.If no value is passed then negative infinity valueswill be replaced with a very small (or negative) number.</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?copy : bool,
+            [<Optional>] ?nan : double,
+            [<Optional>] ?posinf : float,
+            [<Optional>] ?neginf : float) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "copy", copy |> Option.map box |> Parameter
+                    "nan", nan |> Option.map box |> Parameter
+                    "posinf", posinf |> Option.map box |> Parameter
+                    "neginf", neginf |> Option.map box |> Parameter
+                ]
+            new NpiNanToNum(Arguments<Symbol>(operatorArguments))
+        /// Default value for Copy
+        /// Whether to create a copy of `x` (True) or to replace valuesin-place (False). The in-place operation only occurs ifcasting to an array does not require a copy.Default is True.
+        static member CopyDefault : bool = true
+        /// Default value for Nan
+        /// Value to be used to fill NaN values. If no value is passedthen NaN values will be replaced with 0.0.
+        static member NanDefault : double = 0.0
+        /// Default value for Posinf
+        /// Value to be used to fill positive infinity values.If no value is passed then positive infinity values will bereplaced with a very large number.
+        static member PosinfDefault : double option = None
+        /// Default value for Neginf
+        /// Value to be used to fill negative infinity values.If no value is passed then negative infinity valueswill be replaced with a very small (or negative) number.
+        static member NeginfDefault : double option = None
+        /// Input ndarray
+        member __.Data = operatorArguments.GetInput "data"
+        /// Whether to create a copy of `x` (True) or to replace valuesin-place (False). The in-place operation only occurs ifcasting to an array does not require a copy.Default is True.
+        member __.Copy = operatorArguments.GetParameter("copy", NpiNanToNum.CopyDefault)
+        /// Value to be used to fill NaN values. If no value is passedthen NaN values will be replaced with 0.0.
+        member __.Nan = operatorArguments.GetParameter("nan", NpiNanToNum.NanDefault)
+        /// Value to be used to fill positive infinity values.If no value is passed then positive infinity values will bereplaced with a very large number.
+        member __.Posinf = operatorArguments.GetParameter("posinf", NpiNanToNum.PosinfDefault)
+        /// Value to be used to fill negative infinity values.If no value is passed then negative infinity valueswill be replaced with a very small (or negative) number.
+        member __.Neginf = operatorArguments.GetParameter("neginf", NpiNanToNum.NeginfDefault)
+        /// <summary>Copy NpiNanToNum instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input ndarray</param>
+        /// <param name="copy">Whether to create a copy of `x` (True) or to replace valuesin-place (False). The in-place operation only occurs ifcasting to an array does not require a copy.Default is True.</param>
+        /// <param name="nan">Value to be used to fill NaN values. If no value is passedthen NaN values will be replaced with 0.0.</param>
+        /// <param name="posinf">Value to be used to fill positive infinity values.If no value is passed then positive infinity values will bereplaced with a very large number.</param>
+        /// <param name="neginf">Value to be used to fill negative infinity values.If no value is passed then negative infinity valueswill be replaced with a very small (or negative) number.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?copy : bool,
+            [<Optional>] ?nan : double,
+            [<Optional>] ?posinf : float,
+            [<Optional>] ?neginf : float) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    copy |> Option.map (fun x -> "copy", Parameter(Some (box x)))
+                    nan |> Option.map (fun x -> "nan", Parameter(Some (box x)))
+                    posinf |> Option.map (fun x -> "posinf", Parameter(Some (box x)))
+                    neginf |> Option.map (fun x -> "neginf", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiNanToNum(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBackwardNanToNum private (operatorArguments) = 
+        inherit SymbolOperator("_npi_backward_nan_to_num", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBackwardNanToNum(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBackwardNanToNum(this.OperatorArguments.AddReplace(args)) :> Symbol
+        new() =
+            let operatorArguments = 
+                [
+                ]
+            new NpiBackwardNanToNum(Arguments<Symbol>(operatorArguments))
     
     type NpiZeros private (operatorArguments) = 
         inherit SymbolOperator("_npi_zeros", operatorArguments)
@@ -13580,51 +15391,126 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiIdentity(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
-    type NpZerosLike private (operatorArguments) = 
-        inherit SymbolOperator("_np_zeros_like", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new NpZerosLike(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new NpZerosLike(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
-        new([<Optional>] ?a : Symbol) =
-            let a = defaultArg a (new ImplicitVariable() :> Symbol)
+    type NpAtleast1d private (operatorArguments) = 
+        inherit SymbolOperator("_np_atleast_1d", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpAtleast1d(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpAtleast1d(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="arys">List of input arrays</param>
+        new([<ParamArray>] arys : Symbol[]) =
             let operatorArguments = 
                 [
-                    "a", Input a
+                    "arys", VarArg("num_args", arys)
                 ]
-            new NpZerosLike(Arguments<Symbol>(operatorArguments))
-        /// The shape and data-type of a define these same attributes of the returned array.
-        member __.A = operatorArguments.GetInput "a"
-        /// <summary>Copy NpZerosLike instance with updated inputs/parameters.</summary>
-        /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
-        member this.With([<Optional>] ?a : Symbol) =
+            new NpAtleast1d(Arguments<Symbol>(operatorArguments))
+        /// List of input arrays
+        member __.Arys = operatorArguments.GetVarArg "arys"
+        /// <summary>Copy NpAtleast1d instance with updated inputs/parameters.</summary>
+        /// <param name="arys">List of input arrays</param>
+        member this.With([<Optional>] ?arys : Symbol seq) =
             let operatorArguments = 
                 [
-                    a |> Option.map (fun x -> "a", Input x)
+                    arys |> Option.map (fun x -> "arys", VarArg("num_args", Seq.toArray x))
                 ] |> List.choose id
-            new NpZerosLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+            new NpAtleast1d(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
-    type NpOnesLike private (operatorArguments) = 
-        inherit SymbolOperator("_np_ones_like", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new NpOnesLike(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new NpOnesLike(this.OperatorArguments.AddReplace(args)) :> Symbol
+    type NpAtleast2d private (operatorArguments) = 
+        inherit SymbolOperator("_np_atleast_2d", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpAtleast2d(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpAtleast2d(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="arys">List of input arrays</param>
+        new([<ParamArray>] arys : Symbol[]) =
+            let operatorArguments = 
+                [
+                    "arys", VarArg("num_args", arys)
+                ]
+            new NpAtleast2d(Arguments<Symbol>(operatorArguments))
+        /// List of input arrays
+        member __.Arys = operatorArguments.GetVarArg "arys"
+        /// <summary>Copy NpAtleast2d instance with updated inputs/parameters.</summary>
+        /// <param name="arys">List of input arrays</param>
+        member this.With([<Optional>] ?arys : Symbol seq) =
+            let operatorArguments = 
+                [
+                    arys |> Option.map (fun x -> "arys", VarArg("num_args", Seq.toArray x))
+                ] |> List.choose id
+            new NpAtleast2d(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpAtleast3d private (operatorArguments) = 
+        inherit SymbolOperator("_np_atleast_3d", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpAtleast3d(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpAtleast3d(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="arys">List of input arrays</param>
+        new([<ParamArray>] arys : Symbol[]) =
+            let operatorArguments = 
+                [
+                    "arys", VarArg("num_args", arys)
+                ]
+            new NpAtleast3d(Arguments<Symbol>(operatorArguments))
+        /// List of input arrays
+        member __.Arys = operatorArguments.GetVarArg "arys"
+        /// <summary>Copy NpAtleast3d instance with updated inputs/parameters.</summary>
+        /// <param name="arys">List of input arrays</param>
+        member this.With([<Optional>] ?arys : Symbol seq) =
+            let operatorArguments = 
+                [
+                    arys |> Option.map (fun x -> "arys", VarArg("num_args", Seq.toArray x))
+                ] |> List.choose id
+            new NpAtleast3d(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiFullLike private (operatorArguments) = 
+        inherit SymbolOperator("_npi_full_like", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiFullLike(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiFullLike(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
-        new([<Optional>] ?a : Symbol) =
+        /// <param name="fillValue">Value with which to fill newly created tensor</param>
+        /// <param name="dtype">Target data type.</param>
+        new(a : Symbol,
+            fillValue : double,
+            [<Optional>] ?dtype : NpiFullLikeDtype) = 
+            let operatorArguments = 
+                [
+                    "a", Input a
+                    "fill_value", Parameter(Some(box fillValue))
+                    "dtype", dtype |> Option.map box |> Parameter
+                ]
+            new NpiFullLike(Arguments<Symbol>(operatorArguments))
+        /// <param name="fillValue">Value with which to fill newly created tensor</param>
+        /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
+        /// <param name="dtype">Target data type.</param>
+        new(fillValue : double,
+            [<Optional>] ?a : Symbol,
+            [<Optional>] ?dtype : NpiFullLikeDtype) = 
             let a = defaultArg a (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "a", Input a
+                    "fill_value", Parameter(Some(box fillValue))
+                    "dtype", dtype |> Option.map box |> Parameter
                 ]
-            new NpOnesLike(Arguments<Symbol>(operatorArguments))
+            new NpiFullLike(Arguments<Symbol>(operatorArguments))
+        /// Default value for Dtype
+        /// Target data type.
+        static member DtypeDefault : NpiFullLikeDtype option = None
         /// The shape and data-type of a define these same attributes of the returned array.
         member __.A = operatorArguments.GetInput "a"
-        /// <summary>Copy NpOnesLike instance with updated inputs/parameters.</summary>
+        /// Value with which to fill newly created tensor
+        member __.FillValue : double = match operatorArguments.GetParameter "fill_value" with Some(v) -> unbox v | None -> failwithf "Required parameter fill_value is missing"
+        /// Target data type.
+        member __.Dtype = operatorArguments.GetParameter("dtype", NpiFullLike.DtypeDefault)
+        /// <summary>Copy NpiFullLike instance with updated inputs/parameters.</summary>
         /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
-        member this.With([<Optional>] ?a : Symbol) =
+        /// <param name="fillValue">Value with which to fill newly created tensor</param>
+        /// <param name="dtype">Target data type.</param>
+        member this.With([<Optional>] ?a : Symbol,
+            [<Optional>] ?fillValue : double,
+            [<Optional>] ?dtype : NpiFullLikeDtype) = 
             let operatorArguments = 
                 [
                     a |> Option.map (fun x -> "a", Input x)
+                    fillValue |> Option.map (fun x -> "fill_value", Parameter(Some (box x)))
+                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
                 ] |> List.choose id
-            new NpOnesLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+            new NpiFullLike(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpiArange private (operatorArguments) = 
         inherit SymbolOperator("_npi_arange", operatorArguments)
@@ -13641,7 +15527,7 @@ module SymbolOperators =
             [<Optional>] ?step : double,
             [<Optional>] ?repeat : int,
             [<Optional>] ?inferRange : bool,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : NpiArangeDtype) = 
             let operatorArguments = 
                 [
                     "start", Parameter(Some(box start))
@@ -13666,7 +15552,7 @@ module SymbolOperators =
         static member InferRangeDefault : bool = false
         /// Default value for Dtype
         /// Target data type.
-        static member DtypeDefault : DataType = DataType.Float32
+        static member DtypeDefault : NpiArangeDtype = NpiArangeDtype.Float32
         /// Start of interval. The interval includes this value. The default start value is 0.
         member __.Start : double = match operatorArguments.GetParameter "start" with Some(v) -> unbox v | None -> failwithf "Required parameter start is missing"
         /// End of interval. The interval does not include this value, except in some cases where step is not an integer and floating point round-off affects the length of out.
@@ -13691,7 +15577,7 @@ module SymbolOperators =
             [<Optional>] ?step : double,
             [<Optional>] ?repeat : int,
             [<Optional>] ?inferRange : bool,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : NpiArangeDtype) = 
             let operatorArguments = 
                 [
                     start |> Option.map (fun x -> "start", Parameter(Some (box x)))
@@ -13715,7 +15601,7 @@ module SymbolOperators =
         new(N : int64,
             M : int64,
             [<Optional>] ?k : int64,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : NpiEyeDtype) = 
             let operatorArguments = 
                 [
                     "N", Parameter(Some(box N))
@@ -13729,7 +15615,7 @@ module SymbolOperators =
         static member KDefault : int64 = 0L
         /// Default value for Dtype
         /// Data-type of the returned array.
-        static member DtypeDefault : DataType = DataType.Float32
+        static member DtypeDefault : NpiEyeDtype = NpiEyeDtype.Float32
         /// Number of rows in the output.
         member __.N : int64 = match operatorArguments.GetParameter "N" with Some(v) -> unbox v | None -> failwithf "Required parameter N is missing"
         /// Number of columns in the output. If None, defaults to N.
@@ -13746,7 +15632,7 @@ module SymbolOperators =
         member this.With([<Optional>] ?N : int64,
             [<Optional>] ?M : int64,
             [<Optional>] ?k : int64,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : NpiEyeDtype) = 
             let operatorArguments = 
                 [
                     N |> Option.map (fun x -> "N", Parameter(Some (box x)))
@@ -13764,7 +15650,7 @@ module SymbolOperators =
         /// <param name="dimensions">The shape of the grid.</param>
         /// <param name="dtype">Target data type.</param>
         new(dimensions : int seq,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : NpiIndicesDtype) = 
             let operatorArguments = 
                 [
                     "dimensions", Parameter(Some(box dimensions))
@@ -13773,7 +15659,7 @@ module SymbolOperators =
             new NpiIndices(Arguments<Symbol>(operatorArguments))
         /// Default value for Dtype
         /// Target data type.
-        static member DtypeDefault : DataType = DataType.Int32
+        static member DtypeDefault : NpiIndicesDtype = NpiIndicesDtype.Int32
         /// The shape of the grid.
         member __.Dimensions : int seq = match operatorArguments.GetParameter "dimensions" with Some(v) -> unbox v | None -> failwithf "Required parameter dimensions is missing"
         /// Target data type.
@@ -13782,7 +15668,7 @@ module SymbolOperators =
         /// <param name="dimensions">The shape of the grid.</param>
         /// <param name="dtype">Target data type.</param>
         member this.With([<Optional>] ?dimensions : int seq,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : NpiIndicesDtype) = 
             let operatorArguments = 
                 [
                     dimensions |> Option.map (fun x -> "dimensions", Parameter(Some (box x)))
@@ -13806,7 +15692,7 @@ module SymbolOperators =
             num : int,
             [<Optional>] ?endpoint : bool,
             [<Optional>] ?lbase : double,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : NpiLogspaceDtype) = 
             let operatorArguments = 
                 [
                     "start", Parameter(Some(box start))
@@ -13825,7 +15711,7 @@ module SymbolOperators =
         static member LbaseDefault : double = 10.0
         /// Default value for Dtype
         /// Target data type.
-        static member DtypeDefault : DataType = DataType.Float32
+        static member DtypeDefault : NpiLogspaceDtype = NpiLogspaceDtype.Float32
         /// The starting value of the sequence.
         member __.Start : double = match operatorArguments.GetParameter "start" with Some(v) -> unbox v | None -> failwithf "Required parameter start is missing"
         /// The ending value of the sequence
@@ -13850,7 +15736,7 @@ module SymbolOperators =
             [<Optional>] ?num : int,
             [<Optional>] ?endpoint : bool,
             [<Optional>] ?lbase : double,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : NpiLogspaceDtype) = 
             let operatorArguments = 
                 [
                     start |> Option.map (fun x -> "start", Parameter(Some (box x)))
@@ -13861,6 +15747,354 @@ module SymbolOperators =
                     dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiLogspace(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiInsertScalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_insert_scalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiInsertScalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiInsertScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Insert values along the given axis before the given indices.
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_insert_op_scalar.cc:L106</summary>
+        /// <param name="arr">Input ndarray</param>
+        /// <param name="values">Input ndarray</param>
+        /// <param name="value">A scaler to be inserted into &#39;array&#39;</param>
+        /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+        /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+        /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+        /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+        /// <param name="axis">Axis along which to insert &#39;values&#39;.</param>
+        new([<Optional>] ?arr : Symbol,
+            [<Optional>] ?values : Symbol,
+            [<Optional>] ?value : float,
+            [<Optional>] ?start : int,
+            [<Optional>] ?stop : int,
+            [<Optional>] ?step : int,
+            [<Optional>] ?intInd : int,
+            [<Optional>] ?axis : int) = 
+            let arr = defaultArg arr (new ImplicitVariable() :> Symbol)
+            let values = defaultArg values (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "arr", Input arr
+                    "values", Input values
+                    "val", value |> Option.map box |> Parameter
+                    "start", start |> Option.map box |> Parameter
+                    "stop", stop |> Option.map box |> Parameter
+                    "step", step |> Option.map box |> Parameter
+                    "int_ind", intInd |> Option.map box |> Parameter
+                    "axis", axis |> Option.map box |> Parameter
+                ]
+            new NpiInsertScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Value
+        /// A scaler to be inserted into &#39;array&#39;
+        static member ValueDefault : double option = None
+        /// Default value for Start
+        /// If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.
+        static member StartDefault : int option = None
+        /// Default value for Stop
+        /// If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.
+        static member StopDefault : int option = None
+        /// Default value for Step
+        /// If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.
+        static member StepDefault : int option = None
+        /// Default value for IntInd
+        /// If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted
+        static member IntIndDefault : int option = None
+        /// Default value for Axis
+        /// Axis along which to insert &#39;values&#39;.
+        static member AxisDefault : int option = None
+        /// Input ndarray
+        member __.Arr = operatorArguments.GetInput "arr"
+        /// Input ndarray
+        member __.Values = operatorArguments.GetInput "values"
+        /// A scaler to be inserted into &#39;array&#39;
+        member __.Value = operatorArguments.GetParameter("val", NpiInsertScalar.ValueDefault)
+        /// If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.
+        member __.Start = operatorArguments.GetParameter("start", NpiInsertScalar.StartDefault)
+        /// If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.
+        member __.Stop = operatorArguments.GetParameter("stop", NpiInsertScalar.StopDefault)
+        /// If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.
+        member __.Step = operatorArguments.GetParameter("step", NpiInsertScalar.StepDefault)
+        /// If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted
+        member __.IntInd = operatorArguments.GetParameter("int_ind", NpiInsertScalar.IntIndDefault)
+        /// Axis along which to insert &#39;values&#39;.
+        member __.Axis = operatorArguments.GetParameter("axis", NpiInsertScalar.AxisDefault)
+        /// <summary>Copy NpiInsertScalar instance with updated inputs/parameters.</summary>
+        /// <param name="arr">Input ndarray</param>
+        /// <param name="values">Input ndarray</param>
+        /// <param name="value">A scaler to be inserted into &#39;array&#39;</param>
+        /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+        /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+        /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+        /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+        /// <param name="axis">Axis along which to insert &#39;values&#39;.</param>
+        member this.With([<Optional>] ?arr : Symbol,
+            [<Optional>] ?values : Symbol,
+            [<Optional>] ?value : float,
+            [<Optional>] ?start : int,
+            [<Optional>] ?stop : int,
+            [<Optional>] ?step : int,
+            [<Optional>] ?intInd : int,
+            [<Optional>] ?axis : int) = 
+            let operatorArguments = 
+                [
+                    arr |> Option.map (fun x -> "arr", Input x)
+                    values |> Option.map (fun x -> "values", Input x)
+                    value |> Option.map (fun x -> "val", Parameter(Some (box x)))
+                    start |> Option.map (fun x -> "start", Parameter(Some (box x)))
+                    stop |> Option.map (fun x -> "stop", Parameter(Some (box x)))
+                    step |> Option.map (fun x -> "step", Parameter(Some (box x)))
+                    intInd |> Option.map (fun x -> "int_ind", Parameter(Some (box x)))
+                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiInsertScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiInsertSlice private (operatorArguments) = 
+        inherit SymbolOperator("_npi_insert_slice", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiInsertSlice(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiInsertSlice(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Insert values along the given axis before the given indices.
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_insert_op_slice.cc:L132</summary>
+        /// <param name="arr">Input ndarray</param>
+        /// <param name="values">Input ndarray</param>
+        /// <param name="value">A scaler to be inserted into &#39;array&#39;</param>
+        /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+        /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+        /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+        /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+        /// <param name="axis">Axis along which to insert &#39;values&#39;.</param>
+        new([<Optional>] ?arr : Symbol,
+            [<Optional>] ?values : Symbol,
+            [<Optional>] ?value : float,
+            [<Optional>] ?start : int,
+            [<Optional>] ?stop : int,
+            [<Optional>] ?step : int,
+            [<Optional>] ?intInd : int,
+            [<Optional>] ?axis : int) = 
+            let arr = defaultArg arr (new ImplicitVariable() :> Symbol)
+            let values = defaultArg values (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "arr", Input arr
+                    "values", Input values
+                    "val", value |> Option.map box |> Parameter
+                    "start", start |> Option.map box |> Parameter
+                    "stop", stop |> Option.map box |> Parameter
+                    "step", step |> Option.map box |> Parameter
+                    "int_ind", intInd |> Option.map box |> Parameter
+                    "axis", axis |> Option.map box |> Parameter
+                ]
+            new NpiInsertSlice(Arguments<Symbol>(operatorArguments))
+        /// Default value for Value
+        /// A scaler to be inserted into &#39;array&#39;
+        static member ValueDefault : double option = None
+        /// Default value for Start
+        /// If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.
+        static member StartDefault : int option = None
+        /// Default value for Stop
+        /// If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.
+        static member StopDefault : int option = None
+        /// Default value for Step
+        /// If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.
+        static member StepDefault : int option = None
+        /// Default value for IntInd
+        /// If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted
+        static member IntIndDefault : int option = None
+        /// Default value for Axis
+        /// Axis along which to insert &#39;values&#39;.
+        static member AxisDefault : int option = None
+        /// Input ndarray
+        member __.Arr = operatorArguments.GetInput "arr"
+        /// Input ndarray
+        member __.Values = operatorArguments.GetInput "values"
+        /// A scaler to be inserted into &#39;array&#39;
+        member __.Value = operatorArguments.GetParameter("val", NpiInsertSlice.ValueDefault)
+        /// If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.
+        member __.Start = operatorArguments.GetParameter("start", NpiInsertSlice.StartDefault)
+        /// If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.
+        member __.Stop = operatorArguments.GetParameter("stop", NpiInsertSlice.StopDefault)
+        /// If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.
+        member __.Step = operatorArguments.GetParameter("step", NpiInsertSlice.StepDefault)
+        /// If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted
+        member __.IntInd = operatorArguments.GetParameter("int_ind", NpiInsertSlice.IntIndDefault)
+        /// Axis along which to insert &#39;values&#39;.
+        member __.Axis = operatorArguments.GetParameter("axis", NpiInsertSlice.AxisDefault)
+        /// <summary>Copy NpiInsertSlice instance with updated inputs/parameters.</summary>
+        /// <param name="arr">Input ndarray</param>
+        /// <param name="values">Input ndarray</param>
+        /// <param name="value">A scaler to be inserted into &#39;array&#39;</param>
+        /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+        /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+        /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+        /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+        /// <param name="axis">Axis along which to insert &#39;values&#39;.</param>
+        member this.With([<Optional>] ?arr : Symbol,
+            [<Optional>] ?values : Symbol,
+            [<Optional>] ?value : float,
+            [<Optional>] ?start : int,
+            [<Optional>] ?stop : int,
+            [<Optional>] ?step : int,
+            [<Optional>] ?intInd : int,
+            [<Optional>] ?axis : int) = 
+            let operatorArguments = 
+                [
+                    arr |> Option.map (fun x -> "arr", Input x)
+                    values |> Option.map (fun x -> "values", Input x)
+                    value |> Option.map (fun x -> "val", Parameter(Some (box x)))
+                    start |> Option.map (fun x -> "start", Parameter(Some (box x)))
+                    stop |> Option.map (fun x -> "stop", Parameter(Some (box x)))
+                    step |> Option.map (fun x -> "step", Parameter(Some (box x)))
+                    intInd |> Option.map (fun x -> "int_ind", Parameter(Some (box x)))
+                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiInsertSlice(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiInsertTensor private (operatorArguments) = 
+        inherit SymbolOperator("_npi_insert_tensor", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiInsertTensor(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiInsertTensor(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Insert values along the given axis before the given indices.
+        ///           Indices is tensor and ndim &gt; 0.
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_insert_op_tensor.cc:L122</summary>
+        /// <param name="arr">Input ndarray</param>
+        /// <param name="values">Input ndarray</param>
+        /// <param name="obj">Input ndarray</param>
+        /// <param name="value">A scaler to be inserted into &#39;array&#39;</param>
+        /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+        /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+        /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+        /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+        /// <param name="axis">Axis along which to insert &#39;values&#39;.</param>
+        new([<Optional>] ?arr : Symbol,
+            [<Optional>] ?values : Symbol,
+            [<Optional>] ?obj : Symbol,
+            [<Optional>] ?value : float,
+            [<Optional>] ?start : int,
+            [<Optional>] ?stop : int,
+            [<Optional>] ?step : int,
+            [<Optional>] ?intInd : int,
+            [<Optional>] ?axis : int) = 
+            let arr = defaultArg arr (new ImplicitVariable() :> Symbol)
+            let values = defaultArg values (new ImplicitVariable() :> Symbol)
+            let obj = defaultArg obj (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "arr", Input arr
+                    "values", Input values
+                    "obj", Input obj
+                    "val", value |> Option.map box |> Parameter
+                    "start", start |> Option.map box |> Parameter
+                    "stop", stop |> Option.map box |> Parameter
+                    "step", step |> Option.map box |> Parameter
+                    "int_ind", intInd |> Option.map box |> Parameter
+                    "axis", axis |> Option.map box |> Parameter
+                ]
+            new NpiInsertTensor(Arguments<Symbol>(operatorArguments))
+        /// Default value for Value
+        /// A scaler to be inserted into &#39;array&#39;
+        static member ValueDefault : double option = None
+        /// Default value for Start
+        /// If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.
+        static member StartDefault : int option = None
+        /// Default value for Stop
+        /// If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.
+        static member StopDefault : int option = None
+        /// Default value for Step
+        /// If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.
+        static member StepDefault : int option = None
+        /// Default value for IntInd
+        /// If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted
+        static member IntIndDefault : int option = None
+        /// Default value for Axis
+        /// Axis along which to insert &#39;values&#39;.
+        static member AxisDefault : int option = None
+        /// Input ndarray
+        member __.Arr = operatorArguments.GetInput "arr"
+        /// Input ndarray
+        member __.Values = operatorArguments.GetInput "values"
+        /// Input ndarray
+        member __.Obj = operatorArguments.GetInput "obj"
+        /// A scaler to be inserted into &#39;array&#39;
+        member __.Value = operatorArguments.GetParameter("val", NpiInsertTensor.ValueDefault)
+        /// If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.
+        member __.Start = operatorArguments.GetParameter("start", NpiInsertTensor.StartDefault)
+        /// If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.
+        member __.Stop = operatorArguments.GetParameter("stop", NpiInsertTensor.StopDefault)
+        /// If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.
+        member __.Step = operatorArguments.GetParameter("step", NpiInsertTensor.StepDefault)
+        /// If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted
+        member __.IntInd = operatorArguments.GetParameter("int_ind", NpiInsertTensor.IntIndDefault)
+        /// Axis along which to insert &#39;values&#39;.
+        member __.Axis = operatorArguments.GetParameter("axis", NpiInsertTensor.AxisDefault)
+        /// <summary>Copy NpiInsertTensor instance with updated inputs/parameters.</summary>
+        /// <param name="arr">Input ndarray</param>
+        /// <param name="values">Input ndarray</param>
+        /// <param name="obj">Input ndarray</param>
+        /// <param name="value">A scaler to be inserted into &#39;array&#39;</param>
+        /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+        /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+        /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+        /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+        /// <param name="axis">Axis along which to insert &#39;values&#39;.</param>
+        member this.With([<Optional>] ?arr : Symbol,
+            [<Optional>] ?values : Symbol,
+            [<Optional>] ?obj : Symbol,
+            [<Optional>] ?value : float,
+            [<Optional>] ?start : int,
+            [<Optional>] ?stop : int,
+            [<Optional>] ?step : int,
+            [<Optional>] ?intInd : int,
+            [<Optional>] ?axis : int) = 
+            let operatorArguments = 
+                [
+                    arr |> Option.map (fun x -> "arr", Input x)
+                    values |> Option.map (fun x -> "values", Input x)
+                    obj |> Option.map (fun x -> "obj", Input x)
+                    value |> Option.map (fun x -> "val", Parameter(Some (box x)))
+                    start |> Option.map (fun x -> "start", Parameter(Some (box x)))
+                    stop |> Option.map (fun x -> "stop", Parameter(Some (box x)))
+                    step |> Option.map (fun x -> "step", Parameter(Some (box x)))
+                    intInd |> Option.map (fun x -> "int_ind", Parameter(Some (box x)))
+                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiInsertTensor(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiMatmul private (operatorArguments) = 
+        inherit SymbolOperator("_npi_matmul", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiMatmul(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiMatmul(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matmul_op.cc:L140</summary>
+        /// <param name="a">First input</param>
+        /// <param name="b">Second input</param>
+        new([<Optional>] ?a : Symbol,
+            [<Optional>] ?b : Symbol) = 
+            let a = defaultArg a (new ImplicitVariable() :> Symbol)
+            let b = defaultArg b (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "a", Input a
+                    "b", Input b
+                ]
+            new NpiMatmul(Arguments<Symbol>(operatorArguments))
+        /// First input
+        member __.A = operatorArguments.GetInput "a"
+        /// Second input
+        member __.B = operatorArguments.GetInput "b"
+        /// <summary>Copy NpiMatmul instance with updated inputs/parameters.</summary>
+        /// <param name="a">First input</param>
+        /// <param name="b">Second input</param>
+        member this.With([<Optional>] ?a : Symbol,
+            [<Optional>] ?b : Symbol) = 
+            let operatorArguments = 
+                [
+                    a |> Option.map (fun x -> "a", Input x)
+                    b |> Option.map (fun x -> "b", Input x)
+                ] |> List.choose id
+            new NpiMatmul(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpTranspose private (operatorArguments) = 
         inherit SymbolOperator("_np_transpose", operatorArguments)
@@ -13902,7 +16136,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpReshape(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L353</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L357</summary>
         /// <param name="a">Array to be reshaped.</param>
         /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions.</param>
         /// <param name="order">Read the elements of a using this index order, and place the elements into the reshaped array using this index order. &#39;C&#39; means to read/write the elements using C-like index order, with the last axis index changing fastest, back to the first axis index changing slowest. Note that currently only C-like order is supported</param>
@@ -13918,7 +16152,7 @@ module SymbolOperators =
             new NpReshape(Arguments<Symbol>(operatorArguments))
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L353</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L357</summary>
         /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions.</param>
         /// <param name="a">Array to be reshaped.</param>
         /// <param name="order">Read the elements of a using this index order, and place the elements into the reshaped array using this index order. &#39;C&#39; means to read/write the elements using C-like index order, with the last axis index changing fastest, back to the first axis index changing slowest. Note that currently only C-like order is supported</param>
@@ -13963,7 +16197,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpxReshape(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L379</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L382</summary>
         /// <param name="a">Array to be reshaped.</param>
         /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions. -2 to -6 are used for data manipulation. -2 copy this dimension from the input to the output shape. -3 will skip current dimension if and only if the current dim size is one. -4 copy all remain of the input dimensions to the output shape. -5 use the product of two consecutive dimensions of the input shape as the output. -6 split one dimension of the input into two dimensions passed subsequent to -6 in the new shape.</param>
         /// <param name="reverse">If true then the special values are inferred from right to left</param>
@@ -13982,7 +16216,7 @@ module SymbolOperators =
             new NpxReshape(Arguments<Symbol>(operatorArguments))
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L379</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L382</summary>
         /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions. -2 to -6 are used for data manipulation. -2 copy this dimension from the input to the output shape. -3 will skip current dimension if and only if the current dim size is one. -4 copy all remain of the input dimensions to the output shape. -5 use the product of two consecutive dimensions of the input shape as the output. -6 split one dimension of the input into two dimensions passed subsequent to -6 in the new shape.</param>
         /// <param name="a">Array to be reshaped.</param>
         /// <param name="reverse">If true then the special values are inferred from right to left</param>
@@ -14072,7 +16306,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpiConcatenate(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Join a sequence of arrays along an existing axis.
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L621</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L678</summary>
         /// <param name="data">List of arrays to concatenate</param>
         /// <param name="dim">the dimension to be concated.</param>
         new([<Optional>] ?data : Symbol seq,
@@ -14159,7 +16393,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpiColumnStack(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L809</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L866</summary>
         /// <param name="data">List of arrays to column_stack</param>
         new([<ParamArray>] data : Symbol[]) =
             let operatorArguments = 
@@ -14184,7 +16418,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new NpiVstack(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L951</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1008</summary>
         /// <param name="data">List of arrays to vstack</param>
         new([<ParamArray>] data : Symbol[]) =
             let operatorArguments = 
@@ -14203,13 +16437,50 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiVstack(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiHstack private (operatorArguments) = 
+        inherit SymbolOperator("_npi_hstack", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiHstack(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiHstack(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Stack tensors horizontally (in second dimension)
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1043</summary>
+        /// <param name="data">List of arrays to concatenate</param>
+        /// <param name="dim">the dimension to be concated.</param>
+        new([<Optional>] ?data : Symbol seq,
+            [<Optional>] ?dim : int) = 
+            let data = defaultArg (data |> Option.map Seq.toArray) Array.empty
+            let operatorArguments = 
+                [
+                    "data", VarArg("num_args", data)
+                    "dim", dim |> Option.map box |> Parameter
+                ]
+            new NpiHstack(Arguments<Symbol>(operatorArguments))
+        /// Default value for Dim
+        /// the dimension to be concated.
+        static member DimDefault : int = 1
+        /// List of arrays to concatenate
+        member __.Data = operatorArguments.GetVarArg "data"
+        /// the dimension to be concated.
+        member __.Dim = operatorArguments.GetParameter("dim", NpiHstack.DimDefault)
+        /// <summary>Copy NpiHstack instance with updated inputs/parameters.</summary>
+        /// <param name="data">List of arrays to concatenate</param>
+        /// <param name="dim">the dimension to be concated.</param>
+        member this.With([<Optional>] ?data : Symbol seq,
+            [<Optional>] ?dim : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", VarArg("num_args", Seq.toArray x))
+                    dim |> Option.map (fun x -> "dim", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiHstack(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpiDstack private (operatorArguments) = 
         inherit SymbolOperator("_npi_dstack", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiDstack(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiDstack(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Stack tensors in sequence depthwise (in third dimension)
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L986</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1081</summary>
         /// <param name="data">List of arrays to concatenate</param>
         /// <param name="dim">the dimension to be concated.</param>
         new([<Optional>] ?data : Symbol seq,
@@ -14334,7 +16605,7 @@ module SymbolOperators =
         /// Other axes remain in their original order.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1169</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1264</summary>
         /// <param name="a">Source input</param>
         /// <param name="source">Original positions of the axes to move. These must be unique.</param>
         /// <param name="destination">Destination positions for each of the original axes. These must also be unique.</param>
@@ -14352,7 +16623,7 @@ module SymbolOperators =
         /// Other axes remain in their original order.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1169</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1264</summary>
         /// <param name="source">Original positions of the axes to move. These must be unique.</param>
         /// <param name="destination">Destination positions for each of the original axes. These must also be unique.</param>
         /// <param name="a">Source input</param>
@@ -14526,6 +16797,236 @@ module SymbolOperators =
                 ]
             new NpiHsplitBackward(Arguments<Symbol>(operatorArguments))
     
+    type NpiDsplit private (operatorArguments) = 
+        inherit SymbolOperator("_npi_dsplit", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiDsplit(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiDsplit(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">The input</param>
+        /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
+        /// <param name="axis">Axis along which to split.</param>
+        /// <param name="squeezeAxis">If true, Removes the axis with length 1 from the shapes of the output arrays. **Note** that setting `squeeze_axis` to ``true`` removes axis with length 1 only along the `axis` which it is split. Also `squeeze_axis` can be set to ``true`` only if ``input.shape[axis] == num_outputs``.</param>
+        /// <param name="sections">Number of sections if equally splitted. Default to 0 which means split by indices.</param>
+        new(data : Symbol,
+            indices : int seq,
+            [<Optional>] ?axis : int,
+            [<Optional>] ?squeezeAxis : bool,
+            [<Optional>] ?sections : int) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "indices", Parameter(Some(box indices))
+                    "axis", axis |> Option.map box |> Parameter
+                    "squeeze_axis", squeezeAxis |> Option.map box |> Parameter
+                    "sections", sections |> Option.map box |> Parameter
+                ]
+            new NpiDsplit(Arguments<Symbol>(operatorArguments))
+        /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
+        /// <param name="data">The input</param>
+        /// <param name="axis">Axis along which to split.</param>
+        /// <param name="squeezeAxis">If true, Removes the axis with length 1 from the shapes of the output arrays. **Note** that setting `squeeze_axis` to ``true`` removes axis with length 1 only along the `axis` which it is split. Also `squeeze_axis` can be set to ``true`` only if ``input.shape[axis] == num_outputs``.</param>
+        /// <param name="sections">Number of sections if equally splitted. Default to 0 which means split by indices.</param>
+        new(indices : int seq,
+            [<Optional>] ?data : Symbol,
+            [<Optional>] ?axis : int,
+            [<Optional>] ?squeezeAxis : bool,
+            [<Optional>] ?sections : int) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "indices", Parameter(Some(box indices))
+                    "axis", axis |> Option.map box |> Parameter
+                    "squeeze_axis", squeezeAxis |> Option.map box |> Parameter
+                    "sections", sections |> Option.map box |> Parameter
+                ]
+            new NpiDsplit(Arguments<Symbol>(operatorArguments))
+        /// Default value for Axis
+        /// Axis along which to split.
+        static member AxisDefault : int = 1
+        /// Default value for SqueezeAxis
+        /// If true, Removes the axis with length 1 from the shapes of the output arrays. **Note** that setting `squeeze_axis` to ``true`` removes axis with length 1 only along the `axis` which it is split. Also `squeeze_axis` can be set to ``true`` only if ``input.shape[axis] == num_outputs``.
+        static member SqueezeAxisDefault : bool = false
+        /// Default value for Sections
+        /// Number of sections if equally splitted. Default to 0 which means split by indices.
+        static member SectionsDefault : int = 0
+        /// The input
+        member __.Data = operatorArguments.GetInput "data"
+        /// Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.
+        member __.Indices : int seq = match operatorArguments.GetParameter "indices" with Some(v) -> unbox v | None -> failwithf "Required parameter indices is missing"
+        /// Axis along which to split.
+        member __.Axis = operatorArguments.GetParameter("axis", NpiDsplit.AxisDefault)
+        /// If true, Removes the axis with length 1 from the shapes of the output arrays. **Note** that setting `squeeze_axis` to ``true`` removes axis with length 1 only along the `axis` which it is split. Also `squeeze_axis` can be set to ``true`` only if ``input.shape[axis] == num_outputs``.
+        member __.SqueezeAxis = operatorArguments.GetParameter("squeeze_axis", NpiDsplit.SqueezeAxisDefault)
+        /// Number of sections if equally splitted. Default to 0 which means split by indices.
+        member __.Sections = operatorArguments.GetParameter("sections", NpiDsplit.SectionsDefault)
+        /// <summary>Copy NpiDsplit instance with updated inputs/parameters.</summary>
+        /// <param name="data">The input</param>
+        /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
+        /// <param name="axis">Axis along which to split.</param>
+        /// <param name="squeezeAxis">If true, Removes the axis with length 1 from the shapes of the output arrays. **Note** that setting `squeeze_axis` to ``true`` removes axis with length 1 only along the `axis` which it is split. Also `squeeze_axis` can be set to ``true`` only if ``input.shape[axis] == num_outputs``.</param>
+        /// <param name="sections">Number of sections if equally splitted. Default to 0 which means split by indices.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?indices : int seq,
+            [<Optional>] ?axis : int,
+            [<Optional>] ?squeezeAxis : bool,
+            [<Optional>] ?sections : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    indices |> Option.map (fun x -> "indices", Parameter(Some (box x)))
+                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                    squeezeAxis |> Option.map (fun x -> "squeeze_axis", Parameter(Some (box x)))
+                    sections |> Option.map (fun x -> "sections", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiDsplit(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpDiag private (operatorArguments) = 
+        inherit SymbolOperator("_np_diag", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpDiag(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpDiag(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">Input ndarray</param>
+        /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?k : int) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "k", k |> Option.map box |> Parameter
+                ]
+            new NpDiag(Arguments<Symbol>(operatorArguments))
+        /// Default value for K
+        /// Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. 
+        static member KDefault : int = 0
+        /// Input ndarray
+        member __.Data = operatorArguments.GetInput "data"
+        /// Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. 
+        member __.K = operatorArguments.GetParameter("k", NpDiag.KDefault)
+        /// <summary>Copy NpDiag instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input ndarray</param>
+        /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?k : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    k |> Option.map (fun x -> "k", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpDiag(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpDiagonal private (operatorArguments) = 
+        inherit SymbolOperator("_np_diagonal", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpDiagonal(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpDiagonal(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">Input ndarray</param>
+        /// <param name="offset">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. If input has shape (S0 S1) k must be between -S0 and S1</param>
+        /// <param name="axis1">The first axis of the sub-arrays of interest. Ignored when the input is a 1-D array.</param>
+        /// <param name="axis2">The second axis of the sub-arrays of interest. Ignored when the input is a 1-D array.</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?offset : int,
+            [<Optional>] ?axis1 : int,
+            [<Optional>] ?axis2 : int) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "offset", offset |> Option.map box |> Parameter
+                    "axis1", axis1 |> Option.map box |> Parameter
+                    "axis2", axis2 |> Option.map box |> Parameter
+                ]
+            new NpDiagonal(Arguments<Symbol>(operatorArguments))
+        /// Default value for Offset
+        /// Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. If input has shape (S0 S1) k must be between -S0 and S1
+        static member OffsetDefault : int = 0
+        /// Default value for Axis1
+        /// The first axis of the sub-arrays of interest. Ignored when the input is a 1-D array.
+        static member Axis1Default : int = 0
+        /// Default value for Axis2
+        /// The second axis of the sub-arrays of interest. Ignored when the input is a 1-D array.
+        static member Axis2Default : int = 1
+        /// Input ndarray
+        member __.Data = operatorArguments.GetInput "data"
+        /// Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. If input has shape (S0 S1) k must be between -S0 and S1
+        member __.Offset = operatorArguments.GetParameter("offset", NpDiagonal.OffsetDefault)
+        /// The first axis of the sub-arrays of interest. Ignored when the input is a 1-D array.
+        member __.Axis1 = operatorArguments.GetParameter("axis1", NpDiagonal.Axis1Default)
+        /// The second axis of the sub-arrays of interest. Ignored when the input is a 1-D array.
+        member __.Axis2 = operatorArguments.GetParameter("axis2", NpDiagonal.Axis2Default)
+        /// <summary>Copy NpDiagonal instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input ndarray</param>
+        /// <param name="offset">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. If input has shape (S0 S1) k must be between -S0 and S1</param>
+        /// <param name="axis1">The first axis of the sub-arrays of interest. Ignored when the input is a 1-D array.</param>
+        /// <param name="axis2">The second axis of the sub-arrays of interest. Ignored when the input is a 1-D array.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?offset : int,
+            [<Optional>] ?axis1 : int,
+            [<Optional>] ?axis2 : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    offset |> Option.map (fun x -> "offset", Parameter(Some (box x)))
+                    axis1 |> Option.map (fun x -> "axis1", Parameter(Some (box x)))
+                    axis2 |> Option.map (fun x -> "axis2", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpDiagonal(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpDiagflat private (operatorArguments) = 
+        inherit SymbolOperator("_np_diagflat", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpDiagflat(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpDiagflat(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">Input ndarray</param>
+        /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?k : int) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "k", k |> Option.map box |> Parameter
+                ]
+            new NpDiagflat(Arguments<Symbol>(operatorArguments))
+        /// Default value for K
+        /// Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. 
+        static member KDefault : int = 0
+        /// Input ndarray
+        member __.Data = operatorArguments.GetInput "data"
+        /// Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. 
+        member __.K = operatorArguments.GetParameter("k", NpDiagflat.KDefault)
+        /// <summary>Copy NpDiagflat instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input ndarray</param>
+        /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?k : int) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    k |> Option.map (fun x -> "k", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpDiagflat(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiDiagIndicesFrom private (operatorArguments) = 
+        inherit SymbolOperator("_npi_diag_indices_from", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiDiagIndicesFrom(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiDiagIndicesFrom(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">Input ndarray</param>
+        new([<Optional>] ?data : Symbol) =
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                ]
+            new NpiDiagIndicesFrom(Arguments<Symbol>(operatorArguments))
+        /// Input ndarray
+        member __.Data = operatorArguments.GetInput "data"
+        /// <summary>Copy NpiDiagIndicesFrom instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input ndarray</param>
+        member this.With([<Optional>] ?data : Symbol) =
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                ] |> List.choose id
+            new NpiDiagIndicesFrom(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpiShareMemory private (operatorArguments) = 
         inherit SymbolOperator("_npi_share_memory", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiShareMemory(args)
@@ -14558,6 +17059,205 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiShareMemory(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiStd private (operatorArguments) = 
+        inherit SymbolOperator("_npi_std", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiStd(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiStd(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="a">The input</param>
+        /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+        /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
+        /// <param name="ddof">Starting value for the sum.</param>
+        /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+        new([<Optional>] ?a : Symbol,
+            [<Optional>] ?axis : int seq,
+            [<Optional>] ?dtype : DataType,
+            [<Optional>] ?ddof : int,
+            [<Optional>] ?keepdims : bool) = 
+            let a = defaultArg a (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "a", Input a
+                    "axis", axis |> Option.map box |> Parameter
+                    "dtype", dtype |> Option.map box |> Parameter
+                    "ddof", ddof |> Option.map box |> Parameter
+                    "keepdims", keepdims |> Option.map box |> Parameter
+                ]
+            new NpiStd(Arguments<Symbol>(operatorArguments))
+        /// Default value for Axis
+        /// Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.
+        static member AxisDefault : int [] option = None
+        /// Default value for Dtype
+        /// The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.
+        static member DtypeDefault : DataType option = None
+        /// Default value for Ddof
+        /// Starting value for the sum.
+        static member DdofDefault : int = 0
+        /// Default value for Keepdims
+        /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
+        static member KeepdimsDefault : bool = false
+        /// The input
+        member __.A = operatorArguments.GetInput "a"
+        /// Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.
+        member __.Axis = operatorArguments.GetParameter("axis", NpiStd.AxisDefault)
+        /// The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.
+        member __.Dtype = operatorArguments.GetParameter("dtype", NpiStd.DtypeDefault)
+        /// Starting value for the sum.
+        member __.Ddof = operatorArguments.GetParameter("ddof", NpiStd.DdofDefault)
+        /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
+        member __.Keepdims = operatorArguments.GetParameter("keepdims", NpiStd.KeepdimsDefault)
+        /// <summary>Copy NpiStd instance with updated inputs/parameters.</summary>
+        /// <param name="a">The input</param>
+        /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+        /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
+        /// <param name="ddof">Starting value for the sum.</param>
+        /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+        member this.With([<Optional>] ?a : Symbol,
+            [<Optional>] ?axis : int seq,
+            [<Optional>] ?dtype : DataType,
+            [<Optional>] ?ddof : int,
+            [<Optional>] ?keepdims : bool) = 
+            let operatorArguments = 
+                [
+                    a |> Option.map (fun x -> "a", Input x)
+                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                    ddof |> Option.map (fun x -> "ddof", Parameter(Some (box x)))
+                    keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiStd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiVar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_var", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiVar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiVar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="a">The input</param>
+        /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+        /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
+        /// <param name="ddof">Starting value for the sum.</param>
+        /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+        new([<Optional>] ?a : Symbol,
+            [<Optional>] ?axis : int seq,
+            [<Optional>] ?dtype : DataType,
+            [<Optional>] ?ddof : int,
+            [<Optional>] ?keepdims : bool) = 
+            let a = defaultArg a (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "a", Input a
+                    "axis", axis |> Option.map box |> Parameter
+                    "dtype", dtype |> Option.map box |> Parameter
+                    "ddof", ddof |> Option.map box |> Parameter
+                    "keepdims", keepdims |> Option.map box |> Parameter
+                ]
+            new NpiVar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Axis
+        /// Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.
+        static member AxisDefault : int [] option = None
+        /// Default value for Dtype
+        /// The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.
+        static member DtypeDefault : DataType option = None
+        /// Default value for Ddof
+        /// Starting value for the sum.
+        static member DdofDefault : int = 0
+        /// Default value for Keepdims
+        /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
+        static member KeepdimsDefault : bool = false
+        /// The input
+        member __.A = operatorArguments.GetInput "a"
+        /// Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.
+        member __.Axis = operatorArguments.GetParameter("axis", NpiVar.AxisDefault)
+        /// The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.
+        member __.Dtype = operatorArguments.GetParameter("dtype", NpiVar.DtypeDefault)
+        /// Starting value for the sum.
+        member __.Ddof = operatorArguments.GetParameter("ddof", NpiVar.DdofDefault)
+        /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
+        member __.Keepdims = operatorArguments.GetParameter("keepdims", NpiVar.KeepdimsDefault)
+        /// <summary>Copy NpiVar instance with updated inputs/parameters.</summary>
+        /// <param name="a">The input</param>
+        /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+        /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
+        /// <param name="ddof">Starting value for the sum.</param>
+        /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+        member this.With([<Optional>] ?a : Symbol,
+            [<Optional>] ?axis : int seq,
+            [<Optional>] ?dtype : DataType,
+            [<Optional>] ?ddof : int,
+            [<Optional>] ?keepdims : bool) = 
+            let operatorArguments = 
+                [
+                    a |> Option.map (fun x -> "a", Input x)
+                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                    ddof |> Option.map (fun x -> "ddof", Parameter(Some (box x)))
+                    keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiVar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiAverage private (operatorArguments) = 
+        inherit SymbolOperator("_npi_average", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiAverage(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiAverage(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="a">The input</param>
+        /// <param name="weights">The weights to calculate average</param>
+        /// <param name="axis">Axis or axes along which a average is performed. The default, axis=None, will average all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+        /// <param name="returned">If True, the tuple (average, sum_of_weights) is returned,otherwise only the average is returned.If weights=None, sum_of_weights is equivalent tothe number of elements over which the average is taken.</param>
+        /// <param name="weighted">Auxiliary flag to deal with none weights.</param>
+        new([<Optional>] ?a : Symbol,
+            [<Optional>] ?weights : Symbol,
+            [<Optional>] ?axis : int seq,
+            [<Optional>] ?returned : bool,
+            [<Optional>] ?weighted : bool) = 
+            let a = defaultArg a (new ImplicitVariable() :> Symbol)
+            let weights = defaultArg weights (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "a", Input a
+                    "weights", Input weights
+                    "axis", axis |> Option.map box |> Parameter
+                    "returned", returned |> Option.map box |> Parameter
+                    "weighted", weighted |> Option.map box |> Parameter
+                ]
+            new NpiAverage(Arguments<Symbol>(operatorArguments))
+        /// Default value for Axis
+        /// Axis or axes along which a average is performed. The default, axis=None, will average all of the elements of the input array. If axis is negative it counts from the last to the first axis.
+        static member AxisDefault : int [] option = None
+        /// Default value for Returned
+        /// If True, the tuple (average, sum_of_weights) is returned,otherwise only the average is returned.If weights=None, sum_of_weights is equivalent tothe number of elements over which the average is taken.
+        static member ReturnedDefault : bool = false
+        /// Default value for Weighted
+        /// Auxiliary flag to deal with none weights.
+        static member WeightedDefault : bool = true
+        /// The input
+        member __.A = operatorArguments.GetInput "a"
+        /// The weights to calculate average
+        member __.Weights = operatorArguments.GetInput "weights"
+        /// Axis or axes along which a average is performed. The default, axis=None, will average all of the elements of the input array. If axis is negative it counts from the last to the first axis.
+        member __.Axis = operatorArguments.GetParameter("axis", NpiAverage.AxisDefault)
+        /// If True, the tuple (average, sum_of_weights) is returned,otherwise only the average is returned.If weights=None, sum_of_weights is equivalent tothe number of elements over which the average is taken.
+        member __.Returned = operatorArguments.GetParameter("returned", NpiAverage.ReturnedDefault)
+        /// Auxiliary flag to deal with none weights.
+        member __.Weighted = operatorArguments.GetParameter("weighted", NpiAverage.WeightedDefault)
+        /// <summary>Copy NpiAverage instance with updated inputs/parameters.</summary>
+        /// <param name="a">The input</param>
+        /// <param name="weights">The weights to calculate average</param>
+        /// <param name="axis">Axis or axes along which a average is performed. The default, axis=None, will average all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+        /// <param name="returned">If True, the tuple (average, sum_of_weights) is returned,otherwise only the average is returned.If weights=None, sum_of_weights is equivalent tothe number of elements over which the average is taken.</param>
+        /// <param name="weighted">Auxiliary flag to deal with none weights.</param>
+        member this.With([<Optional>] ?a : Symbol,
+            [<Optional>] ?weights : Symbol,
+            [<Optional>] ?axis : int seq,
+            [<Optional>] ?returned : bool,
+            [<Optional>] ?weighted : bool) = 
+            let operatorArguments = 
+                [
+                    a |> Option.map (fun x -> "a", Input x)
+                    weights |> Option.map (fun x -> "weights", Input x)
+                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                    returned |> Option.map (fun x -> "returned", Parameter(Some (box x)))
+                    weighted |> Option.map (fun x -> "weighted", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiAverage(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpxNonzero private (operatorArguments) = 
         inherit SymbolOperator("_npx_nonzero", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpxNonzero(args)
@@ -14580,6 +17280,207 @@ module SymbolOperators =
                     x |> Option.map (fun x -> "x", Input x)
                 ] |> List.choose id
             new NpxNonzero(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiPad private (operatorArguments) = 
+        inherit SymbolOperator("_npi_pad", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiPad(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiPad(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="data">Input ndarray</param>
+        /// <param name="padWidth">Number of values padded to the edges of each axis. ((before_1, after_1), &#226;€?(before_N,after_N)) unique pad widths for each axis. ((before, after),) yields same before andafter pad for each axis. (pad,) or int is a shortcut for before = after = pad width for allaxes.</param>
+        /// <param name="mode">Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; Pads with the reflection of the vector mirroredon the first and last values of the vector along each axis. &quot;symmetric&quot; Pads with the reflection of the vector mirroredalong the edge of the array. &quot;maximum&quot; Pads with the maximum value of all or part of thevector along each axis. &quot;minimum&quot; Pads with the minimum value of all or part of thevector along each axis.</param>
+        /// <param name="constantValue">Used in &#226;€˜constant&#226;€? The values to set the padded values for each axis.((before_1, after_1), ... (before_N, after_N)) unique pad constants foreach axis.((before, after),) yields same before and after constants for each axis.(constant,) or constant is a shortcut for before = after = constant for allaxes.Default is 0.</param>
+        /// <param name="reflectType">Used in &#226;€˜reflect&#226;€? and &#226;€˜symmetric&#226;€? The &#226;€˜even&#226;€?style is the default with an unaltered reflection around the edge value. For the &#226;€˜odd&#226;€?style,the extended part of the array is created by subtracting the reflected values from two times the edge value.</param>
+        new(data : Symbol,
+            padWidth : int [],
+            [<Optional>] ?mode : NpiPadMode,
+            [<Optional>] ?constantValue : double,
+            [<Optional>] ?reflectType : string) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "pad_width", Parameter(Some(box padWidth))
+                    "mode", mode |> Option.map box |> Parameter
+                    "constant_value", constantValue |> Option.map box |> Parameter
+                    "reflect_type", reflectType |> Option.map box |> Parameter
+                ]
+            new NpiPad(Arguments<Symbol>(operatorArguments))
+        /// <param name="padWidth">Number of values padded to the edges of each axis. ((before_1, after_1), &#226;€?(before_N,after_N)) unique pad widths for each axis. ((before, after),) yields same before andafter pad for each axis. (pad,) or int is a shortcut for before = after = pad width for allaxes.</param>
+        /// <param name="data">Input ndarray</param>
+        /// <param name="mode">Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; Pads with the reflection of the vector mirroredon the first and last values of the vector along each axis. &quot;symmetric&quot; Pads with the reflection of the vector mirroredalong the edge of the array. &quot;maximum&quot; Pads with the maximum value of all or part of thevector along each axis. &quot;minimum&quot; Pads with the minimum value of all or part of thevector along each axis.</param>
+        /// <param name="constantValue">Used in &#226;€˜constant&#226;€? The values to set the padded values for each axis.((before_1, after_1), ... (before_N, after_N)) unique pad constants foreach axis.((before, after),) yields same before and after constants for each axis.(constant,) or constant is a shortcut for before = after = constant for allaxes.Default is 0.</param>
+        /// <param name="reflectType">Used in &#226;€˜reflect&#226;€? and &#226;€˜symmetric&#226;€? The &#226;€˜even&#226;€?style is the default with an unaltered reflection around the edge value. For the &#226;€˜odd&#226;€?style,the extended part of the array is created by subtracting the reflected values from two times the edge value.</param>
+        new(padWidth : int [],
+            [<Optional>] ?data : Symbol,
+            [<Optional>] ?mode : NpiPadMode,
+            [<Optional>] ?constantValue : double,
+            [<Optional>] ?reflectType : string) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "pad_width", Parameter(Some(box padWidth))
+                    "mode", mode |> Option.map box |> Parameter
+                    "constant_value", constantValue |> Option.map box |> Parameter
+                    "reflect_type", reflectType |> Option.map box |> Parameter
+                ]
+            new NpiPad(Arguments<Symbol>(operatorArguments))
+        /// Default value for Mode
+        /// Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; Pads with the reflection of the vector mirroredon the first and last values of the vector along each axis. &quot;symmetric&quot; Pads with the reflection of the vector mirroredalong the edge of the array. &quot;maximum&quot; Pads with the maximum value of all or part of thevector along each axis. &quot;minimum&quot; Pads with the minimum value of all or part of thevector along each axis.
+        static member ModeDefault : NpiPadMode = NpiPadMode.Constant
+        /// Default value for ConstantValue
+        /// Used in &#226;€˜constant&#226;€? The values to set the padded values for each axis.((before_1, after_1), ... (before_N, after_N)) unique pad constants foreach axis.((before, after),) yields same before and after constants for each axis.(constant,) or constant is a shortcut for before = after = constant for allaxes.Default is 0.
+        static member ConstantValueDefault : double = 0.0
+        /// Default value for ReflectType
+        /// Used in &#226;€˜reflect&#226;€? and &#226;€˜symmetric&#226;€? The &#226;€˜even&#226;€?style is the default with an unaltered reflection around the edge value. For the &#226;€˜odd&#226;€?style,the extended part of the array is created by subtracting the reflected values from two times the edge value.
+        static member ReflectTypeDefault : string = "even"
+        /// Input ndarray
+        member __.Data = operatorArguments.GetInput "data"
+        /// Number of values padded to the edges of each axis. ((before_1, after_1), &#226;€?(before_N,after_N)) unique pad widths for each axis. ((before, after),) yields same before andafter pad for each axis. (pad,) or int is a shortcut for before = after = pad width for allaxes.
+        member __.PadWidth : int [] = match operatorArguments.GetParameter "pad_width" with Some(v) -> unbox v | None -> failwithf "Required parameter pad_width is missing"
+        /// Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; Pads with the reflection of the vector mirroredon the first and last values of the vector along each axis. &quot;symmetric&quot; Pads with the reflection of the vector mirroredalong the edge of the array. &quot;maximum&quot; Pads with the maximum value of all or part of thevector along each axis. &quot;minimum&quot; Pads with the minimum value of all or part of thevector along each axis.
+        member __.Mode = operatorArguments.GetParameter("mode", NpiPad.ModeDefault)
+        /// Used in &#226;€˜constant&#226;€? The values to set the padded values for each axis.((before_1, after_1), ... (before_N, after_N)) unique pad constants foreach axis.((before, after),) yields same before and after constants for each axis.(constant,) or constant is a shortcut for before = after = constant for allaxes.Default is 0.
+        member __.ConstantValue = operatorArguments.GetParameter("constant_value", NpiPad.ConstantValueDefault)
+        /// Used in &#226;€˜reflect&#226;€? and &#226;€˜symmetric&#226;€? The &#226;€˜even&#226;€?style is the default with an unaltered reflection around the edge value. For the &#226;€˜odd&#226;€?style,the extended part of the array is created by subtracting the reflected values from two times the edge value.
+        member __.ReflectType = operatorArguments.GetParameter("reflect_type", NpiPad.ReflectTypeDefault)
+        /// <summary>Copy NpiPad instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input ndarray</param>
+        /// <param name="padWidth">Number of values padded to the edges of each axis. ((before_1, after_1), &#226;€?(before_N,after_N)) unique pad widths for each axis. ((before, after),) yields same before andafter pad for each axis. (pad,) or int is a shortcut for before = after = pad width for allaxes.</param>
+        /// <param name="mode">Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; Pads with the reflection of the vector mirroredon the first and last values of the vector along each axis. &quot;symmetric&quot; Pads with the reflection of the vector mirroredalong the edge of the array. &quot;maximum&quot; Pads with the maximum value of all or part of thevector along each axis. &quot;minimum&quot; Pads with the minimum value of all or part of thevector along each axis.</param>
+        /// <param name="constantValue">Used in &#226;€˜constant&#226;€? The values to set the padded values for each axis.((before_1, after_1), ... (before_N, after_N)) unique pad constants foreach axis.((before, after),) yields same before and after constants for each axis.(constant,) or constant is a shortcut for before = after = constant for allaxes.Default is 0.</param>
+        /// <param name="reflectType">Used in &#226;€˜reflect&#226;€? and &#226;€˜symmetric&#226;€? The &#226;€˜even&#226;€?style is the default with an unaltered reflection around the edge value. For the &#226;€˜odd&#226;€?style,the extended part of the array is created by subtracting the reflected values from two times the edge value.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?padWidth : int [],
+            [<Optional>] ?mode : NpiPadMode,
+            [<Optional>] ?constantValue : double,
+            [<Optional>] ?reflectType : string) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    padWidth |> Option.map (fun x -> "pad_width", Parameter(Some (box x)))
+                    mode |> Option.map (fun x -> "mode", Parameter(Some (box x)))
+                    constantValue |> Option.map (fun x -> "constant_value", Parameter(Some (box x)))
+                    reflectType |> Option.map (fun x -> "reflect_type", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiPad(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiPercentile private (operatorArguments) = 
+        inherit SymbolOperator("_npi_percentile", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiPercentile(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiPercentile(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="a">Input data</param>
+        /// <param name="q">Input percentile</param>
+        /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+        /// <param name="interpolation">his optional parameter specifies the interpolation method to use when thedesired percentile lies between two data points i &lt; j</param>
+        /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+        /// <param name="qScalar">inqut q is a scalar</param>
+        new([<Optional>] ?a : Symbol,
+            [<Optional>] ?q : Symbol,
+            [<Optional>] ?axis : int seq,
+            [<Optional>] ?interpolation : Interpolation,
+            [<Optional>] ?keepdims : bool,
+            [<Optional>] ?qScalar : float) = 
+            let a = defaultArg a (new ImplicitVariable() :> Symbol)
+            let q = defaultArg q (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "a", Input a
+                    "q", Input q
+                    "axis", axis |> Option.map box |> Parameter
+                    "interpolation", interpolation |> Option.map box |> Parameter
+                    "keepdims", keepdims |> Option.map box |> Parameter
+                    "q_scalar", qScalar |> Option.map box |> Parameter
+                ]
+            new NpiPercentile(Arguments<Symbol>(operatorArguments))
+        /// Default value for Axis
+        /// Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.
+        static member AxisDefault : int [] option = None
+        /// Default value for Interpolation
+        /// his optional parameter specifies the interpolation method to use when thedesired percentile lies between two data points i &lt; j
+        static member InterpolationDefault : Interpolation = Interpolation.Linear
+        /// Default value for Keepdims
+        /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
+        static member KeepdimsDefault : bool = false
+        /// Default value for QScalar
+        /// inqut q is a scalar
+        static member QScalarDefault : double option = None
+        /// Input data
+        member __.A = operatorArguments.GetInput "a"
+        /// Input percentile
+        member __.Q = operatorArguments.GetInput "q"
+        /// Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.
+        member __.Axis = operatorArguments.GetParameter("axis", NpiPercentile.AxisDefault)
+        /// his optional parameter specifies the interpolation method to use when thedesired percentile lies between two data points i &lt; j
+        member __.Interpolation = operatorArguments.GetParameter("interpolation", NpiPercentile.InterpolationDefault)
+        /// If this is set to `True`, the reduced axes are left in the result as dimension with size one.
+        member __.Keepdims = operatorArguments.GetParameter("keepdims", NpiPercentile.KeepdimsDefault)
+        /// inqut q is a scalar
+        member __.QScalar = operatorArguments.GetParameter("q_scalar", NpiPercentile.QScalarDefault)
+        /// <summary>Copy NpiPercentile instance with updated inputs/parameters.</summary>
+        /// <param name="a">Input data</param>
+        /// <param name="q">Input percentile</param>
+        /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+        /// <param name="interpolation">his optional parameter specifies the interpolation method to use when thedesired percentile lies between two data points i &lt; j</param>
+        /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+        /// <param name="qScalar">inqut q is a scalar</param>
+        member this.With([<Optional>] ?a : Symbol,
+            [<Optional>] ?q : Symbol,
+            [<Optional>] ?axis : int seq,
+            [<Optional>] ?interpolation : Interpolation,
+            [<Optional>] ?keepdims : bool,
+            [<Optional>] ?qScalar : float) = 
+            let operatorArguments = 
+                [
+                    a |> Option.map (fun x -> "a", Input x)
+                    q |> Option.map (fun x -> "q", Input x)
+                    axis |> Option.map (fun x -> "axis", Parameter(Some (box x)))
+                    interpolation |> Option.map (fun x -> "interpolation", Parameter(Some (box x)))
+                    keepdims |> Option.map (fun x -> "keepdims", Parameter(Some (box x)))
+                    qScalar |> Option.map (fun x -> "q_scalar", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiPercentile(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiPolyval private (operatorArguments) = 
+        inherit SymbolOperator("_npi_polyval", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiPolyval(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiPolyval(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="p">polynomial coefficients</param>
+        /// <param name="x">variables</param>
+        new([<Optional>] ?p : Symbol,
+            [<Optional>] ?x : Symbol) = 
+            let p = defaultArg p (new ImplicitVariable() :> Symbol)
+            let x = defaultArg x (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "p", Input p
+                    "x", Input x
+                ]
+            new NpiPolyval(Arguments<Symbol>(operatorArguments))
+        /// polynomial coefficients
+        member __.P = operatorArguments.GetInput "p"
+        /// variables
+        member __.X = operatorArguments.GetInput "x"
+        /// <summary>Copy NpiPolyval instance with updated inputs/parameters.</summary>
+        /// <param name="p">polynomial coefficients</param>
+        /// <param name="x">variables</param>
+        member this.With([<Optional>] ?p : Symbol,
+            [<Optional>] ?x : Symbol) = 
+            let operatorArguments = 
+                [
+                    p |> Option.map (fun x -> "p", Input x)
+                    x |> Option.map (fun x -> "x", Input x)
+                ] |> List.choose id
+            new NpiPolyval(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBackwardPolyval private (operatorArguments) = 
+        inherit SymbolOperator("_npi_backward_polyval", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBackwardPolyval(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBackwardPolyval(this.OperatorArguments.AddReplace(args)) :> Symbol
+        new() =
+            let operatorArguments = 
+                [
+                ]
+            new NpiBackwardPolyval(Arguments<Symbol>(operatorArguments))
     
     type NpiTensordot private (operatorArguments) = 
         inherit SymbolOperator("_npi_tensordot", operatorArguments)
@@ -14845,39 +17746,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiTrueDivideScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiTrueDivideScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiTrueDivideScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiTrueDivideScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiTrueDivideScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiTrueDivideScalar.IsIntDefault)
         /// <summary>Copy NpiTrueDivideScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiTrueDivideScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -14886,39 +17791,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRtrueDivideScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NpiRtrueDivideScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NpiRtrueDivideScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NpiRtrueDivideScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiRtrueDivideScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NpiRtrueDivideScalar.IsIntDefault)
         /// <summary>Copy NpiRtrueDivideScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiRtrueDivideScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -14989,6 +17898,178 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiUnique(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiWhere private (operatorArguments) = 
+        inherit SymbolOperator("_npi_where", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiWhere(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiWhere(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="condition">condition array</param>
+        /// <param name="x">input x</param>
+        /// <param name="y">input y</param>
+        new([<Optional>] ?condition : Symbol,
+            [<Optional>] ?x : Symbol,
+            [<Optional>] ?y : Symbol) = 
+            let condition = defaultArg condition (new ImplicitVariable() :> Symbol)
+            let x = defaultArg x (new ImplicitVariable() :> Symbol)
+            let y = defaultArg y (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "condition", Input condition
+                    "x", Input x
+                    "y", Input y
+                ]
+            new NpiWhere(Arguments<Symbol>(operatorArguments))
+        /// condition array
+        member __.Condition = operatorArguments.GetInput "condition"
+        /// input x
+        member __.X = operatorArguments.GetInput "x"
+        /// input y
+        member __.Y = operatorArguments.GetInput "y"
+        /// <summary>Copy NpiWhere instance with updated inputs/parameters.</summary>
+        /// <param name="condition">condition array</param>
+        /// <param name="x">input x</param>
+        /// <param name="y">input y</param>
+        member this.With([<Optional>] ?condition : Symbol,
+            [<Optional>] ?x : Symbol,
+            [<Optional>] ?y : Symbol) = 
+            let operatorArguments = 
+                [
+                    condition |> Option.map (fun x -> "condition", Input x)
+                    x |> Option.map (fun x -> "x", Input x)
+                    y |> Option.map (fun x -> "y", Input x)
+                ] |> List.choose id
+            new NpiWhere(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiWhereLscalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_where_lscalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiWhereLscalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiWhereLscalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="condition">condition array</param>
+        /// <param name="x">input x</param>
+        /// <param name="scalar">The scalar value of x/y.</param>
+        new([<Optional>] ?condition : Symbol,
+            [<Optional>] ?x : Symbol,
+            [<Optional>] ?scalar : double) = 
+            let condition = defaultArg condition (new ImplicitVariable() :> Symbol)
+            let x = defaultArg x (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "condition", Input condition
+                    "x", Input x
+                    "scalar", scalar |> Option.map box |> Parameter
+                ]
+            new NpiWhereLscalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// The scalar value of x/y.
+        static member ScalarDefault : double = 0.0
+        /// condition array
+        member __.Condition = operatorArguments.GetInput "condition"
+        /// input x
+        member __.X = operatorArguments.GetInput "x"
+        /// The scalar value of x/y.
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiWhereLscalar.ScalarDefault)
+        /// <summary>Copy NpiWhereLscalar instance with updated inputs/parameters.</summary>
+        /// <param name="condition">condition array</param>
+        /// <param name="x">input x</param>
+        /// <param name="scalar">The scalar value of x/y.</param>
+        member this.With([<Optional>] ?condition : Symbol,
+            [<Optional>] ?x : Symbol,
+            [<Optional>] ?scalar : double) = 
+            let operatorArguments = 
+                [
+                    condition |> Option.map (fun x -> "condition", Input x)
+                    x |> Option.map (fun x -> "x", Input x)
+                    scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiWhereLscalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiWhereRscalar private (operatorArguments) = 
+        inherit SymbolOperator("_npi_where_rscalar", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiWhereRscalar(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiWhereRscalar(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="condition">condition array</param>
+        /// <param name="y">input y</param>
+        /// <param name="scalar">The scalar value of x/y.</param>
+        new([<Optional>] ?condition : Symbol,
+            [<Optional>] ?y : Symbol,
+            [<Optional>] ?scalar : double) = 
+            let condition = defaultArg condition (new ImplicitVariable() :> Symbol)
+            let y = defaultArg y (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "condition", Input condition
+                    "y", Input y
+                    "scalar", scalar |> Option.map box |> Parameter
+                ]
+            new NpiWhereRscalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// The scalar value of x/y.
+        static member ScalarDefault : double = 0.0
+        /// condition array
+        member __.Condition = operatorArguments.GetInput "condition"
+        /// input y
+        member __.Y = operatorArguments.GetInput "y"
+        /// The scalar value of x/y.
+        member __.Scalar = operatorArguments.GetParameter("scalar", NpiWhereRscalar.ScalarDefault)
+        /// <summary>Copy NpiWhereRscalar instance with updated inputs/parameters.</summary>
+        /// <param name="condition">condition array</param>
+        /// <param name="y">input y</param>
+        /// <param name="scalar">The scalar value of x/y.</param>
+        member this.With([<Optional>] ?condition : Symbol,
+            [<Optional>] ?y : Symbol,
+            [<Optional>] ?scalar : double) = 
+            let operatorArguments = 
+                [
+                    condition |> Option.map (fun x -> "condition", Input x)
+                    y |> Option.map (fun x -> "y", Input x)
+                    scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiWhereRscalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiWhereScalar2 private (operatorArguments) = 
+        inherit SymbolOperator("_npi_where_scalar2", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiWhereScalar2(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiWhereScalar2(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="condition">condition array</param>
+        /// <param name="x">The scalar value of x.</param>
+        /// <param name="y">The scalar value of y.</param>
+        new([<Optional>] ?condition : Symbol,
+            [<Optional>] ?x : double,
+            [<Optional>] ?y : double) = 
+            let condition = defaultArg condition (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "condition", Input condition
+                    "x", x |> Option.map box |> Parameter
+                    "y", y |> Option.map box |> Parameter
+                ]
+            new NpiWhereScalar2(Arguments<Symbol>(operatorArguments))
+        /// Default value for X
+        /// The scalar value of x.
+        static member XDefault : double = 0.0
+        /// Default value for Y
+        /// The scalar value of y.
+        static member YDefault : double = 0.0
+        /// condition array
+        member __.Condition = operatorArguments.GetInput "condition"
+        /// The scalar value of x.
+        member __.X = operatorArguments.GetParameter("x", NpiWhereScalar2.XDefault)
+        /// The scalar value of y.
+        member __.Y = operatorArguments.GetParameter("y", NpiWhereScalar2.YDefault)
+        /// <summary>Copy NpiWhereScalar2 instance with updated inputs/parameters.</summary>
+        /// <param name="condition">condition array</param>
+        /// <param name="x">The scalar value of x.</param>
+        /// <param name="y">The scalar value of y.</param>
+        member this.With([<Optional>] ?condition : Symbol,
+            [<Optional>] ?x : double,
+            [<Optional>] ?y : double) = 
+            let operatorArguments = 
+                [
+                    condition |> Option.map (fun x -> "condition", Input x)
+                    x |> Option.map (fun x -> "x", Parameter(Some (box x)))
+                    y |> Option.map (fun x -> "y", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiWhereScalar2(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpiHanning private (operatorArguments) = 
         inherit SymbolOperator("_npi_hanning", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiHanning(args)
@@ -14997,7 +18078,7 @@ module SymbolOperators =
         /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
         /// <param name="dtype">Data-type of the returned array.</param>
         new(M : int,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : NpiHanningDtype) = 
             let operatorArguments = 
                 [
                     "M", Parameter(Some(box M))
@@ -15006,7 +18087,7 @@ module SymbolOperators =
             new NpiHanning(Arguments<Symbol>(operatorArguments))
         /// Default value for Dtype
         /// Data-type of the returned array.
-        static member DtypeDefault : DataType = DataType.Float32
+        static member DtypeDefault : NpiHanningDtype = NpiHanningDtype.Float32
         /// Number of points in the output window. If zero or less, an empty array is returned.
         member __.M : int = match operatorArguments.GetParameter "M" with Some(v) -> unbox v | None -> failwithf "Required parameter M is missing"
         /// Data-type of the returned array.
@@ -15015,7 +18096,7 @@ module SymbolOperators =
         /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
         /// <param name="dtype">Data-type of the returned array.</param>
         member this.With([<Optional>] ?M : int,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : NpiHanningDtype) = 
             let operatorArguments = 
                 [
                     M |> Option.map (fun x -> "M", Parameter(Some (box x)))
@@ -15031,7 +18112,7 @@ module SymbolOperators =
         /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
         /// <param name="dtype">Data-type of the returned array.</param>
         new(M : int,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : NpiHammingDtype) = 
             let operatorArguments = 
                 [
                     "M", Parameter(Some(box M))
@@ -15040,7 +18121,7 @@ module SymbolOperators =
             new NpiHamming(Arguments<Symbol>(operatorArguments))
         /// Default value for Dtype
         /// Data-type of the returned array.
-        static member DtypeDefault : DataType = DataType.Float32
+        static member DtypeDefault : NpiHammingDtype = NpiHammingDtype.Float32
         /// Number of points in the output window. If zero or less, an empty array is returned.
         member __.M : int = match operatorArguments.GetParameter "M" with Some(v) -> unbox v | None -> failwithf "Required parameter M is missing"
         /// Data-type of the returned array.
@@ -15049,7 +18130,7 @@ module SymbolOperators =
         /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
         /// <param name="dtype">Data-type of the returned array.</param>
         member this.With([<Optional>] ?M : int,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : NpiHammingDtype) = 
             let operatorArguments = 
                 [
                     M |> Option.map (fun x -> "M", Parameter(Some (box x)))
@@ -15065,7 +18146,7 @@ module SymbolOperators =
         /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
         /// <param name="dtype">Data-type of the returned array.</param>
         new(M : int,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : NpiBlackmanDtype) = 
             let operatorArguments = 
                 [
                     "M", Parameter(Some(box M))
@@ -15074,7 +18155,7 @@ module SymbolOperators =
             new NpiBlackman(Arguments<Symbol>(operatorArguments))
         /// Default value for Dtype
         /// Data-type of the returned array.
-        static member DtypeDefault : DataType = DataType.Float32
+        static member DtypeDefault : NpiBlackmanDtype = NpiBlackmanDtype.Float32
         /// Number of points in the output window. If zero or less, an empty array is returned.
         member __.M : int = match operatorArguments.GetParameter "M" with Some(v) -> unbox v | None -> failwithf "Required parameter M is missing"
         /// Data-type of the returned array.
@@ -15083,13 +18164,110 @@ module SymbolOperators =
         /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
         /// <param name="dtype">Data-type of the returned array.</param>
         member this.With([<Optional>] ?M : int,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : NpiBlackmanDtype) = 
             let operatorArguments = 
                 [
                     M |> Option.map (fun x -> "M", Parameter(Some (box x)))
                     dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiBlackman(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiBernoulli private (operatorArguments) = 
+        inherit SymbolOperator("_npi_bernoulli", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiBernoulli(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiBernoulli(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="input1">Source input</param>
+        /// <param name="isLogit"></param>
+        /// <param name="prob"></param>
+        /// <param name="logit"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        new(input1 : Symbol,
+            isLogit : bool,
+            [<Optional>] ?prob : float,
+            [<Optional>] ?logit : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : DataType) = 
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "is_logit", Parameter(Some(box isLogit))
+                    "prob", prob |> Option.map box |> Parameter
+                    "logit", logit |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                    "dtype", dtype |> Option.map box |> Parameter
+                ]
+            new NpiBernoulli(Arguments<Symbol>(operatorArguments))
+        /// <param name="isLogit"></param>
+        /// <param name="input1">Source input</param>
+        /// <param name="prob"></param>
+        /// <param name="logit"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        new(isLogit : bool,
+            [<Optional>] ?input1 : Symbol,
+            [<Optional>] ?prob : float,
+            [<Optional>] ?logit : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : DataType) = 
+            let input1 = defaultArg input1 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "is_logit", Parameter(Some(box isLogit))
+                    "prob", prob |> Option.map box |> Parameter
+                    "logit", logit |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                    "dtype", dtype |> Option.map box |> Parameter
+                ]
+            new NpiBernoulli(Arguments<Symbol>(operatorArguments))
+        /// Default value for Prob
+        /// 
+        static member ProbDefault : double option = None
+        /// Default value for Logit
+        /// 
+        static member LogitDefault : double option = None
+        /// Default value for Size
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        static member SizeDefault : int [] option = None
+        /// Default value for Dtype
+        /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+        static member DtypeDefault : DataType = DataType.Float32
+        /// Source input
+        member __.Input1 = operatorArguments.GetInput "input1"
+        /// 
+        member __.IsLogit : bool = match operatorArguments.GetParameter "is_logit" with Some(v) -> unbox v | None -> failwithf "Required parameter is_logit is missing"
+        /// 
+        member __.Prob = operatorArguments.GetParameter("prob", NpiBernoulli.ProbDefault)
+        /// 
+        member __.Logit = operatorArguments.GetParameter("logit", NpiBernoulli.LogitDefault)
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        member __.Size = operatorArguments.GetParameter("size", NpiBernoulli.SizeDefault)
+        /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+        member __.Dtype = operatorArguments.GetParameter("dtype", NpiBernoulli.DtypeDefault)
+        /// <summary>Copy NpiBernoulli instance with updated inputs/parameters.</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="isLogit"></param>
+        /// <param name="prob"></param>
+        /// <param name="logit"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        member this.With([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?isLogit : bool,
+            [<Optional>] ?prob : float,
+            [<Optional>] ?logit : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : DataType) = 
+            let operatorArguments = 
+                [
+                    input1 |> Option.map (fun x -> "input1", Input x)
+                    isLogit |> Option.map (fun x -> "is_logit", Parameter(Some (box x)))
+                    prob |> Option.map (fun x -> "prob", Parameter(Some (box x)))
+                    logit |> Option.map (fun x -> "logit", Parameter(Some (box x)))
+                    size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiBernoulli(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpiChoice private (operatorArguments) = 
         inherit SymbolOperator("_npi_choice", operatorArguments)
@@ -15184,6 +18362,259 @@ module SymbolOperators =
                     weighted |> Option.map (fun x -> "weighted", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiChoice(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiExponential private (operatorArguments) = 
+        inherit SymbolOperator("_npi_exponential", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiExponential(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiExponential(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Numpy behavior exponential</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="scale"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        new([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?scale : float,
+            [<Optional>] ?size : int seq) = 
+            let input1 = defaultArg input1 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "scale", scale |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                ]
+            new NpiExponential(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scale
+        /// 
+        static member ScaleDefault : double option = Some(1.0)
+        /// Default value for Size
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        static member SizeDefault : int [] option = None
+        /// Source input
+        member __.Input1 = operatorArguments.GetInput "input1"
+        /// 
+        member __.Scale = operatorArguments.GetParameter("scale", NpiExponential.ScaleDefault)
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        member __.Size = operatorArguments.GetParameter("size", NpiExponential.SizeDefault)
+        /// <summary>Copy NpiExponential instance with updated inputs/parameters.</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="scale"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        member this.With([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?scale : float,
+            [<Optional>] ?size : int seq) = 
+            let operatorArguments = 
+                [
+                    input1 |> Option.map (fun x -> "input1", Input x)
+                    scale |> Option.map (fun x -> "scale", Parameter(Some (box x)))
+                    size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiExponential(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiGamma private (operatorArguments) = 
+        inherit SymbolOperator("_npi_gamma", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiGamma(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiGamma(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Numpy behavior gamma</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="shape"></param>
+        /// <param name="scale"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        new([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?shape : float,
+            [<Optional>] ?scale : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : FloatDType) = 
+            let input1 = defaultArg input1 (new ImplicitVariable() :> Symbol)
+            let input2 = defaultArg input2 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "input2", Input input2
+                    "shape", shape |> Option.map box |> Parameter
+                    "scale", scale |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                    "dtype", dtype |> Option.map box |> Parameter
+                ]
+            new NpiGamma(Arguments<Symbol>(operatorArguments))
+        /// Default value for Shape
+        /// 
+        static member ShapeDefault : double option = None
+        /// Default value for Scale
+        /// 
+        static member ScaleDefault : double option = None
+        /// Default value for Size
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        static member SizeDefault : int [] option = None
+        /// Default value for Dtype
+        /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+        static member DtypeDefault : FloatDType = FloatDType.Float32
+        /// Source input
+        member __.Input1 = operatorArguments.GetInput "input1"
+        /// Source input
+        member __.Input2 = operatorArguments.GetInput "input2"
+        /// 
+        member __.Shape = operatorArguments.GetParameter("shape", NpiGamma.ShapeDefault)
+        /// 
+        member __.Scale = operatorArguments.GetParameter("scale", NpiGamma.ScaleDefault)
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        member __.Size = operatorArguments.GetParameter("size", NpiGamma.SizeDefault)
+        /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+        member __.Dtype = operatorArguments.GetParameter("dtype", NpiGamma.DtypeDefault)
+        /// <summary>Copy NpiGamma instance with updated inputs/parameters.</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="shape"></param>
+        /// <param name="scale"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        member this.With([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?shape : float,
+            [<Optional>] ?scale : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : FloatDType) = 
+            let operatorArguments = 
+                [
+                    input1 |> Option.map (fun x -> "input1", Input x)
+                    input2 |> Option.map (fun x -> "input2", Input x)
+                    shape |> Option.map (fun x -> "shape", Parameter(Some (box x)))
+                    scale |> Option.map (fun x -> "scale", Parameter(Some (box x)))
+                    size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiGamma(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiLogistic private (operatorArguments) = 
+        inherit SymbolOperator("_npi_logistic", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiLogistic(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiLogistic(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="loc"></param>
+        /// <param name="scale"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        new([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?loc : float,
+            [<Optional>] ?scale : float,
+            [<Optional>] ?size : int seq) = 
+            let input1 = defaultArg input1 (new ImplicitVariable() :> Symbol)
+            let input2 = defaultArg input2 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "input2", Input input2
+                    "loc", loc |> Option.map box |> Parameter
+                    "scale", scale |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                ]
+            new NpiLogistic(Arguments<Symbol>(operatorArguments))
+        /// Default value for Loc
+        /// 
+        static member LocDefault : double option = None
+        /// Default value for Scale
+        /// 
+        static member ScaleDefault : double option = None
+        /// Default value for Size
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        static member SizeDefault : int [] option = None
+        /// Source input
+        member __.Input1 = operatorArguments.GetInput "input1"
+        /// Source input
+        member __.Input2 = operatorArguments.GetInput "input2"
+        /// 
+        member __.Loc = operatorArguments.GetParameter("loc", NpiLogistic.LocDefault)
+        /// 
+        member __.Scale = operatorArguments.GetParameter("scale", NpiLogistic.ScaleDefault)
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        member __.Size = operatorArguments.GetParameter("size", NpiLogistic.SizeDefault)
+        /// <summary>Copy NpiLogistic instance with updated inputs/parameters.</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="loc"></param>
+        /// <param name="scale"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        member this.With([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?loc : float,
+            [<Optional>] ?scale : float,
+            [<Optional>] ?size : int seq) = 
+            let operatorArguments = 
+                [
+                    input1 |> Option.map (fun x -> "input1", Input x)
+                    input2 |> Option.map (fun x -> "input2", Input x)
+                    loc |> Option.map (fun x -> "loc", Parameter(Some (box x)))
+                    scale |> Option.map (fun x -> "scale", Parameter(Some (box x)))
+                    size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiLogistic(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiGumbel private (operatorArguments) = 
+        inherit SymbolOperator("_npi_gumbel", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiGumbel(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiGumbel(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="loc"></param>
+        /// <param name="scale"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        new([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?loc : float,
+            [<Optional>] ?scale : float,
+            [<Optional>] ?size : int seq) = 
+            let input1 = defaultArg input1 (new ImplicitVariable() :> Symbol)
+            let input2 = defaultArg input2 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "input2", Input input2
+                    "loc", loc |> Option.map box |> Parameter
+                    "scale", scale |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                ]
+            new NpiGumbel(Arguments<Symbol>(operatorArguments))
+        /// Default value for Loc
+        /// 
+        static member LocDefault : double option = None
+        /// Default value for Scale
+        /// 
+        static member ScaleDefault : double option = None
+        /// Default value for Size
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        static member SizeDefault : int [] option = None
+        /// Source input
+        member __.Input1 = operatorArguments.GetInput "input1"
+        /// Source input
+        member __.Input2 = operatorArguments.GetInput "input2"
+        /// 
+        member __.Loc = operatorArguments.GetParameter("loc", NpiGumbel.LocDefault)
+        /// 
+        member __.Scale = operatorArguments.GetParameter("scale", NpiGumbel.ScaleDefault)
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        member __.Size = operatorArguments.GetParameter("size", NpiGumbel.SizeDefault)
+        /// <summary>Copy NpiGumbel instance with updated inputs/parameters.</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="loc"></param>
+        /// <param name="scale"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        member this.With([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?loc : float,
+            [<Optional>] ?scale : float,
+            [<Optional>] ?size : int seq) = 
+            let operatorArguments = 
+                [
+                    input1 |> Option.map (fun x -> "input1", Input x)
+                    input2 |> Option.map (fun x -> "input2", Input x)
+                    loc |> Option.map (fun x -> "loc", Parameter(Some (box x)))
+                    scale |> Option.map (fun x -> "scale", Parameter(Some (box x)))
+                    size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiGumbel(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type NpiMultinomial private (operatorArguments) = 
         inherit SymbolOperator("_npi_multinomial", operatorArguments)
@@ -15342,6 +18773,220 @@ module SymbolOperators =
                 ] |> List.choose id
             new NpiNormal(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type NpiNormalN private (operatorArguments) = 
+        inherit SymbolOperator("_npi_normal_n", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiNormalN(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiNormalN(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Ndarray behavior normal</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="loc"></param>
+        /// <param name="scale"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        new([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?loc : float,
+            [<Optional>] ?scale : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : FloatDType) = 
+            let input1 = defaultArg input1 (new ImplicitVariable() :> Symbol)
+            let input2 = defaultArg input2 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "input2", Input input2
+                    "loc", loc |> Option.map box |> Parameter
+                    "scale", scale |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                    "dtype", dtype |> Option.map box |> Parameter
+                ]
+            new NpiNormalN(Arguments<Symbol>(operatorArguments))
+        /// Default value for Loc
+        /// 
+        static member LocDefault : double option = None
+        /// Default value for Scale
+        /// 
+        static member ScaleDefault : double option = None
+        /// Default value for Size
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        static member SizeDefault : int [] option = None
+        /// Default value for Dtype
+        /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+        static member DtypeDefault : FloatDType = FloatDType.Float32
+        /// Source input
+        member __.Input1 = operatorArguments.GetInput "input1"
+        /// Source input
+        member __.Input2 = operatorArguments.GetInput "input2"
+        /// 
+        member __.Loc = operatorArguments.GetParameter("loc", NpiNormalN.LocDefault)
+        /// 
+        member __.Scale = operatorArguments.GetParameter("scale", NpiNormalN.ScaleDefault)
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        member __.Size = operatorArguments.GetParameter("size", NpiNormalN.SizeDefault)
+        /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+        member __.Dtype = operatorArguments.GetParameter("dtype", NpiNormalN.DtypeDefault)
+        /// <summary>Copy NpiNormalN instance with updated inputs/parameters.</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="loc"></param>
+        /// <param name="scale"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        member this.With([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?loc : float,
+            [<Optional>] ?scale : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : FloatDType) = 
+            let operatorArguments = 
+                [
+                    input1 |> Option.map (fun x -> "input1", Input x)
+                    input2 |> Option.map (fun x -> "input2", Input x)
+                    loc |> Option.map (fun x -> "loc", Parameter(Some (box x)))
+                    scale |> Option.map (fun x -> "scale", Parameter(Some (box x)))
+                    size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiNormalN(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiPareto private (operatorArguments) = 
+        inherit SymbolOperator("_npi_pareto", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiPareto(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiPareto(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Numpy behavior Pareto</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="a"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        new([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?a : float,
+            [<Optional>] ?size : int seq) = 
+            let input1 = defaultArg input1 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "a", a |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                ]
+            new NpiPareto(Arguments<Symbol>(operatorArguments))
+        /// Default value for A
+        /// 
+        static member ADefault : double option = None
+        /// Default value for Size
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        static member SizeDefault : int [] option = None
+        /// Source input
+        member __.Input1 = operatorArguments.GetInput "input1"
+        /// 
+        member __.A = operatorArguments.GetParameter("a", NpiPareto.ADefault)
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        member __.Size = operatorArguments.GetParameter("size", NpiPareto.SizeDefault)
+        /// <summary>Copy NpiPareto instance with updated inputs/parameters.</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="a"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        member this.With([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?a : float,
+            [<Optional>] ?size : int seq) = 
+            let operatorArguments = 
+                [
+                    input1 |> Option.map (fun x -> "input1", Input x)
+                    a |> Option.map (fun x -> "a", Parameter(Some (box x)))
+                    size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiPareto(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiPowerd private (operatorArguments) = 
+        inherit SymbolOperator("_npi_powerd", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiPowerd(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiPowerd(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <param name="input1">Source input</param>
+        /// <param name="a"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        new([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?a : float,
+            [<Optional>] ?size : int seq) = 
+            let input1 = defaultArg input1 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "a", a |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                ]
+            new NpiPowerd(Arguments<Symbol>(operatorArguments))
+        /// Default value for A
+        /// 
+        static member ADefault : double option = None
+        /// Default value for Size
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        static member SizeDefault : int [] option = None
+        /// Source input
+        member __.Input1 = operatorArguments.GetInput "input1"
+        /// 
+        member __.A = operatorArguments.GetParameter("a", NpiPowerd.ADefault)
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        member __.Size = operatorArguments.GetParameter("size", NpiPowerd.SizeDefault)
+        /// <summary>Copy NpiPowerd instance with updated inputs/parameters.</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="a"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        member this.With([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?a : float,
+            [<Optional>] ?size : int seq) = 
+            let operatorArguments = 
+                [
+                    input1 |> Option.map (fun x -> "input1", Input x)
+                    a |> Option.map (fun x -> "a", Parameter(Some (box x)))
+                    size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiPowerd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiRayleigh private (operatorArguments) = 
+        inherit SymbolOperator("_npi_rayleigh", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiRayleigh(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiRayleigh(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Numpy behavior rayleigh</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="scale"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        new([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?scale : float,
+            [<Optional>] ?size : int seq) = 
+            let input1 = defaultArg input1 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "scale", scale |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                ]
+            new NpiRayleigh(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scale
+        /// 
+        static member ScaleDefault : double option = Some(1.0)
+        /// Default value for Size
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        static member SizeDefault : int [] option = None
+        /// Source input
+        member __.Input1 = operatorArguments.GetInput "input1"
+        /// 
+        member __.Scale = operatorArguments.GetParameter("scale", NpiRayleigh.ScaleDefault)
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        member __.Size = operatorArguments.GetParameter("size", NpiRayleigh.SizeDefault)
+        /// <summary>Copy NpiRayleigh instance with updated inputs/parameters.</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="scale"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        member this.With([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?scale : float,
+            [<Optional>] ?size : int seq) = 
+            let operatorArguments = 
+                [
+                    input1 |> Option.map (fun x -> "input1", Input x)
+                    scale |> Option.map (fun x -> "scale", Parameter(Some (box x)))
+                    size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiRayleigh(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type NpiUniform private (operatorArguments) = 
         inherit SymbolOperator("_npi_uniform", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new NpiUniform(args)
@@ -15418,6 +19063,129 @@ module SymbolOperators =
                     dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
                 ] |> List.choose id
             new NpiUniform(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiUniformN private (operatorArguments) = 
+        inherit SymbolOperator("_npi_uniform_n", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiUniformN(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiUniformN(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>numpy behavior uniform</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="low"></param>
+        /// <param name="high"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        new([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?low : float,
+            [<Optional>] ?high : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : FloatDType) = 
+            let input1 = defaultArg input1 (new ImplicitVariable() :> Symbol)
+            let input2 = defaultArg input2 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "input2", Input input2
+                    "low", low |> Option.map box |> Parameter
+                    "high", high |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                    "dtype", dtype |> Option.map box |> Parameter
+                ]
+            new NpiUniformN(Arguments<Symbol>(operatorArguments))
+        /// Default value for Low
+        /// 
+        static member LowDefault : double option = None
+        /// Default value for High
+        /// 
+        static member HighDefault : double option = None
+        /// Default value for Size
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        static member SizeDefault : int [] option = None
+        /// Default value for Dtype
+        /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+        static member DtypeDefault : FloatDType = FloatDType.Float32
+        /// Source input
+        member __.Input1 = operatorArguments.GetInput "input1"
+        /// Source input
+        member __.Input2 = operatorArguments.GetInput "input2"
+        /// 
+        member __.Low = operatorArguments.GetParameter("low", NpiUniformN.LowDefault)
+        /// 
+        member __.High = operatorArguments.GetParameter("high", NpiUniformN.HighDefault)
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        member __.Size = operatorArguments.GetParameter("size", NpiUniformN.SizeDefault)
+        /// DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).
+        member __.Dtype = operatorArguments.GetParameter("dtype", NpiUniformN.DtypeDefault)
+        /// <summary>Copy NpiUniformN instance with updated inputs/parameters.</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="input2">Source input</param>
+        /// <param name="low"></param>
+        /// <param name="high"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+        member this.With([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?input2 : Symbol,
+            [<Optional>] ?low : float,
+            [<Optional>] ?high : float,
+            [<Optional>] ?size : int seq,
+            [<Optional>] ?dtype : FloatDType) = 
+            let operatorArguments = 
+                [
+                    input1 |> Option.map (fun x -> "input1", Input x)
+                    input2 |> Option.map (fun x -> "input2", Input x)
+                    low |> Option.map (fun x -> "low", Parameter(Some (box x)))
+                    high |> Option.map (fun x -> "high", Parameter(Some (box x)))
+                    size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiUniformN(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type NpiWeibull private (operatorArguments) = 
+        inherit SymbolOperator("_npi_weibull", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new NpiWeibull(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new NpiWeibull(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Numpy behavior Weibull</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="a"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        new([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?a : float,
+            [<Optional>] ?size : int seq) = 
+            let input1 = defaultArg input1 (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "input1", Input input1
+                    "a", a |> Option.map box |> Parameter
+                    "size", size |> Option.map box |> Parameter
+                ]
+            new NpiWeibull(Arguments<Symbol>(operatorArguments))
+        /// Default value for A
+        /// 
+        static member ADefault : double option = None
+        /// Default value for Size
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        static member SizeDefault : int [] option = None
+        /// Source input
+        member __.Input1 = operatorArguments.GetInput "input1"
+        /// 
+        member __.A = operatorArguments.GetParameter("a", NpiWeibull.ADefault)
+        /// Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.
+        member __.Size = operatorArguments.GetParameter("size", NpiWeibull.SizeDefault)
+        /// <summary>Copy NpiWeibull instance with updated inputs/parameters.</summary>
+        /// <param name="input1">Source input</param>
+        /// <param name="a"></param>
+        /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+        member this.With([<Optional>] ?input1 : Symbol,
+            [<Optional>] ?a : float,
+            [<Optional>] ?size : int seq) = 
+            let operatorArguments = 
+                [
+                    input1 |> Option.map (fun x -> "input1", Input x)
+                    a |> Option.map (fun x -> "a", Parameter(Some (box x)))
+                    size |> Option.map (fun x -> "size", Parameter(Some (box x)))
+                ] |> List.choose id
+            new NpiWeibull(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type SignsgdUpdate private (operatorArguments) = 
         inherit SymbolOperator("signsgd_update", operatorArguments)
@@ -20035,7 +23803,7 @@ module SymbolOperators =
         /// .. Note::
         ///     This operator only supports forward propogation. DO NOT use it in training.
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L137</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L188</summary>
         /// <param name="data">Input data.</param>
         /// <param name="weight">weight.</param>
         /// <param name="bias">bias.</param>
@@ -20110,7 +23878,7 @@ module SymbolOperators =
         /// .. Note::
         ///     This operator only supports forward propogation. DO NOT use it in training.
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L137</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L188</summary>
         /// <param name="kernel">Convolution kernel size: (w,), (h, w) or (d, h, w)</param>
         /// <param name="numFilter">Convolution filter(channel) number</param>
         /// <param name="data">Input data.</param>
@@ -20399,6 +24167,200 @@ module SymbolOperators =
                 ] |> List.choose id
             new ContribQuantizedElemwiseAdd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type ElemwiseAdd private (operatorArguments) = 
+        inherit SymbolOperator("elemwise_add", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ElemwiseAdd(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ElemwiseAdd(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Adds arguments element-wise.
+        /// 
+        /// The storage type of ``elemwise_add`` output depends on storage types of inputs
+        /// 
+        ///    - elemwise_add(row_sparse, row_sparse) = row_sparse
+        ///    - elemwise_add(csr, csr) = csr
+        ///    - elemwise_add(default, csr) = default
+        ///    - elemwise_add(csr, default) = default
+        ///    - elemwise_add(default, rsp) = default
+        ///    - elemwise_add(rsp, default) = default
+        ///    - otherwise, ``elemwise_add`` generates output with default storage
+        /// 
+        /// </summary>
+        /// <param name="lhs">first input</param>
+        /// <param name="rhs">second input</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                ]
+            new ElemwiseAdd(Arguments<Symbol>(operatorArguments))
+        /// first input
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// second input
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// <summary>Copy ElemwiseAdd instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">first input</param>
+        /// <param name="rhs">second input</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                ] |> List.choose id
+            new ElemwiseAdd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type ContribQuantizedElemwiseMul private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_quantized_elemwise_mul", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedElemwiseMul(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantizedElemwiseMul(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Multiplies arguments int8 element-wise.
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_elemwise_mul.cc:L222</summary>
+        /// <param name="lhs">first input</param>
+        /// <param name="rhs">second input</param>
+        /// <param name="lhsMin">Minimum value of first input.</param>
+        /// <param name="lhsMax">Maximum value of first input.</param>
+        /// <param name="rhsMin">Minimum value of second input.</param>
+        /// <param name="rhsMax">Maximum value of second input.</param>
+        /// <param name="minCalibRange">The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
+        /// <param name="maxCalibRange">The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
+        /// <param name="enableFloatOutput">Whether to enable float32 output</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol,
+            [<Optional>] ?lhsMin : Symbol,
+            [<Optional>] ?lhsMax : Symbol,
+            [<Optional>] ?rhsMin : Symbol,
+            [<Optional>] ?rhsMax : Symbol,
+            [<Optional>] ?minCalibRange : float,
+            [<Optional>] ?maxCalibRange : float,
+            [<Optional>] ?enableFloatOutput : bool) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let lhsMin = defaultArg lhsMin (new ImplicitVariable() :> Symbol)
+            let lhsMax = defaultArg lhsMax (new ImplicitVariable() :> Symbol)
+            let rhsMin = defaultArg rhsMin (new ImplicitVariable() :> Symbol)
+            let rhsMax = defaultArg rhsMax (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                    "lhs_min", Input lhsMin
+                    "lhs_max", Input lhsMax
+                    "rhs_min", Input rhsMin
+                    "rhs_max", Input rhsMax
+                    "min_calib_range", minCalibRange |> Option.map box |> Parameter
+                    "max_calib_range", maxCalibRange |> Option.map box |> Parameter
+                    "enable_float_output", enableFloatOutput |> Option.map box |> Parameter
+                ]
+            new ContribQuantizedElemwiseMul(Arguments<Symbol>(operatorArguments))
+        /// Default value for MinCalibRange
+        /// The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.
+        static member MinCalibRangeDefault : double option = None
+        /// Default value for MaxCalibRange
+        /// The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.
+        static member MaxCalibRangeDefault : double option = None
+        /// Default value for EnableFloatOutput
+        /// Whether to enable float32 output
+        static member EnableFloatOutputDefault : bool = false
+        /// first input
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// second input
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// Minimum value of first input.
+        member __.LhsMin = operatorArguments.GetInput "lhs_min"
+        /// Maximum value of first input.
+        member __.LhsMax = operatorArguments.GetInput "lhs_max"
+        /// Minimum value of second input.
+        member __.RhsMin = operatorArguments.GetInput "rhs_min"
+        /// Maximum value of second input.
+        member __.RhsMax = operatorArguments.GetInput "rhs_max"
+        /// The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.
+        member __.MinCalibRange = operatorArguments.GetParameter("min_calib_range", ContribQuantizedElemwiseMul.MinCalibRangeDefault)
+        /// The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.
+        member __.MaxCalibRange = operatorArguments.GetParameter("max_calib_range", ContribQuantizedElemwiseMul.MaxCalibRangeDefault)
+        /// Whether to enable float32 output
+        member __.EnableFloatOutput = operatorArguments.GetParameter("enable_float_output", ContribQuantizedElemwiseMul.EnableFloatOutputDefault)
+        /// <summary>Copy ContribQuantizedElemwiseMul instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">first input</param>
+        /// <param name="rhs">second input</param>
+        /// <param name="lhsMin">Minimum value of first input.</param>
+        /// <param name="lhsMax">Maximum value of first input.</param>
+        /// <param name="rhsMin">Minimum value of second input.</param>
+        /// <param name="rhsMax">Maximum value of second input.</param>
+        /// <param name="minCalibRange">The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
+        /// <param name="maxCalibRange">The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
+        /// <param name="enableFloatOutput">Whether to enable float32 output</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol,
+            [<Optional>] ?lhsMin : Symbol,
+            [<Optional>] ?lhsMax : Symbol,
+            [<Optional>] ?rhsMin : Symbol,
+            [<Optional>] ?rhsMax : Symbol,
+            [<Optional>] ?minCalibRange : float,
+            [<Optional>] ?maxCalibRange : float,
+            [<Optional>] ?enableFloatOutput : bool) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                    lhsMin |> Option.map (fun x -> "lhs_min", Input x)
+                    lhsMax |> Option.map (fun x -> "lhs_max", Input x)
+                    rhsMin |> Option.map (fun x -> "rhs_min", Input x)
+                    rhsMax |> Option.map (fun x -> "rhs_max", Input x)
+                    minCalibRange |> Option.map (fun x -> "min_calib_range", Parameter(Some (box x)))
+                    maxCalibRange |> Option.map (fun x -> "max_calib_range", Parameter(Some (box x)))
+                    enableFloatOutput |> Option.map (fun x -> "enable_float_output", Parameter(Some (box x)))
+                ] |> List.choose id
+            new ContribQuantizedElemwiseMul(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type ElemwiseMul private (operatorArguments) = 
+        inherit SymbolOperator("elemwise_mul", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ElemwiseMul(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ElemwiseMul(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Multiplies arguments element-wise.
+        /// 
+        /// The storage type of ``elemwise_mul`` output depends on storage types of inputs
+        /// 
+        ///    - elemwise_mul(default, default) = default
+        ///    - elemwise_mul(row_sparse, row_sparse) = row_sparse
+        ///    - elemwise_mul(default, row_sparse) = row_sparse
+        ///    - elemwise_mul(row_sparse, default) = row_sparse
+        ///    - elemwise_mul(csr, csr) = csr
+        ///    - otherwise, ``elemwise_mul`` generates output with default storage
+        /// 
+        /// </summary>
+        /// <param name="lhs">first input</param>
+        /// <param name="rhs">second input</param>
+        new([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
+            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "lhs", Input lhs
+                    "rhs", Input rhs
+                ]
+            new ElemwiseMul(Arguments<Symbol>(operatorArguments))
+        /// first input
+        member __.Lhs = operatorArguments.GetInput "lhs"
+        /// second input
+        member __.Rhs = operatorArguments.GetInput "rhs"
+        /// <summary>Copy ElemwiseMul instance with updated inputs/parameters.</summary>
+        /// <param name="lhs">first input</param>
+        /// <param name="rhs">second input</param>
+        member this.With([<Optional>] ?lhs : Symbol,
+            [<Optional>] ?rhs : Symbol) = 
+            let operatorArguments = 
+                [
+                    lhs |> Option.map (fun x -> "lhs", Input x)
+                    rhs |> Option.map (fun x -> "rhs", Input x)
+                ] |> List.choose id
+            new ElemwiseMul(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type ContribQuantizedFlatten private (operatorArguments) = 
         inherit SymbolOperator("_contrib_quantized_flatten", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedFlatten(args)
@@ -20669,6 +24631,330 @@ module SymbolOperators =
                 ] |> List.choose id
             new ContribQuantizedFullyConnected(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
+    type ContribQuantizedEmbedding private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_quantized_embedding", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedEmbedding(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribQuantizedEmbedding(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Maps integer indices to int8 vector representations (embeddings).
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_indexing_op.cc:L134</summary>
+        /// <param name="data">The input array to the embedding operator.</param>
+        /// <param name="weight">The embedding weight matrix.</param>
+        /// <param name="minWeight">Minimum value of data.</param>
+        /// <param name="maxWeight">Maximum value of data.</param>
+        /// <param name="inputDim">Vocabulary size of the input indices.</param>
+        /// <param name="outputDim">Dimension of the embedding vectors.</param>
+        /// <param name="dtype">Data type of weight.</param>
+        /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
+        new(data : Symbol,
+            weight : Symbol,
+            minWeight : Symbol,
+            maxWeight : Symbol,
+            inputDim : int,
+            outputDim : int,
+            [<Optional>] ?dtype : ContribQuantizedEmbeddingDtype,
+            [<Optional>] ?sparseGrad : bool) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "weight", Input weight
+                    "min_weight", Input minWeight
+                    "max_weight", Input maxWeight
+                    "input_dim", Parameter(Some(box inputDim))
+                    "output_dim", Parameter(Some(box outputDim))
+                    "dtype", dtype |> Option.map box |> Parameter
+                    "sparse_grad", sparseGrad |> Option.map box |> Parameter
+                ]
+            new ContribQuantizedEmbedding(Arguments<Symbol>(operatorArguments))
+        /// <summary>Maps integer indices to int8 vector representations (embeddings).
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_indexing_op.cc:L134</summary>
+        /// <param name="inputDim">Vocabulary size of the input indices.</param>
+        /// <param name="outputDim">Dimension of the embedding vectors.</param>
+        /// <param name="data">The input array to the embedding operator.</param>
+        /// <param name="weight">The embedding weight matrix.</param>
+        /// <param name="minWeight">Minimum value of data.</param>
+        /// <param name="maxWeight">Maximum value of data.</param>
+        /// <param name="dtype">Data type of weight.</param>
+        /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
+        new(inputDim : int,
+            outputDim : int,
+            [<Optional>] ?data : Symbol,
+            [<Optional>] ?weight : Symbol,
+            [<Optional>] ?minWeight : Symbol,
+            [<Optional>] ?maxWeight : Symbol,
+            [<Optional>] ?dtype : ContribQuantizedEmbeddingDtype,
+            [<Optional>] ?sparseGrad : bool) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let weight = defaultArg weight (new ImplicitVariable() :> Symbol)
+            let minWeight = defaultArg minWeight (new ImplicitVariable() :> Symbol)
+            let maxWeight = defaultArg maxWeight (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "weight", Input weight
+                    "min_weight", Input minWeight
+                    "max_weight", Input maxWeight
+                    "input_dim", Parameter(Some(box inputDim))
+                    "output_dim", Parameter(Some(box outputDim))
+                    "dtype", dtype |> Option.map box |> Parameter
+                    "sparse_grad", sparseGrad |> Option.map box |> Parameter
+                ]
+            new ContribQuantizedEmbedding(Arguments<Symbol>(operatorArguments))
+        /// Default value for Dtype
+        /// Data type of weight.
+        static member DtypeDefault : ContribQuantizedEmbeddingDtype = ContribQuantizedEmbeddingDtype.Float32
+        /// Default value for SparseGrad
+        /// Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.
+        static member SparseGradDefault : bool = false
+        /// The input array to the embedding operator.
+        member __.Data = operatorArguments.GetInput "data"
+        /// The embedding weight matrix.
+        member __.Weight = operatorArguments.GetInput "weight"
+        /// Minimum value of data.
+        member __.MinWeight = operatorArguments.GetInput "min_weight"
+        /// Maximum value of data.
+        member __.MaxWeight = operatorArguments.GetInput "max_weight"
+        /// Vocabulary size of the input indices.
+        member __.InputDim : int = match operatorArguments.GetParameter "input_dim" with Some(v) -> unbox v | None -> failwithf "Required parameter input_dim is missing"
+        /// Dimension of the embedding vectors.
+        member __.OutputDim : int = match operatorArguments.GetParameter "output_dim" with Some(v) -> unbox v | None -> failwithf "Required parameter output_dim is missing"
+        /// Data type of weight.
+        member __.Dtype = operatorArguments.GetParameter("dtype", ContribQuantizedEmbedding.DtypeDefault)
+        /// Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.
+        member __.SparseGrad = operatorArguments.GetParameter("sparse_grad", ContribQuantizedEmbedding.SparseGradDefault)
+        /// <summary>Copy ContribQuantizedEmbedding instance with updated inputs/parameters.</summary>
+        /// <param name="data">The input array to the embedding operator.</param>
+        /// <param name="weight">The embedding weight matrix.</param>
+        /// <param name="minWeight">Minimum value of data.</param>
+        /// <param name="maxWeight">Maximum value of data.</param>
+        /// <param name="inputDim">Vocabulary size of the input indices.</param>
+        /// <param name="outputDim">Dimension of the embedding vectors.</param>
+        /// <param name="dtype">Data type of weight.</param>
+        /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?weight : Symbol,
+            [<Optional>] ?minWeight : Symbol,
+            [<Optional>] ?maxWeight : Symbol,
+            [<Optional>] ?inputDim : int,
+            [<Optional>] ?outputDim : int,
+            [<Optional>] ?dtype : ContribQuantizedEmbeddingDtype,
+            [<Optional>] ?sparseGrad : bool) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    weight |> Option.map (fun x -> "weight", Input x)
+                    minWeight |> Option.map (fun x -> "min_weight", Input x)
+                    maxWeight |> Option.map (fun x -> "max_weight", Input x)
+                    inputDim |> Option.map (fun x -> "input_dim", Parameter(Some (box x)))
+                    outputDim |> Option.map (fun x -> "output_dim", Parameter(Some (box x)))
+                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                    sparseGrad |> Option.map (fun x -> "sparse_grad", Parameter(Some (box x)))
+                ] |> List.choose id
+            new ContribQuantizedEmbedding(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type Embedding private (operatorArguments) = 
+        inherit SymbolOperator("Embedding", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new Embedding(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new Embedding(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Maps integer indices to vector representations (embeddings).
+        /// 
+        /// This operator maps words to real-valued vectors in a high-dimensional space,
+        /// called word embeddings. These embeddings can capture semantic and syntactic properties of the words.
+        /// For example, it has been noted that in the learned embedding spaces, similar words tend
+        /// to be close to each other and dissimilar words far apart.
+        /// 
+        /// For an input array of shape (d1, ..., dK),
+        /// the shape of an output array is (d1, ..., dK, output_dim).
+        /// All the input values should be integers in the range [0, input_dim).
+        /// 
+        /// If the input_dim is ip0 and output_dim is op0, then shape of the embedding weight matrix must be
+        /// (ip0, op0).
+        /// 
+        /// When &quot;sparse_grad&quot; is False, if any index mentioned is too large, it is replaced by the index that
+        /// addresses the last vector in an embedding matrix.
+        /// When &quot;sparse_grad&quot; is True, an error will be raised if invalid indices are found.
+        /// 
+        /// Examples::
+        /// 
+        ///   input_dim = 4
+        ///   output_dim = 5
+        /// 
+        ///   // Each row in weight matrix y represents a word. So, y = (w0,w1,w2,w3)
+        ///   y = [[  0.,   1.,   2.,   3.,   4.],
+        ///        [  5.,   6.,   7.,   8.,   9.],
+        ///        [ 10.,  11.,  12.,  13.,  14.],
+        ///        [ 15.,  16.,  17.,  18.,  19.]]
+        /// 
+        ///   // Input array x represents n-grams(2-gram). So, x = [(w1,w3), (w0,w2)]
+        ///   x = [[ 1.,  3.],
+        ///        [ 0.,  2.]]
+        /// 
+        ///   // Mapped input x to its vector representation y.
+        ///   Embedding(x, y, 4, 5) = [[[  5.,   6.,   7.,   8.,   9.],
+        ///                             [ 15.,  16.,  17.,  18.,  19.]],
+        /// 
+        ///                            [[  0.,   1.,   2.,   3.,   4.],
+        ///                             [ 10.,  11.,  12.,  13.,  14.]]]
+        /// 
+        /// 
+        /// The storage type of weight can be either row_sparse or default.
+        /// 
+        /// .. Note::
+        /// 
+        ///     If &quot;sparse_grad&quot; is set to True, the storage type of gradient w.r.t weights will be
+        ///     &quot;row_sparse&quot;. Only a subset of optimizers support sparse gradients, including SGD, AdaGrad
+        ///     and Adam. Note that by default lazy updates is turned on, which may perform differently
+        ///     from standard updates. For more details, please check the Optimization API at:
+        ///     https://mxnet.incubator.apache.org/api/python/optimization/optimization.html
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L598</summary>
+        /// <param name="data">The input array to the embedding operator.</param>
+        /// <param name="weight">The embedding weight matrix.</param>
+        /// <param name="inputDim">Vocabulary size of the input indices.</param>
+        /// <param name="outputDim">Dimension of the embedding vectors.</param>
+        /// <param name="dtype">Data type of weight.</param>
+        /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
+        new(data : Symbol,
+            weight : Symbol,
+            inputDim : int,
+            outputDim : int,
+            [<Optional>] ?dtype : EmbeddingDtype,
+            [<Optional>] ?sparseGrad : bool) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "weight", Input weight
+                    "input_dim", Parameter(Some(box inputDim))
+                    "output_dim", Parameter(Some(box outputDim))
+                    "dtype", dtype |> Option.map box |> Parameter
+                    "sparse_grad", sparseGrad |> Option.map box |> Parameter
+                ]
+            new Embedding(Arguments<Symbol>(operatorArguments))
+        /// <summary>Maps integer indices to vector representations (embeddings).
+        /// 
+        /// This operator maps words to real-valued vectors in a high-dimensional space,
+        /// called word embeddings. These embeddings can capture semantic and syntactic properties of the words.
+        /// For example, it has been noted that in the learned embedding spaces, similar words tend
+        /// to be close to each other and dissimilar words far apart.
+        /// 
+        /// For an input array of shape (d1, ..., dK),
+        /// the shape of an output array is (d1, ..., dK, output_dim).
+        /// All the input values should be integers in the range [0, input_dim).
+        /// 
+        /// If the input_dim is ip0 and output_dim is op0, then shape of the embedding weight matrix must be
+        /// (ip0, op0).
+        /// 
+        /// When &quot;sparse_grad&quot; is False, if any index mentioned is too large, it is replaced by the index that
+        /// addresses the last vector in an embedding matrix.
+        /// When &quot;sparse_grad&quot; is True, an error will be raised if invalid indices are found.
+        /// 
+        /// Examples::
+        /// 
+        ///   input_dim = 4
+        ///   output_dim = 5
+        /// 
+        ///   // Each row in weight matrix y represents a word. So, y = (w0,w1,w2,w3)
+        ///   y = [[  0.,   1.,   2.,   3.,   4.],
+        ///        [  5.,   6.,   7.,   8.,   9.],
+        ///        [ 10.,  11.,  12.,  13.,  14.],
+        ///        [ 15.,  16.,  17.,  18.,  19.]]
+        /// 
+        ///   // Input array x represents n-grams(2-gram). So, x = [(w1,w3), (w0,w2)]
+        ///   x = [[ 1.,  3.],
+        ///        [ 0.,  2.]]
+        /// 
+        ///   // Mapped input x to its vector representation y.
+        ///   Embedding(x, y, 4, 5) = [[[  5.,   6.,   7.,   8.,   9.],
+        ///                             [ 15.,  16.,  17.,  18.,  19.]],
+        /// 
+        ///                            [[  0.,   1.,   2.,   3.,   4.],
+        ///                             [ 10.,  11.,  12.,  13.,  14.]]]
+        /// 
+        /// 
+        /// The storage type of weight can be either row_sparse or default.
+        /// 
+        /// .. Note::
+        /// 
+        ///     If &quot;sparse_grad&quot; is set to True, the storage type of gradient w.r.t weights will be
+        ///     &quot;row_sparse&quot;. Only a subset of optimizers support sparse gradients, including SGD, AdaGrad
+        ///     and Adam. Note that by default lazy updates is turned on, which may perform differently
+        ///     from standard updates. For more details, please check the Optimization API at:
+        ///     https://mxnet.incubator.apache.org/api/python/optimization/optimization.html
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L598</summary>
+        /// <param name="inputDim">Vocabulary size of the input indices.</param>
+        /// <param name="outputDim">Dimension of the embedding vectors.</param>
+        /// <param name="data">The input array to the embedding operator.</param>
+        /// <param name="weight">The embedding weight matrix.</param>
+        /// <param name="dtype">Data type of weight.</param>
+        /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
+        new(inputDim : int,
+            outputDim : int,
+            [<Optional>] ?data : Symbol,
+            [<Optional>] ?weight : Symbol,
+            [<Optional>] ?dtype : EmbeddingDtype,
+            [<Optional>] ?sparseGrad : bool) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let weight = defaultArg weight (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "weight", Input weight
+                    "input_dim", Parameter(Some(box inputDim))
+                    "output_dim", Parameter(Some(box outputDim))
+                    "dtype", dtype |> Option.map box |> Parameter
+                    "sparse_grad", sparseGrad |> Option.map box |> Parameter
+                ]
+            new Embedding(Arguments<Symbol>(operatorArguments))
+        /// Default value for Dtype
+        /// Data type of weight.
+        static member DtypeDefault : EmbeddingDtype = EmbeddingDtype.Float32
+        /// Default value for SparseGrad
+        /// Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.
+        static member SparseGradDefault : bool = false
+        /// The input array to the embedding operator.
+        member __.Data = operatorArguments.GetInput "data"
+        /// The embedding weight matrix.
+        member __.Weight = operatorArguments.GetInput "weight"
+        /// Vocabulary size of the input indices.
+        member __.InputDim : int = match operatorArguments.GetParameter "input_dim" with Some(v) -> unbox v | None -> failwithf "Required parameter input_dim is missing"
+        /// Dimension of the embedding vectors.
+        member __.OutputDim : int = match operatorArguments.GetParameter "output_dim" with Some(v) -> unbox v | None -> failwithf "Required parameter output_dim is missing"
+        /// Data type of weight.
+        member __.Dtype = operatorArguments.GetParameter("dtype", Embedding.DtypeDefault)
+        /// Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.
+        member __.SparseGrad = operatorArguments.GetParameter("sparse_grad", Embedding.SparseGradDefault)
+        /// <summary>Copy Embedding instance with updated inputs/parameters.</summary>
+        /// <param name="data">The input array to the embedding operator.</param>
+        /// <param name="weight">The embedding weight matrix.</param>
+        /// <param name="inputDim">Vocabulary size of the input indices.</param>
+        /// <param name="outputDim">Dimension of the embedding vectors.</param>
+        /// <param name="dtype">Data type of weight.</param>
+        /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?weight : Symbol,
+            [<Optional>] ?inputDim : int,
+            [<Optional>] ?outputDim : int,
+            [<Optional>] ?dtype : EmbeddingDtype,
+            [<Optional>] ?sparseGrad : bool) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    weight |> Option.map (fun x -> "weight", Input x)
+                    inputDim |> Option.map (fun x -> "input_dim", Parameter(Some (box x)))
+                    outputDim |> Option.map (fun x -> "output_dim", Parameter(Some (box x)))
+                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
+                    sparseGrad |> Option.map (fun x -> "sparse_grad", Parameter(Some (box x)))
+                ] |> List.choose id
+            new Embedding(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
     type ContribQuantizedPooling private (operatorArguments) = 
         inherit SymbolOperator("_contrib_quantized_pooling", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new ContribQuantizedPooling(args)
@@ -20681,7 +24967,7 @@ module SymbolOperators =
         ///     This operator only supports forward propogation. DO NOT use it in training.
         ///     This operator only supports `pool_type` of `avg` or `max`.
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_pooling.cc:L145</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_pooling.cc:L187</summary>
         /// <param name="data">Input data.</param>
         /// <param name="minData">Minimum value of data.</param>
         /// <param name="maxData">Maximum value of data.</param>
@@ -23407,6 +27693,23 @@ module SymbolOperators =
         ///             h_t = o_t * \tanh(c_t)
         ///             \end{array}
         /// 
+        /// With the projection size being set, LSTM could use the projection feature to reduce the parameters
+        /// size and give some speedups without significant damage to the accuracy.
+        /// 
+        /// Long Short-Term Memory Based Recurrent Neural Network Architectures for Large Vocabulary Speech
+        /// Recognition - Sak et al. 2014. https://arxiv.org/abs/1402.1128
+        /// 
+        /// .. math::
+        ///   \begin{array}{ll}
+        ///             i_t = \mathrm{sigmoid}(W_{ii} x_t + b_{ii} + W_{ri} r_{(t-1)} + b_{ri}) \\
+        ///             f_t = \mathrm{sigmoid}(W_{if} x_t + b_{if} + W_{rf} r_{(t-1)} + b_{rf}) \\
+        ///             g_t = \tanh(W_{ig} x_t + b_{ig} + W_{rc} r_{(t-1)} + b_{rg}) \\
+        ///             o_t = \mathrm{sigmoid}(W_{io} x_t + b_{o} + W_{ro} r_{(t-1)} + b_{ro}) \\
+        ///             c_t = f_t * c_{(t-1)} + i_t * g_t \\
+        ///             h_t = o_t * \tanh(c_t)
+        ///             r_t = W_{hr} h_t
+        ///             \end{array}
+        /// 
         /// **GRU**
         /// 
         /// Gated Recurrent Unit - Cho et al. 2014. http://arxiv.org/abs/1406.1078
@@ -23422,7 +27725,7 @@ module SymbolOperators =
         ///             \end{array}
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L354</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L368</summary>
         /// <param name="data">Input data to RNN</param>
         /// <param name="parameters">Vector of all RNN trainable parameters concatenated</param>
         /// <param name="state">initial hidden state of the RNN</param>
@@ -23515,6 +27818,23 @@ module SymbolOperators =
         ///             h_t = o_t * \tanh(c_t)
         ///             \end{array}
         /// 
+        /// With the projection size being set, LSTM could use the projection feature to reduce the parameters
+        /// size and give some speedups without significant damage to the accuracy.
+        /// 
+        /// Long Short-Term Memory Based Recurrent Neural Network Architectures for Large Vocabulary Speech
+        /// Recognition - Sak et al. 2014. https://arxiv.org/abs/1402.1128
+        /// 
+        /// .. math::
+        ///   \begin{array}{ll}
+        ///             i_t = \mathrm{sigmoid}(W_{ii} x_t + b_{ii} + W_{ri} r_{(t-1)} + b_{ri}) \\
+        ///             f_t = \mathrm{sigmoid}(W_{if} x_t + b_{if} + W_{rf} r_{(t-1)} + b_{rf}) \\
+        ///             g_t = \tanh(W_{ig} x_t + b_{ig} + W_{rc} r_{(t-1)} + b_{rg}) \\
+        ///             o_t = \mathrm{sigmoid}(W_{io} x_t + b_{o} + W_{ro} r_{(t-1)} + b_{ro}) \\
+        ///             c_t = f_t * c_{(t-1)} + i_t * g_t \\
+        ///             h_t = o_t * \tanh(c_t)
+        ///             r_t = W_{hr} h_t
+        ///             \end{array}
+        /// 
         /// **GRU**
         /// 
         /// Gated Recurrent Unit - Cho et al. 2014. http://arxiv.org/abs/1406.1078
@@ -23530,7 +27850,7 @@ module SymbolOperators =
         ///             \end{array}
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L354</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L368</summary>
         /// <param name="stateSize">size of the state for each layer</param>
         /// <param name="numLayers">number of stacked layers</param>
         /// <param name="mode">the type of RNN to compute</param>
@@ -24452,11 +28772,11 @@ module SymbolOperators =
         /// It casts only between low precision float/FP32 and does not do anything for other types.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L121</summary>
         /// <param name="data">The input.</param>
         /// <param name="dtype">Output data type.</param>
         new(data : Symbol,
-            dtype : DataType) = 
+            dtype : AmpCastDtype) = 
             let operatorArguments = 
                 [
                     "data", Input data
@@ -24468,10 +28788,10 @@ module SymbolOperators =
         /// It casts only between low precision float/FP32 and does not do anything for other types.
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L121</summary>
         /// <param name="dtype">Output data type.</param>
         /// <param name="data">The input.</param>
-        new(dtype : DataType,
+        new(dtype : AmpCastDtype,
             [<Optional>] ?data : Symbol) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
@@ -24483,12 +28803,12 @@ module SymbolOperators =
         /// The input.
         member __.Data = operatorArguments.GetInput "data"
         /// Output data type.
-        member __.Dtype : DataType = match operatorArguments.GetParameter "dtype" with Some(v) -> unbox v | None -> failwithf "Required parameter dtype is missing"
+        member __.Dtype : AmpCastDtype = match operatorArguments.GetParameter "dtype" with Some(v) -> unbox v | None -> failwithf "Required parameter dtype is missing"
         /// <summary>Copy AmpCast instance with updated inputs/parameters.</summary>
         /// <param name="data">The input.</param>
         /// <param name="dtype">Output data type.</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : AmpCastDtype) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
@@ -24506,7 +28826,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L165</summary>
         /// <param name="data">Weights</param>
         /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
         /// <param name="castNarrow">Whether to cast to the narrowest type</param>
@@ -24526,7 +28846,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L165</summary>
         /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
         /// <param name="data">Weights</param>
         /// <param name="castNarrow">Whether to cast to the narrowest type</param>
@@ -25108,10 +29428,6 @@ module SymbolOperators =
         ///   // picks elements with specified indices along axis 1
         ///   pick(x, y=[0,1,0], 1) = [ 1.,  4.,  5.]
         /// 
-        ///   y = [[ 1.],
-        ///        [ 0.],
-        ///        [ 2.]]
-        /// 
         ///   // picks elements with specified indices along axis 1 using &#39;wrap&#39; mode
         ///   // to place indicies that would normally be out of bounds
         ///   pick(x, y=[2,-1,-2], 1, mode=&#39;wrap&#39;) = [ 1.,  4.,  5.]
@@ -25121,13 +29437,13 @@ module SymbolOperators =
         ///        [ 2.]]
         /// 
         ///   // picks elements with specified indices along axis 1 and dims are maintained
-        ///   pick(x,y, 1, keepdims=True) = [[ 2.],
+        ///   pick(x, y, 1, keepdims=True) = [[ 2.],
         ///                                  [ 3.],
         ///                                  [ 6.]]
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L155</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L151</summary>
         /// <param name="data">The input array</param>
         /// <param name="index">The index array</param>
         /// <param name="axis">int or None. The axis to picking the elements. Negative values means indexing from right to left. If is `None`, the elements in the index w.r.t the flattened input will be picked.</param>
@@ -25216,7 +29532,7 @@ module SymbolOperators =
         ///                                                  [ 2.,  2.,  2.]]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L58</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L93</summary>
         /// <param name="data">The input</param>
         /// <param name="axis">The axes to perform the broadcasting.</param>
         /// <param name="size">Target sizes of the broadcasting axes.</param>
@@ -25281,7 +29597,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L82</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L117</summary>
         /// <param name="data">The input</param>
         /// <param name="shape">The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.</param>
         new([<Optional>] ?data : Symbol,
@@ -25344,7 +29660,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L135</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L170</summary>
         /// <param name="lhs">First input.</param>
         /// <param name="rhs">Second input.</param>
         /// <param name="lhsAxes">Axes to perform broadcast on in the first input array</param>
@@ -27382,51 +31698,6 @@ module SymbolOperators =
                 ] |> List.choose id
             new BroadcastLogicalXor(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
-    type ElemwiseAdd private (operatorArguments) = 
-        inherit SymbolOperator("elemwise_add", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new ElemwiseAdd(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new ElemwiseAdd(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <summary>Adds arguments element-wise.
-        /// 
-        /// The storage type of ``elemwise_add`` output depends on storage types of inputs
-        /// 
-        ///    - elemwise_add(row_sparse, row_sparse) = row_sparse
-        ///    - elemwise_add(csr, csr) = csr
-        ///    - elemwise_add(default, csr) = default
-        ///    - elemwise_add(csr, default) = default
-        ///    - elemwise_add(default, rsp) = default
-        ///    - elemwise_add(rsp, default) = default
-        ///    - otherwise, ``elemwise_add`` generates output with default storage
-        /// 
-        /// </summary>
-        /// <param name="lhs">first input</param>
-        /// <param name="rhs">second input</param>
-        new([<Optional>] ?lhs : Symbol,
-            [<Optional>] ?rhs : Symbol) = 
-            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
-            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
-            let operatorArguments = 
-                [
-                    "lhs", Input lhs
-                    "rhs", Input rhs
-                ]
-            new ElemwiseAdd(Arguments<Symbol>(operatorArguments))
-        /// first input
-        member __.Lhs = operatorArguments.GetInput "lhs"
-        /// second input
-        member __.Rhs = operatorArguments.GetInput "rhs"
-        /// <summary>Copy ElemwiseAdd instance with updated inputs/parameters.</summary>
-        /// <param name="lhs">first input</param>
-        /// <param name="rhs">second input</param>
-        member this.With([<Optional>] ?lhs : Symbol,
-            [<Optional>] ?rhs : Symbol) = 
-            let operatorArguments = 
-                [
-                    lhs |> Option.map (fun x -> "lhs", Input x)
-                    rhs |> Option.map (fun x -> "rhs", Input x)
-                ] |> List.choose id
-            new ElemwiseAdd(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
-    
     type GradAdd private (operatorArguments) = 
         inherit SymbolOperator("_grad_add", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new GradAdd(args)
@@ -27503,50 +31774,6 @@ module SymbolOperators =
                     rhs |> Option.map (fun x -> "rhs", Input x)
                 ] |> List.choose id
             new ElemwiseSub(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
-    
-    type ElemwiseMul private (operatorArguments) = 
-        inherit SymbolOperator("elemwise_mul", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new ElemwiseMul(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new ElemwiseMul(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <summary>Multiplies arguments element-wise.
-        /// 
-        /// The storage type of ``elemwise_mul`` output depends on storage types of inputs
-        /// 
-        ///    - elemwise_mul(default, default) = default
-        ///    - elemwise_mul(row_sparse, row_sparse) = row_sparse
-        ///    - elemwise_mul(default, row_sparse) = row_sparse
-        ///    - elemwise_mul(row_sparse, default) = row_sparse
-        ///    - elemwise_mul(csr, csr) = csr
-        ///    - otherwise, ``elemwise_mul`` generates output with default storage
-        /// 
-        /// </summary>
-        /// <param name="lhs">first input</param>
-        /// <param name="rhs">second input</param>
-        new([<Optional>] ?lhs : Symbol,
-            [<Optional>] ?rhs : Symbol) = 
-            let lhs = defaultArg lhs (new ImplicitVariable() :> Symbol)
-            let rhs = defaultArg rhs (new ImplicitVariable() :> Symbol)
-            let operatorArguments = 
-                [
-                    "lhs", Input lhs
-                    "rhs", Input rhs
-                ]
-            new ElemwiseMul(Arguments<Symbol>(operatorArguments))
-        /// first input
-        member __.Lhs = operatorArguments.GetInput "lhs"
-        /// second input
-        member __.Rhs = operatorArguments.GetInput "rhs"
-        /// <summary>Copy ElemwiseMul instance with updated inputs/parameters.</summary>
-        /// <param name="lhs">first input</param>
-        /// <param name="rhs">second input</param>
-        member this.With([<Optional>] ?lhs : Symbol,
-            [<Optional>] ?rhs : Symbol) = 
-            let operatorArguments = 
-                [
-                    lhs |> Option.map (fun x -> "lhs", Input x)
-                    rhs |> Option.map (fun x -> "rhs", Input x)
-                ] |> List.choose id
-            new ElemwiseMul(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type ElemwiseDiv private (operatorArguments) = 
         inherit SymbolOperator("elemwise_div", operatorArguments)
@@ -28043,39 +32270,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new PlusScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new PlusScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new PlusScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new PlusScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", PlusScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", PlusScalar.IsIntDefault)
         /// <summary>Copy PlusScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new PlusScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28084,39 +32315,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new MinusScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new MinusScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new MinusScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new MinusScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", MinusScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", MinusScalar.IsIntDefault)
         /// <summary>Copy MinusScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new MinusScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28125,39 +32360,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new RminusScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new RminusScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new RminusScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new RminusScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", RminusScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", RminusScalar.IsIntDefault)
         /// <summary>Copy RminusScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new RminusScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28175,52 +32414,45 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L149</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L153</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new MulScalar(Arguments<Symbol>(operatorArguments))
-        /// <summary>Multiply an array with a scalar.
-        /// 
-        /// ``_mul_scalar`` only operates on data array of input if input is sparse.
-        /// 
-        /// For example, if input of shape (100, 100) has only 2 non zero elements,
-        /// i.e. input.data = [5, 6], scalar = nan,
-        /// it will result output.data = [nan, nan] instead of 10000 nans.
-        /// 
-        /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L149</summary>
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new MulScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", MulScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", MulScalar.IsIntDefault)
         /// <summary>Copy MulScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new MulScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28238,52 +32470,45 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L171</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L175</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new DivScalar(Arguments<Symbol>(operatorArguments))
-        /// <summary>Divide an array with a scalar.
-        /// 
-        /// ``_div_scalar`` only operates on data array of input if input is sparse.
-        /// 
-        /// For example, if input of shape (100, 100) has only 2 non zero elements,
-        /// i.e. input.data = [5, 6], scalar = nan,
-        /// it will result output.data = [nan, nan] instead of 10000 nans.
-        /// 
-        /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L171</summary>
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new DivScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", DivScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", DivScalar.IsIntDefault)
         /// <summary>Copy DivScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new DivScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28292,39 +32517,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new RdivScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new RdivScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new RdivScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new RdivScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", RdivScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", RdivScalar.IsIntDefault)
         /// <summary>Copy RdivScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new RdivScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28333,39 +32562,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new ModScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new ModScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new ModScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new ModScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", ModScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", ModScalar.IsIntDefault)
         /// <summary>Copy ModScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new ModScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28374,39 +32607,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new RmodScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new RmodScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new RmodScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new RmodScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", RmodScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", RmodScalar.IsIntDefault)
         /// <summary>Copy RmodScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new RmodScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28415,39 +32652,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new MaximumScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new MaximumScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new MaximumScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new MaximumScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", MaximumScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", MaximumScalar.IsIntDefault)
         /// <summary>Copy MaximumScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new MaximumScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28456,39 +32697,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new MinimumScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new MinimumScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new MinimumScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new MinimumScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", MinimumScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", MinimumScalar.IsIntDefault)
         /// <summary>Copy MinimumScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new MinimumScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28497,39 +32742,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new PowerScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new PowerScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new PowerScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new PowerScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", PowerScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", PowerScalar.IsIntDefault)
         /// <summary>Copy PowerScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new PowerScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28538,39 +32787,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new RpowerScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new RpowerScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new RpowerScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new RpowerScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", RpowerScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", RpowerScalar.IsIntDefault)
         /// <summary>Copy RpowerScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new RpowerScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28579,39 +32832,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new HypotScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new HypotScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new HypotScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new HypotScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", HypotScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", HypotScalar.IsIntDefault)
         /// <summary>Copy HypotScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new HypotScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28638,7 +32895,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L108</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L109</summary>
         /// <param name="data">source input</param>
         /// <param name="scalar">scalar input</param>
         new(data : Symbol,
@@ -28668,7 +32925,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L108</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L109</summary>
         /// <param name="scalar">scalar input</param>
         /// <param name="data">source input</param>
         new(scalar : float,
@@ -28701,39 +32958,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new EqualScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new EqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new EqualScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new EqualScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", EqualScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", EqualScalar.IsIntDefault)
         /// <summary>Copy EqualScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new EqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28742,39 +33003,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new NotEqualScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new NotEqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new NotEqualScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new NotEqualScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", NotEqualScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", NotEqualScalar.IsIntDefault)
         /// <summary>Copy NotEqualScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new NotEqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28783,39 +33048,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new GreaterScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new GreaterScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new GreaterScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new GreaterScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", GreaterScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", GreaterScalar.IsIntDefault)
         /// <summary>Copy GreaterScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new GreaterScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28824,39 +33093,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new GreaterEqualScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new GreaterEqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new GreaterEqualScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new GreaterEqualScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", GreaterEqualScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", GreaterEqualScalar.IsIntDefault)
         /// <summary>Copy GreaterEqualScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new GreaterEqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28865,39 +33138,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new LesserScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new LesserScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new LesserScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new LesserScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", LesserScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", LesserScalar.IsIntDefault)
         /// <summary>Copy LesserScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new LesserScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28906,39 +33183,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new LesserEqualScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new LesserEqualScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new LesserEqualScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new LesserEqualScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", LesserEqualScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", LesserEqualScalar.IsIntDefault)
         /// <summary>Copy LesserEqualScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new LesserEqualScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28947,39 +33228,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalAndScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new LogicalAndScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new LogicalAndScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new LogicalAndScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", LogicalAndScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", LogicalAndScalar.IsIntDefault)
         /// <summary>Copy LogicalAndScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new LogicalAndScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -28988,39 +33273,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalOrScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new LogicalOrScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new LogicalOrScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new LogicalOrScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", LogicalOrScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", LogicalOrScalar.IsIntDefault)
         /// <summary>Copy LogicalOrScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new LogicalOrScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -29029,39 +33318,43 @@ module SymbolOperators =
         static member CreateFromArguments(args : Arguments<Symbol>) = new LogicalXorScalar(args)
         override this.WithArguments(args : Arguments<Symbol>) = new LogicalXorScalar(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new LogicalXorScalar(Arguments<Symbol>(operatorArguments))
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new LogicalXorScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", LogicalXorScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", LogicalXorScalar.IsIntDefault)
         /// <summary>Copy LogicalXorScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new LogicalXorScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -29127,51 +33420,43 @@ module SymbolOperators =
         /// 
         /// </summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new ScatterPlusScalar(Arguments<Symbol>(operatorArguments))
-        /// <summary>Adds a scalar to a tensor element-wise.  If the left-hand-side input is
-        /// &#39;row_sparse&#39; or &#39;csr&#39;, then only the values which exist in the left-hand sparse array are computed.
-        /// The &#39;missing&#39; values are ignored.
-        /// 
-        /// The storage type of ``_scatter_plus_scalar`` output depends on storage types of inputs
-        /// 
-        /// - _scatter_plus_scalar(row_sparse, scalar) = row_sparse
-        /// - _scatter_plus_scalar(csr, scalar) = csr
-        /// - otherwise, ``_scatter_plus_scalar`` behaves exactly like _plus_scalar and generates output
-        /// with default storage
-        /// 
-        /// </summary>
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new ScatterPlusScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", ScatterPlusScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", ScatterPlusScalar.IsIntDefault)
         /// <summary>Copy ScatterPlusScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new ScatterPlusScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -29192,51 +33477,43 @@ module SymbolOperators =
         /// 
         /// </summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
-        new(data : Symbol,
-            scalar : float) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "scalar", Parameter(Some(box scalar))
-                ]
-            new ScatterMinusScalar(Arguments<Symbol>(operatorArguments))
-        /// <summary>Subtracts a scalar to a tensor element-wise.  If the left-hand-side input is
-        /// &#39;row_sparse&#39; or &#39;csr&#39;, then only the values which exist in the left-hand sparse array are computed.
-        /// The &#39;missing&#39; values are ignored.
-        /// 
-        /// The storage type of ``_scatter_minus_scalar`` output depends on storage types of inputs
-        /// 
-        /// - _scatter_minus_scalar(row_sparse, scalar) = row_sparse
-        /// - _scatter_minus_scalar(csr, scalar) = csr
-        /// - otherwise, ``_scatter_minus_scalar`` behaves exactly like _minus_scalar and generates output
-        /// with default storage
-        /// 
-        /// </summary>
-        /// <param name="scalar">scalar input</param>
-        /// <param name="data">source input</param>
-        new(scalar : float,
-            [<Optional>] ?data : Symbol) = 
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
+        new([<Optional>] ?data : Symbol,
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
                     "data", Input data
-                    "scalar", Parameter(Some(box scalar))
+                    "scalar", scalar |> Option.map box |> Parameter
+                    "is_int", isInt |> Option.map box |> Parameter
                 ]
             new ScatterMinusScalar(Arguments<Symbol>(operatorArguments))
+        /// Default value for Scalar
+        /// Scalar input value
+        static member ScalarDefault : double = 1.0
+        /// Default value for IsInt
+        /// Indicate whether scalar input is int type
+        static member IsIntDefault : bool = true
         /// source input
         member __.Data = operatorArguments.GetInput "data"
-        /// scalar input
-        member __.Scalar : float = match operatorArguments.GetParameter "scalar" with Some(v) -> unbox v | None -> failwithf "Required parameter scalar is missing"
+        /// Scalar input value
+        member __.Scalar = operatorArguments.GetParameter("scalar", ScatterMinusScalar.ScalarDefault)
+        /// Indicate whether scalar input is int type
+        member __.IsInt = operatorArguments.GetParameter("is_int", ScatterMinusScalar.IsIntDefault)
         /// <summary>Copy ScatterMinusScalar instance with updated inputs/parameters.</summary>
         /// <param name="data">source input</param>
-        /// <param name="scalar">scalar input</param>
+        /// <param name="scalar">Scalar input value</param>
+        /// <param name="isInt">Indicate whether scalar input is int type</param>
         member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?scalar : float) = 
+            [<Optional>] ?scalar : double,
+            [<Optional>] ?isInt : bool) = 
             let operatorArguments = 
                 [
                     data |> Option.map (fun x -> "data", Input x)
                     scalar |> Option.map (fun x -> "scalar", Parameter(Some (box x)))
+                    isInt |> Option.map (fun x -> "is_int", Parameter(Some (box x)))
                 ] |> List.choose id
             new ScatterMinusScalar(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -29441,7 +33718,7 @@ module SymbolOperators =
         override this.WithArguments(args : Arguments<Symbol>) = new Copy(this.OperatorArguments.AddReplace(args)) :> Symbol
         /// <summary>Returns a copy of the input.
         /// 
-        /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:246</summary>
+        /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:244</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -29492,7 +33769,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L327</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L325</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -29575,7 +33852,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L513</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L511</summary>
         /// <param name="lhs">First input.</param>
         /// <param name="rhs">Second input.</param>
         /// <param name="lhsBegin">Defaults to 0. The beginning index along which the lhs dimensions are to be reshaped. Supports negative indices.</param>
@@ -29660,7 +33937,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L574</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L573</summary>
         /// <param name="data">Input Array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -29692,7 +33969,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L625</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L624</summary>
         /// <param name="data">Input Array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -29728,7 +34005,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L664</summary>
         /// <param name="data">The input.</param>
         /// <param name="dtype">Output data type.</param>
         new(data : Symbol,
@@ -29751,7 +34028,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L664</summary>
         /// <param name="dtype">Output data type.</param>
         /// <param name="data">The input.</param>
         new(dtype : DataType,
@@ -29829,7 +34106,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L721</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L720</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -29867,7 +34144,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L759</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L758</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -29905,7 +34182,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L778</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L777</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -29947,7 +34224,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L799</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L798</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -29987,7 +34264,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L818</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L817</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30027,7 +34304,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L837</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L836</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30068,7 +34345,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L857</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L856</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30107,7 +34384,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L875</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L874</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30171,7 +34448,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L907</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L908</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30295,7 +34572,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L63</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L64</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30327,7 +34604,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L76</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L77</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30359,7 +34636,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L93</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L94</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30391,7 +34668,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L105</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L106</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30428,7 +34705,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L206</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L199</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30464,7 +34741,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L224</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L244</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30498,7 +34775,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L42</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L43</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30539,7 +34816,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L118</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L119</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30580,7 +34857,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L142</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L170</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30617,7 +34894,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L193</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L221</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30658,7 +34935,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L216</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L270</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30693,7 +34970,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L269</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L323</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30882,7 +35159,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L206</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L233</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30921,7 +35198,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L227</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L282</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30958,7 +35235,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L274</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L332</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -30995,7 +35272,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L293</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L351</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -31032,7 +35309,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L313</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L371</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -31065,7 +35342,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L351</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L409</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -31102,7 +35379,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L393</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L451</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -31137,7 +35414,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L436</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L494</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -31168,7 +35445,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L474</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L535</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -31203,7 +35480,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L515</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L579</summary>
         /// <param name="data">The input array.</param>
         new([<Optional>] ?data : Symbol) =
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
@@ -31290,206 +35567,6 @@ module SymbolOperators =
                 ] |> List.choose id
             new Histogram(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
-    type Embedding private (operatorArguments) = 
-        inherit SymbolOperator("Embedding", operatorArguments)
-        static member CreateFromArguments(args : Arguments<Symbol>) = new Embedding(args)
-        override this.WithArguments(args : Arguments<Symbol>) = new Embedding(this.OperatorArguments.AddReplace(args)) :> Symbol
-        /// <summary>Maps integer indices to vector representations (embeddings).
-        /// 
-        /// This operator maps words to real-valued vectors in a high-dimensional space,
-        /// called word embeddings. These embeddings can capture semantic and syntactic properties of the words.
-        /// For example, it has been noted that in the learned embedding spaces, similar words tend
-        /// to be close to each other and dissimilar words far apart.
-        /// 
-        /// For an input array of shape (d1, ..., dK),
-        /// the shape of an output array is (d1, ..., dK, output_dim).
-        /// All the input values should be integers in the range [0, input_dim).
-        /// 
-        /// If the input_dim is ip0 and output_dim is op0, then shape of the embedding weight matrix must be
-        /// (ip0, op0).
-        /// 
-        /// When &quot;sparse_grad&quot; is False, if any index mentioned is too large, it is replaced by the index that
-        /// addresses the last vector in an embedding matrix.
-        /// When &quot;sparse_grad&quot; is True, an error will be raised if invalid indices are found.
-        /// 
-        /// Examples::
-        /// 
-        ///   input_dim = 4
-        ///   output_dim = 5
-        /// 
-        ///   // Each row in weight matrix y represents a word. So, y = (w0,w1,w2,w3)
-        ///   y = [[  0.,   1.,   2.,   3.,   4.],
-        ///        [  5.,   6.,   7.,   8.,   9.],
-        ///        [ 10.,  11.,  12.,  13.,  14.],
-        ///        [ 15.,  16.,  17.,  18.,  19.]]
-        /// 
-        ///   // Input array x represents n-grams(2-gram). So, x = [(w1,w3), (w0,w2)]
-        ///   x = [[ 1.,  3.],
-        ///        [ 0.,  2.]]
-        /// 
-        ///   // Mapped input x to its vector representation y.
-        ///   Embedding(x, y, 4, 5) = [[[  5.,   6.,   7.,   8.,   9.],
-        ///                             [ 15.,  16.,  17.,  18.,  19.]],
-        /// 
-        ///                            [[  0.,   1.,   2.,   3.,   4.],
-        ///                             [ 10.,  11.,  12.,  13.,  14.]]]
-        /// 
-        /// 
-        /// The storage type of weight can be either row_sparse or default.
-        /// 
-        /// .. Note::
-        /// 
-        ///     If &quot;sparse_grad&quot; is set to True, the storage type of gradient w.r.t weights will be
-        ///     &quot;row_sparse&quot;. Only a subset of optimizers support sparse gradients, including SGD, AdaGrad
-        ///     and Adam. Note that by default lazy updates is turned on, which may perform differently
-        ///     from standard updates. For more details, please check the Optimization API at:
-        ///     https://mxnet.incubator.apache.org/api/python/optimization/optimization.html
-        /// 
-        /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
-        /// <param name="data">The input array to the embedding operator.</param>
-        /// <param name="weight">The embedding weight matrix.</param>
-        /// <param name="inputDim">Vocabulary size of the input indices.</param>
-        /// <param name="outputDim">Dimension of the embedding vectors.</param>
-        /// <param name="dtype">Data type of weight.</param>
-        /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
-        new(data : Symbol,
-            weight : Symbol,
-            inputDim : int,
-            outputDim : int,
-            [<Optional>] ?dtype : DataType,
-            [<Optional>] ?sparseGrad : bool) = 
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "weight", Input weight
-                    "input_dim", Parameter(Some(box inputDim))
-                    "output_dim", Parameter(Some(box outputDim))
-                    "dtype", dtype |> Option.map box |> Parameter
-                    "sparse_grad", sparseGrad |> Option.map box |> Parameter
-                ]
-            new Embedding(Arguments<Symbol>(operatorArguments))
-        /// <summary>Maps integer indices to vector representations (embeddings).
-        /// 
-        /// This operator maps words to real-valued vectors in a high-dimensional space,
-        /// called word embeddings. These embeddings can capture semantic and syntactic properties of the words.
-        /// For example, it has been noted that in the learned embedding spaces, similar words tend
-        /// to be close to each other and dissimilar words far apart.
-        /// 
-        /// For an input array of shape (d1, ..., dK),
-        /// the shape of an output array is (d1, ..., dK, output_dim).
-        /// All the input values should be integers in the range [0, input_dim).
-        /// 
-        /// If the input_dim is ip0 and output_dim is op0, then shape of the embedding weight matrix must be
-        /// (ip0, op0).
-        /// 
-        /// When &quot;sparse_grad&quot; is False, if any index mentioned is too large, it is replaced by the index that
-        /// addresses the last vector in an embedding matrix.
-        /// When &quot;sparse_grad&quot; is True, an error will be raised if invalid indices are found.
-        /// 
-        /// Examples::
-        /// 
-        ///   input_dim = 4
-        ///   output_dim = 5
-        /// 
-        ///   // Each row in weight matrix y represents a word. So, y = (w0,w1,w2,w3)
-        ///   y = [[  0.,   1.,   2.,   3.,   4.],
-        ///        [  5.,   6.,   7.,   8.,   9.],
-        ///        [ 10.,  11.,  12.,  13.,  14.],
-        ///        [ 15.,  16.,  17.,  18.,  19.]]
-        /// 
-        ///   // Input array x represents n-grams(2-gram). So, x = [(w1,w3), (w0,w2)]
-        ///   x = [[ 1.,  3.],
-        ///        [ 0.,  2.]]
-        /// 
-        ///   // Mapped input x to its vector representation y.
-        ///   Embedding(x, y, 4, 5) = [[[  5.,   6.,   7.,   8.,   9.],
-        ///                             [ 15.,  16.,  17.,  18.,  19.]],
-        /// 
-        ///                            [[  0.,   1.,   2.,   3.,   4.],
-        ///                             [ 10.,  11.,  12.,  13.,  14.]]]
-        /// 
-        /// 
-        /// The storage type of weight can be either row_sparse or default.
-        /// 
-        /// .. Note::
-        /// 
-        ///     If &quot;sparse_grad&quot; is set to True, the storage type of gradient w.r.t weights will be
-        ///     &quot;row_sparse&quot;. Only a subset of optimizers support sparse gradients, including SGD, AdaGrad
-        ///     and Adam. Note that by default lazy updates is turned on, which may perform differently
-        ///     from standard updates. For more details, please check the Optimization API at:
-        ///     https://mxnet.incubator.apache.org/api/python/optimization/optimization.html
-        /// 
-        /// 
-        /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
-        /// <param name="inputDim">Vocabulary size of the input indices.</param>
-        /// <param name="outputDim">Dimension of the embedding vectors.</param>
-        /// <param name="data">The input array to the embedding operator.</param>
-        /// <param name="weight">The embedding weight matrix.</param>
-        /// <param name="dtype">Data type of weight.</param>
-        /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
-        new(inputDim : int,
-            outputDim : int,
-            [<Optional>] ?data : Symbol,
-            [<Optional>] ?weight : Symbol,
-            [<Optional>] ?dtype : DataType,
-            [<Optional>] ?sparseGrad : bool) = 
-            let data = defaultArg data (new ImplicitVariable() :> Symbol)
-            let weight = defaultArg weight (new ImplicitVariable() :> Symbol)
-            let operatorArguments = 
-                [
-                    "data", Input data
-                    "weight", Input weight
-                    "input_dim", Parameter(Some(box inputDim))
-                    "output_dim", Parameter(Some(box outputDim))
-                    "dtype", dtype |> Option.map box |> Parameter
-                    "sparse_grad", sparseGrad |> Option.map box |> Parameter
-                ]
-            new Embedding(Arguments<Symbol>(operatorArguments))
-        /// Default value for Dtype
-        /// Data type of weight.
-        static member DtypeDefault : DataType = DataType.Float32
-        /// Default value for SparseGrad
-        /// Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.
-        static member SparseGradDefault : bool = false
-        /// The input array to the embedding operator.
-        member __.Data = operatorArguments.GetInput "data"
-        /// The embedding weight matrix.
-        member __.Weight = operatorArguments.GetInput "weight"
-        /// Vocabulary size of the input indices.
-        member __.InputDim : int = match operatorArguments.GetParameter "input_dim" with Some(v) -> unbox v | None -> failwithf "Required parameter input_dim is missing"
-        /// Dimension of the embedding vectors.
-        member __.OutputDim : int = match operatorArguments.GetParameter "output_dim" with Some(v) -> unbox v | None -> failwithf "Required parameter output_dim is missing"
-        /// Data type of weight.
-        member __.Dtype = operatorArguments.GetParameter("dtype", Embedding.DtypeDefault)
-        /// Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.
-        member __.SparseGrad = operatorArguments.GetParameter("sparse_grad", Embedding.SparseGradDefault)
-        /// <summary>Copy Embedding instance with updated inputs/parameters.</summary>
-        /// <param name="data">The input array to the embedding operator.</param>
-        /// <param name="weight">The embedding weight matrix.</param>
-        /// <param name="inputDim">Vocabulary size of the input indices.</param>
-        /// <param name="outputDim">Dimension of the embedding vectors.</param>
-        /// <param name="dtype">Data type of weight.</param>
-        /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
-        member this.With([<Optional>] ?data : Symbol,
-            [<Optional>] ?weight : Symbol,
-            [<Optional>] ?inputDim : int,
-            [<Optional>] ?outputDim : int,
-            [<Optional>] ?dtype : DataType,
-            [<Optional>] ?sparseGrad : bool) = 
-            let operatorArguments = 
-                [
-                    data |> Option.map (fun x -> "data", Input x)
-                    weight |> Option.map (fun x -> "weight", Input x)
-                    inputDim |> Option.map (fun x -> "input_dim", Parameter(Some (box x)))
-                    outputDim |> Option.map (fun x -> "output_dim", Parameter(Some (box x)))
-                    dtype |> Option.map (fun x -> "dtype", Parameter(Some (box x)))
-                    sparseGrad |> Option.map (fun x -> "sparse_grad", Parameter(Some (box x)))
-                ] |> List.choose id
-            new Embedding(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
-    
     type ContribSparseEmbedding private (operatorArguments) = 
         inherit SymbolOperator("_contrib_SparseEmbedding", operatorArguments)
         static member CreateFromArguments(args : Arguments<Symbol>) = new ContribSparseEmbedding(args)
@@ -31545,7 +35622,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L675</summary>
         /// <param name="data">The input array to the embedding operator.</param>
         /// <param name="weight">The embedding weight matrix.</param>
         /// <param name="inputDim">Vocabulary size of the input indices.</param>
@@ -31556,7 +35633,7 @@ module SymbolOperators =
             weight : Symbol,
             inputDim : int,
             outputDim : int,
-            [<Optional>] ?dtype : DataType,
+            [<Optional>] ?dtype : ContribSparseEmbeddingDtype,
             [<Optional>] ?sparseGrad : bool) = 
             let operatorArguments = 
                 [
@@ -31619,7 +35696,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L675</summary>
         /// <param name="inputDim">Vocabulary size of the input indices.</param>
         /// <param name="outputDim">Dimension of the embedding vectors.</param>
         /// <param name="data">The input array to the embedding operator.</param>
@@ -31630,7 +35707,7 @@ module SymbolOperators =
             outputDim : int,
             [<Optional>] ?data : Symbol,
             [<Optional>] ?weight : Symbol,
-            [<Optional>] ?dtype : DataType,
+            [<Optional>] ?dtype : ContribSparseEmbeddingDtype,
             [<Optional>] ?sparseGrad : bool) = 
             let data = defaultArg data (new ImplicitVariable() :> Symbol)
             let weight = defaultArg weight (new ImplicitVariable() :> Symbol)
@@ -31646,7 +35723,7 @@ module SymbolOperators =
             new ContribSparseEmbedding(Arguments<Symbol>(operatorArguments))
         /// Default value for Dtype
         /// Data type of weight.
-        static member DtypeDefault : DataType = DataType.Float32
+        static member DtypeDefault : ContribSparseEmbeddingDtype = ContribSparseEmbeddingDtype.Float32
         /// Default value for SparseGrad
         /// Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.
         static member SparseGradDefault : bool = false
@@ -31673,7 +35750,7 @@ module SymbolOperators =
             [<Optional>] ?weight : Symbol,
             [<Optional>] ?inputDim : int,
             [<Optional>] ?outputDim : int,
-            [<Optional>] ?dtype : DataType,
+            [<Optional>] ?dtype : ContribSparseEmbeddingDtype,
             [<Optional>] ?sparseGrad : bool) = 
             let operatorArguments = 
                 [
@@ -31741,7 +35818,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L718</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L777</summary>
         /// <param name="a">The input array.</param>
         /// <param name="indices">The indices of the values to be extracted.</param>
         /// <param name="axis">The axis of input array to be taken.For input tensor of rank r, it could be in the range of [-r, r-1]</param>
@@ -31817,7 +35894,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L777</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L836</summary>
         /// <param name="a">The input array</param>
         /// <param name="indices">The index array</param>
         new([<Optional>] ?a : Symbol,
@@ -31884,7 +35961,7 @@ module SymbolOperators =
         ///                                       [ 1.  0.  0.]]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L883</summary>
         /// <param name="indices">array of locations where to set on_value</param>
         /// <param name="depth">Depth of the one hot dimension.</param>
         /// <param name="onValue">The value assigned to the locations represented by indices.</param>
@@ -31894,7 +35971,7 @@ module SymbolOperators =
             depth : int,
             [<Optional>] ?onValue : double,
             [<Optional>] ?offValue : double,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : OneHotDtype) = 
             let operatorArguments = 
                 [
                     "indices", Input indices
@@ -31938,7 +36015,7 @@ module SymbolOperators =
         ///                                       [ 1.  0.  0.]]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L883</summary>
         /// <param name="depth">Depth of the one hot dimension.</param>
         /// <param name="indices">array of locations where to set on_value</param>
         /// <param name="onValue">The value assigned to the locations represented by indices.</param>
@@ -31948,7 +36025,7 @@ module SymbolOperators =
             [<Optional>] ?indices : Symbol,
             [<Optional>] ?onValue : double,
             [<Optional>] ?offValue : double,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : OneHotDtype) = 
             let indices = defaultArg indices (new ImplicitVariable() :> Symbol)
             let operatorArguments = 
                 [
@@ -31967,7 +36044,7 @@ module SymbolOperators =
         static member OffValueDefault : double = 0.0
         /// Default value for Dtype
         /// DType of the output
-        static member DtypeDefault : DataType = DataType.Float32
+        static member DtypeDefault : OneHotDtype = OneHotDtype.Float32
         /// array of locations where to set on_value
         member __.Indices = operatorArguments.GetInput "indices"
         /// Depth of the one hot dimension.
@@ -31988,7 +36065,7 @@ module SymbolOperators =
             [<Optional>] ?depth : int,
             [<Optional>] ?onValue : double,
             [<Optional>] ?offValue : double,
-            [<Optional>] ?dtype : DataType) = 
+            [<Optional>] ?dtype : OneHotDtype) = 
             let operatorArguments = 
                 [
                     indices |> Option.map (fun x -> "indices", Input x)
@@ -34029,7 +38106,7 @@ module SymbolOperators =
         ///                  [[-2., 1.5], [1., -0.5]]]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L919</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L920</summary>
         /// <param name="A">Tensor of square matrix</param>
         new([<Optional>] ?A : Symbol) =
             let A = defaultArg A (new ImplicitVariable() :> Symbol)
@@ -34081,7 +38158,7 @@ module SymbolOperators =
         ///    det(A) = [-5., 5.]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L973</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L975</summary>
         /// <param name="A">Tensor of square matrix</param>
         new([<Optional>] ?A : Symbol) =
             let A = defaultArg A (new ImplicitVariable() :> Symbol)
@@ -34139,7 +38216,7 @@ module SymbolOperators =
         ///    logabsdet = [1.609438, -inf, 1.609438]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L1031</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L1034</summary>
         /// <param name="A">Tensor of square matrix</param>
         new([<Optional>] ?A : Symbol) =
             let A = defaultArg A (new ImplicitVariable() :> Symbol)
@@ -35857,7 +39934,7 @@ module SymbolOperators =
         /// 
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L132</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L133</summary>
         /// <param name="data">The input array</param>
         /// <param name="axis">Axis along which to choose sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
         /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
@@ -35925,7 +40002,7 @@ module SymbolOperators =
         ///   argsort(x, axis=None) = [ 3.,  1.,  5.,  0.,  4.,  2.]
         /// 
         /// 
-        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L183</summary>
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L185</summary>
         /// <param name="data">The input array</param>
         /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
         /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
@@ -36258,6 +40335,7 @@ module SymbolOperators =
         /// <param name="numClasses">Number of classes.</param>
         /// <param name="maskSize">Size of the pooled masks height and width: (h, w).</param>
         /// <param name="sampleRatio">Sampling ratio of ROI align. Set to -1 to use adaptative size.</param>
+        /// <param name="aligned">Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.</param>
         new(rois : Symbol,
             gtMasks : Symbol,
             matches : Symbol,
@@ -36265,7 +40343,8 @@ module SymbolOperators =
             numRois : int,
             numClasses : int,
             maskSize : int seq,
-            [<Optional>] ?sampleRatio : int) = 
+            [<Optional>] ?sampleRatio : int,
+            [<Optional>] ?aligned : bool) = 
             let operatorArguments = 
                 [
                     "rois", Input rois
@@ -36276,6 +40355,7 @@ module SymbolOperators =
                     "num_classes", Parameter(Some(box numClasses))
                     "mask_size", Parameter(Some(box maskSize))
                     "sample_ratio", sampleRatio |> Option.map box |> Parameter
+                    "aligned", aligned |> Option.map box |> Parameter
                 ]
             new ContribMrcnnMaskTarget(Arguments<Symbol>(operatorArguments))
         /// <summary>Generate mask targets for Mask-RCNN.</summary>
@@ -36287,6 +40367,7 @@ module SymbolOperators =
         /// <param name="matches">Index to a gt_mask, a 2D array</param>
         /// <param name="clsTargets">Value [0, num_class), excluding background class, a 2D array</param>
         /// <param name="sampleRatio">Sampling ratio of ROI align. Set to -1 to use adaptative size.</param>
+        /// <param name="aligned">Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.</param>
         new(numRois : int,
             numClasses : int,
             maskSize : int seq,
@@ -36294,7 +40375,8 @@ module SymbolOperators =
             [<Optional>] ?gtMasks : Symbol,
             [<Optional>] ?matches : Symbol,
             [<Optional>] ?clsTargets : Symbol,
-            [<Optional>] ?sampleRatio : int) = 
+            [<Optional>] ?sampleRatio : int,
+            [<Optional>] ?aligned : bool) = 
             let rois = defaultArg rois (new ImplicitVariable() :> Symbol)
             let gtMasks = defaultArg gtMasks (new ImplicitVariable() :> Symbol)
             let matches = defaultArg matches (new ImplicitVariable() :> Symbol)
@@ -36309,11 +40391,15 @@ module SymbolOperators =
                     "num_classes", Parameter(Some(box numClasses))
                     "mask_size", Parameter(Some(box maskSize))
                     "sample_ratio", sampleRatio |> Option.map box |> Parameter
+                    "aligned", aligned |> Option.map box |> Parameter
                 ]
             new ContribMrcnnMaskTarget(Arguments<Symbol>(operatorArguments))
         /// Default value for SampleRatio
         /// Sampling ratio of ROI align. Set to -1 to use adaptative size.
         static member SampleRatioDefault : int = 2
+        /// Default value for Aligned
+        /// Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.
+        static member AlignedDefault : bool = false
         /// Bounding box coordinates, a 3D array
         member __.Rois = operatorArguments.GetInput "rois"
         /// Input masks of full image size, a 4D array
@@ -36330,6 +40416,8 @@ module SymbolOperators =
         member __.MaskSize : int seq = match operatorArguments.GetParameter "mask_size" with Some(v) -> unbox v | None -> failwithf "Required parameter mask_size is missing"
         /// Sampling ratio of ROI align. Set to -1 to use adaptative size.
         member __.SampleRatio = operatorArguments.GetParameter("sample_ratio", ContribMrcnnMaskTarget.SampleRatioDefault)
+        /// Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.
+        member __.Aligned = operatorArguments.GetParameter("aligned", ContribMrcnnMaskTarget.AlignedDefault)
         /// <summary>Copy ContribMrcnnMaskTarget instance with updated inputs/parameters.</summary>
         /// <param name="rois">Bounding box coordinates, a 3D array</param>
         /// <param name="gtMasks">Input masks of full image size, a 4D array</param>
@@ -36339,6 +40427,7 @@ module SymbolOperators =
         /// <param name="numClasses">Number of classes.</param>
         /// <param name="maskSize">Size of the pooled masks height and width: (h, w).</param>
         /// <param name="sampleRatio">Sampling ratio of ROI align. Set to -1 to use adaptative size.</param>
+        /// <param name="aligned">Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.</param>
         member this.With([<Optional>] ?rois : Symbol,
             [<Optional>] ?gtMasks : Symbol,
             [<Optional>] ?matches : Symbol,
@@ -36346,7 +40435,8 @@ module SymbolOperators =
             [<Optional>] ?numRois : int,
             [<Optional>] ?numClasses : int,
             [<Optional>] ?maskSize : int seq,
-            [<Optional>] ?sampleRatio : int) = 
+            [<Optional>] ?sampleRatio : int,
+            [<Optional>] ?aligned : bool) = 
             let operatorArguments = 
                 [
                     rois |> Option.map (fun x -> "rois", Input x)
@@ -36357,6 +40447,7 @@ module SymbolOperators =
                     numClasses |> Option.map (fun x -> "num_classes", Parameter(Some (box x)))
                     maskSize |> Option.map (fun x -> "mask_size", Parameter(Some (box x)))
                     sampleRatio |> Option.map (fun x -> "sample_ratio", Parameter(Some (box x)))
+                    aligned |> Option.map (fun x -> "aligned", Parameter(Some (box x)))
                 ] |> List.choose id
             new ContribMrcnnMaskTarget(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
@@ -37155,6 +41246,329 @@ module SymbolOperators =
                     computeSize |> Option.map (fun x -> "compute_size", Parameter(Some (box x)))
                 ] |> List.choose id
             new ContribIfft(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
+    
+    type ContribModulatedDeformableConvolution private (operatorArguments) = 
+        inherit SymbolOperator("_contrib_ModulatedDeformableConvolution", operatorArguments)
+        static member CreateFromArguments(args : Arguments<Symbol>) = new ContribModulatedDeformableConvolution(args)
+        override this.WithArguments(args : Arguments<Symbol>) = new ContribModulatedDeformableConvolution(this.OperatorArguments.AddReplace(args)) :> Symbol
+        /// <summary>Compute 2-D modulated deformable convolution on 4-D input.
+        /// 
+        /// The modulated deformable convolution operation is described in https://arxiv.org/abs/1811.11168
+        /// 
+        /// For 2-D modulated deformable convolution, the shapes are
+        /// 
+        /// - **data**: *(batch_size, channel, height, width)*
+        /// - **offset**: *(batch_size, num_deformable_group * kernel[0] * kernel[1] * 2, height, width)*
+        /// - **mask**: *(batch_size, num_deformable_group * kernel[0] * kernel[1], height, width)*
+        /// - **weight**: *(num_filter, channel, kernel[0], kernel[1])*
+        /// - **bias**: *(num_filter,)*
+        /// - **out**: *(batch_size, num_filter, out_height, out_width)*.
+        /// 
+        /// Define::
+        /// 
+        ///   f(x,k,p,s,d) = floor((x+2*p-d*(k-1)-1)/s)+1
+        /// 
+        /// then we have::
+        /// 
+        ///   out_height=f(height, kernel[0], pad[0], stride[0], dilate[0])
+        ///   out_width=f(width, kernel[1], pad[1], stride[1], dilate[1])
+        /// 
+        /// If ``no_bias`` is set to be true, then the ``bias`` term is ignored.
+        /// 
+        /// The default data ``layout`` is *NCHW*, namely *(batch_size, channle, height,
+        /// width)*.
+        /// 
+        /// If ``num_group`` is larger than 1, denoted by *g*, then split the input ``data``
+        /// evenly into *g* parts along the channel axis, and also evenly split ``weight``
+        /// along the first dimension. Next compute the convolution on the *i*-th part of
+        /// the data with the *i*-th weight part. The output is obtained by concating all
+        /// the *g* results.
+        /// 
+        /// If ``num_deformable_group`` is larger than 1, denoted by *dg*, then split the
+        /// input ``offset`` evenly into *dg* parts along the channel axis, and also evenly
+        /// split ``out`` evenly into *dg* parts along the channel axis. Next compute the
+        /// deformable convolution, apply the *i*-th part of the offset part on the *i*-th
+        /// out.
+        /// 
+        /// 
+        /// Both ``weight`` and ``bias`` are learnable parameters.
+        /// 
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\modulated_deformable_convolution.cc:L102</summary>
+        /// <param name="data">Input data to the ModulatedDeformableConvolutionOp.</param>
+        /// <param name="offset">Input offset to ModulatedDeformableConvolutionOp.</param>
+        /// <param name="mask">Input mask to the ModulatedDeformableConvolutionOp.</param>
+        /// <param name="weight">Weight matrix.</param>
+        /// <param name="bias">Bias parameter.</param>
+        /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
+        /// <param name="numFilter">Convolution filter(channel) number</param>
+        /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
+        /// <param name="numGroup">Number of group partitions.</param>
+        /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
+        /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
+        /// <param name="noBias">Whether to disable bias parameter.</param>
+        /// <param name="im2colStep">Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.</param>
+        /// <param name="layout">Set layout for input, output and weight. Empty for
+        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
+        new(data : Symbol,
+            offset : Symbol,
+            mask : Symbol,
+            weight : Symbol,
+            bias : Symbol,
+            kernel : int seq,
+            numFilter : int,
+            [<Optional>] ?stride : int seq,
+            [<Optional>] ?dilate : int seq,
+            [<Optional>] ?pad : int seq,
+            [<Optional>] ?numGroup : int,
+            [<Optional>] ?numDeformableGroup : int,
+            [<Optional>] ?workspace : int64,
+            [<Optional>] ?noBias : bool,
+            [<Optional>] ?im2colStep : int,
+            [<Optional>] ?layout : ContribModulatedDeformableConvolutionLayout) = 
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "offset", Input offset
+                    "mask", Input mask
+                    "weight", Input weight
+                    "bias", Input bias
+                    "kernel", Parameter(Some(box kernel))
+                    "num_filter", Parameter(Some(box numFilter))
+                    "stride", stride |> Option.map box |> Parameter
+                    "dilate", dilate |> Option.map box |> Parameter
+                    "pad", pad |> Option.map box |> Parameter
+                    "num_group", numGroup |> Option.map box |> Parameter
+                    "num_deformable_group", numDeformableGroup |> Option.map box |> Parameter
+                    "workspace", workspace |> Option.map box |> Parameter
+                    "no_bias", noBias |> Option.map box |> Parameter
+                    "im2col_step", im2colStep |> Option.map box |> Parameter
+                    "layout", layout |> Option.map box |> Parameter
+                ]
+            new ContribModulatedDeformableConvolution(Arguments<Symbol>(operatorArguments))
+        /// <summary>Compute 2-D modulated deformable convolution on 4-D input.
+        /// 
+        /// The modulated deformable convolution operation is described in https://arxiv.org/abs/1811.11168
+        /// 
+        /// For 2-D modulated deformable convolution, the shapes are
+        /// 
+        /// - **data**: *(batch_size, channel, height, width)*
+        /// - **offset**: *(batch_size, num_deformable_group * kernel[0] * kernel[1] * 2, height, width)*
+        /// - **mask**: *(batch_size, num_deformable_group * kernel[0] * kernel[1], height, width)*
+        /// - **weight**: *(num_filter, channel, kernel[0], kernel[1])*
+        /// - **bias**: *(num_filter,)*
+        /// - **out**: *(batch_size, num_filter, out_height, out_width)*.
+        /// 
+        /// Define::
+        /// 
+        ///   f(x,k,p,s,d) = floor((x+2*p-d*(k-1)-1)/s)+1
+        /// 
+        /// then we have::
+        /// 
+        ///   out_height=f(height, kernel[0], pad[0], stride[0], dilate[0])
+        ///   out_width=f(width, kernel[1], pad[1], stride[1], dilate[1])
+        /// 
+        /// If ``no_bias`` is set to be true, then the ``bias`` term is ignored.
+        /// 
+        /// The default data ``layout`` is *NCHW*, namely *(batch_size, channle, height,
+        /// width)*.
+        /// 
+        /// If ``num_group`` is larger than 1, denoted by *g*, then split the input ``data``
+        /// evenly into *g* parts along the channel axis, and also evenly split ``weight``
+        /// along the first dimension. Next compute the convolution on the *i*-th part of
+        /// the data with the *i*-th weight part. The output is obtained by concating all
+        /// the *g* results.
+        /// 
+        /// If ``num_deformable_group`` is larger than 1, denoted by *dg*, then split the
+        /// input ``offset`` evenly into *dg* parts along the channel axis, and also evenly
+        /// split ``out`` evenly into *dg* parts along the channel axis. Next compute the
+        /// deformable convolution, apply the *i*-th part of the offset part on the *i*-th
+        /// out.
+        /// 
+        /// 
+        /// Both ``weight`` and ``bias`` are learnable parameters.
+        /// 
+        /// 
+        /// 
+        /// 
+        /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\modulated_deformable_convolution.cc:L102</summary>
+        /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
+        /// <param name="numFilter">Convolution filter(channel) number</param>
+        /// <param name="data">Input data to the ModulatedDeformableConvolutionOp.</param>
+        /// <param name="offset">Input offset to ModulatedDeformableConvolutionOp.</param>
+        /// <param name="mask">Input mask to the ModulatedDeformableConvolutionOp.</param>
+        /// <param name="weight">Weight matrix.</param>
+        /// <param name="bias">Bias parameter.</param>
+        /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
+        /// <param name="numGroup">Number of group partitions.</param>
+        /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
+        /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
+        /// <param name="noBias">Whether to disable bias parameter.</param>
+        /// <param name="im2colStep">Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.</param>
+        /// <param name="layout">Set layout for input, output and weight. Empty for
+        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
+        new(kernel : int seq,
+            numFilter : int,
+            [<Optional>] ?data : Symbol,
+            [<Optional>] ?offset : Symbol,
+            [<Optional>] ?mask : Symbol,
+            [<Optional>] ?weight : Symbol,
+            [<Optional>] ?bias : Symbol,
+            [<Optional>] ?stride : int seq,
+            [<Optional>] ?dilate : int seq,
+            [<Optional>] ?pad : int seq,
+            [<Optional>] ?numGroup : int,
+            [<Optional>] ?numDeformableGroup : int,
+            [<Optional>] ?workspace : int64,
+            [<Optional>] ?noBias : bool,
+            [<Optional>] ?im2colStep : int,
+            [<Optional>] ?layout : ContribModulatedDeformableConvolutionLayout) = 
+            let data = defaultArg data (new ImplicitVariable() :> Symbol)
+            let offset = defaultArg offset (new ImplicitVariable() :> Symbol)
+            let mask = defaultArg mask (new ImplicitVariable() :> Symbol)
+            let weight = defaultArg weight (new ImplicitVariable() :> Symbol)
+            let bias = defaultArg bias (new ImplicitVariable() :> Symbol)
+            let operatorArguments = 
+                [
+                    "data", Input data
+                    "offset", Input offset
+                    "mask", Input mask
+                    "weight", Input weight
+                    "bias", Input bias
+                    "kernel", Parameter(Some(box kernel))
+                    "num_filter", Parameter(Some(box numFilter))
+                    "stride", stride |> Option.map box |> Parameter
+                    "dilate", dilate |> Option.map box |> Parameter
+                    "pad", pad |> Option.map box |> Parameter
+                    "num_group", numGroup |> Option.map box |> Parameter
+                    "num_deformable_group", numDeformableGroup |> Option.map box |> Parameter
+                    "workspace", workspace |> Option.map box |> Parameter
+                    "no_bias", noBias |> Option.map box |> Parameter
+                    "im2col_step", im2colStep |> Option.map box |> Parameter
+                    "layout", layout |> Option.map box |> Parameter
+                ]
+            new ContribModulatedDeformableConvolution(Arguments<Symbol>(operatorArguments))
+        /// Default value for Stride
+        /// Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        static member StrideDefault : int [] = [||]
+        /// Default value for Dilate
+        /// Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        static member DilateDefault : int [] = [||]
+        /// Default value for Pad
+        /// Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.
+        static member PadDefault : int [] = [||]
+        /// Default value for NumGroup
+        /// Number of group partitions.
+        static member NumGroupDefault : int = 1
+        /// Default value for NumDeformableGroup
+        /// Number of deformable group partitions.
+        static member NumDeformableGroupDefault : int = 1
+        /// Default value for Workspace
+        /// Maximum temperal workspace allowed for convolution (MB).
+        static member WorkspaceDefault : int64 = 1024L
+        /// Default value for NoBias
+        /// Whether to disable bias parameter.
+        static member NoBiasDefault : bool = false
+        /// Default value for Im2colStep
+        /// Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.
+        static member Im2colStepDefault : int = 64
+        /// Default value for Layout
+        /// Set layout for input, output and weight. Empty for
+        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.
+        static member LayoutDefault : ContribModulatedDeformableConvolutionLayout option = None
+        /// Input data to the ModulatedDeformableConvolutionOp.
+        member __.Data = operatorArguments.GetInput "data"
+        /// Input offset to ModulatedDeformableConvolutionOp.
+        member __.Offset = operatorArguments.GetInput "offset"
+        /// Input mask to the ModulatedDeformableConvolutionOp.
+        member __.Mask = operatorArguments.GetInput "mask"
+        /// Weight matrix.
+        member __.Weight = operatorArguments.GetInput "weight"
+        /// Bias parameter.
+        member __.Bias = operatorArguments.GetInput "bias"
+        /// Convolution kernel size: (h, w) or (d, h, w)
+        member __.Kernel : int seq = match operatorArguments.GetParameter "kernel" with Some(v) -> unbox v | None -> failwithf "Required parameter kernel is missing"
+        /// Convolution filter(channel) number
+        member __.NumFilter : int = match operatorArguments.GetParameter "num_filter" with Some(v) -> unbox v | None -> failwithf "Required parameter num_filter is missing"
+        /// Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        member __.Stride = operatorArguments.GetParameter("stride", ContribModulatedDeformableConvolution.StrideDefault)
+        /// Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.
+        member __.Dilate = operatorArguments.GetParameter("dilate", ContribModulatedDeformableConvolution.DilateDefault)
+        /// Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.
+        member __.Pad = operatorArguments.GetParameter("pad", ContribModulatedDeformableConvolution.PadDefault)
+        /// Number of group partitions.
+        member __.NumGroup = operatorArguments.GetParameter("num_group", ContribModulatedDeformableConvolution.NumGroupDefault)
+        /// Number of deformable group partitions.
+        member __.NumDeformableGroup = operatorArguments.GetParameter("num_deformable_group", ContribModulatedDeformableConvolution.NumDeformableGroupDefault)
+        /// Maximum temperal workspace allowed for convolution (MB).
+        member __.Workspace = operatorArguments.GetParameter("workspace", ContribModulatedDeformableConvolution.WorkspaceDefault)
+        /// Whether to disable bias parameter.
+        member __.NoBias = operatorArguments.GetParameter("no_bias", ContribModulatedDeformableConvolution.NoBiasDefault)
+        /// Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.
+        member __.Im2colStep = operatorArguments.GetParameter("im2col_step", ContribModulatedDeformableConvolution.Im2colStepDefault)
+        /// Set layout for input, output and weight. Empty for
+        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.
+        member __.Layout = operatorArguments.GetParameter("layout", ContribModulatedDeformableConvolution.LayoutDefault)
+        /// <summary>Copy ContribModulatedDeformableConvolution instance with updated inputs/parameters.</summary>
+        /// <param name="data">Input data to the ModulatedDeformableConvolutionOp.</param>
+        /// <param name="offset">Input offset to ModulatedDeformableConvolutionOp.</param>
+        /// <param name="mask">Input mask to the ModulatedDeformableConvolutionOp.</param>
+        /// <param name="weight">Weight matrix.</param>
+        /// <param name="bias">Bias parameter.</param>
+        /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
+        /// <param name="numFilter">Convolution filter(channel) number</param>
+        /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+        /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
+        /// <param name="numGroup">Number of group partitions.</param>
+        /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
+        /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
+        /// <param name="noBias">Whether to disable bias parameter.</param>
+        /// <param name="im2colStep">Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.</param>
+        /// <param name="layout">Set layout for input, output and weight. Empty for
+        ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
+        member this.With([<Optional>] ?data : Symbol,
+            [<Optional>] ?offset : Symbol,
+            [<Optional>] ?mask : Symbol,
+            [<Optional>] ?weight : Symbol,
+            [<Optional>] ?bias : Symbol,
+            [<Optional>] ?kernel : int seq,
+            [<Optional>] ?numFilter : int,
+            [<Optional>] ?stride : int seq,
+            [<Optional>] ?dilate : int seq,
+            [<Optional>] ?pad : int seq,
+            [<Optional>] ?numGroup : int,
+            [<Optional>] ?numDeformableGroup : int,
+            [<Optional>] ?workspace : int64,
+            [<Optional>] ?noBias : bool,
+            [<Optional>] ?im2colStep : int,
+            [<Optional>] ?layout : ContribModulatedDeformableConvolutionLayout) = 
+            let operatorArguments = 
+                [
+                    data |> Option.map (fun x -> "data", Input x)
+                    offset |> Option.map (fun x -> "offset", Input x)
+                    mask |> Option.map (fun x -> "mask", Input x)
+                    weight |> Option.map (fun x -> "weight", Input x)
+                    bias |> Option.map (fun x -> "bias", Input x)
+                    kernel |> Option.map (fun x -> "kernel", Parameter(Some (box x)))
+                    numFilter |> Option.map (fun x -> "num_filter", Parameter(Some (box x)))
+                    stride |> Option.map (fun x -> "stride", Parameter(Some (box x)))
+                    dilate |> Option.map (fun x -> "dilate", Parameter(Some (box x)))
+                    pad |> Option.map (fun x -> "pad", Parameter(Some (box x)))
+                    numGroup |> Option.map (fun x -> "num_group", Parameter(Some (box x)))
+                    numDeformableGroup |> Option.map (fun x -> "num_deformable_group", Parameter(Some (box x)))
+                    workspace |> Option.map (fun x -> "workspace", Parameter(Some (box x)))
+                    noBias |> Option.map (fun x -> "no_bias", Parameter(Some (box x)))
+                    im2colStep |> Option.map (fun x -> "im2col_step", Parameter(Some (box x)))
+                    layout |> Option.map (fun x -> "layout", Parameter(Some (box x)))
+                ] |> List.choose id
+            new ContribModulatedDeformableConvolution(this.OperatorArguments.AddReplace(Arguments<Symbol>(operatorArguments)))
     
     type ContribMultiProposal private (operatorArguments) = 
         inherit SymbolOperator("_contrib_MultiProposal", operatorArguments)

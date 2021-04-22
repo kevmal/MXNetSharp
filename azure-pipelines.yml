@@ -1,5 +1,5 @@
 variables:
-  mxv: '1.6.0'
+  mxv: '1.7.0'
 
 trigger:
 - master
@@ -12,9 +12,10 @@ stages:
         pool:
           vmImage: 'ubuntu-latest'
         steps:
-        - task: DotNetCoreInstaller@1
+        - task: UseDotNet@2
           inputs:
-            version: $(dotnet_version)
+            packageType: 'sdk'
+            version: '5.0.x'
         - task: UsePythonVersion@0
         - checkout: self
           clean: true
@@ -23,16 +24,16 @@ stages:
             command: 'build'
             projects: 'MXNetSharp'
             arguments: '-f netstandard2.0 -c Debug'
-            requestedMajorVersion: 3
+            requestedMajorVersion: 5
           displayName: 'dotnet build Debug'
         - task: DotNetCoreCLI@2
           inputs:
             command: 'build'
             projects: 'MXNetSharp'
             arguments: '-f netstandard2.0 -c Release'
-            requestedMajorVersion: 3
+            requestedMajorVersion: 5
           displayName: 'dotnet build Release'
-        - script: pip install --target=$(Agent.TempDirectory) mxnet -f https://dist.mxnet.io/python
+        - script: pip install --target=$(Agent.TempDirectory) mxnet==1.7.0b20200903 -f https://dist.mxnet.io/python
           displayName: 'Install MXNet $(mxv)'
         - task: DotNetCoreCLI@2
           env: 
@@ -41,6 +42,7 @@ stages:
             command: 'test'
             projects: 'MXNETSharp.Tests'
             arguments: '-c Debug'
+            requestedMajorVersion: 5
           displayName: 'dotnet test Debug'
         - task: DotNetCoreCLI@2
           env: 
@@ -49,16 +51,17 @@ stages:
             command: 'test'
             projects: 'MXNETSharp.Tests'
             arguments: '-c Release'
-            requestedMajorVersion: 3
+            requestedMajorVersion: 5
           displayName: 'dotnet test Release'
 
       - job: Windows
         pool:
           vmImage: 'windows-2019'
         steps:
-        - task: DotNetCoreInstaller@1
+        - task: UseDotNet@2
           inputs:
-            version: $(dotnet_version)
+            packageType: 'sdk'
+            version: '5.0.x'
         - task: UsePythonVersion@0
         - checkout: self
           clean: true
@@ -66,15 +69,15 @@ stages:
           inputs:
             command: 'build'
             arguments: '-c Debug'
-            requestedMajorVersion: 3
+            requestedMajorVersion: 5
           displayName: 'dotnet build Debug'
         - task: DotNetCoreCLI@2
           inputs:
             command: 'build'
             arguments: '-c Release'
-            requestedMajorVersion: 3
+            requestedMajorVersion: 5
           displayName: 'dotnet build Release'
-        - script: pip install --target=$(Agent.TempDirectory) mxnet -f https://dist.mxnet.io/python
+        - script: pip install --target=$(Agent.TempDirectory) mxnet==$(mxv) -f https://dist.mxnet.io/python
           displayName: 'Install MXNet $(mxv)'
         - task: DotNetCoreCLI@2
           env: 
@@ -82,7 +85,7 @@ stages:
           inputs:
             command: 'test'
             arguments: '-c Debug'
-            requestedMajorVersion: 3
+            requestedMajorVersion: 5
           displayName: 'dotnet test Debug'
         - task: DotNetCoreCLI@2
           env: 
@@ -90,5 +93,5 @@ stages:
           inputs:
             command: 'test'
             arguments: '-c Release'
-            requestedMajorVersion: 3
+            requestedMajorVersion: 5
           displayName: 'dotnet test Release'

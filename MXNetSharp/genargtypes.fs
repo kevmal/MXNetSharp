@@ -206,6 +206,217 @@ module GeneratedArgumentTypes =
                 | Sum -> "sum"
     
     [<RequireQualifiedAccess>]
+    type UpperLower = 
+        | L
+        | U
+        override x.ToString() =
+            match x with
+                | L -> "L"
+                | U -> "U"
+    
+    [<RequireQualifiedAccess>]
+    type NpiFullLikeDtype = 
+        | Bfloat16
+        | Bool
+        | Float16
+        | Float32
+        | Float64
+        | Int32
+        | Int64
+        | Int8
+        | Uint8
+        override x.ToString() =
+            match x with
+                | Bfloat16 -> "bfloat16"
+                | Bool -> "bool"
+                | Float16 -> "float16"
+                | Float32 -> "float32"
+                | Float64 -> "float64"
+                | Int32 -> "int32"
+                | Int64 -> "int64"
+                | Int8 -> "int8"
+                | Uint8 -> "uint8"
+    
+    [<RequireQualifiedAccess>]
+    type NpiArangeDtype = 
+        | Bfloat16
+        | Float16
+        | Float32
+        | Float64
+        | Int32
+        | Int64
+        | Int8
+        | Uint8
+        override x.ToString() =
+            match x with
+                | Bfloat16 -> "bfloat16"
+                | Float16 -> "float16"
+                | Float32 -> "float32"
+                | Float64 -> "float64"
+                | Int32 -> "int32"
+                | Int64 -> "int64"
+                | Int8 -> "int8"
+                | Uint8 -> "uint8"
+    
+    [<RequireQualifiedAccess>]
+    type NpiEyeDtype = 
+        | Bfloat16
+        | Float16
+        | Float32
+        | Float64
+        | Int32
+        | Int64
+        | Int8
+        | Uint8
+        override x.ToString() =
+            match x with
+                | Bfloat16 -> "bfloat16"
+                | Float16 -> "float16"
+                | Float32 -> "float32"
+                | Float64 -> "float64"
+                | Int32 -> "int32"
+                | Int64 -> "int64"
+                | Int8 -> "int8"
+                | Uint8 -> "uint8"
+    
+    [<RequireQualifiedAccess>]
+    type NpiIndicesDtype = 
+        | Bfloat16
+        | Float16
+        | Float32
+        | Float64
+        | Int32
+        | Int64
+        | Int8
+        | Uint8
+        override x.ToString() =
+            match x with
+                | Bfloat16 -> "bfloat16"
+                | Float16 -> "float16"
+                | Float32 -> "float32"
+                | Float64 -> "float64"
+                | Int32 -> "int32"
+                | Int64 -> "int64"
+                | Int8 -> "int8"
+                | Uint8 -> "uint8"
+    
+    [<RequireQualifiedAccess>]
+    type NpiLogspaceDtype = 
+        | Bfloat16
+        | Float16
+        | Float32
+        | Float64
+        | Int32
+        | Int64
+        | Int8
+        | Uint8
+        override x.ToString() =
+            match x with
+                | Bfloat16 -> "bfloat16"
+                | Float16 -> "float16"
+                | Float32 -> "float32"
+                | Float64 -> "float64"
+                | Int32 -> "int32"
+                | Int64 -> "int64"
+                | Int8 -> "int8"
+                | Uint8 -> "uint8"
+    
+    [<RequireQualifiedAccess>]
+    type NpiPadMode = 
+        | Constant
+        | Edge
+        | Maximum
+        | Minimum
+        | Reflect
+        | Symmetric
+        override x.ToString() =
+            match x with
+                | Constant -> "constant"
+                | Edge -> "edge"
+                | Maximum -> "maximum"
+                | Minimum -> "minimum"
+                | Reflect -> "reflect"
+                | Symmetric -> "symmetric"
+    
+    [<RequireQualifiedAccess>]
+    type Interpolation = 
+        | Higher
+        | Linear
+        | Lower
+        | Midpoint
+        | Nearest
+        override x.ToString() =
+            match x with
+                | Higher -> "higher"
+                | Linear -> "linear"
+                | Lower -> "lower"
+                | Midpoint -> "midpoint"
+                | Nearest -> "nearest"
+    
+    [<RequireQualifiedAccess>]
+    type NpiHanningDtype = 
+        | Bfloat16
+        | Float16
+        | Float32
+        | Float64
+        | Int32
+        | Int64
+        | Int8
+        | Uint8
+        override x.ToString() =
+            match x with
+                | Bfloat16 -> "bfloat16"
+                | Float16 -> "float16"
+                | Float32 -> "float32"
+                | Float64 -> "float64"
+                | Int32 -> "int32"
+                | Int64 -> "int64"
+                | Int8 -> "int8"
+                | Uint8 -> "uint8"
+    
+    [<RequireQualifiedAccess>]
+    type NpiHammingDtype = 
+        | Bfloat16
+        | Float16
+        | Float32
+        | Float64
+        | Int32
+        | Int64
+        | Int8
+        | Uint8
+        override x.ToString() =
+            match x with
+                | Bfloat16 -> "bfloat16"
+                | Float16 -> "float16"
+                | Float32 -> "float32"
+                | Float64 -> "float64"
+                | Int32 -> "int32"
+                | Int64 -> "int64"
+                | Int8 -> "int8"
+                | Uint8 -> "uint8"
+    
+    [<RequireQualifiedAccess>]
+    type NpiBlackmanDtype = 
+        | Bfloat16
+        | Float16
+        | Float32
+        | Float64
+        | Int32
+        | Int64
+        | Int8
+        | Uint8
+        override x.ToString() =
+            match x with
+                | Bfloat16 -> "bfloat16"
+                | Float16 -> "float16"
+                | Float32 -> "float32"
+                | Float64 -> "float64"
+                | Int32 -> "int32"
+                | Int64 -> "int64"
+                | Int8 -> "int8"
+                | Uint8 -> "uint8"
+    
+    [<RequireQualifiedAccess>]
     type PadMode = 
         | Constant
         | Edge
@@ -257,6 +468,48 @@ module GeneratedArgumentTypes =
                 | NCW -> "NCW"
                 | NDHWC -> "NDHWC"
                 | NHWC -> "NHWC"
+    
+    [<RequireQualifiedAccess>]
+    type ContribQuantizedEmbeddingDtype = 
+        | Bfloat16
+        | Float16
+        | Float32
+        | Float64
+        | Int32
+        | Int64
+        | Int8
+        | Uint8
+        override x.ToString() =
+            match x with
+                | Bfloat16 -> "bfloat16"
+                | Float16 -> "float16"
+                | Float32 -> "float32"
+                | Float64 -> "float64"
+                | Int32 -> "int32"
+                | Int64 -> "int64"
+                | Int8 -> "int8"
+                | Uint8 -> "uint8"
+    
+    [<RequireQualifiedAccess>]
+    type EmbeddingDtype = 
+        | Bfloat16
+        | Float16
+        | Float32
+        | Float64
+        | Int32
+        | Int64
+        | Int8
+        | Uint8
+        override x.ToString() =
+            match x with
+                | Bfloat16 -> "bfloat16"
+                | Float16 -> "float16"
+                | Float32 -> "float32"
+                | Float64 -> "float64"
+                | Int32 -> "int32"
+                | Int64 -> "int64"
+                | Int8 -> "int8"
+                | Uint8 -> "uint8"
     
     [<RequireQualifiedAccess>]
     type ContribQuantizedPoolingLayout = 
@@ -335,6 +588,27 @@ module GeneratedArgumentTypes =
                 | Valid -> "valid"
     
     [<RequireQualifiedAccess>]
+    type AmpCastDtype = 
+        | Bfloat16
+        | Float16
+        | Float32
+        | Float64
+        | Int32
+        | Int64
+        | Int8
+        | Uint8
+        override x.ToString() =
+            match x with
+                | Bfloat16 -> "bfloat16"
+                | Float16 -> "float16"
+                | Float32 -> "float32"
+                | Float64 -> "float64"
+                | Int32 -> "int32"
+                | Int64 -> "int64"
+                | Int8 -> "int8"
+                | Uint8 -> "uint8"
+    
+    [<RequireQualifiedAccess>]
     type PickMode = 
         | Clip
         | Wrap
@@ -342,6 +616,27 @@ module GeneratedArgumentTypes =
             match x with
                 | Clip -> "clip"
                 | Wrap -> "wrap"
+    
+    [<RequireQualifiedAccess>]
+    type ContribSparseEmbeddingDtype = 
+        | Bfloat16
+        | Float16
+        | Float32
+        | Float64
+        | Int32
+        | Int64
+        | Int8
+        | Uint8
+        override x.ToString() =
+            match x with
+                | Bfloat16 -> "bfloat16"
+                | Float16 -> "float16"
+                | Float32 -> "float32"
+                | Float64 -> "float64"
+                | Int32 -> "int32"
+                | Int64 -> "int64"
+                | Int8 -> "int8"
+                | Uint8 -> "uint8"
     
     [<RequireQualifiedAccess>]
     type TakeMode = 
@@ -353,6 +648,27 @@ module GeneratedArgumentTypes =
                 | Clip -> "clip"
                 | Raise -> "raise"
                 | Wrap -> "wrap"
+    
+    [<RequireQualifiedAccess>]
+    type OneHotDtype = 
+        | Bfloat16
+        | Float16
+        | Float32
+        | Float64
+        | Int32
+        | Int64
+        | Int8
+        | Uint8
+        override x.ToString() =
+            match x with
+                | Bfloat16 -> "bfloat16"
+                | Float16 -> "float16"
+                | Float32 -> "float32"
+                | Float64 -> "float64"
+                | Int32 -> "int32"
+                | Int64 -> "int64"
+                | Int8 -> "int8"
+                | Uint8 -> "uint8"
     
     [<RequireQualifiedAccess>]
     type RetTyp = 
@@ -369,6 +685,17 @@ module GeneratedArgumentTypes =
     
     [<RequireQualifiedAccess>]
     type ContribDeformableConvolutionLayout = 
+        | NCDHW
+        | NCHW
+        | NCW
+        override x.ToString() =
+            match x with
+                | NCDHW -> "NCDHW"
+                | NCHW -> "NCHW"
+                | NCW -> "NCW"
+    
+    [<RequireQualifiedAccess>]
+    type ContribModulatedDeformableConvolutionLayout = 
         | NCDHW
         | NCHW
         | NCW

@@ -58,6 +58,31 @@ type MX() =
         CachedOp(data)
 
 
+    /// <param name="data">input data list</param>
+    static member CachedOpThreadSafe([<ParamArray>] data : NDArray[]) =
+        let creator = AtomicSymbolCreator.FromName "_CachedOpThreadSafe"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 (data |> Array.map (fun x -> x.UnsafeHandle))
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">input data list</param>
+    static member CachedOpThreadSafe(outputArray : NDArray seq, [<ParamArray>] data : NDArray[]) =
+        let creator = AtomicSymbolCreator.FromName "_CachedOpThreadSafe"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     (data |> Array.map (fun x -> x.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="data">input data list</param>
+    static member CachedOpThreadSafe([<ParamArray>] data : Symbol[]) =
+        CachedOpThreadSafe(data)
+
     /// <summary>Decode image with OpenCV. 
     /// Note: return image in RGB by default, instead of OpenCV&#39;s default BGR.</summary>
     /// <param name="buf">Buffer containing binary encoded image</param>
@@ -1497,7 +1522,7 @@ type MX() =
     /// for more details.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bilinear_resize.cc:L215</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bilinear_resize.cc:L220</summary>
     /// <param name="data">Input data</param>
     /// <param name="like">Resize data to it&#39;s shape</param>
     /// <param name="height">output height (required, but ignored if scale_height is defined or mode is not &quot;size&quot;)</param>
@@ -1505,18 +1530,20 @@ type MX() =
     /// <param name="scaleHeight">sampling scale of the height (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
     /// <param name="scaleWidth">sampling scale of the width (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
     /// <param name="mode">resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);</param>
+    /// <param name="alignCorners">With align_corners = True, the interpolating doesn&#39;t proportionally align theoutput and input pixels, and thus the output values can depend on the input size.</param>
     static member ContribBilinearResize2D(data : NDArray, 
                                           like : NDArray, 
                                           [<Optional>] ?height : int, 
                                           [<Optional>] ?width : int, 
                                           [<Optional>] ?scaleHeight : float, 
                                           [<Optional>] ?scaleWidth : float, 
-                                          [<Optional>] ?mode : ContribBilinearResize2DMode) =
+                                          [<Optional>] ?mode : ContribBilinearResize2DMode, 
+                                          [<Optional>] ?alignCorners : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_BilinearResize2D"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg like)) then like.UnsafeHandle|]
-                                                 [|"height"; "width"; "scale_height"; "scale_width"; "mode"|]
-                                                 [|(match height with None -> "1" | Some height -> string height); (match width with None -> "1" | Some width -> string width); (match scaleHeight with None -> "None" | Some scaleHeight -> string scaleHeight); (match scaleWidth with None -> "None" | Some scaleWidth -> string scaleWidth); (match mode with None -> "size" | Some mode -> string mode)|]
+                                                 [|"height"; "width"; "scale_height"; "scale_width"; "mode"; "align_corners"|]
+                                                 [|(match height with None -> "1" | Some height -> string height); (match width with None -> "1" | Some width -> string width); (match scaleHeight with None -> "None" | Some scaleHeight -> string scaleHeight); (match scaleWidth with None -> "None" | Some scaleWidth -> string scaleWidth); (match mode with None -> "size" | Some mode -> string mode); (match alignCorners with None -> "true" | Some alignCorners -> string alignCorners)|]
         (new NDArray(outputs.[0]))
     /// <summary>
     /// Perform 2D resizing (upsampling or downsampling) for 4D input using bilinear interpolation.
@@ -1529,7 +1556,7 @@ type MX() =
     /// for more details.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bilinear_resize.cc:L215</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bilinear_resize.cc:L220</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data</param>
     /// <param name="like">Resize data to it&#39;s shape</param>
@@ -1538,6 +1565,7 @@ type MX() =
     /// <param name="scaleHeight">sampling scale of the height (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
     /// <param name="scaleWidth">sampling scale of the width (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
     /// <param name="mode">resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);</param>
+    /// <param name="alignCorners">With align_corners = True, the interpolating doesn&#39;t proportionally align theoutput and input pixels, and thus the output values can depend on the input size.</param>
     static member ContribBilinearResize2D(outputArray : NDArray seq, 
                                           data : NDArray, 
                                           like : NDArray, 
@@ -1545,10 +1573,11 @@ type MX() =
                                           [<Optional>] ?width : int, 
                                           [<Optional>] ?scaleHeight : float, 
                                           [<Optional>] ?scaleWidth : float, 
-                                          [<Optional>] ?mode : ContribBilinearResize2DMode) =
+                                          [<Optional>] ?mode : ContribBilinearResize2DMode, 
+                                          [<Optional>] ?alignCorners : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_BilinearResize2D"
-        let names = [|"height"; "width"; "scale_height"; "scale_width"; "mode"|]
-        let vals = [|(match height with None -> "1" | Some height -> string height); (match width with None -> "1" | Some width -> string width); (match scaleHeight with None -> "None" | Some scaleHeight -> string scaleHeight); (match scaleWidth with None -> "None" | Some scaleWidth -> string scaleWidth); (match mode with None -> "size" | Some mode -> string mode)|]
+        let names = [|"height"; "width"; "scale_height"; "scale_width"; "mode"; "align_corners"|]
+        let vals = [|(match height with None -> "1" | Some height -> string height); (match width with None -> "1" | Some width -> string width); (match scaleHeight with None -> "None" | Some scaleHeight -> string scaleHeight); (match scaleWidth with None -> "None" | Some scaleWidth -> string scaleWidth); (match mode with None -> "size" | Some mode -> string mode); (match alignCorners with None -> "true" | Some alignCorners -> string alignCorners)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg like)) then like.UnsafeHandle|]
@@ -1567,7 +1596,7 @@ type MX() =
     /// for more details.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bilinear_resize.cc:L215</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bilinear_resize.cc:L220</summary>
     /// <param name="data">Input data</param>
     /// <param name="like">Resize data to it&#39;s shape</param>
     /// <param name="height">output height (required, but ignored if scale_height is defined or mode is not &quot;size&quot;)</param>
@@ -1575,8 +1604,9 @@ type MX() =
     /// <param name="scaleHeight">sampling scale of the height (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
     /// <param name="scaleWidth">sampling scale of the width (optional, used in modes &quot;scale&quot; and &quot;odd_scale&quot;)</param>
     /// <param name="mode">resizing mode. &quot;simple&quot; - output height equals parameter &quot;height&quot; if &quot;scale_height&quot; parameter is not defined or input height multiplied by &quot;scale_height&quot; otherwise. Same for width;&quot;odd_scale&quot; - if original height or width is odd, then result height is calculated like result_h = (original_h - 1) * scale + 1; for scale &gt; 1 the result shape would be like if we did deconvolution with kernel = (1, 1) and stride = (height_scale, width_scale); and for scale &lt; 1 shape would be like we did convolution with kernel = (1, 1) and stride = (int(1 / height_scale), int( 1/ width_scale);&quot;like&quot; - resize first input to the height and width of second input; &quot;to_even_down&quot; - resize input to nearest lower even height and width (if original height is odd then result height = original height - 1);&quot;to_even_up&quot; - resize input to nearest bigger even height and width (if original height is odd then result height = original height + 1);&quot;to_odd_down&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height - 1);&quot;to_odd_up&quot; - resize input to nearest odd height and width (if original height is odd then result height = original height + 1);</param>
-    static member ContribBilinearResize2D([<Optional>] ?data : Symbol, [<Optional>] ?like : Symbol, [<Optional>] ?height : int, [<Optional>] ?width : int, [<Optional>] ?scaleHeight : float, [<Optional>] ?scaleWidth : float, [<Optional>] ?mode : ContribBilinearResize2DMode) =
-        ContribBilinearResize2D(?data = data, ?like = like, ?height = height, ?width = width, ?scaleHeight = scaleHeight, ?scaleWidth = scaleWidth, ?mode = mode)
+    /// <param name="alignCorners">With align_corners = True, the interpolating doesn&#39;t proportionally align theoutput and input pixels, and thus the output values can depend on the input size.</param>
+    static member ContribBilinearResize2D([<Optional>] ?data : Symbol, [<Optional>] ?like : Symbol, [<Optional>] ?height : int, [<Optional>] ?width : int, [<Optional>] ?scaleHeight : float, [<Optional>] ?scaleWidth : float, [<Optional>] ?mode : ContribBilinearResize2DMode, [<Optional>] ?alignCorners : bool) =
+        ContribBilinearResize2D(?data = data, ?like = like, ?height = height, ?width = width, ?scaleHeight = scaleHeight, ?scaleWidth = scaleWidth, ?mode = mode, ?alignCorners = alignCorners)
 
 
     /// <summary>
@@ -1716,7 +1746,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L94</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L95</summary>
     /// <param name="data">The input</param>
     /// <param name="overlapThresh">Overlapping(IoU) threshold to suppress object with smaller score.</param>
     /// <param name="validThresh">Filter input boxes to those whose scores greater than valid_thresh.</param>
@@ -1804,7 +1834,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L94</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L95</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="overlapThresh">Overlapping(IoU) threshold to suppress object with smaller score.</param>
@@ -1898,7 +1928,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L94</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L95</summary>
     /// <param name="data">The input</param>
     /// <param name="overlapThresh">Overlapping(IoU) threshold to suppress object with smaller score.</param>
     /// <param name="validThresh">Filter input boxes to those whose scores greater than valid_thresh.</param>
@@ -1934,7 +1964,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L136</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L137</summary>
     /// <param name="lhs">The first input</param>
     /// <param name="rhs">The second input</param>
     /// <param name="format">The box encoding type. 
@@ -1964,7 +1994,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L136</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L137</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">The first input</param>
     /// <param name="rhs">The second input</param>
@@ -1999,7 +2029,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L136</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L137</summary>
     /// <param name="lhs">The first input</param>
     /// <param name="rhs">The second input</param>
     /// <param name="format">The box encoding type. 
@@ -2031,7 +2061,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L182</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L183</summary>
     /// <param name="data">The input</param>
     /// <param name="threshold">Ignore matching when score &lt; thresh, if is_ascend=false, or ignore score &gt; thresh, if is_ascend=true.</param>
     /// <param name="isAscend">Use ascend order for scores instead of descending. Please set threshold accordingly.</param>
@@ -2066,7 +2096,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L182</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L183</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="threshold">Ignore matching when score &lt; thresh, if is_ascend=false, or ignore score &gt; thresh, if is_ascend=true.</param>
@@ -2106,7 +2136,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L182</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L183</summary>
     /// <param name="data">The input</param>
     /// <param name="threshold">Ignore matching when score &lt; thresh, if is_ascend=false, or ignore score &gt; thresh, if is_ascend=true.</param>
     /// <param name="isAscend">Use ascend order for scores instead of descending. Please set threshold accordingly.</param>
@@ -2136,7 +2166,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L182</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L183</summary>
     /// <param name="threshold">Ignore matching when score &lt; thresh, if is_ascend=false, or ignore score &gt; thresh, if is_ascend=true.</param>
     /// <param name="data">The input</param>
     /// <param name="isAscend">Use ascend order for scores instead of descending. Please set threshold accordingly.</param>
@@ -2149,7 +2179,7 @@ type MX() =
     ///     Input bounding boxes are using corner type: `x_{min}, y_{min}, x_{max}, y_{max}`.) array
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L210</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L211</summary>
     /// <param name="samples">(B, N) value +1 (positive), -1 (negative), 0 (ignore)</param>
     /// <param name="matches">(B, N) value range [0, M)</param>
     /// <param name="anchors">(B, N, 4) encoded in corner</param>
@@ -2172,7 +2202,7 @@ type MX() =
     ///     Input bounding boxes are using corner type: `x_{min}, y_{min}, x_{max}, y_{max}`.) array
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L210</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L211</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="samples">(B, N) value +1 (positive), -1 (negative), 0 (ignore)</param>
     /// <param name="matches">(B, N) value range [0, M)</param>
@@ -2201,7 +2231,7 @@ type MX() =
     ///     Input bounding boxes are using corner type: `x_{min}, y_{min}, x_{max}, y_{max}`.) array
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L210</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L211</summary>
     /// <param name="samples">(B, N) value +1 (positive), -1 (negative), 0 (ignore)</param>
     /// <param name="matches">(B, N) value range [0, M)</param>
     /// <param name="anchors">(B, N, 4) encoded in corner</param>
@@ -2216,7 +2246,7 @@ type MX() =
     ///     or center type: `x, y, width, height.) array
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L233</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L234</summary>
     /// <param name="data">(B, N, 4) predicted bbox offset</param>
     /// <param name="anchors">(1, N, 4) encoded in corner or center</param>
     /// <param name="std0">value to be divided from the 1st encoded values</param>
@@ -2245,7 +2275,7 @@ type MX() =
     ///     or center type: `x, y, width, height.) array
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L233</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L234</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">(B, N, 4) predicted bbox offset</param>
     /// <param name="anchors">(1, N, 4) encoded in corner or center</param>
@@ -2280,7 +2310,7 @@ type MX() =
     ///     or center type: `x, y, width, height.) array
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L233</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\bounding_box.cc:L234</summary>
     /// <param name="data">(B, N, 4) predicted bbox offset</param>
     /// <param name="anchors">(1, N, 4) encoded in corner or center</param>
     /// <param name="std0">value to be divided from the 1st encoded values</param>
@@ -3203,15 +3233,16 @@ type MX() =
     /// the preceding layer.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L78</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L79</summary>
     /// <param name="data">The input array.</param>
-    /// <param name="scalar">lambda multiplier</param>
-    static member ContribGradientmultiplier(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member ContribGradientmultiplier(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_gradientmultiplier"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <summary>This operator implements the gradient multiplier function.
     /// In forward pass it acts as an identity transform. During backpropagation it
@@ -3219,14 +3250,15 @@ type MX() =
     /// the preceding layer.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L78</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L79</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
-    /// <param name="scalar">lambda multiplier</param>
-    static member ContribGradientmultiplier(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member ContribGradientmultiplier(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_gradientmultiplier"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -3240,39 +3272,31 @@ type MX() =
     /// the preceding layer.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L78</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L79</summary>
     /// <param name="data">The input array.</param>
-    /// <param name="scalar">lambda multiplier</param>
-    static member ContribGradientmultiplier(data : Symbol, scalar : float) =
-        ContribGradientmultiplier(data, scalar)
-    /// <summary>This operator implements the gradient multiplier function.
-    /// In forward pass it acts as an identity transform. During backpropagation it
-    /// multiplies the gradient from the subsequent level by a scalar factor lambda and passes it to
-    /// the preceding layer.
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\gradient_multiplier_op.cc:L78</summary>
-    /// <param name="scalar">lambda multiplier</param>
-    /// <param name="data">The input array.</param>
-    static member ContribGradientmultiplier(scalar : float, [<Optional>] ?data : Symbol) =
-        ContribGradientmultiplier(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member ContribGradientmultiplier([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        ContribGradientmultiplier(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member ContribBackwardGradientmultiplier(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member ContribBackwardGradientmultiplier(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_backward_gradientmultiplier"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member ContribBackwardGradientmultiplier(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member ContribBackwardGradientmultiplier(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_backward_gradientmultiplier"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -3281,13 +3305,10 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member ContribBackwardGradientmultiplier(data : Symbol, scalar : float) =
-        ContribBackwardGradientmultiplier(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member ContribBackwardGradientmultiplier(scalar : float, [<Optional>] ?data : Symbol) =
-        ContribBackwardGradientmultiplier(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member ContribBackwardGradientmultiplier([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        ContribBackwardGradientmultiplier(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <summary>Computes the log likelihood of a univariate Hawkes process.
     /// 
@@ -3978,6 +3999,240 @@ type MX() =
     /// <param name="args">Positional input matrices</param>
     static member KhatriRao([<ParamArray>] args : Symbol[]) =
         KhatriRao(args)
+
+    /// <summary>Compute the LAMB coefficients of multiple weights and grads&quot;
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lamb.cc:L176</summary>
+    /// <param name="data">data</param>
+    /// <param name="learningRates">List of learning rates</param>
+    /// <param name="wds">List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+    /// <param name="stepCount">Step count for each tensor</param>
+    /// <param name="beta1">Exponential decay rate for the first moment estimates.</param>
+    /// <param name="beta2">Exponential decay rate for the second moment estimates.</param>
+    /// <param name="epsilon">Small value to avoid division by 0.</param>
+    /// <param name="rescaleGrad">Gradient rescaling factor</param>
+    /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+    /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+    /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+    /// <param name="biasCorrection">Whether to use bias correction.</param>
+    /// <param name="numTensors">Number of tensors</param>
+    static member MultiLambUpdate([<ParamArray>] data : NDArray[], 
+                                  learningRates : double seq, 
+                                  wds : double seq, 
+                                  stepCount : int seq, 
+                                  [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                                  [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                                  [<Optional; DefaultParameterValue(0.000001)>] epsilon : float, 
+                                  [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
+                                  [<Optional; DefaultParameterValue(-1.0)>] lowerBound : float, 
+                                  [<Optional; DefaultParameterValue(-1.0)>] upperBound : float, 
+                                  [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
+                                  [<Optional; DefaultParameterValue(true)>] biasCorrection : bool, 
+                                  [<Optional; DefaultParameterValue(1)>] numTensors : int) =
+        let creator = AtomicSymbolCreator.FromName "_multi_lamb_update"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 (data |> Array.map (fun x -> x.UnsafeHandle))
+                                                 [|"learning_rates"; "wds"; "step_count"; "beta1"; "beta2"; "epsilon"; "rescale_grad"; "lower_bound"; "upper_bound"; "clip_gradient"; "bias_correction"; "num_tensors"|]
+                                                 [|string learningRates; string wds; (stepCount |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string beta1; string beta2; string epsilon; string rescaleGrad; string lowerBound; string upperBound; string clipGradient; string biasCorrection; string numTensors|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Compute the LAMB coefficients of multiple weights and grads&quot;
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lamb.cc:L176</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">data</param>
+    /// <param name="learningRates">List of learning rates</param>
+    /// <param name="wds">List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+    /// <param name="stepCount">Step count for each tensor</param>
+    /// <param name="beta1">Exponential decay rate for the first moment estimates.</param>
+    /// <param name="beta2">Exponential decay rate for the second moment estimates.</param>
+    /// <param name="epsilon">Small value to avoid division by 0.</param>
+    /// <param name="rescaleGrad">Gradient rescaling factor</param>
+    /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+    /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+    /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+    /// <param name="biasCorrection">Whether to use bias correction.</param>
+    /// <param name="numTensors">Number of tensors</param>
+    static member MultiLambUpdate(outputArray : NDArray seq, 
+                                  [<ParamArray>] data : NDArray[], 
+                                  learningRates : double seq, 
+                                  wds : double seq, 
+                                  stepCount : int seq, 
+                                  [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                                  [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                                  [<Optional; DefaultParameterValue(0.000001)>] epsilon : float, 
+                                  [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
+                                  [<Optional; DefaultParameterValue(-1.0)>] lowerBound : float, 
+                                  [<Optional; DefaultParameterValue(-1.0)>] upperBound : float, 
+                                  [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
+                                  [<Optional; DefaultParameterValue(true)>] biasCorrection : bool, 
+                                  [<Optional; DefaultParameterValue(1)>] numTensors : int) =
+        let creator = AtomicSymbolCreator.FromName "_multi_lamb_update"
+        let names = [|"learning_rates"; "wds"; "step_count"; "beta1"; "beta2"; "epsilon"; "rescale_grad"; "lower_bound"; "upper_bound"; "clip_gradient"; "bias_correction"; "num_tensors"|]
+        let vals = [|string learningRates; string wds; (stepCount |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string beta1; string beta2; string epsilon; string rescaleGrad; string lowerBound; string upperBound; string clipGradient; string biasCorrection; string numTensors|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     (data |> Array.map (fun x -> x.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Compute the LAMB coefficients of multiple weights and grads&quot;
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lamb.cc:L176</summary>
+    /// <param name="data">data</param>
+    /// <param name="learningRates">List of learning rates</param>
+    /// <param name="wds">List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+    /// <param name="stepCount">Step count for each tensor</param>
+    /// <param name="beta1">Exponential decay rate for the first moment estimates.</param>
+    /// <param name="beta2">Exponential decay rate for the second moment estimates.</param>
+    /// <param name="epsilon">Small value to avoid division by 0.</param>
+    /// <param name="rescaleGrad">Gradient rescaling factor</param>
+    /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+    /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+    /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+    /// <param name="biasCorrection">Whether to use bias correction.</param>
+    /// <param name="numTensors">Number of tensors</param>
+    static member MultiLambUpdate(data : Symbol seq, learningRates : double seq, wds : double seq, stepCount : int seq, [<Optional>] ?beta1 : float, [<Optional>] ?beta2 : float, [<Optional>] ?epsilon : float, [<Optional>] ?rescaleGrad : float, [<Optional>] ?lowerBound : float, [<Optional>] ?upperBound : float, [<Optional>] ?clipGradient : float, [<Optional>] ?biasCorrection : bool, [<Optional>] ?numTensors : int) =
+        MultiLambUpdate(data, learningRates, wds, stepCount, ?beta1 = beta1, ?beta2 = beta2, ?epsilon = epsilon, ?rescaleGrad = rescaleGrad, ?lowerBound = lowerBound, ?upperBound = upperBound, ?clipGradient = clipGradient, ?biasCorrection = biasCorrection, ?numTensors = numTensors)
+    /// <summary>Compute the LAMB coefficients of multiple weights and grads&quot;
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lamb.cc:L176</summary>
+    /// <param name="learningRates">List of learning rates</param>
+    /// <param name="wds">List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+    /// <param name="stepCount">Step count for each tensor</param>
+    /// <param name="data">data</param>
+    /// <param name="beta1">Exponential decay rate for the first moment estimates.</param>
+    /// <param name="beta2">Exponential decay rate for the second moment estimates.</param>
+    /// <param name="epsilon">Small value to avoid division by 0.</param>
+    /// <param name="rescaleGrad">Gradient rescaling factor</param>
+    /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+    /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+    /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+    /// <param name="biasCorrection">Whether to use bias correction.</param>
+    /// <param name="numTensors">Number of tensors</param>
+    static member MultiLambUpdate(learningRates : double seq, wds : double seq, stepCount : int seq, [<Optional>] ?data : Symbol seq, [<Optional>] ?beta1 : float, [<Optional>] ?beta2 : float, [<Optional>] ?epsilon : float, [<Optional>] ?rescaleGrad : float, [<Optional>] ?lowerBound : float, [<Optional>] ?upperBound : float, [<Optional>] ?clipGradient : float, [<Optional>] ?biasCorrection : bool, [<Optional>] ?numTensors : int) =
+        MultiLambUpdate(learningRates, wds, stepCount, ?data = data, ?beta1 = beta1, ?beta2 = beta2, ?epsilon = epsilon, ?rescaleGrad = rescaleGrad, ?lowerBound = lowerBound, ?upperBound = upperBound, ?clipGradient = clipGradient, ?biasCorrection = biasCorrection, ?numTensors = numTensors)
+
+    /// <summary>Compute the LAMB coefficients of multiple weights and grads with Mix Precision&quot;
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lamb.cc:L214</summary>
+    /// <param name="data">data</param>
+    /// <param name="learningRates">List of learning rates</param>
+    /// <param name="wds">List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+    /// <param name="stepCount">Step count for each tensor</param>
+    /// <param name="beta1">Exponential decay rate for the first moment estimates.</param>
+    /// <param name="beta2">Exponential decay rate for the second moment estimates.</param>
+    /// <param name="epsilon">Small value to avoid division by 0.</param>
+    /// <param name="rescaleGrad">Gradient rescaling factor</param>
+    /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+    /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+    /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+    /// <param name="biasCorrection">Whether to use bias correction.</param>
+    /// <param name="numTensors">Number of tensors</param>
+    static member MultiMpLambUpdate([<ParamArray>] data : NDArray[], 
+                                    learningRates : double seq, 
+                                    wds : double seq, 
+                                    stepCount : int seq, 
+                                    [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                                    [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                                    [<Optional; DefaultParameterValue(0.000001)>] epsilon : float, 
+                                    [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
+                                    [<Optional; DefaultParameterValue(-1.0)>] lowerBound : float, 
+                                    [<Optional; DefaultParameterValue(-1.0)>] upperBound : float, 
+                                    [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
+                                    [<Optional; DefaultParameterValue(true)>] biasCorrection : bool, 
+                                    [<Optional; DefaultParameterValue(1)>] numTensors : int) =
+        let creator = AtomicSymbolCreator.FromName "_multi_mp_lamb_update"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 (data |> Array.map (fun x -> x.UnsafeHandle))
+                                                 [|"learning_rates"; "wds"; "step_count"; "beta1"; "beta2"; "epsilon"; "rescale_grad"; "lower_bound"; "upper_bound"; "clip_gradient"; "bias_correction"; "num_tensors"|]
+                                                 [|string learningRates; string wds; (stepCount |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string beta1; string beta2; string epsilon; string rescaleGrad; string lowerBound; string upperBound; string clipGradient; string biasCorrection; string numTensors|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Compute the LAMB coefficients of multiple weights and grads with Mix Precision&quot;
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lamb.cc:L214</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">data</param>
+    /// <param name="learningRates">List of learning rates</param>
+    /// <param name="wds">List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+    /// <param name="stepCount">Step count for each tensor</param>
+    /// <param name="beta1">Exponential decay rate for the first moment estimates.</param>
+    /// <param name="beta2">Exponential decay rate for the second moment estimates.</param>
+    /// <param name="epsilon">Small value to avoid division by 0.</param>
+    /// <param name="rescaleGrad">Gradient rescaling factor</param>
+    /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+    /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+    /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+    /// <param name="biasCorrection">Whether to use bias correction.</param>
+    /// <param name="numTensors">Number of tensors</param>
+    static member MultiMpLambUpdate(outputArray : NDArray seq, 
+                                    [<ParamArray>] data : NDArray[], 
+                                    learningRates : double seq, 
+                                    wds : double seq, 
+                                    stepCount : int seq, 
+                                    [<Optional; DefaultParameterValue(0.9)>] beta1 : float, 
+                                    [<Optional; DefaultParameterValue(0.999)>] beta2 : float, 
+                                    [<Optional; DefaultParameterValue(0.000001)>] epsilon : float, 
+                                    [<Optional; DefaultParameterValue(1.0)>] rescaleGrad : float, 
+                                    [<Optional; DefaultParameterValue(-1.0)>] lowerBound : float, 
+                                    [<Optional; DefaultParameterValue(-1.0)>] upperBound : float, 
+                                    [<Optional; DefaultParameterValue(-1.0)>] clipGradient : float, 
+                                    [<Optional; DefaultParameterValue(true)>] biasCorrection : bool, 
+                                    [<Optional; DefaultParameterValue(1)>] numTensors : int) =
+        let creator = AtomicSymbolCreator.FromName "_multi_mp_lamb_update"
+        let names = [|"learning_rates"; "wds"; "step_count"; "beta1"; "beta2"; "epsilon"; "rescale_grad"; "lower_bound"; "upper_bound"; "clip_gradient"; "bias_correction"; "num_tensors"|]
+        let vals = [|string learningRates; string wds; (stepCount |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string beta1; string beta2; string epsilon; string rescaleGrad; string lowerBound; string upperBound; string clipGradient; string biasCorrection; string numTensors|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     (data |> Array.map (fun x -> x.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Compute the LAMB coefficients of multiple weights and grads with Mix Precision&quot;
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lamb.cc:L214</summary>
+    /// <param name="data">data</param>
+    /// <param name="learningRates">List of learning rates</param>
+    /// <param name="wds">List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+    /// <param name="stepCount">Step count for each tensor</param>
+    /// <param name="beta1">Exponential decay rate for the first moment estimates.</param>
+    /// <param name="beta2">Exponential decay rate for the second moment estimates.</param>
+    /// <param name="epsilon">Small value to avoid division by 0.</param>
+    /// <param name="rescaleGrad">Gradient rescaling factor</param>
+    /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+    /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+    /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+    /// <param name="biasCorrection">Whether to use bias correction.</param>
+    /// <param name="numTensors">Number of tensors</param>
+    static member MultiMpLambUpdate(data : Symbol seq, learningRates : double seq, wds : double seq, stepCount : int seq, [<Optional>] ?beta1 : float, [<Optional>] ?beta2 : float, [<Optional>] ?epsilon : float, [<Optional>] ?rescaleGrad : float, [<Optional>] ?lowerBound : float, [<Optional>] ?upperBound : float, [<Optional>] ?clipGradient : float, [<Optional>] ?biasCorrection : bool, [<Optional>] ?numTensors : int) =
+        MultiMpLambUpdate(data, learningRates, wds, stepCount, ?beta1 = beta1, ?beta2 = beta2, ?epsilon = epsilon, ?rescaleGrad = rescaleGrad, ?lowerBound = lowerBound, ?upperBound = upperBound, ?clipGradient = clipGradient, ?biasCorrection = biasCorrection, ?numTensors = numTensors)
+    /// <summary>Compute the LAMB coefficients of multiple weights and grads with Mix Precision&quot;
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\multi_lamb.cc:L214</summary>
+    /// <param name="learningRates">List of learning rates</param>
+    /// <param name="wds">List of Weight decays.Weight decay augments the objective function with a regularization term that penalizes large weights. The penalty scales with the square of the magnitude of each weight.</param>
+    /// <param name="stepCount">Step count for each tensor</param>
+    /// <param name="data">data</param>
+    /// <param name="beta1">Exponential decay rate for the first moment estimates.</param>
+    /// <param name="beta2">Exponential decay rate for the second moment estimates.</param>
+    /// <param name="epsilon">Small value to avoid division by 0.</param>
+    /// <param name="rescaleGrad">Gradient rescaling factor</param>
+    /// <param name="lowerBound">Lower limit of norm of weight. If lower_bound &lt;= 0, Lower limit is not set</param>
+    /// <param name="upperBound">Upper limit of norm of weight. If upper_bound &lt;= 0, Upper limit is not set</param>
+    /// <param name="clipGradient">Clip gradient to the range of [-clip_gradient, clip_gradient] If clip_gradient &lt;= 0, gradient clipping is turned off. grad = max(min(grad, clip_gradient), -clip_gradient).</param>
+    /// <param name="biasCorrection">Whether to use bias correction.</param>
+    /// <param name="numTensors">Number of tensors</param>
+    static member MultiMpLambUpdate(learningRates : double seq, wds : double seq, stepCount : int seq, [<Optional>] ?data : Symbol seq, [<Optional>] ?beta1 : float, [<Optional>] ?beta2 : float, [<Optional>] ?epsilon : float, [<Optional>] ?rescaleGrad : float, [<Optional>] ?lowerBound : float, [<Optional>] ?upperBound : float, [<Optional>] ?clipGradient : float, [<Optional>] ?biasCorrection : bool, [<Optional>] ?numTensors : int) =
+        MultiMpLambUpdate(learningRates, wds, stepCount, ?data = data, ?beta1 = beta1, ?beta2 = beta2, ?epsilon = epsilon, ?rescaleGrad = rescaleGrad, ?lowerBound = lowerBound, ?upperBound = upperBound, ?clipGradient = clipGradient, ?biasCorrection = biasCorrection, ?numTensors = numTensors)
 
     /// <summary>Compute the LARS coefficients of multiple weights and grads from their sums of square&quot;
     /// 
@@ -5043,24 +5298,26 @@ type MX() =
     /// He, Kaiming, et al. &quot;Mask R-CNN.&quot; ICCV, 2017
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L559</summary>
     /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
     /// <param name="rois">Bounding box coordinates, a 2D array, if batchid is less than 0, it will be ignored.</param>
     /// <param name="pooledSize">ROI Align output roi feature map height and width: (h, w)</param>
     /// <param name="spatialScale">Ratio of input feature map height (or w) to raw image height (or w). Equals the reciprocal of total stride in convolutional layers</param>
     /// <param name="sampleRatio">Optional sampling ratio of ROI align, using adaptive size by default.</param>
     /// <param name="positionSensitive">Whether to perform position-sensitive RoI pooling. PSRoIPooling is first proposaled by R-FCN and it can reduce the input channels by ph*pw times, where (ph, pw) is the pooled_size</param>
+    /// <param name="aligned">Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.</param>
     static member ContribROIAlign(data : NDArray, 
                                   rois : NDArray, 
                                   pooledSize : int seq, 
                                   spatialScale : float, 
                                   [<Optional; DefaultParameterValue(-1)>] sampleRatio : int, 
-                                  [<Optional; DefaultParameterValue(false)>] positionSensitive : bool) =
+                                  [<Optional; DefaultParameterValue(false)>] positionSensitive : bool, 
+                                  [<Optional; DefaultParameterValue(false)>] aligned : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_ROIAlign"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rois)) then rois.UnsafeHandle|]
-                                                 [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|]
-                                                 [|(pooledSize |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string spatialScale; string sampleRatio; string positionSensitive|]
+                                                 [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"; "aligned"|]
+                                                 [|(pooledSize |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string spatialScale; string sampleRatio; string positionSensitive; string aligned|]
         (new NDArray(outputs.[0]))
     /// <summary>
     /// This operator takes a 4D feature map as an input array and region proposals as `rois`,
@@ -5083,7 +5340,7 @@ type MX() =
     /// He, Kaiming, et al. &quot;Mask R-CNN.&quot; ICCV, 2017
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L559</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
     /// <param name="rois">Bounding box coordinates, a 2D array, if batchid is less than 0, it will be ignored.</param>
@@ -5091,16 +5348,18 @@ type MX() =
     /// <param name="spatialScale">Ratio of input feature map height (or w) to raw image height (or w). Equals the reciprocal of total stride in convolutional layers</param>
     /// <param name="sampleRatio">Optional sampling ratio of ROI align, using adaptive size by default.</param>
     /// <param name="positionSensitive">Whether to perform position-sensitive RoI pooling. PSRoIPooling is first proposaled by R-FCN and it can reduce the input channels by ph*pw times, where (ph, pw) is the pooled_size</param>
+    /// <param name="aligned">Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.</param>
     static member ContribROIAlign(outputArray : NDArray seq, 
                                   data : NDArray, 
                                   rois : NDArray, 
                                   pooledSize : int seq, 
                                   spatialScale : float, 
                                   [<Optional; DefaultParameterValue(-1)>] sampleRatio : int, 
-                                  [<Optional; DefaultParameterValue(false)>] positionSensitive : bool) =
+                                  [<Optional; DefaultParameterValue(false)>] positionSensitive : bool, 
+                                  [<Optional; DefaultParameterValue(false)>] aligned : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_ROIAlign"
-        let names = [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"|]
-        let vals = [|(pooledSize |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string spatialScale; string sampleRatio; string positionSensitive|]
+        let names = [|"pooled_size"; "spatial_scale"; "sample_ratio"; "position_sensitive"; "aligned"|]
+        let vals = [|(pooledSize |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string spatialScale; string sampleRatio; string positionSensitive; string aligned|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rois)) then rois.UnsafeHandle|]
@@ -5129,15 +5388,16 @@ type MX() =
     /// He, Kaiming, et al. &quot;Mask R-CNN.&quot; ICCV, 2017
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L559</summary>
     /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
     /// <param name="rois">Bounding box coordinates, a 2D array, if batchid is less than 0, it will be ignored.</param>
     /// <param name="pooledSize">ROI Align output roi feature map height and width: (h, w)</param>
     /// <param name="spatialScale">Ratio of input feature map height (or w) to raw image height (or w). Equals the reciprocal of total stride in convolutional layers</param>
     /// <param name="sampleRatio">Optional sampling ratio of ROI align, using adaptive size by default.</param>
     /// <param name="positionSensitive">Whether to perform position-sensitive RoI pooling. PSRoIPooling is first proposaled by R-FCN and it can reduce the input channels by ph*pw times, where (ph, pw) is the pooled_size</param>
-    static member ContribROIAlign(data : Symbol, rois : Symbol, pooledSize : int seq, spatialScale : float, [<Optional>] ?sampleRatio : int, [<Optional>] ?positionSensitive : bool) =
-        ContribROIAlign(data, rois, pooledSize, spatialScale, ?sampleRatio = sampleRatio, ?positionSensitive = positionSensitive)
+    /// <param name="aligned">Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.</param>
+    static member ContribROIAlign(data : Symbol, rois : Symbol, pooledSize : int seq, spatialScale : float, [<Optional>] ?sampleRatio : int, [<Optional>] ?positionSensitive : bool, [<Optional>] ?aligned : bool) =
+        ContribROIAlign(data, rois, pooledSize, spatialScale, ?sampleRatio = sampleRatio, ?positionSensitive = positionSensitive, ?aligned = aligned)
     /// <summary>
     /// This operator takes a 4D feature map as an input array and region proposals as `rois`,
     /// then align the feature map over sub-regions of input and produces a fixed-sized output array.
@@ -5159,15 +5419,16 @@ type MX() =
     /// He, Kaiming, et al. &quot;Mask R-CNN.&quot; ICCV, 2017
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L544</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\roi_align.cc:L559</summary>
     /// <param name="pooledSize">ROI Align output roi feature map height and width: (h, w)</param>
     /// <param name="spatialScale">Ratio of input feature map height (or w) to raw image height (or w). Equals the reciprocal of total stride in convolutional layers</param>
     /// <param name="data">Input data to the pooling operator, a 4D Feature maps</param>
     /// <param name="rois">Bounding box coordinates, a 2D array, if batchid is less than 0, it will be ignored.</param>
     /// <param name="sampleRatio">Optional sampling ratio of ROI align, using adaptive size by default.</param>
     /// <param name="positionSensitive">Whether to perform position-sensitive RoI pooling. PSRoIPooling is first proposaled by R-FCN and it can reduce the input channels by ph*pw times, where (ph, pw) is the pooled_size</param>
-    static member ContribROIAlign(pooledSize : int seq, spatialScale : float, [<Optional>] ?data : Symbol, [<Optional>] ?rois : Symbol, [<Optional>] ?sampleRatio : int, [<Optional>] ?positionSensitive : bool) =
-        ContribROIAlign(pooledSize, spatialScale, ?data = data, ?rois = rois, ?sampleRatio = sampleRatio, ?positionSensitive = positionSensitive)
+    /// <param name="aligned">Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.</param>
+    static member ContribROIAlign(pooledSize : int seq, spatialScale : float, [<Optional>] ?data : Symbol, [<Optional>] ?rois : Symbol, [<Optional>] ?sampleRatio : int, [<Optional>] ?positionSensitive : bool, [<Optional>] ?aligned : bool) =
+        ContribROIAlign(pooledSize, spatialScale, ?data = data, ?rois = rois, ?sampleRatio = sampleRatio, ?positionSensitive = positionSensitive, ?aligned = aligned)
 
 
     /// <summary>Performs Rotated ROI Align on the input array.
@@ -7763,7 +8024,7 @@ type MX() =
     /// <param name="data">The input.</param>
     /// <param name="size">Size of new image. Could be (width, height) or (size)</param>
     /// <param name="keepRatio">Whether to resize the short edge or both edges to `size`, if size is give as an integer.</param>
-    /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu</param>
+    /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1)</param>
     static member ImageResize(data : NDArray, [<Optional>] size : int seq, [<Optional; DefaultParameterValue(false)>] keepRatio : bool, [<Optional; DefaultParameterValue(1)>] interp : int) =
         let creator = AtomicSymbolCreator.FromName "_image_resize"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
@@ -7811,7 +8072,7 @@ type MX() =
     /// <param name="data">The input.</param>
     /// <param name="size">Size of new image. Could be (width, height) or (size)</param>
     /// <param name="keepRatio">Whether to resize the short edge or both edges to `size`, if size is give as an integer.</param>
-    /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu</param>
+    /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1)</param>
     static member ImageResize(outputArray : NDArray seq, data : NDArray, [<Optional>] size : int seq, [<Optional; DefaultParameterValue(false)>] keepRatio : bool, [<Optional; DefaultParameterValue(1)>] interp : int) =
         let creator = AtomicSymbolCreator.FromName "_image_resize"
         let names = [|"size"; "keep_ratio"; "interp"|]
@@ -7862,7 +8123,7 @@ type MX() =
     /// <param name="data">The input.</param>
     /// <param name="size">Size of new image. Could be (width, height) or (size)</param>
     /// <param name="keepRatio">Whether to resize the short edge or both edges to `size`, if size is give as an integer.</param>
-    /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1) and the result on cpu would be slightly different from gpu.It uses opencv resize function which tend to align center on cpuwhile using contrib.bilinearResize2D which aligns corner on gpu</param>
+    /// <param name="interp">Interpolation method for resizing. By default uses bilinear interpolationOptions are INTER_NEAREST - a nearest-neighbor interpolationINTER_LINEAR - a bilinear interpolationINTER_AREA - resampling using pixel area relationINTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhoodINTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhoodNote that the GPU version only support bilinear interpolation(1)</param>
     static member ImageResize([<Optional>] ?data : Symbol, [<Optional>] ?size : int seq, [<Optional>] ?keepRatio : bool, [<Optional>] ?interp : int) =
         ImageResize(?data = data, ?size = size, ?keepRatio = keepRatio, ?interp = interp)
 
@@ -8109,7 +8370,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L168</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L165</summary>
     /// <param name="data">The input array.</param>
     /// <param name="actType">Activation function to be applied.</param>
     static member Activation(data : NDArray, actType : ActType) =
@@ -8131,7 +8392,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L168</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L165</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     /// <param name="actType">Activation function to be applied.</param>
@@ -8158,7 +8419,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L168</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L165</summary>
     /// <param name="data">The input array.</param>
     /// <param name="actType">Activation function to be applied.</param>
     static member Activation(data : Symbol, actType : ActType) =
@@ -8175,7 +8436,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L168</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\activation.cc:L165</summary>
     /// <param name="actType">Activation function to be applied.</param>
     /// <param name="data">The input array.</param>
     static member Activation(actType : ActType, [<Optional>] ?data : Symbol) =
@@ -8233,7 +8494,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\batch_norm.cc:L571</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\batch_norm.cc:L587</summary>
     /// <param name="data">Input data to batch normalization</param>
     /// <param name="gamma">gamma array</param>
     /// <param name="beta">beta array</param>
@@ -8319,7 +8580,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\batch_norm.cc:L571</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\batch_norm.cc:L587</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to batch normalization</param>
     /// <param name="gamma">gamma array</param>
@@ -8411,7 +8672,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\batch_norm.cc:L571</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\batch_norm.cc:L587</summary>
     /// <param name="data">Input data to batch normalization</param>
     /// <param name="gamma">gamma array</param>
     /// <param name="beta">beta array</param>
@@ -8468,7 +8729,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\concat.cc:L383</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\concat.cc:L385</summary>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
     /// <param name="dim">the dimension to be concated.</param>
@@ -8517,7 +8778,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\concat.cc:L383</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\concat.cc:L385</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
@@ -8571,7 +8832,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\concat.cc:L383</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\concat.cc:L385</summary>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="dim">the dimension to be concated.</param>
     static member Concat([<Optional>] ?data : Symbol seq, [<Optional>] ?dim : int) =
@@ -8682,7 +8943,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L473</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L469</summary>
     /// <param name="data">Input data to the ConvolutionOp.</param>
     /// <param name="weight">Weight matrix.</param>
     /// <param name="bias">Bias parameter.</param>
@@ -8792,7 +9053,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L473</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L469</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the ConvolutionOp.</param>
     /// <param name="weight">Weight matrix.</param>
@@ -8908,7 +9169,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L473</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L469</summary>
     /// <param name="data">Input data to the ConvolutionOp.</param>
     /// <param name="weight">Weight matrix.</param>
     /// <param name="bias">Bias parameter.</param>
@@ -9000,7 +9261,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L473</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\convolution.cc:L469</summary>
     /// <param name="kernel">Convolution kernel size: (w,), (h, w) or (d, h, w)</param>
     /// <param name="numFilter">Convolution filter(channel) number</param>
     /// <param name="data">Input data to the ConvolutionOp.</param>
@@ -9615,7 +9876,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L287</summary>
     /// <param name="data">Input data.</param>
     /// <param name="weight">Weight matrix.</param>
     /// <param name="bias">Bias parameter.</param>
@@ -9666,7 +9927,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L287</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data.</param>
     /// <param name="weight">Weight matrix.</param>
@@ -9723,7 +9984,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L287</summary>
     /// <param name="data">Input data.</param>
     /// <param name="weight">Weight matrix.</param>
     /// <param name="bias">Bias parameter.</param>
@@ -9764,7 +10025,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L291</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\fully_connected.cc:L287</summary>
     /// <param name="numHidden">Number of hidden nodes of the output.</param>
     /// <param name="data">Input data.</param>
     /// <param name="weight">Weight matrix.</param>
@@ -9873,6 +10134,256 @@ type MX() =
         GroupNorm(?data = data, ?gamma = gamma, ?beta = beta, ?numGroups = numGroups, ?eps = eps, ?outputMeanVar = outputMeanVar)
 
 
+    /// <summary>Extract sliding blocks from input array.
+    /// 
+    /// This operator is used in vanilla convolution implementation to transform the sliding
+    /// blocks on image to column matrix, then the convolution operation can be computed
+    /// by matrix multiplication between column and convolution weight. Due to the close
+    /// relation between im2col and convolution, the concept of **kernel**, **stride**,
+    /// **dilate** and **pad** in this operator are inherited from convolution operation.
+    /// 
+    /// Given the input data of shape :math:`(N, C, *)`, where :math:`N` is the batch size,
+    /// :math:`C` is the channel size, and :math:`*` is the arbitrary spatial dimension,
+    /// the output column array is always with shape :math:`(N, C \times \prod(\text{kernel}), W)`,
+    /// where :math:`C \times \prod(\text{kernel})` is the block size, and :math:`W` is the
+    /// block number which is the spatial size of the convolution output with same input parameters.
+    /// Only 1-D, 2-D and 3-D of spatial dimension is supported in this operator.
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\im2col.cc:L100</summary>
+    /// <param name="data">Input array to extract sliding blocks.</param>
+    /// <param name="kernel">Sliding kernel size: (w,), (h, w) or (d, h, w).</param>
+    /// <param name="stride">The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="dilate">The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="pad">The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+    static member Im2col(data : NDArray, 
+                         kernel : int seq, 
+                         [<Optional>] stride : int seq, 
+                         [<Optional>] dilate : int seq, 
+                         [<Optional>] pad : int seq) =
+        let creator = AtomicSymbolCreator.FromName "im2col"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 [|"kernel"; "stride"; "dilate"; "pad"|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Extract sliding blocks from input array.
+    /// 
+    /// This operator is used in vanilla convolution implementation to transform the sliding
+    /// blocks on image to column matrix, then the convolution operation can be computed
+    /// by matrix multiplication between column and convolution weight. Due to the close
+    /// relation between im2col and convolution, the concept of **kernel**, **stride**,
+    /// **dilate** and **pad** in this operator are inherited from convolution operation.
+    /// 
+    /// Given the input data of shape :math:`(N, C, *)`, where :math:`N` is the batch size,
+    /// :math:`C` is the channel size, and :math:`*` is the arbitrary spatial dimension,
+    /// the output column array is always with shape :math:`(N, C \times \prod(\text{kernel}), W)`,
+    /// where :math:`C \times \prod(\text{kernel})` is the block size, and :math:`W` is the
+    /// block number which is the spatial size of the convolution output with same input parameters.
+    /// Only 1-D, 2-D and 3-D of spatial dimension is supported in this operator.
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\im2col.cc:L100</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">Input array to extract sliding blocks.</param>
+    /// <param name="kernel">Sliding kernel size: (w,), (h, w) or (d, h, w).</param>
+    /// <param name="stride">The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="dilate">The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="pad">The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+    static member Im2col(outputArray : NDArray seq, 
+                         data : NDArray, 
+                         kernel : int seq, 
+                         [<Optional>] stride : int seq, 
+                         [<Optional>] dilate : int seq, 
+                         [<Optional>] pad : int seq) =
+        let creator = AtomicSymbolCreator.FromName "im2col"
+        let names = [|"kernel"; "stride"; "dilate"; "pad"|]
+        let vals = [|(kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Extract sliding blocks from input array.
+    /// 
+    /// This operator is used in vanilla convolution implementation to transform the sliding
+    /// blocks on image to column matrix, then the convolution operation can be computed
+    /// by matrix multiplication between column and convolution weight. Due to the close
+    /// relation between im2col and convolution, the concept of **kernel**, **stride**,
+    /// **dilate** and **pad** in this operator are inherited from convolution operation.
+    /// 
+    /// Given the input data of shape :math:`(N, C, *)`, where :math:`N` is the batch size,
+    /// :math:`C` is the channel size, and :math:`*` is the arbitrary spatial dimension,
+    /// the output column array is always with shape :math:`(N, C \times \prod(\text{kernel}), W)`,
+    /// where :math:`C \times \prod(\text{kernel})` is the block size, and :math:`W` is the
+    /// block number which is the spatial size of the convolution output with same input parameters.
+    /// Only 1-D, 2-D and 3-D of spatial dimension is supported in this operator.
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\im2col.cc:L100</summary>
+    /// <param name="data">Input array to extract sliding blocks.</param>
+    /// <param name="kernel">Sliding kernel size: (w,), (h, w) or (d, h, w).</param>
+    /// <param name="stride">The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="dilate">The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="pad">The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+    static member Im2col(data : Symbol, kernel : int seq, [<Optional>] ?stride : int seq, [<Optional>] ?dilate : int seq, [<Optional>] ?pad : int seq) =
+        Im2col(data, kernel, ?stride = stride, ?dilate = dilate, ?pad = pad)
+    /// <summary>Extract sliding blocks from input array.
+    /// 
+    /// This operator is used in vanilla convolution implementation to transform the sliding
+    /// blocks on image to column matrix, then the convolution operation can be computed
+    /// by matrix multiplication between column and convolution weight. Due to the close
+    /// relation between im2col and convolution, the concept of **kernel**, **stride**,
+    /// **dilate** and **pad** in this operator are inherited from convolution operation.
+    /// 
+    /// Given the input data of shape :math:`(N, C, *)`, where :math:`N` is the batch size,
+    /// :math:`C` is the channel size, and :math:`*` is the arbitrary spatial dimension,
+    /// the output column array is always with shape :math:`(N, C \times \prod(\text{kernel}), W)`,
+    /// where :math:`C \times \prod(\text{kernel})` is the block size, and :math:`W` is the
+    /// block number which is the spatial size of the convolution output with same input parameters.
+    /// Only 1-D, 2-D and 3-D of spatial dimension is supported in this operator.
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\im2col.cc:L100</summary>
+    /// <param name="kernel">Sliding kernel size: (w,), (h, w) or (d, h, w).</param>
+    /// <param name="data">Input array to extract sliding blocks.</param>
+    /// <param name="stride">The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="dilate">The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="pad">The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+    static member Im2col(kernel : int seq, [<Optional>] ?data : Symbol, [<Optional>] ?stride : int seq, [<Optional>] ?dilate : int seq, [<Optional>] ?pad : int seq) =
+        Im2col(kernel, ?data = data, ?stride = stride, ?dilate = dilate, ?pad = pad)
+
+
+    /// <summary>Combining the output column matrix of im2col back to image array.
+    /// 
+    /// Like :class:`~mxnet.ndarray.im2col`, this operator is also used in the vanilla convolution
+    /// implementation. Despite the name, col2im is not the reverse operation of im2col. Since there
+    /// may be overlaps between neighbouring sliding blocks, the column elements cannot be directly
+    /// put back into image. Instead, they are accumulated (i.e., summed) in the input image
+    /// just like the gradient computation, so col2im is the gradient of im2col and vice versa.
+    /// 
+    /// Using the notation in im2col, given an input column array of shape
+    /// :math:`(N, C \times  \prod(\text{kernel}), W)`, this operator accumulates the column elements
+    /// into output array of shape :math:`(N, C, \text{output_size}[0], \text{output_size}[1], \dots)`.
+    /// Only 1-D, 2-D and 3-D of spatial dimension is supported in this operator.
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\im2col.cc:L182</summary>
+    /// <param name="data">Input array to combine sliding blocks.</param>
+    /// <param name="outputSize">The spatial dimension of image array: (w,), (h, w) or (d, h, w).</param>
+    /// <param name="kernel">Sliding kernel size: (w,), (h, w) or (d, h, w).</param>
+    /// <param name="stride">The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="dilate">The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="pad">The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+    static member Col2im(data : NDArray, 
+                         outputSize : int seq, 
+                         kernel : int seq, 
+                         [<Optional>] stride : int seq, 
+                         [<Optional>] dilate : int seq, 
+                         [<Optional>] pad : int seq) =
+        let creator = AtomicSymbolCreator.FromName "col2im"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 [|"output_size"; "kernel"; "stride"; "dilate"; "pad"|]
+                                                 [|(outputSize |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Combining the output column matrix of im2col back to image array.
+    /// 
+    /// Like :class:`~mxnet.ndarray.im2col`, this operator is also used in the vanilla convolution
+    /// implementation. Despite the name, col2im is not the reverse operation of im2col. Since there
+    /// may be overlaps between neighbouring sliding blocks, the column elements cannot be directly
+    /// put back into image. Instead, they are accumulated (i.e., summed) in the input image
+    /// just like the gradient computation, so col2im is the gradient of im2col and vice versa.
+    /// 
+    /// Using the notation in im2col, given an input column array of shape
+    /// :math:`(N, C \times  \prod(\text{kernel}), W)`, this operator accumulates the column elements
+    /// into output array of shape :math:`(N, C, \text{output_size}[0], \text{output_size}[1], \dots)`.
+    /// Only 1-D, 2-D and 3-D of spatial dimension is supported in this operator.
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\im2col.cc:L182</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">Input array to combine sliding blocks.</param>
+    /// <param name="outputSize">The spatial dimension of image array: (w,), (h, w) or (d, h, w).</param>
+    /// <param name="kernel">Sliding kernel size: (w,), (h, w) or (d, h, w).</param>
+    /// <param name="stride">The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="dilate">The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="pad">The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+    static member Col2im(outputArray : NDArray seq, 
+                         data : NDArray, 
+                         outputSize : int seq, 
+                         kernel : int seq, 
+                         [<Optional>] stride : int seq, 
+                         [<Optional>] dilate : int seq, 
+                         [<Optional>] pad : int seq) =
+        let creator = AtomicSymbolCreator.FromName "col2im"
+        let names = [|"output_size"; "kernel"; "stride"; "dilate"; "pad"|]
+        let vals = [|(outputSize |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Combining the output column matrix of im2col back to image array.
+    /// 
+    /// Like :class:`~mxnet.ndarray.im2col`, this operator is also used in the vanilla convolution
+    /// implementation. Despite the name, col2im is not the reverse operation of im2col. Since there
+    /// may be overlaps between neighbouring sliding blocks, the column elements cannot be directly
+    /// put back into image. Instead, they are accumulated (i.e., summed) in the input image
+    /// just like the gradient computation, so col2im is the gradient of im2col and vice versa.
+    /// 
+    /// Using the notation in im2col, given an input column array of shape
+    /// :math:`(N, C \times  \prod(\text{kernel}), W)`, this operator accumulates the column elements
+    /// into output array of shape :math:`(N, C, \text{output_size}[0], \text{output_size}[1], \dots)`.
+    /// Only 1-D, 2-D and 3-D of spatial dimension is supported in this operator.
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\im2col.cc:L182</summary>
+    /// <param name="data">Input array to combine sliding blocks.</param>
+    /// <param name="outputSize">The spatial dimension of image array: (w,), (h, w) or (d, h, w).</param>
+    /// <param name="kernel">Sliding kernel size: (w,), (h, w) or (d, h, w).</param>
+    /// <param name="stride">The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="dilate">The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="pad">The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+    static member Col2im(data : Symbol, outputSize : int seq, kernel : int seq, [<Optional>] ?stride : int seq, [<Optional>] ?dilate : int seq, [<Optional>] ?pad : int seq) =
+        Col2im(data, outputSize, kernel, ?stride = stride, ?dilate = dilate, ?pad = pad)
+    /// <summary>Combining the output column matrix of im2col back to image array.
+    /// 
+    /// Like :class:`~mxnet.ndarray.im2col`, this operator is also used in the vanilla convolution
+    /// implementation. Despite the name, col2im is not the reverse operation of im2col. Since there
+    /// may be overlaps between neighbouring sliding blocks, the column elements cannot be directly
+    /// put back into image. Instead, they are accumulated (i.e., summed) in the input image
+    /// just like the gradient computation, so col2im is the gradient of im2col and vice versa.
+    /// 
+    /// Using the notation in im2col, given an input column array of shape
+    /// :math:`(N, C \times  \prod(\text{kernel}), W)`, this operator accumulates the column elements
+    /// into output array of shape :math:`(N, C, \text{output_size}[0], \text{output_size}[1], \dots)`.
+    /// Only 1-D, 2-D and 3-D of spatial dimension is supported in this operator.
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\im2col.cc:L182</summary>
+    /// <param name="outputSize">The spatial dimension of image array: (w,), (h, w) or (d, h, w).</param>
+    /// <param name="kernel">Sliding kernel size: (w,), (h, w) or (d, h, w).</param>
+    /// <param name="data">Input array to combine sliding blocks.</param>
+    /// <param name="stride">The stride between adjacent sliding blocks in spatial dimension: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="dilate">The spacing between adjacent kernel points: (w,), (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="pad">The zero-value padding size on both sides of spatial dimension: (w,), (h, w) or (d, h, w). Defaults to no padding.</param>
+    static member Col2im(outputSize : int seq, kernel : int seq, [<Optional>] ?data : Symbol, [<Optional>] ?stride : int seq, [<Optional>] ?dilate : int seq, [<Optional>] ?pad : int seq) =
+        Col2im(outputSize, kernel, ?data = data, ?stride = stride, ?dilate = dilate, ?pad = pad)
+
+
     /// <summary>Layer normalization.
     /// 
     /// Normalizes the channels of the input tensor by mean and variance, and applies a scale ``gamma`` as
@@ -9900,7 +10411,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\layer_norm.cc:L156</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\layer_norm.cc:L158</summary>
     /// <param name="data">Input data to layer normalization</param>
     /// <param name="gamma">gamma array</param>
     /// <param name="beta">beta array</param>
@@ -9946,7 +10457,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\layer_norm.cc:L156</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\layer_norm.cc:L158</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to layer normalization</param>
     /// <param name="gamma">gamma array</param>
@@ -9998,7 +10509,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\layer_norm.cc:L156</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\layer_norm.cc:L158</summary>
     /// <param name="data">Input data to layer normalization</param>
     /// <param name="gamma">gamma array</param>
     /// <param name="beta">beta array</param>
@@ -10121,7 +10632,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L164</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L158</summary>
     /// <param name="data">Input data to LRN</param>
     /// <param name="nsize">normalization window width in elements.</param>
     /// <param name="alpha">The variance scaling parameter :math:`lpha` in the LRN expression.</param>
@@ -10155,7 +10666,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L164</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L158</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to LRN</param>
     /// <param name="nsize">normalization window width in elements.</param>
@@ -10195,7 +10706,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L164</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L158</summary>
     /// <param name="data">Input data to LRN</param>
     /// <param name="nsize">normalization window width in elements.</param>
     /// <param name="alpha">The variance scaling parameter :math:`lpha` in the LRN expression.</param>
@@ -10220,7 +10731,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L164</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\lrn.cc:L158</summary>
     /// <param name="nsize">normalization window width in elements.</param>
     /// <param name="data">Input data to LRN</param>
     /// <param name="alpha">The variance scaling parameter :math:`lpha` in the LRN expression.</param>
@@ -10379,7 +10890,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\pooling.cc:L417</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\pooling.cc:L414</summary>
     /// <param name="data">Input data to the pooling operator.</param>
     /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
     /// <param name="poolType">Pooling type to be applied.</param>
@@ -10460,7 +10971,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\pooling.cc:L417</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\pooling.cc:L414</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to the pooling operator.</param>
     /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
@@ -10547,7 +11058,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\pooling.cc:L417</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\pooling.cc:L414</summary>
     /// <param name="data">Input data to the pooling operator.</param>
     /// <param name="kernel">Pooling kernel size: (y, x) or (d, y, x)</param>
     /// <param name="poolType">Pooling type to be applied.</param>
@@ -10588,7 +11099,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L103</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L134</summary>
     /// <param name="data">The input array.</param>
     /// <param name="length">The length array.</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
@@ -10631,7 +11142,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L103</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L134</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     /// <param name="length">The length array.</param>
@@ -10680,7 +11191,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L103</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\nn\softmax.cc:L134</summary>
     /// <param name="data">The input array.</param>
     /// <param name="length">The length array.</param>
     /// <param name="axis">The axis along which to compute softmax.</param>
@@ -11193,6 +11704,112 @@ type MX() =
         UpSampling(scale, sampleType, ?data = data, ?numFilter = numFilter, ?multiInputMode = multiInputMode, ?workspace = workspace)
 
 
+    /// <param name="A">Tensor of square matrix</param>
+    static member NpiEig(A : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_eig"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="A">Tensor of square matrix</param>
+    static member NpiEig(outputArray : NDArray seq, A : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_eig"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="A">Tensor of square matrix</param>
+    static member NpiEig([<Optional>] ?A : Symbol) =
+        NpiEig(?A = A)
+
+    /// <param name="A">Tensor of real matrices</param>
+    /// <param name="UPLO">Specifies whether the calculation is done with the lower or upper triangular part.</param>
+    static member NpiEigh(A : NDArray, [<Optional>] UPLO : UpperLower) =
+        let creator = AtomicSymbolCreator.FromName "_npi_eigh"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
+                                                 [|"UPLO"|]
+                                                 [|string UPLO|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="A">Tensor of real matrices</param>
+    /// <param name="UPLO">Specifies whether the calculation is done with the lower or upper triangular part.</param>
+    static member NpiEigh(outputArray : NDArray seq, A : NDArray, [<Optional>] UPLO : UpperLower) =
+        let creator = AtomicSymbolCreator.FromName "_npi_eigh"
+        let names = [|"UPLO"|]
+        let vals = [|string UPLO|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="A">Tensor of real matrices</param>
+    /// <param name="UPLO">Specifies whether the calculation is done with the lower or upper triangular part.</param>
+    static member NpiEigh([<Optional>] ?A : Symbol, [<Optional>] ?UPLO : UpperLower) =
+        NpiEigh(?A = A, ?UPLO = UPLO)
+
+    /// <param name="A">Tensor of square matrix</param>
+    static member NpiEigvals(A : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_eigvals"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="A">Tensor of square matrix</param>
+    static member NpiEigvals(outputArray : NDArray seq, A : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_eigvals"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="A">Tensor of square matrix</param>
+    static member NpiEigvals([<Optional>] ?A : Symbol) =
+        NpiEigvals(?A = A)
+
+    /// <param name="A">Tensor of square matrix</param>
+    /// <param name="UPLO">Specifies whether the calculation is done with the lower or upper triangular part.</param>
+    static member NpiEigvalsh(A : NDArray, [<Optional>] UPLO : UpperLower) =
+        let creator = AtomicSymbolCreator.FromName "_npi_eigvalsh"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
+                                                 [|"UPLO"|]
+                                                 [|string UPLO|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="A">Tensor of square matrix</param>
+    /// <param name="UPLO">Specifies whether the calculation is done with the lower or upper triangular part.</param>
+    static member NpiEigvalsh(outputArray : NDArray seq, A : NDArray, [<Optional>] UPLO : UpperLower) =
+        let creator = AtomicSymbolCreator.FromName "_npi_eigvalsh"
+        let names = [|"UPLO"|]
+        let vals = [|string UPLO|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="A">Tensor of square matrix</param>
+    /// <param name="UPLO">Specifies whether the calculation is done with the lower or upper triangular part.</param>
+    static member NpiEigvalsh([<Optional>] ?A : Symbol, [<Optional>] ?UPLO : UpperLower) =
+        NpiEigvalsh(?A = A, ?UPLO = UPLO)
+
     /// <summary>
     /// 
     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_gesvd.cc:L93</summary>
@@ -11228,30 +11845,323 @@ type MX() =
         NpiSvd(?A = A)
 
 
+
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_norm_forward.cc:L32</summary>
+    /// <param name="data">The input</param>
+    static member NpiNorm(data : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_norm"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_norm_forward.cc:L32</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">The input</param>
+    static member NpiNorm(outputArray : NDArray seq, data : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_norm"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_norm_forward.cc:L32</summary>
+    /// <param name="data">The input</param>
+    static member NpiNorm([<Optional>] ?data : Symbol) =
+        NpiNorm(?data = data)
+
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_pinv.cc:L99</summary>
+    /// <param name="A">Tensor of matrix</param>
+    /// <param name="rcond">Cutoff for small singular values.</param>
+    /// <param name="hermitian">If True, A is assumed to be Hermitian (symmetric if real-valued).</param>
+    static member NpiPinv(A : NDArray, rcond : NDArray, [<Optional; DefaultParameterValue(false)>] hermitian : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_pinv"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rcond)) then rcond.UnsafeHandle|]
+                                                 [|"hermitian"|]
+                                                 [|string hermitian|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_pinv.cc:L99</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="A">Tensor of matrix</param>
+    /// <param name="rcond">Cutoff for small singular values.</param>
+    /// <param name="hermitian">If True, A is assumed to be Hermitian (symmetric if real-valued).</param>
+    static member NpiPinv(outputArray : NDArray seq, A : NDArray, rcond : NDArray, [<Optional; DefaultParameterValue(false)>] hermitian : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_pinv"
+        let names = [|"hermitian"|]
+        let vals = [|string hermitian|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rcond)) then rcond.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_pinv.cc:L99</summary>
+    /// <param name="A">Tensor of matrix</param>
+    /// <param name="rcond">Cutoff for small singular values.</param>
+    /// <param name="hermitian">If True, A is assumed to be Hermitian (symmetric if real-valued).</param>
+    static member NpiPinv([<Optional>] ?A : Symbol, [<Optional>] ?rcond : Symbol, [<Optional>] ?hermitian : bool) =
+        NpiPinv(?A = A, ?rcond = rcond, ?hermitian = hermitian)
+
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_pinv.cc:L177</summary>
+    /// <param name="A">Tensor of matrix</param>
+    /// <param name="rcond">Cutoff for small singular values.</param>
+    /// <param name="hermitian">If True, A is assumed to be Hermitian (symmetric if real-valued).</param>
+    static member NpiPinvScalarRcond(A : NDArray, [<Optional; DefaultParameterValue(0.0)>] rcond : double, [<Optional; DefaultParameterValue(false)>] hermitian : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_pinv_scalar_rcond"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
+                                                 [|"rcond"; "hermitian"|]
+                                                 [|string rcond; string hermitian|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_pinv.cc:L177</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="A">Tensor of matrix</param>
+    /// <param name="rcond">Cutoff for small singular values.</param>
+    /// <param name="hermitian">If True, A is assumed to be Hermitian (symmetric if real-valued).</param>
+    static member NpiPinvScalarRcond(outputArray : NDArray seq, A : NDArray, [<Optional; DefaultParameterValue(0.0)>] rcond : double, [<Optional; DefaultParameterValue(false)>] hermitian : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_pinv_scalar_rcond"
+        let names = [|"rcond"; "hermitian"|]
+        let vals = [|string rcond; string hermitian|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_pinv.cc:L177</summary>
+    /// <param name="A">Tensor of matrix</param>
+    /// <param name="rcond">Cutoff for small singular values.</param>
+    /// <param name="hermitian">If True, A is assumed to be Hermitian (symmetric if real-valued).</param>
+    static member NpiPinvScalarRcond([<Optional>] ?A : Symbol, [<Optional>] ?rcond : double, [<Optional>] ?hermitian : bool) =
+        NpiPinvScalarRcond(?A = A, ?rcond = rcond, ?hermitian = hermitian)
+
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_potrf.cc:L47</summary>
+    /// <param name="A">Tensor of input matrices to be decomposed</param>
+    static member NpiCholesky(A : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_cholesky"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        (new NDArray(outputs.[0]))
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_potrf.cc:L47</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="A">Tensor of input matrices to be decomposed</param>
+    static member NpiCholesky(outputArray : NDArray seq, A : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_cholesky"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_potrf.cc:L47</summary>
+    /// <param name="A">Tensor of input matrices to be decomposed</param>
+    static member NpiCholesky([<Optional>] ?A : Symbol) =
+        NpiCholesky(?A = A)
+
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_solve.cc:L89</summary>
+    /// <param name="A">Tensor of square matrix</param>
+    /// <param name="B">Tensor of right side vector</param>
+    static member NpiSolve(A : NDArray, B : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_solve"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg B)) then B.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_solve.cc:L89</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="A">Tensor of square matrix</param>
+    /// <param name="B">Tensor of right side vector</param>
+    static member NpiSolve(outputArray : NDArray seq, A : NDArray, B : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_solve"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg A)) then A.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg B)) then B.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_solve.cc:L89</summary>
+    /// <param name="A">Tensor of square matrix</param>
+    /// <param name="B">Tensor of right side vector</param>
+    static member NpiSolve([<Optional>] ?A : Symbol, [<Optional>] ?B : Symbol) =
+        NpiSolve(?A = A, ?B = B)
+
+
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_tensorinv.cc:L102</summary>
+    /// <param name="a">First input</param>
+    /// <param name="ind">Number of first indices that are involved in the inverse sum.</param>
+    static member NpiTensorinv(a : NDArray, [<Optional; DefaultParameterValue(2)>] ind : int) =
+        let creator = AtomicSymbolCreator.FromName "_npi_tensorinv"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
+                                                 [|"ind"|]
+                                                 [|string ind|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_tensorinv.cc:L102</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="a">First input</param>
+    /// <param name="ind">Number of first indices that are involved in the inverse sum.</param>
+    static member NpiTensorinv(outputArray : NDArray seq, a : NDArray, [<Optional; DefaultParameterValue(2)>] ind : int) =
+        let creator = AtomicSymbolCreator.FromName "_npi_tensorinv"
+        let names = [|"ind"|]
+        let vals = [|string ind|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\linalg\np_tensorinv.cc:L102</summary>
+    /// <param name="a">First input</param>
+    /// <param name="ind">Number of first indices that are involved in the inverse sum.</param>
+    static member NpiTensorinv([<Optional>] ?a : Symbol, [<Optional>] ?ind : int) =
+        NpiTensorinv(?a = a, ?ind = ind)
+
+
+    /// <param name="a">First input</param>
+    /// <param name="b">Second input</param>
+    /// <param name="aAxes">Tuple of ints, optional. Axes in a to reorder to the right, before inversion.</param>
+    static member NpiTensorsolve(a : NDArray, b : NDArray, [<Optional>] aAxes : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_tensorsolve"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg b)) then b.UnsafeHandle|]
+                                                 [|"a_axes"|]
+                                                 [|(if isNull (aAxes :> obj) then "[]" else (aAxes |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="a">First input</param>
+    /// <param name="b">Second input</param>
+    /// <param name="aAxes">Tuple of ints, optional. Axes in a to reorder to the right, before inversion.</param>
+    static member NpiTensorsolve(outputArray : NDArray seq, a : NDArray, b : NDArray, [<Optional>] aAxes : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_tensorsolve"
+        let names = [|"a_axes"|]
+        let vals = [|(if isNull (aAxes :> obj) then "[]" else (aAxes |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg b)) then b.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="a">First input</param>
+    /// <param name="b">Second input</param>
+    /// <param name="aAxes">Tuple of ints, optional. Axes in a to reorder to the right, before inversion.</param>
+    static member NpiTensorsolve([<Optional>] ?a : Symbol, [<Optional>] ?b : Symbol, [<Optional>] ?aAxes : int seq) =
+        NpiTensorsolve(?a = a, ?b = b, ?aAxes = aAxes)
+
+
+    /// <param name="data">Data</param>
+    /// <param name="weights">Weights</param>
+    /// <param name="minlength">A minimum number of bins for the output arrayIf minlength is specified, there will be at least thisnumber of bins in the output array</param>
+    /// <param name="hasWeights">Determine whether Bincount has weights.</param>
+    static member NpiBincount(data : NDArray, weights : NDArray, [<Optional; DefaultParameterValue(0)>] minlength : int, [<Optional; DefaultParameterValue(false)>] hasWeights : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_bincount"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weights)) then weights.UnsafeHandle|]
+                                                 [|"minlength"; "has_weights"|]
+                                                 [|string minlength; string hasWeights|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">Data</param>
+    /// <param name="weights">Weights</param>
+    /// <param name="minlength">A minimum number of bins for the output arrayIf minlength is specified, there will be at least thisnumber of bins in the output array</param>
+    /// <param name="hasWeights">Determine whether Bincount has weights.</param>
+    static member NpiBincount(outputArray : NDArray seq, data : NDArray, weights : NDArray, [<Optional; DefaultParameterValue(0)>] minlength : int, [<Optional; DefaultParameterValue(false)>] hasWeights : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_bincount"
+        let names = [|"minlength"; "has_weights"|]
+        let vals = [|string minlength; string hasWeights|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weights)) then weights.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="data">Data</param>
+    /// <param name="weights">Weights</param>
+    /// <param name="minlength">A minimum number of bins for the output arrayIf minlength is specified, there will be at least thisnumber of bins in the output array</param>
+    /// <param name="hasWeights">Determine whether Bincount has weights.</param>
+    static member NpiBincount([<Optional>] ?data : Symbol, [<Optional>] ?weights : Symbol, [<Optional>] ?minlength : int, [<Optional>] ?hasWeights : bool) =
+        NpiBincount(?data = data, ?weights = weights, ?minlength = minlength, ?hasWeights = hasWeights)
+
     /// <summary>Scalar version of boolean assign
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L282</summary>
     /// <param name="data">input</param>
     /// <param name="mask">mask</param>
     /// <param name="value">value to be assigned to masked positions</param>
-    static member NpiBooleanMaskAssignScalar(data : NDArray, mask : NDArray, value : float) =
+    /// <param name="startAxis">starting axis of boolean mask</param>
+    static member NpiBooleanMaskAssignScalar(data : NDArray, mask : NDArray, value : float, startAxis : int) =
         let creator = AtomicSymbolCreator.FromName "_npi_boolean_mask_assign_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mask)) then mask.UnsafeHandle|]
-                                                 [|"value"|]
-                                                 [|string value|]
+                                                 [|"value"; "start_axis"|]
+                                                 [|string value; string startAxis|]
         (new NDArray(outputs.[0]))
     /// <summary>Scalar version of boolean assign
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L282</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">input</param>
     /// <param name="mask">mask</param>
     /// <param name="value">value to be assigned to masked positions</param>
-    static member NpiBooleanMaskAssignScalar(outputArray : NDArray seq, data : NDArray, mask : NDArray, value : float) =
+    /// <param name="startAxis">starting axis of boolean mask</param>
+    static member NpiBooleanMaskAssignScalar(outputArray : NDArray seq, data : NDArray, mask : NDArray, value : float, startAxis : int) =
         let creator = AtomicSymbolCreator.FromName "_npi_boolean_mask_assign_scalar"
-        let names = [|"value"|]
-        let vals = [|string value|]
+        let names = [|"value"; "start_axis"|]
+        let vals = [|string value; string startAxis|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mask)) then mask.UnsafeHandle|]
@@ -11261,45 +12171,49 @@ type MX() =
         ()
     /// <summary>Scalar version of boolean assign
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L282</summary>
     /// <param name="data">input</param>
     /// <param name="mask">mask</param>
     /// <param name="value">value to be assigned to masked positions</param>
-    static member NpiBooleanMaskAssignScalar(data : Symbol, mask : Symbol, value : float) =
-        NpiBooleanMaskAssignScalar(data, mask, value)
+    /// <param name="startAxis">starting axis of boolean mask</param>
+    static member NpiBooleanMaskAssignScalar(data : Symbol, mask : Symbol, value : float, startAxis : int) =
+        NpiBooleanMaskAssignScalar(data, mask, value, startAxis)
     /// <summary>Scalar version of boolean assign
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L222</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L282</summary>
     /// <param name="value">value to be assigned to masked positions</param>
+    /// <param name="startAxis">starting axis of boolean mask</param>
     /// <param name="data">input</param>
     /// <param name="mask">mask</param>
-    static member NpiBooleanMaskAssignScalar(value : float, [<Optional>] ?data : Symbol, [<Optional>] ?mask : Symbol) =
-        NpiBooleanMaskAssignScalar(value, ?data = data, ?mask = mask)
+    static member NpiBooleanMaskAssignScalar(value : float, startAxis : int, [<Optional>] ?data : Symbol, [<Optional>] ?mask : Symbol) =
+        NpiBooleanMaskAssignScalar(value, startAxis, ?data = data, ?mask = mask)
 
     /// <summary>Tensor version of boolean assign
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L246</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L307</summary>
     /// <param name="data">input</param>
     /// <param name="mask">mask</param>
     /// <param name="value">assignment</param>
-    static member NpiBooleanMaskAssignTensor(data : NDArray, mask : NDArray, value : NDArray) =
+    /// <param name="startAxis">starting axis of boolean mask</param>
+    static member NpiBooleanMaskAssignTensor(data : NDArray, mask : NDArray, value : NDArray, startAxis : int) =
         let creator = AtomicSymbolCreator.FromName "_npi_boolean_mask_assign_tensor"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mask)) then mask.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg value)) then value.UnsafeHandle|]
-                                                 Array.empty
-                                                 Array.empty
+                                                 [|"start_axis"|]
+                                                 [|string startAxis|]
         (new NDArray(outputs.[0]))
     /// <summary>Tensor version of boolean assign
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L246</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L307</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">input</param>
     /// <param name="mask">mask</param>
     /// <param name="value">assignment</param>
-    static member NpiBooleanMaskAssignTensor(outputArray : NDArray seq, data : NDArray, mask : NDArray, value : NDArray) =
+    /// <param name="startAxis">starting axis of boolean mask</param>
+    static member NpiBooleanMaskAssignTensor(outputArray : NDArray seq, data : NDArray, mask : NDArray, value : NDArray, startAxis : int) =
         let creator = AtomicSymbolCreator.FromName "_npi_boolean_mask_assign_tensor"
-        let names = Array.empty
-        let vals = Array.empty
+        let names = [|"start_axis"|]
+        let vals = [|string startAxis|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mask)) then mask.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg value)) then value.UnsafeHandle|]
@@ -11309,12 +12223,84 @@ type MX() =
         ()
     /// <summary>Tensor version of boolean assign
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L246</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L307</summary>
     /// <param name="data">input</param>
     /// <param name="mask">mask</param>
     /// <param name="value">assignment</param>
-    static member NpiBooleanMaskAssignTensor([<Optional>] ?data : Symbol, [<Optional>] ?mask : Symbol, [<Optional>] ?value : Symbol) =
-        NpiBooleanMaskAssignTensor(?data = data, ?mask = mask, ?value = value)
+    /// <param name="startAxis">starting axis of boolean mask</param>
+    static member NpiBooleanMaskAssignTensor(data : Symbol, mask : Symbol, value : Symbol, startAxis : int) =
+        NpiBooleanMaskAssignTensor(data, mask, value, startAxis)
+    /// <summary>Tensor version of boolean assign
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_boolean_mask_assign.cc:L307</summary>
+    /// <param name="startAxis">starting axis of boolean mask</param>
+    /// <param name="data">input</param>
+    /// <param name="mask">mask</param>
+    /// <param name="value">assignment</param>
+    static member NpiBooleanMaskAssignTensor(startAxis : int, [<Optional>] ?data : Symbol, [<Optional>] ?mask : Symbol, [<Optional>] ?value : Symbol) =
+        NpiBooleanMaskAssignTensor(startAxis, ?data = data, ?mask = mask, ?value = value)
+
+    /// <param name="data">Input ndarray</param>
+    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+    static member NpAny(data : NDArray, [<Optional>] ?axis : int seq, [<Optional>] ?keepdims : bool) =
+        let creator = AtomicSymbolCreator.FromName "_np_any"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 [|"axis"; "keepdims"|]
+                                                 [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">Input ndarray</param>
+    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+    static member NpAny(outputArray : NDArray seq, data : NDArray, [<Optional>] ?axis : int seq, [<Optional>] ?keepdims : bool) =
+        let creator = AtomicSymbolCreator.FromName "_np_any"
+        let names = [|"axis"; "keepdims"|]
+        let vals = [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="data">Input ndarray</param>
+    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+    static member NpAny([<Optional>] ?data : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?keepdims : bool) =
+        NpAny(?data = data, ?axis = axis, ?keepdims = keepdims)
+
+    /// <param name="data">Input ndarray</param>
+    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+    static member NpAll(data : NDArray, [<Optional>] ?axis : int seq, [<Optional>] ?keepdims : bool) =
+        let creator = AtomicSymbolCreator.FromName "_np_all"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 [|"axis"; "keepdims"|]
+                                                 [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">Input ndarray</param>
+    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+    static member NpAll(outputArray : NDArray seq, data : NDArray, [<Optional>] ?axis : int seq, [<Optional>] ?keepdims : bool) =
+        let creator = AtomicSymbolCreator.FromName "_np_all"
+        let names = [|"axis"; "keepdims"|]
+        let vals = [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="data">Input ndarray</param>
+    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+    static member NpAll([<Optional>] ?data : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?keepdims : bool) =
+        NpAll(?data = data, ?axis = axis, ?keepdims = keepdims)
 
     /// <param name="data">The input</param>
     /// <param name="axis">The axis along which to perform the reduction. Negative values means indexing from right to left. ``Requires axis to be set as int, because global reduction is not supported yet.``</param>
@@ -11380,7 +12366,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L124</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L130</summary>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
@@ -11399,7 +12385,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L124</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L130</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
@@ -11424,7 +12410,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L124</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L130</summary>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
@@ -11436,7 +12422,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L163</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L170</summary>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
@@ -11450,7 +12436,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L163</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L170</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
@@ -11469,7 +12455,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L163</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L170</summary>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
@@ -11480,7 +12466,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L191</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L199</summary>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
@@ -11494,7 +12480,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L191</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L199</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
@@ -11513,7 +12499,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L191</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_broadcast_reduce_op_value.cc:L199</summary>
     /// <param name="a">The input</param>
     /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
     /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
@@ -11616,112 +12602,20 @@ type MX() =
         NpiMean(?a = a, ?axis = axis, ?dtype = dtype, ?keepdims = keepdims, ?initial = initial)
 
 
-    /// <param name="a">The input</param>
-    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
-    /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
-    /// <param name="ddof">Starting value for the sum.</param>
-    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
-    static member NpiStd(a : NDArray, 
-                         [<Optional>] ?axis : int seq, 
-                         [<Optional>] ?dtype : DataType, 
-                         [<Optional>] ?ddof : int, 
-                         [<Optional>] ?keepdims : bool) =
-        let creator = AtomicSymbolCreator.FromName "_npi_std"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
-                                                 [|"axis"; "dtype"; "ddof"; "keepdims"|]
-                                                 [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "None" | Some dtype -> string dtype); (match ddof with None -> "0" | Some ddof -> string ddof); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
-        (new NDArray(outputs.[0]))
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="a">The input</param>
-    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
-    /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
-    /// <param name="ddof">Starting value for the sum.</param>
-    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
-    static member NpiStd(outputArray : NDArray seq, 
-                         a : NDArray, 
-                         [<Optional>] ?axis : int seq, 
-                         [<Optional>] ?dtype : DataType, 
-                         [<Optional>] ?ddof : int, 
-                         [<Optional>] ?keepdims : bool) =
-        let creator = AtomicSymbolCreator.FromName "_npi_std"
-        let names = [|"axis"; "dtype"; "ddof"; "keepdims"|]
-        let vals = [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "None" | Some dtype -> string dtype); (match ddof with None -> "0" | Some ddof -> string ddof); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <param name="a">The input</param>
-    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
-    /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
-    /// <param name="ddof">Starting value for the sum.</param>
-    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
-    static member NpiStd([<Optional>] ?a : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?dtype : DataType, [<Optional>] ?ddof : int, [<Optional>] ?keepdims : bool) =
-        NpiStd(?a = a, ?axis = axis, ?dtype = dtype, ?ddof = ddof, ?keepdims = keepdims)
-
-    /// <param name="a">The input</param>
-    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
-    /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
-    /// <param name="ddof">Starting value for the sum.</param>
-    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
-    static member NpiVar(a : NDArray, 
-                         [<Optional>] ?axis : int seq, 
-                         [<Optional>] ?dtype : DataType, 
-                         [<Optional>] ?ddof : int, 
-                         [<Optional>] ?keepdims : bool) =
-        let creator = AtomicSymbolCreator.FromName "_npi_var"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
-                                                 [|"axis"; "dtype"; "ddof"; "keepdims"|]
-                                                 [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "None" | Some dtype -> string dtype); (match ddof with None -> "0" | Some ddof -> string ddof); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
-        (new NDArray(outputs.[0]))
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="a">The input</param>
-    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
-    /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
-    /// <param name="ddof">Starting value for the sum.</param>
-    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
-    static member NpiVar(outputArray : NDArray seq, 
-                         a : NDArray, 
-                         [<Optional>] ?axis : int seq, 
-                         [<Optional>] ?dtype : DataType, 
-                         [<Optional>] ?ddof : int, 
-                         [<Optional>] ?keepdims : bool) =
-        let creator = AtomicSymbolCreator.FromName "_npi_var"
-        let names = [|"axis"; "dtype"; "ddof"; "keepdims"|]
-        let vals = [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "None" | Some dtype -> string dtype); (match ddof with None -> "0" | Some ddof -> string ddof); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <param name="a">The input</param>
-    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
-    /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
-    /// <param name="ddof">Starting value for the sum.</param>
-    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
-    static member NpiVar([<Optional>] ?a : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?dtype : DataType, [<Optional>] ?ddof : int, [<Optional>] ?keepdims : bool) =
-        NpiVar(?a = a, ?axis = axis, ?dtype = dtype, ?ddof = ddof, ?keepdims = keepdims)
-
     /// <param name="array">The input</param>
     /// <param name="shape">The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.</param>
-    static member NpBroadcastTo(array : NDArray, [<Optional>] shape : int seq) =
-        let creator = AtomicSymbolCreator.FromName "_np_broadcast_to"
+    static member NpiBroadcastTo(array : NDArray, [<Optional>] shape : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_broadcast_to"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg array)) then array.UnsafeHandle|]
                                                  [|"shape"|]
                                                  [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
-        (new NDArray(outputs.[0]))
+        outputs |> Array.map (fun h -> new NDArray(h))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="array">The input</param>
     /// <param name="shape">The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.</param>
-    static member NpBroadcastTo(outputArray : NDArray seq, array : NDArray, [<Optional>] shape : int seq) =
-        let creator = AtomicSymbolCreator.FromName "_np_broadcast_to"
+    static member NpiBroadcastTo(outputArray : NDArray seq, array : NDArray, [<Optional>] shape : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_broadcast_to"
         let names = [|"shape"|]
         let vals = [|(if isNull (shape :> obj) then "[]" else (shape |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
@@ -11733,9 +12627,103 @@ type MX() =
         ()
     /// <param name="array">The input</param>
     /// <param name="shape">The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.</param>
-    static member NpBroadcastTo([<Optional>] ?array : Symbol, [<Optional>] ?shape : int seq) =
-        NpBroadcastTo(?array = array, ?shape = shape)
+    static member NpiBroadcastTo([<Optional>] ?array : Symbol, [<Optional>] ?shape : int seq) =
+        NpiBroadcastTo(?array = array, ?shape = shape)
 
+
+    /// <summary>This operator will check if all the elements in a boolean tensor is true.
+    /// If not, ValueError exception will be raised in the backend with given error message.
+    /// In order to evaluate this operator, one should multiply the origin tensor by the return value
+    /// of this operator to force this operator become part of the computation graph, otherwise the check
+    /// would not be working under symoblic mode.
+    /// 
+    /// Example:
+    /// 
+    /// loc = np.zeros((2,2))
+    /// scale = np.array(#some_value)
+    /// constraint = (scale &gt; 0)
+    /// np.random.normal(loc, scale * npx.constraint_check(constraint, &#39;Scale should be larger than zero&#39;))
+    /// 
+    /// If elements in the scale tensor are all bigger than zero, npx.constraint_check would return
+    /// `np.array(True)`, which will not change the value of `scale` when multiplied by.
+    /// If some of the elements in the scale tensor violate the constraint, i.e. there exists `False` in
+    /// the boolean tensor `constraint`, a `ValueError` exception with given message
+    /// &#39;Scale should be larger than zero&#39; would be raised.
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_constraint_check.cc:L79</summary>
+    /// <param name="input">Input boolean array</param>
+    /// <param name="msg">Error message raised when constraint violated</param>
+    static member NpxConstraintCheck(input : NDArray, [<Optional; DefaultParameterValue("Constraint violated.")>] msg : string) =
+        let creator = AtomicSymbolCreator.FromName "_npx_constraint_check"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input)) then input.UnsafeHandle|]
+                                                 [|"msg"|]
+                                                 [|msg|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>This operator will check if all the elements in a boolean tensor is true.
+    /// If not, ValueError exception will be raised in the backend with given error message.
+    /// In order to evaluate this operator, one should multiply the origin tensor by the return value
+    /// of this operator to force this operator become part of the computation graph, otherwise the check
+    /// would not be working under symoblic mode.
+    /// 
+    /// Example:
+    /// 
+    /// loc = np.zeros((2,2))
+    /// scale = np.array(#some_value)
+    /// constraint = (scale &gt; 0)
+    /// np.random.normal(loc, scale * npx.constraint_check(constraint, &#39;Scale should be larger than zero&#39;))
+    /// 
+    /// If elements in the scale tensor are all bigger than zero, npx.constraint_check would return
+    /// `np.array(True)`, which will not change the value of `scale` when multiplied by.
+    /// If some of the elements in the scale tensor violate the constraint, i.e. there exists `False` in
+    /// the boolean tensor `constraint`, a `ValueError` exception with given message
+    /// &#39;Scale should be larger than zero&#39; would be raised.
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_constraint_check.cc:L79</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="input">Input boolean array</param>
+    /// <param name="msg">Error message raised when constraint violated</param>
+    static member NpxConstraintCheck(outputArray : NDArray seq, input : NDArray, [<Optional; DefaultParameterValue("Constraint violated.")>] msg : string) =
+        let creator = AtomicSymbolCreator.FromName "_npx_constraint_check"
+        let names = [|"msg"|]
+        let vals = [|msg|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input)) then input.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>This operator will check if all the elements in a boolean tensor is true.
+    /// If not, ValueError exception will be raised in the backend with given error message.
+    /// In order to evaluate this operator, one should multiply the origin tensor by the return value
+    /// of this operator to force this operator become part of the computation graph, otherwise the check
+    /// would not be working under symoblic mode.
+    /// 
+    /// Example:
+    /// 
+    /// loc = np.zeros((2,2))
+    /// scale = np.array(#some_value)
+    /// constraint = (scale &gt; 0)
+    /// np.random.normal(loc, scale * npx.constraint_check(constraint, &#39;Scale should be larger than zero&#39;))
+    /// 
+    /// If elements in the scale tensor are all bigger than zero, npx.constraint_check would return
+    /// `np.array(True)`, which will not change the value of `scale` when multiplied by.
+    /// If some of the elements in the scale tensor violate the constraint, i.e. there exists `False` in
+    /// the boolean tensor `constraint`, a `ValueError` exception with given message
+    /// &#39;Scale should be larger than zero&#39; would be raised.
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_constraint_check.cc:L79</summary>
+    /// <param name="input">Input boolean array</param>
+    /// <param name="msg">Error message raised when constraint violated</param>
+    static member NpxConstraintCheck([<Optional>] ?input : Symbol, [<Optional>] ?msg : string) =
+        NpxConstraintCheck(?input = input, ?msg = msg)
 
     /// <summary>Return the cumulative sum of the elements along a given axis.
     /// 
@@ -11777,6 +12765,71 @@ type MX() =
     static member NpCumsum([<Optional>] ?a : Symbol, [<Optional>] ?axis : int, [<Optional>] ?dtype : DataType) =
         NpCumsum(?a = a, ?axis = axis, ?dtype = dtype)
 
+
+    /// <summary>Delete values along the given axis before the given indices.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_delete_op.cc:L72</summary>
+    /// <param name="arr">Input ndarray</param>
+    /// <param name="obj">Input ndarray</param>
+    /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+    /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+    /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+    /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+    /// <param name="axis">Axis along which to insert `values`.</param>
+    static member NpiDelete(arr : NDArray, 
+                            obj : NDArray, 
+                            [<Optional>] ?start : int, 
+                            [<Optional>] ?stop : int, 
+                            [<Optional>] ?step : int, 
+                            [<Optional>] ?intInd : int, 
+                            [<Optional>] ?axis : int) =
+        let creator = AtomicSymbolCreator.FromName "_npi_delete"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg arr)) then arr.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg obj)) then obj.UnsafeHandle|]
+                                                 [|"start"; "stop"; "step"; "int_ind"; "axis"|]
+                                                 [|(match start with None -> "None" | Some start -> string start); (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "None" | Some step -> string step); (match intInd with None -> "None" | Some intInd -> string intInd); (match axis with None -> "None" | Some axis -> string axis)|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Delete values along the given axis before the given indices.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_delete_op.cc:L72</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="arr">Input ndarray</param>
+    /// <param name="obj">Input ndarray</param>
+    /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+    /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+    /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+    /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+    /// <param name="axis">Axis along which to insert `values`.</param>
+    static member NpiDelete(outputArray : NDArray seq, 
+                            arr : NDArray, 
+                            obj : NDArray, 
+                            [<Optional>] ?start : int, 
+                            [<Optional>] ?stop : int, 
+                            [<Optional>] ?step : int, 
+                            [<Optional>] ?intInd : int, 
+                            [<Optional>] ?axis : int) =
+        let creator = AtomicSymbolCreator.FromName "_npi_delete"
+        let names = [|"start"; "stop"; "step"; "int_ind"; "axis"|]
+        let vals = [|(match start with None -> "None" | Some start -> string start); (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "None" | Some step -> string step); (match intInd with None -> "None" | Some intInd -> string intInd); (match axis with None -> "None" | Some axis -> string axis)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg arr)) then arr.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg obj)) then obj.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Delete values along the given axis before the given indices.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_delete_op.cc:L72</summary>
+    /// <param name="arr">Input ndarray</param>
+    /// <param name="obj">Input ndarray</param>
+    /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+    /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+    /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+    /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+    /// <param name="axis">Axis along which to insert `values`.</param>
+    static member NpiDelete([<Optional>] ?arr : Symbol, [<Optional>] ?obj : Symbol, [<Optional>] ?start : int, [<Optional>] ?stop : int, [<Optional>] ?step : int, [<Optional>] ?intInd : int, [<Optional>] ?axis : int) =
+        NpiDelete(?arr = arr, ?obj = obj, ?start = start, ?stop = stop, ?step = step, ?intInd = intInd, ?axis = axis)
 
     /// <param name="a">Input ndarray</param>
     /// <param name="n">The number of times values are differenced. If zero, the input is returned as-is.</param>
@@ -11895,6 +12948,84 @@ type MX() =
     static member NpDot([<Optional>] ?a : Symbol, [<Optional>] ?b : Symbol) =
         NpDot(?a = a, ?b = b)
 
+
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="input3">Source input</param>
+    /// <param name="toBeginArrGiven">To determine whether the `to_begin` parameter is an array.</param>
+    /// <param name="toEndArrGiven">To determine whether the `to_end` parameter is an array.</param>
+    /// <param name="toBeginScalar">If the `to_begin`is a scalar, the value of this parameter.</param>
+    /// <param name="toEndScalar">If the `to_end`is a scalar, the value of this parameter.</param>
+    static member NpiEdiff1d(input1 : NDArray, 
+                             input2 : NDArray, 
+                             input3 : NDArray, 
+                             [<Optional>] ?toBeginArrGiven : bool, 
+                             [<Optional>] ?toEndArrGiven : bool, 
+                             [<Optional>] ?toBeginScalar : float, 
+                             [<Optional>] ?toEndScalar : float) =
+        let creator = AtomicSymbolCreator.FromName "_npi_ediff1d"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input3)) then input3.UnsafeHandle|]
+                                                 [|"to_begin_arr_given"; "to_end_arr_given"; "to_begin_scalar"; "to_end_scalar"|]
+                                                 [|(match toBeginArrGiven with None -> "false" | Some toBeginArrGiven -> string toBeginArrGiven); (match toEndArrGiven with None -> "false" | Some toEndArrGiven -> string toEndArrGiven); (match toBeginScalar with None -> "None" | Some toBeginScalar -> string toBeginScalar); (match toEndScalar with None -> "None" | Some toEndScalar -> string toEndScalar)|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="input3">Source input</param>
+    /// <param name="toBeginArrGiven">To determine whether the `to_begin` parameter is an array.</param>
+    /// <param name="toEndArrGiven">To determine whether the `to_end` parameter is an array.</param>
+    /// <param name="toBeginScalar">If the `to_begin`is a scalar, the value of this parameter.</param>
+    /// <param name="toEndScalar">If the `to_end`is a scalar, the value of this parameter.</param>
+    static member NpiEdiff1d(outputArray : NDArray seq, 
+                             input1 : NDArray, 
+                             input2 : NDArray, 
+                             input3 : NDArray, 
+                             [<Optional>] ?toBeginArrGiven : bool, 
+                             [<Optional>] ?toEndArrGiven : bool, 
+                             [<Optional>] ?toBeginScalar : float, 
+                             [<Optional>] ?toEndScalar : float) =
+        let creator = AtomicSymbolCreator.FromName "_npi_ediff1d"
+        let names = [|"to_begin_arr_given"; "to_end_arr_given"; "to_begin_scalar"; "to_end_scalar"|]
+        let vals = [|(match toBeginArrGiven with None -> "false" | Some toBeginArrGiven -> string toBeginArrGiven); (match toEndArrGiven with None -> "false" | Some toEndArrGiven -> string toEndArrGiven); (match toBeginScalar with None -> "None" | Some toBeginScalar -> string toBeginScalar); (match toEndScalar with None -> "None" | Some toEndScalar -> string toEndScalar)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input3)) then input3.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="input3">Source input</param>
+    /// <param name="toBeginArrGiven">To determine whether the `to_begin` parameter is an array.</param>
+    /// <param name="toEndArrGiven">To determine whether the `to_end` parameter is an array.</param>
+    /// <param name="toBeginScalar">If the `to_begin`is a scalar, the value of this parameter.</param>
+    /// <param name="toEndScalar">If the `to_end`is a scalar, the value of this parameter.</param>
+    static member NpiEdiff1d([<Optional>] ?input1 : Symbol, [<Optional>] ?input2 : Symbol, [<Optional>] ?input3 : Symbol, [<Optional>] ?toBeginArrGiven : bool, [<Optional>] ?toEndArrGiven : bool, [<Optional>] ?toBeginScalar : float, [<Optional>] ?toEndScalar : float) =
+        NpiEdiff1d(?input1 = input1, ?input2 = input2, ?input3 = input3, ?toBeginArrGiven = toBeginArrGiven, ?toEndArrGiven = toEndArrGiven, ?toBeginScalar = toBeginScalar, ?toEndScalar = toEndScalar)
+
+    static member NpiBackwardEdiff1dNDArray() =
+        let creator = AtomicSymbolCreator.FromName "_npi_backward_ediff1d"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 Array.empty
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    static member NpiBackwardEdiff1d(outputArray : NDArray seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_backward_ediff1d"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     Array.empty
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    static member NpiBackwardEdiff1d() =
+        NpiBackwardEdiff1d()
 
     /// <summary>
     /// 
@@ -12108,21 +13239,23 @@ type MX() =
         NpiLessEqual(?lhs = lhs, ?rhs = rhs)
 
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiEqualScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiEqualScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_equal_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiEqualScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiEqualScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_equal_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12131,30 +13264,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiEqualScalar(data : Symbol, scalar : float) =
-        NpiEqualScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">First input to the function</param>
-    static member NpiEqualScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiEqualScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiEqualScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiEqualScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiNotEqualScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiNotEqualScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_not_equal_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiNotEqualScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiNotEqualScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_not_equal_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12163,30 +13295,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiNotEqualScalar(data : Symbol, scalar : float) =
-        NpiNotEqualScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">First input to the function</param>
-    static member NpiNotEqualScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiNotEqualScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiNotEqualScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiNotEqualScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiGreaterScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiGreaterScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_greater_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiGreaterScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiGreaterScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_greater_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12195,30 +13326,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiGreaterScalar(data : Symbol, scalar : float) =
-        NpiGreaterScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">First input to the function</param>
-    static member NpiGreaterScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiGreaterScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiGreaterScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiGreaterScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiLessScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiLessScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_less_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiLessScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiLessScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_less_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12227,30 +13357,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiLessScalar(data : Symbol, scalar : float) =
-        NpiLessScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">First input to the function</param>
-    static member NpiLessScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiLessScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiLessScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiLessScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiGreaterEqualScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiGreaterEqualScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_greater_equal_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiGreaterEqualScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiGreaterEqualScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_greater_equal_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12259,30 +13388,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiGreaterEqualScalar(data : Symbol, scalar : float) =
-        NpiGreaterEqualScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">First input to the function</param>
-    static member NpiGreaterEqualScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiGreaterEqualScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiGreaterEqualScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiGreaterEqualScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiLessEqualScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiLessEqualScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_less_equal_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         outputs |> Array.map (fun h -> new NDArray(h))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiLessEqualScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiLessEqualScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_less_equal_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12291,13 +13419,10 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">First input to the function</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiLessEqualScalar(data : Symbol, scalar : float) =
-        NpiLessEqualScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">First input to the function</param>
-    static member NpiLessEqualScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiLessEqualScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiLessEqualScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiLessEqualScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -12327,6 +13452,7 @@ type MX() =
     static member NpiAdd([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
         NpiAdd(?lhs = lhs, ?rhs = rhs)
 
+
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member NpiSubtract(lhs : NDArray, rhs : NDArray) =
@@ -12354,6 +13480,7 @@ type MX() =
     /// <param name="rhs">Second input to the function</param>
     static member NpiSubtract([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
         NpiSubtract(?lhs = lhs, ?rhs = rhs)
+
 
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -12412,6 +13539,7 @@ type MX() =
     static member NpiMod([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
         NpiMod(?lhs = lhs, ?rhs = rhs)
 
+
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member NpiPower(lhs : NDArray, rhs : NDArray) =
@@ -12440,22 +13568,25 @@ type MX() =
     static member NpiPower([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
         NpiPower(?lhs = lhs, ?rhs = rhs)
 
+
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiAddScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiAddScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_add_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiAddScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiAddScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_add_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12464,30 +13595,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiAddScalar(data : Symbol, scalar : float) =
-        NpiAddScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiAddScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiAddScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiAddScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiAddScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiSubtractScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiSubtractScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_subtract_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiSubtractScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiSubtractScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_subtract_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12496,30 +13626,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiSubtractScalar(data : Symbol, scalar : float) =
-        NpiSubtractScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiSubtractScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiSubtractScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiSubtractScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiSubtractScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRsubtractScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRsubtractScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_rsubtract_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRsubtractScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRsubtractScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_rsubtract_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12528,30 +13657,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRsubtractScalar(data : Symbol, scalar : float) =
-        NpiRsubtractScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiRsubtractScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiRsubtractScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRsubtractScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiRsubtractScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiMultiplyScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiMultiplyScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_multiply_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiMultiplyScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiMultiplyScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_multiply_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12560,30 +13688,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiMultiplyScalar(data : Symbol, scalar : float) =
-        NpiMultiplyScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiMultiplyScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiMultiplyScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiMultiplyScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiMultiplyScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiModScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiModScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_mod_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiModScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiModScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_mod_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12592,30 +13719,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiModScalar(data : Symbol, scalar : float) =
-        NpiModScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiModScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiModScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiModScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiModScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRmodScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRmodScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_rmod_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRmodScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRmodScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_rmod_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12624,30 +13750,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRmodScalar(data : Symbol, scalar : float) =
-        NpiRmodScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiRmodScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiRmodScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRmodScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiRmodScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiPowerScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiPowerScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_power_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiPowerScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiPowerScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_power_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12656,30 +13781,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiPowerScalar(data : Symbol, scalar : float) =
-        NpiPowerScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiPowerScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiPowerScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiPowerScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiPowerScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRpowerScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRpowerScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_rpower_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRpowerScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRpowerScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_rpower_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12688,17 +13812,14 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRpowerScalar(data : Symbol, scalar : float) =
-        NpiRpowerScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiRpowerScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiRpowerScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRpowerScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiRpowerScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_broadcast_op_extended.cc:L49</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_broadcast_op_extended.cc:L48</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member NpiCopysign(lhs : NDArray, rhs : NDArray) =
@@ -12710,7 +13831,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_broadcast_op_extended.cc:L49</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_broadcast_op_extended.cc:L48</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -12727,7 +13848,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_broadcast_op_extended.cc:L49</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_broadcast_op_extended.cc:L48</summary>
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
     static member NpiCopysign([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
@@ -12763,21 +13884,23 @@ type MX() =
         NpiLcm(?lhs = lhs, ?rhs = rhs)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiLcmScalar(data : NDArray, scalar : int) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiLcmScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_lcm_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiLcmScalar(outputArray : NDArray seq, data : NDArray, scalar : int) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiLcmScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_lcm_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12786,13 +13909,69 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiLcmScalar(data : Symbol, scalar : int) =
-        NpiLcmScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiLcmScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiLcmScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
+
+    /// <param name="lhs">First input to the function</param>
+    /// <param name="rhs">Second input to the function</param>
+    static member NpiBitwiseAnd(lhs : NDArray, rhs : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_bitwise_and"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="lhs">First input to the function</param>
+    /// <param name="rhs">Second input to the function</param>
+    static member NpiBitwiseAnd(outputArray : NDArray seq, lhs : NDArray, rhs : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_bitwise_and"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="lhs">First input to the function</param>
+    /// <param name="rhs">Second input to the function</param>
+    static member NpiBitwiseAnd([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
+        NpiBitwiseAnd(?lhs = lhs, ?rhs = rhs)
+
     /// <param name="data">source input</param>
-    static member NpiLcmScalar(scalar : int, [<Optional>] ?data : Symbol) =
-        NpiLcmScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiBitwiseAndScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_bitwise_and_scalar"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">source input</param>
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiBitwiseAndScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_bitwise_and_scalar"
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="data">source input</param>
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiBitwiseAndScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiBitwiseAndScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="lhs">First input to the function</param>
     /// <param name="rhs">Second input to the function</param>
@@ -12822,22 +14001,52 @@ type MX() =
     static member NpiBitwiseXor([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
         NpiBitwiseXor(?lhs = lhs, ?rhs = rhs)
 
+    /// <param name="lhs">First input to the function</param>
+    /// <param name="rhs">Second input to the function</param>
+    static member NpiBitwiseOr(lhs : NDArray, rhs : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_bitwise_or"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        (new NDArray(outputs.[0]))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="lhs">First input to the function</param>
+    /// <param name="rhs">Second input to the function</param>
+    static member NpiBitwiseOr(outputArray : NDArray seq, lhs : NDArray, rhs : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_bitwise_or"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="lhs">First input to the function</param>
+    /// <param name="rhs">Second input to the function</param>
+    static member NpiBitwiseOr([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
+        NpiBitwiseOr(?lhs = lhs, ?rhs = rhs)
+
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiBitwiseXorScalar(data : NDArray, scalar : int) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiBitwiseXorScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_bitwise_xor_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiBitwiseXorScalar(outputArray : NDArray seq, data : NDArray, scalar : int) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiBitwiseXorScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_bitwise_xor_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12846,30 +14055,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiBitwiseXorScalar(data : Symbol, scalar : int) =
-        NpiBitwiseXorScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiBitwiseXorScalar(scalar : int, [<Optional>] ?data : Symbol) =
-        NpiBitwiseXorScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiBitwiseXorScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiBitwiseXorScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiCopysignScalar(data : NDArray, scalar : float) =
-        let creator = AtomicSymbolCreator.FromName "_npi_copysign_scalar"
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiBitwiseOrScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_bitwise_or_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiCopysignScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
-        let creator = AtomicSymbolCreator.FromName "_npi_copysign_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiBitwiseOrScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_bitwise_or_scalar"
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12878,30 +14086,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiCopysignScalar(data : Symbol, scalar : float) =
-        NpiCopysignScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiCopysignScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiCopysignScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiBitwiseOrScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiBitwiseOrScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRcopysignScalar(data : NDArray, scalar : float) =
-        let creator = AtomicSymbolCreator.FromName "_npi_rcopysign_scalar"
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiCopysignScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_copysign_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRcopysignScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
-        let creator = AtomicSymbolCreator.FromName "_npi_rcopysign_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiCopysignScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_copysign_scalar"
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12910,13 +14117,41 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRcopysignScalar(data : Symbol, scalar : float) =
-        NpiRcopysignScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiCopysignScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiCopysignScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
+
     /// <param name="data">source input</param>
-    static member NpiRcopysignScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiRcopysignScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRcopysignScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_rcopysign_scalar"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
+        (new NDArray(outputs.[0]))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">source input</param>
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRcopysignScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_rcopysign_scalar"
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="data">source input</param>
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRcopysignScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiRcopysignScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
 
 
@@ -12950,21 +14185,23 @@ type MX() =
 
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiArctan2Scalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiArctan2Scalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_arctan2_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiArctan2Scalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiArctan2Scalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_arctan2_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -12973,30 +14210,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiArctan2Scalar(data : Symbol, scalar : float) =
-        NpiArctan2Scalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiArctan2Scalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiArctan2Scalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiArctan2Scalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiArctan2Scalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRarctan2Scalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRarctan2Scalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_rarctan2_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRarctan2Scalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRarctan2Scalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_rarctan2_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -13005,13 +14241,10 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRarctan2Scalar(data : Symbol, scalar : float) =
-        NpiRarctan2Scalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiRarctan2Scalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiRarctan2Scalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRarctan2Scalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiRarctan2Scalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
 
 
@@ -13073,21 +14306,23 @@ type MX() =
         NpiLdexp(?lhs = lhs, ?rhs = rhs)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiLdexpScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiLdexpScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_ldexp_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiLdexpScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiLdexpScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_ldexp_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -13096,30 +14331,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiLdexpScalar(data : Symbol, scalar : float) =
-        NpiLdexpScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiLdexpScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiLdexpScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiLdexpScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiLdexpScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRldexpScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRldexpScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_rldexp_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRldexpScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRldexpScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_npi_rldexp_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -13128,13 +14362,10 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRldexpScalar(data : Symbol, scalar : float) =
-        NpiRldexpScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiRldexpScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiRldexpScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRldexpScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiRldexpScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
 
 
@@ -13338,7 +14569,7 @@ type MX() =
     ///    absolute([-2, 0, 3]) = [2, 0, 3]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L134</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L139</summary>
     /// <param name="x">The input array.</param>
     static member NpiAbsolute(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_absolute"
@@ -13352,7 +14583,7 @@ type MX() =
     ///    absolute([-2, 0, 3]) = [2, 0, 3]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L134</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L139</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiAbsolute(outputArray : NDArray seq, x : NDArray) =
@@ -13371,7 +14602,7 @@ type MX() =
     ///    absolute([-2, 0, 3]) = [2, 0, 3]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L134</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L139</summary>
     /// <param name="x">The input array.</param>
     static member NpiAbsolute([<Optional>] ?x : Symbol) =
         NpiAbsolute(?x = x)
@@ -13382,7 +14613,7 @@ type MX() =
     ///    sign([-2, 0, 3]) = [-1, 0, 1]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L143</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L148</summary>
     /// <param name="x">The input array.</param>
     static member NpiSign(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_sign"
@@ -13397,7 +14628,7 @@ type MX() =
     ///    sign([-2, 0, 3]) = [-1, 0, 1]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L143</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L148</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiSign(outputArray : NDArray seq, x : NDArray) =
@@ -13417,7 +14648,7 @@ type MX() =
     ///    sign([-2, 0, 3]) = [-1, 0, 1]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L143</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L148</summary>
     /// <param name="x">The input array.</param>
     static member NpiSign([<Optional>] ?x : Symbol) =
         NpiSign(?x = x)
@@ -13427,7 +14658,7 @@ type MX() =
     ///    rint([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -0.,  0.,  2.,  2.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L151</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L156</summary>
     /// <param name="x">The input array.</param>
     static member NpiRint(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_rint"
@@ -13441,7 +14672,7 @@ type MX() =
     ///    rint([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -0.,  0.,  2.,  2.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L151</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L156</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiRint(outputArray : NDArray seq, x : NDArray) =
@@ -13460,7 +14691,7 @@ type MX() =
     ///    rint([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -0.,  0.,  2.,  2.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L151</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L156</summary>
     /// <param name="x">The input array.</param>
     static member NpiRint([<Optional>] ?x : Symbol) =
         NpiRint(?x = x)
@@ -13471,7 +14702,7 @@ type MX() =
     ///    ceil([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  1.,  2.,  2.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L160</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L165</summary>
     /// <param name="x">The input array.</param>
     static member NpiCeil(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_ceil"
@@ -13486,7 +14717,7 @@ type MX() =
     ///    ceil([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  1.,  2.,  2.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L160</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L165</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiCeil(outputArray : NDArray seq, x : NDArray) =
@@ -13506,7 +14737,7 @@ type MX() =
     ///    ceil([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  1.,  2.,  2.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L160</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L165</summary>
     /// <param name="x">The input array.</param>
     static member NpiCeil([<Optional>] ?x : Symbol) =
         NpiCeil(?x = x)
@@ -13517,7 +14748,7 @@ type MX() =
     ///    floor([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -1.,  0.,  1.,  1.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L169</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L174</summary>
     /// <param name="x">The input array.</param>
     static member NpiFloor(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_floor"
@@ -13532,7 +14763,7 @@ type MX() =
     ///    floor([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -1.,  0.,  1.,  1.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L169</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L174</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiFloor(outputArray : NDArray seq, x : NDArray) =
@@ -13552,10 +14783,35 @@ type MX() =
     ///    floor([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-2., -2., -1.,  0.,  1.,  1.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L169</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L174</summary>
     /// <param name="x">The input array.</param>
     static member NpiFloor([<Optional>] ?x : Symbol) =
         NpiFloor(?x = x)
+
+    /// <param name="x">The input array.</param>
+    static member NpiBitwiseNot(x : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_bitwise_not"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="x">The input array.</param>
+    static member NpiBitwiseNot(outputArray : NDArray seq, x : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_bitwise_not"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="x">The input array.</param>
+    static member NpiBitwiseNot([<Optional>] ?x : Symbol) =
+        NpiBitwiseNot(?x = x)
 
     /// <summary>Return the truncated value of the input, element-wise.
     /// The truncated value of the scalar x is the nearest integer i which is closer to
@@ -13564,7 +14820,7 @@ type MX() =
     ///    trunc([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  0.,  1.,  1.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L179</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L198</summary>
     /// <param name="x">The input array.</param>
     static member NpiTrunc(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_trunc"
@@ -13580,7 +14836,7 @@ type MX() =
     ///    trunc([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  0.,  1.,  1.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L179</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L198</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiTrunc(outputArray : NDArray seq, x : NDArray) =
@@ -13601,7 +14857,7 @@ type MX() =
     ///    trunc([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0]) = [-1., -1., -0.,  0.,  1.,  1.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L179</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L198</summary>
     /// <param name="x">The input array.</param>
     static member NpiTrunc([<Optional>] ?x : Symbol) =
         NpiTrunc(?x = x)
@@ -13613,7 +14869,7 @@ type MX() =
     ///    fix([-2.1, -1.9, 1.9, 2.1]) = [-2., -1.,  1., 2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L189</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L208</summary>
     /// <param name="x">The input array.</param>
     static member NpiFix(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_fix"
@@ -13629,7 +14885,7 @@ type MX() =
     ///    fix([-2.1, -1.9, 1.9, 2.1]) = [-2., -1.,  1., 2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L189</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L208</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiFix(outputArray : NDArray seq, x : NDArray) =
@@ -13650,7 +14906,7 @@ type MX() =
     ///    fix([-2.1, -1.9, 1.9, 2.1]) = [-2., -1.,  1., 2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L189</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L208</summary>
     /// <param name="x">The input array.</param>
     static member NpiFix([<Optional>] ?x : Symbol) =
         NpiFix(?x = x)
@@ -13660,7 +14916,7 @@ type MX() =
     ///    square([2, 3, 4]) = [4, 9, 16]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L197</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L216</summary>
     /// <param name="x">The input array.</param>
     static member NpiSquare(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_square"
@@ -13674,7 +14930,7 @@ type MX() =
     ///    square([2, 3, 4]) = [4, 9, 16]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L197</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L216</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiSquare(outputArray : NDArray seq, x : NDArray) =
@@ -13693,7 +14949,7 @@ type MX() =
     ///    square([2, 3, 4]) = [4, 9, 16]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L197</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L216</summary>
     /// <param name="x">The input array.</param>
     static member NpiSquare([<Optional>] ?x : Symbol) =
         NpiSquare(?x = x)
@@ -13703,7 +14959,7 @@ type MX() =
     ///    sqrt([4, 9, 16]) = [2, 3, 4]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L205</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L224</summary>
     /// <param name="x">The input array.</param>
     static member NpiSqrt(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_sqrt"
@@ -13717,7 +14973,7 @@ type MX() =
     ///    sqrt([4, 9, 16]) = [2, 3, 4]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L205</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L224</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiSqrt(outputArray : NDArray seq, x : NDArray) =
@@ -13736,7 +14992,7 @@ type MX() =
     ///    sqrt([4, 9, 16]) = [2, 3, 4]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L205</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L224</summary>
     /// <param name="x">The input array.</param>
     static member NpiSqrt([<Optional>] ?x : Symbol) =
         NpiSqrt(?x = x)
@@ -13746,7 +15002,7 @@ type MX() =
     ///    cbrt([1, 8, -125]) = [1, 2, -5]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L213</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L232</summary>
     /// <param name="x">The input array.</param>
     static member NpiCbrt(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_cbrt"
@@ -13760,7 +15016,7 @@ type MX() =
     ///    cbrt([1, 8, -125]) = [1, 2, -5]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L213</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L232</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiCbrt(outputArray : NDArray seq, x : NDArray) =
@@ -13779,7 +15035,7 @@ type MX() =
     ///    cbrt([1, 8, -125]) = [1, 2, -5]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L213</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L232</summary>
     /// <param name="x">The input array.</param>
     static member NpiCbrt([<Optional>] ?x : Symbol) =
         NpiCbrt(?x = x)
@@ -13789,7 +15045,7 @@ type MX() =
     ///    exp([0, 1, 2]) = [1., 2.71828175, 7.38905621]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L221</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L240</summary>
     /// <param name="x">The input array.</param>
     static member NpiExp(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_exp"
@@ -13803,7 +15059,7 @@ type MX() =
     ///    exp([0, 1, 2]) = [1., 2.71828175, 7.38905621]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L221</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L240</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiExp(outputArray : NDArray seq, x : NDArray) =
@@ -13822,7 +15078,7 @@ type MX() =
     ///    exp([0, 1, 2]) = [1., 2.71828175, 7.38905621]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L221</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L240</summary>
     /// <param name="x">The input array.</param>
     static member NpiExp([<Optional>] ?x : Symbol) =
         NpiExp(?x = x)
@@ -13831,7 +15087,7 @@ type MX() =
     /// The natural logarithm is logarithm in base *e*, so that ``log(exp(x)) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L228</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L247</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_log"
@@ -13844,7 +15100,7 @@ type MX() =
     /// The natural logarithm is logarithm in base *e*, so that ``log(exp(x)) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L228</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L247</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiLog(outputArray : NDArray seq, x : NDArray) =
@@ -13862,7 +15118,7 @@ type MX() =
     /// The natural logarithm is logarithm in base *e*, so that ``log(exp(x)) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L228</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L247</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog([<Optional>] ?x : Symbol) =
         NpiLog(?x = x)
@@ -13871,7 +15127,7 @@ type MX() =
     /// ``10**log10(x) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L249</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L268</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog10(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_log10"
@@ -13884,7 +15140,7 @@ type MX() =
     /// ``10**log10(x) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L249</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L268</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiLog10(outputArray : NDArray seq, x : NDArray) =
@@ -13902,7 +15158,7 @@ type MX() =
     /// ``10**log10(x) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L249</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L268</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog10([<Optional>] ?x : Symbol) =
         NpiLog10(?x = x)
@@ -13911,7 +15167,7 @@ type MX() =
     /// ``2**log2(x) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L256</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L275</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog2(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_log2"
@@ -13924,7 +15180,7 @@ type MX() =
     /// ``2**log2(x) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L256</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L275</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiLog2(outputArray : NDArray seq, x : NDArray) =
@@ -13942,7 +15198,7 @@ type MX() =
     /// ``2**log2(x) = x``
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L256</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L275</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog2([<Optional>] ?x : Symbol) =
         NpiLog2(?x = x)
@@ -13951,7 +15207,7 @@ type MX() =
     /// Calculates ``log(1 + x)``.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L263</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L282</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog1p(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_log1p"
@@ -13964,7 +15220,7 @@ type MX() =
     /// Calculates ``log(1 + x)``.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L263</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L282</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiLog1p(outputArray : NDArray seq, x : NDArray) =
@@ -13982,14 +15238,14 @@ type MX() =
     /// Calculates ``log(1 + x)``.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L263</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L282</summary>
     /// <param name="x">The input array.</param>
     static member NpiLog1p([<Optional>] ?x : Symbol) =
         NpiLog1p(?x = x)
 
     /// <summary>Calculate ``exp(x) - 1`` for all elements in the array.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L268</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L287</summary>
     /// <param name="x">The input array.</param>
     static member NpiExpm1(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_expm1"
@@ -14000,7 +15256,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Calculate ``exp(x) - 1`` for all elements in the array.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L268</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L287</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiExpm1(outputArray : NDArray seq, x : NDArray) =
@@ -14016,7 +15272,7 @@ type MX() =
         ()
     /// <summary>Calculate ``exp(x) - 1`` for all elements in the array.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L268</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L287</summary>
     /// <param name="x">The input array.</param>
     static member NpiExpm1([<Optional>] ?x : Symbol) =
         NpiExpm1(?x = x)
@@ -14046,12 +15302,137 @@ type MX() =
     static member NpiLogicalNot([<Optional>] ?x : Symbol) =
         NpiLogicalNot(?x = x)
 
+    /// <param name="x">The input array.</param>
+    static member NpiIsnan(x : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_isnan"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="x">The input array.</param>
+    static member NpiIsnan(outputArray : NDArray seq, x : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_isnan"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="x">The input array.</param>
+    static member NpiIsnan([<Optional>] ?x : Symbol) =
+        NpiIsnan(?x = x)
+
+    /// <param name="x">The input array.</param>
+    static member NpiIsinf(x : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_isinf"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="x">The input array.</param>
+    static member NpiIsinf(outputArray : NDArray seq, x : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_isinf"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="x">The input array.</param>
+    static member NpiIsinf([<Optional>] ?x : Symbol) =
+        NpiIsinf(?x = x)
+
+    /// <param name="x">The input array.</param>
+    static member NpiIsposinf(x : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_isposinf"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="x">The input array.</param>
+    static member NpiIsposinf(outputArray : NDArray seq, x : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_isposinf"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="x">The input array.</param>
+    static member NpiIsposinf([<Optional>] ?x : Symbol) =
+        NpiIsposinf(?x = x)
+
+    /// <param name="x">The input array.</param>
+    static member NpiIsneginf(x : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_isneginf"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="x">The input array.</param>
+    static member NpiIsneginf(outputArray : NDArray seq, x : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_isneginf"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="x">The input array.</param>
+    static member NpiIsneginf([<Optional>] ?x : Symbol) =
+        NpiIsneginf(?x = x)
+
+    /// <param name="x">The input array.</param>
+    static member NpiIsfinite(x : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_isfinite"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="x">The input array.</param>
+    static member NpiIsfinite(outputArray : NDArray seq, x : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_isfinite"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="x">The input array.</param>
+    static member NpiIsfinite([<Optional>] ?x : Symbol) =
+        NpiIsfinite(?x = x)
+
     /// <summary>Trigonometric sine, element-wise.
     /// .. math::
     ///    sin([0, \pi/4, \pi/2]) = [0, 0.707, 1]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L281</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L320</summary>
     /// <param name="x">The input array.</param>
     static member NpiSin(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_sin"
@@ -14065,7 +15446,7 @@ type MX() =
     ///    sin([0, \pi/4, \pi/2]) = [0, 0.707, 1]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L281</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L320</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiSin(outputArray : NDArray seq, x : NDArray) =
@@ -14084,7 +15465,7 @@ type MX() =
     ///    sin([0, \pi/4, \pi/2]) = [0, 0.707, 1]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L281</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L320</summary>
     /// <param name="x">The input array.</param>
     static member NpiSin([<Optional>] ?x : Symbol) =
         NpiSin(?x = x)
@@ -14094,7 +15475,7 @@ type MX() =
     ///    cos([0, \pi/4, \pi/2]) = [1, 0.707, 0]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L289</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L328</summary>
     /// <param name="x">The input array.</param>
     static member NpiCos(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_cos"
@@ -14108,7 +15489,7 @@ type MX() =
     ///    cos([0, \pi/4, \pi/2]) = [1, 0.707, 0]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L289</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L328</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiCos(outputArray : NDArray seq, x : NDArray) =
@@ -14127,7 +15508,7 @@ type MX() =
     ///    cos([0, \pi/4, \pi/2]) = [1, 0.707, 0]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L289</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L328</summary>
     /// <param name="x">The input array.</param>
     static member NpiCos([<Optional>] ?x : Symbol) =
         NpiCos(?x = x)
@@ -14137,7 +15518,7 @@ type MX() =
     ///    tan([0, \pi/4, \pi/2]) = [0, 1, -inf]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L297</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L336</summary>
     /// <param name="x">The input array.</param>
     static member NpiTan(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_tan"
@@ -14151,7 +15532,7 @@ type MX() =
     ///    tan([0, \pi/4, \pi/2]) = [0, 1, -inf]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L297</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L336</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiTan(outputArray : NDArray seq, x : NDArray) =
@@ -14170,7 +15551,7 @@ type MX() =
     ///    tan([0, \pi/4, \pi/2]) = [0, 1, -inf]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L297</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L336</summary>
     /// <param name="x">The input array.</param>
     static member NpiTan([<Optional>] ?x : Symbol) =
         NpiTan(?x = x)
@@ -14180,7 +15561,7 @@ type MX() =
     ///    arcsin([-1, -.707, 0, .707, 1]) = [-\pi/2, -\pi/4, 0, \pi/4, \pi/2]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L305</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L344</summary>
     /// <param name="x">The input array.</param>
     static member NpiArcsin(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_arcsin"
@@ -14194,7 +15575,7 @@ type MX() =
     ///    arcsin([-1, -.707, 0, .707, 1]) = [-\pi/2, -\pi/4, 0, \pi/4, \pi/2]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L305</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L344</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiArcsin(outputArray : NDArray seq, x : NDArray) =
@@ -14213,7 +15594,7 @@ type MX() =
     ///    arcsin([-1, -.707, 0, .707, 1]) = [-\pi/2, -\pi/4, 0, \pi/4, \pi/2]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L305</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L344</summary>
     /// <param name="x">The input array.</param>
     static member NpiArcsin([<Optional>] ?x : Symbol) =
         NpiArcsin(?x = x)
@@ -14226,7 +15607,7 @@ type MX() =
     /// The storage type of ``arccos`` output is always dense
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L316</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L355</summary>
     /// <param name="x">The input array.</param>
     static member NpiArccos(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_arccos"
@@ -14243,7 +15624,7 @@ type MX() =
     /// The storage type of ``arccos`` output is always dense
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L316</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L355</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiArccos(outputArray : NDArray seq, x : NDArray) =
@@ -14265,7 +15646,7 @@ type MX() =
     /// The storage type of ``arccos`` output is always dense
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L316</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L355</summary>
     /// <param name="x">The input array.</param>
     static member NpiArccos([<Optional>] ?x : Symbol) =
         NpiArccos(?x = x)
@@ -14275,7 +15656,7 @@ type MX() =
     ///    arctan([-1, 0, 1]) = [-\pi/4, 0, \pi/4]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L324</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L363</summary>
     /// <param name="x">The input array.</param>
     static member NpiArctan(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_arctan"
@@ -14289,7 +15670,7 @@ type MX() =
     ///    arctan([-1, 0, 1]) = [-\pi/4, 0, \pi/4]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L324</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L363</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiArctan(outputArray : NDArray seq, x : NDArray) =
@@ -14308,7 +15689,7 @@ type MX() =
     ///    arctan([-1, 0, 1]) = [-\pi/4, 0, \pi/4]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L324</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L363</summary>
     /// <param name="x">The input array.</param>
     static member NpiArctan([<Optional>] ?x : Symbol) =
         NpiArctan(?x = x)
@@ -14318,7 +15699,7 @@ type MX() =
     ///    degrees([0, \pi/2, \pi, 3\pi/2, 2\pi]) = [0, 90, 180, 270, 360]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L332</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L371</summary>
     /// <param name="x">The input array.</param>
     static member NpiDegrees(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_degrees"
@@ -14332,7 +15713,7 @@ type MX() =
     ///    degrees([0, \pi/2, \pi, 3\pi/2, 2\pi]) = [0, 90, 180, 270, 360]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L332</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L371</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiDegrees(outputArray : NDArray seq, x : NDArray) =
@@ -14351,7 +15732,7 @@ type MX() =
     ///    degrees([0, \pi/2, \pi, 3\pi/2, 2\pi]) = [0, 90, 180, 270, 360]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L332</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L371</summary>
     /// <param name="x">The input array.</param>
     static member NpiDegrees([<Optional>] ?x : Symbol) =
         NpiDegrees(?x = x)
@@ -14361,7 +15742,7 @@ type MX() =
     ///    radians([0, 90, 180, 270, 360]) = [0, \pi/2, \pi, 3\pi/2, 2\pi]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L340</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L379</summary>
     /// <param name="x">The input array.</param>
     static member NpiRadians(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_radians"
@@ -14375,7 +15756,7 @@ type MX() =
     ///    radians([0, 90, 180, 270, 360]) = [0, \pi/2, \pi, 3\pi/2, 2\pi]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L340</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L379</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiRadians(outputArray : NDArray seq, x : NDArray) =
@@ -14394,7 +15775,7 @@ type MX() =
     ///    radians([0, 90, 180, 270, 360]) = [0, \pi/2, \pi, 3\pi/2, 2\pi]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L340</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L379</summary>
     /// <param name="x">The input array.</param>
     static member NpiRadians([<Optional>] ?x : Symbol) =
         NpiRadians(?x = x)
@@ -14404,7 +15785,7 @@ type MX() =
     ///    sinh(x) = 0.5\times(exp(x) - exp(-x))
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L348</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L387</summary>
     /// <param name="x">The input array.</param>
     static member NpiSinh(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_sinh"
@@ -14418,7 +15799,7 @@ type MX() =
     ///    sinh(x) = 0.5\times(exp(x) - exp(-x))
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L348</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L387</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiSinh(outputArray : NDArray seq, x : NDArray) =
@@ -14437,7 +15818,7 @@ type MX() =
     ///    sinh(x) = 0.5\times(exp(x) - exp(-x))
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L348</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L387</summary>
     /// <param name="x">The input array.</param>
     static member NpiSinh([<Optional>] ?x : Symbol) =
         NpiSinh(?x = x)
@@ -14447,7 +15828,7 @@ type MX() =
     ///    cosh(x) = 0.5\times(exp(x) + exp(-x))
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L356</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L395</summary>
     /// <param name="x">The input array.</param>
     static member NpiCosh(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_cosh"
@@ -14461,7 +15842,7 @@ type MX() =
     ///    cosh(x) = 0.5\times(exp(x) + exp(-x))
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L356</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L395</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiCosh(outputArray : NDArray seq, x : NDArray) =
@@ -14480,7 +15861,7 @@ type MX() =
     ///    cosh(x) = 0.5\times(exp(x) + exp(-x))
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L356</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L395</summary>
     /// <param name="x">The input array.</param>
     static member NpiCosh([<Optional>] ?x : Symbol) =
         NpiCosh(?x = x)
@@ -14490,7 +15871,7 @@ type MX() =
     ///    tanh(x) = sinh(x) / cosh(x)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L364</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L403</summary>
     /// <param name="x">The input array.</param>
     static member NpiTanh(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_tanh"
@@ -14504,7 +15885,7 @@ type MX() =
     ///    tanh(x) = sinh(x) / cosh(x)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L364</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L403</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiTanh(outputArray : NDArray seq, x : NDArray) =
@@ -14523,7 +15904,7 @@ type MX() =
     ///    tanh(x) = sinh(x) / cosh(x)
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L364</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L403</summary>
     /// <param name="x">The input array.</param>
     static member NpiTanh([<Optional>] ?x : Symbol) =
         NpiTanh(?x = x)
@@ -14532,7 +15913,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L371</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L410</summary>
     /// <param name="x">The input array.</param>
     static member NpiArcsinh(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_arcsinh"
@@ -14545,7 +15926,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L371</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L410</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiArcsinh(outputArray : NDArray seq, x : NDArray) =
@@ -14563,7 +15944,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L371</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L410</summary>
     /// <param name="x">The input array.</param>
     static member NpiArcsinh([<Optional>] ?x : Symbol) =
         NpiArcsinh(?x = x)
@@ -14572,7 +15953,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L378</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L417</summary>
     /// <param name="x">The input array.</param>
     static member NpiArccosh(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_arccosh"
@@ -14585,7 +15966,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L378</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L417</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiArccosh(outputArray : NDArray seq, x : NDArray) =
@@ -14603,7 +15984,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L378</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L417</summary>
     /// <param name="x">The input array.</param>
     static member NpiArccosh([<Optional>] ?x : Symbol) =
         NpiArccosh(?x = x)
@@ -14612,7 +15993,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L385</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L424</summary>
     /// <param name="x">The input array.</param>
     static member NpiArctanh(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npi_arctanh"
@@ -14625,7 +16006,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L385</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L424</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="x">The input array.</param>
     static member NpiArctanh(outputArray : NDArray seq, x : NDArray) =
@@ -14643,7 +16024,7 @@ type MX() =
     /// computed element-wise.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L385</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L424</summary>
     /// <param name="x">The input array.</param>
     static member NpiArctanh([<Optional>] ?x : Symbol) =
         NpiArctanh(?x = x)
@@ -14675,6 +16056,83 @@ type MX() =
     /// <param name="decimals">Number of decimal places to round to.</param>
     static member NpiAround([<Optional>] ?x : Symbol, [<Optional>] ?decimals : int) =
         NpiAround(?x = x, ?decimals = decimals)
+
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L464</summary>
+    /// <param name="data">Input ndarray</param>
+    /// <param name="copy">Whether to create a copy of `x` (True) or to replace valuesin-place (False). The in-place operation only occurs ifcasting to an array does not require a copy.Default is True.</param>
+    /// <param name="nan">Value to be used to fill NaN values. If no value is passedthen NaN values will be replaced with 0.0.</param>
+    /// <param name="posinf">Value to be used to fill positive infinity values.If no value is passed then positive infinity values will bereplaced with a very large number.</param>
+    /// <param name="neginf">Value to be used to fill negative infinity values.If no value is passed then negative infinity valueswill be replaced with a very small (or negative) number.</param>
+    static member NpiNanToNum(data : NDArray, 
+                              [<Optional>] ?copy : bool, 
+                              [<Optional>] ?nan : double, 
+                              [<Optional>] ?posinf : float, 
+                              [<Optional>] ?neginf : float) =
+        let creator = AtomicSymbolCreator.FromName "_npi_nan_to_num"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 [|"copy"; "nan"; "posinf"; "neginf"|]
+                                                 [|(match copy with None -> "true" | Some copy -> string copy); (match nan with None -> "0.0" | Some nan -> string nan); (match posinf with None -> "None" | Some posinf -> string posinf); (match neginf with None -> "None" | Some neginf -> string neginf)|]
+        (new NDArray(outputs.[0]))
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L464</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">Input ndarray</param>
+    /// <param name="copy">Whether to create a copy of `x` (True) or to replace valuesin-place (False). The in-place operation only occurs ifcasting to an array does not require a copy.Default is True.</param>
+    /// <param name="nan">Value to be used to fill NaN values. If no value is passedthen NaN values will be replaced with 0.0.</param>
+    /// <param name="posinf">Value to be used to fill positive infinity values.If no value is passed then positive infinity values will bereplaced with a very large number.</param>
+    /// <param name="neginf">Value to be used to fill negative infinity values.If no value is passed then negative infinity valueswill be replaced with a very small (or negative) number.</param>
+    static member NpiNanToNum(outputArray : NDArray seq, 
+                              data : NDArray, 
+                              [<Optional>] ?copy : bool, 
+                              [<Optional>] ?nan : double, 
+                              [<Optional>] ?posinf : float, 
+                              [<Optional>] ?neginf : float) =
+        let creator = AtomicSymbolCreator.FromName "_npi_nan_to_num"
+        let names = [|"copy"; "nan"; "posinf"; "neginf"|]
+        let vals = [|(match copy with None -> "true" | Some copy -> string copy); (match nan with None -> "0.0" | Some nan -> string nan); (match posinf with None -> "None" | Some posinf -> string posinf); (match neginf with None -> "None" | Some neginf -> string neginf)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_elemwise_unary_op_basic.cc:L464</summary>
+    /// <param name="data">Input ndarray</param>
+    /// <param name="copy">Whether to create a copy of `x` (True) or to replace valuesin-place (False). The in-place operation only occurs ifcasting to an array does not require a copy.Default is True.</param>
+    /// <param name="nan">Value to be used to fill NaN values. If no value is passedthen NaN values will be replaced with 0.0.</param>
+    /// <param name="posinf">Value to be used to fill positive infinity values.If no value is passed then positive infinity values will bereplaced with a very large number.</param>
+    /// <param name="neginf">Value to be used to fill negative infinity values.If no value is passed then negative infinity valueswill be replaced with a very small (or negative) number.</param>
+    static member NpiNanToNum([<Optional>] ?data : Symbol, [<Optional>] ?copy : bool, [<Optional>] ?nan : double, [<Optional>] ?posinf : float, [<Optional>] ?neginf : float) =
+        NpiNanToNum(?data = data, ?copy = copy, ?nan = nan, ?posinf = posinf, ?neginf = neginf)
+
+    static member NpiBackwardNanToNumNDArray() =
+        let creator = AtomicSymbolCreator.FromName "_npi_backward_nan_to_num"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 Array.empty
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    static member NpiBackwardNanToNum(outputArray : NDArray seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_backward_nan_to_num"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     Array.empty
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    static member NpiBackwardNanToNum() =
+        NpiBackwardNanToNum()
 
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="shape">The shape of the output</param>
@@ -14772,45 +16230,107 @@ type MX() =
     static member NpiIdentity([<Optional>] ?shape : int seq, [<Optional>] ?dtype : DataType) =
         NpiIdentity(?shape = shape, ?dtype = dtype)
 
-    /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
-    static member NpZerosLike(a : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "_np_zeros_like"
+    /// <param name="arys">List of input arrays</param>
+    /// <param name="numArgs">Number of input arrays.</param>
+    static member NpAtleast1d([<ParamArray>] arys : NDArray[]) =
+        let creator = AtomicSymbolCreator.FromName "_np_atleast_1d"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
-                                                 Array.empty
-                                                 Array.empty
-        (new NDArray(outputs.[0]))
+                                                 (arys |> Array.map (fun x -> x.UnsafeHandle))
+                                                 [|"num_args"|]
+                                                 [|string arys.Length|]
+        outputs |> Array.map (fun h -> new NDArray(h))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
-    static member NpZerosLike(outputArray : NDArray seq, a : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "_np_zeros_like"
-        let names = Array.empty
-        let vals = Array.empty
+    /// <param name="arys">List of input arrays</param>
+    /// <param name="numArgs">Number of input arrays.</param>
+    static member NpAtleast1d(outputArray : NDArray seq, [<ParamArray>] arys : NDArray[]) =
+        let creator = AtomicSymbolCreator.FromName "_np_atleast_1d"
+        let names = [|"num_args"|]
+        let vals = [|string arys.Length|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
+                                                     (arys |> Array.map (fun x -> x.UnsafeHandle))
                                                      (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
                                                      names
                                                      vals
         ()
-    /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
-    static member NpZerosLike([<Optional>] ?a : Symbol) =
-        NpZerosLike(?a = a)
+    /// <param name="arys">List of input arrays</param>
+    static member NpAtleast1d([<ParamArray>] arys : Symbol[]) =
+        NpAtleast1d(arys)
+
+    /// <param name="arys">List of input arrays</param>
+    /// <param name="numArgs">Number of input arrays.</param>
+    static member NpAtleast2d([<ParamArray>] arys : NDArray[]) =
+        let creator = AtomicSymbolCreator.FromName "_np_atleast_2d"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 (arys |> Array.map (fun x -> x.UnsafeHandle))
+                                                 [|"num_args"|]
+                                                 [|string arys.Length|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="arys">List of input arrays</param>
+    /// <param name="numArgs">Number of input arrays.</param>
+    static member NpAtleast2d(outputArray : NDArray seq, [<ParamArray>] arys : NDArray[]) =
+        let creator = AtomicSymbolCreator.FromName "_np_atleast_2d"
+        let names = [|"num_args"|]
+        let vals = [|string arys.Length|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     (arys |> Array.map (fun x -> x.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="arys">List of input arrays</param>
+    static member NpAtleast2d([<ParamArray>] arys : Symbol[]) =
+        NpAtleast2d(arys)
+
+    /// <param name="arys">List of input arrays</param>
+    /// <param name="numArgs">Number of input arrays.</param>
+    static member NpAtleast3d([<ParamArray>] arys : NDArray[]) =
+        let creator = AtomicSymbolCreator.FromName "_np_atleast_3d"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 (arys |> Array.map (fun x -> x.UnsafeHandle))
+                                                 [|"num_args"|]
+                                                 [|string arys.Length|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="arys">List of input arrays</param>
+    /// <param name="numArgs">Number of input arrays.</param>
+    static member NpAtleast3d(outputArray : NDArray seq, [<ParamArray>] arys : NDArray[]) =
+        let creator = AtomicSymbolCreator.FromName "_np_atleast_3d"
+        let names = [|"num_args"|]
+        let vals = [|string arys.Length|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     (arys |> Array.map (fun x -> x.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="arys">List of input arrays</param>
+    static member NpAtleast3d([<ParamArray>] arys : Symbol[]) =
+        NpAtleast3d(arys)
 
     /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
-    static member NpOnesLike(a : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "_np_ones_like"
+    /// <param name="fillValue">Value with which to fill newly created tensor</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
+    /// <param name="dtype">Target data type.</param>
+    static member NpiFullLike(a : NDArray, fillValue : double, ctx : Context, [<Optional>] dtype : NpiFullLikeDtype) =
+        let creator = AtomicSymbolCreator.FromName "_npi_full_like"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
-                                                 Array.empty
-                                                 Array.empty
-        (new NDArray(outputs.[0]))
+                                                 [|"fill_value"; "ctx"; "dtype"|]
+                                                 [|string fillValue; string ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
+        outputs |> Array.map (fun h -> new NDArray(h))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
-    static member NpOnesLike(outputArray : NDArray seq, a : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "_np_ones_like"
-        let names = Array.empty
-        let vals = Array.empty
+    /// <param name="fillValue">Value with which to fill newly created tensor</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
+    /// <param name="dtype">Target data type.</param>
+    static member NpiFullLike(outputArray : NDArray seq, a : NDArray, fillValue : double, ctx : Context, [<Optional>] dtype : NpiFullLikeDtype) =
+        let creator = AtomicSymbolCreator.FromName "_npi_full_like"
+        let names = [|"fill_value"; "ctx"; "dtype"|]
+        let vals = [|string fillValue; string ctx; (if isNull (dtype :> obj) then "None" else string dtype)|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
@@ -14819,8 +16339,15 @@ type MX() =
                                                      vals
         ()
     /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
-    static member NpOnesLike([<Optional>] ?a : Symbol) =
-        NpOnesLike(?a = a)
+    /// <param name="fillValue">Value with which to fill newly created tensor</param>
+    /// <param name="dtype">Target data type.</param>
+    static member NpiFullLike(a : Symbol, fillValue : double, [<Optional>] ?dtype : NpiFullLikeDtype) =
+        NpiFullLike(a, fillValue, ?dtype = dtype)
+    /// <param name="fillValue">Value with which to fill newly created tensor</param>
+    /// <param name="a">The shape and data-type of a define these same attributes of the returned array.</param>
+    /// <param name="dtype">Target data type.</param>
+    static member NpiFullLike(fillValue : double, [<Optional>] ?a : Symbol, [<Optional>] ?dtype : NpiFullLikeDtype) =
+        NpiFullLike(fillValue, ?a = a, ?dtype = dtype)
 
     /// <param name="start">Start of interval. The interval includes this value. The default start value is 0.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
@@ -14835,7 +16362,7 @@ type MX() =
                                    [<Optional>] ?step : double, 
                                    [<Optional>] ?repeat : int, 
                                    [<Optional>] ?inferRange : bool, 
-                                   [<Optional>] ?dtype : DataType) =
+                                   [<Optional>] ?dtype : NpiArangeDtype) =
         let creator = AtomicSymbolCreator.FromName "_npi_arange"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -14857,7 +16384,7 @@ type MX() =
                             [<Optional>] ?step : double, 
                             [<Optional>] ?repeat : int, 
                             [<Optional>] ?inferRange : bool, 
-                            [<Optional>] ?dtype : DataType) =
+                            [<Optional>] ?dtype : NpiArangeDtype) =
         let creator = AtomicSymbolCreator.FromName "_npi_arange"
         let names = [|"start"; "ctx"; "stop"; "step"; "repeat"; "infer_range"; "dtype"|]
         let vals = [|string start; string ctx; (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "1.0" | Some step -> string step); (match repeat with None -> "1" | Some repeat -> string repeat); (match inferRange with None -> "false" | Some inferRange -> string inferRange); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
@@ -14874,7 +16401,7 @@ type MX() =
     /// <param name="repeat">The repeating time of all elements. E.g repeat=3, the element a will be repeated three times --&gt; a, a, a.</param>
     /// <param name="inferRange">When set to True, infer the stop position from the start, step, repeat, and output tensor size.</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiArange(start : double, [<Optional>] ?stop : float, [<Optional>] ?step : double, [<Optional>] ?repeat : int, [<Optional>] ?inferRange : bool, [<Optional>] ?dtype : DataType) =
+    static member NpiArange(start : double, [<Optional>] ?stop : float, [<Optional>] ?step : double, [<Optional>] ?repeat : int, [<Optional>] ?inferRange : bool, [<Optional>] ?dtype : NpiArangeDtype) =
         NpiArange(start, ?stop = stop, ?step = step, ?repeat = repeat, ?inferRange = inferRange, ?dtype = dtype)
 
     /// <summary>Return a 2-D array with ones on the diagonal and zeros elsewhere.</summary>
@@ -14887,7 +16414,7 @@ type MX() =
                                 M : int64, 
                                 ctx : Context, 
                                 [<Optional; DefaultParameterValue(0L)>] k : int64, 
-                                [<Optional>] dtype : DataType) =
+                                [<Optional>] dtype : NpiEyeDtype) =
         let creator = AtomicSymbolCreator.FromName "_npi_eye"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -14906,7 +16433,7 @@ type MX() =
                          M : int64, 
                          ctx : Context, 
                          [<Optional; DefaultParameterValue(0L)>] k : int64, 
-                         [<Optional>] dtype : DataType) =
+                         [<Optional>] dtype : NpiEyeDtype) =
         let creator = AtomicSymbolCreator.FromName "_npi_eye"
         let names = [|"N"; "M"; "ctx"; "k"; "dtype"|]
         let vals = [|string N; string M; string ctx; string k; (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -14922,14 +16449,14 @@ type MX() =
     /// <param name="M">Number of columns in the output. If None, defaults to N.</param>
     /// <param name="k">Index of the diagonal. 0 (the default) refers to the main diagonal,a positive value refers to an upper diagonal.and a negative value to a lower diagonal.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiEye(N : int64, M : int64, [<Optional>] ?k : int64, [<Optional>] ?dtype : DataType) =
+    static member NpiEye(N : int64, M : int64, [<Optional>] ?k : int64, [<Optional>] ?dtype : NpiEyeDtype) =
         NpiEye(N, M, ?k = k, ?dtype = dtype)
 
     /// <summary>Return an array representing the indices of a grid.</summary>
     /// <param name="dimensions">The shape of the grid.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiIndicesNDArray(dimensions : int seq, ctx : Context, [<Optional>] dtype : DataType) =
+    static member NpiIndicesNDArray(dimensions : int seq, ctx : Context, [<Optional>] dtype : NpiIndicesDtype) =
         let creator = AtomicSymbolCreator.FromName "_npi_indices"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -14941,7 +16468,7 @@ type MX() =
     /// <param name="dimensions">The shape of the grid.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiIndices(outputArray : NDArray seq, dimensions : int seq, ctx : Context, [<Optional>] dtype : DataType) =
+    static member NpiIndices(outputArray : NDArray seq, dimensions : int seq, ctx : Context, [<Optional>] dtype : NpiIndicesDtype) =
         let creator = AtomicSymbolCreator.FromName "_npi_indices"
         let names = [|"dimensions"; "ctx"; "dtype"|]
         let vals = [|(dimensions |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string ctx; (if isNull (dtype :> obj) then "int32" else string dtype)|]
@@ -14955,7 +16482,7 @@ type MX() =
     /// <summary>Return an array representing the indices of a grid.</summary>
     /// <param name="dimensions">The shape of the grid.</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiIndices(dimensions : int seq, [<Optional>] ?dtype : DataType) =
+    static member NpiIndices(dimensions : int seq, [<Optional>] ?dtype : NpiIndicesDtype) =
         NpiIndices(dimensions, ?dtype = dtype)
 
     /// <summary>Return numbers spaced evenly on a log scale.</summary>
@@ -14972,7 +16499,7 @@ type MX() =
                                      ctx : Context, 
                                      [<Optional; DefaultParameterValue(true)>] endpoint : bool, 
                                      [<Optional; DefaultParameterValue(10.0)>] lbase : double, 
-                                     [<Optional>] dtype : DataType) =
+                                     [<Optional>] dtype : NpiLogspaceDtype) =
         let creator = AtomicSymbolCreator.FromName "_npi_logspace"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -14995,7 +16522,7 @@ type MX() =
                               ctx : Context, 
                               [<Optional; DefaultParameterValue(true)>] endpoint : bool, 
                               [<Optional; DefaultParameterValue(10.0)>] lbase : double, 
-                              [<Optional>] dtype : DataType) =
+                              [<Optional>] dtype : NpiLogspaceDtype) =
         let creator = AtomicSymbolCreator.FromName "_npi_logspace"
         let names = [|"start"; "stop"; "num"; "ctx"; "endpoint"; "base"; "dtype"|]
         let vals = [|string start; string stop; string num; string ctx; string endpoint; string lbase; (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -15013,8 +16540,264 @@ type MX() =
     /// <param name="endpoint">If True, stop is the last sample. Otherwise, it is not included.</param>
     /// <param name="lbase">The base of the log space. The step size between the elements in ln(samples) / ln(base) (or log_base(samples)) is uniform.</param>
     /// <param name="dtype">Target data type.</param>
-    static member NpiLogspace(start : double, stop : double, num : int, [<Optional>] ?endpoint : bool, [<Optional>] ?lbase : double, [<Optional>] ?dtype : DataType) =
+    static member NpiLogspace(start : double, stop : double, num : int, [<Optional>] ?endpoint : bool, [<Optional>] ?lbase : double, [<Optional>] ?dtype : NpiLogspaceDtype) =
         NpiLogspace(start, stop, num, ?endpoint = endpoint, ?lbase = lbase, ?dtype = dtype)
+
+    /// <summary>Insert values along the given axis before the given indices.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_insert_op_scalar.cc:L106</summary>
+    /// <param name="arr">Input ndarray</param>
+    /// <param name="values">Input ndarray</param>
+    /// <param name="value">A scaler to be inserted into &#39;array&#39;</param>
+    /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+    /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+    /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+    /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+    /// <param name="axis">Axis along which to insert &#39;values&#39;.</param>
+    static member NpiInsertScalar(arr : NDArray, 
+                                  values : NDArray, 
+                                  [<Optional>] ?value : float, 
+                                  [<Optional>] ?start : int, 
+                                  [<Optional>] ?stop : int, 
+                                  [<Optional>] ?step : int, 
+                                  [<Optional>] ?intInd : int, 
+                                  [<Optional>] ?axis : int) =
+        let creator = AtomicSymbolCreator.FromName "_npi_insert_scalar"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg arr)) then arr.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg values)) then values.UnsafeHandle|]
+                                                 [|"val"; "start"; "stop"; "step"; "int_ind"; "axis"|]
+                                                 [|(match value with None -> "None" | Some value -> string value); (match start with None -> "None" | Some start -> string start); (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "None" | Some step -> string step); (match intInd with None -> "None" | Some intInd -> string intInd); (match axis with None -> "None" | Some axis -> string axis)|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Insert values along the given axis before the given indices.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_insert_op_scalar.cc:L106</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="arr">Input ndarray</param>
+    /// <param name="values">Input ndarray</param>
+    /// <param name="value">A scaler to be inserted into &#39;array&#39;</param>
+    /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+    /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+    /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+    /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+    /// <param name="axis">Axis along which to insert &#39;values&#39;.</param>
+    static member NpiInsertScalar(outputArray : NDArray seq, 
+                                  arr : NDArray, 
+                                  values : NDArray, 
+                                  [<Optional>] ?value : float, 
+                                  [<Optional>] ?start : int, 
+                                  [<Optional>] ?stop : int, 
+                                  [<Optional>] ?step : int, 
+                                  [<Optional>] ?intInd : int, 
+                                  [<Optional>] ?axis : int) =
+        let creator = AtomicSymbolCreator.FromName "_npi_insert_scalar"
+        let names = [|"val"; "start"; "stop"; "step"; "int_ind"; "axis"|]
+        let vals = [|(match value with None -> "None" | Some value -> string value); (match start with None -> "None" | Some start -> string start); (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "None" | Some step -> string step); (match intInd with None -> "None" | Some intInd -> string intInd); (match axis with None -> "None" | Some axis -> string axis)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg arr)) then arr.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg values)) then values.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Insert values along the given axis before the given indices.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_insert_op_scalar.cc:L106</summary>
+    /// <param name="arr">Input ndarray</param>
+    /// <param name="values">Input ndarray</param>
+    /// <param name="value">A scaler to be inserted into &#39;array&#39;</param>
+    /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+    /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+    /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+    /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+    /// <param name="axis">Axis along which to insert &#39;values&#39;.</param>
+    static member NpiInsertScalar([<Optional>] ?arr : Symbol, [<Optional>] ?values : Symbol, [<Optional>] ?value : float, [<Optional>] ?start : int, [<Optional>] ?stop : int, [<Optional>] ?step : int, [<Optional>] ?intInd : int, [<Optional>] ?axis : int) =
+        NpiInsertScalar(?arr = arr, ?values = values, ?value = value, ?start = start, ?stop = stop, ?step = step, ?intInd = intInd, ?axis = axis)
+
+    /// <summary>Insert values along the given axis before the given indices.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_insert_op_slice.cc:L132</summary>
+    /// <param name="arr">Input ndarray</param>
+    /// <param name="values">Input ndarray</param>
+    /// <param name="value">A scaler to be inserted into &#39;array&#39;</param>
+    /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+    /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+    /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+    /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+    /// <param name="axis">Axis along which to insert &#39;values&#39;.</param>
+    static member NpiInsertSlice(arr : NDArray, 
+                                 values : NDArray, 
+                                 [<Optional>] ?value : float, 
+                                 [<Optional>] ?start : int, 
+                                 [<Optional>] ?stop : int, 
+                                 [<Optional>] ?step : int, 
+                                 [<Optional>] ?intInd : int, 
+                                 [<Optional>] ?axis : int) =
+        let creator = AtomicSymbolCreator.FromName "_npi_insert_slice"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg arr)) then arr.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg values)) then values.UnsafeHandle|]
+                                                 [|"val"; "start"; "stop"; "step"; "int_ind"; "axis"|]
+                                                 [|(match value with None -> "None" | Some value -> string value); (match start with None -> "None" | Some start -> string start); (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "None" | Some step -> string step); (match intInd with None -> "None" | Some intInd -> string intInd); (match axis with None -> "None" | Some axis -> string axis)|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Insert values along the given axis before the given indices.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_insert_op_slice.cc:L132</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="arr">Input ndarray</param>
+    /// <param name="values">Input ndarray</param>
+    /// <param name="value">A scaler to be inserted into &#39;array&#39;</param>
+    /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+    /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+    /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+    /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+    /// <param name="axis">Axis along which to insert &#39;values&#39;.</param>
+    static member NpiInsertSlice(outputArray : NDArray seq, 
+                                 arr : NDArray, 
+                                 values : NDArray, 
+                                 [<Optional>] ?value : float, 
+                                 [<Optional>] ?start : int, 
+                                 [<Optional>] ?stop : int, 
+                                 [<Optional>] ?step : int, 
+                                 [<Optional>] ?intInd : int, 
+                                 [<Optional>] ?axis : int) =
+        let creator = AtomicSymbolCreator.FromName "_npi_insert_slice"
+        let names = [|"val"; "start"; "stop"; "step"; "int_ind"; "axis"|]
+        let vals = [|(match value with None -> "None" | Some value -> string value); (match start with None -> "None" | Some start -> string start); (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "None" | Some step -> string step); (match intInd with None -> "None" | Some intInd -> string intInd); (match axis with None -> "None" | Some axis -> string axis)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg arr)) then arr.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg values)) then values.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Insert values along the given axis before the given indices.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_insert_op_slice.cc:L132</summary>
+    /// <param name="arr">Input ndarray</param>
+    /// <param name="values">Input ndarray</param>
+    /// <param name="value">A scaler to be inserted into &#39;array&#39;</param>
+    /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+    /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+    /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+    /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+    /// <param name="axis">Axis along which to insert &#39;values&#39;.</param>
+    static member NpiInsertSlice([<Optional>] ?arr : Symbol, [<Optional>] ?values : Symbol, [<Optional>] ?value : float, [<Optional>] ?start : int, [<Optional>] ?stop : int, [<Optional>] ?step : int, [<Optional>] ?intInd : int, [<Optional>] ?axis : int) =
+        NpiInsertSlice(?arr = arr, ?values = values, ?value = value, ?start = start, ?stop = stop, ?step = step, ?intInd = intInd, ?axis = axis)
+
+    /// <summary>Insert values along the given axis before the given indices.
+    ///           Indices is tensor and ndim &gt; 0.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_insert_op_tensor.cc:L122</summary>
+    /// <param name="arr">Input ndarray</param>
+    /// <param name="values">Input ndarray</param>
+    /// <param name="obj">Input ndarray</param>
+    /// <param name="value">A scaler to be inserted into &#39;array&#39;</param>
+    /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+    /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+    /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+    /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+    /// <param name="axis">Axis along which to insert &#39;values&#39;.</param>
+    static member NpiInsertTensor(arr : NDArray, 
+                                  values : NDArray, 
+                                  obj : NDArray, 
+                                  [<Optional>] ?value : float, 
+                                  [<Optional>] ?start : int, 
+                                  [<Optional>] ?stop : int, 
+                                  [<Optional>] ?step : int, 
+                                  [<Optional>] ?intInd : int, 
+                                  [<Optional>] ?axis : int) =
+        let creator = AtomicSymbolCreator.FromName "_npi_insert_tensor"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg arr)) then arr.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg values)) then values.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg obj)) then obj.UnsafeHandle|]
+                                                 [|"val"; "start"; "stop"; "step"; "int_ind"; "axis"|]
+                                                 [|(match value with None -> "None" | Some value -> string value); (match start with None -> "None" | Some start -> string start); (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "None" | Some step -> string step); (match intInd with None -> "None" | Some intInd -> string intInd); (match axis with None -> "None" | Some axis -> string axis)|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Insert values along the given axis before the given indices.
+    ///           Indices is tensor and ndim &gt; 0.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_insert_op_tensor.cc:L122</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="arr">Input ndarray</param>
+    /// <param name="values">Input ndarray</param>
+    /// <param name="obj">Input ndarray</param>
+    /// <param name="value">A scaler to be inserted into &#39;array&#39;</param>
+    /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+    /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+    /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+    /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+    /// <param name="axis">Axis along which to insert &#39;values&#39;.</param>
+    static member NpiInsertTensor(outputArray : NDArray seq, 
+                                  arr : NDArray, 
+                                  values : NDArray, 
+                                  obj : NDArray, 
+                                  [<Optional>] ?value : float, 
+                                  [<Optional>] ?start : int, 
+                                  [<Optional>] ?stop : int, 
+                                  [<Optional>] ?step : int, 
+                                  [<Optional>] ?intInd : int, 
+                                  [<Optional>] ?axis : int) =
+        let creator = AtomicSymbolCreator.FromName "_npi_insert_tensor"
+        let names = [|"val"; "start"; "stop"; "step"; "int_ind"; "axis"|]
+        let vals = [|(match value with None -> "None" | Some value -> string value); (match start with None -> "None" | Some start -> string start); (match stop with None -> "None" | Some stop -> string stop); (match step with None -> "None" | Some step -> string step); (match intInd with None -> "None" | Some intInd -> string intInd); (match axis with None -> "None" | Some axis -> string axis)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg arr)) then arr.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg values)) then values.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg obj)) then obj.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Insert values along the given axis before the given indices.
+    ///           Indices is tensor and ndim &gt; 0.
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_insert_op_tensor.cc:L122</summary>
+    /// <param name="arr">Input ndarray</param>
+    /// <param name="values">Input ndarray</param>
+    /// <param name="obj">Input ndarray</param>
+    /// <param name="value">A scaler to be inserted into &#39;array&#39;</param>
+    /// <param name="start">If &#39;obj&#39; is slice, &#39;start&#39; is one of it&#39;s arguments.</param>
+    /// <param name="stop">If &#39;obj&#39; is slice, &#39;stop&#39; is one of it&#39;s arguments.</param>
+    /// <param name="step">If &#39;obj&#39; is slice, &#39;step&#39; is one of it&#39;s arguments.</param>
+    /// <param name="intInd">If &#39;obj&#39; is int, &#39;int_ind&#39; is the index before which&#39;values&#39; is inserted</param>
+    /// <param name="axis">Axis along which to insert &#39;values&#39;.</param>
+    static member NpiInsertTensor([<Optional>] ?arr : Symbol, [<Optional>] ?values : Symbol, [<Optional>] ?obj : Symbol, [<Optional>] ?value : float, [<Optional>] ?start : int, [<Optional>] ?stop : int, [<Optional>] ?step : int, [<Optional>] ?intInd : int, [<Optional>] ?axis : int) =
+        NpiInsertTensor(?arr = arr, ?values = values, ?obj = obj, ?value = value, ?start = start, ?stop = stop, ?step = step, ?intInd = intInd, ?axis = axis)
+
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matmul_op.cc:L140</summary>
+    /// <param name="a">First input</param>
+    /// <param name="b">Second input</param>
+    static member NpiMatmul(a : NDArray, b : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_matmul"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg b)) then b.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matmul_op.cc:L140</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="a">First input</param>
+    /// <param name="b">Second input</param>
+    static member NpiMatmul(outputArray : NDArray seq, a : NDArray, b : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_matmul"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg b)) then b.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matmul_op.cc:L140</summary>
+    /// <param name="a">First input</param>
+    /// <param name="b">Second input</param>
+    static member NpiMatmul([<Optional>] ?a : Symbol, [<Optional>] ?b : Symbol) =
+        NpiMatmul(?a = a, ?b = b)
+
 
     /// <param name="a">Source input</param>
     /// <param name="axes">By default, reverse the dimensions, otherwise permute the axes according to the values given.</param>
@@ -15046,7 +16829,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L353</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L357</summary>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions.</param>
     /// <param name="order">Read the elements of a using this index order, and place the elements into the reshaped array using this index order. &#39;C&#39; means to read/write the elements using C-like index order, with the last axis index changing fastest, back to the first axis index changing slowest. Note that currently only C-like order is supported</param>
@@ -15059,7 +16842,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L353</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L357</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions.</param>
@@ -15077,7 +16860,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L353</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L357</summary>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions.</param>
     /// <param name="order">Read the elements of a using this index order, and place the elements into the reshaped array using this index order. &#39;C&#39; means to read/write the elements using C-like index order, with the last axis index changing fastest, back to the first axis index changing slowest. Note that currently only C-like order is supported</param>
@@ -15085,7 +16868,7 @@ type MX() =
         NpReshape(a, newshape, ?order = order)
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L353</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L357</summary>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions.</param>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="order">Read the elements of a using this index order, and place the elements into the reshaped array using this index order. &#39;C&#39; means to read/write the elements using C-like index order, with the last axis index changing fastest, back to the first axis index changing slowest. Note that currently only C-like order is supported</param>
@@ -15094,7 +16877,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L379</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L382</summary>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions. -2 to -6 are used for data manipulation. -2 copy this dimension from the input to the output shape. -3 will skip current dimension if and only if the current dim size is one. -4 copy all remain of the input dimensions to the output shape. -5 use the product of two consecutive dimensions of the input shape as the output. -6 split one dimension of the input into two dimensions passed subsequent to -6 in the new shape.</param>
     /// <param name="reverse">If true then the special values are inferred from right to left</param>
@@ -15108,7 +16891,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L379</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L382</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions. -2 to -6 are used for data manipulation. -2 copy this dimension from the input to the output shape. -3 will skip current dimension if and only if the current dim size is one. -4 copy all remain of the input dimensions to the output shape. -5 use the product of two consecutive dimensions of the input shape as the output. -6 split one dimension of the input into two dimensions passed subsequent to -6 in the new shape.</param>
@@ -15127,7 +16910,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L379</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L382</summary>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions. -2 to -6 are used for data manipulation. -2 copy this dimension from the input to the output shape. -3 will skip current dimension if and only if the current dim size is one. -4 copy all remain of the input dimensions to the output shape. -5 use the product of two consecutive dimensions of the input shape as the output. -6 split one dimension of the input into two dimensions passed subsequent to -6 in the new shape.</param>
     /// <param name="reverse">If true then the special values are inferred from right to left</param>
@@ -15136,7 +16919,7 @@ type MX() =
         NpxReshape(a, newshape, ?reverse = reverse, ?order = order)
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L379</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L382</summary>
     /// <param name="newshape">The new shape should be compatible with the original shape. If an integer, then the result will be a 1-D array of that length. One shape dimension can be -1. In this case, the value is inferred from the length of the array and remaining dimensions. -2 to -6 are used for data manipulation. -2 copy this dimension from the input to the output shape. -3 will skip current dimension if and only if the current dim size is one. -4 copy all remain of the input dimensions to the output shape. -5 use the product of two consecutive dimensions of the input shape as the output. -6 split one dimension of the input into two dimensions passed subsequent to -6 in the new shape.</param>
     /// <param name="a">Array to be reshaped.</param>
     /// <param name="reverse">If true then the special values are inferred from right to left</param>
@@ -15174,7 +16957,7 @@ type MX() =
 
     /// <summary>Join a sequence of arrays along an existing axis.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L621</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L678</summary>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
     /// <param name="dim">the dimension to be concated.</param>
@@ -15187,7 +16970,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Join a sequence of arrays along an existing axis.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L621</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L678</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
@@ -15205,7 +16988,7 @@ type MX() =
         ()
     /// <summary>Join a sequence of arrays along an existing axis.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L621</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L678</summary>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="dim">the dimension to be concated.</param>
     static member NpiConcatenate([<Optional>] ?data : Symbol seq, [<Optional>] ?dim : int) =
@@ -15292,7 +17075,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L809</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L866</summary>
     /// <param name="data">List of arrays to column_stack</param>
     /// <param name="numArgs">Number of inputs to be column stacked</param>
     static member NpiColumnStack([<ParamArray>] data : NDArray[]) =
@@ -15304,7 +17087,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L809</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L866</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">List of arrays to column_stack</param>
     /// <param name="numArgs">Number of inputs to be column stacked</param>
@@ -15321,7 +17104,7 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L809</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L866</summary>
     /// <param name="data">List of arrays to column_stack</param>
     static member NpiColumnStack([<ParamArray>] data : Symbol[]) =
         NpiColumnStack(data)
@@ -15329,7 +17112,7 @@ type MX() =
 
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L951</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1008</summary>
     /// <param name="data">List of arrays to vstack</param>
     /// <param name="numArgs">Number of inputs to be vstacked.</param>
     static member NpiVstack([<ParamArray>] data : NDArray[]) =
@@ -15341,7 +17124,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L951</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1008</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">List of arrays to vstack</param>
     /// <param name="numArgs">Number of inputs to be vstacked.</param>
@@ -15358,15 +17141,55 @@ type MX() =
         ()
     /// <summary>
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L951</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1008</summary>
     /// <param name="data">List of arrays to vstack</param>
     static member NpiVstack([<ParamArray>] data : Symbol[]) =
         NpiVstack(data)
 
 
+    /// <summary>Stack tensors horizontally (in second dimension)
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1043</summary>
+    /// <param name="data">List of arrays to concatenate</param>
+    /// <param name="numArgs">Number of inputs to be concated.</param>
+    /// <param name="dim">the dimension to be concated.</param>
+    static member NpiHstack([<ParamArray>] data : NDArray[], [<Optional; DefaultParameterValue(1)>] dim : int) =
+        let creator = AtomicSymbolCreator.FromName "_npi_hstack"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 (data |> Array.map (fun x -> x.UnsafeHandle))
+                                                 [|"num_args"; "dim"|]
+                                                 [|string data.Length; string dim|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Stack tensors horizontally (in second dimension)
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1043</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">List of arrays to concatenate</param>
+    /// <param name="numArgs">Number of inputs to be concated.</param>
+    /// <param name="dim">the dimension to be concated.</param>
+    static member NpiHstack(outputArray : NDArray seq, [<ParamArray>] data : NDArray[], [<Optional; DefaultParameterValue(1)>] dim : int) =
+        let creator = AtomicSymbolCreator.FromName "_npi_hstack"
+        let names = [|"num_args"; "dim"|]
+        let vals = [|string data.Length; string dim|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     (data |> Array.map (fun x -> x.UnsafeHandle))
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Stack tensors horizontally (in second dimension)
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1043</summary>
+    /// <param name="data">List of arrays to concatenate</param>
+    /// <param name="dim">the dimension to be concated.</param>
+    static member NpiHstack([<Optional>] ?data : Symbol seq, [<Optional>] ?dim : int) =
+        NpiHstack(?data = data, ?dim = dim)
+
+
     /// <summary>Stack tensors in sequence depthwise (in third dimension)
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L986</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1081</summary>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
     /// <param name="dim">the dimension to be concated.</param>
@@ -15379,7 +17202,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Stack tensors in sequence depthwise (in third dimension)
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L986</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1081</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="numArgs">Number of inputs to be concated.</param>
@@ -15397,7 +17220,7 @@ type MX() =
         ()
     /// <summary>Stack tensors in sequence depthwise (in third dimension)
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L986</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1081</summary>
     /// <param name="data">List of arrays to concatenate</param>
     /// <param name="dim">the dimension to be concated.</param>
     static member NpiDstack([<Optional>] ?data : Symbol seq, [<Optional>] ?dim : int) =
@@ -15472,7 +17295,7 @@ type MX() =
     /// Other axes remain in their original order.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1169</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1264</summary>
     /// <param name="a">Source input</param>
     /// <param name="source">Original positions of the axes to move. These must be unique.</param>
     /// <param name="destination">Destination positions for each of the original axes. These must also be unique.</param>
@@ -15487,7 +17310,7 @@ type MX() =
     /// Other axes remain in their original order.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1169</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1264</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">Source input</param>
     /// <param name="source">Original positions of the axes to move. These must be unique.</param>
@@ -15507,7 +17330,7 @@ type MX() =
     /// Other axes remain in their original order.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1169</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1264</summary>
     /// <param name="a">Source input</param>
     /// <param name="source">Original positions of the axes to move. These must be unique.</param>
     /// <param name="destination">Destination positions for each of the original axes. These must also be unique.</param>
@@ -15517,7 +17340,7 @@ type MX() =
     /// Other axes remain in their original order.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1169</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\numpy\np_matrix_op.cc:L1264</summary>
     /// <param name="source">Original positions of the axes to move. These must be unique.</param>
     /// <param name="destination">Destination positions for each of the original axes. These must also be unique.</param>
     /// <param name="a">Source input</param>
@@ -15630,6 +17453,177 @@ type MX() =
     static member NpiHsplitBackward() =
         NpiHsplitBackward()
 
+    /// <param name="data">The input</param>
+    /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
+    /// <param name="axis">Axis along which to split.</param>
+    /// <param name="squeezeAxis">If true, Removes the axis with length 1 from the shapes of the output arrays. **Note** that setting `squeeze_axis` to ``true`` removes axis with length 1 only along the `axis` which it is split. Also `squeeze_axis` can be set to ``true`` only if ``input.shape[axis] == num_outputs``.</param>
+    /// <param name="sections">Number of sections if equally splitted. Default to 0 which means split by indices.</param>
+    static member NpiDsplit(data : NDArray, 
+                            indices : int seq, 
+                            [<Optional; DefaultParameterValue(1)>] axis : int, 
+                            [<Optional; DefaultParameterValue(false)>] squeezeAxis : bool, 
+                            [<Optional; DefaultParameterValue(0)>] sections : int) =
+        let creator = AtomicSymbolCreator.FromName "_npi_dsplit"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 [|"indices"; "axis"; "squeeze_axis"; "sections"|]
+                                                 [|(indices |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string axis; string squeezeAxis; string sections|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">The input</param>
+    /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
+    /// <param name="axis">Axis along which to split.</param>
+    /// <param name="squeezeAxis">If true, Removes the axis with length 1 from the shapes of the output arrays. **Note** that setting `squeeze_axis` to ``true`` removes axis with length 1 only along the `axis` which it is split. Also `squeeze_axis` can be set to ``true`` only if ``input.shape[axis] == num_outputs``.</param>
+    /// <param name="sections">Number of sections if equally splitted. Default to 0 which means split by indices.</param>
+    static member NpiDsplit(outputArray : NDArray seq, 
+                            data : NDArray, 
+                            indices : int seq, 
+                            [<Optional; DefaultParameterValue(1)>] axis : int, 
+                            [<Optional; DefaultParameterValue(false)>] squeezeAxis : bool, 
+                            [<Optional; DefaultParameterValue(0)>] sections : int) =
+        let creator = AtomicSymbolCreator.FromName "_npi_dsplit"
+        let names = [|"indices"; "axis"; "squeeze_axis"; "sections"|]
+        let vals = [|(indices |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string axis; string squeezeAxis; string sections|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="data">The input</param>
+    /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
+    /// <param name="axis">Axis along which to split.</param>
+    /// <param name="squeezeAxis">If true, Removes the axis with length 1 from the shapes of the output arrays. **Note** that setting `squeeze_axis` to ``true`` removes axis with length 1 only along the `axis` which it is split. Also `squeeze_axis` can be set to ``true`` only if ``input.shape[axis] == num_outputs``.</param>
+    /// <param name="sections">Number of sections if equally splitted. Default to 0 which means split by indices.</param>
+    static member NpiDsplit(data : Symbol, indices : int seq, [<Optional>] ?axis : int, [<Optional>] ?squeezeAxis : bool, [<Optional>] ?sections : int) =
+        NpiDsplit(data, indices, ?axis = axis, ?squeezeAxis = squeezeAxis, ?sections = sections)
+    /// <param name="indices">Indices of splits. The elements should denote the boundaries of at which split is performed along the `axis`.</param>
+    /// <param name="data">The input</param>
+    /// <param name="axis">Axis along which to split.</param>
+    /// <param name="squeezeAxis">If true, Removes the axis with length 1 from the shapes of the output arrays. **Note** that setting `squeeze_axis` to ``true`` removes axis with length 1 only along the `axis` which it is split. Also `squeeze_axis` can be set to ``true`` only if ``input.shape[axis] == num_outputs``.</param>
+    /// <param name="sections">Number of sections if equally splitted. Default to 0 which means split by indices.</param>
+    static member NpiDsplit(indices : int seq, [<Optional>] ?data : Symbol, [<Optional>] ?axis : int, [<Optional>] ?squeezeAxis : bool, [<Optional>] ?sections : int) =
+        NpiDsplit(indices, ?data = data, ?axis = axis, ?squeezeAxis = squeezeAxis, ?sections = sections)
+
+    /// <param name="data">Input ndarray</param>
+    /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
+    static member NpDiag(data : NDArray, [<Optional; DefaultParameterValue(0)>] k : int) =
+        let creator = AtomicSymbolCreator.FromName "_np_diag"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 [|"k"|]
+                                                 [|string k|]
+        (new NDArray(outputs.[0]))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">Input ndarray</param>
+    /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
+    static member NpDiag(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(0)>] k : int) =
+        let creator = AtomicSymbolCreator.FromName "_np_diag"
+        let names = [|"k"|]
+        let vals = [|string k|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="data">Input ndarray</param>
+    /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
+    static member NpDiag([<Optional>] ?data : Symbol, [<Optional>] ?k : int) =
+        NpDiag(?data = data, ?k = k)
+
+
+    /// <param name="data">Input ndarray</param>
+    /// <param name="offset">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. If input has shape (S0 S1) k must be between -S0 and S1</param>
+    /// <param name="axis1">The first axis of the sub-arrays of interest. Ignored when the input is a 1-D array.</param>
+    /// <param name="axis2">The second axis of the sub-arrays of interest. Ignored when the input is a 1-D array.</param>
+    static member NpDiagonal(data : NDArray, [<Optional; DefaultParameterValue(0)>] offset : int, [<Optional; DefaultParameterValue(0)>] axis1 : int, [<Optional; DefaultParameterValue(1)>] axis2 : int) =
+        let creator = AtomicSymbolCreator.FromName "_np_diagonal"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 [|"offset"; "axis1"; "axis2"|]
+                                                 [|string offset; string axis1; string axis2|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">Input ndarray</param>
+    /// <param name="offset">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. If input has shape (S0 S1) k must be between -S0 and S1</param>
+    /// <param name="axis1">The first axis of the sub-arrays of interest. Ignored when the input is a 1-D array.</param>
+    /// <param name="axis2">The second axis of the sub-arrays of interest. Ignored when the input is a 1-D array.</param>
+    static member NpDiagonal(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(0)>] offset : int, [<Optional; DefaultParameterValue(0)>] axis1 : int, [<Optional; DefaultParameterValue(1)>] axis2 : int) =
+        let creator = AtomicSymbolCreator.FromName "_np_diagonal"
+        let names = [|"offset"; "axis1"; "axis2"|]
+        let vals = [|string offset; string axis1; string axis2|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="data">Input ndarray</param>
+    /// <param name="offset">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. If input has shape (S0 S1) k must be between -S0 and S1</param>
+    /// <param name="axis1">The first axis of the sub-arrays of interest. Ignored when the input is a 1-D array.</param>
+    /// <param name="axis2">The second axis of the sub-arrays of interest. Ignored when the input is a 1-D array.</param>
+    static member NpDiagonal([<Optional>] ?data : Symbol, [<Optional>] ?offset : int, [<Optional>] ?axis1 : int, [<Optional>] ?axis2 : int) =
+        NpDiagonal(?data = data, ?offset = offset, ?axis1 = axis1, ?axis2 = axis2)
+
+
+    /// <param name="data">Input ndarray</param>
+    /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
+    static member NpDiagflat(data : NDArray, [<Optional; DefaultParameterValue(0)>] k : int) =
+        let creator = AtomicSymbolCreator.FromName "_np_diagflat"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 [|"k"|]
+                                                 [|string k|]
+        (new NDArray(outputs.[0]))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">Input ndarray</param>
+    /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
+    static member NpDiagflat(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(0)>] k : int) =
+        let creator = AtomicSymbolCreator.FromName "_np_diagflat"
+        let names = [|"k"|]
+        let vals = [|string k|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="data">Input ndarray</param>
+    /// <param name="k">Diagonal in question. The default is 0. Use k&gt;0 for diagonals above the main diagonal, and k&lt;0 for diagonals below the main diagonal. </param>
+    static member NpDiagflat([<Optional>] ?data : Symbol, [<Optional>] ?k : int) =
+        NpDiagflat(?data = data, ?k = k)
+
+
+    /// <param name="data">Input ndarray</param>
+    static member NpiDiagIndicesFrom(data : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_diag_indices_from"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">Input ndarray</param>
+    static member NpiDiagIndicesFrom(outputArray : NDArray seq, data : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_diag_indices_from"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="data">Input ndarray</param>
+    static member NpiDiagIndicesFrom([<Optional>] ?data : Symbol) =
+        NpiDiagIndicesFrom(?data = data)
+
     /// <param name="a">First input</param>
     /// <param name="b">Second input</param>
     static member NpiShareMemory(a : NDArray, b : NDArray) =
@@ -15658,6 +17652,145 @@ type MX() =
     static member NpiShareMemory([<Optional>] ?a : Symbol, [<Optional>] ?b : Symbol) =
         NpiShareMemory(?a = a, ?b = b)
 
+    /// <param name="a">The input</param>
+    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
+    /// <param name="ddof">Starting value for the sum.</param>
+    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+    static member NpiStd(a : NDArray, 
+                         [<Optional>] ?axis : int seq, 
+                         [<Optional>] ?dtype : DataType, 
+                         [<Optional>] ?ddof : int, 
+                         [<Optional>] ?keepdims : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_std"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
+                                                 [|"axis"; "dtype"; "ddof"; "keepdims"|]
+                                                 [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "None" | Some dtype -> string dtype); (match ddof with None -> "0" | Some ddof -> string ddof); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
+        (new NDArray(outputs.[0]))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="a">The input</param>
+    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
+    /// <param name="ddof">Starting value for the sum.</param>
+    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+    static member NpiStd(outputArray : NDArray seq, 
+                         a : NDArray, 
+                         [<Optional>] ?axis : int seq, 
+                         [<Optional>] ?dtype : DataType, 
+                         [<Optional>] ?ddof : int, 
+                         [<Optional>] ?keepdims : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_std"
+        let names = [|"axis"; "dtype"; "ddof"; "keepdims"|]
+        let vals = [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "None" | Some dtype -> string dtype); (match ddof with None -> "0" | Some ddof -> string ddof); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="a">The input</param>
+    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
+    /// <param name="ddof">Starting value for the sum.</param>
+    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+    static member NpiStd([<Optional>] ?a : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?dtype : DataType, [<Optional>] ?ddof : int, [<Optional>] ?keepdims : bool) =
+        NpiStd(?a = a, ?axis = axis, ?dtype = dtype, ?ddof = ddof, ?keepdims = keepdims)
+
+    /// <param name="a">The input</param>
+    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
+    /// <param name="ddof">Starting value for the sum.</param>
+    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+    static member NpiVar(a : NDArray, 
+                         [<Optional>] ?axis : int seq, 
+                         [<Optional>] ?dtype : DataType, 
+                         [<Optional>] ?ddof : int, 
+                         [<Optional>] ?keepdims : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_var"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
+                                                 [|"axis"; "dtype"; "ddof"; "keepdims"|]
+                                                 [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "None" | Some dtype -> string dtype); (match ddof with None -> "0" | Some ddof -> string ddof); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
+        (new NDArray(outputs.[0]))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="a">The input</param>
+    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
+    /// <param name="ddof">Starting value for the sum.</param>
+    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+    static member NpiVar(outputArray : NDArray seq, 
+                         a : NDArray, 
+                         [<Optional>] ?axis : int seq, 
+                         [<Optional>] ?dtype : DataType, 
+                         [<Optional>] ?ddof : int, 
+                         [<Optional>] ?keepdims : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_var"
+        let names = [|"axis"; "dtype"; "ddof"; "keepdims"|]
+        let vals = [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "None" | Some dtype -> string dtype); (match ddof with None -> "0" | Some ddof -> string ddof); (match keepdims with None -> "false" | Some keepdims -> string keepdims)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="a">The input</param>
+    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="dtype">The type of the returned array and of the accumulator in which the elements are summed. The dtype of a is used by default unless a has an integer dtype of less precision than the default platform integer. In that case, if a is signed then the platform integer is used while if a is unsigned then an unsigned integer of the same precision as the platform integer is used.</param>
+    /// <param name="ddof">Starting value for the sum.</param>
+    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+    static member NpiVar([<Optional>] ?a : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?dtype : DataType, [<Optional>] ?ddof : int, [<Optional>] ?keepdims : bool) =
+        NpiVar(?a = a, ?axis = axis, ?dtype = dtype, ?ddof = ddof, ?keepdims = keepdims)
+
+    /// <param name="a">The input</param>
+    /// <param name="weights">The weights to calculate average</param>
+    /// <param name="axis">Axis or axes along which a average is performed. The default, axis=None, will average all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="returned">If True, the tuple (average, sum_of_weights) is returned,otherwise only the average is returned.If weights=None, sum_of_weights is equivalent tothe number of elements over which the average is taken.</param>
+    /// <param name="weighted">Auxiliary flag to deal with none weights.</param>
+    static member NpiAverage(a : NDArray, 
+                             weights : NDArray, 
+                             [<Optional>] ?axis : int seq, 
+                             [<Optional>] ?returned : bool, 
+                             [<Optional>] ?weighted : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_average"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weights)) then weights.UnsafeHandle|]
+                                                 [|"axis"; "returned"; "weighted"|]
+                                                 [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match returned with None -> "false" | Some returned -> string returned); (match weighted with None -> "true" | Some weighted -> string weighted)|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="a">The input</param>
+    /// <param name="weights">The weights to calculate average</param>
+    /// <param name="axis">Axis or axes along which a average is performed. The default, axis=None, will average all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="returned">If True, the tuple (average, sum_of_weights) is returned,otherwise only the average is returned.If weights=None, sum_of_weights is equivalent tothe number of elements over which the average is taken.</param>
+    /// <param name="weighted">Auxiliary flag to deal with none weights.</param>
+    static member NpiAverage(outputArray : NDArray seq, 
+                             a : NDArray, 
+                             weights : NDArray, 
+                             [<Optional>] ?axis : int seq, 
+                             [<Optional>] ?returned : bool, 
+                             [<Optional>] ?weighted : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_average"
+        let names = [|"axis"; "returned"; "weighted"|]
+        let vals = [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match returned with None -> "false" | Some returned -> string returned); (match weighted with None -> "true" | Some weighted -> string weighted)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weights)) then weights.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="a">The input</param>
+    /// <param name="weights">The weights to calculate average</param>
+    /// <param name="axis">Axis or axes along which a average is performed. The default, axis=None, will average all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="returned">If True, the tuple (average, sum_of_weights) is returned,otherwise only the average is returned.If weights=None, sum_of_weights is equivalent tothe number of elements over which the average is taken.</param>
+    /// <param name="weighted">Auxiliary flag to deal with none weights.</param>
+    static member NpiAverage([<Optional>] ?a : Symbol, [<Optional>] ?weights : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?returned : bool, [<Optional>] ?weighted : bool) =
+        NpiAverage(?a = a, ?weights = weights, ?axis = axis, ?returned = returned, ?weighted = weighted)
+
+
     /// <param name="x">The input array.</param>
     static member NpxNonzero(x : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_npx_nonzero"
@@ -15682,6 +17815,161 @@ type MX() =
     /// <param name="x">The input array.</param>
     static member NpxNonzero([<Optional>] ?x : Symbol) =
         NpxNonzero(?x = x)
+
+    /// <param name="data">Input ndarray</param>
+    /// <param name="padWidth">Number of values padded to the edges of each axis. ((before_1, after_1), &#226;€?(before_N,after_N)) unique pad widths for each axis. ((before, after),) yields same before andafter pad for each axis. (pad,) or int is a shortcut for before = after = pad width for allaxes.</param>
+    /// <param name="mode">Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; Pads with the reflection of the vector mirroredon the first and last values of the vector along each axis. &quot;symmetric&quot; Pads with the reflection of the vector mirroredalong the edge of the array. &quot;maximum&quot; Pads with the maximum value of all or part of thevector along each axis. &quot;minimum&quot; Pads with the minimum value of all or part of thevector along each axis.</param>
+    /// <param name="constantValue">Used in &#226;€˜constant&#226;€? The values to set the padded values for each axis.((before_1, after_1), ... (before_N, after_N)) unique pad constants foreach axis.((before, after),) yields same before and after constants for each axis.(constant,) or constant is a shortcut for before = after = constant for allaxes.Default is 0.</param>
+    /// <param name="reflectType">Used in &#226;€˜reflect&#226;€? and &#226;€˜symmetric&#226;€? The &#226;€˜even&#226;€?style is the default with an unaltered reflection around the edge value. For the &#226;€˜odd&#226;€?style,the extended part of the array is created by subtracting the reflected values from two times the edge value.</param>
+    static member NpiPad(data : NDArray, 
+                         padWidth : int [], 
+                         [<Optional>] mode : NpiPadMode, 
+                         [<Optional; DefaultParameterValue(0.0)>] constantValue : double, 
+                         [<Optional; DefaultParameterValue("even")>] reflectType : string) =
+        let creator = AtomicSymbolCreator.FromName "_npi_pad"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 [|"pad_width"; "mode"; "constant_value"; "reflect_type"|]
+                                                 [|string padWidth; (if isNull (mode :> obj) then "constant" else string mode); string constantValue; reflectType|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">Input ndarray</param>
+    /// <param name="padWidth">Number of values padded to the edges of each axis. ((before_1, after_1), &#226;€?(before_N,after_N)) unique pad widths for each axis. ((before, after),) yields same before andafter pad for each axis. (pad,) or int is a shortcut for before = after = pad width for allaxes.</param>
+    /// <param name="mode">Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; Pads with the reflection of the vector mirroredon the first and last values of the vector along each axis. &quot;symmetric&quot; Pads with the reflection of the vector mirroredalong the edge of the array. &quot;maximum&quot; Pads with the maximum value of all or part of thevector along each axis. &quot;minimum&quot; Pads with the minimum value of all or part of thevector along each axis.</param>
+    /// <param name="constantValue">Used in &#226;€˜constant&#226;€? The values to set the padded values for each axis.((before_1, after_1), ... (before_N, after_N)) unique pad constants foreach axis.((before, after),) yields same before and after constants for each axis.(constant,) or constant is a shortcut for before = after = constant for allaxes.Default is 0.</param>
+    /// <param name="reflectType">Used in &#226;€˜reflect&#226;€? and &#226;€˜symmetric&#226;€? The &#226;€˜even&#226;€?style is the default with an unaltered reflection around the edge value. For the &#226;€˜odd&#226;€?style,the extended part of the array is created by subtracting the reflected values from two times the edge value.</param>
+    static member NpiPad(outputArray : NDArray seq, 
+                         data : NDArray, 
+                         padWidth : int [], 
+                         [<Optional>] mode : NpiPadMode, 
+                         [<Optional; DefaultParameterValue(0.0)>] constantValue : double, 
+                         [<Optional; DefaultParameterValue("even")>] reflectType : string) =
+        let creator = AtomicSymbolCreator.FromName "_npi_pad"
+        let names = [|"pad_width"; "mode"; "constant_value"; "reflect_type"|]
+        let vals = [|string padWidth; (if isNull (mode :> obj) then "constant" else string mode); string constantValue; reflectType|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="data">Input ndarray</param>
+    /// <param name="padWidth">Number of values padded to the edges of each axis. ((before_1, after_1), &#226;€?(before_N,after_N)) unique pad widths for each axis. ((before, after),) yields same before andafter pad for each axis. (pad,) or int is a shortcut for before = after = pad width for allaxes.</param>
+    /// <param name="mode">Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; Pads with the reflection of the vector mirroredon the first and last values of the vector along each axis. &quot;symmetric&quot; Pads with the reflection of the vector mirroredalong the edge of the array. &quot;maximum&quot; Pads with the maximum value of all or part of thevector along each axis. &quot;minimum&quot; Pads with the minimum value of all or part of thevector along each axis.</param>
+    /// <param name="constantValue">Used in &#226;€˜constant&#226;€? The values to set the padded values for each axis.((before_1, after_1), ... (before_N, after_N)) unique pad constants foreach axis.((before, after),) yields same before and after constants for each axis.(constant,) or constant is a shortcut for before = after = constant for allaxes.Default is 0.</param>
+    /// <param name="reflectType">Used in &#226;€˜reflect&#226;€? and &#226;€˜symmetric&#226;€? The &#226;€˜even&#226;€?style is the default with an unaltered reflection around the edge value. For the &#226;€˜odd&#226;€?style,the extended part of the array is created by subtracting the reflected values from two times the edge value.</param>
+    static member NpiPad(data : Symbol, padWidth : int [], [<Optional>] ?mode : NpiPadMode, [<Optional>] ?constantValue : double, [<Optional>] ?reflectType : string) =
+        NpiPad(data, padWidth, ?mode = mode, ?constantValue = constantValue, ?reflectType = reflectType)
+    /// <param name="padWidth">Number of values padded to the edges of each axis. ((before_1, after_1), &#226;€?(before_N,after_N)) unique pad widths for each axis. ((before, after),) yields same before andafter pad for each axis. (pad,) or int is a shortcut for before = after = pad width for allaxes.</param>
+    /// <param name="data">Input ndarray</param>
+    /// <param name="mode">Padding type to use. &quot;constant&quot; pads with `constant_value` &quot;edge&quot; pads using the edge values of the input array &quot;reflect&quot; Pads with the reflection of the vector mirroredon the first and last values of the vector along each axis. &quot;symmetric&quot; Pads with the reflection of the vector mirroredalong the edge of the array. &quot;maximum&quot; Pads with the maximum value of all or part of thevector along each axis. &quot;minimum&quot; Pads with the minimum value of all or part of thevector along each axis.</param>
+    /// <param name="constantValue">Used in &#226;€˜constant&#226;€? The values to set the padded values for each axis.((before_1, after_1), ... (before_N, after_N)) unique pad constants foreach axis.((before, after),) yields same before and after constants for each axis.(constant,) or constant is a shortcut for before = after = constant for allaxes.Default is 0.</param>
+    /// <param name="reflectType">Used in &#226;€˜reflect&#226;€? and &#226;€˜symmetric&#226;€? The &#226;€˜even&#226;€?style is the default with an unaltered reflection around the edge value. For the &#226;€˜odd&#226;€?style,the extended part of the array is created by subtracting the reflected values from two times the edge value.</param>
+    static member NpiPad(padWidth : int [], [<Optional>] ?data : Symbol, [<Optional>] ?mode : NpiPadMode, [<Optional>] ?constantValue : double, [<Optional>] ?reflectType : string) =
+        NpiPad(padWidth, ?data = data, ?mode = mode, ?constantValue = constantValue, ?reflectType = reflectType)
+
+
+    /// <param name="a">Input data</param>
+    /// <param name="q">Input percentile</param>
+    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="interpolation">his optional parameter specifies the interpolation method to use when thedesired percentile lies between two data points i &lt; j</param>
+    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+    /// <param name="qScalar">inqut q is a scalar</param>
+    static member NpiPercentile(a : NDArray, 
+                                q : NDArray, 
+                                [<Optional>] ?axis : int seq, 
+                                [<Optional>] ?interpolation : Interpolation, 
+                                [<Optional>] ?keepdims : bool, 
+                                [<Optional>] ?qScalar : float) =
+        let creator = AtomicSymbolCreator.FromName "_npi_percentile"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg q)) then q.UnsafeHandle|]
+                                                 [|"axis"; "interpolation"; "keepdims"; "q_scalar"|]
+                                                 [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match interpolation with None -> "linear" | Some interpolation -> string interpolation); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match qScalar with None -> "None" | Some qScalar -> string qScalar)|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="a">Input data</param>
+    /// <param name="q">Input percentile</param>
+    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="interpolation">his optional parameter specifies the interpolation method to use when thedesired percentile lies between two data points i &lt; j</param>
+    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+    /// <param name="qScalar">inqut q is a scalar</param>
+    static member NpiPercentile(outputArray : NDArray seq, 
+                                a : NDArray, 
+                                q : NDArray, 
+                                [<Optional>] ?axis : int seq, 
+                                [<Optional>] ?interpolation : Interpolation, 
+                                [<Optional>] ?keepdims : bool, 
+                                [<Optional>] ?qScalar : float) =
+        let creator = AtomicSymbolCreator.FromName "_npi_percentile"
+        let names = [|"axis"; "interpolation"; "keepdims"; "q_scalar"|]
+        let vals = [|(match axis with None -> "None" | Some axis -> (axis |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match interpolation with None -> "linear" | Some interpolation -> string interpolation); (match keepdims with None -> "false" | Some keepdims -> string keepdims); (match qScalar with None -> "None" | Some qScalar -> string qScalar)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg a)) then a.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg q)) then q.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="a">Input data</param>
+    /// <param name="q">Input percentile</param>
+    /// <param name="axis">Axis or axes along which a sum is performed. The default, axis=None, will sum all of the elements of the input array. If axis is negative it counts from the last to the first axis.</param>
+    /// <param name="interpolation">his optional parameter specifies the interpolation method to use when thedesired percentile lies between two data points i &lt; j</param>
+    /// <param name="keepdims">If this is set to `True`, the reduced axes are left in the result as dimension with size one.</param>
+    /// <param name="qScalar">inqut q is a scalar</param>
+    static member NpiPercentile([<Optional>] ?a : Symbol, [<Optional>] ?q : Symbol, [<Optional>] ?axis : int seq, [<Optional>] ?interpolation : Interpolation, [<Optional>] ?keepdims : bool, [<Optional>] ?qScalar : float) =
+        NpiPercentile(?a = a, ?q = q, ?axis = axis, ?interpolation = interpolation, ?keepdims = keepdims, ?qScalar = qScalar)
+
+    /// <param name="p">polynomial coefficients</param>
+    /// <param name="x">variables</param>
+    static member NpiPolyval(p : NDArray, x : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_polyval"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg p)) then p.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="p">polynomial coefficients</param>
+    /// <param name="x">variables</param>
+    static member NpiPolyval(outputArray : NDArray seq, p : NDArray, x : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_polyval"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg p)) then p.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="p">polynomial coefficients</param>
+    /// <param name="x">variables</param>
+    static member NpiPolyval([<Optional>] ?p : Symbol, [<Optional>] ?x : Symbol) =
+        NpiPolyval(?p = p, ?x = x)
+
+    static member NpiBackwardPolyvalNDArray() =
+        let creator = AtomicSymbolCreator.FromName "_npi_backward_polyval"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 Array.empty
+                                                 Array.empty
+                                                 Array.empty
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    static member NpiBackwardPolyval(outputArray : NDArray seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_backward_polyval"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     Array.empty
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    static member NpiBackwardPolyval() =
+        NpiBackwardPolyval()
 
     /// <param name="a">First input</param>
     /// <param name="b">Second input</param>
@@ -15913,54 +18201,25 @@ type MX() =
     static member NpiTrueDivide([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
         NpiTrueDivide(?lhs = lhs, ?rhs = rhs)
 
-    /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiTrueDivideScalar(data : NDArray, scalar : float) =
-        let creator = AtomicSymbolCreator.FromName "_npi_true_divide_scalar"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
-        (new NDArray(outputs.[0]))
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiTrueDivideScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
-        let creator = AtomicSymbolCreator.FromName "_npi_true_divide_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiTrueDivideScalar(data : Symbol, scalar : float) =
-        NpiTrueDivideScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NpiTrueDivideScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiTrueDivideScalar(scalar, ?data = data)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRtrueDivideScalar(data : NDArray, scalar : float) =
-        let creator = AtomicSymbolCreator.FromName "_npi_rtrue_divide_scalar"
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiTrueDivideScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_true_divide_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRtrueDivideScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
-        let creator = AtomicSymbolCreator.FromName "_npi_rtrue_divide_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiTrueDivideScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_true_divide_scalar"
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -15969,13 +18228,41 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NpiRtrueDivideScalar(data : Symbol, scalar : float) =
-        NpiRtrueDivideScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiTrueDivideScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiTrueDivideScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
+
     /// <param name="data">source input</param>
-    static member NpiRtrueDivideScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NpiRtrueDivideScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRtrueDivideScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_rtrue_divide_scalar"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
+        (new NDArray(outputs.[0]))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">source input</param>
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRtrueDivideScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
+        let creator = AtomicSymbolCreator.FromName "_npi_rtrue_divide_scalar"
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="data">source input</param>
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NpiRtrueDivideScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NpiRtrueDivideScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">The input array</param>
     /// <param name="returnIndex">If true, return the indices of the input.</param>
@@ -16023,11 +18310,138 @@ type MX() =
     static member NpiUnique([<Optional>] ?data : Symbol, [<Optional>] ?returnIndex : bool, [<Optional>] ?returnInverse : bool, [<Optional>] ?returnCounts : bool, [<Optional>] ?axis : int) =
         NpiUnique(?data = data, ?returnIndex = returnIndex, ?returnInverse = returnInverse, ?returnCounts = returnCounts, ?axis = axis)
 
+    /// <param name="condition">condition array</param>
+    /// <param name="x">input x</param>
+    /// <param name="y">input y</param>
+    static member NpiWhere(condition : NDArray, x : NDArray, y : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_where"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg condition)) then condition.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg y)) then y.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        (new NDArray(outputs.[0]))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="condition">condition array</param>
+    /// <param name="x">input x</param>
+    /// <param name="y">input y</param>
+    static member NpiWhere(outputArray : NDArray seq, condition : NDArray, x : NDArray, y : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "_npi_where"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg condition)) then condition.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg y)) then y.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="condition">condition array</param>
+    /// <param name="x">input x</param>
+    /// <param name="y">input y</param>
+    static member NpiWhere([<Optional>] ?condition : Symbol, [<Optional>] ?x : Symbol, [<Optional>] ?y : Symbol) =
+        NpiWhere(?condition = condition, ?x = x, ?y = y)
+
+
+    /// <param name="condition">condition array</param>
+    /// <param name="x">input x</param>
+    /// <param name="scalar">The scalar value of x/y.</param>
+    static member NpiWhereLscalar(condition : NDArray, x : NDArray, [<Optional; DefaultParameterValue(0.0)>] scalar : double) =
+        let creator = AtomicSymbolCreator.FromName "_npi_where_lscalar"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg condition)) then condition.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                 [|"scalar"|]
+                                                 [|string scalar|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="condition">condition array</param>
+    /// <param name="x">input x</param>
+    /// <param name="scalar">The scalar value of x/y.</param>
+    static member NpiWhereLscalar(outputArray : NDArray seq, condition : NDArray, x : NDArray, [<Optional; DefaultParameterValue(0.0)>] scalar : double) =
+        let creator = AtomicSymbolCreator.FromName "_npi_where_lscalar"
+        let names = [|"scalar"|]
+        let vals = [|string scalar|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg condition)) then condition.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg x)) then x.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="condition">condition array</param>
+    /// <param name="x">input x</param>
+    /// <param name="scalar">The scalar value of x/y.</param>
+    static member NpiWhereLscalar([<Optional>] ?condition : Symbol, [<Optional>] ?x : Symbol, [<Optional>] ?scalar : double) =
+        NpiWhereLscalar(?condition = condition, ?x = x, ?scalar = scalar)
+
+    /// <param name="condition">condition array</param>
+    /// <param name="y">input y</param>
+    /// <param name="scalar">The scalar value of x/y.</param>
+    static member NpiWhereRscalar(condition : NDArray, y : NDArray, [<Optional; DefaultParameterValue(0.0)>] scalar : double) =
+        let creator = AtomicSymbolCreator.FromName "_npi_where_rscalar"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg condition)) then condition.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg y)) then y.UnsafeHandle|]
+                                                 [|"scalar"|]
+                                                 [|string scalar|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="condition">condition array</param>
+    /// <param name="y">input y</param>
+    /// <param name="scalar">The scalar value of x/y.</param>
+    static member NpiWhereRscalar(outputArray : NDArray seq, condition : NDArray, y : NDArray, [<Optional; DefaultParameterValue(0.0)>] scalar : double) =
+        let creator = AtomicSymbolCreator.FromName "_npi_where_rscalar"
+        let names = [|"scalar"|]
+        let vals = [|string scalar|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg condition)) then condition.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg y)) then y.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="condition">condition array</param>
+    /// <param name="y">input y</param>
+    /// <param name="scalar">The scalar value of x/y.</param>
+    static member NpiWhereRscalar([<Optional>] ?condition : Symbol, [<Optional>] ?y : Symbol, [<Optional>] ?scalar : double) =
+        NpiWhereRscalar(?condition = condition, ?y = y, ?scalar = scalar)
+
+
+
+    /// <param name="condition">condition array</param>
+    /// <param name="x">The scalar value of x.</param>
+    /// <param name="y">The scalar value of y.</param>
+    static member NpiWhereScalar2(condition : NDArray, [<Optional; DefaultParameterValue(0.0)>] x : double, [<Optional; DefaultParameterValue(0.0)>] y : double) =
+        let creator = AtomicSymbolCreator.FromName "_npi_where_scalar2"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg condition)) then condition.UnsafeHandle|]
+                                                 [|"x"; "y"|]
+                                                 [|string x; string y|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="condition">condition array</param>
+    /// <param name="x">The scalar value of x.</param>
+    /// <param name="y">The scalar value of y.</param>
+    static member NpiWhereScalar2(outputArray : NDArray seq, condition : NDArray, [<Optional; DefaultParameterValue(0.0)>] x : double, [<Optional; DefaultParameterValue(0.0)>] y : double) =
+        let creator = AtomicSymbolCreator.FromName "_npi_where_scalar2"
+        let names = [|"x"; "y"|]
+        let vals = [|string x; string y|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg condition)) then condition.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="condition">condition array</param>
+    /// <param name="x">The scalar value of x.</param>
+    /// <param name="y">The scalar value of y.</param>
+    static member NpiWhereScalar2([<Optional>] ?condition : Symbol, [<Optional>] ?x : double, [<Optional>] ?y : double) =
+        NpiWhereScalar2(?condition = condition, ?x = x, ?y = y)
+
     /// <summary>Return the Hanning window.The Hanning window is a taper formed by using a weighted cosine.</summary>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHanningNDArray(M : int, ctx : Context, [<Optional>] dtype : DataType) =
+    static member NpiHanningNDArray(M : int, ctx : Context, [<Optional>] dtype : NpiHanningDtype) =
         let creator = AtomicSymbolCreator.FromName "_npi_hanning"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -16039,7 +18453,7 @@ type MX() =
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHanning(outputArray : NDArray seq, M : int, ctx : Context, [<Optional>] dtype : DataType) =
+    static member NpiHanning(outputArray : NDArray seq, M : int, ctx : Context, [<Optional>] dtype : NpiHanningDtype) =
         let creator = AtomicSymbolCreator.FromName "_npi_hanning"
         let names = [|"M"; "ctx"; "dtype"|]
         let vals = [|string M; string ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -16053,14 +18467,14 @@ type MX() =
     /// <summary>Return the Hanning window.The Hanning window is a taper formed by using a weighted cosine.</summary>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHanning(M : int, [<Optional>] ?dtype : DataType) =
+    static member NpiHanning(M : int, [<Optional>] ?dtype : NpiHanningDtype) =
         NpiHanning(M, ?dtype = dtype)
 
     /// <summary>Return the Hamming window.The Hamming window is a taper formed by using a weighted cosine.</summary>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHammingNDArray(M : int, ctx : Context, [<Optional>] dtype : DataType) =
+    static member NpiHammingNDArray(M : int, ctx : Context, [<Optional>] dtype : NpiHammingDtype) =
         let creator = AtomicSymbolCreator.FromName "_npi_hamming"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -16072,7 +18486,7 @@ type MX() =
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHamming(outputArray : NDArray seq, M : int, ctx : Context, [<Optional>] dtype : DataType) =
+    static member NpiHamming(outputArray : NDArray seq, M : int, ctx : Context, [<Optional>] dtype : NpiHammingDtype) =
         let creator = AtomicSymbolCreator.FromName "_npi_hamming"
         let names = [|"M"; "ctx"; "dtype"|]
         let vals = [|string M; string ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -16086,14 +18500,14 @@ type MX() =
     /// <summary>Return the Hamming window.The Hamming window is a taper formed by using a weighted cosine.</summary>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiHamming(M : int, [<Optional>] ?dtype : DataType) =
+    static member NpiHamming(M : int, [<Optional>] ?dtype : NpiHammingDtype) =
         NpiHamming(M, ?dtype = dtype)
 
     /// <summary>Return the Blackman window.The Blackman window is a taper formed by using a weighted cosine.</summary>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiBlackmanNDArray(M : int, ctx : Context, [<Optional>] dtype : DataType) =
+    static member NpiBlackmanNDArray(M : int, ctx : Context, [<Optional>] dtype : NpiBlackmanDtype) =
         let creator = AtomicSymbolCreator.FromName "_npi_blackman"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  Array.empty
@@ -16105,7 +18519,7 @@ type MX() =
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n).Only used for imperative calls.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiBlackman(outputArray : NDArray seq, M : int, ctx : Context, [<Optional>] dtype : DataType) =
+    static member NpiBlackman(outputArray : NDArray seq, M : int, ctx : Context, [<Optional>] dtype : NpiBlackmanDtype) =
         let creator = AtomicSymbolCreator.FromName "_npi_blackman"
         let names = [|"M"; "ctx"; "dtype"|]
         let vals = [|string M; string ctx; (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -16119,8 +18533,71 @@ type MX() =
     /// <summary>Return the Blackman window.The Blackman window is a taper formed by using a weighted cosine.</summary>
     /// <param name="M">Number of points in the output window. If zero or less, an empty array is returned.</param>
     /// <param name="dtype">Data-type of the returned array.</param>
-    static member NpiBlackman(M : int, [<Optional>] ?dtype : DataType) =
+    static member NpiBlackman(M : int, [<Optional>] ?dtype : NpiBlackmanDtype) =
         NpiBlackman(M, ?dtype = dtype)
+
+    /// <param name="input1">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="isLogit"></param>
+    /// <param name="prob"></param>
+    /// <param name="logit"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    static member NpiBernoulli(input1 : NDArray, 
+                               ctx : Context, 
+                               isLogit : bool, 
+                               [<Optional>] ?prob : float, 
+                               [<Optional>] ?logit : float, 
+                               [<Optional>] ?size : int seq, 
+                               [<Optional>] ?dtype : DataType) =
+        let creator = AtomicSymbolCreator.FromName "_npi_bernoulli"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle|]
+                                                 [|"ctx"; "is_logit"; "prob"; "logit"; "size"; "dtype"|]
+                                                 [|string ctx; string isLogit; (match prob with None -> "None" | Some prob -> string prob); (match logit with None -> "None" | Some logit -> string logit); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+        (new NDArray(outputs.[0]))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="input1">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="isLogit"></param>
+    /// <param name="prob"></param>
+    /// <param name="logit"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    static member NpiBernoulli(outputArray : NDArray seq, 
+                               input1 : NDArray, 
+                               ctx : Context, 
+                               isLogit : bool, 
+                               [<Optional>] ?prob : float, 
+                               [<Optional>] ?logit : float, 
+                               [<Optional>] ?size : int seq, 
+                               [<Optional>] ?dtype : DataType) =
+        let creator = AtomicSymbolCreator.FromName "_npi_bernoulli"
+        let names = [|"ctx"; "is_logit"; "prob"; "logit"; "size"; "dtype"|]
+        let vals = [|string ctx; string isLogit; (match prob with None -> "None" | Some prob -> string prob); (match logit with None -> "None" | Some logit -> string logit); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="input1">Source input</param>
+    /// <param name="isLogit"></param>
+    /// <param name="prob"></param>
+    /// <param name="logit"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    static member NpiBernoulli(input1 : Symbol, isLogit : bool, [<Optional>] ?prob : float, [<Optional>] ?logit : float, [<Optional>] ?size : int seq, [<Optional>] ?dtype : DataType) =
+        NpiBernoulli(input1, isLogit, ?prob = prob, ?logit = logit, ?size = size, ?dtype = dtype)
+    /// <param name="isLogit"></param>
+    /// <param name="input1">Source input</param>
+    /// <param name="prob"></param>
+    /// <param name="logit"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    static member NpiBernoulli(isLogit : bool, [<Optional>] ?input1 : Symbol, [<Optional>] ?prob : float, [<Optional>] ?logit : float, [<Optional>] ?size : int seq, [<Optional>] ?dtype : DataType) =
+        NpiBernoulli(isLogit, ?input1 = input1, ?prob = prob, ?logit = logit, ?size = size, ?dtype = dtype)
 
     /// <summary>random choice</summary>
     /// <param name="input1">Source input</param>
@@ -16188,6 +18665,203 @@ type MX() =
     /// <param name="weighted"></param>
     static member NpiChoice(a : int64, size : int seq, [<Optional>] ?input1 : Symbol, [<Optional>] ?input2 : Symbol, [<Optional>] ?replace : bool, [<Optional>] ?weighted : bool) =
         NpiChoice(a, size, ?input1 = input1, ?input2 = input2, ?replace = replace, ?weighted = weighted)
+
+    /// <summary>Numpy behavior exponential</summary>
+    /// <param name="input1">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiExponential(input1 : NDArray, ctx : Context, [<Optional>] ?scale : float, [<Optional>] ?size : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_exponential"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle|]
+                                                 [|"ctx"; "scale"; "size"|]
+                                                 [|string ctx; (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Numpy behavior exponential</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="input1">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiExponential(outputArray : NDArray seq, input1 : NDArray, ctx : Context, [<Optional>] ?scale : float, [<Optional>] ?size : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_exponential"
+        let names = [|"ctx"; "scale"; "size"|]
+        let vals = [|string ctx; (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Numpy behavior exponential</summary>
+    /// <param name="input1">Source input</param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiExponential([<Optional>] ?input1 : Symbol, [<Optional>] ?scale : float, [<Optional>] ?size : int seq) =
+        NpiExponential(?input1 = input1, ?scale = scale, ?size = size)
+
+
+    /// <summary>Numpy behavior gamma</summary>
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="ctx">Context of output, in format [xpu|xpu|xpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="shape"></param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    static member NpiGamma(input1 : NDArray, 
+                           input2 : NDArray, 
+                           ctx : Context, 
+                           [<Optional>] ?shape : float, 
+                           [<Optional>] ?scale : float, 
+                           [<Optional>] ?size : int seq, 
+                           [<Optional>] ?dtype : FloatDType) =
+        let creator = AtomicSymbolCreator.FromName "_npi_gamma"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
+                                                 [|"ctx"; "shape"; "scale"; "size"; "dtype"|]
+                                                 [|string ctx; (match shape with None -> "None" | Some shape -> string shape); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Numpy behavior gamma</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="ctx">Context of output, in format [xpu|xpu|xpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="shape"></param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    static member NpiGamma(outputArray : NDArray seq, 
+                           input1 : NDArray, 
+                           input2 : NDArray, 
+                           ctx : Context, 
+                           [<Optional>] ?shape : float, 
+                           [<Optional>] ?scale : float, 
+                           [<Optional>] ?size : int seq, 
+                           [<Optional>] ?dtype : FloatDType) =
+        let creator = AtomicSymbolCreator.FromName "_npi_gamma"
+        let names = [|"ctx"; "shape"; "scale"; "size"; "dtype"|]
+        let vals = [|string ctx; (match shape with None -> "None" | Some shape -> string shape); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Numpy behavior gamma</summary>
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="shape"></param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    static member NpiGamma([<Optional>] ?input1 : Symbol, [<Optional>] ?input2 : Symbol, [<Optional>] ?shape : float, [<Optional>] ?scale : float, [<Optional>] ?size : int seq, [<Optional>] ?dtype : FloatDType) =
+        NpiGamma(?input1 = input1, ?input2 = input2, ?shape = shape, ?scale = scale, ?size = size, ?dtype = dtype)
+
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="loc"></param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiLogistic(input1 : NDArray, 
+                              input2 : NDArray, 
+                              ctx : Context, 
+                              [<Optional>] ?loc : float, 
+                              [<Optional>] ?scale : float, 
+                              [<Optional>] ?size : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_logistic"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
+                                                 [|"ctx"; "loc"; "scale"; "size"|]
+                                                 [|string ctx; (match loc with None -> "None" | Some loc -> string loc); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="loc"></param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiLogistic(outputArray : NDArray seq, 
+                              input1 : NDArray, 
+                              input2 : NDArray, 
+                              ctx : Context, 
+                              [<Optional>] ?loc : float, 
+                              [<Optional>] ?scale : float, 
+                              [<Optional>] ?size : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_logistic"
+        let names = [|"ctx"; "loc"; "scale"; "size"|]
+        let vals = [|string ctx; (match loc with None -> "None" | Some loc -> string loc); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="loc"></param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiLogistic([<Optional>] ?input1 : Symbol, [<Optional>] ?input2 : Symbol, [<Optional>] ?loc : float, [<Optional>] ?scale : float, [<Optional>] ?size : int seq) =
+        NpiLogistic(?input1 = input1, ?input2 = input2, ?loc = loc, ?scale = scale, ?size = size)
+
+
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="loc"></param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiGumbel(input1 : NDArray, 
+                            input2 : NDArray, 
+                            ctx : Context, 
+                            [<Optional>] ?loc : float, 
+                            [<Optional>] ?scale : float, 
+                            [<Optional>] ?size : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_gumbel"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
+                                                 [|"ctx"; "loc"; "scale"; "size"|]
+                                                 [|string ctx; (match loc with None -> "None" | Some loc -> string loc); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="loc"></param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiGumbel(outputArray : NDArray seq, 
+                            input1 : NDArray, 
+                            input2 : NDArray, 
+                            ctx : Context, 
+                            [<Optional>] ?loc : float, 
+                            [<Optional>] ?scale : float, 
+                            [<Optional>] ?size : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_gumbel"
+        let names = [|"ctx"; "loc"; "scale"; "size"|]
+        let vals = [|string ctx; (match loc with None -> "None" | Some loc -> string loc); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="loc"></param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiGumbel([<Optional>] ?input1 : Symbol, [<Optional>] ?input2 : Symbol, [<Optional>] ?loc : float, [<Optional>] ?scale : float, [<Optional>] ?size : int seq) =
+        NpiGumbel(?input1 = input1, ?input2 = input2, ?loc = loc, ?scale = scale, ?size = size)
+
 
     /// <summary>Draw samples from a multinomial distribution. &quot;
     /// &quot;The multinomial distribution is a multivariate generalisation of the binomial distribution. &quot;
@@ -16315,6 +18989,170 @@ type MX() =
     static member NpiNormal([<Optional>] ?input1 : Symbol, [<Optional>] ?input2 : Symbol, [<Optional>] ?loc : float, [<Optional>] ?scale : float, [<Optional>] ?size : int seq, [<Optional>] ?dtype : FloatDType) =
         NpiNormal(?input1 = input1, ?input2 = input2, ?loc = loc, ?scale = scale, ?size = size, ?dtype = dtype)
 
+    /// <summary>Ndarray behavior normal</summary>
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="loc"></param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    static member NpiNormalN(input1 : NDArray, 
+                             input2 : NDArray, 
+                             ctx : Context, 
+                             [<Optional>] ?loc : float, 
+                             [<Optional>] ?scale : float, 
+                             [<Optional>] ?size : int seq, 
+                             [<Optional>] ?dtype : FloatDType) =
+        let creator = AtomicSymbolCreator.FromName "_npi_normal_n"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
+                                                 [|"ctx"; "loc"; "scale"; "size"; "dtype"|]
+                                                 [|string ctx; (match loc with None -> "None" | Some loc -> string loc); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+        (new NDArray(outputs.[0]))
+    /// <summary>Ndarray behavior normal</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="loc"></param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    static member NpiNormalN(outputArray : NDArray seq, 
+                             input1 : NDArray, 
+                             input2 : NDArray, 
+                             ctx : Context, 
+                             [<Optional>] ?loc : float, 
+                             [<Optional>] ?scale : float, 
+                             [<Optional>] ?size : int seq, 
+                             [<Optional>] ?dtype : FloatDType) =
+        let creator = AtomicSymbolCreator.FromName "_npi_normal_n"
+        let names = [|"ctx"; "loc"; "scale"; "size"; "dtype"|]
+        let vals = [|string ctx; (match loc with None -> "None" | Some loc -> string loc); (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Ndarray behavior normal</summary>
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="loc"></param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    static member NpiNormalN([<Optional>] ?input1 : Symbol, [<Optional>] ?input2 : Symbol, [<Optional>] ?loc : float, [<Optional>] ?scale : float, [<Optional>] ?size : int seq, [<Optional>] ?dtype : FloatDType) =
+        NpiNormalN(?input1 = input1, ?input2 = input2, ?loc = loc, ?scale = scale, ?size = size, ?dtype = dtype)
+
+
+    /// <summary>Numpy behavior Pareto</summary>
+    /// <param name="input1">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="a"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiPareto(input1 : NDArray, ctx : Context, [<Optional>] ?a : float, [<Optional>] ?size : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_pareto"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle|]
+                                                 [|"ctx"; "a"; "size"|]
+                                                 [|string ctx; (match a with None -> "None" | Some a -> string a); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Numpy behavior Pareto</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="input1">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="a"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiPareto(outputArray : NDArray seq, input1 : NDArray, ctx : Context, [<Optional>] ?a : float, [<Optional>] ?size : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_pareto"
+        let names = [|"ctx"; "a"; "size"|]
+        let vals = [|string ctx; (match a with None -> "None" | Some a -> string a); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Numpy behavior Pareto</summary>
+    /// <param name="input1">Source input</param>
+    /// <param name="a"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiPareto([<Optional>] ?input1 : Symbol, [<Optional>] ?a : float, [<Optional>] ?size : int seq) =
+        NpiPareto(?input1 = input1, ?a = a, ?size = size)
+
+
+    /// <param name="input1">Source input</param>
+    /// <param name="a"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiPowerd(input1 : NDArray, [<Optional>] ?a : float, [<Optional>] ?size : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_powerd"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle|]
+                                                 [|"a"; "size"|]
+                                                 [|(match a with None -> "None" | Some a -> string a); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="input1">Source input</param>
+    /// <param name="a"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiPowerd(outputArray : NDArray seq, input1 : NDArray, [<Optional>] ?a : float, [<Optional>] ?size : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_powerd"
+        let names = [|"a"; "size"|]
+        let vals = [|(match a with None -> "None" | Some a -> string a); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <param name="input1">Source input</param>
+    /// <param name="a"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiPowerd([<Optional>] ?input1 : Symbol, [<Optional>] ?a : float, [<Optional>] ?size : int seq) =
+        NpiPowerd(?input1 = input1, ?a = a, ?size = size)
+
+    /// <summary>Numpy behavior rayleigh</summary>
+    /// <param name="input1">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiRayleigh(input1 : NDArray, ctx : Context, [<Optional>] ?scale : float, [<Optional>] ?size : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_rayleigh"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle|]
+                                                 [|"ctx"; "scale"; "size"|]
+                                                 [|string ctx; (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Numpy behavior rayleigh</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="input1">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiRayleigh(outputArray : NDArray seq, input1 : NDArray, ctx : Context, [<Optional>] ?scale : float, [<Optional>] ?size : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_rayleigh"
+        let names = [|"ctx"; "scale"; "size"|]
+        let vals = [|string ctx; (match scale with None -> "None" | Some scale -> string scale); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Numpy behavior rayleigh</summary>
+    /// <param name="input1">Source input</param>
+    /// <param name="scale"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiRayleigh([<Optional>] ?input1 : Symbol, [<Optional>] ?scale : float, [<Optional>] ?size : int seq) =
+        NpiRayleigh(?input1 = input1, ?scale = scale, ?size = size)
+
+
     /// <summary>numpy behavior uniform</summary>
     /// <param name="input1">Source input</param>
     /// <param name="input2">Source input</param>
@@ -16372,6 +19210,101 @@ type MX() =
     /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
     static member NpiUniform([<Optional>] ?input1 : Symbol, [<Optional>] ?input2 : Symbol, [<Optional>] ?low : float, [<Optional>] ?high : float, [<Optional>] ?size : int seq, [<Optional>] ?dtype : FloatDType) =
         NpiUniform(?input1 = input1, ?input2 = input2, ?low = low, ?high = high, ?size = size, ?dtype = dtype)
+
+    /// <summary>numpy behavior uniform</summary>
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="low"></param>
+    /// <param name="high"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    static member NpiUniformN(input1 : NDArray, 
+                              input2 : NDArray, 
+                              ctx : Context, 
+                              [<Optional>] ?low : float, 
+                              [<Optional>] ?high : float, 
+                              [<Optional>] ?size : int seq, 
+                              [<Optional>] ?dtype : FloatDType) =
+        let creator = AtomicSymbolCreator.FromName "_npi_uniform_n"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
+                                                 [|"ctx"; "low"; "high"; "size"; "dtype"|]
+                                                 [|string ctx; (match low with None -> "None" | Some low -> string low); (match high with None -> "None" | Some high -> string high); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+        (new NDArray(outputs.[0]))
+    /// <summary>numpy behavior uniform</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="low"></param>
+    /// <param name="high"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    static member NpiUniformN(outputArray : NDArray seq, 
+                              input1 : NDArray, 
+                              input2 : NDArray, 
+                              ctx : Context, 
+                              [<Optional>] ?low : float, 
+                              [<Optional>] ?high : float, 
+                              [<Optional>] ?size : int seq, 
+                              [<Optional>] ?dtype : FloatDType) =
+        let creator = AtomicSymbolCreator.FromName "_npi_uniform_n"
+        let names = [|"ctx"; "low"; "high"; "size"; "dtype"|]
+        let vals = [|string ctx; (match low with None -> "None" | Some low -> string low); (match high with None -> "None" | Some high -> string high); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (match dtype with None -> "float32" | Some dtype -> string dtype)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input2)) then input2.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>numpy behavior uniform</summary>
+    /// <param name="input1">Source input</param>
+    /// <param name="input2">Source input</param>
+    /// <param name="low"></param>
+    /// <param name="high"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    /// <param name="dtype">DType of the output in case this can&#39;t be inferred. Defaults to float32 if not defined (dtype=None).</param>
+    static member NpiUniformN([<Optional>] ?input1 : Symbol, [<Optional>] ?input2 : Symbol, [<Optional>] ?low : float, [<Optional>] ?high : float, [<Optional>] ?size : int seq, [<Optional>] ?dtype : FloatDType) =
+        NpiUniformN(?input1 = input1, ?input2 = input2, ?low = low, ?high = high, ?size = size, ?dtype = dtype)
+
+    /// <summary>Numpy behavior Weibull</summary>
+    /// <param name="input1">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="a"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiWeibull(input1 : NDArray, ctx : Context, [<Optional>] ?a : float, [<Optional>] ?size : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_weibull"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle|]
+                                                 [|"ctx"; "a"; "size"|]
+                                                 [|string ctx; (match a with None -> "None" | Some a -> string a); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Numpy behavior Weibull</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="input1">Source input</param>
+    /// <param name="ctx">Context of output, in format [cpu|gpu|cpu_pinned](n). Only used for imperative calls.</param>
+    /// <param name="a"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiWeibull(outputArray : NDArray seq, input1 : NDArray, ctx : Context, [<Optional>] ?a : float, [<Optional>] ?size : int seq) =
+        let creator = AtomicSymbolCreator.FromName "_npi_weibull"
+        let names = [|"ctx"; "a"; "size"|]
+        let vals = [|string ctx; (match a with None -> "None" | Some a -> string a); (match size with None -> "None" | Some size -> (size |> Seq.map string |> String.concat ", " |> sprintf "[%s]"))|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg input1)) then input1.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Numpy behavior Weibull</summary>
+    /// <param name="input1">Source input</param>
+    /// <param name="a"></param>
+    /// <param name="size">Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. Default is None, in which case a single value is returned.</param>
+    static member NpiWeibull([<Optional>] ?input1 : Symbol, [<Optional>] ?a : float, [<Optional>] ?size : int seq) =
+        NpiWeibull(?input1 = input1, ?a = a, ?size = size)
+
 
     /// <summary>Update function for SignSGD optimizer.
     /// 
@@ -20754,7 +23687,7 @@ type MX() =
     /// .. Note::
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L188</summary>
     /// <param name="data">Input data.</param>
     /// <param name="weight">weight.</param>
     /// <param name="bias">bias.</param>
@@ -20811,7 +23744,7 @@ type MX() =
     /// .. Note::
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L188</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data.</param>
     /// <param name="weight">weight.</param>
@@ -20874,7 +23807,7 @@ type MX() =
     /// .. Note::
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L188</summary>
     /// <param name="data">Input data.</param>
     /// <param name="weight">weight.</param>
     /// <param name="bias">bias.</param>
@@ -20907,7 +23840,7 @@ type MX() =
     /// .. Note::
     ///     This operator only supports forward propogation. DO NOT use it in training.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L137</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_conv.cc:L188</summary>
     /// <param name="kernel">Convolution kernel size: (w,), (h, w) or (d, h, w)</param>
     /// <param name="numFilter">Convolution filter(channel) number</param>
     /// <param name="data">Input data.</param>
@@ -21012,6 +23945,215 @@ type MX() =
     /// <param name="rhsMax">6th input</param>
     static member ContribQuantizedElemwiseAdd([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol, [<Optional>] ?lhsMin : Symbol, [<Optional>] ?lhsMax : Symbol, [<Optional>] ?rhsMin : Symbol, [<Optional>] ?rhsMax : Symbol) =
         ContribQuantizedElemwiseAdd(?lhs = lhs, ?rhs = rhs, ?lhsMin = lhsMin, ?lhsMax = lhsMax, ?rhsMin = rhsMin, ?rhsMax = rhsMax)
+
+    /// <summary>Adds arguments element-wise.
+    /// 
+    /// The storage type of ``elemwise_add`` output depends on storage types of inputs
+    /// 
+    ///    - elemwise_add(row_sparse, row_sparse) = row_sparse
+    ///    - elemwise_add(csr, csr) = csr
+    ///    - elemwise_add(default, csr) = default
+    ///    - elemwise_add(csr, default) = default
+    ///    - elemwise_add(default, rsp) = default
+    ///    - elemwise_add(rsp, default) = default
+    ///    - otherwise, ``elemwise_add`` generates output with default storage
+    /// 
+    /// </summary>
+    /// <param name="lhs">first input</param>
+    /// <param name="rhs">second input</param>
+    static member ElemwiseAdd(lhs : NDArray, rhs : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "elemwise_add"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        (new NDArray(outputs.[0]))
+    /// <summary>Adds arguments element-wise.
+    /// 
+    /// The storage type of ``elemwise_add`` output depends on storage types of inputs
+    /// 
+    ///    - elemwise_add(row_sparse, row_sparse) = row_sparse
+    ///    - elemwise_add(csr, csr) = csr
+    ///    - elemwise_add(default, csr) = default
+    ///    - elemwise_add(csr, default) = default
+    ///    - elemwise_add(default, rsp) = default
+    ///    - elemwise_add(rsp, default) = default
+    ///    - otherwise, ``elemwise_add`` generates output with default storage
+    /// 
+    /// </summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="lhs">first input</param>
+    /// <param name="rhs">second input</param>
+    static member ElemwiseAdd(outputArray : NDArray seq, lhs : NDArray, rhs : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "elemwise_add"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Adds arguments element-wise.
+    /// 
+    /// The storage type of ``elemwise_add`` output depends on storage types of inputs
+    /// 
+    ///    - elemwise_add(row_sparse, row_sparse) = row_sparse
+    ///    - elemwise_add(csr, csr) = csr
+    ///    - elemwise_add(default, csr) = default
+    ///    - elemwise_add(csr, default) = default
+    ///    - elemwise_add(default, rsp) = default
+    ///    - elemwise_add(rsp, default) = default
+    ///    - otherwise, ``elemwise_add`` generates output with default storage
+    /// 
+    /// </summary>
+    /// <param name="lhs">first input</param>
+    /// <param name="rhs">second input</param>
+    static member ElemwiseAdd([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
+        ElemwiseAdd(?lhs = lhs, ?rhs = rhs)
+
+    /// <summary>Multiplies arguments int8 element-wise.
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_elemwise_mul.cc:L222</summary>
+    /// <param name="lhs">first input</param>
+    /// <param name="rhs">second input</param>
+    /// <param name="lhsMin">Minimum value of first input.</param>
+    /// <param name="lhsMax">Maximum value of first input.</param>
+    /// <param name="rhsMin">Minimum value of second input.</param>
+    /// <param name="rhsMax">Maximum value of second input.</param>
+    /// <param name="minCalibRange">The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
+    /// <param name="maxCalibRange">The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
+    /// <param name="enableFloatOutput">Whether to enable float32 output</param>
+    static member ContribQuantizedElemwiseMul(lhs : NDArray, 
+                                              rhs : NDArray, 
+                                              lhsMin : NDArray, 
+                                              lhsMax : NDArray, 
+                                              rhsMin : NDArray, 
+                                              rhsMax : NDArray, 
+                                              [<Optional>] ?minCalibRange : float, 
+                                              [<Optional>] ?maxCalibRange : float, 
+                                              [<Optional>] ?enableFloatOutput : bool) =
+        let creator = AtomicSymbolCreator.FromName "_contrib_quantized_elemwise_mul"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhsMin)) then lhsMin.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhsMax)) then lhsMax.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhsMin)) then rhsMin.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhsMax)) then rhsMax.UnsafeHandle|]
+                                                 [|"min_calib_range"; "max_calib_range"; "enable_float_output"|]
+                                                 [|(match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange); (match enableFloatOutput with None -> "false" | Some enableFloatOutput -> string enableFloatOutput)|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Multiplies arguments int8 element-wise.
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_elemwise_mul.cc:L222</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="lhs">first input</param>
+    /// <param name="rhs">second input</param>
+    /// <param name="lhsMin">Minimum value of first input.</param>
+    /// <param name="lhsMax">Maximum value of first input.</param>
+    /// <param name="rhsMin">Minimum value of second input.</param>
+    /// <param name="rhsMax">Maximum value of second input.</param>
+    /// <param name="minCalibRange">The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
+    /// <param name="maxCalibRange">The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
+    /// <param name="enableFloatOutput">Whether to enable float32 output</param>
+    static member ContribQuantizedElemwiseMul(outputArray : NDArray seq, 
+                                              lhs : NDArray, 
+                                              rhs : NDArray, 
+                                              lhsMin : NDArray, 
+                                              lhsMax : NDArray, 
+                                              rhsMin : NDArray, 
+                                              rhsMax : NDArray, 
+                                              [<Optional>] ?minCalibRange : float, 
+                                              [<Optional>] ?maxCalibRange : float, 
+                                              [<Optional>] ?enableFloatOutput : bool) =
+        let creator = AtomicSymbolCreator.FromName "_contrib_quantized_elemwise_mul"
+        let names = [|"min_calib_range"; "max_calib_range"; "enable_float_output"|]
+        let vals = [|(match minCalibRange with None -> "None" | Some minCalibRange -> string minCalibRange); (match maxCalibRange with None -> "None" | Some maxCalibRange -> string maxCalibRange); (match enableFloatOutput with None -> "false" | Some enableFloatOutput -> string enableFloatOutput)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhsMin)) then lhsMin.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhsMax)) then lhsMax.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhsMin)) then rhsMin.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhsMax)) then rhsMax.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Multiplies arguments int8 element-wise.
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_elemwise_mul.cc:L222</summary>
+    /// <param name="lhs">first input</param>
+    /// <param name="rhs">second input</param>
+    /// <param name="lhsMin">Minimum value of first input.</param>
+    /// <param name="lhsMax">Maximum value of first input.</param>
+    /// <param name="rhsMin">Minimum value of second input.</param>
+    /// <param name="rhsMax">Maximum value of second input.</param>
+    /// <param name="minCalibRange">The minimum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
+    /// <param name="maxCalibRange">The maximum scalar value in the form of float32 obtained through calibration. If present, it will be used to requantize the int8 output data.</param>
+    /// <param name="enableFloatOutput">Whether to enable float32 output</param>
+    static member ContribQuantizedElemwiseMul([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol, [<Optional>] ?lhsMin : Symbol, [<Optional>] ?lhsMax : Symbol, [<Optional>] ?rhsMin : Symbol, [<Optional>] ?rhsMax : Symbol, [<Optional>] ?minCalibRange : float, [<Optional>] ?maxCalibRange : float, [<Optional>] ?enableFloatOutput : bool) =
+        ContribQuantizedElemwiseMul(?lhs = lhs, ?rhs = rhs, ?lhsMin = lhsMin, ?lhsMax = lhsMax, ?rhsMin = rhsMin, ?rhsMax = rhsMax, ?minCalibRange = minCalibRange, ?maxCalibRange = maxCalibRange, ?enableFloatOutput = enableFloatOutput)
+
+    /// <summary>Multiplies arguments element-wise.
+    /// 
+    /// The storage type of ``elemwise_mul`` output depends on storage types of inputs
+    /// 
+    ///    - elemwise_mul(default, default) = default
+    ///    - elemwise_mul(row_sparse, row_sparse) = row_sparse
+    ///    - elemwise_mul(default, row_sparse) = row_sparse
+    ///    - elemwise_mul(row_sparse, default) = row_sparse
+    ///    - elemwise_mul(csr, csr) = csr
+    ///    - otherwise, ``elemwise_mul`` generates output with default storage
+    /// 
+    /// </summary>
+    /// <param name="lhs">first input</param>
+    /// <param name="rhs">second input</param>
+    static member ElemwiseMul(lhs : NDArray, rhs : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "elemwise_mul"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
+                                                 Array.empty
+                                                 Array.empty
+        (new NDArray(outputs.[0]))
+    /// <summary>Multiplies arguments element-wise.
+    /// 
+    /// The storage type of ``elemwise_mul`` output depends on storage types of inputs
+    /// 
+    ///    - elemwise_mul(default, default) = default
+    ///    - elemwise_mul(row_sparse, row_sparse) = row_sparse
+    ///    - elemwise_mul(default, row_sparse) = row_sparse
+    ///    - elemwise_mul(row_sparse, default) = row_sparse
+    ///    - elemwise_mul(csr, csr) = csr
+    ///    - otherwise, ``elemwise_mul`` generates output with default storage
+    /// 
+    /// </summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="lhs">first input</param>
+    /// <param name="rhs">second input</param>
+    static member ElemwiseMul(outputArray : NDArray seq, lhs : NDArray, rhs : NDArray) =
+        let creator = AtomicSymbolCreator.FromName "elemwise_mul"
+        let names = Array.empty
+        let vals = Array.empty
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Multiplies arguments element-wise.
+    /// 
+    /// The storage type of ``elemwise_mul`` output depends on storage types of inputs
+    /// 
+    ///    - elemwise_mul(default, default) = default
+    ///    - elemwise_mul(row_sparse, row_sparse) = row_sparse
+    ///    - elemwise_mul(default, row_sparse) = row_sparse
+    ///    - elemwise_mul(row_sparse, default) = row_sparse
+    ///    - elemwise_mul(csr, csr) = csr
+    ///    - otherwise, ``elemwise_mul`` generates output with default storage
+    /// 
+    /// </summary>
+    /// <param name="lhs">first input</param>
+    /// <param name="rhs">second input</param>
+    static member ElemwiseMul([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
+        ElemwiseMul(?lhs = lhs, ?rhs = rhs)
 
     /// <param name="data">A ndarray/symbol of type `float32`</param>
     /// <param name="minData">The minimum scalar value possibly produced for the data</param>
@@ -21267,6 +24409,368 @@ type MX() =
     static member ContribQuantizedFullyConnected(numHidden : int, [<Optional>] ?data : Symbol, [<Optional>] ?weight : Symbol, [<Optional>] ?bias : Symbol, [<Optional>] ?minData : Symbol, [<Optional>] ?maxData : Symbol, [<Optional>] ?minWeight : Symbol, [<Optional>] ?maxWeight : Symbol, [<Optional>] ?minBias : Symbol, [<Optional>] ?maxBias : Symbol, [<Optional>] ?noBias : bool, [<Optional>] ?flatten : bool) =
         ContribQuantizedFullyConnected(numHidden, ?data = data, ?weight = weight, ?bias = bias, ?minData = minData, ?maxData = maxData, ?minWeight = minWeight, ?maxWeight = maxWeight, ?minBias = minBias, ?maxBias = maxBias, ?noBias = noBias, ?flatten = flatten)
 
+    /// <summary>Maps integer indices to int8 vector representations (embeddings).
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_indexing_op.cc:L134</summary>
+    /// <param name="data">The input array to the embedding operator.</param>
+    /// <param name="weight">The embedding weight matrix.</param>
+    /// <param name="minWeight">Minimum value of data.</param>
+    /// <param name="maxWeight">Maximum value of data.</param>
+    /// <param name="inputDim">Vocabulary size of the input indices.</param>
+    /// <param name="outputDim">Dimension of the embedding vectors.</param>
+    /// <param name="dtype">Data type of weight.</param>
+    /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
+    static member ContribQuantizedEmbedding(data : NDArray, 
+                                            weight : NDArray, 
+                                            minWeight : NDArray, 
+                                            maxWeight : NDArray, 
+                                            inputDim : int, 
+                                            outputDim : int, 
+                                            [<Optional>] dtype : ContribQuantizedEmbeddingDtype, 
+                                            [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
+        let creator = AtomicSymbolCreator.FromName "_contrib_quantized_embedding"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minWeight)) then minWeight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxWeight)) then maxWeight.UnsafeHandle|]
+                                                 [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
+                                                 [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
+        outputs |> Array.map (fun h -> new NDArray(h))
+    /// <summary>Maps integer indices to int8 vector representations (embeddings).
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_indexing_op.cc:L134</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">The input array to the embedding operator.</param>
+    /// <param name="weight">The embedding weight matrix.</param>
+    /// <param name="minWeight">Minimum value of data.</param>
+    /// <param name="maxWeight">Maximum value of data.</param>
+    /// <param name="inputDim">Vocabulary size of the input indices.</param>
+    /// <param name="outputDim">Dimension of the embedding vectors.</param>
+    /// <param name="dtype">Data type of weight.</param>
+    /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
+    static member ContribQuantizedEmbedding(outputArray : NDArray seq, 
+                                            data : NDArray, 
+                                            weight : NDArray, 
+                                            minWeight : NDArray, 
+                                            maxWeight : NDArray, 
+                                            inputDim : int, 
+                                            outputDim : int, 
+                                            [<Optional>] dtype : ContribQuantizedEmbeddingDtype, 
+                                            [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
+        let creator = AtomicSymbolCreator.FromName "_contrib_quantized_embedding"
+        let names = [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
+        let vals = [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg minWeight)) then minWeight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg maxWeight)) then maxWeight.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Maps integer indices to int8 vector representations (embeddings).
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_indexing_op.cc:L134</summary>
+    /// <param name="data">The input array to the embedding operator.</param>
+    /// <param name="weight">The embedding weight matrix.</param>
+    /// <param name="minWeight">Minimum value of data.</param>
+    /// <param name="maxWeight">Maximum value of data.</param>
+    /// <param name="inputDim">Vocabulary size of the input indices.</param>
+    /// <param name="outputDim">Dimension of the embedding vectors.</param>
+    /// <param name="dtype">Data type of weight.</param>
+    /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
+    static member ContribQuantizedEmbedding(data : Symbol, weight : Symbol, minWeight : Symbol, maxWeight : Symbol, inputDim : int, outputDim : int, [<Optional>] ?dtype : ContribQuantizedEmbeddingDtype, [<Optional>] ?sparseGrad : bool) =
+        ContribQuantizedEmbedding(data, weight, minWeight, maxWeight, inputDim, outputDim, ?dtype = dtype, ?sparseGrad = sparseGrad)
+    /// <summary>Maps integer indices to int8 vector representations (embeddings).
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_indexing_op.cc:L134</summary>
+    /// <param name="inputDim">Vocabulary size of the input indices.</param>
+    /// <param name="outputDim">Dimension of the embedding vectors.</param>
+    /// <param name="data">The input array to the embedding operator.</param>
+    /// <param name="weight">The embedding weight matrix.</param>
+    /// <param name="minWeight">Minimum value of data.</param>
+    /// <param name="maxWeight">Maximum value of data.</param>
+    /// <param name="dtype">Data type of weight.</param>
+    /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
+    static member ContribQuantizedEmbedding(inputDim : int, outputDim : int, [<Optional>] ?data : Symbol, [<Optional>] ?weight : Symbol, [<Optional>] ?minWeight : Symbol, [<Optional>] ?maxWeight : Symbol, [<Optional>] ?dtype : ContribQuantizedEmbeddingDtype, [<Optional>] ?sparseGrad : bool) =
+        ContribQuantizedEmbedding(inputDim, outputDim, ?data = data, ?weight = weight, ?minWeight = minWeight, ?maxWeight = maxWeight, ?dtype = dtype, ?sparseGrad = sparseGrad)
+
+    /// <summary>Maps integer indices to vector representations (embeddings).
+    /// 
+    /// This operator maps words to real-valued vectors in a high-dimensional space,
+    /// called word embeddings. These embeddings can capture semantic and syntactic properties of the words.
+    /// For example, it has been noted that in the learned embedding spaces, similar words tend
+    /// to be close to each other and dissimilar words far apart.
+    /// 
+    /// For an input array of shape (d1, ..., dK),
+    /// the shape of an output array is (d1, ..., dK, output_dim).
+    /// All the input values should be integers in the range [0, input_dim).
+    /// 
+    /// If the input_dim is ip0 and output_dim is op0, then shape of the embedding weight matrix must be
+    /// (ip0, op0).
+    /// 
+    /// When &quot;sparse_grad&quot; is False, if any index mentioned is too large, it is replaced by the index that
+    /// addresses the last vector in an embedding matrix.
+    /// When &quot;sparse_grad&quot; is True, an error will be raised if invalid indices are found.
+    /// 
+    /// Examples::
+    /// 
+    ///   input_dim = 4
+    ///   output_dim = 5
+    /// 
+    ///   // Each row in weight matrix y represents a word. So, y = (w0,w1,w2,w3)
+    ///   y = [[  0.,   1.,   2.,   3.,   4.],
+    ///        [  5.,   6.,   7.,   8.,   9.],
+    ///        [ 10.,  11.,  12.,  13.,  14.],
+    ///        [ 15.,  16.,  17.,  18.,  19.]]
+    /// 
+    ///   // Input array x represents n-grams(2-gram). So, x = [(w1,w3), (w0,w2)]
+    ///   x = [[ 1.,  3.],
+    ///        [ 0.,  2.]]
+    /// 
+    ///   // Mapped input x to its vector representation y.
+    ///   Embedding(x, y, 4, 5) = [[[  5.,   6.,   7.,   8.,   9.],
+    ///                             [ 15.,  16.,  17.,  18.,  19.]],
+    /// 
+    ///                            [[  0.,   1.,   2.,   3.,   4.],
+    ///                             [ 10.,  11.,  12.,  13.,  14.]]]
+    /// 
+    /// 
+    /// The storage type of weight can be either row_sparse or default.
+    /// 
+    /// .. Note::
+    /// 
+    ///     If &quot;sparse_grad&quot; is set to True, the storage type of gradient w.r.t weights will be
+    ///     &quot;row_sparse&quot;. Only a subset of optimizers support sparse gradients, including SGD, AdaGrad
+    ///     and Adam. Note that by default lazy updates is turned on, which may perform differently
+    ///     from standard updates. For more details, please check the Optimization API at:
+    ///     https://mxnet.incubator.apache.org/api/python/optimization/optimization.html
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L598</summary>
+    /// <param name="data">The input array to the embedding operator.</param>
+    /// <param name="weight">The embedding weight matrix.</param>
+    /// <param name="inputDim">Vocabulary size of the input indices.</param>
+    /// <param name="outputDim">Dimension of the embedding vectors.</param>
+    /// <param name="dtype">Data type of weight.</param>
+    /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
+    static member Embedding(data : NDArray, 
+                            weight : NDArray, 
+                            inputDim : int, 
+                            outputDim : int, 
+                            [<Optional>] dtype : EmbeddingDtype, 
+                            [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
+        let creator = AtomicSymbolCreator.FromName "Embedding"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle|]
+                                                 [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
+                                                 [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
+        (new NDArray(outputs.[0]))
+    /// <summary>Maps integer indices to vector representations (embeddings).
+    /// 
+    /// This operator maps words to real-valued vectors in a high-dimensional space,
+    /// called word embeddings. These embeddings can capture semantic and syntactic properties of the words.
+    /// For example, it has been noted that in the learned embedding spaces, similar words tend
+    /// to be close to each other and dissimilar words far apart.
+    /// 
+    /// For an input array of shape (d1, ..., dK),
+    /// the shape of an output array is (d1, ..., dK, output_dim).
+    /// All the input values should be integers in the range [0, input_dim).
+    /// 
+    /// If the input_dim is ip0 and output_dim is op0, then shape of the embedding weight matrix must be
+    /// (ip0, op0).
+    /// 
+    /// When &quot;sparse_grad&quot; is False, if any index mentioned is too large, it is replaced by the index that
+    /// addresses the last vector in an embedding matrix.
+    /// When &quot;sparse_grad&quot; is True, an error will be raised if invalid indices are found.
+    /// 
+    /// Examples::
+    /// 
+    ///   input_dim = 4
+    ///   output_dim = 5
+    /// 
+    ///   // Each row in weight matrix y represents a word. So, y = (w0,w1,w2,w3)
+    ///   y = [[  0.,   1.,   2.,   3.,   4.],
+    ///        [  5.,   6.,   7.,   8.,   9.],
+    ///        [ 10.,  11.,  12.,  13.,  14.],
+    ///        [ 15.,  16.,  17.,  18.,  19.]]
+    /// 
+    ///   // Input array x represents n-grams(2-gram). So, x = [(w1,w3), (w0,w2)]
+    ///   x = [[ 1.,  3.],
+    ///        [ 0.,  2.]]
+    /// 
+    ///   // Mapped input x to its vector representation y.
+    ///   Embedding(x, y, 4, 5) = [[[  5.,   6.,   7.,   8.,   9.],
+    ///                             [ 15.,  16.,  17.,  18.,  19.]],
+    /// 
+    ///                            [[  0.,   1.,   2.,   3.,   4.],
+    ///                             [ 10.,  11.,  12.,  13.,  14.]]]
+    /// 
+    /// 
+    /// The storage type of weight can be either row_sparse or default.
+    /// 
+    /// .. Note::
+    /// 
+    ///     If &quot;sparse_grad&quot; is set to True, the storage type of gradient w.r.t weights will be
+    ///     &quot;row_sparse&quot;. Only a subset of optimizers support sparse gradients, including SGD, AdaGrad
+    ///     and Adam. Note that by default lazy updates is turned on, which may perform differently
+    ///     from standard updates. For more details, please check the Optimization API at:
+    ///     https://mxnet.incubator.apache.org/api/python/optimization/optimization.html
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L598</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">The input array to the embedding operator.</param>
+    /// <param name="weight">The embedding weight matrix.</param>
+    /// <param name="inputDim">Vocabulary size of the input indices.</param>
+    /// <param name="outputDim">Dimension of the embedding vectors.</param>
+    /// <param name="dtype">Data type of weight.</param>
+    /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
+    static member Embedding(outputArray : NDArray seq, 
+                            data : NDArray, 
+                            weight : NDArray, 
+                            inputDim : int, 
+                            outputDim : int, 
+                            [<Optional>] dtype : EmbeddingDtype, 
+                            [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
+        let creator = AtomicSymbolCreator.FromName "Embedding"
+        let names = [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
+        let vals = [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Maps integer indices to vector representations (embeddings).
+    /// 
+    /// This operator maps words to real-valued vectors in a high-dimensional space,
+    /// called word embeddings. These embeddings can capture semantic and syntactic properties of the words.
+    /// For example, it has been noted that in the learned embedding spaces, similar words tend
+    /// to be close to each other and dissimilar words far apart.
+    /// 
+    /// For an input array of shape (d1, ..., dK),
+    /// the shape of an output array is (d1, ..., dK, output_dim).
+    /// All the input values should be integers in the range [0, input_dim).
+    /// 
+    /// If the input_dim is ip0 and output_dim is op0, then shape of the embedding weight matrix must be
+    /// (ip0, op0).
+    /// 
+    /// When &quot;sparse_grad&quot; is False, if any index mentioned is too large, it is replaced by the index that
+    /// addresses the last vector in an embedding matrix.
+    /// When &quot;sparse_grad&quot; is True, an error will be raised if invalid indices are found.
+    /// 
+    /// Examples::
+    /// 
+    ///   input_dim = 4
+    ///   output_dim = 5
+    /// 
+    ///   // Each row in weight matrix y represents a word. So, y = (w0,w1,w2,w3)
+    ///   y = [[  0.,   1.,   2.,   3.,   4.],
+    ///        [  5.,   6.,   7.,   8.,   9.],
+    ///        [ 10.,  11.,  12.,  13.,  14.],
+    ///        [ 15.,  16.,  17.,  18.,  19.]]
+    /// 
+    ///   // Input array x represents n-grams(2-gram). So, x = [(w1,w3), (w0,w2)]
+    ///   x = [[ 1.,  3.],
+    ///        [ 0.,  2.]]
+    /// 
+    ///   // Mapped input x to its vector representation y.
+    ///   Embedding(x, y, 4, 5) = [[[  5.,   6.,   7.,   8.,   9.],
+    ///                             [ 15.,  16.,  17.,  18.,  19.]],
+    /// 
+    ///                            [[  0.,   1.,   2.,   3.,   4.],
+    ///                             [ 10.,  11.,  12.,  13.,  14.]]]
+    /// 
+    /// 
+    /// The storage type of weight can be either row_sparse or default.
+    /// 
+    /// .. Note::
+    /// 
+    ///     If &quot;sparse_grad&quot; is set to True, the storage type of gradient w.r.t weights will be
+    ///     &quot;row_sparse&quot;. Only a subset of optimizers support sparse gradients, including SGD, AdaGrad
+    ///     and Adam. Note that by default lazy updates is turned on, which may perform differently
+    ///     from standard updates. For more details, please check the Optimization API at:
+    ///     https://mxnet.incubator.apache.org/api/python/optimization/optimization.html
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L598</summary>
+    /// <param name="data">The input array to the embedding operator.</param>
+    /// <param name="weight">The embedding weight matrix.</param>
+    /// <param name="inputDim">Vocabulary size of the input indices.</param>
+    /// <param name="outputDim">Dimension of the embedding vectors.</param>
+    /// <param name="dtype">Data type of weight.</param>
+    /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
+    static member Embedding(data : Symbol, weight : Symbol, inputDim : int, outputDim : int, [<Optional>] ?dtype : EmbeddingDtype, [<Optional>] ?sparseGrad : bool) =
+        Embedding(data, weight, inputDim, outputDim, ?dtype = dtype, ?sparseGrad = sparseGrad)
+    /// <summary>Maps integer indices to vector representations (embeddings).
+    /// 
+    /// This operator maps words to real-valued vectors in a high-dimensional space,
+    /// called word embeddings. These embeddings can capture semantic and syntactic properties of the words.
+    /// For example, it has been noted that in the learned embedding spaces, similar words tend
+    /// to be close to each other and dissimilar words far apart.
+    /// 
+    /// For an input array of shape (d1, ..., dK),
+    /// the shape of an output array is (d1, ..., dK, output_dim).
+    /// All the input values should be integers in the range [0, input_dim).
+    /// 
+    /// If the input_dim is ip0 and output_dim is op0, then shape of the embedding weight matrix must be
+    /// (ip0, op0).
+    /// 
+    /// When &quot;sparse_grad&quot; is False, if any index mentioned is too large, it is replaced by the index that
+    /// addresses the last vector in an embedding matrix.
+    /// When &quot;sparse_grad&quot; is True, an error will be raised if invalid indices are found.
+    /// 
+    /// Examples::
+    /// 
+    ///   input_dim = 4
+    ///   output_dim = 5
+    /// 
+    ///   // Each row in weight matrix y represents a word. So, y = (w0,w1,w2,w3)
+    ///   y = [[  0.,   1.,   2.,   3.,   4.],
+    ///        [  5.,   6.,   7.,   8.,   9.],
+    ///        [ 10.,  11.,  12.,  13.,  14.],
+    ///        [ 15.,  16.,  17.,  18.,  19.]]
+    /// 
+    ///   // Input array x represents n-grams(2-gram). So, x = [(w1,w3), (w0,w2)]
+    ///   x = [[ 1.,  3.],
+    ///        [ 0.,  2.]]
+    /// 
+    ///   // Mapped input x to its vector representation y.
+    ///   Embedding(x, y, 4, 5) = [[[  5.,   6.,   7.,   8.,   9.],
+    ///                             [ 15.,  16.,  17.,  18.,  19.]],
+    /// 
+    ///                            [[  0.,   1.,   2.,   3.,   4.],
+    ///                             [ 10.,  11.,  12.,  13.,  14.]]]
+    /// 
+    /// 
+    /// The storage type of weight can be either row_sparse or default.
+    /// 
+    /// .. Note::
+    /// 
+    ///     If &quot;sparse_grad&quot; is set to True, the storage type of gradient w.r.t weights will be
+    ///     &quot;row_sparse&quot;. Only a subset of optimizers support sparse gradients, including SGD, AdaGrad
+    ///     and Adam. Note that by default lazy updates is turned on, which may perform differently
+    ///     from standard updates. For more details, please check the Optimization API at:
+    ///     https://mxnet.incubator.apache.org/api/python/optimization/optimization.html
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L598</summary>
+    /// <param name="inputDim">Vocabulary size of the input indices.</param>
+    /// <param name="outputDim">Dimension of the embedding vectors.</param>
+    /// <param name="data">The input array to the embedding operator.</param>
+    /// <param name="weight">The embedding weight matrix.</param>
+    /// <param name="dtype">Data type of weight.</param>
+    /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
+    static member Embedding(inputDim : int, outputDim : int, [<Optional>] ?data : Symbol, [<Optional>] ?weight : Symbol, [<Optional>] ?dtype : EmbeddingDtype, [<Optional>] ?sparseGrad : bool) =
+        Embedding(inputDim, outputDim, ?data = data, ?weight = weight, ?dtype = dtype, ?sparseGrad = sparseGrad)
+
     /// <summary>Pooling operator for input and output data type of int8.
     /// The input and output data comes with min and max thresholds for quantizing
     /// the float32 data into int8.
@@ -21275,7 +24779,7 @@ type MX() =
     ///     This operator only supports forward propogation. DO NOT use it in training.
     ///     This operator only supports `pool_type` of `avg` or `max`.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_pooling.cc:L145</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_pooling.cc:L187</summary>
     /// <param name="data">Input data.</param>
     /// <param name="minData">Minimum value of data.</param>
     /// <param name="maxData">Maximum value of data.</param>
@@ -21317,7 +24821,7 @@ type MX() =
     ///     This operator only supports forward propogation. DO NOT use it in training.
     ///     This operator only supports `pool_type` of `avg` or `max`.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_pooling.cc:L145</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_pooling.cc:L187</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data.</param>
     /// <param name="minData">Minimum value of data.</param>
@@ -21365,7 +24869,7 @@ type MX() =
     ///     This operator only supports forward propogation. DO NOT use it in training.
     ///     This operator only supports `pool_type` of `avg` or `max`.
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_pooling.cc:L145</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\quantization\quantized_pooling.cc:L187</summary>
     /// <param name="data">Input data.</param>
     /// <param name="minData">Minimum value of data.</param>
     /// <param name="maxData">Maximum value of data.</param>
@@ -24919,6 +28423,23 @@ type MX() =
     ///             h_t = o_t * \tanh(c_t)
     ///             \end{array}
     /// 
+    /// With the projection size being set, LSTM could use the projection feature to reduce the parameters
+    /// size and give some speedups without significant damage to the accuracy.
+    /// 
+    /// Long Short-Term Memory Based Recurrent Neural Network Architectures for Large Vocabulary Speech
+    /// Recognition - Sak et al. 2014. https://arxiv.org/abs/1402.1128
+    /// 
+    /// .. math::
+    ///   \begin{array}{ll}
+    ///             i_t = \mathrm{sigmoid}(W_{ii} x_t + b_{ii} + W_{ri} r_{(t-1)} + b_{ri}) \\
+    ///             f_t = \mathrm{sigmoid}(W_{if} x_t + b_{if} + W_{rf} r_{(t-1)} + b_{rf}) \\
+    ///             g_t = \tanh(W_{ig} x_t + b_{ig} + W_{rc} r_{(t-1)} + b_{rg}) \\
+    ///             o_t = \mathrm{sigmoid}(W_{io} x_t + b_{o} + W_{ro} r_{(t-1)} + b_{ro}) \\
+    ///             c_t = f_t * c_{(t-1)} + i_t * g_t \\
+    ///             h_t = o_t * \tanh(c_t)
+    ///             r_t = W_{hr} h_t
+    ///             \end{array}
+    /// 
     /// **GRU**
     /// 
     /// Gated Recurrent Unit - Cho et al. 2014. http://arxiv.org/abs/1406.1078
@@ -24934,7 +28455,7 @@ type MX() =
     ///             \end{array}
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L354</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L368</summary>
     /// <param name="data">Input data to RNN</param>
     /// <param name="parameters">Vector of all RNN trainable parameters concatenated</param>
     /// <param name="state">initial hidden state of the RNN</param>
@@ -25013,6 +28534,23 @@ type MX() =
     ///             h_t = o_t * \tanh(c_t)
     ///             \end{array}
     /// 
+    /// With the projection size being set, LSTM could use the projection feature to reduce the parameters
+    /// size and give some speedups without significant damage to the accuracy.
+    /// 
+    /// Long Short-Term Memory Based Recurrent Neural Network Architectures for Large Vocabulary Speech
+    /// Recognition - Sak et al. 2014. https://arxiv.org/abs/1402.1128
+    /// 
+    /// .. math::
+    ///   \begin{array}{ll}
+    ///             i_t = \mathrm{sigmoid}(W_{ii} x_t + b_{ii} + W_{ri} r_{(t-1)} + b_{ri}) \\
+    ///             f_t = \mathrm{sigmoid}(W_{if} x_t + b_{if} + W_{rf} r_{(t-1)} + b_{rf}) \\
+    ///             g_t = \tanh(W_{ig} x_t + b_{ig} + W_{rc} r_{(t-1)} + b_{rg}) \\
+    ///             o_t = \mathrm{sigmoid}(W_{io} x_t + b_{o} + W_{ro} r_{(t-1)} + b_{ro}) \\
+    ///             c_t = f_t * c_{(t-1)} + i_t * g_t \\
+    ///             h_t = o_t * \tanh(c_t)
+    ///             r_t = W_{hr} h_t
+    ///             \end{array}
+    /// 
     /// **GRU**
     /// 
     /// Gated Recurrent Unit - Cho et al. 2014. http://arxiv.org/abs/1406.1078
@@ -25028,7 +28566,7 @@ type MX() =
     ///             \end{array}
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L354</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L368</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input data to RNN</param>
     /// <param name="parameters">Vector of all RNN trainable parameters concatenated</param>
@@ -25113,6 +28651,23 @@ type MX() =
     ///             h_t = o_t * \tanh(c_t)
     ///             \end{array}
     /// 
+    /// With the projection size being set, LSTM could use the projection feature to reduce the parameters
+    /// size and give some speedups without significant damage to the accuracy.
+    /// 
+    /// Long Short-Term Memory Based Recurrent Neural Network Architectures for Large Vocabulary Speech
+    /// Recognition - Sak et al. 2014. https://arxiv.org/abs/1402.1128
+    /// 
+    /// .. math::
+    ///   \begin{array}{ll}
+    ///             i_t = \mathrm{sigmoid}(W_{ii} x_t + b_{ii} + W_{ri} r_{(t-1)} + b_{ri}) \\
+    ///             f_t = \mathrm{sigmoid}(W_{if} x_t + b_{if} + W_{rf} r_{(t-1)} + b_{rf}) \\
+    ///             g_t = \tanh(W_{ig} x_t + b_{ig} + W_{rc} r_{(t-1)} + b_{rg}) \\
+    ///             o_t = \mathrm{sigmoid}(W_{io} x_t + b_{o} + W_{ro} r_{(t-1)} + b_{ro}) \\
+    ///             c_t = f_t * c_{(t-1)} + i_t * g_t \\
+    ///             h_t = o_t * \tanh(c_t)
+    ///             r_t = W_{hr} h_t
+    ///             \end{array}
+    /// 
     /// **GRU**
     /// 
     /// Gated Recurrent Unit - Cho et al. 2014. http://arxiv.org/abs/1406.1078
@@ -25128,7 +28683,7 @@ type MX() =
     ///             \end{array}
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L354</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L368</summary>
     /// <param name="data">Input data to RNN</param>
     /// <param name="parameters">Vector of all RNN trainable parameters concatenated</param>
     /// <param name="state">initial hidden state of the RNN</param>
@@ -25187,6 +28742,23 @@ type MX() =
     ///             h_t = o_t * \tanh(c_t)
     ///             \end{array}
     /// 
+    /// With the projection size being set, LSTM could use the projection feature to reduce the parameters
+    /// size and give some speedups without significant damage to the accuracy.
+    /// 
+    /// Long Short-Term Memory Based Recurrent Neural Network Architectures for Large Vocabulary Speech
+    /// Recognition - Sak et al. 2014. https://arxiv.org/abs/1402.1128
+    /// 
+    /// .. math::
+    ///   \begin{array}{ll}
+    ///             i_t = \mathrm{sigmoid}(W_{ii} x_t + b_{ii} + W_{ri} r_{(t-1)} + b_{ri}) \\
+    ///             f_t = \mathrm{sigmoid}(W_{if} x_t + b_{if} + W_{rf} r_{(t-1)} + b_{rf}) \\
+    ///             g_t = \tanh(W_{ig} x_t + b_{ig} + W_{rc} r_{(t-1)} + b_{rg}) \\
+    ///             o_t = \mathrm{sigmoid}(W_{io} x_t + b_{o} + W_{ro} r_{(t-1)} + b_{ro}) \\
+    ///             c_t = f_t * c_{(t-1)} + i_t * g_t \\
+    ///             h_t = o_t * \tanh(c_t)
+    ///             r_t = W_{hr} h_t
+    ///             \end{array}
+    /// 
     /// **GRU**
     /// 
     /// Gated Recurrent Unit - Cho et al. 2014. http://arxiv.org/abs/1406.1078
@@ -25202,7 +28774,7 @@ type MX() =
     ///             \end{array}
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L354</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\rnn.cc:L368</summary>
     /// <param name="stateSize">size of the state for each layer</param>
     /// <param name="numLayers">number of stacked layers</param>
     /// <param name="mode">the type of RNN to compute</param>
@@ -26389,10 +29961,10 @@ type MX() =
     /// It casts only between low precision float/FP32 and does not do anything for other types.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L121</summary>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
-    static member AmpCast(data : NDArray, dtype : DataType) =
+    static member AmpCast(data : NDArray, dtype : AmpCastDtype) =
         let creator = AtomicSymbolCreator.FromName "amp_cast"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -26404,11 +29976,11 @@ type MX() =
     /// It casts only between low precision float/FP32 and does not do anything for other types.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L121</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
-    static member AmpCast(outputArray : NDArray seq, data : NDArray, dtype : DataType) =
+    static member AmpCast(outputArray : NDArray seq, data : NDArray, dtype : AmpCastDtype) =
         let creator = AtomicSymbolCreator.FromName "amp_cast"
         let names = [|"dtype"|]
         let vals = [|string dtype|]
@@ -26424,20 +29996,20 @@ type MX() =
     /// It casts only between low precision float/FP32 and does not do anything for other types.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L121</summary>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
-    static member AmpCast(data : Symbol, dtype : DataType) =
+    static member AmpCast(data : Symbol, dtype : AmpCastDtype) =
         AmpCast(data, dtype)
     /// <summary>Cast function between low precision float/FP32 used by AMP.
     /// 
     /// It casts only between low precision float/FP32 and does not do anything for other types.
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L37</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L121</summary>
     /// <param name="dtype">Output data type.</param>
     /// <param name="data">The input.</param>
-    static member AmpCast(dtype : DataType, [<Optional>] ?data : Symbol) =
+    static member AmpCast(dtype : AmpCastDtype, [<Optional>] ?data : Symbol) =
         AmpCast(dtype, ?data = data)
 
 
@@ -26447,7 +30019,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L165</summary>
     /// <param name="data">Weights</param>
     /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
     /// <param name="castNarrow">Whether to cast to the narrowest type</param>
@@ -26464,7 +30036,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L165</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Weights</param>
     /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
@@ -26486,7 +30058,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L165</summary>
     /// <param name="data">Weights</param>
     /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
     /// <param name="castNarrow">Whether to cast to the narrowest type</param>
@@ -26498,7 +30070,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L71</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\amp_cast.cc:L165</summary>
     /// <param name="numOutputs">Number of input/output pairs to be casted to the widest type.</param>
     /// <param name="data">Weights</param>
     /// <param name="castNarrow">Whether to cast to the narrowest type</param>
@@ -27124,10 +30696,6 @@ type MX() =
     ///   // picks elements with specified indices along axis 1
     ///   pick(x, y=[0,1,0], 1) = [ 1.,  4.,  5.]
     /// 
-    ///   y = [[ 1.],
-    ///        [ 0.],
-    ///        [ 2.]]
-    /// 
     ///   // picks elements with specified indices along axis 1 using &#39;wrap&#39; mode
     ///   // to place indicies that would normally be out of bounds
     ///   pick(x, y=[2,-1,-2], 1, mode=&#39;wrap&#39;) = [ 1.,  4.,  5.]
@@ -27137,13 +30705,13 @@ type MX() =
     ///        [ 2.]]
     /// 
     ///   // picks elements with specified indices along axis 1 and dims are maintained
-    ///   pick(x,y, 1, keepdims=True) = [[ 2.],
+    ///   pick(x, y, 1, keepdims=True) = [[ 2.],
     ///                                  [ 3.],
     ///                                  [ 6.]]
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L155</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L151</summary>
     /// <param name="data">The input array</param>
     /// <param name="index">The index array</param>
     /// <param name="axis">int or None. The axis to picking the elements. Negative values means indexing from right to left. If is `None`, the elements in the index w.r.t the flattened input will be picked.</param>
@@ -27184,10 +30752,6 @@ type MX() =
     ///   // picks elements with specified indices along axis 1
     ///   pick(x, y=[0,1,0], 1) = [ 1.,  4.,  5.]
     /// 
-    ///   y = [[ 1.],
-    ///        [ 0.],
-    ///        [ 2.]]
-    /// 
     ///   // picks elements with specified indices along axis 1 using &#39;wrap&#39; mode
     ///   // to place indicies that would normally be out of bounds
     ///   pick(x, y=[2,-1,-2], 1, mode=&#39;wrap&#39;) = [ 1.,  4.,  5.]
@@ -27197,13 +30761,13 @@ type MX() =
     ///        [ 2.]]
     /// 
     ///   // picks elements with specified indices along axis 1 and dims are maintained
-    ///   pick(x,y, 1, keepdims=True) = [[ 2.],
+    ///   pick(x, y, 1, keepdims=True) = [[ 2.],
     ///                                  [ 3.],
     ///                                  [ 6.]]
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L155</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L151</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array</param>
     /// <param name="index">The index array</param>
@@ -27250,10 +30814,6 @@ type MX() =
     ///   // picks elements with specified indices along axis 1
     ///   pick(x, y=[0,1,0], 1) = [ 1.,  4.,  5.]
     /// 
-    ///   y = [[ 1.],
-    ///        [ 0.],
-    ///        [ 2.]]
-    /// 
     ///   // picks elements with specified indices along axis 1 using &#39;wrap&#39; mode
     ///   // to place indicies that would normally be out of bounds
     ///   pick(x, y=[2,-1,-2], 1, mode=&#39;wrap&#39;) = [ 1.,  4.,  5.]
@@ -27263,13 +30823,13 @@ type MX() =
     ///        [ 2.]]
     /// 
     ///   // picks elements with specified indices along axis 1 and dims are maintained
-    ///   pick(x,y, 1, keepdims=True) = [[ 2.],
+    ///   pick(x, y, 1, keepdims=True) = [[ 2.],
     ///                                  [ 3.],
     ///                                  [ 6.]]
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L155</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_index.cc:L151</summary>
     /// <param name="data">The input array</param>
     /// <param name="index">The index array</param>
     /// <param name="axis">int or None. The axis to picking the elements. Negative values means indexing from right to left. If is `None`, the elements in the index w.r.t the flattened input will be picked.</param>
@@ -27302,7 +30862,7 @@ type MX() =
     ///                                                  [ 2.,  2.,  2.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L93</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axes to perform the broadcasting.</param>
     /// <param name="size">Target sizes of the broadcasting axes.</param>
@@ -27336,7 +30896,7 @@ type MX() =
     ///                                                  [ 2.,  2.,  2.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L93</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="axis">The axes to perform the broadcasting.</param>
@@ -27375,7 +30935,7 @@ type MX() =
     ///                                                  [ 2.,  2.,  2.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L58</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L93</summary>
     /// <param name="data">The input</param>
     /// <param name="axis">The axes to perform the broadcasting.</param>
     /// <param name="size">Target sizes of the broadcasting axes.</param>
@@ -27401,7 +30961,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L82</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L117</summary>
     /// <param name="data">The input</param>
     /// <param name="shape">The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.</param>
     static member BroadcastTo(data : NDArray, [<Optional>] shape : int seq) =
@@ -27430,7 +30990,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L82</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L117</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input</param>
     /// <param name="shape">The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.</param>
@@ -27464,7 +31024,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L82</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L117</summary>
     /// <param name="data">The input</param>
     /// <param name="shape">The shape of the desired array. We can set the dim to zero if it&#39;s same as the original. E.g `A = broadcast_to(B, shape=(10, 0, 0))` has the same meaning as `A = broadcast_axis(B, axis=0, size=10)`.</param>
     static member BroadcastTo([<Optional>] ?data : Symbol, [<Optional>] ?shape : int seq) =
@@ -27510,7 +31070,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L135</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L170</summary>
     /// <param name="lhs">First input.</param>
     /// <param name="rhs">Second input.</param>
     /// <param name="lhsAxes">Axes to perform broadcast on in the first input array</param>
@@ -27540,7 +31100,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L135</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L170</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input.</param>
     /// <param name="rhs">Second input.</param>
@@ -27575,7 +31135,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L135</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\broadcast_reduce_op_value.cc:L170</summary>
     /// <param name="lhs">First input.</param>
     /// <param name="rhs">Second input.</param>
     /// <param name="lhsAxes">Axes to perform broadcast on in the first input array</param>
@@ -30389,73 +33949,6 @@ type MX() =
     static member BroadcastLogicalXor([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
         BroadcastLogicalXor(?lhs = lhs, ?rhs = rhs)
 
-    /// <summary>Adds arguments element-wise.
-    /// 
-    /// The storage type of ``elemwise_add`` output depends on storage types of inputs
-    /// 
-    ///    - elemwise_add(row_sparse, row_sparse) = row_sparse
-    ///    - elemwise_add(csr, csr) = csr
-    ///    - elemwise_add(default, csr) = default
-    ///    - elemwise_add(csr, default) = default
-    ///    - elemwise_add(default, rsp) = default
-    ///    - elemwise_add(rsp, default) = default
-    ///    - otherwise, ``elemwise_add`` generates output with default storage
-    /// 
-    /// </summary>
-    /// <param name="lhs">first input</param>
-    /// <param name="rhs">second input</param>
-    static member ElemwiseAdd(lhs : NDArray, rhs : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "elemwise_add"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
-                                                 Array.empty
-                                                 Array.empty
-        (new NDArray(outputs.[0]))
-    /// <summary>Adds arguments element-wise.
-    /// 
-    /// The storage type of ``elemwise_add`` output depends on storage types of inputs
-    /// 
-    ///    - elemwise_add(row_sparse, row_sparse) = row_sparse
-    ///    - elemwise_add(csr, csr) = csr
-    ///    - elemwise_add(default, csr) = default
-    ///    - elemwise_add(csr, default) = default
-    ///    - elemwise_add(default, rsp) = default
-    ///    - elemwise_add(rsp, default) = default
-    ///    - otherwise, ``elemwise_add`` generates output with default storage
-    /// 
-    /// </summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="lhs">first input</param>
-    /// <param name="rhs">second input</param>
-    static member ElemwiseAdd(outputArray : NDArray seq, lhs : NDArray, rhs : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "elemwise_add"
-        let names = Array.empty
-        let vals = Array.empty
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Adds arguments element-wise.
-    /// 
-    /// The storage type of ``elemwise_add`` output depends on storage types of inputs
-    /// 
-    ///    - elemwise_add(row_sparse, row_sparse) = row_sparse
-    ///    - elemwise_add(csr, csr) = csr
-    ///    - elemwise_add(default, csr) = default
-    ///    - elemwise_add(csr, default) = default
-    ///    - elemwise_add(default, rsp) = default
-    ///    - elemwise_add(rsp, default) = default
-    ///    - otherwise, ``elemwise_add`` generates output with default storage
-    /// 
-    /// </summary>
-    /// <param name="lhs">first input</param>
-    /// <param name="rhs">second input</param>
-    static member ElemwiseAdd([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
-        ElemwiseAdd(?lhs = lhs, ?rhs = rhs)
-
     /// <param name="lhs">first input</param>
     /// <param name="rhs">second input</param>
     static member GradAdd(lhs : NDArray, rhs : NDArray) =
@@ -30552,70 +34045,6 @@ type MX() =
     static member ElemwiseSub([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
         ElemwiseSub(?lhs = lhs, ?rhs = rhs)
 
-
-    /// <summary>Multiplies arguments element-wise.
-    /// 
-    /// The storage type of ``elemwise_mul`` output depends on storage types of inputs
-    /// 
-    ///    - elemwise_mul(default, default) = default
-    ///    - elemwise_mul(row_sparse, row_sparse) = row_sparse
-    ///    - elemwise_mul(default, row_sparse) = row_sparse
-    ///    - elemwise_mul(row_sparse, default) = row_sparse
-    ///    - elemwise_mul(csr, csr) = csr
-    ///    - otherwise, ``elemwise_mul`` generates output with default storage
-    /// 
-    /// </summary>
-    /// <param name="lhs">first input</param>
-    /// <param name="rhs">second input</param>
-    static member ElemwiseMul(lhs : NDArray, rhs : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "elemwise_mul"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
-                                                 Array.empty
-                                                 Array.empty
-        (new NDArray(outputs.[0]))
-    /// <summary>Multiplies arguments element-wise.
-    /// 
-    /// The storage type of ``elemwise_mul`` output depends on storage types of inputs
-    /// 
-    ///    - elemwise_mul(default, default) = default
-    ///    - elemwise_mul(row_sparse, row_sparse) = row_sparse
-    ///    - elemwise_mul(default, row_sparse) = row_sparse
-    ///    - elemwise_mul(row_sparse, default) = row_sparse
-    ///    - elemwise_mul(csr, csr) = csr
-    ///    - otherwise, ``elemwise_mul`` generates output with default storage
-    /// 
-    /// </summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="lhs">first input</param>
-    /// <param name="rhs">second input</param>
-    static member ElemwiseMul(outputArray : NDArray seq, lhs : NDArray, rhs : NDArray) =
-        let creator = AtomicSymbolCreator.FromName "elemwise_mul"
-        let names = Array.empty
-        let vals = Array.empty
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg lhs)) then lhs.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rhs)) then rhs.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Multiplies arguments element-wise.
-    /// 
-    /// The storage type of ``elemwise_mul`` output depends on storage types of inputs
-    /// 
-    ///    - elemwise_mul(default, default) = default
-    ///    - elemwise_mul(row_sparse, row_sparse) = row_sparse
-    ///    - elemwise_mul(default, row_sparse) = row_sparse
-    ///    - elemwise_mul(row_sparse, default) = row_sparse
-    ///    - elemwise_mul(csr, csr) = csr
-    ///    - otherwise, ``elemwise_mul`` generates output with default storage
-    /// 
-    /// </summary>
-    /// <param name="lhs">first input</param>
-    /// <param name="rhs">second input</param>
-    static member ElemwiseMul([<Optional>] ?lhs : Symbol, [<Optional>] ?rhs : Symbol) =
-        ElemwiseMul(?lhs = lhs, ?rhs = rhs)
 
 
     /// <summary>Divides arguments element-wise.
@@ -31075,21 +34504,23 @@ type MX() =
         LogicalXor(?lhs = lhs, ?rhs = rhs)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member PlusScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member PlusScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_plus_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member PlusScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member PlusScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_plus_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31098,30 +34529,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member PlusScalar(data : Symbol, scalar : float) =
-        PlusScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member PlusScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        PlusScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member PlusScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        PlusScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member MinusScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member MinusScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_minus_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member MinusScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member MinusScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_minus_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31130,30 +34560,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member MinusScalar(data : Symbol, scalar : float) =
-        MinusScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member MinusScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        MinusScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member MinusScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        MinusScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member RminusScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member RminusScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_rminus_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member RminusScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member RminusScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_rminus_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31162,13 +34591,10 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member RminusScalar(data : Symbol, scalar : float) =
-        RminusScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member RminusScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        RminusScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member RminusScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        RminusScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <summary>Multiply an array with a scalar.
     /// 
@@ -31180,15 +34606,16 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L149</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L153</summary>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member MulScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member MulScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_mul_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <summary>Multiply an array with a scalar.
     /// 
@@ -31200,14 +34627,15 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L149</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L153</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member MulScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member MulScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_mul_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31225,26 +34653,12 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L149</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L153</summary>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member MulScalar(data : Symbol, scalar : float) =
-        MulScalar(data, scalar)
-    /// <summary>Multiply an array with a scalar.
-    /// 
-    /// ``_mul_scalar`` only operates on data array of input if input is sparse.
-    /// 
-    /// For example, if input of shape (100, 100) has only 2 non zero elements,
-    /// i.e. input.data = [5, 6], scalar = nan,
-    /// it will result output.data = [nan, nan] instead of 10000 nans.
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L149</summary>
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member MulScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        MulScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member MulScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        MulScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
 
     /// <summary>Divide an array with a scalar.
@@ -31257,15 +34671,16 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L171</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L175</summary>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member DivScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member DivScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_div_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <summary>Divide an array with a scalar.
     /// 
@@ -31277,14 +34692,15 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L171</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L175</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member DivScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member DivScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_div_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31302,44 +34718,32 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L171</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L175</summary>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member DivScalar(data : Symbol, scalar : float) =
-        DivScalar(data, scalar)
-    /// <summary>Divide an array with a scalar.
-    /// 
-    /// ``_div_scalar`` only operates on data array of input if input is sparse.
-    /// 
-    /// For example, if input of shape (100, 100) has only 2 non zero elements,
-    /// i.e. input.data = [5, 6], scalar = nan,
-    /// it will result output.data = [nan, nan] instead of 10000 nans.
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_basic.cc:L171</summary>
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member DivScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        DivScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member DivScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        DivScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member RdivScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member RdivScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_rdiv_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member RdivScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member RdivScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_rdiv_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31348,31 +34752,30 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member RdivScalar(data : Symbol, scalar : float) =
-        RdivScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member RdivScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        RdivScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member RdivScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        RdivScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member ModScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member ModScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_mod_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member ModScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member ModScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_mod_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31381,31 +34784,30 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member ModScalar(data : Symbol, scalar : float) =
-        ModScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member ModScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        ModScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member ModScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        ModScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member RmodScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member RmodScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_rmod_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member RmodScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member RmodScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_rmod_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31414,31 +34816,30 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member RmodScalar(data : Symbol, scalar : float) =
-        RmodScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member RmodScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        RmodScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member RmodScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        RmodScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member MaximumScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member MaximumScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_maximum_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member MaximumScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member MaximumScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_maximum_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31447,31 +34848,30 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member MaximumScalar(data : Symbol, scalar : float) =
-        MaximumScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member MaximumScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        MaximumScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member MaximumScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        MaximumScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member MinimumScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member MinimumScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_minimum_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member MinimumScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member MinimumScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_minimum_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31480,31 +34880,30 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member MinimumScalar(data : Symbol, scalar : float) =
-        MinimumScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member MinimumScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        MinimumScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member MinimumScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        MinimumScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member PowerScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member PowerScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_power_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member PowerScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member PowerScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_power_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31513,31 +34912,30 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member PowerScalar(data : Symbol, scalar : float) =
-        PowerScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member PowerScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        PowerScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member PowerScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        PowerScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member RpowerScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member RpowerScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_rpower_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member RpowerScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member RpowerScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_rpower_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31546,31 +34944,30 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member RpowerScalar(data : Symbol, scalar : float) =
-        RpowerScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member RpowerScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        RpowerScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member RpowerScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        RpowerScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member HypotScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member HypotScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_hypot_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member HypotScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member HypotScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_hypot_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31579,13 +34976,10 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member HypotScalar(data : Symbol, scalar : float) =
-        HypotScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member HypotScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        HypotScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member HypotScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        HypotScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
 
     /// <summary>Calculate Smooth L1 Loss(lhs, scalar) by summing
@@ -31607,7 +35001,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L108</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L109</summary>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     static member SmoothL1(data : NDArray, scalar : float) =
@@ -31636,7 +35030,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L108</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L109</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
@@ -31670,7 +35064,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L108</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L109</summary>
     /// <param name="data">source input</param>
     /// <param name="scalar">scalar input</param>
     static member SmoothL1(data : Symbol, scalar : float) =
@@ -31694,7 +35088,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L108</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_binary_scalar_op_extended.cc:L109</summary>
     /// <param name="scalar">scalar input</param>
     /// <param name="data">source input</param>
     static member SmoothL1(scalar : float, [<Optional>] ?data : Symbol) =
@@ -31702,21 +35096,23 @@ type MX() =
 
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member EqualScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member EqualScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_equal_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member EqualScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member EqualScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_equal_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31725,30 +35121,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member EqualScalar(data : Symbol, scalar : float) =
-        EqualScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member EqualScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        EqualScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member EqualScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        EqualScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NotEqualScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NotEqualScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_not_equal_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NotEqualScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NotEqualScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_not_equal_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31757,30 +35152,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member NotEqualScalar(data : Symbol, scalar : float) =
-        NotEqualScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member NotEqualScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        NotEqualScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member NotEqualScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        NotEqualScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member GreaterScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member GreaterScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_greater_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member GreaterScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member GreaterScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_greater_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31789,30 +35183,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member GreaterScalar(data : Symbol, scalar : float) =
-        GreaterScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member GreaterScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        GreaterScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member GreaterScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        GreaterScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member GreaterEqualScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member GreaterEqualScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_greater_equal_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member GreaterEqualScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member GreaterEqualScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_greater_equal_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31821,30 +35214,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member GreaterEqualScalar(data : Symbol, scalar : float) =
-        GreaterEqualScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member GreaterEqualScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        GreaterEqualScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member GreaterEqualScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        GreaterEqualScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member LesserScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member LesserScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_lesser_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member LesserScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member LesserScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_lesser_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31853,30 +35245,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member LesserScalar(data : Symbol, scalar : float) =
-        LesserScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member LesserScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        LesserScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member LesserScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        LesserScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member LesserEqualScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member LesserEqualScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_lesser_equal_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member LesserEqualScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member LesserEqualScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_lesser_equal_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31885,30 +35276,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member LesserEqualScalar(data : Symbol, scalar : float) =
-        LesserEqualScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member LesserEqualScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        LesserEqualScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member LesserEqualScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        LesserEqualScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member LogicalAndScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member LogicalAndScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_logical_and_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member LogicalAndScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member LogicalAndScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_logical_and_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31917,30 +35307,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member LogicalAndScalar(data : Symbol, scalar : float) =
-        LogicalAndScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member LogicalAndScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        LogicalAndScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member LogicalAndScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        LogicalAndScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member LogicalOrScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member LogicalOrScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_logical_or_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member LogicalOrScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member LogicalOrScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_logical_or_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31949,30 +35338,29 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member LogicalOrScalar(data : Symbol, scalar : float) =
-        LogicalOrScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member LogicalOrScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        LogicalOrScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member LogicalOrScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        LogicalOrScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member LogicalXorScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member LogicalXorScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_logical_xor_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member LogicalXorScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member LogicalXorScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_logical_xor_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -31981,13 +35369,10 @@ type MX() =
                                                      vals
         ()
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member LogicalXorScalar(data : Symbol, scalar : float) =
-        LogicalXorScalar(data, scalar)
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member LogicalXorScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        LogicalXorScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member LogicalXorScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        LogicalXorScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <summary>Divides arguments element-wise.  If the left-hand-side input is &#39;row_sparse&#39;, then
     /// only the values which exist in the left-hand sparse array are computed.  The &#39;missing&#39; values
@@ -32069,13 +35454,14 @@ type MX() =
     /// 
     /// </summary>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member ScatterPlusScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member ScatterPlusScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_scatter_plus_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <summary>Adds a scalar to a tensor element-wise.  If the left-hand-side input is
     /// &#39;row_sparse&#39; or &#39;csr&#39;, then only the values which exist in the left-hand sparse array are computed.
@@ -32091,11 +35477,12 @@ type MX() =
     /// </summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member ScatterPlusScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member ScatterPlusScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_scatter_plus_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -32116,25 +35503,10 @@ type MX() =
     /// 
     /// </summary>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member ScatterPlusScalar(data : Symbol, scalar : float) =
-        ScatterPlusScalar(data, scalar)
-    /// <summary>Adds a scalar to a tensor element-wise.  If the left-hand-side input is
-    /// &#39;row_sparse&#39; or &#39;csr&#39;, then only the values which exist in the left-hand sparse array are computed.
-    /// The &#39;missing&#39; values are ignored.
-    /// 
-    /// The storage type of ``_scatter_plus_scalar`` output depends on storage types of inputs
-    /// 
-    /// - _scatter_plus_scalar(row_sparse, scalar) = row_sparse
-    /// - _scatter_plus_scalar(csr, scalar) = csr
-    /// - otherwise, ``_scatter_plus_scalar`` behaves exactly like _plus_scalar and generates output
-    /// with default storage
-    /// 
-    /// </summary>
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member ScatterPlusScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        ScatterPlusScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member ScatterPlusScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        ScatterPlusScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <summary>Subtracts a scalar to a tensor element-wise.  If the left-hand-side input is
     /// &#39;row_sparse&#39; or &#39;csr&#39;, then only the values which exist in the left-hand sparse array are computed.
@@ -32149,13 +35521,14 @@ type MX() =
     /// 
     /// </summary>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member ScatterMinusScalar(data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member ScatterMinusScalar(data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_scatter_minus_scalar"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
-                                                 [|"scalar"|]
-                                                 [|string scalar|]
+                                                 [|"scalar"; "is_int"|]
+                                                 [|string scalar; string isInt|]
         (new NDArray(outputs.[0]))
     /// <summary>Subtracts a scalar to a tensor element-wise.  If the left-hand-side input is
     /// &#39;row_sparse&#39; or &#39;csr&#39;, then only the values which exist in the left-hand sparse array are computed.
@@ -32171,11 +35544,12 @@ type MX() =
     /// </summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member ScatterMinusScalar(outputArray : NDArray seq, data : NDArray, scalar : float) =
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member ScatterMinusScalar(outputArray : NDArray seq, data : NDArray, [<Optional; DefaultParameterValue(1.0)>] scalar : double, [<Optional; DefaultParameterValue(true)>] isInt : bool) =
         let creator = AtomicSymbolCreator.FromName "_scatter_minus_scalar"
-        let names = [|"scalar"|]
-        let vals = [|string scalar|]
+        let names = [|"scalar"; "is_int"|]
+        let vals = [|string scalar; string isInt|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle|]
@@ -32196,25 +35570,10 @@ type MX() =
     /// 
     /// </summary>
     /// <param name="data">source input</param>
-    /// <param name="scalar">scalar input</param>
-    static member ScatterMinusScalar(data : Symbol, scalar : float) =
-        ScatterMinusScalar(data, scalar)
-    /// <summary>Subtracts a scalar to a tensor element-wise.  If the left-hand-side input is
-    /// &#39;row_sparse&#39; or &#39;csr&#39;, then only the values which exist in the left-hand sparse array are computed.
-    /// The &#39;missing&#39; values are ignored.
-    /// 
-    /// The storage type of ``_scatter_minus_scalar`` output depends on storage types of inputs
-    /// 
-    /// - _scatter_minus_scalar(row_sparse, scalar) = row_sparse
-    /// - _scatter_minus_scalar(csr, scalar) = csr
-    /// - otherwise, ``_scatter_minus_scalar`` behaves exactly like _minus_scalar and generates output
-    /// with default storage
-    /// 
-    /// </summary>
-    /// <param name="scalar">scalar input</param>
-    /// <param name="data">source input</param>
-    static member ScatterMinusScalar(scalar : float, [<Optional>] ?data : Symbol) =
-        ScatterMinusScalar(scalar, ?data = data)
+    /// <param name="scalar">Scalar input value</param>
+    /// <param name="isInt">Indicate whether scalar input is int type</param>
+    static member ScatterMinusScalar([<Optional>] ?data : Symbol, [<Optional>] ?scalar : double, [<Optional>] ?isInt : bool) =
+        ScatterMinusScalar(?data = data, ?scalar = scalar, ?isInt = isInt)
 
     /// <summary>Adds all input arguments element-wise.
     /// 
@@ -32530,7 +35889,7 @@ type MX() =
 
     /// <summary>Returns a copy of the input.
     /// 
-    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:246</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:244</summary>
     /// <param name="data">The input array.</param>
     static member Copy(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_copy"
@@ -32541,7 +35900,7 @@ type MX() =
         (new NDArray(outputs.[0]))
     /// <summary>Returns a copy of the input.
     /// 
-    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:246</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:244</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Copy(outputArray : NDArray seq, data : NDArray) =
@@ -32557,7 +35916,7 @@ type MX() =
         ()
     /// <summary>Returns a copy of the input.
     /// 
-    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:246</summary>
+    /// From:C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:244</summary>
     /// <param name="data">The input array.</param>
     static member Copy([<Optional>] ?data : Symbol) =
         Copy(?data = data)
@@ -32591,7 +35950,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L327</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L325</summary>
     /// <param name="data">The input array.</param>
     static member BlockGrad(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "BlockGrad"
@@ -32627,7 +35986,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L327</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L325</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member BlockGrad(outputArray : NDArray seq, data : NDArray) =
@@ -32668,7 +36027,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L327</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L325</summary>
     /// <param name="data">The input array.</param>
     static member BlockGrad([<Optional>] ?data : Symbol) =
         BlockGrad(?data = data)
@@ -32696,7 +36055,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L360</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L358</summary>
     /// <param name="data">The input array.</param>
     static member MakeLoss(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "make_loss"
@@ -32728,7 +36087,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L360</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L358</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member MakeLoss(outputArray : NDArray seq, data : NDArray) =
@@ -32765,7 +36124,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L360</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L358</summary>
     /// <param name="data">The input array.</param>
     static member MakeLoss([<Optional>] ?data : Symbol) =
         MakeLoss(?data = data)
@@ -32825,7 +36184,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L513</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L511</summary>
     /// <param name="lhs">First input.</param>
     /// <param name="rhs">Second input.</param>
     /// <param name="lhsBegin">Defaults to 0. The beginning index along which the lhs dimensions are to be reshaped. Supports negative indices.</param>
@@ -32871,7 +36230,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L513</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L511</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="lhs">First input.</param>
     /// <param name="rhs">Second input.</param>
@@ -32923,7 +36282,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L513</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L511</summary>
     /// <param name="lhs">First input.</param>
     /// <param name="rhs">Second input.</param>
     /// <param name="lhsBegin">Defaults to 0. The beginning index along which the lhs dimensions are to be reshaped. Supports negative indices.</param>
@@ -32941,7 +36300,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L574</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L573</summary>
     /// <param name="data">Input Array.</param>
     static member ShapeArray(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "shape_array"
@@ -32958,7 +36317,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L574</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L573</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input Array.</param>
     static member ShapeArray(outputArray : NDArray seq, data : NDArray) =
@@ -32980,7 +36339,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L574</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L573</summary>
     /// <param name="data">Input Array.</param>
     static member ShapeArray([<Optional>] ?data : Symbol) =
         ShapeArray(?data = data)
@@ -32993,7 +36352,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L625</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L624</summary>
     /// <param name="data">Input Array.</param>
     static member SizeArray(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "size_array"
@@ -33010,7 +36369,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L625</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L624</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">Input Array.</param>
     static member SizeArray(outputArray : NDArray seq, data : NDArray) =
@@ -33032,7 +36391,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L625</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L624</summary>
     /// <param name="data">Input Array.</param>
     static member SizeArray([<Optional>] ?data : Symbol) =
         SizeArray(?data = data)
@@ -33049,7 +36408,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L664</summary>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
     static member Cast(data : NDArray, dtype : DataType) =
@@ -33071,7 +36430,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L664</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
@@ -33098,7 +36457,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L664</summary>
     /// <param name="data">The input.</param>
     /// <param name="dtype">Output data type.</param>
     static member Cast(data : Symbol, dtype : DataType) =
@@ -33115,7 +36474,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L665</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L664</summary>
     /// <param name="dtype">Output data type.</param>
     /// <param name="data">The input.</param>
     static member Cast(dtype : DataType, [<Optional>] ?data : Symbol) =
@@ -33188,7 +36547,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L721</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L720</summary>
     /// <param name="data">The input array.</param>
     static member Abs(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "abs"
@@ -33211,7 +36570,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L721</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L720</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Abs(outputArray : NDArray seq, data : NDArray) =
@@ -33239,7 +36598,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L721</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L720</summary>
     /// <param name="data">The input array.</param>
     static member Abs([<Optional>] ?data : Symbol) =
         Abs(?data = data)
@@ -33259,7 +36618,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L759</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L758</summary>
     /// <param name="data">The input array.</param>
     static member Sign(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "sign"
@@ -33282,7 +36641,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L759</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L758</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Sign(outputArray : NDArray seq, data : NDArray) =
@@ -33310,7 +36669,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L759</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L758</summary>
     /// <param name="data">The input array.</param>
     static member Sign([<Optional>] ?data : Symbol) =
         Sign(?data = data)
@@ -33330,7 +36689,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L778</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L777</summary>
     /// <param name="data">The input array.</param>
     static member Round(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "round"
@@ -33353,7 +36712,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L778</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L777</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Round(outputArray : NDArray seq, data : NDArray) =
@@ -33381,7 +36740,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L778</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L777</summary>
     /// <param name="data">The input array.</param>
     static member Round([<Optional>] ?data : Symbol) =
         Round(?data = data)
@@ -33404,7 +36763,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L799</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L798</summary>
     /// <param name="data">The input array.</param>
     static member Rint(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "rint"
@@ -33431,7 +36790,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L799</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L798</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Rint(outputArray : NDArray seq, data : NDArray) =
@@ -33463,7 +36822,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L799</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L798</summary>
     /// <param name="data">The input array.</param>
     static member Rint([<Optional>] ?data : Symbol) =
         Rint(?data = data)
@@ -33484,7 +36843,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L818</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L817</summary>
     /// <param name="data">The input array.</param>
     static member Ceil(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "ceil"
@@ -33509,7 +36868,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L818</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L817</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Ceil(outputArray : NDArray seq, data : NDArray) =
@@ -33539,7 +36898,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L818</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L817</summary>
     /// <param name="data">The input array.</param>
     static member Ceil([<Optional>] ?data : Symbol) =
         Ceil(?data = data)
@@ -33560,7 +36919,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L837</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L836</summary>
     /// <param name="data">The input array.</param>
     static member Floor(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "floor"
@@ -33585,7 +36944,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L837</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L836</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Floor(outputArray : NDArray seq, data : NDArray) =
@@ -33615,7 +36974,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L837</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L836</summary>
     /// <param name="data">The input array.</param>
     static member Floor([<Optional>] ?data : Symbol) =
         Floor(?data = data)
@@ -33637,7 +36996,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L857</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L856</summary>
     /// <param name="data">The input array.</param>
     static member Trunc(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "trunc"
@@ -33663,7 +37022,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L857</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L856</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Trunc(outputArray : NDArray seq, data : NDArray) =
@@ -33694,7 +37053,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L857</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L856</summary>
     /// <param name="data">The input array.</param>
     static member Trunc([<Optional>] ?data : Symbol) =
         Trunc(?data = data)
@@ -33714,7 +37073,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L875</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L874</summary>
     /// <param name="data">The input array.</param>
     static member Fix(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "fix"
@@ -33738,7 +37097,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L875</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L874</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Fix(outputArray : NDArray seq, data : NDArray) =
@@ -33767,7 +37126,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L875</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L874</summary>
     /// <param name="data">The input array.</param>
     static member Fix([<Optional>] ?data : Symbol) =
         Fix(?data = data)
@@ -33833,7 +37192,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L907</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L908</summary>
     /// <param name="data">The input array.</param>
     static member Erfinv(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "erfinv"
@@ -33850,7 +37209,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L907</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L908</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Erfinv(outputArray : NDArray seq, data : NDArray) =
@@ -33872,7 +37231,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L907</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_basic.cc:L908</summary>
     /// <param name="data">The input array.</param>
     static member Erfinv([<Optional>] ?data : Symbol) =
         Erfinv(?data = data)
@@ -34022,7 +37381,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L63</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L64</summary>
     /// <param name="data">The input array.</param>
     static member Exp(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "exp"
@@ -34044,7 +37403,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L63</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L64</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Exp(outputArray : NDArray seq, data : NDArray) =
@@ -34071,7 +37430,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L63</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L64</summary>
     /// <param name="data">The input array.</param>
     static member Exp([<Optional>] ?data : Symbol) =
         Exp(?data = data)
@@ -34084,7 +37443,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L76</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L77</summary>
     /// <param name="data">The input array.</param>
     static member Log(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "log"
@@ -34101,7 +37460,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L76</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L77</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Log(outputArray : NDArray seq, data : NDArray) =
@@ -34123,7 +37482,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L76</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L77</summary>
     /// <param name="data">The input array.</param>
     static member Log([<Optional>] ?data : Symbol) =
         Log(?data = data)
@@ -34136,7 +37495,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L93</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L94</summary>
     /// <param name="data">The input array.</param>
     static member Log10(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "log10"
@@ -34153,7 +37512,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L93</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L94</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Log10(outputArray : NDArray seq, data : NDArray) =
@@ -34175,7 +37534,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L93</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L94</summary>
     /// <param name="data">The input array.</param>
     static member Log10([<Optional>] ?data : Symbol) =
         Log10(?data = data)
@@ -34188,7 +37547,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L105</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L106</summary>
     /// <param name="data">The input array.</param>
     static member Log2(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "log2"
@@ -34205,7 +37564,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L105</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L106</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Log2(outputArray : NDArray seq, data : NDArray) =
@@ -34227,7 +37586,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L105</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L106</summary>
     /// <param name="data">The input array.</param>
     static member Log2([<Optional>] ?data : Symbol) =
         Log2(?data = data)
@@ -34248,7 +37607,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L206</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L199</summary>
     /// <param name="data">The input array.</param>
     static member Log1p(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "log1p"
@@ -34270,7 +37629,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L206</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L199</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Log1p(outputArray : NDArray seq, data : NDArray) =
@@ -34297,7 +37656,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L206</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L199</summary>
     /// <param name="data">The input array.</param>
     static member Log1p([<Optional>] ?data : Symbol) =
         Log1p(?data = data)
@@ -34315,7 +37674,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L224</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L244</summary>
     /// <param name="data">The input array.</param>
     static member Expm1(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "expm1"
@@ -34336,7 +37695,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L224</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L244</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Expm1(outputArray : NDArray seq, data : NDArray) =
@@ -34362,7 +37721,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L224</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_logexp.cc:L244</summary>
     /// <param name="data">The input array.</param>
     static member Expm1([<Optional>] ?data : Symbol) =
         Expm1(?data = data)
@@ -34378,7 +37737,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L42</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L43</summary>
     /// <param name="data">The input array.</param>
     static member Reciprocal(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "reciprocal"
@@ -34397,7 +37756,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L42</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L43</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Reciprocal(outputArray : NDArray seq, data : NDArray) =
@@ -34421,7 +37780,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L42</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L43</summary>
     /// <param name="data">The input array.</param>
     static member Reciprocal([<Optional>] ?data : Symbol) =
         Reciprocal(?data = data)
@@ -34444,7 +37803,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L118</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L119</summary>
     /// <param name="data">The input array.</param>
     static member Square(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "square"
@@ -34470,7 +37829,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L118</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L119</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Square(outputArray : NDArray seq, data : NDArray) =
@@ -34501,7 +37860,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L118</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L119</summary>
     /// <param name="data">The input array.</param>
     static member Square([<Optional>] ?data : Symbol) =
         Square(?data = data)
@@ -34524,7 +37883,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L142</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L170</summary>
     /// <param name="data">The input array.</param>
     static member Sqrt(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "sqrt"
@@ -34550,7 +37909,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L142</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L170</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Sqrt(outputArray : NDArray seq, data : NDArray) =
@@ -34581,7 +37940,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L142</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L170</summary>
     /// <param name="data">The input array.</param>
     static member Sqrt([<Optional>] ?data : Symbol) =
         Sqrt(?data = data)
@@ -34600,7 +37959,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L193</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L221</summary>
     /// <param name="data">The input array.</param>
     static member Rsqrt(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "rsqrt"
@@ -34622,7 +37981,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L193</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L221</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Rsqrt(outputArray : NDArray seq, data : NDArray) =
@@ -34649,7 +38008,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L193</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L221</summary>
     /// <param name="data">The input array.</param>
     static member Rsqrt([<Optional>] ?data : Symbol) =
         Rsqrt(?data = data)
@@ -34672,7 +38031,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L216</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L270</summary>
     /// <param name="data">The input array.</param>
     static member Cbrt(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "cbrt"
@@ -34698,7 +38057,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L216</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L270</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Cbrt(outputArray : NDArray seq, data : NDArray) =
@@ -34729,7 +38088,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L216</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L270</summary>
     /// <param name="data">The input array.</param>
     static member Cbrt([<Optional>] ?data : Symbol) =
         Cbrt(?data = data)
@@ -34746,7 +38105,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L269</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L323</summary>
     /// <param name="data">The input array.</param>
     static member Rcbrt(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "rcbrt"
@@ -34766,7 +38125,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L269</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L323</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Rcbrt(outputArray : NDArray seq, data : NDArray) =
@@ -34791,7 +38150,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L269</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_pow.cc:L323</summary>
     /// <param name="data">The input array.</param>
     static member Rcbrt([<Optional>] ?data : Symbol) =
         Rcbrt(?data = data)
@@ -35096,7 +38455,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L206</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L233</summary>
     /// <param name="data">The input array.</param>
     static member Arccos(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arccos"
@@ -35117,7 +38476,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L206</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L233</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Arccos(outputArray : NDArray seq, data : NDArray) =
@@ -35143,7 +38502,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L206</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L233</summary>
     /// <param name="data">The input array.</param>
     static member Arccos([<Optional>] ?data : Symbol) =
         Arccos(?data = data)
@@ -35164,7 +38523,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L227</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L282</summary>
     /// <param name="data">The input array.</param>
     static member Arctan(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arctan"
@@ -35188,7 +38547,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L227</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L282</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Arctan(outputArray : NDArray seq, data : NDArray) =
@@ -35217,7 +38576,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L227</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L282</summary>
     /// <param name="data">The input array.</param>
     static member Arctan([<Optional>] ?data : Symbol) =
         Arctan(?data = data)
@@ -35236,7 +38595,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L274</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L332</summary>
     /// <param name="data">The input array.</param>
     static member Degrees(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "degrees"
@@ -35258,7 +38617,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L274</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L332</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Degrees(outputArray : NDArray seq, data : NDArray) =
@@ -35285,7 +38644,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L274</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L332</summary>
     /// <param name="data">The input array.</param>
     static member Degrees([<Optional>] ?data : Symbol) =
         Degrees(?data = data)
@@ -35304,7 +38663,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L293</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L351</summary>
     /// <param name="data">The input array.</param>
     static member Radians(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "radians"
@@ -35326,7 +38685,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L293</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L351</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Radians(outputArray : NDArray seq, data : NDArray) =
@@ -35353,7 +38712,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L293</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L351</summary>
     /// <param name="data">The input array.</param>
     static member Radians([<Optional>] ?data : Symbol) =
         Radians(?data = data)
@@ -35372,7 +38731,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L313</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L371</summary>
     /// <param name="data">The input array.</param>
     static member Sinh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "sinh"
@@ -35394,7 +38753,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L313</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L371</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Sinh(outputArray : NDArray seq, data : NDArray) =
@@ -35421,7 +38780,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L313</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L371</summary>
     /// <param name="data">The input array.</param>
     static member Sinh([<Optional>] ?data : Symbol) =
         Sinh(?data = data)
@@ -35436,7 +38795,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L351</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L409</summary>
     /// <param name="data">The input array.</param>
     static member Cosh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "cosh"
@@ -35454,7 +38813,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L351</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L409</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Cosh(outputArray : NDArray seq, data : NDArray) =
@@ -35477,7 +38836,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L351</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L409</summary>
     /// <param name="data">The input array.</param>
     static member Cosh([<Optional>] ?data : Symbol) =
         Cosh(?data = data)
@@ -35496,7 +38855,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L393</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L451</summary>
     /// <param name="data">The input array.</param>
     static member Tanh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "tanh"
@@ -35518,7 +38877,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L393</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L451</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Tanh(outputArray : NDArray seq, data : NDArray) =
@@ -35545,7 +38904,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L393</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L451</summary>
     /// <param name="data">The input array.</param>
     static member Tanh([<Optional>] ?data : Symbol) =
         Tanh(?data = data)
@@ -35562,7 +38921,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L436</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L494</summary>
     /// <param name="data">The input array.</param>
     static member Arcsinh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arcsinh"
@@ -35582,7 +38941,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L436</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L494</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Arcsinh(outputArray : NDArray seq, data : NDArray) =
@@ -35607,7 +38966,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L436</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L494</summary>
     /// <param name="data">The input array.</param>
     static member Arcsinh([<Optional>] ?data : Symbol) =
         Arcsinh(?data = data)
@@ -35620,7 +38979,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L474</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L535</summary>
     /// <param name="data">The input array.</param>
     static member Arccosh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arccosh"
@@ -35636,7 +38995,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L474</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L535</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Arccosh(outputArray : NDArray seq, data : NDArray) =
@@ -35657,7 +39016,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L474</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L535</summary>
     /// <param name="data">The input array.</param>
     static member Arccosh([<Optional>] ?data : Symbol) =
         Arccosh(?data = data)
@@ -35674,7 +39033,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L515</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L579</summary>
     /// <param name="data">The input array.</param>
     static member Arctanh(data : NDArray) =
         let creator = AtomicSymbolCreator.FromName "arctanh"
@@ -35694,7 +39053,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L515</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L579</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array.</param>
     static member Arctanh(outputArray : NDArray seq, data : NDArray) =
@@ -35719,7 +39078,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L515</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\elemwise_unary_op_trig.cc:L579</summary>
     /// <param name="data">The input array.</param>
     static member Arctanh([<Optional>] ?data : Symbol) =
         Arctanh(?data = data)
@@ -35800,281 +39159,6 @@ type MX() =
 
     /// <summary>Maps integer indices to vector representations (embeddings).
     /// 
-    /// This operator maps words to real-valued vectors in a high-dimensional space,
-    /// called word embeddings. These embeddings can capture semantic and syntactic properties of the words.
-    /// For example, it has been noted that in the learned embedding spaces, similar words tend
-    /// to be close to each other and dissimilar words far apart.
-    /// 
-    /// For an input array of shape (d1, ..., dK),
-    /// the shape of an output array is (d1, ..., dK, output_dim).
-    /// All the input values should be integers in the range [0, input_dim).
-    /// 
-    /// If the input_dim is ip0 and output_dim is op0, then shape of the embedding weight matrix must be
-    /// (ip0, op0).
-    /// 
-    /// When &quot;sparse_grad&quot; is False, if any index mentioned is too large, it is replaced by the index that
-    /// addresses the last vector in an embedding matrix.
-    /// When &quot;sparse_grad&quot; is True, an error will be raised if invalid indices are found.
-    /// 
-    /// Examples::
-    /// 
-    ///   input_dim = 4
-    ///   output_dim = 5
-    /// 
-    ///   // Each row in weight matrix y represents a word. So, y = (w0,w1,w2,w3)
-    ///   y = [[  0.,   1.,   2.,   3.,   4.],
-    ///        [  5.,   6.,   7.,   8.,   9.],
-    ///        [ 10.,  11.,  12.,  13.,  14.],
-    ///        [ 15.,  16.,  17.,  18.,  19.]]
-    /// 
-    ///   // Input array x represents n-grams(2-gram). So, x = [(w1,w3), (w0,w2)]
-    ///   x = [[ 1.,  3.],
-    ///        [ 0.,  2.]]
-    /// 
-    ///   // Mapped input x to its vector representation y.
-    ///   Embedding(x, y, 4, 5) = [[[  5.,   6.,   7.,   8.,   9.],
-    ///                             [ 15.,  16.,  17.,  18.,  19.]],
-    /// 
-    ///                            [[  0.,   1.,   2.,   3.,   4.],
-    ///                             [ 10.,  11.,  12.,  13.,  14.]]]
-    /// 
-    /// 
-    /// The storage type of weight can be either row_sparse or default.
-    /// 
-    /// .. Note::
-    /// 
-    ///     If &quot;sparse_grad&quot; is set to True, the storage type of gradient w.r.t weights will be
-    ///     &quot;row_sparse&quot;. Only a subset of optimizers support sparse gradients, including SGD, AdaGrad
-    ///     and Adam. Note that by default lazy updates is turned on, which may perform differently
-    ///     from standard updates. For more details, please check the Optimization API at:
-    ///     https://mxnet.incubator.apache.org/api/python/optimization/optimization.html
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
-    /// <param name="data">The input array to the embedding operator.</param>
-    /// <param name="weight">The embedding weight matrix.</param>
-    /// <param name="inputDim">Vocabulary size of the input indices.</param>
-    /// <param name="outputDim">Dimension of the embedding vectors.</param>
-    /// <param name="dtype">Data type of weight.</param>
-    /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
-    static member Embedding(data : NDArray, 
-                            weight : NDArray, 
-                            inputDim : int, 
-                            outputDim : int, 
-                            [<Optional>] dtype : DataType, 
-                            [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
-        let creator = AtomicSymbolCreator.FromName "Embedding"
-        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
-                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle|]
-                                                 [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
-                                                 [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
-        (new NDArray(outputs.[0]))
-    /// <summary>Maps integer indices to vector representations (embeddings).
-    /// 
-    /// This operator maps words to real-valued vectors in a high-dimensional space,
-    /// called word embeddings. These embeddings can capture semantic and syntactic properties of the words.
-    /// For example, it has been noted that in the learned embedding spaces, similar words tend
-    /// to be close to each other and dissimilar words far apart.
-    /// 
-    /// For an input array of shape (d1, ..., dK),
-    /// the shape of an output array is (d1, ..., dK, output_dim).
-    /// All the input values should be integers in the range [0, input_dim).
-    /// 
-    /// If the input_dim is ip0 and output_dim is op0, then shape of the embedding weight matrix must be
-    /// (ip0, op0).
-    /// 
-    /// When &quot;sparse_grad&quot; is False, if any index mentioned is too large, it is replaced by the index that
-    /// addresses the last vector in an embedding matrix.
-    /// When &quot;sparse_grad&quot; is True, an error will be raised if invalid indices are found.
-    /// 
-    /// Examples::
-    /// 
-    ///   input_dim = 4
-    ///   output_dim = 5
-    /// 
-    ///   // Each row in weight matrix y represents a word. So, y = (w0,w1,w2,w3)
-    ///   y = [[  0.,   1.,   2.,   3.,   4.],
-    ///        [  5.,   6.,   7.,   8.,   9.],
-    ///        [ 10.,  11.,  12.,  13.,  14.],
-    ///        [ 15.,  16.,  17.,  18.,  19.]]
-    /// 
-    ///   // Input array x represents n-grams(2-gram). So, x = [(w1,w3), (w0,w2)]
-    ///   x = [[ 1.,  3.],
-    ///        [ 0.,  2.]]
-    /// 
-    ///   // Mapped input x to its vector representation y.
-    ///   Embedding(x, y, 4, 5) = [[[  5.,   6.,   7.,   8.,   9.],
-    ///                             [ 15.,  16.,  17.,  18.,  19.]],
-    /// 
-    ///                            [[  0.,   1.,   2.,   3.,   4.],
-    ///                             [ 10.,  11.,  12.,  13.,  14.]]]
-    /// 
-    /// 
-    /// The storage type of weight can be either row_sparse or default.
-    /// 
-    /// .. Note::
-    /// 
-    ///     If &quot;sparse_grad&quot; is set to True, the storage type of gradient w.r.t weights will be
-    ///     &quot;row_sparse&quot;. Only a subset of optimizers support sparse gradients, including SGD, AdaGrad
-    ///     and Adam. Note that by default lazy updates is turned on, which may perform differently
-    ///     from standard updates. For more details, please check the Optimization API at:
-    ///     https://mxnet.incubator.apache.org/api/python/optimization/optimization.html
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
-    /// <param name = "outputArray">Array of NDArray for outputs</param>
-    /// <param name="data">The input array to the embedding operator.</param>
-    /// <param name="weight">The embedding weight matrix.</param>
-    /// <param name="inputDim">Vocabulary size of the input indices.</param>
-    /// <param name="outputDim">Dimension of the embedding vectors.</param>
-    /// <param name="dtype">Data type of weight.</param>
-    /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
-    static member Embedding(outputArray : NDArray seq, 
-                            data : NDArray, 
-                            weight : NDArray, 
-                            inputDim : int, 
-                            outputDim : int, 
-                            [<Optional>] dtype : DataType, 
-                            [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
-        let creator = AtomicSymbolCreator.FromName "Embedding"
-        let names = [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
-        let vals = [|string inputDim; string outputDim; (if isNull (dtype :> obj) then "float32" else string dtype); string sparseGrad|]
-        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
-        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
-                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle|]
-                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
-                                                     names
-                                                     vals
-        ()
-    /// <summary>Maps integer indices to vector representations (embeddings).
-    /// 
-    /// This operator maps words to real-valued vectors in a high-dimensional space,
-    /// called word embeddings. These embeddings can capture semantic and syntactic properties of the words.
-    /// For example, it has been noted that in the learned embedding spaces, similar words tend
-    /// to be close to each other and dissimilar words far apart.
-    /// 
-    /// For an input array of shape (d1, ..., dK),
-    /// the shape of an output array is (d1, ..., dK, output_dim).
-    /// All the input values should be integers in the range [0, input_dim).
-    /// 
-    /// If the input_dim is ip0 and output_dim is op0, then shape of the embedding weight matrix must be
-    /// (ip0, op0).
-    /// 
-    /// When &quot;sparse_grad&quot; is False, if any index mentioned is too large, it is replaced by the index that
-    /// addresses the last vector in an embedding matrix.
-    /// When &quot;sparse_grad&quot; is True, an error will be raised if invalid indices are found.
-    /// 
-    /// Examples::
-    /// 
-    ///   input_dim = 4
-    ///   output_dim = 5
-    /// 
-    ///   // Each row in weight matrix y represents a word. So, y = (w0,w1,w2,w3)
-    ///   y = [[  0.,   1.,   2.,   3.,   4.],
-    ///        [  5.,   6.,   7.,   8.,   9.],
-    ///        [ 10.,  11.,  12.,  13.,  14.],
-    ///        [ 15.,  16.,  17.,  18.,  19.]]
-    /// 
-    ///   // Input array x represents n-grams(2-gram). So, x = [(w1,w3), (w0,w2)]
-    ///   x = [[ 1.,  3.],
-    ///        [ 0.,  2.]]
-    /// 
-    ///   // Mapped input x to its vector representation y.
-    ///   Embedding(x, y, 4, 5) = [[[  5.,   6.,   7.,   8.,   9.],
-    ///                             [ 15.,  16.,  17.,  18.,  19.]],
-    /// 
-    ///                            [[  0.,   1.,   2.,   3.,   4.],
-    ///                             [ 10.,  11.,  12.,  13.,  14.]]]
-    /// 
-    /// 
-    /// The storage type of weight can be either row_sparse or default.
-    /// 
-    /// .. Note::
-    /// 
-    ///     If &quot;sparse_grad&quot; is set to True, the storage type of gradient w.r.t weights will be
-    ///     &quot;row_sparse&quot;. Only a subset of optimizers support sparse gradients, including SGD, AdaGrad
-    ///     and Adam. Note that by default lazy updates is turned on, which may perform differently
-    ///     from standard updates. For more details, please check the Optimization API at:
-    ///     https://mxnet.incubator.apache.org/api/python/optimization/optimization.html
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
-    /// <param name="data">The input array to the embedding operator.</param>
-    /// <param name="weight">The embedding weight matrix.</param>
-    /// <param name="inputDim">Vocabulary size of the input indices.</param>
-    /// <param name="outputDim">Dimension of the embedding vectors.</param>
-    /// <param name="dtype">Data type of weight.</param>
-    /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
-    static member Embedding(data : Symbol, weight : Symbol, inputDim : int, outputDim : int, [<Optional>] ?dtype : DataType, [<Optional>] ?sparseGrad : bool) =
-        Embedding(data, weight, inputDim, outputDim, ?dtype = dtype, ?sparseGrad = sparseGrad)
-    /// <summary>Maps integer indices to vector representations (embeddings).
-    /// 
-    /// This operator maps words to real-valued vectors in a high-dimensional space,
-    /// called word embeddings. These embeddings can capture semantic and syntactic properties of the words.
-    /// For example, it has been noted that in the learned embedding spaces, similar words tend
-    /// to be close to each other and dissimilar words far apart.
-    /// 
-    /// For an input array of shape (d1, ..., dK),
-    /// the shape of an output array is (d1, ..., dK, output_dim).
-    /// All the input values should be integers in the range [0, input_dim).
-    /// 
-    /// If the input_dim is ip0 and output_dim is op0, then shape of the embedding weight matrix must be
-    /// (ip0, op0).
-    /// 
-    /// When &quot;sparse_grad&quot; is False, if any index mentioned is too large, it is replaced by the index that
-    /// addresses the last vector in an embedding matrix.
-    /// When &quot;sparse_grad&quot; is True, an error will be raised if invalid indices are found.
-    /// 
-    /// Examples::
-    /// 
-    ///   input_dim = 4
-    ///   output_dim = 5
-    /// 
-    ///   // Each row in weight matrix y represents a word. So, y = (w0,w1,w2,w3)
-    ///   y = [[  0.,   1.,   2.,   3.,   4.],
-    ///        [  5.,   6.,   7.,   8.,   9.],
-    ///        [ 10.,  11.,  12.,  13.,  14.],
-    ///        [ 15.,  16.,  17.,  18.,  19.]]
-    /// 
-    ///   // Input array x represents n-grams(2-gram). So, x = [(w1,w3), (w0,w2)]
-    ///   x = [[ 1.,  3.],
-    ///        [ 0.,  2.]]
-    /// 
-    ///   // Mapped input x to its vector representation y.
-    ///   Embedding(x, y, 4, 5) = [[[  5.,   6.,   7.,   8.,   9.],
-    ///                             [ 15.,  16.,  17.,  18.,  19.]],
-    /// 
-    ///                            [[  0.,   1.,   2.,   3.,   4.],
-    ///                             [ 10.,  11.,  12.,  13.,  14.]]]
-    /// 
-    /// 
-    /// The storage type of weight can be either row_sparse or default.
-    /// 
-    /// .. Note::
-    /// 
-    ///     If &quot;sparse_grad&quot; is set to True, the storage type of gradient w.r.t weights will be
-    ///     &quot;row_sparse&quot;. Only a subset of optimizers support sparse gradients, including SGD, AdaGrad
-    ///     and Adam. Note that by default lazy updates is turned on, which may perform differently
-    ///     from standard updates. For more details, please check the Optimization API at:
-    ///     https://mxnet.incubator.apache.org/api/python/optimization/optimization.html
-    /// 
-    /// 
-    /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L539</summary>
-    /// <param name="inputDim">Vocabulary size of the input indices.</param>
-    /// <param name="outputDim">Dimension of the embedding vectors.</param>
-    /// <param name="data">The input array to the embedding operator.</param>
-    /// <param name="weight">The embedding weight matrix.</param>
-    /// <param name="dtype">Data type of weight.</param>
-    /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
-    static member Embedding(inputDim : int, outputDim : int, [<Optional>] ?data : Symbol, [<Optional>] ?weight : Symbol, [<Optional>] ?dtype : DataType, [<Optional>] ?sparseGrad : bool) =
-        Embedding(inputDim, outputDim, ?data = data, ?weight = weight, ?dtype = dtype, ?sparseGrad = sparseGrad)
-
-    /// <summary>Maps integer indices to vector representations (embeddings).
-    /// 
     /// note:: ``contrib.SparseEmbedding`` is deprecated, use ``Embedding`` instead.
     /// 
     /// This operator maps words to real-valued vectors in a high-dimensional space,
@@ -36124,7 +39208,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L675</summary>
     /// <param name="data">The input array to the embedding operator.</param>
     /// <param name="weight">The embedding weight matrix.</param>
     /// <param name="inputDim">Vocabulary size of the input indices.</param>
@@ -36135,7 +39219,7 @@ type MX() =
                                          weight : NDArray, 
                                          inputDim : int, 
                                          outputDim : int, 
-                                         [<Optional>] dtype : DataType, 
+                                         [<Optional>] dtype : ContribSparseEmbeddingDtype, 
                                          [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_SparseEmbedding"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
@@ -36194,7 +39278,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L675</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array to the embedding operator.</param>
     /// <param name="weight">The embedding weight matrix.</param>
@@ -36207,7 +39291,7 @@ type MX() =
                                          weight : NDArray, 
                                          inputDim : int, 
                                          outputDim : int, 
-                                         [<Optional>] dtype : DataType, 
+                                         [<Optional>] dtype : ContribSparseEmbeddingDtype, 
                                          [<Optional; DefaultParameterValue(false)>] sparseGrad : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_SparseEmbedding"
         let names = [|"input_dim"; "output_dim"; "dtype"; "sparse_grad"|]
@@ -36270,14 +39354,14 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L675</summary>
     /// <param name="data">The input array to the embedding operator.</param>
     /// <param name="weight">The embedding weight matrix.</param>
     /// <param name="inputDim">Vocabulary size of the input indices.</param>
     /// <param name="outputDim">Dimension of the embedding vectors.</param>
     /// <param name="dtype">Data type of weight.</param>
     /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
-    static member ContribSparseEmbedding(data : Symbol, weight : Symbol, inputDim : int, outputDim : int, [<Optional>] ?dtype : DataType, [<Optional>] ?sparseGrad : bool) =
+    static member ContribSparseEmbedding(data : Symbol, weight : Symbol, inputDim : int, outputDim : int, [<Optional>] ?dtype : ContribSparseEmbeddingDtype, [<Optional>] ?sparseGrad : bool) =
         ContribSparseEmbedding(data, weight, inputDim, outputDim, ?dtype = dtype, ?sparseGrad = sparseGrad)
     /// <summary>Maps integer indices to vector representations (embeddings).
     /// 
@@ -36330,14 +39414,14 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L616</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L675</summary>
     /// <param name="inputDim">Vocabulary size of the input indices.</param>
     /// <param name="outputDim">Dimension of the embedding vectors.</param>
     /// <param name="data">The input array to the embedding operator.</param>
     /// <param name="weight">The embedding weight matrix.</param>
     /// <param name="dtype">Data type of weight.</param>
     /// <param name="sparseGrad">Compute row sparse gradient in the backward calculation. If set to True, the grad&#39;s storage type is row_sparse.</param>
-    static member ContribSparseEmbedding(inputDim : int, outputDim : int, [<Optional>] ?data : Symbol, [<Optional>] ?weight : Symbol, [<Optional>] ?dtype : DataType, [<Optional>] ?sparseGrad : bool) =
+    static member ContribSparseEmbedding(inputDim : int, outputDim : int, [<Optional>] ?data : Symbol, [<Optional>] ?weight : Symbol, [<Optional>] ?dtype : ContribSparseEmbeddingDtype, [<Optional>] ?sparseGrad : bool) =
         ContribSparseEmbedding(inputDim, outputDim, ?data = data, ?weight = weight, ?dtype = dtype, ?sparseGrad = sparseGrad)
 
 
@@ -36393,7 +39477,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L718</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L777</summary>
     /// <param name="a">The input array.</param>
     /// <param name="indices">The indices of the values to be extracted.</param>
     /// <param name="axis">The axis of input array to be taken.For input tensor of rank r, it could be in the range of [-r, r-1]</param>
@@ -36456,7 +39540,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L718</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L777</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input array.</param>
     /// <param name="indices">The indices of the values to be extracted.</param>
@@ -36524,7 +39608,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L718</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L777</summary>
     /// <param name="a">The input array.</param>
     /// <param name="indices">The indices of the values to be extracted.</param>
     /// <param name="axis">The axis of input array to be taken.For input tensor of rank r, it could be in the range of [-r, r-1]</param>
@@ -36554,7 +39638,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L777</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L836</summary>
     /// <param name="a">The input array</param>
     /// <param name="indices">The index array</param>
     static member BatchTake(a : NDArray, indices : NDArray) =
@@ -36585,7 +39669,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L777</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L836</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="a">The input array</param>
     /// <param name="indices">The index array</param>
@@ -36621,7 +39705,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L777</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L836</summary>
     /// <param name="a">The input array</param>
     /// <param name="indices">The index array</param>
     static member BatchTake([<Optional>] ?a : Symbol, [<Optional>] ?indices : Symbol) =
@@ -36661,7 +39745,7 @@ type MX() =
     ///                                       [ 1.  0.  0.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L883</summary>
     /// <param name="indices">array of locations where to set on_value</param>
     /// <param name="depth">Depth of the one hot dimension.</param>
     /// <param name="onValue">The value assigned to the locations represented by indices.</param>
@@ -36671,7 +39755,7 @@ type MX() =
                          depth : int, 
                          [<Optional; DefaultParameterValue(1.0)>] onValue : double, 
                          [<Optional; DefaultParameterValue(0.0)>] offValue : double, 
-                         [<Optional>] dtype : DataType) =
+                         [<Optional>] dtype : OneHotDtype) =
         let creator = AtomicSymbolCreator.FromName "one_hot"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg indices)) then indices.UnsafeHandle|]
@@ -36712,7 +39796,7 @@ type MX() =
     ///                                       [ 1.  0.  0.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L883</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="indices">array of locations where to set on_value</param>
     /// <param name="depth">Depth of the one hot dimension.</param>
@@ -36724,7 +39808,7 @@ type MX() =
                          depth : int, 
                          [<Optional; DefaultParameterValue(1.0)>] onValue : double, 
                          [<Optional; DefaultParameterValue(0.0)>] offValue : double, 
-                         [<Optional>] dtype : DataType) =
+                         [<Optional>] dtype : OneHotDtype) =
         let creator = AtomicSymbolCreator.FromName "one_hot"
         let names = [|"depth"; "on_value"; "off_value"; "dtype"|]
         let vals = [|string depth; string onValue; string offValue; (if isNull (dtype :> obj) then "float32" else string dtype)|]
@@ -36769,13 +39853,13 @@ type MX() =
     ///                                       [ 1.  0.  0.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L883</summary>
     /// <param name="indices">array of locations where to set on_value</param>
     /// <param name="depth">Depth of the one hot dimension.</param>
     /// <param name="onValue">The value assigned to the locations represented by indices.</param>
     /// <param name="offValue">The value assigned to the locations not represented by indices.</param>
     /// <param name="dtype">DType of the output</param>
-    static member OneHot(indices : Symbol, depth : int, [<Optional>] ?onValue : double, [<Optional>] ?offValue : double, [<Optional>] ?dtype : DataType) =
+    static member OneHot(indices : Symbol, depth : int, [<Optional>] ?onValue : double, [<Optional>] ?offValue : double, [<Optional>] ?dtype : OneHotDtype) =
         OneHot(indices, depth, ?onValue = onValue, ?offValue = offValue, ?dtype = dtype)
     /// <summary>Returns a one-hot array.
     /// 
@@ -36811,13 +39895,13 @@ type MX() =
     ///                                       [ 1.  0.  0.]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L824</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\indexing_op.cc:L883</summary>
     /// <param name="depth">Depth of the one hot dimension.</param>
     /// <param name="indices">array of locations where to set on_value</param>
     /// <param name="onValue">The value assigned to the locations represented by indices.</param>
     /// <param name="offValue">The value assigned to the locations not represented by indices.</param>
     /// <param name="dtype">DType of the output</param>
-    static member OneHot(depth : int, [<Optional>] ?indices : Symbol, [<Optional>] ?onValue : double, [<Optional>] ?offValue : double, [<Optional>] ?dtype : DataType) =
+    static member OneHot(depth : int, [<Optional>] ?indices : Symbol, [<Optional>] ?onValue : double, [<Optional>] ?offValue : double, [<Optional>] ?dtype : OneHotDtype) =
         OneHot(depth, ?indices = indices, ?onValue = onValue, ?offValue = offValue, ?dtype = dtype)
 
     /// <summary>Gather elements or slices from `data` and store to a tensor whose
@@ -39915,7 +42999,7 @@ type MX() =
     ///                  [[-2., 1.5], [1., -0.5]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L919</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L920</summary>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgInverse(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_inverse"
@@ -39949,7 +43033,7 @@ type MX() =
     ///                  [[-2., 1.5], [1., -0.5]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L919</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L920</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgInverse(outputArray : NDArray seq, A : NDArray) =
@@ -39988,7 +43072,7 @@ type MX() =
     ///                  [[-2., 1.5], [1., -0.5]]]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L919</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L920</summary>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgInverse([<Optional>] ?A : Symbol) =
         LinalgInverse(?A = A)
@@ -40022,7 +43106,7 @@ type MX() =
     ///    det(A) = [-5., 5.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L973</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L975</summary>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgDet(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_det"
@@ -40059,7 +43143,7 @@ type MX() =
     ///    det(A) = [-5., 5.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L973</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L975</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgDet(outputArray : NDArray seq, A : NDArray) =
@@ -40101,7 +43185,7 @@ type MX() =
     ///    det(A) = [-5., 5.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L973</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L975</summary>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgDet([<Optional>] ?A : Symbol) =
         LinalgDet(?A = A)
@@ -40141,7 +43225,7 @@ type MX() =
     ///    logabsdet = [1.609438, -inf, 1.609438]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L1031</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L1034</summary>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgSlogdet(A : NDArray) =
         let creator = AtomicSymbolCreator.FromName "_linalg_slogdet"
@@ -40184,7 +43268,7 @@ type MX() =
     ///    logabsdet = [1.609438, -inf, 1.609438]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L1031</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L1034</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgSlogdet(outputArray : NDArray seq, A : NDArray) =
@@ -40232,7 +43316,7 @@ type MX() =
     ///    logabsdet = [1.609438, -inf, 1.609438]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L1031</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\la_op.cc:L1034</summary>
     /// <param name="A">Tensor of square matrix</param>
     static member LinalgSlogdet([<Optional>] ?A : Symbol) =
         LinalgSlogdet(?A = A)
@@ -42501,7 +45585,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L132</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L133</summary>
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to choose sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
@@ -42536,7 +45620,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L132</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L133</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to choose sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
@@ -42576,7 +45660,7 @@ type MX() =
     /// 
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L132</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L133</summary>
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to choose sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
@@ -42605,7 +45689,7 @@ type MX() =
     ///   argsort(x, axis=None) = [ 3.,  1.,  5.,  0.,  4.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L183</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L185</summary>
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
@@ -42639,7 +45723,7 @@ type MX() =
     ///   argsort(x, axis=None) = [ 3.,  1.,  5.,  0.,  4.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L183</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L185</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
@@ -42678,7 +45762,7 @@ type MX() =
     ///   argsort(x, axis=None) = [ 3.,  1.,  5.,  0.,  4.,  2.]
     /// 
     /// 
-    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L183</summary>
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\tensor\ordering_op.cc:L185</summary>
     /// <param name="data">The input array</param>
     /// <param name="axis">Axis along which to sort the input tensor. If not given, the flattened array is used. Default is -1.</param>
     /// <param name="isAscend">Whether to sort in ascending or descending order.</param>
@@ -43031,6 +46115,7 @@ type MX() =
     /// <param name="numClasses">Number of classes.</param>
     /// <param name="maskSize">Size of the pooled masks height and width: (h, w).</param>
     /// <param name="sampleRatio">Sampling ratio of ROI align. Set to -1 to use adaptative size.</param>
+    /// <param name="aligned">Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.</param>
     static member ContribMrcnnMaskTarget(rois : NDArray, 
                                          gtMasks : NDArray, 
                                          matches : NDArray, 
@@ -43038,12 +46123,13 @@ type MX() =
                                          numRois : int, 
                                          numClasses : int, 
                                          maskSize : int seq, 
-                                         [<Optional; DefaultParameterValue(2)>] sampleRatio : int) =
+                                         [<Optional; DefaultParameterValue(2)>] sampleRatio : int, 
+                                         [<Optional; DefaultParameterValue(false)>] aligned : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_mrcnn_mask_target"
         let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
                                                  [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rois)) then rois.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg gtMasks)) then gtMasks.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg matches)) then matches.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg clsTargets)) then clsTargets.UnsafeHandle|]
-                                                 [|"num_rois"; "num_classes"; "mask_size"; "sample_ratio"|]
-                                                 [|string numRois; string numClasses; (maskSize |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string sampleRatio|]
+                                                 [|"num_rois"; "num_classes"; "mask_size"; "sample_ratio"; "aligned"|]
+                                                 [|string numRois; string numClasses; (maskSize |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string sampleRatio; string aligned|]
         (new NDArray(outputs.[0])), (new NDArray(outputs.[1]))
     /// <summary>Generate mask targets for Mask-RCNN.</summary>
     /// <param name = "outputArray">Array of NDArray for outputs</param>
@@ -43055,6 +46141,7 @@ type MX() =
     /// <param name="numClasses">Number of classes.</param>
     /// <param name="maskSize">Size of the pooled masks height and width: (h, w).</param>
     /// <param name="sampleRatio">Sampling ratio of ROI align. Set to -1 to use adaptative size.</param>
+    /// <param name="aligned">Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.</param>
     static member ContribMrcnnMaskTarget(outputArray : NDArray seq, 
                                          rois : NDArray, 
                                          gtMasks : NDArray, 
@@ -43063,10 +46150,11 @@ type MX() =
                                          numRois : int, 
                                          numClasses : int, 
                                          maskSize : int seq, 
-                                         [<Optional; DefaultParameterValue(2)>] sampleRatio : int) =
+                                         [<Optional; DefaultParameterValue(2)>] sampleRatio : int, 
+                                         [<Optional; DefaultParameterValue(false)>] aligned : bool) =
         let creator = AtomicSymbolCreator.FromName "_contrib_mrcnn_mask_target"
-        let names = [|"num_rois"; "num_classes"; "mask_size"; "sample_ratio"|]
-        let vals = [|string numRois; string numClasses; (maskSize |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string sampleRatio|]
+        let names = [|"num_rois"; "num_classes"; "mask_size"; "sample_ratio"; "aligned"|]
+        let vals = [|string numRois; string numClasses; (maskSize |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string sampleRatio; string aligned|]
         let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
         let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
                                                      [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg rois)) then rois.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg gtMasks)) then gtMasks.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg matches)) then matches.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg clsTargets)) then clsTargets.UnsafeHandle|]
@@ -43083,8 +46171,9 @@ type MX() =
     /// <param name="numClasses">Number of classes.</param>
     /// <param name="maskSize">Size of the pooled masks height and width: (h, w).</param>
     /// <param name="sampleRatio">Sampling ratio of ROI align. Set to -1 to use adaptative size.</param>
-    static member ContribMrcnnMaskTarget(rois : Symbol, gtMasks : Symbol, matches : Symbol, clsTargets : Symbol, numRois : int, numClasses : int, maskSize : int seq, [<Optional>] ?sampleRatio : int) =
-        ContribMrcnnMaskTarget(rois, gtMasks, matches, clsTargets, numRois, numClasses, maskSize, ?sampleRatio = sampleRatio)
+    /// <param name="aligned">Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.</param>
+    static member ContribMrcnnMaskTarget(rois : Symbol, gtMasks : Symbol, matches : Symbol, clsTargets : Symbol, numRois : int, numClasses : int, maskSize : int seq, [<Optional>] ?sampleRatio : int, [<Optional>] ?aligned : bool) =
+        ContribMrcnnMaskTarget(rois, gtMasks, matches, clsTargets, numRois, numClasses, maskSize, ?sampleRatio = sampleRatio, ?aligned = aligned)
     /// <summary>Generate mask targets for Mask-RCNN.</summary>
     /// <param name="numRois">Number of sampled RoIs.</param>
     /// <param name="numClasses">Number of classes.</param>
@@ -43094,8 +46183,9 @@ type MX() =
     /// <param name="matches">Index to a gt_mask, a 2D array</param>
     /// <param name="clsTargets">Value [0, num_class), excluding background class, a 2D array</param>
     /// <param name="sampleRatio">Sampling ratio of ROI align. Set to -1 to use adaptative size.</param>
-    static member ContribMrcnnMaskTarget(numRois : int, numClasses : int, maskSize : int seq, [<Optional>] ?rois : Symbol, [<Optional>] ?gtMasks : Symbol, [<Optional>] ?matches : Symbol, [<Optional>] ?clsTargets : Symbol, [<Optional>] ?sampleRatio : int) =
-        ContribMrcnnMaskTarget(numRois, numClasses, maskSize, ?rois = rois, ?gtMasks = gtMasks, ?matches = matches, ?clsTargets = clsTargets, ?sampleRatio = sampleRatio)
+    /// <param name="aligned">Center-aligned ROIAlign introduced in Detectron2. To enable, set aligned to True.</param>
+    static member ContribMrcnnMaskTarget(numRois : int, numClasses : int, maskSize : int seq, [<Optional>] ?rois : Symbol, [<Optional>] ?gtMasks : Symbol, [<Optional>] ?matches : Symbol, [<Optional>] ?clsTargets : Symbol, [<Optional>] ?sampleRatio : int, [<Optional>] ?aligned : bool) =
+        ContribMrcnnMaskTarget(numRois, numClasses, maskSize, ?rois = rois, ?gtMasks = gtMasks, ?matches = matches, ?clsTargets = clsTargets, ?sampleRatio = sampleRatio, ?aligned = aligned)
 
 
     /// <summary>Applies bilinear sampling to input feature map.
@@ -43975,6 +47065,314 @@ type MX() =
     /// <param name="computeSize">Maximum size of sub-batch to be forwarded at one time</param>
     static member ContribIfft([<Optional>] ?data : Symbol, [<Optional>] ?computeSize : int) =
         ContribIfft(?data = data, ?computeSize = computeSize)
+
+
+    /// <summary>Compute 2-D modulated deformable convolution on 4-D input.
+    /// 
+    /// The modulated deformable convolution operation is described in https://arxiv.org/abs/1811.11168
+    /// 
+    /// For 2-D modulated deformable convolution, the shapes are
+    /// 
+    /// - **data**: *(batch_size, channel, height, width)*
+    /// - **offset**: *(batch_size, num_deformable_group * kernel[0] * kernel[1] * 2, height, width)*
+    /// - **mask**: *(batch_size, num_deformable_group * kernel[0] * kernel[1], height, width)*
+    /// - **weight**: *(num_filter, channel, kernel[0], kernel[1])*
+    /// - **bias**: *(num_filter,)*
+    /// - **out**: *(batch_size, num_filter, out_height, out_width)*.
+    /// 
+    /// Define::
+    /// 
+    ///   f(x,k,p,s,d) = floor((x+2*p-d*(k-1)-1)/s)+1
+    /// 
+    /// then we have::
+    /// 
+    ///   out_height=f(height, kernel[0], pad[0], stride[0], dilate[0])
+    ///   out_width=f(width, kernel[1], pad[1], stride[1], dilate[1])
+    /// 
+    /// If ``no_bias`` is set to be true, then the ``bias`` term is ignored.
+    /// 
+    /// The default data ``layout`` is *NCHW*, namely *(batch_size, channle, height,
+    /// width)*.
+    /// 
+    /// If ``num_group`` is larger than 1, denoted by *g*, then split the input ``data``
+    /// evenly into *g* parts along the channel axis, and also evenly split ``weight``
+    /// along the first dimension. Next compute the convolution on the *i*-th part of
+    /// the data with the *i*-th weight part. The output is obtained by concating all
+    /// the *g* results.
+    /// 
+    /// If ``num_deformable_group`` is larger than 1, denoted by *dg*, then split the
+    /// input ``offset`` evenly into *dg* parts along the channel axis, and also evenly
+    /// split ``out`` evenly into *dg* parts along the channel axis. Next compute the
+    /// deformable convolution, apply the *i*-th part of the offset part on the *i*-th
+    /// out.
+    /// 
+    /// 
+    /// Both ``weight`` and ``bias`` are learnable parameters.
+    /// 
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\modulated_deformable_convolution.cc:L102</summary>
+    /// <param name="data">Input data to the ModulatedDeformableConvolutionOp.</param>
+    /// <param name="offset">Input offset to ModulatedDeformableConvolutionOp.</param>
+    /// <param name="mask">Input mask to the ModulatedDeformableConvolutionOp.</param>
+    /// <param name="weight">Weight matrix.</param>
+    /// <param name="bias">Bias parameter.</param>
+    /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
+    /// <param name="numFilter">Convolution filter(channel) number</param>
+    /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
+    /// <param name="numGroup">Number of group partitions.</param>
+    /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
+    /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
+    /// <param name="noBias">Whether to disable bias parameter.</param>
+    /// <param name="im2colStep">Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.</param>
+    /// <param name="layout">Set layout for input, output and weight. Empty for
+    ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
+    static member ContribModulatedDeformableConvolution(data : NDArray, 
+                                                        offset : NDArray, 
+                                                        mask : NDArray, 
+                                                        weight : NDArray, 
+                                                        bias : NDArray, 
+                                                        kernel : int seq, 
+                                                        numFilter : int, 
+                                                        [<Optional>] stride : int seq, 
+                                                        [<Optional>] dilate : int seq, 
+                                                        [<Optional>] pad : int seq, 
+                                                        [<Optional; DefaultParameterValue(1)>] numGroup : int, 
+                                                        [<Optional; DefaultParameterValue(1)>] numDeformableGroup : int, 
+                                                        [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
+                                                        [<Optional; DefaultParameterValue(false)>] noBias : bool, 
+                                                        [<Optional; DefaultParameterValue(64)>] im2colStep : int, 
+                                                        [<Optional>] layout : ContribModulatedDeformableConvolutionLayout) =
+        let creator = AtomicSymbolCreator.FromName "_contrib_ModulatedDeformableConvolution"
+        let outputs = MXNDArray.imperativeInvoke creator.AtomicSymbolCreatorHandle
+                                                 [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg offset)) then offset.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mask)) then mask.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg bias)) then bias.UnsafeHandle|]
+                                                 [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "im2col_step"; "layout"|]
+                                                 [|(kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string numDeformableGroup; string workspace; string noBias; string im2colStep; (if isNull (layout :> obj) then "None" else string layout)|]
+        (new NDArray(outputs.[0]))
+    /// <summary>Compute 2-D modulated deformable convolution on 4-D input.
+    /// 
+    /// The modulated deformable convolution operation is described in https://arxiv.org/abs/1811.11168
+    /// 
+    /// For 2-D modulated deformable convolution, the shapes are
+    /// 
+    /// - **data**: *(batch_size, channel, height, width)*
+    /// - **offset**: *(batch_size, num_deformable_group * kernel[0] * kernel[1] * 2, height, width)*
+    /// - **mask**: *(batch_size, num_deformable_group * kernel[0] * kernel[1], height, width)*
+    /// - **weight**: *(num_filter, channel, kernel[0], kernel[1])*
+    /// - **bias**: *(num_filter,)*
+    /// - **out**: *(batch_size, num_filter, out_height, out_width)*.
+    /// 
+    /// Define::
+    /// 
+    ///   f(x,k,p,s,d) = floor((x+2*p-d*(k-1)-1)/s)+1
+    /// 
+    /// then we have::
+    /// 
+    ///   out_height=f(height, kernel[0], pad[0], stride[0], dilate[0])
+    ///   out_width=f(width, kernel[1], pad[1], stride[1], dilate[1])
+    /// 
+    /// If ``no_bias`` is set to be true, then the ``bias`` term is ignored.
+    /// 
+    /// The default data ``layout`` is *NCHW*, namely *(batch_size, channle, height,
+    /// width)*.
+    /// 
+    /// If ``num_group`` is larger than 1, denoted by *g*, then split the input ``data``
+    /// evenly into *g* parts along the channel axis, and also evenly split ``weight``
+    /// along the first dimension. Next compute the convolution on the *i*-th part of
+    /// the data with the *i*-th weight part. The output is obtained by concating all
+    /// the *g* results.
+    /// 
+    /// If ``num_deformable_group`` is larger than 1, denoted by *dg*, then split the
+    /// input ``offset`` evenly into *dg* parts along the channel axis, and also evenly
+    /// split ``out`` evenly into *dg* parts along the channel axis. Next compute the
+    /// deformable convolution, apply the *i*-th part of the offset part on the *i*-th
+    /// out.
+    /// 
+    /// 
+    /// Both ``weight`` and ``bias`` are learnable parameters.
+    /// 
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\modulated_deformable_convolution.cc:L102</summary>
+    /// <param name = "outputArray">Array of NDArray for outputs</param>
+    /// <param name="data">Input data to the ModulatedDeformableConvolutionOp.</param>
+    /// <param name="offset">Input offset to ModulatedDeformableConvolutionOp.</param>
+    /// <param name="mask">Input mask to the ModulatedDeformableConvolutionOp.</param>
+    /// <param name="weight">Weight matrix.</param>
+    /// <param name="bias">Bias parameter.</param>
+    /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
+    /// <param name="numFilter">Convolution filter(channel) number</param>
+    /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
+    /// <param name="numGroup">Number of group partitions.</param>
+    /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
+    /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
+    /// <param name="noBias">Whether to disable bias parameter.</param>
+    /// <param name="im2colStep">Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.</param>
+    /// <param name="layout">Set layout for input, output and weight. Empty for
+    ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
+    static member ContribModulatedDeformableConvolution(outputArray : NDArray seq, 
+                                                        data : NDArray, 
+                                                        offset : NDArray, 
+                                                        mask : NDArray, 
+                                                        weight : NDArray, 
+                                                        bias : NDArray, 
+                                                        kernel : int seq, 
+                                                        numFilter : int, 
+                                                        [<Optional>] stride : int seq, 
+                                                        [<Optional>] dilate : int seq, 
+                                                        [<Optional>] pad : int seq, 
+                                                        [<Optional; DefaultParameterValue(1)>] numGroup : int, 
+                                                        [<Optional; DefaultParameterValue(1)>] numDeformableGroup : int, 
+                                                        [<Optional; DefaultParameterValue(1024L)>] workspace : int64, 
+                                                        [<Optional; DefaultParameterValue(false)>] noBias : bool, 
+                                                        [<Optional; DefaultParameterValue(64)>] im2colStep : int, 
+                                                        [<Optional>] layout : ContribModulatedDeformableConvolutionLayout) =
+        let creator = AtomicSymbolCreator.FromName "_contrib_ModulatedDeformableConvolution"
+        let names = [|"kernel"; "num_filter"; "stride"; "dilate"; "pad"; "num_group"; "num_deformable_group"; "workspace"; "no_bias"; "im2col_step"; "layout"|]
+        let vals = [|(kernel |> Seq.map string |> String.concat ", " |> sprintf "[%s]"); string numFilter; (if isNull (stride :> obj) then "[]" else (stride |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (dilate :> obj) then "[]" else (dilate |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); (if isNull (pad :> obj) then "[]" else (pad |> Seq.map string |> String.concat ", " |> sprintf "[%s]")); string numGroup; string numDeformableGroup; string workspace; string noBias; string im2colStep; (if isNull (layout :> obj) then "None" else string layout)|]
+        let names,vals = (names, vals) ||> Array.zip |> Array.choose (fun (n,v) -> if isNull v then None else Some(n,v)) |> Array.unzip
+        let outputs = MXNDArray.imperativeInvokeInto creator.AtomicSymbolCreatorHandle
+                                                     [|if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg data)) then data.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg offset)) then offset.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg mask)) then mask.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg weight)) then weight.UnsafeHandle; if (not(LanguagePrimitives.PhysicalEquality NDArray.NoArg bias)) then bias.UnsafeHandle|]
+                                                     (outputArray |> Seq.map (fun x -> x.UnsafeHandle) |> Seq.toArray)
+                                                     names
+                                                     vals
+        ()
+    /// <summary>Compute 2-D modulated deformable convolution on 4-D input.
+    /// 
+    /// The modulated deformable convolution operation is described in https://arxiv.org/abs/1811.11168
+    /// 
+    /// For 2-D modulated deformable convolution, the shapes are
+    /// 
+    /// - **data**: *(batch_size, channel, height, width)*
+    /// - **offset**: *(batch_size, num_deformable_group * kernel[0] * kernel[1] * 2, height, width)*
+    /// - **mask**: *(batch_size, num_deformable_group * kernel[0] * kernel[1], height, width)*
+    /// - **weight**: *(num_filter, channel, kernel[0], kernel[1])*
+    /// - **bias**: *(num_filter,)*
+    /// - **out**: *(batch_size, num_filter, out_height, out_width)*.
+    /// 
+    /// Define::
+    /// 
+    ///   f(x,k,p,s,d) = floor((x+2*p-d*(k-1)-1)/s)+1
+    /// 
+    /// then we have::
+    /// 
+    ///   out_height=f(height, kernel[0], pad[0], stride[0], dilate[0])
+    ///   out_width=f(width, kernel[1], pad[1], stride[1], dilate[1])
+    /// 
+    /// If ``no_bias`` is set to be true, then the ``bias`` term is ignored.
+    /// 
+    /// The default data ``layout`` is *NCHW*, namely *(batch_size, channle, height,
+    /// width)*.
+    /// 
+    /// If ``num_group`` is larger than 1, denoted by *g*, then split the input ``data``
+    /// evenly into *g* parts along the channel axis, and also evenly split ``weight``
+    /// along the first dimension. Next compute the convolution on the *i*-th part of
+    /// the data with the *i*-th weight part. The output is obtained by concating all
+    /// the *g* results.
+    /// 
+    /// If ``num_deformable_group`` is larger than 1, denoted by *dg*, then split the
+    /// input ``offset`` evenly into *dg* parts along the channel axis, and also evenly
+    /// split ``out`` evenly into *dg* parts along the channel axis. Next compute the
+    /// deformable convolution, apply the *i*-th part of the offset part on the *i*-th
+    /// out.
+    /// 
+    /// 
+    /// Both ``weight`` and ``bias`` are learnable parameters.
+    /// 
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\modulated_deformable_convolution.cc:L102</summary>
+    /// <param name="data">Input data to the ModulatedDeformableConvolutionOp.</param>
+    /// <param name="offset">Input offset to ModulatedDeformableConvolutionOp.</param>
+    /// <param name="mask">Input mask to the ModulatedDeformableConvolutionOp.</param>
+    /// <param name="weight">Weight matrix.</param>
+    /// <param name="bias">Bias parameter.</param>
+    /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
+    /// <param name="numFilter">Convolution filter(channel) number</param>
+    /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
+    /// <param name="numGroup">Number of group partitions.</param>
+    /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
+    /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
+    /// <param name="noBias">Whether to disable bias parameter.</param>
+    /// <param name="im2colStep">Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.</param>
+    /// <param name="layout">Set layout for input, output and weight. Empty for
+    ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
+    static member ContribModulatedDeformableConvolution(data : Symbol, offset : Symbol, mask : Symbol, weight : Symbol, bias : Symbol, kernel : int seq, numFilter : int, [<Optional>] ?stride : int seq, [<Optional>] ?dilate : int seq, [<Optional>] ?pad : int seq, [<Optional>] ?numGroup : int, [<Optional>] ?numDeformableGroup : int, [<Optional>] ?workspace : int64, [<Optional>] ?noBias : bool, [<Optional>] ?im2colStep : int, [<Optional>] ?layout : ContribModulatedDeformableConvolutionLayout) =
+        ContribModulatedDeformableConvolution(data, offset, mask, weight, bias, kernel, numFilter, ?stride = stride, ?dilate = dilate, ?pad = pad, ?numGroup = numGroup, ?numDeformableGroup = numDeformableGroup, ?workspace = workspace, ?noBias = noBias, ?im2colStep = im2colStep, ?layout = layout)
+    /// <summary>Compute 2-D modulated deformable convolution on 4-D input.
+    /// 
+    /// The modulated deformable convolution operation is described in https://arxiv.org/abs/1811.11168
+    /// 
+    /// For 2-D modulated deformable convolution, the shapes are
+    /// 
+    /// - **data**: *(batch_size, channel, height, width)*
+    /// - **offset**: *(batch_size, num_deformable_group * kernel[0] * kernel[1] * 2, height, width)*
+    /// - **mask**: *(batch_size, num_deformable_group * kernel[0] * kernel[1], height, width)*
+    /// - **weight**: *(num_filter, channel, kernel[0], kernel[1])*
+    /// - **bias**: *(num_filter,)*
+    /// - **out**: *(batch_size, num_filter, out_height, out_width)*.
+    /// 
+    /// Define::
+    /// 
+    ///   f(x,k,p,s,d) = floor((x+2*p-d*(k-1)-1)/s)+1
+    /// 
+    /// then we have::
+    /// 
+    ///   out_height=f(height, kernel[0], pad[0], stride[0], dilate[0])
+    ///   out_width=f(width, kernel[1], pad[1], stride[1], dilate[1])
+    /// 
+    /// If ``no_bias`` is set to be true, then the ``bias`` term is ignored.
+    /// 
+    /// The default data ``layout`` is *NCHW*, namely *(batch_size, channle, height,
+    /// width)*.
+    /// 
+    /// If ``num_group`` is larger than 1, denoted by *g*, then split the input ``data``
+    /// evenly into *g* parts along the channel axis, and also evenly split ``weight``
+    /// along the first dimension. Next compute the convolution on the *i*-th part of
+    /// the data with the *i*-th weight part. The output is obtained by concating all
+    /// the *g* results.
+    /// 
+    /// If ``num_deformable_group`` is larger than 1, denoted by *dg*, then split the
+    /// input ``offset`` evenly into *dg* parts along the channel axis, and also evenly
+    /// split ``out`` evenly into *dg* parts along the channel axis. Next compute the
+    /// deformable convolution, apply the *i*-th part of the offset part on the *i*-th
+    /// out.
+    /// 
+    /// 
+    /// Both ``weight`` and ``bias`` are learnable parameters.
+    /// 
+    /// 
+    /// 
+    /// 
+    /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\contrib\modulated_deformable_convolution.cc:L102</summary>
+    /// <param name="kernel">Convolution kernel size: (h, w) or (d, h, w)</param>
+    /// <param name="numFilter">Convolution filter(channel) number</param>
+    /// <param name="data">Input data to the ModulatedDeformableConvolutionOp.</param>
+    /// <param name="offset">Input offset to ModulatedDeformableConvolutionOp.</param>
+    /// <param name="mask">Input mask to the ModulatedDeformableConvolutionOp.</param>
+    /// <param name="weight">Weight matrix.</param>
+    /// <param name="bias">Bias parameter.</param>
+    /// <param name="stride">Convolution stride: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="dilate">Convolution dilate: (h, w) or (d, h, w). Defaults to 1 for each dimension.</param>
+    /// <param name="pad">Zero pad for convolution: (h, w) or (d, h, w). Defaults to no padding.</param>
+    /// <param name="numGroup">Number of group partitions.</param>
+    /// <param name="numDeformableGroup">Number of deformable group partitions.</param>
+    /// <param name="workspace">Maximum temperal workspace allowed for convolution (MB).</param>
+    /// <param name="noBias">Whether to disable bias parameter.</param>
+    /// <param name="im2colStep">Maximum number of images per im2col computation; The total batch size should be divisable by this value or smaller than this value; if you face out of memory problem, you can try to use a smaller value here.</param>
+    /// <param name="layout">Set layout for input, output and weight. Empty for
+    ///     default layout: NCW for 1d, NCHW for 2d and NCDHW for 3d.</param>
+    static member ContribModulatedDeformableConvolution(kernel : int seq, numFilter : int, [<Optional>] ?data : Symbol, [<Optional>] ?offset : Symbol, [<Optional>] ?mask : Symbol, [<Optional>] ?weight : Symbol, [<Optional>] ?bias : Symbol, [<Optional>] ?stride : int seq, [<Optional>] ?dilate : int seq, [<Optional>] ?pad : int seq, [<Optional>] ?numGroup : int, [<Optional>] ?numDeformableGroup : int, [<Optional>] ?workspace : int64, [<Optional>] ?noBias : bool, [<Optional>] ?im2colStep : int, [<Optional>] ?layout : ContribModulatedDeformableConvolutionLayout) =
+        ContribModulatedDeformableConvolution(kernel, numFilter, ?data = data, ?offset = offset, ?mask = mask, ?weight = weight, ?bias = bias, ?stride = stride, ?dilate = dilate, ?pad = pad, ?numGroup = numGroup, ?numDeformableGroup = numDeformableGroup, ?workspace = workspace, ?noBias = noBias, ?im2colStep = im2colStep, ?layout = layout)
 
 
     /// <summary>Generate region proposals via RPN</summary>
@@ -45717,7 +49115,7 @@ type MX() =
 //     /// 
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\custom\custom.cc:L546</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\custom\custom.cc:L547</summary>
 //     /// <param name="data">Input data for the custom operator.</param>
 //     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
 //     static member Custom([<ParamArray>] data : NDArray[], opType : string) =
@@ -45735,7 +49133,7 @@ type MX() =
 //     /// 
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\custom\custom.cc:L546</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\custom\custom.cc:L547</summary>
 //     /// <param name = "outputArray">Array of NDArray for outputs</param>
 //     /// <param name="data">Input data for the custom operator.</param>
 //     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
@@ -45758,7 +49156,7 @@ type MX() =
 //     /// 
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\custom\custom.cc:L546</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\custom\custom.cc:L547</summary>
 //     /// <param name="data">Input data for the custom operator.</param>
 //     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
 //     static member Custom(data : Symbol seq, opType : string) =
@@ -45771,7 +49169,7 @@ type MX() =
 //     /// 
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\custom\custom.cc:L546</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\custom\custom.cc:L547</summary>
 //     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
 //     /// <param name="data">Input data for the custom operator.</param>
 //     static member Custom(opType : string, [<Optional>] ?data : Symbol seq) =
@@ -45784,7 +49182,7 @@ type MX() =
 //     /// 
 //     /// 
 //     /// 
-//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\custom\custom.cc:L546</summary>
+//     /// Defined in C:\Jenkins\workspace\mxnet-tag\mxnet\src\operator\custom\custom.cc:L547</summary>
 //     /// <param name="opType">Name of the custom operator. This is the name that is passed to `mx.operator.register` to register the operator.</param>
 //     /// <param name="data">Input data for the custom operator.</param>
 //     static member Custom(opType : string, [<ParamArray>] data : Symbol[]) =
