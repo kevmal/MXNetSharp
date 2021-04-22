@@ -58,6 +58,8 @@ COPY ./notebooks/ ${HOME}/notebooks/
 # Copy package sources
 COPY ./NuGet.config ${HOME}/nuget.config
 
+COPY ./MXNetSharp/ ${HOME}/MXNetSharp/
+
 RUN chown -R ${NB_UID} ${HOME}
 USER ${USER}
 
@@ -77,7 +79,6 @@ RUN dotnet interactive jupyter install
 ENV DOTNET_INTERACTIVE_CLI_TELEMETRY_OPTOUT=false
 
 RUN pip install mxnet
-COPY ./MXNetSharp/ ${HOME}/MXNetSharp/
 
 
 RUN dotnet build MXNetSharp -c Release -f netstandard2.0
