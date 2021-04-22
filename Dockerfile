@@ -17,27 +17,30 @@ RUN apt-get update
 RUN apt-get install -y curl
 
 # Install .NET CLI dependencies
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         libc6 \
         libgcc1 \
         libgssapi-krb5-2 \
-        libicu60 \
+        libicu66 \
         libssl1.1 \
         libstdc++6 \
-        zlib1g 
-
-RUN rm -rf /var/lib/apt/lists/*
+        zlib1g \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install .NET Core SDK
-ENV DOTNET_SDK_VERSION 3.1.0
+ENV DOTNET_SDK_VERSION 5.0.102
 
-RUN curl -SL --output dotnet.tar.gz https://download.visualstudio.microsoft.com/download/pr/d731f991-8e68-4c7c-8ea0-fad5605b077a/49497b5420eecbd905158d86d738af64/dotnet-sdk-3.1.100-linux-x64.tar.gz \
-    && dotnet_sha512='5217ae1441089a71103694be8dd5bb3437680f00e263ad28317665d819a92338a27466e7d7a2b1f6b74367dd314128db345fa8fff6e90d0c966dea7a9a43bd21' \
+RUN dotnet_sdk_version=5.0.102 \
+    && curl -SL --output dotnet.tar.gz https://dotnetcli.azureedge.net/dotnet/Sdk/$dotnet_sdk_version/dotnet-sdk-$dotnet_sdk_version-linux-x64.tar.gz \
+    && dotnet_sha512='0ce2d5365ca39808fb71baec4584d4ec786491c3735543dc93244604ea97e242377d0987cd8b1e529258dee68f203b5780559201e7ea6d84487d6d8d433329b3' \
     && echo "$dotnet_sha512 dotnet.tar.gz" | sha512sum -c - \
     && mkdir -p /usr/share/dotnet \
-    && tar -zxf dotnet.tar.gz -C /usr/share/dotnet \
+    && tar -ozxf dotnet.tar.gz -C /usr/share/dotnet \
     && rm dotnet.tar.gz \
-    && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+    && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
+    # Trigger first run experience by running arbitrary cmd
+    && dotnet help
 
 # Enable detection of running in a container
 ENV DOTNET_RUNNING_IN_CONTAINER=true \
@@ -65,7 +68,7 @@ RUN chown -R ${NB_UID} ${HOME}
 USER ${USER}
 
 # Install lastest build from master branch of Microsoft.DotNet.Interactive from myget
-RUN dotnet tool install -g dotnet-interactive --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json"
+RUN dotnet tool install -g Microsoft.dotnet-interactive --add-source "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json"
 
 ENV PATH="${PATH}:${HOME}/.dotnet/tools"
 RUN echo "$PATH"
