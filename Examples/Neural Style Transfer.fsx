@@ -3,15 +3,14 @@
 
 
 #load "load.fsx"
+#r "nuget:SkiaSharp"
+
 open MXNetSharp
 open MXNetSharp.SymbolOperators
 open MXNetSharp.Interop
 open System
 open System.Net
-open System.Drawing
-open System.Drawing.Drawing2D
-open System.Drawing.Imaging
-
+open SkiaSharp
 
 // Images will be saved here
 let outputDirectory = IO.Path.Combine(__SOURCE_DIRECTORY__, "Output")
@@ -36,19 +35,18 @@ ensure vggParamsUrl vggParamsFile
 ensure styleUrl styleFile
 ensure contentUrl contentFile
 
-let styleImage = Image.FromFile(styleFile)
-let contentImage = Image.FromFile(contentFile)
+let styleImage = SKBitmap.Decode(styleFile)
+let contentImage = SKBitmap.Decode(contentFile)
 
-let loadImage (image : Image) = 
-    use bmp = new Bitmap(image)
+let loadImage (image : SKBitmap) = 
     let dat =
         [|
             for y = 0 to image.Height - 1 do
                 for x = 0 to image.Width - 1 do
-                    let p = bmp.GetPixel(x,y)
-                    yield float32 p.R - 123.68f
-                    yield float32 p.G - 116.779f
-                    yield float32 p.B - 103.939f
+                    let p = image.GetPixel(x,y)
+                    yield float32 p.Red - 123.68f
+                    yield float32 p.Green - 116.779f
+                    yield float32 p.Blue - 103.939f
         |]
     let im = context.CopyFrom(dat, [image.Height; image.Width; 3])
     let resized = MX.ImageResize(im, [224;224])
@@ -272,29 +270,10 @@ let momentum = MX.ZerosLike(img)
 let mutable lr = learningRate
 let opt w g = MX.NagMomUpdate([w],w,g,momentum, lr, momentum = 0.95, wd = 0.0001 )
 
-// https://stackoverflow.com/questions/1922040/how-to-resize-an-image-c-sharp
-let resizeImage (image : Image) w h = 
-    let w,h = 
-        let longEdge = max w h
-        if longEdge > maxSize then 
-            let r = double maxSize / double longEdge
-            let scale x = double x * r |> round |> int
-            scale w, scale h
-        else
-            w,h
-    let destRect = Rectangle(0,0,w,h)
-    let destImage = new Bitmap(w,h)
-    destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution)
-    use g = Graphics.FromImage destImage
-    g.CompositingMode <- CompositingMode.SourceCopy
-    g.CompositingQuality <- CompositingQuality.HighQuality
-    g.InterpolationMode  <- InterpolationMode.HighQualityBicubic
-    g.SmoothingMode <- SmoothingMode.HighQuality
-    g.PixelOffsetMode <- PixelOffsetMode.HighQuality
-    use wrapMode = new ImageAttributes()
-    wrapMode.SetWrapMode(WrapMode.TileFlipXY)
-    g.DrawImage(image,destRect,0,0,image.Width,image.Height,GraphicsUnit.Pixel,wrapMode)
-    destImage
+let resizeImage (image : SKBitmap) (w : int) (h : int) = 
+    let dest = new SKBitmap(w,h)
+    image.ScalePixels(dest,SKFilterQuality.High) |> ignore
+    dest
 
 let save (filename : string) (img : NDArray) = 
     printfn "Saving %s" filename
@@ -305,20 +284,21 @@ let save (filename : string) (img : NDArray) =
     let w = 224
     //let img = Operators.ImageResize(img, contentImage.Height, contentImage.Width).[0]
     let a : float32 [] = img.ToArray<_>()
-    use bmp = new Bitmap(w,h,PixelFormat.Format32bppRgb)
+    use bmp = new SKBitmap(w,h)
     let mutable i = 0
     for y = 0 to h - 1 do
         for x = 0 to w - 1 do
-            let r = a.[i] + 123.68f |> min 255.f |> max 0.f |> int
+            let r = a.[i] + 123.68f |> min 255.f |> max 0.f |> byte
             i <- i + 1
-            let g = a.[i] + 116.779f |> min 255.f |> max 0.f |> int
+            let g = a.[i] + 116.779f |> min 255.f |> max 0.f |> byte
             i <- i + 1
-            let b = a.[i] + 103.939f |> min 255.f |> max 0.f |> int
+            let b = a.[i] + 103.939f |> min 255.f |> max 0.f |> byte
             i <- i + 1
-            let c = Color.FromArgb(1,r,g,b)
+            let c = SKColor(r,g,b)
             bmp.SetPixel(x,y,c)
     use resizedImage = resizeImage bmp contentImage.Width contentImage.Height
-    resizedImage.Save(filename, Imaging.ImageFormat.Jpeg)
+    use s = IO.File.OpenWrite filename
+    resizedImage.Encode(s, SKEncodedImageFormat.Jpeg, 100) |> ignore
 
 save "nstyle_start.jpg" img
 save "nstyle_content.jpg" contentIn

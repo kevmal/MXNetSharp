@@ -496,8 +496,9 @@ let copyToTarget() =
     for a in targetBindings do 
         let scc,b = trainBindings.TryGetValue(a.Name)
         if scc && a.Shape = b.Shape then 
-            b.NDArray.Value.CopyTo(a.NDArray.Value)
-
+            match b.NDArray, a.NDArray with 
+            | Some ba, Some aa -> ba.CopyTo(aa)
+            | _ -> ()
 
 // Create the needed executors for training
 let execEval = qmodel.Bind(context, evalBindings)
@@ -666,7 +667,9 @@ let copyToRun() =
             for a in runBindings do 
                 let scc,b = trainBindings.TryGetValue(a.Name)
                 if scc && a.Shape = b.Shape then 
-                    b.NDArray.Value.CopyTo(a.NDArray.Value)
+                    match b.NDArray, a.NDArray with 
+                    | Some ba, Some aa -> ba.CopyTo(aa)
+                    | _ -> ()
         )
 
 /// Live executor

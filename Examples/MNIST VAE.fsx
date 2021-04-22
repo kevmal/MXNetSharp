@@ -35,10 +35,10 @@ let ensure (url : string) (file : string) =
         else
             wc.DownloadFile(url, file)
 
-ensure "http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz" "train-images-idx3-ubyte"
-ensure "http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz" "train-labels-idx1-ubyte"
-ensure "http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz" "t10k-images-idx3-ubyte"
-ensure "http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz" "t10k-labels-idx1-ubyte"
+ensure "https://storage.googleapis.com/cvdf-datasets/mnist/train-images-idx3-ubyte.gz" "train-images-idx3-ubyte"
+ensure "https://storage.googleapis.com/cvdf-datasets/mnist/train-labels-idx1-ubyte.gz" "train-labels-idx1-ubyte"
+ensure "https://storage.googleapis.com/cvdf-datasets/mnist/t10k-images-idx3-ubyte.gz" "t10k-images-idx3-ubyte"
+ensure "https://storage.googleapis.com/cvdf-datasets/mnist/t10k-labels-idx1-ubyte.gz" "t10k-labels-idx1-ubyte"
 
 let trainIter = new MNISTIter(@"train-images-idx3-ubyte", 
                               @"train-labels-idx1-ubyte",
